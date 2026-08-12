@@ -43,10 +43,12 @@ WICKET_ID_RE = re.compile(r"^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)*/\d+\.\d+\.\d+$"
 # reference checks ``guards/engine.py`` evaluates and ``cli/constraints_cmd.
 # py``'s ``CHECKS`` catalog lists, plus ``hold_reconcile`` (``holds/engine.
 # py``'s tolerance check for planned-vs-executed reconciliation, capsule-emit
-# #53). Closed for the same reason ``folds/definition.py``'s
-# ``KNOWN_REDUCERS`` is: an unregistered name is a typo or a not-yet-built
-# check, never silently accepted as data.
-KNOWN_CHECKS = frozenset({"dedupe", "caps", "verify_before_dispatch", "hold_reconcile"})
+# #53), plus ``plan_containment`` (``guards/checks/plan_containment.py`` --
+# forward-compiled-plan containment, ``[ldg-plan-containment]``). Closed for
+# the same reason ``folds/definition.py``'s ``KNOWN_REDUCERS`` is: an
+# unregistered name is a typo or a not-yet-built check, never silently
+# accepted as data.
+KNOWN_CHECKS = frozenset({"dedupe", "caps", "verify_before_dispatch", "hold_reconcile", "plan_containment"})
 
 
 @dataclass(frozen=True)

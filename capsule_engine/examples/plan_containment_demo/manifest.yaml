@@ -1,0 +1,12 @@
+# The policy manifest the plan-containment demo (Run A/B/C) resolves and
+# cites -- "which policy (including which compiled plan) governed this
+# decision" is checkable directly off every decision capsule's own
+# `asg_payload.manifest_digest` (guards/engine.py:75, comment :87), the same
+# existing mechanism `default.yaml` uses, cited at just this one wicket.
+#
+# wicket digest: `capsule_engine/examples/plan_containment_demo/wickets/plan_containment.yaml`
+manifest_id: plan_containment_demo/1.0.0
+wickets:
+  - wicket_id: plan_containment/1.0.0
+    engine: wicket/1
+    digest: e7293ad59cc82a709c425e13834d50e977dc1080b75e220123acda5f86a189f9
