@@ -1,0 +1,27 @@
+# Reservation-as-capsule policy manifest (capsule-emit #51/#52/#53): the
+# fold + wicket set `holds/engine.py`'s `HoldEngine` resolves its cap and
+# tolerance configuration from -- same declare-attest-verify mechanism as
+# `default.yaml`, a separate manifest rather than an edit to it so adopting
+# hold semantics for a deployment is opt-in and `default.yaml`'s own pinned
+# digest (test_policy_manifest.py's EXPECTED_DEFAULT_DIGEST) stays untouched.
+#
+# fold digest: capsule_ledger/folds/catalog_defs/hold.active_exposure.yaml
+# wicket digests: capsule_ledger/guards/wickets/catalog_defs/{caps_holds,hold_reconcile,dedupe,verify_before_dispatch}.yaml
+manifest_id: holds/1.0.0
+folds:
+  - fold_id: hold.active_exposure/1.0.0
+    engine: fold/1
+    digest: b1c542b22e79482df37e7ea18540377058499ec7dca52bc9bbba5559004bdbb2
+wickets:
+  - wicket_id: dedupe/1.0.0
+    engine: wicket/1
+    digest: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
+  - wicket_id: caps_holds/1.0.0
+    engine: wicket/1
+    digest: 86a07c5c2739502b1211dbb1c73df0d6950f91ba454ff151ff32cb6946fc21f6
+  - wicket_id: hold_reconcile/1.0.0
+    engine: wicket/1
+    digest: cf6f76b1aeb1d705f90f89c97667c2db035e697211f7f7dc0f8455c54acaec74
+  - wicket_id: verify_before_dispatch/1.0.0
+    engine: wicket/1
+    digest: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c

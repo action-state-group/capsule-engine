@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>capsule console</title>
+<!-- No Google Fonts <link>, matching gallery.html and report/render.py's
+     verify surface: this page is served locally and makes no outbound
+     network calls. -->
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="components.css">
+<link rel="stylesheet" href="console.css">
+</head>
+<body>
+<div class="console-wrap">
+
+  <header class="console-header">
+    <div>
+      <div class="eyebrow">capsule console</div>
+      <h1 class="console-title">Record stream</h1>
+    </div>
+    <div class="console-checkpoint mono" id="checkpoint-line">checkpoint — · as of — · verifies offline</div>
+  </header>
+
+  <div class="console-filters">
+    <input type="text" id="filter-agent" placeholder="agent">
+    <input type="text" id="filter-verdict" placeholder="verdict">
+    <input type="text" id="filter-since" placeholder="since (ISO-8601)">
+    <input type="text" id="filter-until" placeholder="until (ISO-8601)">
+    <button type="button" id="filter-apply">apply</button>
+  </div>
+  <div class="cli-echo" id="cli-echo-bar">≡ capsule log</div>
+  <div class="console-stream-status" id="console-stream-status"></div>
+
+  <div class="console-body">
+    <div class="console-stream" id="record-stream"></div>
+    <aside class="console-inspector" id="inspector">
+      <div class="inspector-empty">select a record to inspect it</div>
+    </aside>
+  </div>
+
+  <div class="console-links">
+    <span class="mono">Deeper views (run locally, offline):</span>
+    <span class="mono">dry-run report — <code>capsule guard dry-run --ledger &lt;ledger&gt; --share</code></span>
+    <span class="mono">no-account verify — <code>capsule verify --bundle &lt;bundle.json&gt;</code></span>
+  </div>
+
+</div>
+<script src="console.js"></script>
+</body>
+</html>

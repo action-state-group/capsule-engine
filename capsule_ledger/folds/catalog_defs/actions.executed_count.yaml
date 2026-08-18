@@ -1,0 +1,16 @@
+# Count of actions whose disposition reached verdict_class "executed",
+# grouped by developer.
+fold_id: actions.executed_count/1.0.0
+reads:
+  - path: developer
+    erasure_class: commitment-ok
+  - path: disposition.verdict_class
+    erasure_class: commitment-ok
+filter:
+  - field: disposition.verdict_class
+    op: eq
+    value: executed
+key: developer
+reduce:
+  reducer: count
+emit: count

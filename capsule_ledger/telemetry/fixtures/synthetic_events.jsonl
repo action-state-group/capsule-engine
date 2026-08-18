@@ -1,0 +1,45 @@
+{"metric": "install_seen", "arm": "guards-only", "install_id": "synthetic-g1", "value": true, "emitted_at": "2026-08-05T00:00:00Z"}
+{"metric": "install_seen", "arm": "guards-only", "install_id": "synthetic-g2", "value": true, "emitted_at": "2026-08-05T00:00:01Z"}
+{"metric": "install_seen", "arm": "guards-only", "install_id": "synthetic-g3", "value": true, "emitted_at": "2026-08-05T00:00:02Z"}
+{"metric": "install_seen", "arm": "guards-only", "install_id": "synthetic-g4", "value": true, "emitted_at": "2026-08-05T00:00:03Z"}
+{"metric": "install_seen", "arm": "guards-only", "install_id": "synthetic-g5", "value": true, "emitted_at": "2026-08-05T00:00:04Z"}
+{"metric": "install_seen", "arm": "guards-only", "install_id": "synthetic-g6", "value": true, "emitted_at": "2026-08-05T00:00:05Z"}
+{"metric": "install_seen", "arm": "guards-only", "install_id": "synthetic-g7", "value": true, "emitted_at": "2026-08-05T00:00:06Z"}
+{"metric": "install_seen", "arm": "guards-only", "install_id": "synthetic-g8", "value": true, "emitted_at": "2026-08-05T00:00:07Z"}
+{"metric": "install_seen", "arm": "guards-only", "install_id": "synthetic-g9", "value": true, "emitted_at": "2026-08-05T00:00:08Z"}
+{"metric": "install_seen", "arm": "guards-only", "install_id": "synthetic-g10", "value": true, "emitted_at": "2026-08-05T00:00:09Z"}
+{"metric": "m1_activation", "arm": "guards-only", "install_id": "synthetic-g1", "value": true, "emitted_at": "2026-08-05T04:00:00Z"}
+{"metric": "m1_activation", "arm": "guards-only", "install_id": "synthetic-g2", "value": true, "emitted_at": "2026-08-05T04:00:01Z"}
+{"metric": "m1_activation", "arm": "guards-only", "install_id": "synthetic-g3", "value": true, "emitted_at": "2026-08-05T04:00:02Z"}
+{"metric": "m1_activation", "arm": "guards-only", "install_id": "synthetic-g4", "value": true, "emitted_at": "2026-08-05T04:00:03Z"}
+{"metric": "m2_enforcement_on", "arm": "guards-only", "install_id": "synthetic-g1", "value": true, "emitted_at": "2026-08-12T00:00:00Z"}
+{"metric": "m2_enforcement_on", "arm": "guards-only", "install_id": "synthetic-g2", "value": true, "emitted_at": "2026-08-12T00:00:01Z"}
+{"metric": "m3_day14_alive", "arm": "guards-only", "install_id": "synthetic-g1", "value": true, "emitted_at": "2026-08-18T00:00:00Z"}
+{"metric": "m3_day14_alive", "arm": "guards-only", "install_id": "synthetic-g2", "value": true, "emitted_at": "2026-08-18T00:00:01Z"}
+{"metric": "m3_day14_alive", "arm": "guards-only", "install_id": "synthetic-g3", "value": true, "emitted_at": "2026-08-18T00:00:02Z"}
+{"metric": "install_seen", "arm": "full", "install_id": "synthetic-f1", "value": true, "emitted_at": "2026-08-05T00:00:00Z"}
+{"metric": "install_seen", "arm": "full", "install_id": "synthetic-f2", "value": true, "emitted_at": "2026-08-05T00:00:01Z"}
+{"metric": "install_seen", "arm": "full", "install_id": "synthetic-f3", "value": true, "emitted_at": "2026-08-05T00:00:02Z"}
+{"metric": "install_seen", "arm": "full", "install_id": "synthetic-f4", "value": true, "emitted_at": "2026-08-05T00:00:03Z"}
+{"metric": "install_seen", "arm": "full", "install_id": "synthetic-f5", "value": true, "emitted_at": "2026-08-05T00:00:04Z"}
+{"metric": "install_seen", "arm": "full", "install_id": "synthetic-f6", "value": true, "emitted_at": "2026-08-05T00:00:05Z"}
+{"metric": "install_seen", "arm": "full", "install_id": "synthetic-f7", "value": true, "emitted_at": "2026-08-05T00:00:06Z"}
+{"metric": "install_seen", "arm": "full", "install_id": "synthetic-f8", "value": true, "emitted_at": "2026-08-05T00:00:07Z"}
+{"metric": "install_seen", "arm": "full", "install_id": "synthetic-f9", "value": true, "emitted_at": "2026-08-05T00:00:08Z"}
+{"metric": "install_seen", "arm": "full", "install_id": "synthetic-f10", "value": true, "emitted_at": "2026-08-05T00:00:09Z"}
+{"metric": "m1_activation", "arm": "full", "install_id": "synthetic-f1", "value": true, "emitted_at": "2026-08-05T04:00:00Z"}
+{"metric": "m1_activation", "arm": "full", "install_id": "synthetic-f2", "value": true, "emitted_at": "2026-08-05T04:00:01Z"}
+{"metric": "m1_activation", "arm": "full", "install_id": "synthetic-f3", "value": true, "emitted_at": "2026-08-05T04:00:02Z"}
+{"metric": "m1_activation", "arm": "full", "install_id": "synthetic-f4", "value": true, "emitted_at": "2026-08-05T04:00:03Z"}
+{"metric": "m1_activation", "arm": "full", "install_id": "synthetic-f5", "value": true, "emitted_at": "2026-08-05T04:00:04Z"}
+{"metric": "m2_enforcement_on", "arm": "full", "install_id": "synthetic-f1", "value": true, "emitted_at": "2026-08-12T00:00:00Z"}
+{"metric": "m3_day14_alive", "arm": "full", "install_id": "synthetic-f1", "value": true, "emitted_at": "2026-08-18T00:00:00Z"}
+{"metric": "m3_day14_alive", "arm": "full", "install_id": "synthetic-f2", "value": true, "emitted_at": "2026-08-18T00:00:01Z"}
+{"metric": "m5_evidence_pull", "arm": "full", "install_id": "synthetic-f1", "value": true, "emitted_at": "2026-08-06T00:00:00Z"}
+{"metric": "m5_evidence_pull", "arm": "full", "install_id": "synthetic-f3", "value": true, "emitted_at": "2026-08-06T00:00:01Z"}
+{"metric": "m6_report_opened", "report_token": "synthetic-tok-A", "emitted_at": "2026-08-06T00:00:00Z"}
+{"metric": "m6_report_opened", "report_token": "synthetic-tok-A", "emitted_at": "2026-08-06T01:00:00Z"}
+{"metric": "m6_report_opened", "report_token": "synthetic-tok-A", "emitted_at": "2026-08-06T02:00:00Z"}
+{"metric": "m6_report_opened", "report_token": "synthetic-tok-B", "emitted_at": "2026-08-07T00:00:00Z"}
+{"metric": "m6_report_opened", "report_token": "synthetic-tok-B", "emitted_at": "2026-08-07T05:00:00Z"}
+{"metric": "m6_report_opened", "report_token": "synthetic-tok-C", "emitted_at": "2026-08-08T00:00:00Z"}

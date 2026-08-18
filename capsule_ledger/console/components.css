@@ -1,0 +1,418 @@
+/* SPDX-License-Identifier: Apache-2.0
+ *
+ * Component library implementing the Visual Language Spec's product laws.
+ * Requires tokens.css to be loaded first.
+ *
+ * Every rule that touches --asg-brick is confined to the "verification
+ * failure" components at the bottom of this file (evaluation-fail-card,
+ * verify-stage--fail, staleness-chip--stale-beyond-bound) -- see the
+ * file-level comment above that section for why the staleness-bound
+ * variant is included, and tests/test_console_product_laws.py for the
+ * mechanical check that no other rule in this file references it.
+ */
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--asg-cream);
+  color: var(--asg-text-body);
+  font-family: var(--asg-font-sans);
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+}
+
+.mono { font-family: var(--asg-font-mono); }
+.serif { font-family: var(--asg-font-display); }
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--asg-font-sans);
+  font-size: var(--asg-eyebrow-size);
+  font-weight: 500;
+  letter-spacing: var(--asg-eyebrow-tracking);
+  text-transform: uppercase;
+  color: var(--asg-amber);
+}
+.eyebrow::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  background: var(--asg-amber);
+  border-radius: 50%;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+ * 1 · EVALUATION-CLASS MARKS -- Rule 2, "never confusable"
+ * Three classes, three marks. deterministic = solid sage square + check.
+ * model-assisted = dashed amber square + tilde, never a check.
+ * manual = bark circle seal + initials. Each owns its shape, color, and
+ * frame; none may borrow another's.
+ * ════════════════════════════════════════════════════════════════════ */
+
+.eval-mark {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--asg-radius-chip);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 600;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.eval-mark--deterministic {
+  background: var(--asg-sage);
+  color: var(--asg-warm-white);
+}
+
+.eval-mark--model {
+  border: 2px dashed var(--asg-amber);
+  color: var(--asg-amber);
+  font-size: 16px;
+}
+
+.eval-mark--manual {
+  border-radius: 50%;
+  background: var(--asg-bark);
+  color: var(--asg-cream);
+  font-family: var(--asg-font-display);
+  font-size: 11px;
+  font-style: italic;
+}
+
+.eval-card {
+  background: var(--asg-warm-white);
+  border: 1px solid var(--asg-sand);
+  border-radius: var(--asg-radius-card-lg);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.eval-card-head { display: flex; align-items: center; gap: 10px; }
+.eval-card-title { font-weight: 600; font-size: 15px; color: var(--asg-bark); }
+.eval-card-kind { font-size: 12px; color: var(--asg-text-muted); }
+.eval-card-body { font-size: 13.5px; line-height: 1.65; color: var(--asg-text-muted); margin: 0; }
+
+/* deterministic example: fact + envelope, sage frame */
+.eval-example--deterministic {
+  background: rgba(122, 140, 110, 0.08);
+  border: 1px solid rgba(122, 140, 110, 0.25);
+  border-radius: var(--asg-radius-card-sm);
+  padding: 14px 16px;
+}
+
+/* model-assisted example: dashed amber frame, italic quoted claim, never a check */
+.eval-example--model {
+  background: rgba(200, 97, 26, 0.05);
+  border: 1px dashed rgba(200, 97, 26, 0.45);
+  border-radius: var(--asg-radius-card-sm);
+  padding: 14px 16px;
+}
+.eval-example--model .eval-claim { font-style: italic; color: var(--asg-text-body); }
+/* every number inside a model sentence is a cited deterministic chip, never prose */
+.eval-cited-chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  font-style: normal;
+  font-family: var(--asg-font-mono);
+  font-size: 11px;
+  color: var(--asg-text-body);
+  background: rgba(122, 140, 110, 0.10);
+  border: 1px solid rgba(122, 140, 110, 0.3);
+  border-radius: var(--asg-radius-pill);
+  padding: 2px 9px;
+  white-space: nowrap;
+}
+.eval-cited-chip .eval-mark--deterministic-inline { color: var(--asg-sage); font-weight: 600; }
+
+/* manual example: signature card, bark seal */
+.eval-example--manual {
+  background: var(--asg-cream);
+  border: 1px solid var(--asg-sand-dark);
+  border-radius: var(--asg-radius-card-sm);
+  padding: 14px 16px;
+}
+.eval-signature-name { font-family: var(--asg-font-display); font-style: italic; font-size: 17px; color: var(--asg-bark); }
+
+/* ════════════════════════════════════════════════════════════════════
+ * 2 · ENVELOPE LINE -- DM Mono, verbatim literal text, not a font choice.
+ * Format pinned by capsule_ledger/cli/format.py:format_envelope_line --
+ * "fold <id> · records N-M · checkpoint #X · as of <staleness>"
+ * ════════════════════════════════════════════════════════════════════ */
+
+.envelope-line {
+  font-family: var(--asg-font-mono);
+  font-size: 11px;
+  color: var(--asg-sage);
+  line-height: 1.7;
+}
+.envelope-line--muted { color: var(--asg-text-muted); }
+.envelope-line--amber { color: var(--asg-amber); }
+
+/* ════════════════════════════════════════════════════════════════════
+ * 3 · RUNG CHIP -- Rule 3, "degradation shown, not hidden"
+ * Five rungs: standalone -> countersigned -> locally receipted ->
+ * counterparty-visible -> independently witnessed. Orthogonal to
+ * evaluation class. Downgrades show the rung *held*, never the hoped-for
+ * one ("witnessed 1 of 3 · retrying").
+ * ════════════════════════════════════════════════════════════════════ */
+
+.rung-row {
+  display: grid;
+  grid-template-columns: 44px 220px 1fr 150px;
+  gap: 20px;
+  align-items: center;
+  padding: 16px 20px;
+  border: 1px solid var(--asg-sand);
+  background: var(--asg-warm-white);
+}
+.rung-dot-wrap { display: flex; justify-content: center; }
+.rung-dot { border-radius: 50%; box-sizing: border-box; display: block; }
+.rung-name { font-weight: 600; font-size: 14.5px; color: var(--asg-bark); }
+.rung-mode { font-family: var(--asg-font-mono); font-size: 11px; color: var(--asg-text-muted); margin-top: 2px; }
+.rung-plain { font-size: 13.5px; line-height: 1.6; color: var(--asg-text-muted); }
+.rung-enterprise-badge {
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--asg-sage);
+  background: rgba(122, 140, 110, 0.08);
+  border: 1px solid rgba(122, 140, 110, 0.25);
+  border-radius: var(--asg-radius-pill);
+  padding: 4px 12px;
+}
+
+/* the rung chip: a compact standalone label (mono), used inline in headers/rows */
+.rung-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--asg-font-mono);
+  font-size: 11.5px;
+  color: var(--asg-text-body);
+  background: var(--asg-cream);
+  border: 1px solid var(--asg-sand);
+  border-radius: var(--asg-radius-pill);
+  padding: 5px 12px;
+}
+.rung-chip .rung-dot { width: 8px; height: 8px; }
+
+/* "rung held" -- a downgrade in progress. Amber (attention, retrying),
+ * never brick: this is degraded assurance, not a verification failure. */
+.rung-chip--held {
+  color: var(--asg-amber);
+  background: rgba(200, 97, 26, 0.05);
+  border: 1px dashed rgba(200, 97, 26, 0.45);
+}
+.rung-chip--held .rung-dot { background: var(--asg-amber); animation: asg-pulse 1.6s var(--asg-ease) infinite; }
+
+@keyframes asg-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: .4; transform: scale(.6); }
+}
+
+/* ════════════════════════════════════════════════════════════════════
+ * 4 · STALENESS CHIP -- Rule 3, every aggregate carries its checkpoint age.
+ * "stale · older than policy bound" is the one deliberate brick use
+ * outside the failure-stage cards -- copied verbatim from the Visual
+ * Language Spec file (section 5, "Shared furniture"), and consistent
+ * with the HITL Bridge screen's stale-beyond-bound state (brick banner,
+ * decide buttons locked). Past its policy bound, an aggregate's
+ * freshness claim can no longer be trusted -- the design treats that as
+ * failure-adjacent, not merely a normal degraded state like a rung hold.
+ * ════════════════════════════════════════════════════════════════════ */
+
+.staleness-chip {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--asg-font-mono);
+  font-size: 11.5px;
+  border-radius: var(--asg-radius-pill);
+  padding: 4px 12px;
+}
+
+.staleness-chip--fresh {
+  color: var(--asg-text-body);
+  background: var(--asg-cream);
+  border: 1px solid var(--asg-sand);
+}
+
+.staleness-chip--refreshing {
+  color: var(--asg-text-body);
+  background: var(--asg-cream);
+  border: 1px solid var(--asg-sand);
+}
+
+.staleness-chip--stale-beyond-bound {
+  color: var(--asg-brick);
+  background: rgba(169, 63, 43, 0.04);
+  border: 1px solid rgba(169, 63, 43, 0.35);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+ * 5 · VERDICT CHIPS -- presentational categories (Local Console screen).
+ * These are display-layer labels, distinct from the data-layer
+ * disposition.decision / verdict_class tokens -- do not conflate.
+ *
+ * Exact colors for confirmed/blocked/needs-decision are given verbatim
+ * in the design handoff (README's Local Console section + the Visual
+ * Language Spec's evaluation-class and refusal treatments). The
+ * handoff bundle's Local Console screen file (not required reading for
+ * this task) is the source for dispatched-unconfirmed/errored; only
+ * their shapes ("dashed outline arrow", "outline bang") are given in
+ * the README prose, without hex values, so their color here is chosen
+ * to stay law-compliant: never brick (§ verification failure only),
+ * distinct from amber (§ model-assisted / needs-decision) and sage
+ * (§ deterministic / confirmed / blocked).
+ * ════════════════════════════════════════════════════════════════════ */
+
+.verdict-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--asg-font-mono);
+  font-size: 12px;
+  border-radius: var(--asg-radius-pill);
+  padding: 5px 13px;
+}
+
+.verdict-glyph {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10.5px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* confirmed: solid sage check */
+.verdict-chip--confirmed {
+  color: var(--asg-bark);
+  background: rgba(122, 140, 110, 0.08);
+  border: 1px solid rgba(122, 140, 110, 0.25);
+}
+.verdict-chip--confirmed .verdict-glyph { background: var(--asg-sage); color: var(--asg-warm-white); border-radius: 50%; }
+
+/* dispatched, unconfirmed: dashed neutral outline + arrow -- in flight,
+ * neither positive nor negative yet */
+.verdict-chip--dispatched {
+  color: var(--asg-text-muted);
+  background: transparent;
+  border: 1px dashed var(--asg-sand-dark);
+}
+.verdict-chip--dispatched .verdict-glyph { color: var(--asg-text-muted); background: transparent; }
+
+/* blocked/denied: solid sage slashed-circle -- proof the guard ran, NOT
+ * a failure. Never brick, never red. */
+.verdict-chip--blocked {
+  color: var(--asg-bark);
+  background: rgba(122, 140, 110, 0.08);
+  border: 1px solid rgba(122, 140, 110, 0.25);
+}
+.verdict-chip--blocked .verdict-glyph { background: var(--asg-sage); color: var(--asg-warm-white); border-radius: 50%; }
+
+/* needs decision: dashed amber circle + question mark */
+.verdict-chip--needs-decision {
+  color: var(--asg-amber);
+  background: rgba(200, 97, 26, 0.05);
+  border: 1px dashed rgba(200, 97, 26, 0.45);
+}
+.verdict-chip--needs-decision .verdict-glyph { border: 1.5px dashed var(--asg-amber); color: var(--asg-amber); border-radius: 50%; background: transparent; }
+.verdict-subline { display: block; font-family: var(--asg-font-sans); font-size: 10.5px; font-weight: 300; color: var(--asg-text-muted); margin-top: 2px; }
+
+/* errored: plain outline + bang -- a runtime/system error, distinct from
+ * a verification failure (brick) and from a refusal (sage) */
+.verdict-chip--errored {
+  color: var(--asg-text-body);
+  background: transparent;
+  border: 1px solid var(--asg-sand-dark);
+}
+.verdict-chip--errored .verdict-glyph { color: var(--asg-text-body); background: transparent; }
+
+/* ════════════════════════════════════════════════════════════════════
+ * 6 · CLI-ECHO BAR -- standing rule: every GUI filter/action shows its
+ * live CLI/API equivalent.
+ * ════════════════════════════════════════════════════════════════════ */
+
+.cli-echo {
+  font-family: var(--asg-font-mono);
+  font-size: 11.5px;
+  color: var(--asg-text-body);
+  background: var(--asg-cream);
+  border: 1px solid var(--asg-sand);
+  border-radius: 8px;
+  padding: 10px 14px;
+  display: inline-block;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+ * 7 · BRICK-FAILURE TREATMENT -- Rule 5: #A93F2B reserved EXCLUSIVELY
+ * for verification failure (digest_mismatch / signature_invalid /
+ * chain_gap / inclusion_unproven). Refusals/blocks are NOT failures --
+ * they wear sage ⊘ (see .verdict-chip--blocked above).
+ * ════════════════════════════════════════════════════════════════════ */
+
+.fail-card {
+  border: 1px solid rgba(169, 63, 43, 0.35);
+  border-radius: var(--asg-radius-card-sm);
+  padding: 16px 18px;
+  background: rgba(169, 63, 43, 0.03);
+}
+.fail-card-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.fail-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: var(--asg-radius-chip);
+  background: var(--asg-brick);
+  color: var(--asg-cream);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.fail-stage { font-family: var(--asg-font-mono); font-size: 12px; color: var(--asg-brick); }
+.fail-title { font-size: 14px; font-weight: 500; color: var(--asg-bark); margin-bottom: 4px; }
+.fail-render { font-size: 13px; line-height: 1.6; color: var(--asg-text-muted); }
+
+/* the verify ritual: 4 stage rows. pass = sage, fail = brick (ONLY
+ * failure use besides fail-card/fail-icon above), skipped = neutral
+ * outline -- unreachable is rendered distinctly from disproven. */
+.verify-stage {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--asg-sand);
+}
+.verify-stage:last-child { border-bottom: none; }
+.verify-stage-glyph {
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.verify-stage-name { font-size: 13px; color: var(--asg-bark); min-width: 120px; }
+.verify-stage-detail { font-size: 12.5px; color: var(--asg-text-muted); }
+
+.verify-stage--pass .verify-stage-glyph { background: var(--asg-sage); color: var(--asg-warm-white); }
+.verify-stage--fail .verify-stage-glyph { background: var(--asg-brick); color: var(--asg-cream); }
+.verify-stage--skip .verify-stage-glyph { border: 1px solid var(--asg-sand-dark); color: var(--asg-text-muted); background: transparent; }

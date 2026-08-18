@@ -1,0 +1,9 @@
+# verify_before_dispatch wicket: the cited mandate capsule must exist in the
+# ledger and independently re-verify (guards/checks/verify_before_dispatch.py).
+# This check takes no per-deployment tuning parameters -- `config` is empty
+# on purpose, not omitted, so the digest still pins "this check, unconfigured"
+# distinctly from "this wicket_id was never declared at all".
+wicket_id: verify_before_dispatch/1.0.0
+check: verify_before_dispatch
+config:
+  method: agent_action_capsule.verify

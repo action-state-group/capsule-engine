@@ -1,0 +1,48 @@
+# Golden decision table: action x state -> verdict, including boundary rows
+# (fixture-shape discipline, 2026-08-11 -- generalizes the IETF conformance-
+# vector discipline down into per-pack fixtures). Cross-checked against the
+# real replayed fixture (mini_ledger.jsonl) by tests/test_pack_decision_table.py,
+# joined on the exact `action_id` each row names -- if this table and the
+# actual capsules disagree, that test fails; this file cannot silently go
+# stale relative to what the pack actually does.
+#
+# "no-dead-rules": every check below (dedupe, caps, verify_before_dispatch)
+# has at least one 'pass' row AND at least one 'fail' row -- a declared
+# constraint that never fires both ways is exactly the class of bug this
+# table exists to catch (the earlier version of this fixture had
+# verify_before_dispatch fire only 'fail', never a genuine 'pass' -- fixed
+# 2026-08-11, see verify-before-dispatch-pass below).
+rows:
+  - scenario: caps-allow
+    action_id: dispatch_payout/payments-safety-fixture-caps-allow
+    checks: {dedupe: pass, caps: pass, verify_before_dispatch: n/a}
+    verdict: allow
+  - scenario: caps-escalate
+    action_id: dispatch_payout/payments-safety-fixture-caps-escalate
+    checks: {dedupe: pass, caps: fail, verify_before_dispatch: n/a}
+    verdict: escalate
+    note: "pooled with caps-allow (same developer, same window): 650k + 600k > 1,000,000 cap"
+  - scenario: caps-boundary-at-cap
+    action_id: dispatch_payout/payments-safety-fixture-caps-boundary
+    checks: {dedupe: pass, caps: pass, verify_before_dispatch: n/a}
+    verdict: allow
+    note: "boundary: spend == cap exactly (1,000,000); check_caps uses <=, not <, so this must pass"
+  - scenario: dedupe-original
+    action_id: dispatch_payout/payments-safety-fixture-dedupe-original
+    checks: {dedupe: pass, caps: pass, verify_before_dispatch: n/a}
+    verdict: allow
+  - scenario: dedupe-deny
+    action_id: dispatch_payout/payments-safety-fixture-dedupe-collision
+    checks: {dedupe: fail, caps: pass, verify_before_dispatch: n/a}
+    verdict: deny
+    note: "identical logical action to dedupe-original, resubmitted"
+  - scenario: verify-before-dispatch-pass
+    action_id: dispatch_payout/payments-safety-fixture-vbd-pass
+    checks: {dedupe: pass, caps: pass, verify_before_dispatch: pass}
+    verdict: allow
+    note: "cites the real caps-allow capsule, which re-verifies"
+  - scenario: verify-before-dispatch-refusal
+    action_id: dispatch_payout/payments-safety-fixture-refusal
+    checks: {dedupe: pass, caps: pass, verify_before_dispatch: fail}
+    verdict: deny
+    note: "cites a mandate capsule that was never recorded"

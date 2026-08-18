@@ -1,0 +1,12 @@
+# The most recent disposition.decision seen for a developer, in ledger order.
+fold_id: actions.last_decision/1.0.0
+reads:
+  - path: developer
+    erasure_class: commitment-ok
+  - path: disposition.decision
+    erasure_class: commitment-ok
+key: developer
+reduce:
+  reducer: last
+  field: disposition.decision
+emit: string

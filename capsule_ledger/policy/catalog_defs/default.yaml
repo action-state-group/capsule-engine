@@ -1,0 +1,23 @@
+# The default policy manifest: the reference set of fold + wicket
+# definitions this repo's own fixtures/tests/CLI defaults exercise. Every
+# digest below is real and independently recomputable -- see
+# `capsule manifest show` (or `resolve_manifest()`), which re-derives each
+# one from the current catalog files and fails closed on any mismatch.
+#
+# fold digest: `capsule_ledger/folds/catalog_defs/spend.weekly.yaml`
+# wicket digests: `capsule_ledger/guards/wickets/catalog_defs/*.yaml`
+manifest_id: default/1.0.0
+folds:
+  - fold_id: spend.weekly/1.0.0
+    engine: fold/1
+    digest: 3e7f6a3e8707de92b120bbc2aa0b5a78032df5d36e99f9955dd3ba948bba5e9c
+wickets:
+  - wicket_id: dedupe/1.0.0
+    engine: wicket/1
+    digest: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
+  - wicket_id: caps/1.0.0
+    engine: wicket/1
+    digest: 906a75a0b908d38fa7b05823ba11f229c3d593516119ad757b541cee7083f54b
+  - wicket_id: verify_before_dispatch/1.0.0
+    engine: wicket/1
+    digest: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c

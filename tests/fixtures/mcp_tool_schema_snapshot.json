@@ -1,0 +1,432 @@
+[
+  {
+    "description": "Has an equivalent action already been recorded? Wraps the guard's own\n`dedupe` check (exact-match equivalence, no fuzzy matching) run as a\nstandalone lookup rather than as a gate -- use this before declaring an\nintent you suspect might be a repeat.\n",
+    "inputSchema": {
+      "properties": {
+        "action_type": {
+          "default": "decide",
+          "description": "'decide' (default) or 'fyi'",
+          "title": "Action Type",
+          "type": "string"
+        },
+        "developer": {
+          "description": "the developer/agent id",
+          "title": "Developer",
+          "type": "string"
+        },
+        "equivalence_key": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "override the default equivalence formula for this lookup",
+          "title": "Equivalence Key"
+        },
+        "operator": {
+          "description": "the operator/tenant id",
+          "title": "Operator",
+          "type": "string"
+        },
+        "since_days": {
+          "default": 30,
+          "description": "lookback window in days (default: 30, matching the guard's own dedupe window)",
+          "title": "Since Days",
+          "type": "integer"
+        },
+        "target": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "dedupe discriminator, e.g. a recipient/counterparty reference",
+          "title": "Target"
+        },
+        "verb": {
+          "description": "the action verb, e.g. 'transfer_funds'",
+          "title": "Verb",
+          "type": "string"
+        }
+      },
+      "required": [
+        "verb",
+        "operator",
+        "developer"
+      ],
+      "title": "action_been_doneArguments",
+      "type": "object"
+    },
+    "name": "action_been_done"
+  },
+  {
+    "description": "How much of `action_class`'s configured weekly cap `agent` has left --\nthe tool for \"budget left\" questions. Evaluated by replaying the real\n`spend.weekly` fold (the same one the guard's own `caps` check uses),\nnever by summing raw records. If no cap is configured for this action\nclass on this deployment, returns `cap_configured: false` rather than a\nfabricated number.\n",
+    "inputSchema": {
+      "properties": {
+        "action_class": {
+          "default": "money.transfer",
+          "description": "action class the cap applies to, e.g. 'money.transfer' (see constraints_list)",
+          "title": "Action Class",
+          "type": "string"
+        },
+        "agent": {
+          "description": "developer/agent id",
+          "title": "Agent",
+          "type": "string"
+        },
+        "as_of": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "reference timestamp for the rolling window (default: now)",
+          "title": "As Of"
+        }
+      },
+      "required": [
+        "agent"
+      ],
+      "title": "budget_remainingArguments",
+      "type": "object"
+    },
+    "name": "budget_remaining"
+  },
+  {
+    "description": "What's actually enforced: every registered guard check (id, type,\nmethod) and the action-class taxonomy (consequential /\nfail-open-allowed flags per class, including the fail-closed\n`unclassified` default). Call this before assuming a guard exists, a\nclass is fail-open, or a cap applies -- it is the ground truth, not an\ninference from source you haven't read.\n",
+    "inputSchema": {
+      "properties": {},
+      "title": "constraints_listArguments",
+      "type": "object"
+    },
+    "name": "constraints_list"
+  },
+  {
+    "description": "Why a decision came out the way it did -- the tool for \"why was this\nrefused\" questions. Returns the capsule's own constraints breakdown\n(`id`/`result`/`method` per check that ran) plus its verdict; the\nconstraints ARE the explanation, there is no separately-generated\nreasoning behind them.\n",
+    "inputSchema": {
+      "properties": {
+        "capsule_id": {
+          "description": "a capsule_id, or an unambiguous prefix (minimum 8 hex chars)",
+          "title": "Capsule Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "capsule_id"
+      ],
+      "title": "decision_explainArguments",
+      "type": "object"
+    },
+    "name": "decision_explain"
+  },
+  {
+    "description": "Evaluate one fold over the live ledger and return its full result\nenvelope: `fold` (the definition's own content digest), `range`,\n`checkpoint`, `staleness`, and `result` -- the number this answer is\nbuilt on always comes with exactly what it was computed against.\n",
+    "inputSchema": {
+      "properties": {
+        "as_of": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "reference timestamp for a rolling window, derived from real data (e.g. the timestamp of the record you care about) -- required for rolling-window folds; this tool never invents one from the wall clock",
+          "title": "As Of"
+        },
+        "fold": {
+          "description": "fold_id (e.g. 'spend.weekly/1.0.0'), a definition digest, or a path to a definition YAML file",
+          "title": "Fold",
+          "type": "string"
+        },
+        "key": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "group key value to evaluate (omit for key-less folds)",
+          "title": "Key"
+        }
+      },
+      "required": [
+        "fold"
+      ],
+      "title": "fold_getArguments",
+      "type": "object"
+    },
+    "name": "fold_get"
+  },
+  {
+    "description": "List every fold defined in the catalog -- id, content digest, and\nsource file. Call this before trying to derive a number (spend, a\ncount, a last-decision) by hand from `ledger_query` rows: if a fold\nalready computes it, `fold_get` gives you a verifiable answer instead\nof an ad hoc one.\n",
+    "inputSchema": {
+      "properties": {},
+      "title": "fold_listArguments",
+      "type": "object"
+    },
+    "name": "fold_list"
+  },
+  {
+    "description": "Declare an intended action and get a real guard decision: allow, deny,\nor escalate. THE ONLY WRITE TOOL on this server -- every other tool only\nreads. The decision is appended to the ledger as a signed capsule (same\nas a live `capsule guard` call); the returned `capsule_id` is immediately\nqueryable via `record_get` or `ledger_query` -- this tool never reports\nsuccess without the record actually landing.\n",
+    "inputSchema": {
+      "properties": {
+        "action_class": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "e.g. 'money.transfer'; absent or unrecognized both resolve to the consequential, fail-closed default",
+          "title": "Action Class"
+        },
+        "amount_minor": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "integer minor units (never a float) -- required for the caps check to apply",
+          "title": "Amount Minor"
+        },
+        "cited_mandate_capsule_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "a prior capsule this action claims authorization from",
+          "title": "Cited Mandate Capsule Id"
+        },
+        "currency": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "ISO currency code, paired with amount_minor",
+          "title": "Currency"
+        },
+        "developer": {
+          "description": "the developer/agent id",
+          "title": "Developer",
+          "type": "string"
+        },
+        "equivalence_key": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "override the default dedupe equivalence formula for this action",
+          "title": "Equivalence Key"
+        },
+        "operator": {
+          "description": "the operator/tenant id",
+          "title": "Operator",
+          "type": "string"
+        },
+        "target": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "dedupe discriminator, e.g. a recipient/counterparty reference",
+          "title": "Target"
+        },
+        "verb": {
+          "description": "the action verb, e.g. 'transfer_funds'",
+          "title": "Verb",
+          "type": "string"
+        }
+      },
+      "required": [
+        "verb",
+        "operator",
+        "developer"
+      ],
+      "title": "intent_declareArguments",
+      "type": "object"
+    },
+    "name": "intent_declare"
+  },
+  {
+    "description": "List ledger records matching a filter -- the tool for \"what did my\nagents do\" questions (add `since`/`until` for a time window: \"...last\nnight\", \"...this week\").\n\nEvery field is optional and independently composable, exactly like `capsule\nlog`'s flags. The response always reports both the filtered `matched`\ncount and the ledger's true `total`, plus the ledger's `checkpoint` and\nany `chain_gaps` -- a filtered view is never mistaken for the whole\nledger, and a broken chain is never silently reported as intact.\n",
+    "inputSchema": {
+      "properties": {
+        "action_type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "filter: action_type, e.g. 'decide' or 'fyi'",
+          "title": "Action Type"
+        },
+        "agent": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "filter: developer/agent id",
+          "title": "Agent"
+        },
+        "counterparty": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "filter: operator id",
+          "title": "Counterparty"
+        },
+        "limit": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "maximum records returned",
+          "title": "Limit"
+        },
+        "since": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "filter: inclusive lower ISO-8601 timestamp bound",
+          "title": "Since"
+        },
+        "until": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "filter: inclusive upper ISO-8601 timestamp bound",
+          "title": "Until"
+        },
+        "verdict": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "filter: disposition.verdict_class, opaque token",
+          "title": "Verdict"
+        }
+      },
+      "title": "ledger_queryArguments",
+      "type": "object"
+    },
+    "name": "ledger_query"
+  },
+  {
+    "description": "Fetch one ledger record in full -- the raw capsule, unchanged. Use this\nwhen you need the actual signed bytes (e.g. to hand off, or to inspect a\nfield `decision_explain` doesn't surface), not just a summary.\n",
+    "inputSchema": {
+      "properties": {
+        "capsule_id": {
+          "description": "a capsule_id, or an unambiguous prefix (minimum 8 hex chars)",
+          "title": "Capsule Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "capsule_id"
+      ],
+      "title": "record_getArguments",
+      "type": "object"
+    },
+    "name": "record_get"
+  },
+  {
+    "description": "Independently re-verify one capsule's digest and chain against the live\nledger -- the tool for \"is this record intact\" questions. Returns `ok`\nplus every finding; a `false` always comes with a reason, never a bare\nboolean.\n",
+    "inputSchema": {
+      "properties": {
+        "capsule_id": {
+          "description": "a capsule_id, or an unambiguous prefix (minimum 8 hex chars)",
+          "title": "Capsule Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "capsule_id"
+      ],
+      "title": "record_verifyArguments",
+      "type": "object"
+    },
+    "name": "record_verify"
+  }
+]

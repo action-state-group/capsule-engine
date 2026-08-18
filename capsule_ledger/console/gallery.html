@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>capsule-ledger console — component gallery</title>
+<!--
+  No Google Fonts <link>: this page (like capsule_ledger/report/render.py's
+  verify surface) makes no outbound network calls. The same font-family
+  declarations are kept so a browser with Playfair Display / DM Sans /
+  DM Mono installed locally still renders them, with a close system-font
+  fallback otherwise.
+-->
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="components.css">
+<style>
+  .gallery-wrap { max-width: 1180px; margin: 0 auto; padding: 56px 48px 100px; }
+  .gallery-header { border-bottom: 1px solid var(--asg-sand); padding-bottom: 24px; margin-bottom: 44px; }
+  .gallery-title { font-family: var(--asg-font-display); font-size: 34px; font-weight: 700; letter-spacing: -1px; color: var(--asg-bark); margin: 10px 0 8px; }
+  .gallery-sub { font-size: 14.5px; font-weight: 300; color: var(--asg-text-muted); max-width: 640px; margin: 0; }
+  section.gallery-section { margin-bottom: 56px; }
+  .section-title { font-family: var(--asg-font-display); font-size: 24px; font-weight: 700; color: var(--asg-bark); margin: 0 0 6px; }
+  .section-note { font-size: 13px; font-weight: 300; color: var(--asg-text-muted); max-width: 720px; margin: 0 0 20px; }
+  .state-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+  .state-grid--2 { grid-template-columns: 1fr 1fr; }
+  .state-label { font-family: var(--asg-font-mono); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--asg-text-muted); margin-bottom: 8px; }
+  .state-slot { display: flex; flex-direction: column; gap: 6px; }
+  .row-stack { display: flex; flex-direction: column; gap: 10px; }
+  .chip-stack { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+</style>
+</head>
+<body>
+<div class="gallery-wrap">
+
+  <header class="gallery-header">
+    <div class="eyebrow">capsule-ledger console</div>
+    <h1 class="gallery-title">Component gallery</h1>
+    <p class="gallery-sub">Every token and component in the visual language, rendered in every listed
+      state, for review against <span class="mono">Visual Language Spec.dc.html</span>. Static assets --
+      no build step, no network calls; open this file directly in a browser.</p>
+  </header>
+
+  <!-- ══════ 1 · EVALUATION-CLASS MARKS ══════ -->
+  <section class="gallery-section" id="evaluation-classes">
+    <div class="eyebrow">Rule 2 · never confusable</div>
+    <h2 class="section-title">Three evaluation classes</h2>
+    <p class="section-note">Deterministic, model-assisted, and manual each own a mark, a color, and a
+      frame the others may not borrow. A model-assisted claim never renders a check mark.</p>
+
+    <div class="state-grid">
+      <div class="eval-card">
+        <div class="eval-card-head">
+          <span class="eval-mark eval-mark--deterministic">✓</span>
+          <div><div class="eval-card-title">Deterministic</div><div class="eval-card-kind">computed · replayable</div></div>
+        </div>
+        <p class="eval-card-body">A fold or query result. Rendered as <strong>fact</strong>, always with
+          its verification envelope. Mark: solid sage check. Anyone can replay it.</p>
+        <div class="eval-example--deterministic">
+          <div style="display:flex; align-items:baseline; gap:8px">
+            <span class="eval-mark--deterministic-inline mono" style="color:var(--asg-sage); font-weight:600; font-size:13px">✓</span>
+            <span style="font-size:14px; color:var(--asg-text-body)">Spend this week: <strong class="mono" style="font-weight:500">€4,120.00</strong></span>
+          </div>
+          <div class="envelope-line" style="margin-top:8px">fold spend_weekly_eur · records 0–212<br>checkpoint #216 · as of 14s ago</div>
+        </div>
+      </div>
+
+      <div class="eval-card">
+        <div class="eval-card-head">
+          <span class="eval-mark eval-mark--model">≈</span>
+          <div><div class="eval-card-title">Model-assisted</div><div class="eval-card-kind">interpretation · awaiting human</div></div>
+        </div>
+        <p class="eval-card-body">An AI reading of the evidence. Rendered as an <strong>attributed
+          claim</strong> — model id, evidence range, confidence. Mark: dashed amber tilde. Never a check.</p>
+        <div class="eval-example--model">
+          <div style="display:flex; align-items:baseline; gap:8px">
+            <span class="mono" style="color:var(--asg-amber); font-weight:600; font-size:14px">≈</span>
+            <span class="eval-claim" style="font-size:14px; line-height:1.8">"This looks like a retry storm —
+              <span class="eval-cited-chip"><span class="eval-mark--deterministic-inline">✓</span>11 near-identical calls / 90s · shape fold · 118–129</span>
+              — worth a look."</span>
+          </div>
+          <div class="envelope-line envelope-line--amber" style="margin-top:8px">claude-sonnet-4-6 · reads records 118–129 · every number in the claim is a cited fold chip, never the model's own<br>confidence: moderate · <span style="border-bottom:1px dotted var(--asg-amber)">confirm</span> / <span style="border-bottom:1px dotted var(--asg-amber)">override</span></div>
+        </div>
+      </div>
+
+      <div class="eval-card">
+        <div class="eval-card-head">
+          <span class="eval-mark eval-mark--manual">EO</span>
+          <div><div class="eval-card-title">Manual</div><div class="eval-card-kind">human attestation · signed</div></div>
+        </div>
+        <p class="eval-card-body">A person put their name on it. Rendered as a <strong>signature</strong> —
+          who, their role, when, recorded as its own capsule. Mark: bark seal with initials.</p>
+        <div class="eval-example--manual">
+          <div class="eval-signature-name">E. Okafor</div>
+          <div style="font-size:12.5px; color:var(--asg-text-muted); margin-top:2px">General Counsel — authorized this action</div>
+          <div class="envelope-line envelope-line--muted" style="margin-top:8px">signed 2026-08-04 09:12 UTC · recorded as 94c877c7…</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════ 2 · ENVELOPE LINE ══════ -->
+  <section class="gallery-section" id="envelope-line">
+    <div class="eyebrow">DM Mono · literal text</div>
+    <h2 class="section-title">Envelope line</h2>
+    <p class="section-note">Verbatim format pinned in <span class="mono">capsule_ledger/cli/format.py</span>:
+      <span class="mono">fold &lt;id&gt; · records N–M · checkpoint #X · as of &lt;staleness&gt;</span>.
+      Always accompanies a deterministic mark.</p>
+    <div class="row-stack">
+      <div class="envelope-line">fold spend_weekly_eur · records 0–212 · checkpoint #216 · as of 14s ago</div>
+      <div class="envelope-line">fold refusal_count · records 0–212 · checkpoint #216 · as of just now</div>
+      <div class="envelope-line envelope-line--muted">fold guard_dry_run@216 · records 118–129 · checkpoint #216 · as of 2m ago</div>
+    </div>
+  </section>
+
+  <!-- ══════ 3 · RUNG CHIP ══════ -->
+  <section class="gallery-section" id="rung-chip">
+    <div class="eyebrow">Rule 3 · degradation shown, not hidden</div>
+    <h2 class="section-title">Assurance rungs</h2>
+    <p class="section-note">Classes and rungs are orthogonal. Climbing is normal life (animate once,
+      settle); a downgrade shows the rung it <em>holds</em>, never the one it hoped for.</p>
+
+    <div class="row-stack" style="margin-bottom:24px">
+      <div class="rung-row" style="border-radius:12px 12px 0 0">
+        <div class="rung-dot-wrap"><span class="rung-dot" style="width:10px; height:10px; background:transparent; border:2px solid var(--asg-sand-dark)"></span></div>
+        <div><div class="rung-name">Standalone</div><div class="rung-mode">ledger_mode: standalone</div></div>
+        <div class="rung-plain">The record is signed and complete on its own. A stranger must trust the operator that it was never replaced.</div>
+        <div></div>
+      </div>
+      <div class="rung-row" style="border-top:none">
+        <div class="rung-dot-wrap"><span class="rung-dot" style="width:10px; height:10px; background:var(--asg-sand-dark)"></span></div>
+        <div><div class="rung-name">Countersigned</div><div class="rung-mode">attestation: counterparty</div></div>
+        <div class="rung-plain">The other side of the action signed it too. Neither party can now tell a different story.</div>
+        <div></div>
+      </div>
+      <div class="rung-row" style="border-top:none">
+        <div class="rung-dot-wrap"><span class="rung-dot" style="width:11px; height:11px; background:var(--asg-amber)"></span></div>
+        <div><div class="rung-name">Locally receipted</div><div class="rung-mode">ledger_mode: chained</div></div>
+        <div class="rung-plain">The record holds its place in an unbroken sequence. Removing or editing it would visibly break the chain.</div>
+        <div></div>
+      </div>
+      <div class="rung-row" style="border-top:none">
+        <div class="rung-dot-wrap"><span class="rung-dot" style="width:12px; height:12px; background:var(--asg-amber)"></span></div>
+        <div><div class="rung-name">Counterparty-visible</div><div class="rung-mode">shared checkpoint</div></div>
+        <div class="rung-plain">The sequence summary is held by the counterparty as well — history can't be rewritten without the other side noticing.</div>
+        <div style="text-align:right"><span class="rung-enterprise-badge">enterprise</span></div>
+      </div>
+      <div class="rung-row" style="border-top:none; border-radius:0 0 12px 12px; background:rgba(122,140,110,0.06)">
+        <div class="rung-dot-wrap"><span class="rung-dot" style="width:13px; height:13px; background:var(--asg-sage)"></span></div>
+        <div><div class="rung-name">Independently witnessed</div><div class="rung-mode">ledger_mode: anchored · 3 external witnesses</div></div>
+        <div class="rung-plain">A summary was lodged with independent public logs — this history cannot be quietly rewritten afterwards.</div>
+        <div style="text-align:right"><span class="rung-enterprise-badge">enterprise</span></div>
+      </div>
+    </div>
+
+    <div class="chip-stack">
+      <div class="state-slot"><span class="state-label">normal</span><span class="rung-chip"><span class="rung-dot" style="width:8px; height:8px; background:var(--asg-sage)"></span>locally receipted</span></div>
+      <div class="state-slot"><span class="state-label">rung held (downgrade)</span><span class="rung-chip rung-chip--held"><span class="rung-dot" style="width:8px; height:8px"></span>witnessed 1 of 3 · retrying</span></div>
+    </div>
+  </section>
+
+  <!-- ══════ 4 · STALENESS CHIP ══════ -->
+  <section class="gallery-section" id="staleness-chip">
+    <div class="eyebrow">Rule 3 · staleness on every aggregate</div>
+    <h2 class="section-title">Staleness chip</h2>
+    <p class="section-note">There is no global real-time truth; the chip says so honestly. Past its
+      policy bound, an aggregate's freshness claim can no longer be trusted (see components.css §4).</p>
+    <div class="chip-stack">
+      <div class="state-slot"><span class="state-label">fresh</span><span class="staleness-chip staleness-chip--fresh mono">as of 14s ago</span></div>
+      <div class="state-slot"><span class="state-label">refreshing</span><span class="staleness-chip staleness-chip--refreshing mono">as of 2m ago · refreshing</span></div>
+      <div class="state-slot"><span class="state-label">stale beyond policy bound</span><span class="staleness-chip staleness-chip--stale-beyond-bound mono">stale · older than policy bound (5m)</span></div>
+    </div>
+  </section>
+
+  <!-- ══════ 5 · VERDICT CHIPS ══════ -->
+  <section class="gallery-section" id="verdict-chips">
+    <div class="eyebrow">Local Console · presentational categories</div>
+    <h2 class="section-title">Verdict chips</h2>
+    <p class="section-note">Presentation-layer labels — distinct from the data-layer
+      <span class="mono">disposition.decision</span> / <span class="mono">verdict_class</span> tokens.
+      Blocked wears sage, never red: proof the guard ran, not a failure.</p>
+    <div class="state-grid">
+      <div class="state-slot">
+        <span class="state-label">confirmed</span>
+        <span class="verdict-chip verdict-chip--confirmed"><span class="verdict-glyph">✓</span>confirmed</span>
+      </div>
+      <div class="state-slot">
+        <span class="state-label">dispatched · unconfirmed</span>
+        <span class="verdict-chip verdict-chip--dispatched"><span class="verdict-glyph">→</span>dispatched · unconfirmed</span>
+      </div>
+      <div class="state-slot">
+        <span class="state-label">blocked (sage, never red)</span>
+        <span class="verdict-chip verdict-chip--blocked"><span class="verdict-glyph">⊘</span>blocked</span>
+      </div>
+      <div class="state-slot">
+        <span class="state-label">needs decision</span>
+        <span>
+          <span class="verdict-chip verdict-chip--needs-decision"><span class="verdict-glyph">?</span>needs decision</span>
+          <span class="verdict-subline">waiting: treasury-approver</span>
+        </span>
+      </div>
+      <div class="state-slot">
+        <span class="state-label">errored</span>
+        <span class="verdict-chip verdict-chip--errored"><span class="verdict-glyph">!</span>errored</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════ 6 · CLI-ECHO BAR ══════ -->
+  <section class="gallery-section" id="cli-echo">
+    <div class="eyebrow">Standing rule</div>
+    <h2 class="section-title">The CLI echo</h2>
+    <p class="section-note">Every GUI filter or action shows its CLI/API equivalent, live.</p>
+    <div class="cli-echo">≡ capsule log --agent hermes --verdict blocked --since 19:00</div>
+  </section>
+
+  <!-- ══════ 7 · BRICK-FAILURE TREATMENT ══════ -->
+  <section class="gallery-section" id="brick-failure">
+    <div class="eyebrow">Rule 5 · precision, never a generic red X</div>
+    <h2 class="section-title">When verification fails</h2>
+    <p class="section-note">Failure red is <span class="mono" style="color:var(--asg-brick)">#A93F2B</span>
+      — reserved exclusively for verification failure. Nothing else on any surface may use it.
+      A failed record names the stage that failed.</p>
+
+    <div class="state-grid--2" style="display:grid; gap:20px; margin-bottom:24px">
+      <div class="fail-card">
+        <div class="fail-card-head"><span class="fail-icon">✕</span><span class="fail-stage mono">digest_mismatch</span></div>
+        <div class="fail-title">The contents changed</div>
+        <div class="fail-render">"This record does not match its fingerprint — it is not the record that was sealed." The mismatching field group is named; the rest of the bundle keeps its own verdicts.</div>
+      </div>
+      <div class="fail-card">
+        <div class="fail-card-head"><span class="fail-icon">✕</span><span class="fail-stage mono">signature_invalid</span></div>
+        <div class="fail-title">The signature doesn't hold</div>
+        <div class="fail-render">"The signature on this record was not made by the key it names." Renders who it claims to be from, and that the claim fails — never just a red icon.</div>
+      </div>
+      <div class="fail-card">
+        <div class="fail-card-head"><span class="fail-icon">✕</span><span class="fail-stage mono">chain_gap</span></div>
+        <div class="fail-title">A break in the sequence</div>
+        <div class="fail-render">"Records are missing between #47 (Tue 14:02) and #48 (Tue 14:19)." The gap window is the finding — located in time and position, browsable from either edge.</div>
+      </div>
+      <div class="fail-card">
+        <div class="fail-card-head"><span class="fail-icon">✕</span><span class="fail-stage mono">inclusion_unproven</span></div>
+        <div class="fail-title">No independent witness</div>
+        <div class="fail-render">"This record claims to be witnessed, but the log's receipt doesn't check out (or can't be reached — retry when online)." Distinguishes unreachable from disproven, always.</div>
+      </div>
+    </div>
+
+    <h3 style="font-family:var(--asg-font-display); font-size:18px; color:var(--asg-bark); margin:0 0 10px">The verify ritual</h3>
+    <p class="section-note">Four stage rows. Pass is sage, fail is brick (the only other permitted brick
+      use), skipped is a neutral outline — never a silent green dot, never a bare red X.</p>
+    <div class="state-grid--2" style="display:grid; gap:20px">
+      <div>
+        <div class="state-label">all pass, witness skipped offline</div>
+        <div style="border:1px solid var(--asg-sand); border-radius:12px">
+          <div class="verify-stage verify-stage--pass"><span class="verify-stage-glyph">✓</span><span class="verify-stage-name">Integrity</span><span class="verify-stage-detail">every record matches its fingerprint</span></div>
+          <div class="verify-stage verify-stage--pass"><span class="verify-stage-glyph">✓</span><span class="verify-stage-name">Sequence</span><span class="verify-stage-detail">nothing missing between the first and last record shown</span></div>
+          <div class="verify-stage verify-stage--pass"><span class="verify-stage-glyph">✓</span><span class="verify-stage-name">Authenticity</span><span class="verify-stage-detail">signed by acme-research</span></div>
+          <div class="verify-stage verify-stage--skip"><span class="verify-stage-glyph">–</span><span class="verify-stage-name">Witness</span><span class="verify-stage-detail">skipped (no connection) — everything else verified</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="state-label">integrity fails, rest continue</div>
+        <div style="border:1px solid var(--asg-sand); border-radius:12px">
+          <div class="verify-stage verify-stage--fail"><span class="verify-stage-glyph">✕</span><span class="verify-stage-name">Integrity</span><span class="verify-stage-detail">digest_mismatch — see failure card above</span></div>
+          <div class="verify-stage verify-stage--pass"><span class="verify-stage-glyph">✓</span><span class="verify-stage-name">Sequence</span><span class="verify-stage-detail">nothing missing between the first and last record shown</span></div>
+          <div class="verify-stage verify-stage--pass"><span class="verify-stage-glyph">✓</span><span class="verify-stage-name">Authenticity</span><span class="verify-stage-detail">signed by acme-research</span></div>
+          <div class="verify-stage verify-stage--pass"><span class="verify-stage-glyph">✓</span><span class="verify-stage-name">Witness</span><span class="verify-stage-detail">witnessed by 3 of 3 logs</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>

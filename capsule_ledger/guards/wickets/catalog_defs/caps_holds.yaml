@@ -1,0 +1,18 @@
+# Reservation-aware caps wicket (capsule-emit #51): the SAME `caps` check
+# (guards/checks/caps.py) the plain `caps` wicket configures, pointed at the
+# hold-aware fold instead of spend.weekly -- "evaluated aggregate = converted
+# spend + active reserves" is entirely a property of *which fold* this wicket
+# cites, not new check logic. A distinct wicket_id from `caps/1.0.0` because
+# the two configure genuinely different fold+limit pairs; a deployment that
+# wants hold semantics for a class points its evaluate-and-reserve path at
+# this wicket instead of (or alongside) the plain one.
+#
+# `fold_digest` is the real, independently-computable `definition_digest()`
+# of capsule_ledger/folds/catalog_defs/hold.active_exposure.yaml.
+wicket_id: caps_holds/1.0.0
+check: caps
+config:
+  fold_id: hold.active_exposure/1.0.0
+  fold_digest: b1c542b22e79482df37e7ea18540377058499ec7dca52bc9bbba5559004bdbb2
+  caps_minor:
+    money.transfer: 10000000

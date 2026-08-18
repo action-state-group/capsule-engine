@@ -1,0 +1,10 @@
+# Total action count, grouped by developer. No filter, no window: the
+# simplest possible fold — a global tally per key.
+fold_id: actions.count_by_developer/1.0.0
+reads:
+  - path: developer
+    erasure_class: commitment-ok
+key: developer
+reduce:
+  reducer: count
+emit: count

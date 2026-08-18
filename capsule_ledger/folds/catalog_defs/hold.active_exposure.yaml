@@ -1,0 +1,44 @@
+# Active-exposure fold (capsule-emit #51 point 3): "the caps fold counts
+# active holds" -- evaluated aggregate = converted spend + active reserves.
+#
+# Modeled on spend.weekly.yaml (same reads/key/reduce shape: sum
+# asg_payload.amount_minor, keyed by developer, filtered to accepted
+# records) with two differences:
+#
+# 1. filter also requires the action_id verb to be one of the four
+#    hold-lifecycle records (`hold.` prefix) -- this fold only ever reads
+#    hold capsules, never a plain decision capsule's amount_minor.
+# 2. no rolling window. Each hold-lifecycle record's own amount_minor is a
+#    *signed delta* against this developer's outstanding exposure (see
+#    holds/capsules.py's docstrings): hold.reserve contributes
+#    +reserved_amount_minor, hold.reconcile contributes
+#    (executed_amount_minor - reserved_amount_minor), hold.release/
+#    hold.expire contribute -reserved_amount_minor. A hold's contributions
+#    always sum to its final settled value (0 for release/expire, executed
+#    for reconcile) regardless of how long ago it was reserved -- windowing
+#    by record age would truncate a reserve's +delta while still counting a
+#    same-hold release/reconcile's matching -delta (or vice-versa), driving
+#    the aggregate negative or double-counted. This fold is deliberately an
+#    unwindowed running balance, not a rate.
+fold_id: hold.active_exposure/1.0.0
+reads:
+  - path: developer
+    erasure_class: commitment-ok
+  - path: action_id
+    erasure_class: commitment-ok
+  - path: asg_payload.amount_minor
+    erasure_class: commitment-ok
+  - path: disposition.decision
+    erasure_class: commitment-ok
+filter:
+  - field: disposition.decision
+    op: eq
+    value: accept
+  - field: action_id
+    op: prefix
+    value: "hold."
+key: developer
+reduce:
+  reducer: sum
+  field: asg_payload.amount_minor
+emit: active_exposure_minor

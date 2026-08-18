@@ -1,0 +1,14 @@
+# hold_reconcile wicket (capsule-emit #53 point 2): "tolerance is policy, not
+# code -- declared in a digest-pinned definition (rides the policy
+# manifest), so 'which tolerance governed' is checkable per decision."
+#
+# `tolerance_minor` is the maximum permitted overage (executed_amount_minor -
+# reserved_amount_minor) per action_class before a conversion is treated as
+# an over-tolerance breach (holds/engine.py routes it through the existing
+# ALLOW/DENY/ESCALATE vocabulary instead of building a hold.reconcile
+# record). No entry for a class means zero tolerance -- any overage breaches.
+wicket_id: hold_reconcile/1.0.0
+check: hold_reconcile
+config:
+  tolerance_minor:
+    money.transfer: 50000

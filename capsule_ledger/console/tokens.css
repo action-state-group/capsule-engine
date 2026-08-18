@@ -1,0 +1,69 @@
+/* SPDX-License-Identifier: Apache-2.0
+ *
+ * Design tokens for the capsule-ledger console, transcribed verbatim from
+ * `action-state-strategy/docs/design/design_handoff_capsule_ledger_ux/
+ * designs/Visual Language Spec.dc.html` (spec v1 · 2026-08-04, capsule
+ * format draft-02). Values are copied from that file's inline styles, not
+ * approximated from the handoff README summary.
+ *
+ * No grays: every neutral in this system is warm (cream/bark/sand ladder).
+ * --asg-brick below is reserved for verification failure ONLY -- see
+ * components.css and the product-law tests in tests/test_console_*.py.
+ */
+
+:root {
+  /* -- color: surfaces -- */
+  --asg-cream: #FAF7F2;       /* default page bg (GC/light surfaces) */
+  --asg-warm-white: #FDF9F4;  /* cards */
+  --asg-desk: #EFE9DF;        /* page bg behind floating cards */
+  --asg-bark: #2C1A0E;        /* dark surface, primary text on light */
+  --asg-console-bg: #231409;  /* dark console page bg */
+
+  /* -- color: accent -- */
+  --asg-amber: #C8611A;       /* THE accent: CTAs, eyebrows, model-class marks */
+  --asg-amber-light: #E8844A; /* hover, amber-on-dark */
+
+  /* -- color: sage (deterministic class, refusals, positive signals) -- */
+  --asg-sage: #7A8C6E;
+  --asg-sage-light: #A8B89C;  /* on dark */
+
+  /* -- color: sand (hairlines/borders) -- */
+  --asg-sand: #E8D5B8;        /* hairlines/borders on light */
+  --asg-sand-dark: #D4BC96;
+
+  /* -- color: text -- */
+  --asg-text-body: #3D2B1F;
+  --asg-text-muted: #7A6355;  /* muted text (light) */
+  --asg-text-dark-1: #E8D5B8; /* text ladder on dark, brightest */
+  --asg-text-dark-2: #D4BC96;
+  --asg-text-dark-3: #A8927D; /* text ladder on dark, dimmest */
+
+  /* -- color: brick -- verification failure ONLY. Nothing else may use it. */
+  --asg-brick: #A93F2B;
+
+  /* -- typography -- */
+  --asg-font-display: 'Playfair Display', ui-serif, Georgia, serif;
+  --asg-font-sans: 'DM Sans', system-ui, -apple-system, sans-serif;
+  --asg-font-mono: 'DM Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+
+  /* eyebrows: DM Sans 500/600, uppercase, letter-spacing 1.5-2.5px, 10-11px */
+  --asg-eyebrow-tracking: 2px;
+  --asg-eyebrow-size: 11px;
+
+  /* -- radii -- */
+  --asg-radius-pill: 100px;
+  --asg-radius-card-sm: 12px;
+  --asg-radius-card-lg: 16px;
+  --asg-radius-floating: 20px;
+  --asg-radius-chip: 6px;      /* 4-9px squares for class marks */
+
+  /* -- shadows: bark-tinted only -- */
+  --asg-shadow-floating-dark: 0 24px 64px rgba(44, 26, 14, 0.22);
+  --asg-shadow-floating-light: 0 24px 64px rgba(44, 26, 14, 0.10);
+  --asg-shadow-amber-button: 0 4px 16px rgba(200, 97, 26, 0.30);
+
+  /* -- motion -- */
+  --asg-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --asg-motion-hover: 200ms;
+  --asg-motion-msg-in: 400ms;
+}

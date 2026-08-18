@@ -1,0 +1,130 @@
+/* SPDX-License-Identifier: Apache-2.0
+ *
+ * Layout only for the local console (`capsule console`). Every color,
+ * radius, shadow, and font referenced below is a var(--asg-*) token from
+ * tokens.css, or a component reused from components.css (verdict chips,
+ * eval marks, envelope lines, the verify ritual, the CLI-echo bar) -- this
+ * file declares no new visual token and no new hex color literal (see
+ * tests/test_console_server_product_laws.py). Requires tokens.css +
+ * components.css to be loaded first.
+ */
+
+.console-wrap { max-width: 1320px; margin: 0 auto; padding: 40px 40px 80px; }
+
+.console-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--asg-sand);
+  padding-bottom: 18px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.console-title { font-family: var(--asg-font-display); font-size: 26px; font-weight: 700; color: var(--asg-bark); margin: 8px 0 0; }
+.console-checkpoint { color: var(--asg-text-muted); }
+
+.console-filters { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; align-items: center; }
+.console-filters input {
+  font-family: var(--asg-font-mono);
+  font-size: 12px;
+  color: var(--asg-text-body);
+  background: var(--asg-warm-white);
+  border: 1px solid var(--asg-sand);
+  border-radius: var(--asg-radius-pill);
+  padding: 7px 14px;
+  min-width: 140px;
+}
+.console-filters button {
+  font-family: var(--asg-font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--asg-warm-white);
+  background: var(--asg-amber);
+  border: none;
+  border-radius: var(--asg-radius-pill);
+  padding: 8px 18px;
+  cursor: pointer;
+}
+
+.console-body { display: grid; grid-template-columns: 1.3fr 1fr; gap: 24px; margin-top: 18px; align-items: start; }
+
+.console-stream { display: flex; flex-direction: column; gap: 10px; }
+.record-row {
+  display: grid;
+  grid-template-columns: 90px 1fr auto;
+  align-items: center;
+  gap: 14px;
+  background: var(--asg-warm-white);
+  border: 1px solid var(--asg-sand);
+  border-radius: var(--asg-radius-card-sm);
+  padding: 12px 16px;
+  cursor: pointer;
+}
+.record-row:hover { border-color: var(--asg-sand-dark); }
+.record-row.selected { border-color: var(--asg-amber); background: rgba(200, 97, 26, 0.04); }
+.record-fp { font-family: var(--asg-font-mono); font-size: 11px; color: var(--asg-text-muted); }
+.record-main { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.record-action { font-size: 13.5px; color: var(--asg-bark); }
+.record-meta { font-family: var(--asg-font-mono); font-size: 10.5px; color: var(--asg-text-muted); }
+.console-stream-status { font-family: var(--asg-font-mono); font-size: 11px; color: var(--asg-text-muted); margin-top: 4px; }
+
+.console-inspector {
+  background: var(--asg-warm-white);
+  border: 1px solid var(--asg-sand);
+  border-radius: var(--asg-radius-card-lg);
+  padding: 22px;
+  position: sticky;
+  top: 20px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+/* Real fold envelope lines carry the fold's definition digest (a 64-hex
+ * string, per cli/format.py's own docstring), much longer than gallery.html's
+ * illustrative short example -- this fixed-width sidebar must wrap it. */
+.console-inspector .envelope-line { overflow-wrap: anywhere; }
+.inspector-empty { font-size: 13px; color: var(--asg-text-muted); }
+.inspector-section { margin-bottom: 18px; }
+.inspector-section:last-child { margin-bottom: 0; }
+.inspector-section-title {
+  font-family: var(--asg-font-sans);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--asg-text-muted);
+  margin-bottom: 8px;
+}
+.inspector-chain-row { font-family: var(--asg-font-mono); font-size: 11.5px; color: var(--asg-text-body); padding: 3px 0; cursor: pointer; background: none; border: none; text-align: left; display: block; }
+.inspector-chain-row:hover { color: var(--asg-amber); }
+.inspector-chain-empty { font-size: 12px; color: var(--asg-text-muted); }
+.inspector-fold-row { display: flex; flex-direction: column; gap: 2px; padding: 6px 0; border-bottom: 1px solid var(--asg-sand); }
+.inspector-fold-row:last-child { border-bottom: none; }
+.inspector-fold-value { font-size: 13px; color: var(--asg-text-body); }
+.inspector-sealed {
+  font-family: var(--asg-font-mono);
+  font-size: 10.5px;
+  color: var(--asg-text-muted);
+  background: var(--asg-cream);
+  border: 1px solid var(--asg-sand);
+  border-radius: var(--asg-radius-card-sm);
+  padding: 10px 12px;
+  max-height: 220px;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+.inspector-check-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.inspector-cli-echo { margin-top: 10px; }
+
+.console-links {
+  margin-top: 28px;
+  padding-top: 18px;
+  border-top: 1px solid var(--asg-sand);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--asg-text-muted);
+}
+.console-links code { font-family: var(--asg-font-mono); color: var(--asg-text-body); }
