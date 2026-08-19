@@ -12,6 +12,7 @@ name this module invents.
 from __future__ import annotations
 
 import json
+import re
 import shlex
 
 from capsule_ledger.payload_store import ResolvedPayload
@@ -21,12 +22,15 @@ __all__ = [
     "format_staleness",
     "format_envelope_line",
     "build_echo",
+    "cli_echo_leaks_absolute_path",
     "summarize_action",
     "format_action_class",
     "assurance_grade_parts",
     "format_assurance_grade",
     "format_resolved_payload",
 ]
+
+_WINDOWS_DRIVE_RE = re.compile(r"[A-Za-z]:\\")
 
 
 def format_staleness(age_ms: int) -> str:
@@ -77,6 +81,21 @@ def build_echo(verb: str, *, positional: str | None = None, flags: list[tuple[st
         if value is not True:
             tokens.append(shlex.quote(str(value)))
     return "≡ " + " ".join(tokens)
+
+
+def cli_echo_leaks_absolute_path(cli_echo: str) -> bool:
+    """``cli_echo`` is rendered verbatim on the bundle permalink and the
+    offline viewer -- a public page -- so it must never carry an operator's
+    absolute filesystem layout (home directory, machine username). Flags any
+    token that is a POSIX absolute path (a leading ``/``, with no allowlisted
+    exception defined) or a Windows drive path (``C:\\...``); callers that
+    build ``cli_echo`` from user-supplied paths must relativize them first
+    rather than adding an exception here."""
+    tokens = shlex.split(cli_echo.removeprefix("≡ "))
+    for token in tokens:
+        if token.startswith("/") or _WINDOWS_DRIVE_RE.match(token):
+            return True
+    return False
 
 
 def summarize_action(capsule: dict) -> str:

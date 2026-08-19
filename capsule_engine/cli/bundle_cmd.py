@@ -25,6 +25,7 @@ import argparse
 import base64
 import dataclasses
 import json
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -76,6 +77,19 @@ def add_parser(sub: argparse._SubParsersAction) -> argparse.ArgumentParser:
     )
     p.set_defaults(func=run)
     return p
+
+
+def _echo_safe_out(out: str) -> str:
+    """The ``--out`` value ``cli_echo`` renders on the public bundle
+    permalink and offline viewer -- it must show where the file went
+    relative to the invocation, never the operator's absolute filesystem
+    layout. An absolute path outside the cwd tree (no relative route to it)
+    falls back to just the filename rather than leaking the full path."""
+    p = Path(out)
+    if not p.is_absolute():
+        return out
+    rel = os.path.relpath(p, Path.cwd())
+    return rel if not rel.startswith("..") else p.name
 
 
 def _default_viewer_out(out: str) -> str:
@@ -186,7 +200,7 @@ def run(args: argparse.Namespace) -> int:
         tree_size = sum(1 for _ in store.scan(ScanQuery()))
         completeness_certificate = _build_completeness_certificate(store, records, tree_size)
 
-    echo = build_echo("bundle", flags=[*echo_parts(args), ("--out", args.out)])
+    echo = build_echo("bundle", flags=[*echo_parts(args), ("--out", _echo_safe_out(args.out))])
     bundle = {
         "bundle_version": "1",
         "created_at": datetime.now(timezone.utc).isoformat(),
