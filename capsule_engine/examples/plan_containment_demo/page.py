@@ -293,7 +293,15 @@ def _render_run_section(run_key: str, result: DemoResult, plan: PlanDefinition) 
 
 def render_demo_page(plan: PlanDefinition, manifest_digest: str, results: dict[str, DemoResult]) -> str:
     """Render the whole two-lane demo page. ``results`` keys are
-    ``"run-a"``/``"run-b"``/``"run-c"`` -> ``DemoResult``."""
+    ``"run-a"``/``"run-b"``/``"run-c"`` -> ``DemoResult``.
+
+    The ``.plan-box`` is the demo's own staged narration (design doc §4:
+    audience sees the plan before the run) -- it is not a claim about what
+    the sealed receipt discloses. The receipt (decision capsule) only ever
+    carries ``plan_digest`` in its evidence; P itself discloses separately,
+    through the Disclosure Envelope. The contrast panel below said "and here
+    is the plan" in v1, which conflated the two -- corrected per
+    ``semantic-compiler-unified-model-2026-08-12`` §2.2."""
     plan_actions_html = "".join(
         f"<li><code>{html.escape(a)}</code></li>" for a in plan.allowed_actions
     )
@@ -423,8 +431,9 @@ def render_demo_page(plan: PlanDefinition, manifest_digest: str, results: dict[s
   <div class="col">
     <h3>Declared intent</h3>
     <p>This action occurred in service of declared outcome <code>{html.escape(plan.outcome_id)}</code>,
-    at a specific step of a compiled plan, digest <code>{html.escape(plan.definition_digest()[:16])}…</code> --
-    and here is the plan.</p>
+    at a specific step of a compiled plan, digest <code>{html.escape(plan.definition_digest()[:16])}…</code>.
+    The receipt carries the plan's digest -- the plan itself discloses separately, through the
+    Disclosure Envelope, a producer act, exactly like conversation content.</p>
   </div>
 </div>
 

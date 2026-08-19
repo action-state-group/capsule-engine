@@ -92,6 +92,27 @@ def check_plan_containment(action: Action, plan: PlanDefinition | None) -> Check
             "attempted_verb": action.verb,
             "allowed_set_digest": allowed_set_digest,
             "step_index": step_index,
+            # Label re-derivability ON the record, not just in a docstring
+            # (a doc claim discovered missing after history is sealed is an
+            # embarrassment; a doc claim absent from the record it describes
+            # cannot be checked at all). "sealed_pure": every input this
+            # evidence was computed from (the plan, cited by plan_digest, and
+            # the action record) is itself sealed on or alongside the
+            # capsule -- a holder of both can recompute this exact evidence
+            # and its digest, forever, with no ledger access. Contrast
+            # ``caps`` (``guards/checks/caps.py``): its evidence is a
+            # function of ledger state read at decision time
+            # (``ledger.scan``), which is not itself sealed onto the
+            # capsule, so a caps verdict is attested, not replayed --
+            # see ``tests/test_plan_containment_check.py::
+            # test_evidence_is_re_derivable_from_the_disclosed_record_alone``.
+            "replay_class": "sealed_pure",
+            # Over-breadth measure (see ``PlanDefinition.
+            # admitted_action_space_size``'s own docstring for what it does
+            # and does NOT claim): sealed at digest-freeze, disclosed on
+            # every decision so a vacuously broad plan is visible in the
+            # receipt rather than flattered by it.
+            "admitted_action_space_size": plan.admitted_action_space_size(),
         }
         evidence.update(extra)
         return evidence

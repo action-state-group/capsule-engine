@@ -292,6 +292,22 @@ def _run_chain(
 
     capsule_ids: dict[str, str] = {}
 
+    # A running cursor onto "whatever was appended most recently" -- reads
+    # (``ToolCallLane.record_read``) and writes (``GuardEngine.check``) have
+    # no chain of their own to join (unlike turns, which auto-chain to the
+    # previous turn, and judgment/confirmation, which chain to a fixed
+    # semantic anchor), so without this every read/write lands as a
+    # ``chain``-less, unlinked record. That is invisible to
+    # ``build_attainment_fold`` above (it only ever walks the semantic
+    # links), but it breaks the bundle viewer's "Sequence" ritual stage,
+    # which requires every record but the true first to declare SOME
+    # existing parent (``offline_shell.html``'s "unbroken -- every record
+    # names the one before it"). ``chain_relation="follows"`` matches the
+    # same relation turn-to-turn chaining already uses (``conversation/
+    # capsules.py``) -- this is presentational walkability, not a new
+    # semantic claim.
+    last_capsule_id: str | None = None
+
     session = ConversationSession(
         ledger=ledger, session_id=f"session-mfa-remediation-{run}-001",
         operator=OPERATOR, developer=ASSISTANT_DEVELOPER, signer_provider=lambda: assistant_signer,
@@ -299,6 +315,7 @@ def _run_chain(
     def _emit_reads_before(turn_index: int) -> None:
         """``reads`` entries are ``(insert_before_turn_index, verb, detail_text)``
         -- a value equal to ``len(transcript)`` inserts after every turn."""
+        nonlocal last_capsule_id
         for insert_before_turn_index, verb, detail_text in reads:
             if insert_before_turn_index != turn_index:
                 continue
@@ -310,8 +327,11 @@ def _run_chain(
                 # is a bare uuid.uuid4() (guards/capsule.py), which would
                 # make this fixture non-reproducible across runs.
                 action_id=f"{verb}/{run}",
+                chain_parent=last_capsule_id,
+                chain_relation="follows" if last_capsule_id else None,
             )
             capsule_ids[f"read_{verb}"] = record.capsule_id
+            last_capsule_id = record.capsule_id
 
     turn_records: list[LedgerRecord] = []
     for turn_index, (role, text) in enumerate(transcript):
@@ -319,11 +339,13 @@ def _run_chain(
         record = session.record_turn(speaker_role=role, content_digest=_content_digest(text), timestamp=clock.next())
         turn_records.append(record)
         capsule_ids[f"turn_{turn_index}_{role}"] = record.capsule_id
+        last_capsule_id = record.capsule_id
     _emit_reads_before(len(transcript))
 
     close_record = session.close(timestamp=clock.next())
     _require(run, close_record.capsule["asg_payload"]["event"] == EVENT_SESSION_CLOSE, "session close event mismatch")
     capsule_ids["session_close"] = close_record.capsule_id
+    last_capsule_id = close_record.capsule_id
     session_digest = close_record.capsule["asg_payload"]["detail"]["session_digest"]
 
     evidence_text = "\n".join(f"{role}: {text}" for role, text in transcript)
@@ -341,6 +363,7 @@ def _run_chain(
     )
     _require(run, judgment_record.capsule["asg_payload"]["detail"]["label"] == label, "judge label mismatch")
     capsule_ids["judgment"] = judgment_record.capsule_id
+    last_capsule_id = judgment_record.capsule_id
 
     constraint_evidence: dict[str, dict] = {}
     for verb, extra in writes:
@@ -354,10 +377,13 @@ def _run_chain(
         if extra.get("cite_judgment"):
             action_kwargs["cited_mandate_capsule_id"] = judgment_record.capsule_id
         action = Action(**action_kwargs)
-        decision = engine.check(action)
+        decision = engine.check(
+            action, chain_parent=last_capsule_id, chain_relation="follows" if last_capsule_id else None
+        )
         _require(run, decision.capsule is not None, f"{verb} produced no decision capsule")
         capsule_ids[f"write_{verb}"] = decision.capsule["capsule_id"]
         capsule_ids[f"write_{verb}_outcome"] = decision.outcome
+        last_capsule_id = decision.capsule["capsule_id"]
         plan_constraint = next((c for c in decision.constraints if c.id == "plan_containment"), None)
         if plan_constraint is not None and plan_constraint.evidence is not None:
             constraint_evidence[f"write_{verb}"] = plan_constraint.evidence

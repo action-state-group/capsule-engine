@@ -77,6 +77,29 @@ def test_canonical_dict_omits_window_when_absent_not_null():
     assert "window" not in plan.canonical_dict()
 
 
+# -- admitted-action-space (over-breadth) measure ---------------------------
+
+
+def test_admitted_action_space_size_counts_allowed_actions():
+    plan = parse_plan_definition(VALID_PLAN)
+    assert plan.admitted_action_space_size() == 4
+
+
+def test_admitted_action_space_size_grows_with_a_broader_plan():
+    narrow = parse_plan_definition(VALID_PLAN)
+    broad_data = dict(VALID_PLAN)
+    broad_data["allowed_actions"] = [*VALID_PLAN["allowed_actions"], "export_user_list"]
+    broad = parse_plan_definition(broad_data)
+    assert broad.admitted_action_space_size() == narrow.admitted_action_space_size() + 1
+
+
+def test_admitted_action_space_size_is_sealed_to_the_frozen_definition():
+    """Same measure every call -- a pure function of the frozen dataclass's
+    own ``allowed_actions`` field, not re-derived from anything mutable."""
+    plan = parse_plan_definition(VALID_PLAN)
+    assert plan.admitted_action_space_size() == plan.admitted_action_space_size() == len(plan.allowed_actions)
+
+
 @pytest.mark.parametrize(
     "mutation,reason",
     [

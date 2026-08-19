@@ -138,6 +138,25 @@ class PlanDefinition:
         without also depending on preconditions/binding/window content."""
         return json_digest({"allowed_actions": list(self.allowed_actions)})
 
+    def admitted_action_space_size(self) -> int:
+        """The over-breadth measure: the cardinality of ``allowed_actions``,
+        sealed at digest-freeze (a pure function of this frozen dataclass's
+        own field, computed once and disclosed on every decision -- never
+        re-derived from a mutable source). Recorded so a vacuously broad
+        plan is VISIBLE in the receipt rather than flattered by one that
+        only ever shows contained/departed verdicts.
+
+        **This measures breadth, not satisfiability.** There is no analyzer
+        in this codebase, so a plan that admits every verb in the taxonomy
+        (trivially permissive -- containment would rubber-stamp almost
+        anything) and a plan whose preconditions can never jointly be
+        satisfied (unsatisfiable -- containment would refuse almost
+        everything) are NOT distinguished or flagged by this number alone;
+        both are just a count. Recording that limitation here, honestly,
+        rather than letting the field's name imply a soundness check that
+        does not exist."""
+        return len(self.allowed_actions)
+
     def step_index(self, verb: str) -> int | None:
         """The 0-based position of ``verb`` in ``allowed_actions``, or
         ``None`` if it is not a contained verb at all."""

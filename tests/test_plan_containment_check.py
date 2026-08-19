@@ -66,6 +66,7 @@ def test_verb_in_allowed_set_with_no_precondition_passes():
     assert outcome.constraint.evidence["outcome_id"] == PLAN.outcome_id
     assert outcome.constraint.evidence["plan_digest"] == PLAN.definition_digest()
     assert outcome.constraint.evidence["allowed_set_digest"] == PLAN.allowed_set_digest()
+    assert outcome.constraint.evidence["admitted_action_space_size"] == PLAN.admitted_action_space_size() == 4
 
 
 # -- pass: precondition satisfied by a cited capsule id ---------------------
@@ -113,3 +114,49 @@ def test_binding_mismatch_fails():
     outcome = check_plan_containment(action, PLAN)
     assert outcome.constraint.result == "fail"
     assert outcome.constraint.evidence["reason_kind"] == "binding_mismatch"
+
+
+# -- re-derivability: labeled ON the record, and actually exercised ---------
+#
+# Design doc's own claim (§1): "hand a stranger the plan and the capsule and
+# they re-derive the verdict." This test plays the stranger: it never reuses
+# the original ``PLAN``/``Action`` Python objects, only what a holder of the
+# disclosed plan (via the Disclosure Envelope) and the sealed action record
+# (verb, target, cited-capsule-id -- exactly ``Action.from_capsule``'s own
+# field set) would have. Contrast ``caps``, whose evidence is a function of
+# ledger state read at decision time and so cannot be replayed this way from
+# the record alone -- that asymmetry is why this check may enforce ahead of
+# ``[ldg-guardengine-caps-race]`` and why it is called out explicitly rather
+# than left implicit.
+
+
+def test_evidence_carries_the_replay_class_label():
+    outcome = check_plan_containment(_action("read_user_directory"), PLAN)
+    assert outcome.constraint.evidence["replay_class"] == "sealed_pure"
+
+
+def test_evidence_is_re_derivable_from_the_disclosed_record_alone():
+    from agent_action_capsule.canonical import json_digest
+
+    original_action = _action("enable_mfa", cited_mandate_capsule_id="d" * 64)
+    original = check_plan_containment(original_action, PLAN)
+    original_digest = json_digest(original.constraint.evidence)
+
+    # A stranger's reconstruction: the plan re-parsed from its own
+    # canonical_dict() (what the Disclosure Envelope would hand over, not
+    # the live PLAN object), and the action rebuilt from only the fields a
+    # sealed action record carries (mirrors ``Action.from_capsule``).
+    disclosed_plan = parse_plan_definition(PLAN.canonical_dict())
+    stranger_action = Action(
+        verb=original_action.verb,
+        operator=original_action.operator,
+        developer=original_action.developer,
+        target=original_action.target,
+        cited_mandate_capsule_id=original_action.cited_mandate_capsule_id,
+    )
+
+    replay = check_plan_containment(stranger_action, disclosed_plan)
+    replay_digest = json_digest(replay.constraint.evidence)
+
+    assert replay.constraint.evidence == original.constraint.evidence
+    assert replay_digest == original_digest
