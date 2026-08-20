@@ -1,0 +1,40 @@
+{"action_class": "remediation", "dispatch_id": "d1", "kind": "dispatch", "tool": "remediate"}
+{"commitment_ref": "d1", "kind": "confirmation", "status": "confirmed"}
+{"action_class": "remediation", "dispatch_id": "d2", "kind": "dispatch", "tool": "remediate"}
+{"commitment_ref": "d2", "kind": "confirmation", "status": "confirmed"}
+{"action_class": "remediation", "dispatch_id": "d3", "kind": "dispatch", "tool": "remediate"}
+{"commitment_ref": "d3", "kind": "confirmation", "status": "confirmed"}
+{"action_class": "remediation", "dispatch_id": "d4", "kind": "dispatch", "tool": "remediate"}
+{"commitment_ref": "d4", "kind": "confirmation", "status": "confirmed"}
+{"action_class": "remediation", "dispatch_id": "d5", "kind": "dispatch", "tool": "remediate"}
+{"commitment_ref": "d5", "kind": "confirmation", "status": "confirmed"}
+{"action_class": "remediation", "dispatch_id": "d6", "kind": "dispatch", "tool": "remediate"}
+{"commitment_ref": "d6", "kind": "confirmation", "status": "confirmed"}
+{"action_class": "remediation", "dispatch_id": "d7", "kind": "dispatch", "tool": "remediate"}
+{"commitment_ref": "d7", "kind": "confirmation", "status": "confirmed"}
+{"action_class": "remediation", "dispatch_id": "d8", "kind": "dispatch", "tool": "remediate"}
+{"commitment_ref": "d8", "kind": "confirmation", "status": "confirmed"}
+{"action_class": "remediation", "dispatch_id": "d9", "kind": "dispatch", "tool": "remediate"}
+{"commitment_ref": "d9", "kind": "confirmation", "status": "confirmed"}
+{"action_class": "remediation", "dispatch_id": "d10", "kind": "dispatch", "tool": "remediate"}
+{"commitment_ref": "d10", "kind": "confirmation", "status": "confirmed"}
+{"kind": "offer", "offer_digest": "0000000000000000000000000000000000000000000000000000000000000001", "offer_id": "advisory/1"}
+{"kind": "response", "offer_id": "advisory/1", "response_class": "accepted"}
+{"kind": "offer", "offer_digest": "0000000000000000000000000000000000000000000000000000000000000002", "offer_id": "advisory/2"}
+{"kind": "response", "offer_id": "advisory/2", "response_class": "accepted"}
+{"kind": "offer", "offer_digest": "0000000000000000000000000000000000000000000000000000000000000003", "offer_id": "advisory/3"}
+{"kind": "response", "offer_id": "advisory/3", "response_class": "accepted"}
+{"kind": "offer", "offer_digest": "0000000000000000000000000000000000000000000000000000000000000004", "offer_id": "advisory/4"}
+{"kind": "response", "offer_id": "advisory/4", "response_class": "accepted"}
+{"kind": "offer", "offer_digest": "0000000000000000000000000000000000000000000000000000000000000005", "offer_id": "advisory/5"}
+{"kind": "response", "offer_id": "advisory/5", "response_class": "accepted"}
+{"kind": "offer", "offer_digest": "0000000000000000000000000000000000000000000000000000000000000006", "offer_id": "advisory/6"}
+{"kind": "response", "offer_id": "advisory/6", "response_class": "accepted"}
+{"kind": "offer", "offer_digest": "0000000000000000000000000000000000000000000000000000000000000007", "offer_id": "advisory/7"}
+{"kind": "response", "offer_id": "advisory/7", "response_class": "declined"}
+{"kind": "offer", "offer_digest": "0000000000000000000000000000000000000000000000000000000000000008", "offer_id": "advisory/8"}
+{"kind": "response", "offer_id": "advisory/8", "response_class": "declined"}
+{"kind": "offer", "offer_digest": "0000000000000000000000000000000000000000000000000000000000000009", "offer_id": "advisory/9"}
+{"kind": "response", "offer_id": "advisory/9", "response_class": "deferred"}
+{"kind": "offer", "offer_digest": "000000000000000000000000000000000000000000000000000000000000000a", "offer_id": "advisory/10"}
+{"kind": "response", "offer_id": "advisory/10", "response_class": "deferred"}

@@ -1,0 +1,29 @@
+{"action_class": "remediation", "dispatch_id": "d1", "kind": "dispatch", "tool": "remediate"}
+{"action_class": "remediation", "dispatch_id": "d2", "kind": "dispatch", "tool": "remediate"}
+{"action_class": "remediation", "dispatch_id": "d3", "kind": "dispatch", "tool": "remediate"}
+{"action_class": "remediation", "dispatch_id": "d4", "kind": "dispatch", "tool": "remediate"}
+{"action_class": "remediation", "dispatch_id": "d5", "kind": "dispatch", "tool": "remediate"}
+{"action_class": "remediation", "dispatch_id": "d6", "kind": "dispatch", "tool": "remediate"}
+{"action_class": "remediation", "dispatch_id": "d7", "kind": "dispatch", "tool": "remediate"}
+{"action_class": "remediation", "dispatch_id": "d8", "kind": "dispatch", "tool": "remediate"}
+{"action_class": "remediation", "dispatch_id": "d9", "kind": "dispatch", "tool": "remediate"}
+{"action_class": "remediation", "dispatch_id": "d10", "kind": "dispatch", "tool": "remediate"}
+{"commitment_ref": "d1", "kind": "confirmation", "status": "confirmed"}
+{"commitment_ref": "d2", "kind": "confirmation", "status": "confirmed"}
+{"commitment_ref": "d3", "kind": "confirmation", "status": "confirmed"}
+{"kind": "offer", "offer_digest": "0000000000000000000000000000000000000000000000000000000000000001", "offer_id": "advisory/1"}
+{"kind": "response", "offer_id": "advisory/1", "response_class": "accepted"}
+{"kind": "offer", "offer_digest": "0000000000000000000000000000000000000000000000000000000000000002", "offer_id": "advisory/2"}
+{"kind": "response", "offer_id": "advisory/2", "response_class": "accepted"}
+{"kind": "offer", "offer_digest": "0000000000000000000000000000000000000000000000000000000000000003", "offer_id": "advisory/3"}
+{"kind": "response", "offer_id": "advisory/3", "response_class": "accepted"}
+{"kind": "offer", "offer_digest": "0000000000000000000000000000000000000000000000000000000000000004", "offer_id": "advisory/4"}
+{"kind": "response", "offer_id": "advisory/4", "response_class": "accepted"}
+{"kind": "offer", "offer_digest": "0000000000000000000000000000000000000000000000000000000000000005", "offer_id": "advisory/5"}
+{"kind": "response", "offer_id": "advisory/5", "response_class": "accepted"}
+{"kind": "offer", "offer_digest": "0000000000000000000000000000000000000000000000000000000000000006", "offer_id": "advisory/6"}
+{"kind": "response", "offer_id": "advisory/6", "response_class": "accepted"}
+{"kind": "offer", "offer_digest": "0000000000000000000000000000000000000000000000000000000000000007", "offer_id": "advisory/7"}
+{"kind": "response", "offer_id": "advisory/7", "response_class": "accepted"}
+{"kind": "offer", "offer_digest": "0000000000000000000000000000000000000000000000000000000000000008", "offer_id": "advisory/8"}
+{"kind": "response", "offer_id": "advisory/8", "response_class": "accepted"}
