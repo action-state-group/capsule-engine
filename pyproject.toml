@@ -59,6 +59,8 @@ capsule_engine = [
     "packs/catalog/*/folds/*.yaml",
     "packs/catalog/*/wickets/*.yaml",
     "packs/catalog/*/fixtures/*.jsonl",
+    "examples/data/tau2_airline/*.jsonl",
+    "examples/data/tau2_airline/*.json",
 ]
 
 [tool.pytest.ini_options]
