@@ -60,6 +60,9 @@ __all__ = [
     "ProposerStub",
     "FixtureScenario",
     "PackFixtures",
+    "WindowSpec",
+    "Outcome",
+    "ScopeCensus",
     "PackDefinition",
 ]
 
@@ -101,11 +104,22 @@ KNOWN_SCOPE_DIMENSIONS = frozenset({"developer", "operator", "action_class", "ta
 @dataclass(frozen=True)
 class Obligation:
     """The human-readable contract this pack encodes, mapped 1:1 to a check
-    (every obligation maps 1:1 to the check that enforces it)."""
+    (every obligation maps 1:1 to the check that enforces it).
+
+    ``re_derivability_grade`` (design §2.3, compiler-and-setup-design
+    2026-08-19) is optional and additive -- an undeclared grade is a
+    legitimately different state from either closed-set value, not a typo,
+    so existing packs (declared before this field existed) parse and digest
+    identically to before. When declared it must be one of
+    ``vocabulary.RE_DERIVABILITY_GRADES`` -- ``compiler.re_derivability.
+    grade_for_check`` gives the seeded default for the checks this repo
+    already ships.
+    """
 
     id: str
     statement: str
     check: str
+    re_derivability_grade: str | None = None
 
 
 @dataclass(frozen=True)
@@ -159,6 +173,83 @@ class PackFixtures:
 
 
 @dataclass(frozen=True)
+class WindowSpec:
+    """Bounded-liveness window (design §3.1/§9.2): an outcome statement of
+    the "eventually X" shape is only monitorable once it names how long
+    "eventually" means. ``cure``/``grace`` are optional ISO-8601 duration
+    strings (e.g. ``"P7D"``) -- present, even if null, because compile-time
+    retention checking (window vs. WORM tier) is one of the non-retrofittable
+    fields the design calls out by name."""
+
+    duration: str
+    cure: str | None = None
+    grace: str | None = None
+
+
+@dataclass(frozen=True)
+class Outcome:
+    """The sister table to ``Obligation`` (design §0: "one declaration ...
+    compiled forward into a check ... compiled backward into a report").
+
+    ``evidence_rule`` is a reference/expression naming which capsule
+    pattern counts as confirming evidence (Outcome Compiler doc §4.1) --
+    this module only requires it to be present and non-empty; validating it
+    against a real observed field basis is the evidence-rule lint (Track A
+    / B1), a later, separate task. A declared outcome with no confirming-
+    evidence rule at all is a schema error here, full stop.
+
+    ``forward_verdict``/``backward_verdict`` are the verdict PAIR (design
+    §2.2) -- a schema shape decision, not an annotation: the judge is never
+    in the enforcement path, so a statement's forward and backward
+    mappability are independent facts, both always present.
+
+    ``effect_claim``, when set, must be one of
+    ``compiler.effect_model.EFFECT_CLAIMS``; ``loader.py`` enforces that a
+    refused claim (``agent.caused_resolution``) can only be declared with
+    the verdict pair and reason code ``compile_effect_claim`` computes for
+    it -- REFUSED at compile time is mechanical, not a reviewer's judgment
+    call. ``refusal_reason_code`` is required whenever either verdict is
+    ``"REFUSED"``, for any reason (not only a refused effect claim -- e.g.
+    an unbounded, un-windowed goal).
+
+    ``declared_by``/``evidence_mapping_by`` are reserved now, semantics
+    later (Outcome Compiler doc §11; DECISION 2026-08-18: default is
+    vendor-led, customer accepts -- but the report-facing computed enum
+    this cashes out to is design §7, still open). Free-form strings here on
+    purpose -- do not read closed-vocabulary meaning into them yet.
+    """
+
+    id: str
+    statement: str
+    evidence_rule: str
+    forward_verdict: str
+    backward_verdict: str
+    window: WindowSpec | None = None
+    effect_claim: str | None = None
+    refusal_reason_code: str | None = None
+    re_derivability_grade: str | None = None
+    declared_by: str | None = None
+    evidence_mapping_by: str | None = None
+    required_assurance_grade: str | None = None
+    exposure_denominator_ref: str | None = None
+    retention_check: str | None = None
+
+
+@dataclass(frozen=True)
+class ScopeCensus:
+    """The T2 CLAIM a pack declares (design §4/§4b gap 3): "this pack covers
+    ``n`` of the ``m`` outcomes/obligations in the document identified by
+    ``document_digest``." This is the declaration; ``compiler.scope_census.
+    build_scope_census_capsule`` seals the human sign-off ACT on it as a
+    ledger record -- the pack.yaml field alone is not a recorded act."""
+
+    document_digest: str
+    n: int
+    m: int
+    review_by: str
+
+
+@dataclass(frozen=True)
 class PackDefinition:
     pack_id: str
     obligations: tuple[Obligation, ...]
@@ -170,6 +261,13 @@ class PackDefinition:
     fixtures: PackFixtures | None = None
     bootstrap_path: str | None = None
     source_dir: Path | None = None
+    # outcomes[]/scope_census -- the compiler's schema surface (design of
+    # record, 2026-08-19). Both default to empty/None so a pack declared
+    # before this field existed parses and DIGESTS identically to before
+    # (canonical_dict below includes them only when non-empty, same
+    # convention as ``proposers``).
+    outcomes: tuple[Outcome, ...] = ()
+    scope_census: ScopeCensus | None = None
     # wicket_id -> declared scope dimensions, e.g. {"payments_safety.caps/1.0.0":
     # ("developer",)}. Required for every `caps` constraint (loader.py enforces
     # this); optional documentation for other check types.
@@ -181,7 +279,15 @@ class PackDefinition:
         digest, never copied in whole -- see the module docstring."""
         out: dict[str, Any] = {
             "pack_id": self.pack_id,
-            "obligations": [{"id": o.id, "statement": o.statement, "check": o.check} for o in self.obligations],
+            "obligations": [
+                {
+                    "id": o.id,
+                    "statement": o.statement,
+                    "check": o.check,
+                    **({"re_derivability_grade": o.re_derivability_grade} if o.re_derivability_grade else {}),
+                }
+                for o in self.obligations
+            ],
             "action_semantics": [
                 {
                     "action_type": a.action_type,
@@ -212,6 +318,37 @@ class PackDefinition:
             out["proposers"] = [
                 {"id": p.id, "fold_id": p.fold_id, "strategy": p.strategy, "status": p.status} for p in self.proposers
             ]
+        if self.outcomes:
+            out["outcomes"] = [
+                {
+                    "id": o.id,
+                    "statement": o.statement,
+                    "evidence_rule": o.evidence_rule,
+                    "forward_verdict": o.forward_verdict,
+                    "backward_verdict": o.backward_verdict,
+                    **(
+                        {"window": {"duration": o.window.duration, "cure": o.window.cure, "grace": o.window.grace}}
+                        if o.window
+                        else {}
+                    ),
+                    **({"effect_claim": o.effect_claim} if o.effect_claim else {}),
+                    **({"refusal_reason_code": o.refusal_reason_code} if o.refusal_reason_code else {}),
+                    **({"re_derivability_grade": o.re_derivability_grade} if o.re_derivability_grade else {}),
+                    **({"declared_by": o.declared_by} if o.declared_by else {}),
+                    **({"evidence_mapping_by": o.evidence_mapping_by} if o.evidence_mapping_by else {}),
+                    **({"required_assurance_grade": o.required_assurance_grade} if o.required_assurance_grade else {}),
+                    **({"exposure_denominator_ref": o.exposure_denominator_ref} if o.exposure_denominator_ref else {}),
+                    **({"retention_check": o.retention_check} if o.retention_check else {}),
+                }
+                for o in self.outcomes
+            ]
+        if self.scope_census:
+            out["scope_census"] = {
+                "document_digest": self.scope_census.document_digest,
+                "n": self.scope_census.n,
+                "m": self.scope_census.m,
+                "review_by": self.scope_census.review_by,
+            }
         return out
 
     def definition_digest(self) -> str:
@@ -227,6 +364,12 @@ class PackDefinition:
     def obligation_for_check(self, check: str) -> Obligation | None:
         for o in self.obligations:
             if o.check == check:
+                return o
+        return None
+
+    def outcome_for_id(self, outcome_id: str) -> Outcome | None:
+        for o in self.outcomes:
+            if o.id == outcome_id:
                 return o
         return None
 

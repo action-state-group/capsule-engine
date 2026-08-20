@@ -33,6 +33,13 @@ from typing import Any
 
 import yaml
 
+from ..compiler.effect_model import EFFECT_CLAIMS, UnknownEffectClaim, compile_effect_claim
+from ..compiler.vocabulary import (
+    BACKWARD_VERDICTS,
+    FORWARD_VERDICTS,
+    RE_DERIVABILITY_GRADES,
+    REFUSAL_REASON_CODES,
+)
 from ..folds.definition import FoldDefinition
 from ..folds.errors import FoldDefinitionError
 from ..folds.loader import load_definition_file as load_fold_definition_file
@@ -44,21 +51,30 @@ from .errors import (
     DUPLICATE_ACTION_TYPE,
     DUPLICATE_CONSTRAINT_WICKET_ID,
     DUPLICATE_OBLIGATION_ID,
+    DUPLICATE_OUTCOME_ID,
+    EFFECT_CLAIM_NOT_REFUSED,
     FOLD_FILE_NOT_FOUND,
     INVALID_ACTION_SEMANTIC,
     INVALID_CONSTRAINT,
     INVALID_FIXTURES,
     INVALID_FOLD_REF,
     INVALID_HOLDS_INTEGRATION,
+    INVALID_OUTCOME,
     INVALID_PACK_ID,
+    INVALID_RE_DERIVABILITY_GRADE,
+    INVALID_SCOPE_CENSUS,
     INVALID_SCOPE_DIMENSION,
+    INVALID_VERDICT,
     MALFORMED_PACK,
     MISSING_CONSTRAINT_SCOPE,
+    MISSING_EVIDENCE_RULE,
+    MISSING_REFUSAL_REASON,
     MISSING_REQUIRED_FIELD,
     OBLIGATION_CHECK_NOT_DECLARED,
     PACK_NOT_FOUND,
     SCOPE_MISMATCH,
     UNKNOWN_ACTION_CLASS,
+    UNKNOWN_EFFECT_CLAIM,
     UNKNOWN_NORMALIZED_FIELD,
     PackDefinitionError,
 )
@@ -70,9 +86,12 @@ from .schema import (
     ActionSemantic,
     FixtureScenario,
     Obligation,
+    Outcome,
     PackDefinition,
     PackFixtures,
     ProposerStub,
+    ScopeCensus,
+    WindowSpec,
 )
 
 __all__ = ["load_pack_dir"]
@@ -139,7 +158,16 @@ def _parse_obligations(raw: Any, *, declared_checks: set[str]) -> tuple[Obligati
                 "to a constraint that actually enforces it; add a constraints[] entry with check: "
                 f"{check!r}, or fix the typo",
             )
-        obligations.append(Obligation(id=obligation_id, statement=statement, check=check))
+        re_derivability_grade = entry.get("re_derivability_grade")
+        if re_derivability_grade is not None and re_derivability_grade not in RE_DERIVABILITY_GRADES:
+            raise PackDefinitionError(
+                INVALID_RE_DERIVABILITY_GRADE,
+                f"obligations[{obligation_id!r}].re_derivability_grade={re_derivability_grade!r} must be one of "
+                f"{sorted(RE_DERIVABILITY_GRADES)}, or omitted",
+            )
+        obligations.append(
+            Obligation(id=obligation_id, statement=statement, check=check, re_derivability_grade=re_derivability_grade)
+        )
     return tuple(obligations)
 
 
@@ -451,6 +479,158 @@ def _parse_fixtures(raw: Any) -> PackFixtures | None:
     return PackFixtures(ledger=ledger, scenarios=tuple(scenarios))
 
 
+def _parse_window(raw: Any, *, what: str) -> WindowSpec | None:
+    if raw is None:
+        return None
+    raw = _require_mapping(raw, what)
+    duration = _require_nonempty_str(raw.get("duration"), f"{what}.duration", "P30D")
+    cure = raw.get("cure")
+    if cure is not None and not isinstance(cure, str):
+        raise PackDefinitionError(INVALID_OUTCOME, f"{what}.cure must be a string duration or omitted")
+    grace = raw.get("grace")
+    if grace is not None and not isinstance(grace, str):
+        raise PackDefinitionError(INVALID_OUTCOME, f"{what}.grace must be a string duration or omitted")
+    return WindowSpec(duration=duration, cure=cure, grace=grace)
+
+
+def _parse_outcomes(raw: Any) -> tuple[Outcome, ...]:
+    """``outcomes[]``, the sister table to ``obligations[]`` (design of
+    record 2026-08-19). Every entry needs a confirming-evidence rule and a
+    verdict pair; an ``effect_claim`` of ``agent.caused_resolution`` MUST
+    compile REFUSED -- this is where "REFUSED at compile time" becomes a
+    load-time error rather than a convention someone could forget."""
+    if not raw:
+        return ()
+    if not isinstance(raw, list):
+        raise PackDefinitionError(MALFORMED_PACK, "'outcomes' must be a list")
+
+    outcomes: list[Outcome] = []
+    seen_ids: set[str] = set()
+    for idx, entry in enumerate(raw):
+        entry = _require_mapping(entry, f"outcomes[{idx}]")
+        outcome_id = _require_nonempty_str(entry.get("id"), f"outcomes[{idx}].id", "outcome.remediation_confirmed")
+        if outcome_id in seen_ids:
+            raise PackDefinitionError(DUPLICATE_OUTCOME_ID, f"outcome id {outcome_id!r} declared more than once")
+        seen_ids.add(outcome_id)
+        statement = _require_nonempty_str(
+            entry.get("statement"), f"outcomes[{outcome_id!r}].statement", "The remediation was confirmed."
+        )
+        evidence_rule = entry.get("evidence_rule")
+        if not isinstance(evidence_rule, str) or not evidence_rule:
+            raise PackDefinitionError(
+                MISSING_EVIDENCE_RULE,
+                f"outcomes[{outcome_id!r}].evidence_rule is required -- a declared outcome with no confirming-"
+                "evidence rule is a schema error, e.g. evidence_rule: \"fulfill capsule chained to intent, "
+                'effect_attestation=counterparty_confirmed"',
+            )
+        forward_verdict = entry.get("forward_verdict")
+        if forward_verdict not in FORWARD_VERDICTS:
+            raise PackDefinitionError(
+                INVALID_VERDICT,
+                f"outcomes[{outcome_id!r}].forward_verdict={forward_verdict!r} must be one of {sorted(FORWARD_VERDICTS)}",
+            )
+        backward_verdict = entry.get("backward_verdict")
+        if backward_verdict not in BACKWARD_VERDICTS:
+            raise PackDefinitionError(
+                INVALID_VERDICT,
+                f"outcomes[{outcome_id!r}].backward_verdict={backward_verdict!r} must be one of "
+                f"{sorted(BACKWARD_VERDICTS)}",
+            )
+        window = _parse_window(entry.get("window"), what=f"outcomes[{outcome_id!r}].window")
+
+        effect_claim = entry.get("effect_claim")
+        refusal_reason_code = entry.get("refusal_reason_code")
+        if effect_claim is not None:
+            if effect_claim not in EFFECT_CLAIMS:
+                raise PackDefinitionError(
+                    UNKNOWN_EFFECT_CLAIM,
+                    f"outcomes[{outcome_id!r}].effect_claim={effect_claim!r} must be one of {sorted(EFFECT_CLAIMS)} "
+                    "-- the advisory effect model is a closed vocabulary (design §4b gap 1)",
+                )
+            try:
+                compiled = compile_effect_claim(effect_claim)
+            except UnknownEffectClaim as exc:  # pragma: no cover -- EFFECT_CLAIMS check above already excludes this
+                raise PackDefinitionError(UNKNOWN_EFFECT_CLAIM, str(exc)) from exc
+            if compiled.refusal_reason_code is not None:
+                # agent.caused_resolution: the format is incoherent without this refusal (design §4b gap 1).
+                # An outcome MAY declare it, but only compiled exactly as compile_effect_claim says --
+                # never claiming provability for an undecomposable causal claim.
+                if (forward_verdict, backward_verdict) != (compiled.verdict.forward, compiled.verdict.backward):
+                    raise PackDefinitionError(
+                        EFFECT_CLAIM_NOT_REFUSED,
+                        f"outcomes[{outcome_id!r}] declares effect_claim={effect_claim!r}, which MUST compile to "
+                        f"forward_verdict={compiled.verdict.forward!r}/backward_verdict={compiled.verdict.backward!r} "
+                        f"(got forward_verdict={forward_verdict!r}/backward_verdict={backward_verdict!r}) -- a "
+                        "record can show a recommendation was made and a person acted, never that the agent "
+                        "caused the resolution; use recommendation.acted_on or resolution.followed_action for "
+                        "the admissible near-miss instead",
+                    )
+                if refusal_reason_code is None:
+                    refusal_reason_code = compiled.refusal_reason_code
+
+        if "REFUSED" in (forward_verdict, backward_verdict):
+            if refusal_reason_code is None:
+                raise PackDefinitionError(
+                    MISSING_REFUSAL_REASON,
+                    f"outcomes[{outcome_id!r}] has forward_verdict={forward_verdict!r}/"
+                    f"backward_verdict={backward_verdict!r} but no refusal_reason_code -- every refusal must name "
+                    f"why, one of {sorted(REFUSAL_REASON_CODES)}",
+                )
+            if refusal_reason_code not in REFUSAL_REASON_CODES:
+                raise PackDefinitionError(
+                    MISSING_REFUSAL_REASON,
+                    f"outcomes[{outcome_id!r}].refusal_reason_code={refusal_reason_code!r} must be one of "
+                    f"{sorted(REFUSAL_REASON_CODES)}",
+                )
+
+        re_derivability_grade = entry.get("re_derivability_grade")
+        if re_derivability_grade is not None and re_derivability_grade not in RE_DERIVABILITY_GRADES:
+            raise PackDefinitionError(
+                INVALID_RE_DERIVABILITY_GRADE,
+                f"outcomes[{outcome_id!r}].re_derivability_grade={re_derivability_grade!r} must be one of "
+                f"{sorted(RE_DERIVABILITY_GRADES)}, or omitted",
+            )
+
+        outcomes.append(
+            Outcome(
+                id=outcome_id,
+                statement=statement,
+                evidence_rule=evidence_rule,
+                forward_verdict=forward_verdict,
+                backward_verdict=backward_verdict,
+                window=window,
+                effect_claim=effect_claim,
+                refusal_reason_code=refusal_reason_code,
+                re_derivability_grade=re_derivability_grade,
+                declared_by=entry.get("declared_by"),
+                evidence_mapping_by=entry.get("evidence_mapping_by"),
+                required_assurance_grade=entry.get("required_assurance_grade"),
+                exposure_denominator_ref=entry.get("exposure_denominator_ref"),
+                retention_check=entry.get("retention_check"),
+            )
+        )
+    return tuple(outcomes)
+
+
+def _parse_scope_census(raw: Any) -> ScopeCensus | None:
+    if raw is None:
+        return None
+    raw = _require_mapping(raw, "scope_census")
+    document_digest = _require_nonempty_str(raw.get("document_digest"), "scope_census.document_digest", "<sha256>")
+    n = raw.get("n")
+    m = raw.get("m")
+    if not isinstance(n, int) or isinstance(n, bool) or n < 0:
+        raise PackDefinitionError(INVALID_SCOPE_CENSUS, f"scope_census.n must be a non-negative integer; got {n!r}")
+    if not isinstance(m, int) or isinstance(m, bool) or m < 1:
+        raise PackDefinitionError(
+            INVALID_SCOPE_CENSUS, f"scope_census.m must be a positive integer (M is the document's statement count); got {m!r}"
+        )
+    if n > m:
+        raise PackDefinitionError(INVALID_SCOPE_CENSUS, f"scope_census.n ({n}) must not exceed scope_census.m ({m})")
+    review_by = _require_nonempty_str(raw.get("review_by"), "scope_census.review_by", "2027-01-01")
+    return ScopeCensus(document_digest=document_digest, n=n, m=m, review_by=review_by)
+
+
 def load_pack_dir(pack_dir: str | Path) -> PackDefinition:
     """Load and fully validate a pack directory's ``pack.yaml`` (plus every
     fold file and inline constraint it references) into a ``PackDefinition``."""
@@ -482,6 +662,8 @@ def load_pack_dir(pack_dir: str | Path) -> PackDefinition:
     _validate_caps_scope_against_folds(constraints, constraint_scopes, folds)
     proposers = _parse_proposers(data.get("proposers"))
     fixtures = _parse_fixtures(data.get("fixtures"))
+    outcomes = _parse_outcomes(data.get("outcomes"))
+    scope_census = _parse_scope_census(data.get("scope_census"))
 
     holds_integration = data.get("holds_integration", "none")
     if holds_integration not in HOLDS_INTEGRATION_VALUES:
@@ -510,4 +692,6 @@ def load_pack_dir(pack_dir: str | Path) -> PackDefinition:
         bootstrap_path=bootstrap_path,
         source_dir=pack_dir,
         constraint_scopes=constraint_scopes,
+        outcomes=outcomes,
+        scope_census=scope_census,
     )
