@@ -25,6 +25,20 @@ example almost exactly:
 - ``unbounded_goal`` / ``refused_effect`` -- REFUSED outright, corpus
   independent, using ``compiler.vocabulary``'s two seeded reason codes
   (``unbounded_goal_unmonitorable``, ``agent_caused_resolution_undecomposable``).
+- ``decision`` -- "an action of this class was authorized by policy rather
+  than blocked." Graded from a DIFFERENT corpus shape than ``attainment``:
+  real ``GuardEngine`` decision capsules (``guards/capsule.py``'s
+  ``build_decision_capsule``, ``action_type == "decide"``,
+  ``asg_payload.action_class`` + ``disposition.decision``) rather than
+  ``setup observe``'s dry-run dispatch/confirmation pair. This is the
+  bridge for any corpus produced by the real engine -- e.g. a
+  plan_containment-checked action-capsule ledger -- where nothing was ever
+  run through ``setup observe`` at all.
+
+``propose``'s default catalog only ever grades ONE ``decision`` template
+(``outcome.change_authorized`` below); its ``action_class`` is a generic
+label a corpus either has decision capsules for or doesn't -- same
+"absent, not failing" behavior as every other candidate.
 """
 from __future__ import annotations
 
@@ -35,11 +49,12 @@ __all__ = [
     "AttainmentCandidate",
     "OfferResponseCandidate",
     "RefusedCandidate",
+    "DecisionCandidate",
     "Candidate",
     "DEFAULT_CANDIDATES",
 ]
 
-CandidateKind = str  # "attainment" | "offer_response" | "refused"
+CandidateKind = str  # "attainment" | "offer_response" | "refused" | "decision"
 
 
 @dataclass(frozen=True)
@@ -78,17 +93,34 @@ class RefusedCandidate:
     kind: CandidateKind = field(default="refused", init=False)
 
 
-Candidate = AttainmentCandidate | OfferResponseCandidate | RefusedCandidate
+@dataclass(frozen=True)
+class DecisionCandidate:
+    """Graded from ``GuardEngine`` decision capsules, never from
+    ``setup observe``'s dispatch/confirmation pair -- see module docstring.
+    Like ``OfferResponseCandidate``/``RefusedCandidate``, this has no
+    plan/fold for ``setup/compile_bridge.py`` to (re)compile: its verdict
+    pair is graded against the corpus at propose time and frozen as-is by
+    ``confirm``."""
+
+    outcome_id: str
+    statement: str
+    action_class: str
+    kind: CandidateKind = field(default="decision", init=False)
+
+
+Candidate = AttainmentCandidate | OfferResponseCandidate | RefusedCandidate | DecisionCandidate
 
 _KIND_FIELDS: dict[str, tuple[str, ...]] = {
     "attainment": ("action_class",),
     "offer_response": ("offer_namespace", "missing_instrument_label"),
     "refused": ("reason_code", "effect_claim"),
+    "decision": ("action_class",),
 }
 _KIND_CLASSES: dict[str, type] = {
     "attainment": AttainmentCandidate,
     "offer_response": OfferResponseCandidate,
     "refused": RefusedCandidate,
+    "decision": DecisionCandidate,
 }
 
 
@@ -134,5 +166,10 @@ DEFAULT_CANDIDATES: tuple[Candidate, ...] = (
         statement="the agent's action caused the case to resolve",
         reason_code="agent_caused_resolution_undecomposable",
         effect_claim="agent.caused_resolution",
+    ),
+    DecisionCandidate(
+        outcome_id="outcome.change_authorized",
+        statement="a change request was authorized by policy rather than blocked",
+        action_class="booking.modify",
     ),
 )

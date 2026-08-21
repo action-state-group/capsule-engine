@@ -4,6 +4,7 @@ import pytest
 from capsule_engine.setup.candidates import (
     DEFAULT_CANDIDATES,
     AttainmentCandidate,
+    DecisionCandidate,
     OfferResponseCandidate,
     RefusedCandidate,
     candidate_from_canonical_dict,
@@ -11,9 +12,9 @@ from capsule_engine.setup.candidates import (
 )
 
 
-def test_default_candidates_cover_all_three_kinds():
+def test_default_candidates_cover_all_four_kinds():
     kinds = {c.kind for c in DEFAULT_CANDIDATES}
-    assert kinds == {"attainment", "offer_response", "refused"}
+    assert kinds == {"attainment", "offer_response", "refused", "decision"}
 
 
 def test_default_candidates_exercise_both_seeded_refusal_reason_codes():
@@ -31,6 +32,7 @@ def test_default_candidates_exercise_both_seeded_refusal_reason_codes():
             outcome_id="outcome.d", statement="d", reason_code="agent_caused_resolution_undecomposable",
             effect_claim="agent.caused_resolution",
         ),
+        DecisionCandidate(outcome_id="outcome.e", statement="e", action_class="verb_e"),
     ],
 )
 def test_canonical_dict_round_trips(candidate):

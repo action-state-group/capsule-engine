@@ -33,6 +33,7 @@ from .candidates import (
     DEFAULT_CANDIDATES,
     AttainmentCandidate,
     Candidate,
+    DecisionCandidate,
     OfferResponseCandidate,
     RefusedCandidate,
     candidate_to_canonical_dict,
@@ -108,6 +109,24 @@ def _attainment_coverage(ledger: LedgerAPI, action_class: str) -> tuple[int, int
     return len(confirmed), len(dispatches)
 
 
+def _decision_coverage(ledger: LedgerAPI, action_class: str) -> tuple[int, int]:
+    """Coverage over real ``GuardEngine`` decision capsules (``action_type
+    == "decide"``, ``guards/capsule.py``'s canonical
+    ``asg_payload.action_class`` / ``disposition.decision`` shape) --
+    the corpus a plan_containment-checked action-capsule ledger actually
+    contains, as opposed to ``setup observe``'s own dispatch/confirmation
+    dry-run pair ``_attainment_coverage`` reads. ``M`` is every decision
+    capsule tagged with this ``action_class``; ``N`` is however many were
+    ``accept`` rather than ``reject``/``hitl_dispatched``."""
+    decisions = [
+        r
+        for r in ledger.scan(ScanQuery(action_type="decide"))
+        if (r.capsule.get("asg_payload") or {}).get("action_class") == action_class
+    ]
+    allowed = sum(1 for r in decisions if (r.capsule.get("disposition") or {}).get("decision") == "accept")
+    return allowed, len(decisions)
+
+
 def _offer_response_coverage(ledger: LedgerAPI, namespace: str) -> tuple[int, int, bool]:
     prefix = f"{namespace}/"
     offers = [r for r in _scan(ledger, EVENT_OFFER) if _detail(r).get("offer_id", "").startswith(prefix)]
@@ -165,6 +184,22 @@ def _propose_offer_response(ledger: LedgerAPI, c: OfferResponseCandidate) -> Pro
     )
 
 
+def _propose_decision(ledger: LedgerAPI, c: DecisionCandidate) -> ProposedOutcome | None:
+    n, m = _decision_coverage(ledger, c.action_class)
+    if m == 0:
+        return None
+    return ProposedOutcome(
+        outcome_id=c.outcome_id,
+        statement=c.statement,
+        forward_verdict="DETERMINISTIC",
+        backward_verdict="DETERMINISTIC",
+        coverage_n=n,
+        coverage_m=m,
+        rationale=f"evidence rule: a {c.action_class!r} decision capsule with disposition.decision='accept'",
+        candidate=c,
+    )
+
+
 def _propose_refused(c: RefusedCandidate) -> ProposedOutcome:
     if c.reason_code not in REFUSAL_REASON_CODES:
         raise ValueError(f"reason_code must be one of {sorted(REFUSAL_REASON_CODES)}; got {c.reason_code!r}")
@@ -198,6 +233,8 @@ def propose_from_ledger(ledger: LedgerAPI, candidates: tuple[Candidate, ...] = D
             outcome = _propose_offer_response(ledger, c)
         elif isinstance(c, RefusedCandidate):
             outcome = _propose_refused(c)
+        elif isinstance(c, DecisionCandidate):
+            outcome = _propose_decision(ledger, c)
         else:  # pragma: no cover - closed set, defensive
             raise TypeError(f"unknown candidate type {type(c)!r}")
         if outcome is not None:
