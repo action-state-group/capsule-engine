@@ -41,6 +41,13 @@ dev = ["pytest>=7.0", "ruff>=0.4", "mcp>=1.0,<2.0"]
 # mcp-types) and dropped the `mcp.server.fastmcp` import path this server
 # uses -- see capsule_engine/mcp/server.py.
 mcp = ["mcp>=1.0,<2.0"]
+# capsule_engine/setup/prose_drafter.py's opt-in DeepEvalRationaleDrafter
+# (`capsule setup propose --drafter deepeval`) is the only thing in this
+# package that imports deepeval; setup/propose.py's deterministic pipeline
+# has no hard dependency on it. It imports deepeval lazily and raises a
+# named, actionable error if this extra isn't installed, so
+# `capsule_engine.setup` stays importable without it.
+drafter = ["deepeval>=1.0"]
 
 [project.scripts]
 capsule-engine = "capsule_engine.cli:main"

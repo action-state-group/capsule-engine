@@ -27,6 +27,7 @@ from ..setup import enforce as setup_enforce
 from ..setup import init as setup_init_mod
 from ..setup import observe as setup_observe
 from ..setup import propose as setup_propose
+from ..setup import prose_drafter as setup_prose_drafter
 from ..setup.declarations import DeclarationStore
 
 __all__ = ["add_parser"]
@@ -148,6 +149,19 @@ def _cmd_propose(args: argparse.Namespace) -> int:
     store = DeclarationStore(_setup_dir(args))
     with LedgerStore(_ledger_path(args)) as ledger:
         proposal_set = setup_propose.propose_from_ledger(ledger)
+        if args.drafter is not None:
+            # Opt-in only: drafting a candidate's PROSE never touches the
+            # verdict pairs or coverage numbers computed above -- see
+            # setup/prose_drafter.py's draft_rationales.
+            if args.drafter == "static":
+                drafter = setup_prose_drafter.StaticRationaleDrafter()
+            else:
+                try:
+                    drafter = setup_prose_drafter.DeepEvalRationaleDrafter(model=args.model)
+                except setup_prose_drafter.DrafterError as exc:
+                    print(f"capsule setup propose: {exc.reason}: {exc}", file=sys.stderr)
+                    return 1
+            proposal_set = setup_prose_drafter.draft_rationales(proposal_set, drafter)
         drift = setup_propose.diff_against_stored(proposal_set, store) if args.diff else []
         setup_propose.persist_proposals(proposal_set, store)
 
@@ -385,6 +399,14 @@ def add_parser(sub: argparse._SubParsersAction) -> argparse.ArgumentParser:
     _add_common_args(p_propose)
     p_propose.add_argument("--out", default=None, help="write the diffable proposals.yaml artifact here")
     p_propose.add_argument("--diff", action="store_true", help="also diff every accepted outcome_id against a fresh recompile (drift check)")
+    p_propose.add_argument(
+        "--drafter", choices=["deepeval", "static"], default=None,
+        help=(
+            "opt-in: let a model draft PROSE/RATIONALE ONLY (verdict pairs and coverage numbers stay "
+            "the existing deterministic computation); default: off, zero model calls"
+        ),
+    )
+    p_propose.add_argument("--model", default=None, help="model id override passed to the deepeval drafter")
     p_propose.set_defaults(func=_cmd_propose)
 
     p_confirm = setup_sub.add_parser("confirm", help="the human touchpoints: T1 accept, T2 census, T4 refusal acknowledgment")
