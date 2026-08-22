@@ -29,11 +29,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from agent_action_capsule import verify as verify_capsule
+from capsule_emit.checkpoint import MmrLedger
+from capsule_emit.checkpoint import core as mmr_core
 
 from ..envcompat import env_get
 from ..ledger.api import ScanQuery
-from ..mmr import core as mmr_core
-from ..mmr.index import MmrLedger
 from .format import build_echo, format_staleness
 from .ledger_io import add_scan_query_args, build_scan_query, echo_parts, open_ledger, require_ledger_path
 
