@@ -25,12 +25,12 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from capsule_ledger.setup.candidates import DecisionCandidate
-from capsule_ledger.setup.propose import propose_from_ledger
+from capsule_engine.setup.candidates import DecisionCandidate
+from capsule_engine.setup.propose import propose_from_ledger
 
 AIRLINE_FIXTURE = (
     Path(__file__).parent.parent
-    / "capsule_ledger"
+    / "capsule_engine"
     / "examples"
     / "live_compile_demo"
     / "fixtures"
@@ -112,8 +112,8 @@ def test_decision_candidate_round_trips_through_the_declaration_store(store, tmp
     ``DeclarationStore`` must handle the new kind exactly like the other
     three -- persist_proposals -> DeclarationStore.load must reproduce the
     same candidate, the same property every other kind already has."""
-    from capsule_ledger.setup.declarations import DeclarationStore
-    from capsule_ledger.setup.propose import persist_proposals
+    from capsule_engine.setup.declarations import DeclarationStore
+    from capsule_engine.setup.propose import persist_proposals
 
     _load_airline_ledger(store)
     proposal_set = propose_from_ledger(store)
