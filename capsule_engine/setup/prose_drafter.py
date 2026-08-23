@@ -65,9 +65,9 @@ class DeepEvalRationaleDrafter:
     G-Eval call per outcome, prompted to turn the SAME deterministic facts
     (statement, verdicts, coverage, the existing machine-written rationale)
     into plain-language prose. ``deepeval`` is an optional dependency
-    (``pip install capsule-ledger[judge]``), imported lazily so
-    ``capsule_ledger.setup`` stays importable without it -- the same seam as
-    ``judge.scorers.deepeval_scorer.DeepEvalScorer``."""
+    (``pip install capsule-engine[drafter]``), imported lazily so
+    ``capsule_engine.setup`` stays importable without it -- the same seam
+    capsule-compiler's ``judge.scorers.deepeval_scorer.DeepEvalScorer`` uses."""
 
     def __init__(self, *, model: str | None = None):
         try:
@@ -77,7 +77,7 @@ class DeepEvalRationaleDrafter:
             raise DrafterError(
                 DRAFTER_DEPENDENCY_MISSING,
                 "DeepEvalRationaleDrafter requires the optional 'deepeval' package -- "
-                "install with `pip install capsule-ledger[judge]`",
+                "install with `pip install capsule-engine[drafter]`",
             ) from exc
         self._GEval = GEval
         self._LLMTestCase = LLMTestCase

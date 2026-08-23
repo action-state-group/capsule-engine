@@ -20,10 +20,10 @@ import io
 
 import pytest
 
-from capsule_ledger.setup.declarations import DeclarationStore
-from capsule_ledger.setup.observe import ObserveRecorder
-from capsule_ledger.setup.propose import propose_from_ledger
-from capsule_ledger.setup.prose_drafter import (
+from capsule_engine.setup.declarations import DeclarationStore
+from capsule_engine.setup.observe import ObserveRecorder
+from capsule_engine.setup.propose import propose_from_ledger
+from capsule_engine.setup.prose_drafter import (
     DRAFTER_DEPENDENCY_MISSING,
     DeepEvalRationaleDrafter,
     DrafterError,
@@ -106,7 +106,7 @@ def test_draft_rationales_never_changes_the_declaration_digest(store, signer, tm
     must freeze to the SAME digest as the undrafted one for every
     outcome_id. This is the check a mutant that let prose leak into the
     digest computation would fail."""
-    from capsule_ledger.setup.propose import persist_proposals
+    from capsule_engine.setup.propose import persist_proposals
 
     off = _seeded_proposal_set(store, signer)
     on = draft_rationales(off, StaticRationaleDrafter())
@@ -139,10 +139,10 @@ def test_deepeval_rationale_drafter_missing_dependency_raises_a_named_reason():
     with pytest.raises(DrafterError) as exc_info:
         DeepEvalRationaleDrafter()
     assert exc_info.value.reason == DRAFTER_DEPENDENCY_MISSING
-    assert "capsule-ledger[judge]" in str(exc_info.value)
+    assert "capsule-engine[drafter]" in str(exc_info.value)
 
 
-@pytest.mark.skipif(not _deepeval_installed(), reason="deepeval is an optional dependency (pip install capsule-ledger[judge])")
+@pytest.mark.skipif(not _deepeval_installed(), reason="deepeval is an optional dependency (pip install capsule-engine[drafter])")
 def test_deepeval_rationale_drafter_wiring_uses_gevals_reason_as_prose(store, signer, monkeypatch):
     # No real model call: GEval.measure is patched so this proves the
     # wiring (construction, one GEval instance per outcome, .reason ->
@@ -163,7 +163,7 @@ def test_deepeval_rationale_drafter_wiring_uses_gevals_reason_as_prose(store, si
         assert p.rationale == f"drafted prose for propose-drafter::{p.outcome_id}"
 
 
-@pytest.mark.skipif(not _deepeval_installed(), reason="deepeval is an optional dependency (pip install capsule-ledger[judge])")
+@pytest.mark.skipif(not _deepeval_installed(), reason="deepeval is an optional dependency (pip install capsule-engine[drafter])")
 def test_deepeval_rationale_drafter_raises_named_reason_when_geval_yields_no_reason(store, signer, monkeypatch):
     monkeypatch.setenv("OPENAI_API_KEY", "sk-test-construction-only")
     proposal_set = _seeded_proposal_set(store, signer)

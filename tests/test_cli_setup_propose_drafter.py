@@ -16,12 +16,12 @@ import io
 
 import pytest
 import yaml
-
-from capsule_ledger.cli.main import main
-from capsule_ledger.guards.signing import LocalSigner
 from capsule_ledger.ledger import LedgerStore
-from capsule_ledger.setup import prose_drafter as setup_prose_drafter
-from capsule_ledger.setup.observe import ObserveRecorder
+
+from capsule_engine.cli.main import main
+from capsule_engine.guards import LocalSigner
+from capsule_engine.setup import prose_drafter as setup_prose_drafter
+from capsule_engine.setup.observe import ObserveRecorder
 
 
 def _seed_ledger(ledger_dir) -> None:
@@ -103,7 +103,7 @@ def test_deepeval_drafter_missing_dependency_returns_1(tmp_path, capsys):
     assert rc == 1
     err = capsys.readouterr().err
     assert "drafter_dependency_missing" in err
-    assert "capsule-ledger[judge]" in err
+    assert "capsule-engine[drafter]" in err
 
 
 def _deepeval_installed() -> bool:
