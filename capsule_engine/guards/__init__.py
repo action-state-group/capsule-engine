@@ -10,6 +10,7 @@ from .action import Action
 from .capsule import ALLOW, DENY, ESCALATE, ConstraintOutcome, build_decision_capsule, build_event_capsule
 from .classes import ActionClass, classify
 from .engine import GuardDecision, GuardEngine
+from .plan import PlanDefinition, PlanPrecondition, parse_plan_definition
 from .revocation import (
     ROTATION_EVENT,
     KeyWindow,
@@ -18,6 +19,7 @@ from .revocation import (
     check_time_fenced_revocation,
 )
 from .signing import LocalSigner, Signer, SigningKeyUnavailable, key_fingerprint
+from .tool_call import TOOL_CALL_LANE, ToolCallLane
 
 __all__ = [
     "Action",
@@ -31,6 +33,9 @@ __all__ = [
     "classify",
     "GuardDecision",
     "GuardEngine",
+    "PlanDefinition",
+    "PlanPrecondition",
+    "parse_plan_definition",
     "LocalSigner",
     "Signer",
     "SigningKeyUnavailable",
@@ -40,4 +45,6 @@ __all__ = [
     "RevocationFinding",
     "build_key_timeline",
     "check_time_fenced_revocation",
+    "TOOL_CALL_LANE",
+    "ToolCallLane",
 ]

@@ -17,8 +17,15 @@ from capsule_ledger.ledger.api import LedgerAPI
 from ..folds.definition import FoldDefinition
 from .action import Action
 from .capsule import ALLOW, DENY, ESCALATE, ConstraintOutcome, build_decision_capsule, build_event_capsule
-from .checks import CheckOutcome, check_caps, check_dedupe, check_verify_before_dispatch
+from .checks import (
+    CheckOutcome,
+    check_caps,
+    check_dedupe,
+    check_plan_containment,
+    check_verify_before_dispatch,
+)
 from .classes import ActionClass, classify
+from .plan import PlanDefinition
 from .signing import Signer, SigningKeyUnavailable
 
 __all__ = ["GuardDecision", "GuardEngine"]
@@ -74,6 +81,7 @@ class GuardEngine:
         witness_reachable: Callable[[], bool] = lambda: True,
         checkpoint_age_ms: Callable[[], int] = lambda: 0,
         manifest_digest: str | None = None,
+        plan: PlanDefinition | None = None,
     ) -> None:
         self._ledger = ledger
         self._caps_fold = caps_fold
@@ -85,6 +93,12 @@ class GuardEngine:
         self._view_healthy = view_healthy
         self._witness_reachable = witness_reachable
         self._checkpoint_age_ms = checkpoint_age_ms
+        # The forward-compiled plan this engine checks containment against
+        # (``[ldg-plan-containment]``) -- ``None`` when no plan is configured
+        # for this engine instance, in which case ``check_plan_containment``
+        # reports ``n/a`` for every action (same "absent config -> n/a"
+        # shape ``caps`` already uses when no per-class cap is configured).
+        self._plan = plan
         # The active policy manifest's own digest (``capsule_ledger.policy.
         # resolve_manifest(...).manifest_digest``), pinned onto every
         # decision capsule this engine produces (``build_decision_capsule``'s
@@ -222,6 +236,18 @@ class GuardEngine:
         vbd_out = check_verify_before_dispatch(action, self._ledger)
 
         constraints = (dedupe_out.constraint, caps_out.constraint, vbd_out.constraint)
+        if self._plan is not None:
+            # Pure function of (action, plan) -- no ledger read (module
+            # docstring, guards/checks/plan_containment.py). Only added to
+            # this decision's constraints when a plan is actually configured
+            # -- unlike ``caps`` (present, as ``n/a``, since this engine's
+            # very first release), adding a constraint unconditionally here
+            # would change the ``capsule_id`` of every decision capsule any
+            # existing caller has ever produced, plan or no plan. An engine
+            # with no plan configured (the default, and every caller that
+            # predates this check) is byte-for-byte unchanged.
+            plan_out = check_plan_containment(action, self._plan)
+            constraints = (*constraints, plan_out.constraint)
         fold_envelopes = tuple(caps_out.fold_envelopes)
         outcome = _decide(constraints, ac)
 

@@ -16,6 +16,7 @@ from pathlib import Path
 
 from ..folds.catalog import Catalog as FoldCatalog
 from ..folds.definition import FoldDefinition
+from ..guards.plan import PlanDefinition, parse_plan_definition
 from ..guards.wickets.catalog import Catalog as WicketCatalog
 from ..guards.wickets.definition import WicketDefinition
 from .errors import (
@@ -64,6 +65,14 @@ class ResolvedManifest:
     def caps_fold(self) -> FoldDefinition | None:
         fold_id = self.wicket_config("caps").get("fold_id")
         return self.folds.get(fold_id) if fold_id else None
+
+    def plan(self) -> PlanDefinition | None:
+        """The compiled plan quoted directly in the resolved
+        ``plan_containment`` wicket's own ``config`` (``guards/plan.py``'s
+        module docstring: "a compiled plan IS a wicket config") -- ``None``
+        when no ``plan_containment`` wicket is active in this manifest."""
+        config = self.wicket_config("plan_containment")
+        return parse_plan_definition(config) if config else None
 
 
 def resolve_manifest(
