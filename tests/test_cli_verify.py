@@ -8,7 +8,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from capsule_ledger.cli.main import main
+from capsule_engine.cli.main import main
 
 FIXTURE_LEDGER = Path(__file__).parent / "fixtures" / "sample_ledger.jsonl"
 APPROVE_ID = "705955419ca6f944a75db77ae2a59844fdd99d355866c6c1dbc4ebe655c024c7"

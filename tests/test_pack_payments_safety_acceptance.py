@@ -25,13 +25,13 @@ import json
 from pathlib import Path
 
 import pytest
-
-from capsule_ledger.guards import Action, LocalSigner
-from capsule_ledger.guards.capsule import ALLOW, DENY, ESCALATE
 from capsule_ledger.ledger import LedgerStore
-from capsule_ledger.packs import build_engine, install_pack, load_pack_dir, record_pack_activation
 
-PACK_DIR = Path(__file__).parent.parent / "capsule_ledger" / "packs" / "catalog" / "payments-safety"
+from capsule_engine.guards import Action, LocalSigner
+from capsule_engine.guards.capsule import ALLOW, DENY, ESCALATE
+from capsule_engine.packs import build_engine, install_pack, load_pack_dir, record_pack_activation
+
+PACK_DIR = Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog" / "payments-safety"
 FIXTURE_PATH = PACK_DIR / "fixtures" / "mini_ledger.jsonl"
 
 OPERATOR = "acme-checkout"
@@ -273,7 +273,7 @@ def test_pack_gives_identical_verdicts_regardless_of_action_origin(tmp_path):
     proves the property this repo controls without a cross-repo langchain
     dependency: nothing in ``payments-safety``'s wickets/folds ever inspects
     where an ``Action`` came from)."""
-    from capsule_ledger.guards.action import Action as ActionCls
+    from capsule_engine.guards.action import Action as ActionCls
 
     ledger_direct = LedgerStore(tmp_path / "ledger-direct")
     ledger_replayed = LedgerStore(tmp_path / "ledger-replayed")

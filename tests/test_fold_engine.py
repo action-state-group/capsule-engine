@@ -3,8 +3,8 @@
 filter ops, windows, and key-less accumulation (spec §3)."""
 from __future__ import annotations
 
-from capsule_ledger.folds.definition import parse_definition
-from capsule_ledger.folds.engine import evaluate_all, evaluate_one
+from capsule_engine.folds.definition import parse_definition
+from capsule_engine.folds.engine import evaluate_all, evaluate_one
 
 
 def test_absent_declared_field_without_default_is_skipped_not_errored():

@@ -1,0 +1,23 @@
+name: vendor-drift
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  envcompat:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: capsule-engine
+      - uses: actions/checkout@v4
+        with:
+          repository: action-state-group/capsule-ledger
+          path: capsule-ledger
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: check vendored envcompat.py matches capsule-ledger
+        working-directory: capsule-engine
+        run: python scripts/vendor_envcompat.py --check ../capsule-ledger

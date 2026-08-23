@@ -10,11 +10,11 @@ from pathlib import Path
 import pytest
 import yaml
 
-from capsule_ledger.packs.errors import PackDefinitionError
-from capsule_ledger.packs.loader import load_pack_dir
+from capsule_engine.packs.errors import PackDefinitionError
+from capsule_engine.packs.loader import load_pack_dir
 
 PAYMENTS_SAFETY_DIR = (
-    Path(__file__).parent.parent / "capsule_ledger" / "packs" / "catalog" / "payments-safety"
+    Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog" / "payments-safety"
 )
 
 BASE_PACK = {

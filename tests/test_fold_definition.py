@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import pytest
 
-from capsule_ledger.folds.definition import parse_definition
-from capsule_ledger.folds.errors import (
+from capsule_engine.folds.definition import parse_definition
+from capsule_engine.folds.errors import (
     DUPLICATE_READ_PATH,
     FLOAT_IN_DEFINITION,
     INVALID_FOLD_ID,

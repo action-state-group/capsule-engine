@@ -8,15 +8,15 @@ from pathlib import Path
 
 import pytest
 
-from capsule_ledger.guards.wickets import (
+from capsule_engine.guards.wickets import (
     Catalog,
     WicketDefinitionError,
     load_definition_file,
     load_definition_text,
 )
-from capsule_ledger.guards.wickets.definition import WicketDefinition
+from capsule_engine.guards.wickets.definition import WicketDefinition
 
-WICKET_CATALOG_DIR = Path(__file__).parent.parent / "capsule_ledger" / "guards" / "wickets" / "catalog_defs"
+WICKET_CATALOG_DIR = Path(__file__).parent.parent / "capsule_engine" / "guards" / "wickets" / "catalog_defs"
 
 # Pinned digests -- independently recomputable from the checked-in YAML.
 # A change to any of these files' content is a real policy-config change and

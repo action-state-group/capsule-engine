@@ -25,7 +25,7 @@ Needs decision (unrelated to D1/D2, not resolved by this task).
 """
 from pathlib import Path
 
-from capsule_ledger.guards import Action, GuardEngine, LocalSigner
+from capsule_engine.guards import Action, GuardEngine, LocalSigner
 
 FIXTURES = Path(__file__).parent / "fixtures"
 AMAURY = FIXTURES / "amaury_sample_ledger.jsonl"

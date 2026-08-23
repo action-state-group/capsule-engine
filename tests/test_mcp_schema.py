@@ -5,7 +5,7 @@ every MCP tool this server exposes, so a future accidental signature change
 is caught by a diff against `tests/fixtures/mcp_tool_schema_snapshot.json`
 rather than discovered by a caller at runtime.
 
-Importing `capsule_ledger.mcp.server` and listing its tools requires no ledger
+Importing `capsule_engine.mcp.server` and listing its tools requires no ledger
 config -- tool registration is pure metadata; nothing here opens a ledger.
 """
 from __future__ import annotations
@@ -15,7 +15,7 @@ import json
 import re
 from pathlib import Path
 
-from capsule_ledger.mcp.server import mcp
+from capsule_engine.mcp.server import mcp
 
 SNAPSHOT_PATH = Path(__file__).parent / "fixtures" / "mcp_tool_schema_snapshot.json"
 EXPECTED_TOOL_NAMES = {

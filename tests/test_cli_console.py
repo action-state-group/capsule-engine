@@ -11,8 +11,8 @@ from pathlib import Path
 
 import pytest
 
-from capsule_ledger.cli.main import _build_parser
-from capsule_ledger.console.server import build_server
+from capsule_engine.cli.main import _build_parser
+from capsule_engine.console.server import build_server
 
 FIXTURE_LEDGER = Path(__file__).parent / "fixtures" / "sample_ledger.jsonl"
 APPROVE_ID = "705955419ca6f944a75db77ae2a59844fdd99d355866c6c1dbc4ebe655c024c7"

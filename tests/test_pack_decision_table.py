@@ -13,7 +13,7 @@ from pathlib import Path
 
 import yaml
 
-PACK_DIR = Path(__file__).parent.parent / "capsule_ledger" / "packs" / "catalog" / "payments-safety"
+PACK_DIR = Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog" / "payments-safety"
 DECISION_TABLE_PATH = PACK_DIR / "fixtures" / "decision_table.yaml"
 FIXTURE_PATH = PACK_DIR / "fixtures" / "mini_ledger.jsonl"
 
@@ -69,7 +69,7 @@ def test_every_declared_obligation_check_appears_in_the_table():
     """Cross-check against pack.yaml itself, not just the table's own
     internal consistency -- a check the pack declares but the table never
     mentions at all is the more basic version of the same dead-rule gap."""
-    from capsule_ledger.packs.loader import load_pack_dir
+    from capsule_engine.packs.loader import load_pack_dir
 
     pack = load_pack_dir(PACK_DIR)
     declared_checks = {o.check for o in pack.obligations}

@@ -8,7 +8,7 @@ from pathlib import Path
 
 from agent_action_capsule import compute_capsule_id
 
-from capsule_ledger.policy import (
+from capsule_engine.policy import (
     EVENT_MANIFEST_ACTIVATED,
     GENESIS_PARENT,
     build_manifest_activation_capsule,
@@ -17,9 +17,9 @@ from capsule_ledger.policy import (
     resolve_manifest,
 )
 
-CATALOG_DIR = Path(__file__).parent.parent / "capsule_ledger" / "folds" / "catalog_defs"
-WICKET_CATALOG_DIR = Path(__file__).parent.parent / "capsule_ledger" / "guards" / "wickets" / "catalog_defs"
-DEFAULT_MANIFEST_PATH = Path(__file__).parent.parent / "capsule_ledger" / "policy" / "catalog_defs" / "default.yaml"
+CATALOG_DIR = Path(__file__).parent.parent / "capsule_engine" / "folds" / "catalog_defs"
+WICKET_CATALOG_DIR = Path(__file__).parent.parent / "capsule_engine" / "guards" / "wickets" / "catalog_defs"
+DEFAULT_MANIFEST_PATH = Path(__file__).parent.parent / "capsule_engine" / "policy" / "catalog_defs" / "default.yaml"
 
 
 def _resolved():
@@ -92,7 +92,7 @@ def test_tampering_the_activation_capsule_is_detected():
     confirm recompute stops matching -- a verifier that can't catch this
     isn't verifying anything."""
     resolved = _resolved()
-    from capsule_ledger.guards import LocalSigner
+    from capsule_engine.guards import LocalSigner
 
     signer = LocalSigner(key_id="k", secret=b"s")
     capsule = build_manifest_activation_capsule(resolved=resolved, operator="acme", developer="ops", signer=signer)

@@ -20,12 +20,12 @@ import threading
 from pathlib import Path
 
 import pytest
-
-from capsule_ledger.guards import Action, LocalSigner
 from capsule_ledger.ledger import LedgerStore
-from capsule_ledger.packs import build_engine, install_pack, load_pack_dir
 
-PACK_DIR = Path(__file__).parent.parent / "capsule_ledger" / "packs" / "catalog" / "payments-safety"
+from capsule_engine.guards import Action, LocalSigner
+from capsule_engine.packs import build_engine, install_pack, load_pack_dir
+
+PACK_DIR = Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog" / "payments-safety"
 
 OPERATOR = "acme-checkout"
 DEVELOPER = "checkout-concurrency-probe@v1"

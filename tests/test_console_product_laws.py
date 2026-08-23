@@ -13,7 +13,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-CONSOLE = Path(__file__).parent.parent / "capsule_ledger" / "console"
+CONSOLE = Path(__file__).parent.parent / "capsule_engine" / "console"
 TOKENS_CSS = (CONSOLE / "tokens.css").read_text(encoding="utf-8")
 COMPONENTS_CSS = (CONSOLE / "components.css").read_text(encoding="utf-8")
 GALLERY_HTML = (CONSOLE / "gallery.html").read_text(encoding="utf-8")
