@@ -1,0 +1,53 @@
+{
+  "claude-3-7-sonnet": {
+    "source_repo": "https://github.com/sierra-research/tau2-bench",
+    "source_file": "data/tau2/results/final/claude-3-7-sonnet-20250219_airline_default_gpt-4.1-2025-04-14_4trials.json",
+    "source_git_commit": "c30d59aaa71c65f9b9eb6a8f8636b48945028fcf",
+    "trial_used": 0,
+    "num_tasks": 50,
+    "num_tool_call_events": 456,
+    "output_file": "tau2_committed_claude-3-7-sonnet_airline_trial0.jsonl",
+    "output_bytes": 616060
+  },
+  "gpt-4-1": {
+    "source_repo": "https://github.com/sierra-research/tau2-bench",
+    "source_file": "data/tau2/results/final/gpt-4.1-2025-04-14_airline_default_gpt-4.1-2025-04-14_4trials.json",
+    "source_git_commit": "c30d59aaa71c65f9b9eb6a8f8636b48945028fcf",
+    "trial_used": 0,
+    "num_tasks": 50,
+    "num_tool_call_events": 396,
+    "output_file": "tau2_committed_gpt-4-1_airline_trial0.jsonl",
+    "output_bytes": 502084
+  },
+  "gpt-4-1-mini": {
+    "source_repo": "https://github.com/sierra-research/tau2-bench",
+    "source_file": "data/tau2/results/final/gpt-4.1-mini-2025-04-14_airline_base_gpt-4.1-2025-04-14_4trials.json",
+    "source_git_commit": "ade39493be54aad326a4c65295f77fe09780329b",
+    "trial_used": 0,
+    "num_tasks": 50,
+    "num_tool_call_events": 380,
+    "output_file": "tau2_committed_gpt-4-1-mini_airline_trial0.jsonl",
+    "output_bytes": 514149
+  },
+  "o4-mini": {
+    "source_repo": "https://github.com/sierra-research/tau2-bench",
+    "source_file": "data/tau2/results/final/o4-mini-2025-04-16_airline_default_gpt-4.1-2025-04-14_4trials.json",
+    "source_git_commit": "c30d59aaa71c65f9b9eb6a8f8636b48945028fcf",
+    "trial_used": 0,
+    "num_tasks": 50,
+    "num_tool_call_events": 292,
+    "output_file": "tau2_committed_o4-mini_airline_trial0.jsonl",
+    "output_bytes": 427028
+  },
+  "pilot1-gemini-2-5-flash": {
+    "source": "record-grounding-bench pilot-1 (2026-08-15), docs/pilot-1-report.md",
+    "record_grounding_bench_pinned_tau2_sha": "668d3bcd135c02aa3438f987ef45735b7c163ee3",
+    "model": "vertex_ai/gemini-2.5-flash (both agent and user-simulator roles)",
+    "shift_seed": 1,
+    "num_tasks": 24,
+    "num_tool_call_events": 142,
+    "output_file": "pilot1_live_gemini-2-5-flash_airline_shift1.jsonl",
+    "output_bytes": 199719,
+    "note": "the only dataset here from a LIVE agent run through record-grounding-bench's own recording pipeline; the other four are replayed from tau2-bench's committed transcripts."
+  }
+}
