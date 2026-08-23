@@ -24,10 +24,10 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 import yaml
-from capsule_compiler.compiler.offer_response import EVENT_OFFER, EVENT_RESPONSE
 from capsule_ledger.ledger.api import LedgerAPI, ScanQuery
 
 from ..compiler.effect_model import compile_effect_claim
+from ..compiler.offer_response import EVENT_OFFER, EVENT_RESPONSE
 from ..compiler.vocabulary import REFUSAL_REASON_CODES, display_string
 from .candidates import (
     DEFAULT_CANDIDATES,

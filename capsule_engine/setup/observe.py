@@ -23,10 +23,10 @@ import sys
 from dataclasses import dataclass, field
 from typing import Any, TextIO
 
-from capsule_compiler.compiler.offer_response import build_offer_capsule, build_response_capsule
 from capsule_ledger.conversation.capsules import build_session_close_capsule, build_turn_capsule
 from capsule_ledger.ledger.api import LedgerAPI
 
+from ..compiler.offer_response import build_offer_capsule, build_response_capsule
 from ..guards.capsule import build_event_capsule
 from ..guards.signing import Signer
 
