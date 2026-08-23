@@ -14,6 +14,18 @@ jobs:
           python-version: "3.12"
       - name: install capsule-ledger (not yet on PyPI)
         run: pip install "capsule-ledger @ git+https://github.com/action-state-group/capsule-ledger.git"
+      # capsule-compiler is a PRIVATE sibling repo in the same org. The default
+      # GITHUB_TOKEN issued to this workflow run is scoped to THIS repo only
+      # and cannot clone a different private repo, even within the same org --
+      # so a plain `pip install git+https://github.com/.../capsule-compiler.git`
+      # here would fail with an authentication error. COMPILER_REPO_PAT (a
+      # fine-grained PAT with read access to action-state-group/capsule-compiler)
+      # must be added as a repo secret by an operator before this workflow can
+      # go green. This step, and therefore this whole CI run, is EXPECTED TO BE
+      # RED until that secret exists -- that is an operator action pending
+      # outside this repo, not a defect of this workflow.
+      - name: install capsule-compiler (private)
+        run: pip install "capsule-compiler @ git+https://x-access-token:${{ secrets.COMPILER_REPO_PAT }}@github.com/action-state-group/capsule-compiler.git"
       - name: install
         run: pip install -e ".[dev]"
       - name: ruff

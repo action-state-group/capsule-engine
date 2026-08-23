@@ -18,9 +18,15 @@ classifiers = [
 # Capsule parsing goes through the public agent-action-capsule reference
 # library -- never vendored into this repo. Ledger storage and the
 # action-class registry are owned by the separate capsule-ledger package.
+# capsule-compiler is the standalone (private, company-OSS) semantic-compiler
+# package: the setup verbs (`capsule setup propose/confirm/enforce`) bridge a
+# stored candidate to the real dual-compile pipeline (compilation record,
+# refusal capsules, scope census) -- this is engine consuming compiler
+# artifacts through its public interface, never the reverse.
 dependencies = [
     "agent-action-capsule>=0.1.0",
     "capsule-ledger>=0.0.1",
+    "capsule-compiler>=0.0.1",
     "capsule-emit>=0.3.0",
     "pyyaml>=6.0",
 ]
