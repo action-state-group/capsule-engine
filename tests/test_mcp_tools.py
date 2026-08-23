@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""Unit tests for `capsule_ledger.mcp.tools` -- direct calls against a real
+"""Unit tests for `capsule_engine.mcp.tools` -- direct calls against a real
 `LedgerStore`, no FastMCP/session in the loop. Each tool is checked against
 the same modules the CLI uses (`store` / `caps_fold` / `signer` fixtures come
 from `conftest.py`, shared with the guard-engine tests)."""
@@ -9,10 +9,10 @@ from pathlib import Path
 
 import pytest
 
-from capsule_ledger.guards import GuardEngine
-from capsule_ledger.mcp import tools
+from capsule_engine.guards import GuardEngine
+from capsule_engine.mcp import tools
 
-CATALOG_DIR = Path(__file__).parent.parent / "capsule_ledger" / "folds" / "catalog_defs"
+CATALOG_DIR = Path(__file__).parent.parent / "capsule_engine" / "folds" / "catalog_defs"
 FIXTURE_LEDGER = Path(__file__).parent / "fixtures" / "sample_ledger.jsonl"
 
 

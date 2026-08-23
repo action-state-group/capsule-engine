@@ -19,11 +19,12 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from capsule_ledger.folds.loader import load_definition_file
-from capsule_ledger.guards import Action, LocalSigner
-from capsule_ledger.guards.capsule import ALLOW, ESCALATE
 from capsule_ledger.ledger import LedgerStore
-from capsule_ledger.packs import (
+
+from capsule_engine.folds.loader import load_definition_file
+from capsule_engine.guards import Action, LocalSigner
+from capsule_engine.guards.capsule import ALLOW, ESCALATE
+from capsule_engine.packs import (
     build_engine,
     enforce_pack,
     install_pack,
@@ -31,10 +32,10 @@ from capsule_ledger.packs import (
     propose_thresholds,
     record_pack_activation,
 )
-from capsule_ledger.report.build import build_dry_run_report_with_proposal
-from capsule_ledger.report.replay import load_records
+from capsule_engine.report.build import build_dry_run_report_with_proposal
+from capsule_engine.report.replay import load_records
 
-PACK_DIR = Path(__file__).parent.parent / "capsule_ledger" / "packs" / "catalog" / "payments-safety"
+PACK_DIR = Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog" / "payments-safety"
 FOLD_FILE = PACK_DIR / "folds" / "spend_weekly.yaml"
 
 OPERATOR = "acme-checkout"

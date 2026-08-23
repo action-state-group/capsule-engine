@@ -13,8 +13,8 @@ from pathlib import Path
 import pytest
 import yaml
 
-from capsule_ledger.packs.errors import PackDefinitionError
-from capsule_ledger.packs.loader import load_pack_dir
+from capsule_engine.packs.errors import PackDefinitionError
+from capsule_engine.packs.loader import load_pack_dir
 
 DEVELOPER_KEYED_FOLD = """
 fold_id: test.spend.by_developer/1.0.0

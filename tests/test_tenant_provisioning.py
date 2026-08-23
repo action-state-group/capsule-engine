@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""Engine-instance-per-tenant provisioning (``capsule_ledger.tenants`` +
+"""Engine-instance-per-tenant provisioning (``capsule_engine.tenants`` +
 ``capsule tenant init/upgrade/list``): one physically-separate ledger dir +
 pinned manifest + signing key per tenant, templated so provisioning many
 tenants is a script, not bespoke work per customer."""
@@ -8,12 +8,12 @@ from __future__ import annotations
 import json
 
 import pytest
-
-from capsule_ledger.cli.main import main
 from capsule_ledger.ledger import LedgerStore
-from capsule_ledger.packs import load_pack_dir
-from capsule_ledger.policy import load_manifest_file
-from capsule_ledger.tenants import (
+
+from capsule_engine.cli.main import main
+from capsule_engine.packs import load_pack_dir
+from capsule_engine.policy import load_manifest_file
+from capsule_engine.tenants import (
     TenantProvisionError,
     init_tenant,
     list_tenants,
@@ -25,7 +25,7 @@ PACK_CATALOG_DIR = None  # resolved lazily below, mirrors cli/init_cmds.py's bui
 
 
 def _payments_safety_pack():
-    from capsule_ledger.cli.init_cmds import BUILTIN_PACK_CATALOG_DIR
+    from capsule_engine.cli.init_cmds import BUILTIN_PACK_CATALOG_DIR
 
     return load_pack_dir(BUILTIN_PACK_CATALOG_DIR / "payments-safety")
 

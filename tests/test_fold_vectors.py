@@ -6,12 +6,12 @@ from __future__ import annotations
 import json
 
 import pytest
-
-from capsule_ledger.folds.engine import evaluate_one
-from capsule_ledger.folds.errors import FoldDefinitionError, FoldDeterminismError
-from capsule_ledger.folds.loader import load_definition_file
 from capsule_ledger.vectors import determinism_cases, kat_cases, must_fail_cases
 from capsule_ledger.vectors.runner import read_jsonl
+
+from capsule_engine.folds.engine import evaluate_one
+from capsule_engine.folds.errors import FoldDefinitionError, FoldDeterminismError
+from capsule_engine.folds.loader import load_definition_file
 
 
 @pytest.mark.parametrize("case", kat_cases(), ids=lambda c: c.name)

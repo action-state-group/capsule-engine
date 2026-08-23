@@ -10,7 +10,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-CONSOLE = Path(__file__).parent.parent / "capsule_ledger" / "console"
+CONSOLE = Path(__file__).parent.parent / "capsule_engine" / "console"
 CONSOLE_HTML = (CONSOLE / "console.html").read_text(encoding="utf-8")
 CONSOLE_CSS = (CONSOLE / "console.css").read_text(encoding="utf-8")
 CONSOLE_JS = (CONSOLE / "console.js").read_text(encoding="utf-8")
@@ -115,7 +115,7 @@ def test_console_html_reuses_the_real_component_library_not_a_copy():
 
 
 def test_console_server_serves_the_same_tokens_and_components_files():
-    from capsule_ledger.console.server import _STATIC_FILES
+    from capsule_engine.console.server import _STATIC_FILES
 
     assert _STATIC_FILES["/tokens.css"][0] == "tokens.css"
     assert _STATIC_FILES["/components.css"][0] == "components.css"

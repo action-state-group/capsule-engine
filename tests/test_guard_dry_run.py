@@ -14,7 +14,7 @@ see D2, 2026-08-05).
 import json
 from pathlib import Path
 
-from capsule_ledger.guards import Action, GuardEngine
+from capsule_engine.guards import Action, GuardEngine
 
 FIXTURES = Path(__file__).parent / "fixtures"
 NANDA = FIXTURES / "nanda_transaction_ledger.jsonl"

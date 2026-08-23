@@ -4,7 +4,7 @@ acceptance: "a real test proving this, not just a schema field that's
 never populated"). Real ``GuardEngine.check()`` calls, real capsules."""
 from __future__ import annotations
 
-from capsule_ledger.guards import Action, GuardEngine
+from capsule_engine.guards import Action, GuardEngine
 
 
 def test_decision_capsule_carries_the_configured_manifest_digest(store, caps_fold, signer, resolved_manifest):

@@ -8,17 +8,17 @@ from pathlib import Path
 
 import pytest
 
-from capsule_ledger.policy import (
+from capsule_engine.policy import (
     PolicyManifestError,
     load_manifest_file,
     load_manifest_text,
     resolve_manifest,
 )
-from capsule_ledger.policy.manifest import PackRef, parse_manifest
+from capsule_engine.policy.manifest import PackRef, parse_manifest
 
-CATALOG_DIR = Path(__file__).parent.parent / "capsule_ledger" / "folds" / "catalog_defs"
-WICKET_CATALOG_DIR = Path(__file__).parent.parent / "capsule_ledger" / "guards" / "wickets" / "catalog_defs"
-DEFAULT_MANIFEST_PATH = Path(__file__).parent.parent / "capsule_ledger" / "policy" / "catalog_defs" / "default.yaml"
+CATALOG_DIR = Path(__file__).parent.parent / "capsule_engine" / "folds" / "catalog_defs"
+WICKET_CATALOG_DIR = Path(__file__).parent.parent / "capsule_engine" / "guards" / "wickets" / "catalog_defs"
+DEFAULT_MANIFEST_PATH = Path(__file__).parent.parent / "capsule_engine" / "policy" / "catalog_defs" / "default.yaml"
 
 # Pinned: independently recomputable from the checked-in default.yaml. A
 # change to that file's content (a fold/wicket added, removed, or
@@ -268,7 +268,7 @@ def test_resolve_detects_wicket_digest_drift():
 def test_resolve_succeeds_when_pinned_digest_is_correct():
     """The positive twin of the drift tests above: the *real* current
     digest, freshly recomputed, must resolve without raising."""
-    from capsule_ledger.folds.catalog import Catalog as FoldCatalog
+    from capsule_engine.folds.catalog import Catalog as FoldCatalog
 
     real_digest = FoldCatalog(CATALOG_DIR).get("spend.weekly/1.0.0").digest
     manifest = parse_manifest(
@@ -285,7 +285,7 @@ def test_resolve_fails_closed_on_unrecognized_fold_engine():
     """A manifest naming an evaluation engine this build doesn't know how
     to run MUST be rejected, not silently ignored -- the actual load-bearing
     part of making the manifest format engine-agnostic."""
-    from capsule_ledger.folds.catalog import Catalog as FoldCatalog
+    from capsule_engine.folds.catalog import Catalog as FoldCatalog
 
     real_digest = FoldCatalog(CATALOG_DIR).get("spend.weekly/1.0.0").digest
     manifest = parse_manifest(
@@ -300,7 +300,7 @@ def test_resolve_fails_closed_on_unrecognized_fold_engine():
 
 
 def test_resolve_fails_closed_on_unrecognized_wicket_engine():
-    from capsule_ledger.guards.wickets.catalog import Catalog as WicketCatalog
+    from capsule_engine.guards.wickets.catalog import Catalog as WicketCatalog
 
     real_digest = WicketCatalog(WICKET_CATALOG_DIR).get("caps/1.0.0").digest
     manifest = parse_manifest(

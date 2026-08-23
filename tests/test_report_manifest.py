@@ -7,8 +7,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from capsule_ledger.cli.main import main
-from capsule_ledger.report import build_dry_run_report
+from capsule_engine.cli.main import main
+from capsule_engine.report import build_dry_run_report
 
 FIXTURES = Path(__file__).parent / "fixtures"
 NANDA = FIXTURES / "nanda_transaction_ledger.jsonl"

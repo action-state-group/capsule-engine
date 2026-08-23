@@ -26,8 +26,8 @@ from pathlib import Path
 
 import pytest
 
-import capsule_ledger.cli.bundle_cmd as bundle_cmd
-from capsule_ledger.cli.main import main
+import capsule_engine.cli.bundle_cmd as bundle_cmd
+from capsule_engine.cli.main import main
 
 FIXTURE_LEDGER = Path(__file__).parent / "fixtures" / "sample_ledger.jsonl"
 HARNESS = Path(__file__).parent / "js_harness_offline_viewer.mjs"

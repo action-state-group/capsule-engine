@@ -20,7 +20,7 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-import capsule_ledger.mcp.server as srv
+import capsule_engine.mcp.server as srv
 
 
 @pytest.fixture(autouse=True)

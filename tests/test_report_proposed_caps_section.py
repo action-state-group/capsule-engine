@@ -7,10 +7,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from capsule_ledger.folds.loader import load_definition_file
-from capsule_ledger.report.build import build_dry_run_report, build_dry_run_report_with_proposal
+from capsule_engine.folds.loader import load_definition_file
+from capsule_engine.report.build import build_dry_run_report, build_dry_run_report_with_proposal
 
-PACK_DIR = Path(__file__).parent.parent / "capsule_ledger" / "packs" / "catalog" / "payments-safety"
+PACK_DIR = Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog" / "payments-safety"
 FOLD_FILE = PACK_DIR / "folds" / "spend_weekly.yaml"
 FIXTURE = PACK_DIR / "fixtures" / "mini_ledger.jsonl"
 

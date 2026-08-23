@@ -8,11 +8,11 @@ from pathlib import Path
 
 import pytest
 
-from capsule_ledger.packs.errors import RegistryPinError
-from capsule_ledger.packs.loader import load_pack_dir
-from capsule_ledger.packs.pins import load_pins_file, verify_pins
+from capsule_engine.packs.errors import RegistryPinError
+from capsule_engine.packs.loader import load_pack_dir
+from capsule_engine.packs.pins import load_pins_file, verify_pins
 
-PAYMENTS_SAFETY_DIR = Path(__file__).parent.parent / "capsule_ledger" / "packs" / "catalog" / "payments-safety"
+PAYMENTS_SAFETY_DIR = Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog" / "payments-safety"
 
 
 def _real_pack():
