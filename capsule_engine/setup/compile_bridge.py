@@ -16,6 +16,7 @@ from capsule_compiler.compiler.compile import (
     ForwardCompilation,
     compile_declaration,
 )
+
 from .candidates import AttainmentCandidate
 from .declarations import StoredCandidate
 

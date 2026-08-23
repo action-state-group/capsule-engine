@@ -16,10 +16,11 @@ import json
 import sys
 from pathlib import Path
 
+from capsule_ledger.ledger import LedgerStore
+
 from ..envcompat import env_get
 from ..guards.action import Action
 from ..guards.signing import LocalSigner
-from capsule_ledger.ledger import LedgerStore
 from ..setup import adapters as setup_adapters
 from ..setup import confirm as setup_confirm
 from ..setup import enforce as setup_enforce

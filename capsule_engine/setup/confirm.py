@@ -30,9 +30,10 @@ from capsule_compiler.compiler.compilation_record import EVENT_COMPILATION_RECOR
 from capsule_compiler.compiler.compile import seal_compilation_record
 from capsule_compiler.compiler.refusal import EVENT_REFUSAL, build_refusal_capsule
 from capsule_compiler.compiler.scope_census import build_scope_census_capsule
+from capsule_ledger.ledger.api import LedgerAPI
+
 from ..guards.capsule import build_event_capsule
 from ..guards.signing import Signer
-from capsule_ledger.ledger.api import LedgerAPI
 from .compile_bridge import compiled_declaration_for
 from .declarations import DeclarationStore
 

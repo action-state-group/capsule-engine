@@ -1,0 +1,13 @@
+# filter references disposition.verdict_class, which is NOT declared in reads.
+fold_id: kat.undeclared_field/1.0.0
+reads:
+  - path: developer
+    erasure_class: commitment-ok
+key: developer
+filter:
+  - field: disposition.verdict_class
+    op: eq
+    value: executed
+reduce:
+  reducer: count
+emit: count

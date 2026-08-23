@@ -25,9 +25,10 @@ from typing import Any, TextIO
 
 from capsule_compiler.compiler.offer_response import build_offer_capsule, build_response_capsule
 from capsule_ledger.conversation.capsules import build_session_close_capsule, build_turn_capsule
+from capsule_ledger.ledger.api import LedgerAPI
+
 from ..guards.capsule import build_event_capsule
 from ..guards.signing import Signer
-from capsule_ledger.ledger.api import LedgerAPI
 
 __all__ = [
     "EVENT_DISPATCH",
@@ -204,9 +205,13 @@ class ObserveRecorder:
         return capsule
 
     def _record_offer(self, raw: dict[str, Any]) -> dict:
+        # ``option_digests`` postdates this trace format -- an un-instrumented
+        # trace naming only a single, undifferentiated offer is the one-option
+        # case: the offer's own digest doubles as its sole option's digest.
         capsule = build_offer_capsule(
             offer_id=raw["offer_id"],
             offer_digest=raw["offer_digest"],
+            option_digests=raw.get("option_digests") or [raw["offer_digest"]],
             operator=self._operator,
             developer=self._developer,
             signer=self._signer,

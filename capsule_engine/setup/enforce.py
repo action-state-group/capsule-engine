@@ -26,13 +26,14 @@ from dataclasses import dataclass, replace
 from pathlib import Path
 from urllib.parse import quote
 
+from capsule_ledger.ledger.api import LedgerAPI
+
 from ..guards.action import Action
 from ..guards.capsule import ALLOW, DENY, build_decision_capsule, build_event_capsule
 from ..guards.checks.base import CheckOutcome
 from ..guards.checks.plan_containment import check_plan_containment
 from ..guards.plan import PlanDefinition
 from ..guards.signing import Signer
-from capsule_ledger.ledger.api import LedgerAPI
 from .candidates import AttainmentCandidate
 from .compile_bridge import compiled_declaration_for
 from .declarations import DeclarationStore, StoredCandidate

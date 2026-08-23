@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 import pytest
-
 from capsule_ledger.ledger import LedgerStore
+
 from capsule_engine.setup.init import setup_init, signer_for
 
 

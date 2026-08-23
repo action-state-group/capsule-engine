@@ -25,9 +25,10 @@ import secrets as secrets_mod
 from dataclasses import dataclass
 from pathlib import Path
 
+from capsule_ledger.ledger import LedgerStore
+
 from ..envcompat import env_get
 from ..guards.signing import LocalSigner, key_fingerprint
-from capsule_ledger.ledger import LedgerStore
 from ..tenants import InitResult as TenantInitResult
 from ..tenants import init_tenant
 from .declarations import DeclarationStore
