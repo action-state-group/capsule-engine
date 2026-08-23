@@ -8,6 +8,7 @@ import base64
 import json
 from pathlib import Path
 
+from capsule_engine.cli.format import cli_echo_leaks_absolute_path
 from capsule_engine.cli.main import main
 
 FIXTURE_LEDGER = Path(__file__).parent / "fixtures" / "sample_ledger.jsonl"
@@ -76,3 +77,44 @@ def test_bundle_flags_a_tampered_record_in_the_slice(tmp_path, capsys):
     assert bundle["verification"][APPROVE_ID]["ok"] is False
     codes = {f["code"] for f in bundle["verification"][APPROVE_ID]["findings"]}
     assert "capsule_id_mismatch" in codes
+
+
+# [ldg-demo-artifact-path-leak] `cli_echo` is rendered on the public bundle
+# permalink and the offline viewer -- verbatim, on a page a stranger opens.
+# It leaked the operator's home directory (`/Users/intangible/...`) via a raw
+# `--out` echo. This is the actual string that leaked (`_work/capsule-ledger/
+# mvp-exit-demo/bundle.json`, 2026-08-12), pinned so the guard's positive
+# case is the real historical bug, not just a synthetic one.
+LEAKED_CLI_ECHO = (
+    "≡ capsule bundle --out /Users/intangible/dev/asg/_work/capsule-ledger/"
+    "mvp-exit-demo/bundle.json"
+)
+
+
+def test_guard_flags_the_historical_leaked_cli_echo():
+    assert cli_echo_leaks_absolute_path(LEAKED_CLI_ECHO) is True
+
+
+def test_guard_passes_a_relative_cli_echo():
+    assert cli_echo_leaks_absolute_path("≡ capsule bundle --out bundle.json") is False
+
+
+def test_bundle_cli_echo_never_leaks_absolute_out_path(tmp_path, monkeypatch, capsys):
+    # tmp_path is always absolute -- this is the exact shape that produced
+    # the historical leak (an absolute --out), so this is the regression
+    # guard for the CLI's own behavior, not just the pure function above.
+    workdir = tmp_path / "workdir"
+    workdir.mkdir()
+    monkeypatch.chdir(workdir)
+    out_path = workdir / "bundle.json"
+
+    rc = main(["bundle", "--ledger", str(FIXTURE_LEDGER), "--out", str(out_path)])
+    assert rc == 0
+
+    bundle = json.loads(out_path.read_text())
+    assert cli_echo_leaks_absolute_path(bundle["cli_echo"]) is False
+
+    stdout = capsys.readouterr().out
+    printed_echo = stdout.rstrip("\n").splitlines()[-1]
+    assert printed_echo == bundle["cli_echo"]
+    assert cli_echo_leaks_absolute_path(printed_echo) is False
