@@ -20,9 +20,4 @@ jobs:
           python-version: "3.12"
       - name: check vendored envcompat.py matches capsule-ledger
         working-directory: capsule-engine
-        run: |
-          python scripts/vendor_envcompat.py ../capsule-ledger
-          git diff --exit-code -- capsule_engine/envcompat.py || {
-            echo "::error::capsule_engine/envcompat.py is out of sync with capsule-ledger's copy -- run scripts/vendor_envcompat.py and commit the result"
-            exit 1
-          }
+        run: python scripts/vendor_envcompat.py --check ../capsule-ledger
