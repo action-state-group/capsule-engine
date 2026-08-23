@@ -29,6 +29,16 @@ def add_parser(sub: argparse._SubParsersAction) -> argparse.ArgumentParser:
         "--bundle", help="verify every record in a bundle file produced by `capsule bundle`, offline and self-contained"
     )
     p.add_argument("--json", action="store_true", help="print the raw verification result(s) as JSON")
+    p.add_argument(
+        "--refusal", action="store_true",
+        help="capsule_id names a setup-enforce decision capsule -- replay its plan_containment check from "
+        "sealed inputs (recompiling the accepted declaration named in asg_payload.action_class) instead of "
+        "digest-verifying it; design's reproduction command for a forward refusal",
+    )
+    p.add_argument(
+        "--declarations", default=".capsule-setup",
+        help="setup directory holding the accepted declaration store (default: .capsule-setup) -- only used with --refusal",
+    )
     p.set_defaults(func=run)
     return p
 
@@ -55,6 +65,8 @@ def run(args: argparse.Namespace) -> int:
     if not args.capsule_id:
         print("capsule verify: capsule_id is required unless --bundle is given", file=sys.stderr)
         return 2
+    if args.refusal:
+        return _run_refusal(args)
 
     ledger_path = require_ledger_path("verify", args)
     if ledger_path is None:
@@ -86,6 +98,48 @@ def run(args: argparse.Namespace) -> int:
     print()
     print(build_echo("verify", positional=capsule_id))
     return 0 if ok else 1
+
+
+def _run_refusal(args: argparse.Namespace) -> int:
+    from ..setup.declarations import DeclarationStore
+    from ..setup.enforce import EnforceError, reproduce_refusal
+
+    ledger_path = require_ledger_path("verify --refusal", args)
+    if ledger_path is None:
+        return 2
+
+    store = DeclarationStore(args.declarations)
+    with open_ledger(ledger_path) as ledger:
+        try:
+            result = reproduce_refusal(args.capsule_id, ledger=ledger, store=store)
+        except EnforceError as exc:
+            print(f"capsule verify --refusal: {exc}", file=sys.stderr)
+            return 2
+
+    if args.json:
+        print(
+            json.dumps(
+                {
+                    "capsule_id": result.capsule_id,
+                    "outcome_id": result.outcome_id,
+                    "original_decision": result.original_decision,
+                    "reproduced_result": result.reproduced_result,
+                    "matches": result.matches,
+                },
+                indent=2,
+                sort_keys=True,
+            )
+        )
+        return 0 if result.matches else 1
+
+    if result.matches:
+        print(f"✓ reproduces · {result.capsule_id} · outcome={result.outcome_id} · {result.reproduced_result}")
+        return 0
+    print(
+        f"✗ DOES NOT reproduce · {result.capsule_id} · outcome={result.outcome_id} · "
+        f"original={result.original_decision} recomputed={result.reproduced_result}"
+    )
+    return 1
 
 
 def _run_bundle(args: argparse.Namespace) -> int:

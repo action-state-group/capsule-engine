@@ -3,7 +3,8 @@
 (dry-run replay + report, enforce marker), `telemetry` (disclosure/status,
 funnel report), `init` (install a starter pack), `constraints` (list the
 registered guard checks + action-class taxonomy), `tenant`
-(engine-instance-per-tenant provisioning), plus the evidence verbs `verify`
+(engine-instance-per-tenant provisioning), `setup` (the onboarding journey:
+`init`/`observe`/`propose`/`confirm`/`enforce`), plus the evidence verbs `verify`
 (verify one ledger record or an offline bundle), `bundle` (produce a
 self-contained verifiable slice of the ledger), and `console` (serve the
 local console UI) -- registered only in the "full" packaging arm, same
@@ -31,6 +32,7 @@ from . import (
     constraints_cmd,
     guard_cmds,
     init_cmds,
+    setup_cmds,
     telemetry_cmd,
     tenant_cmds,
     verify_cmd,
@@ -50,6 +52,7 @@ def _build_parser(arm: str | None = None) -> argparse.ArgumentParser:
     guard_cmds.add_parser(sub)
     tenant_cmds.add_parser(sub)
     telemetry_cmd.add_parser(sub)
+    setup_cmds.add_parser(sub)
 
     # The record-query/evidence verbs -- capsule verify, the shareable
     # bundle, and the local console UI -- are the "evidence": registered
@@ -102,6 +105,12 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "telemetry":
         if getattr(args, "telemetry_command", None) is None:
             args.telemetry_parser.print_help()
+            return 0
+        return args.func(args)
+
+    if args.command == "setup":
+        if getattr(args, "setup_command", None) is None:
+            args.setup_parser.print_help()
             return 0
         return args.func(args)
 
