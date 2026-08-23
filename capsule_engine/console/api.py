@@ -15,6 +15,7 @@ from typing import Any
 
 from capsule_ledger.ledger.api import LedgerAPI, ScanQuery
 from capsule_ledger.ledger.records import LedgerRecord
+from capsule_ledger.payload_store import PayloadStore
 from capsule_ledger.registry import describe_action_class
 
 from ..cli.format import (
@@ -26,7 +27,6 @@ from ..cli.format import (
 )
 from ..envcompat import env_get
 from ..folds import Catalog, FoldDeterminismError, evaluate_one
-from ..payload_store import PayloadStore
 
 __all__ = [
     "checkpoint_status",

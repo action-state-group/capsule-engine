@@ -14,9 +14,8 @@ from __future__ import annotations
 import json
 import shlex
 
+from capsule_ledger.payload_store import ResolvedPayload
 from capsule_ledger.registry import describe_action_class
-
-from ..payload_store import ResolvedPayload
 
 __all__ = [
     "format_staleness",

@@ -24,9 +24,9 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from capsule_ledger.cli.ledger_io import open_ledger
 from capsule_ledger.ledger.api import LedgerAPI
 
-from ..cli.ledger_io import open_ledger
 from ..envcompat import env_get
 
 __all__ = ["ServerConfig", "load_config", "open_backend", "DEFAULT_CATALOG_DIR"]
