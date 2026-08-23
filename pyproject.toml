@@ -30,7 +30,11 @@ Homepage = "https://github.com/action-state-group/capsule-engine"
 Source = "https://github.com/action-state-group/capsule-engine"
 
 [project.optional-dependencies]
-dev = ["pytest>=7.0", "ruff>=0.4", "mcp>=1.0,<2.0"]
+# capsule-compiler is a dev-only dependency: no core capsule_engine module
+# imports it, only capsule_engine/examples/plan_containment_demo/demo.py
+# (a full-stack demo of confirm -> judge -> guard -> ledger) and its tests.
+# The distributed capsule-engine package pulls in zero compiler references.
+dev = ["pytest>=7.0", "ruff>=0.4", "mcp>=1.0,<2.0", "capsule-compiler>=0.0.1"]
 # Pinned below 2.0: the 2.0 release restructured the package (split out
 # mcp-types) and dropped the `mcp.server.fastmcp` import path this server
 # uses -- see capsule_engine/mcp/server.py.
