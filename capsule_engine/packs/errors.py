@@ -30,6 +30,18 @@ INVALID_FIXTURES = "invalid_fixtures"
 FLOAT_IN_PACK_DIGEST = "float_in_pack_digest"
 UNSAFE_INTEGER_IN_PACK_DIGEST = "unsafe_integer_in_pack_digest"
 
+# outcomes[] -- the sister table to obligations[] (compiler-and-setup design
+# 2026-08-19 §4b; supersedes [ldg-outcome-declaration-schema]).
+DUPLICATE_OUTCOME_ID = "duplicate_outcome_id"
+INVALID_OUTCOME = "invalid_outcome"
+MISSING_EVIDENCE_RULE = "missing_evidence_rule"
+INVALID_VERDICT = "invalid_verdict"
+MISSING_REFUSAL_REASON = "missing_refusal_reason"
+EFFECT_CLAIM_NOT_REFUSED = "effect_claim_not_refused"
+UNKNOWN_EFFECT_CLAIM = "unknown_effect_claim"
+INVALID_RE_DERIVABILITY_GRADE = "invalid_re_derivability_grade"
+INVALID_SCOPE_CENSUS = "invalid_scope_census"
+
 # Constraint scope declaration + cross-constraint agreement (generalizes the
 # capsule-emit PR #54 finding: a lock/cap/aggregate scope mismatch let a
 # cross-class race jointly admit what sequential execution would deny --

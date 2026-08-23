@@ -1,0 +1,69 @@
+# Synthetic, neutral fixture -- the "agent cannot act" counterpoint (design §1
+# table: agent authority CANNOT ACT, read-only advisory, no production access).
+# No partner name, customer name, or partner-specific vocabulary. This is the
+# shape that falsifies any effect model assuming the agent caused a state
+# change -- every field that quietly encodes agent-causation breaks visibly
+# here (design §1).
+pack_id: test_pub/advisory-incident-shaped/1.0.0
+
+obligations:
+  - id: no-dup-recommendation
+    statement: "No recommendation may be issued more than once for the same incident investigation."
+    check: dedupe
+
+action_semantics:
+  - action_type: incident.recommend
+    action_class: info.query
+    required_fields: [target]
+
+constraints:
+  - wicket_id: advisory_incident_shaped.dedupe/1.0.0
+    check: dedupe
+    config: {}
+
+folds:
+  - file: spend.yaml
+
+scope_census:
+  document_digest: "6ee425facfb7f2257da0386c7aefa3e64a06914ef512f1049ee09c0c90203b18"
+  n: 5
+  m: 5
+  review_by: "2027-01-01"
+
+outcomes:
+  # The legitimate near-miss: a human's own action, recorded because THEY
+  # acted, citing what they read -- no claim about why they acted.
+  - id: outcome.engineer_acted_on_recommendation
+    statement: "The on-call engineer acted on the agent's recommendation."
+    evidence_rule: "engineer action capsule citing the recommendation capsule by digest"
+    effect_claim: recommendation.acted_on
+    forward_verdict: DETERMINISTIC
+    backward_verdict: DETERMINISTIC
+    re_derivability_grade: ledger_state_dependent
+
+  # The other legitimate near-miss: ordering only, no causal claim.
+  - id: outcome.ticket_resolved_following_recommendation
+    statement: "The ticket resolved after the recommendation was made, in that order."
+    evidence_rule: "resolution capsule citing the recommendation capsule by digest, ordered after it"
+    effect_claim: resolution.followed_action
+    forward_verdict: UNAVAILABLE-STATE-REQUIRED
+    backward_verdict: DETERMINISTIC
+
+  # The refused claim, in its sharpest form: a resolved ticket following a
+  # recommendation is correlation, not causation. The engineer may have
+  # acted for their own reasons, or ignored the agent entirely.
+  - id: outcome.agent_caused_ticket_resolution
+    statement: "The agent's recommendation is what caused the ticket to resolve."
+    evidence_rule: "n/a -- undecomposable causal claim, refused by design"
+    effect_claim: agent.caused_resolution
+    forward_verdict: REFUSED
+    backward_verdict: REFUSED
+
+  # Cross-model A/B is first-class (design §1): two model populations need
+  # two coverage lines, never one blended number -- exercised here as an
+  # unavailable-forward, model-assisted-backward outcome.
+  - id: outcome.resolution_rate_by_model_population
+    statement: "Ticket resolution rate is tracked separately per model population, never blended."
+    evidence_rule: "resolution capsules partitioned by model_id population; two coverage lines, never one"
+    forward_verdict: UNAVAILABLE-MODEL-REQUIRED
+    backward_verdict: MODEL-ASSISTED

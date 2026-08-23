@@ -1,0 +1,75 @@
+# Synthetic, hand-built fixture shaped like tau2-bench's retail domain
+# (refund / exchange / cancel-order tool families: real WRITE tool calls
+# alongside read-only recommend paths) -- NOT a generated tau2-bench shift.
+# [ldg-tau2-shift-generation] (Track C) has not produced a real generated
+# corpus yet at the time this schema landed; see the outbox report for
+# [ldg-cs-p1-schema]. This fixture exists to satisfy the P1 acceptance line
+# "tau2-bench retail traces demonstrably express both gaps" at the SCHEMA
+# level -- it is retail-shaped, not retail-generated. Phase 6's demo is
+# where a real generated shift replaces this.
+pack_id: test_pub/retail-synthetic-shaped/1.0.0
+
+obligations:
+  - id: no-dup-refund
+    statement: "No refund may be issued more than once for the same order."
+    check: dedupe
+
+action_semantics:
+  - action_type: refund.issue
+    action_class: money.transfer
+    required_fields: [amount_minor, target]
+
+constraints:
+  - wicket_id: retail_synthetic_shaped.dedupe/1.0.0
+    check: dedupe
+    config: {}
+
+folds:
+  - file: spend.yaml
+
+scope_census:
+  document_digest: "97c102d1fd8b55c859f2f778cb8e107be5d8b9334e9504fd552c7af1d5840344"
+  n: 6
+  m: 6
+  review_by: "2027-01-01"
+
+outcomes:
+  # EXECUTE path: the agent has WRITE tool access and dispatches the
+  # refund itself -- fully deterministic both ways, same as tau2-bench's
+  # real write_refund/write_transfer-shaped tool calls.
+  - id: outcome.refund_confirmed
+    statement: "The requested refund was issued and confirmed against the order system."
+    evidence_rule: "fulfill capsule chained to intent, effect_attestation=counterparty_confirmed, action_class=money.transfer"
+    forward_verdict: DETERMINISTIC
+    backward_verdict: DETERMINISTIC
+    re_derivability_grade: ledger_state_dependent
+    declared_by: vendor
+
+  # RECOMMEND-ONLY path: the agent recommends an exchange instead of
+  # dispatching it, and the customer's own follow-up action carries it
+  # out -- the admissible near-miss, not a causal claim.
+  - id: outcome.exchange_recommended_and_acted_on
+    statement: "The agent recommended an exchange and the customer's own action carried it out."
+    evidence_rule: "response capsule citing the recommendation capsule by digest, response_class=accepted"
+    effect_claim: recommendation.acted_on
+    forward_verdict: DETERMINISTIC
+    backward_verdict: DETERMINISTIC
+
+  # The offer/response denominator: a customer who is offered an exchange
+  # and declines or never responds is recorded exactly as honestly as one
+  # who accepts -- without this, "recommended and acted on" has no
+  # denominator.
+  - id: outcome.customer_responded_to_exchange_offer
+    statement: "The customer's response to the exchange offer is recorded, whether or not they accepted it."
+    evidence_rule: "response capsule (response_class) chained to the offer capsule"
+    forward_verdict: UNAVAILABLE-STATE-REQUIRED
+    backward_verdict: WITH-INSTRUMENTATION
+
+  # The refused claim, in the retail shape: a satisfied customer following
+  # a recommendation is correlation, not causation.
+  - id: outcome.agent_caused_customer_satisfaction
+    statement: "The agent's recommendation is what caused the customer to remain satisfied."
+    evidence_rule: "n/a -- undecomposable causal claim, refused by design"
+    effect_claim: agent.caused_resolution
+    forward_verdict: REFUSED
+    backward_verdict: REFUSED

@@ -1,0 +1,73 @@
+# Synthetic, neutral fixture -- the "agent acts" counterpoint (design §1 table:
+# agent authority ACTS, changes state directly). No partner name, customer name,
+# or partner-specific vocabulary: see action-state-ops/ledger/CLAUDE.md boundary
+# rule and QUEUE_PROTOCOL §8. Exists so the agent.caused_resolution refusal is
+# demonstrated on the causal shape as well as the advisory one (P1 acceptance:
+# "an [advisory-only]-only fixture set does not discharge this").
+pack_id: test_pub/causal-remediation-shaped/1.0.0
+
+obligations:
+  - id: no-dup-remediation
+    statement: "No remediation action may be dispatched more than once for the same finding."
+    check: dedupe
+
+action_semantics:
+  - action_type: remediation.dispatch
+    action_class: comms.external
+    required_fields: [target]
+
+constraints:
+  - wicket_id: causal_remediation_shaped.dedupe/1.0.0
+    check: dedupe
+    config: {}
+
+folds:
+  - file: spend.yaml
+
+scope_census:
+  document_digest: "5edc2e3456551c5464ae00b1f12e846909eca97b6897c47311b4291dbc35cf8c"
+  n: 23
+  m: 88
+  review_by: "2027-01-01"
+
+outcomes:
+  # Execute path: the agent itself dispatches the remediation and a
+  # counterparty confirms it landed -- fully deterministic both ways.
+  - id: outcome.remediation_confirmed
+    statement: "The flagged condition was remediated and independently confirmed by a counterparty."
+    evidence_rule: "fulfill capsule chained to intent capsule, effect_attestation=counterparty_confirmed"
+    forward_verdict: DETERMINISTIC
+    backward_verdict: DETERMINISTIC
+    re_derivability_grade: ledger_state_dependent
+    declared_by: vendor
+
+  # The offer/response denominator primitive: even where the agent can act
+  # directly, a human is sometimes offered a choice first (design §1: "the
+  # human in the loop | employee, chooses under advice"). Declines/defers
+  # are first-class, not just accepts.
+  - id: outcome.human_responded_to_offer
+    statement: "The person offered a choice about the remediation responded, whether or not they accepted it."
+    evidence_rule: "response capsule (response_class) chained to the offer capsule"
+    forward_verdict: UNAVAILABLE-STATE-REQUIRED
+    backward_verdict: WITH-INSTRUMENTATION
+    declared_by: vendor
+
+  # The near-miss that IS admissible: a human's own action, citing the
+  # recommendation that preceded it.
+  - id: outcome.human_acted_on_recommendation
+    statement: "The person acted on the agent's recommendation, citing the recommendation capsule."
+    evidence_rule: "response capsule citing the recommendation capsule by digest, response_class=accepted"
+    effect_claim: recommendation.acted_on
+    forward_verdict: DETERMINISTIC
+    backward_verdict: DETERMINISTIC
+
+  # The refused claim: this is causal shape, but the sub-flow that offers a
+  # human a choice before the agent acts is still advisory at that step --
+  # the record cannot say the advice CAUSED the human's decision, only that
+  # both happened in order.
+  - id: outcome.agent_caused_human_decision
+    statement: "The agent's advice is what caused the person to choose to remediate."
+    evidence_rule: "n/a -- undecomposable causal claim, refused by design"
+    effect_claim: agent.caused_resolution
+    forward_verdict: REFUSED
+    backward_verdict: REFUSED
