@@ -16,8 +16,12 @@ classifiers = [
     "Development Status :: 2 - Pre-Alpha",
 ]
 # Capsule parsing goes through the public agent-action-capsule reference
-# library -- never vendored into this repo. Ledger storage and the
-# action-class registry are owned by the separate capsule-ledger package.
+# library -- never vendored into this repo. Ledger storage is owned by the
+# separate capsule-ledger package. capsule-ledger keeps its own minimal,
+# self-contained action-class label shim for its own core display surface;
+# this package's registry/ is the fuller interim vendor-of-record copy
+# ([ldg-ledger-scope-re-extraction] RESIDUALS pass §3.1(a)) -- the two are
+# independent by design, not two forks of one truth.
 dependencies = [
     "agent-action-capsule>=0.1.0",
     "capsule-ledger>=0.0.1",
@@ -62,6 +66,7 @@ capsule_engine = [
     "packs/catalog/*/fixtures/*.jsonl",
     "examples/data/tau2_airline/*.jsonl",
     "examples/data/tau2_airline/*.json",
+    "registry/*.json",
 ]
 
 [tool.pytest.ini_options]
