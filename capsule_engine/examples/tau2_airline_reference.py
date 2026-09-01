@@ -238,25 +238,29 @@ def _iter_task_events(path: Path):
 
 def _mandate_capsule_id(
     ledger: LedgerAPI, *, operator: str, developer: str, tool_name: str, action_class: str,
-    task_id: str, call_seq: int, verdict: PredicateVerdict,
+    task_id: str, call_seq: int, verdict: PredicateVerdict, emit_ledger_path: Path,
 ) -> str | None:
     if not verdict.passed:
         # Deliberately dangling: verify_before_dispatch's ledger.fetch()
         # returns None for this id, which is what actually denies the
         # action -- this module never denies unilaterally.
         return f"policy-check-failed/{action_class}/{task_id}/{call_seq}"
-    result = capsule_emit.emit(
+    result = capsule_emit.seal(
+        {"tool_name": tool_name, "tau2_task_id": task_id, "tau2_call_seq": call_seq},
         action=f"policy_check.{action_class}",
         operator=operator,
         developer=developer,
-        agent_input={"tool_name": tool_name, "tau2_task_id": task_id, "tau2_call_seq": call_seq},
         agent_output={"policy_check_passed": True, "reason": verdict.reason},
         verdict="confirmed",
         effect={"type": f"policy_check.{action_class}", "status": "confirmed"},
         decision="accept",
         action_type="fyi",
         anchor=False,
-        ledger=os.devnull,
+        # A real, writable, dataset-scoped path -- not os.devnull. capsule-emit
+        # persists a lock file and a signing keypair beside whatever `ledger`
+        # path it's given, and /dev (os.devnull's directory) isn't writable.
+        # This module keeps its own record via LedgerStore below regardless.
+        ledger=emit_ledger_path,
     ).capsule
     ledger.append(result, consequential=False)
     return result["capsule_id"]
@@ -275,6 +279,7 @@ def run_dataset(dataset: str, path: Path, *, store_dir: str | os.PathLike | None
         signer = LocalSigner(key_id=f"tau2-airline-reference-{dataset}", secret=_seeded_secret(dataset))
         engine = GuardEngine(ledger=ledger, caps_fold=caps_fold, signer_provider=lambda: signer)
         developer = f"tau2-airline-reference@{dataset}"
+        policy_check_ledger_path = Path(store_dir) / f"{dataset}.policy-check.ledger.jsonl"
 
         calls: list[ReplayedCall] = []
         last_capsule_id: str | None = None
@@ -302,6 +307,7 @@ def run_dataset(dataset: str, path: Path, *, store_dir: str | os.PathLike | None
                     cited = _mandate_capsule_id(
                         ledger, operator=OPERATOR, developer=developer, tool_name=tool_name,
                         action_class=action_class, task_id=task_id, call_seq=call_seq, verdict=verdict,
+                        emit_ledger_path=policy_check_ledger_path,
                     )
 
                 action = Action(
