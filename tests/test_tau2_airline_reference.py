@@ -21,6 +21,8 @@ Four concerns:
 """
 from __future__ import annotations
 
+import socket
+
 import pytest
 
 from capsule_engine.examples import tau2_airline_reference as ref
@@ -48,6 +50,64 @@ def test_every_dataset_file_exists_and_is_nonempty():
     for dataset, path in ref.DATASETS.items():
         assert path.is_file(), f"{dataset}: {path} missing -- vendored data must be committed"
         assert path.stat().st_size > 0
+
+
+# -- module docstring claims "entirely offline, no network" -- enforce it --
+
+
+def test_run_dataset_makes_no_network_connection(tmp_path):
+    """The module docstring promises "entirely offline, no network". Force
+    any socket connection attempt to raise, so a regression that drops
+    ``witness=False`` from the ``capsule_emit.seal()`` call (which would
+    silently POST to the live witness endpoint) fails CI instead of
+    quietly phoning home."""
+
+    def _no_network(*_args, **_kwargs):
+        raise AssertionError("tau2_airline_reference attempted a network connection")
+
+    original_connect = socket.socket.connect
+    socket.socket.connect = _no_network  # type: ignore[method-assign]
+    try:
+        result = ref.run_dataset(
+            "pilot1-gemini-2-5-flash", ref.DATASETS["pilot1-gemini-2-5-flash"], store_dir=str(tmp_path / "store")
+        )
+        assert result.calls
+    finally:
+        socket.socket.connect = original_connect  # type: ignore[method-assign]
+
+
+def test_run_dataset_never_arms_witnessing(monkeypatch, tmp_path):
+    """The socket-guard test above is defense in depth, but capsule-emit's
+    checkpoint/witness dispatch is cadence-gated (every 100 entries or 900s
+    -- see capsule_emit.witness.DEFAULT_CADENCE_ENTRIES/SECONDS) and async,
+    so a low-volume replay like this reference's would pass that test even
+    with witness=False silently dropped from the seal() call: the missing
+    kill switch just wouldn't happen to fire within one small test run.
+    This test instead asserts the kill switch itself is engaged on every
+    seal() -- spying on capsule_emit.witness.maybe_checkpoint's `enabled`
+    argument, which is exactly the value the `witness=` kwarg resolves to
+    (see witness.witness_mode/witness_enabled) -- so it fails deterministically,
+    not by chance, if witness=False is ever dropped from the call site."""
+    import capsule_emit.witness as emit_witness
+
+    seen_enabled: list[object] = []
+    original_maybe_checkpoint = emit_witness.maybe_checkpoint
+
+    def _spy_maybe_checkpoint(*args, enabled=None, **kwargs):
+        seen_enabled.append(enabled)
+        return original_maybe_checkpoint(*args, enabled=enabled, **kwargs)
+
+    monkeypatch.setattr(emit_witness, "maybe_checkpoint", _spy_maybe_checkpoint)
+
+    result = ref.run_dataset(
+        "pilot1-gemini-2-5-flash", ref.DATASETS["pilot1-gemini-2-5-flash"], store_dir=str(tmp_path / "store")
+    )
+    assert result.calls
+    assert seen_enabled, "expected at least one capsule_emit.seal() call during replay"
+    assert all(v is False for v in seen_enabled), (
+        f"witnessing was left enabled for at least one seal() call ({seen_enabled}) -- "
+        "this reference must always pass witness=False to stay offline"
+    )
 
 
 # -- P6b acceptance: >=2 refusals, >=1 WITH-INSTRUMENTATION, across the reference set --

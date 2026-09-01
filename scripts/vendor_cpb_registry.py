@@ -37,9 +37,21 @@ NOT fabricated into the CPB registry itself — the CPB markdown stays normative
 
 Usage:
     python scripts/vendor_cpb_registry.py [path-to-scitt-payload-binding-checkout]
+    python scripts/vendor_cpb_registry.py --check [path-to-scitt-payload-binding-checkout]
 
 If no path is given, tries ``$SCITT_PAYLOAD_BINDING_PATH``, else a sibling
 checkout at ``../scitt-payload-binding`` next to this repo.
+
+``--check`` is what CI's vendor-drift workflow runs (see
+``.github/workflows/vendor-drift.yml``). It compares the vendored content --
+``cpb_registry.json``'s ``registry`` field and ``conventions.json``'s
+``provisional_field_conventions`` block -- against what a fresh vendor run
+against the checkout would produce, ignoring the commit-stamped provenance
+fields (``_vendored_commit`` / ``provisional_field_conventions._provenance.
+source``'s embedded commit sha), same rationale as
+``scripts/vendor_envcompat.py``'s ``--check``: those always differ from
+whatever commit the checkout happens to be at, so diffing them would fail
+vendor-drift on every upstream commit, not just on real content drift.
 """
 from __future__ import annotations
 
@@ -140,12 +152,60 @@ def _pinned_commit(spb: Path) -> str:
     return commit
 
 
+def _without_provenance_source(prov: dict) -> dict:
+    prov = json.loads(json.dumps(prov))  # deep copy
+    if "_provenance" in prov:
+        prov["_provenance"].pop("source", None)
+    return prov
+
+
+def _check(spb: Path, live: dict) -> int:
+    problems = []
+
+    if not CPB_OUT.exists():
+        raise SystemExit(f"{CPB_OUT} does not exist -- run scripts/vendor_cpb_registry.py to create it")
+    current_cpb = json.loads(CPB_OUT.read_text(encoding="utf-8"))
+    if current_cpb.get("registry") != live:
+        problems.append(f"{CPB_OUT}'s 'registry' field is out of sync with {spb}/registry.json")
+
+    if not CONVENTIONS.exists():
+        raise SystemExit(f"{CONVENTIONS} does not exist -- run scripts/vendor_cpb_registry.py to create it")
+    conventions = json.loads(CONVENTIONS.read_text(encoding="utf-8"))
+    current_prov = _without_provenance_source(conventions.get("provisional_field_conventions", {}))
+    expected_prov = _without_provenance_source(_PROVISIONAL_FIELD_CONVENTIONS)
+    if current_prov != expected_prov:
+        problems.append(
+            f"{CONVENTIONS}'s 'provisional_field_conventions' block is out of sync with the "
+            "hand-curated table in scripts/vendor_cpb_registry.py"
+        )
+
+    if problems:
+        raise SystemExit(
+            "\n".join(problems) + "\n-- run scripts/vendor_cpb_registry.py and commit the result"
+        )
+    print(f"{CPB_OUT} and {CONVENTIONS}'s provisional_field_conventions match {spb}")
+    return 0
+
+
 def main(argv: list[str]) -> int:
-    spb = _find_spb(argv[1] if len(argv) > 1 else None)
+    args = [a for a in argv[1:] if a != "--check"]
+    check = "--check" in argv[1:]
+    spb = _find_spb(args[0] if args else None)
+
+    live = json.loads((spb / "registry.json").read_text(encoding="utf-8"))
+
+    if check:
+        # --check compares content only -- registry.json's table plus the
+        # hand-curated provisional_field_conventions block (minus its
+        # commit-stamped provenance source string, same rationale as
+        # vendor_envcompat.py's --check) -- and never needs a commit sha, so
+        # a dirty or detached checkout doesn't compromise it the way it
+        # would a real vendor run.
+        return _check(spb, live)
+
     commit = _pinned_commit(spb)
 
     # 1) Vendor the live-table registry.json verbatim (provenance envelope).
-    live = json.loads((spb / "registry.json").read_text(encoding="utf-8"))
     CPB_OUT.write_text(
         json.dumps(
             {
