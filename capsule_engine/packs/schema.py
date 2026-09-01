@@ -40,7 +40,7 @@ pack-load time, not at incident time.
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Any
 
@@ -48,21 +48,37 @@ from agent_action_capsule.canonical import FloatInDigestError, UnsafeIntegerErro
 
 from ..folds.definition import FoldDefinition
 from ..guards.wickets.definition import WicketDefinition
-from .errors import FLOAT_IN_PACK_DIGEST, UNSAFE_INTEGER_IN_PACK_DIGEST, PackDefinitionError
+from .errors import (
+    FLOAT_IN_PACK_DIGEST,
+    UNKNOWN_PROFILE_ID,
+    UNSAFE_INTEGER_IN_PACK_DIGEST,
+    PackDefinitionError,
+)
 
 __all__ = [
     "PACK_ID_RE",
     "NORMALIZED_ACTION_FIELDS",
     "HOLDS_INTEGRATION_VALUES",
     "KNOWN_SCOPE_DIMENSIONS",
+    "MEASURABILITY_VALUES",
+    "EVIDENCE_INSTRUMENT_KINDS",
+    "TIER_VALUES",
+    "MODE_VALUES",
+    "PROFILE_ID_VALUES",
+    "TOPOLOGY_INVARIANT_MODES",
     "Obligation",
     "ActionSemantic",
     "ProposerStub",
     "FixtureScenario",
     "PackFixtures",
     "WindowSpec",
+    "EvidenceInstrument",
     "Outcome",
     "ScopeCensus",
+    "CounterpartyBinding",
+    "OutcomeOverride",
+    "TopologyProfile",
+    "ProfiledOutcomes",
     "PackDefinition",
 ]
 
@@ -99,6 +115,90 @@ HOLDS_INTEGRATION_VALUES = frozenset({"none", "stubbed", "built"})
 # are the fields a numeric-aggregate check (today: caps) can genuinely be
 # partitioned by, given the normalized Action/capsule fields this repo has.
 KNOWN_SCOPE_DIMENSIONS = frozenset({"developer", "operator", "action_class", "target"})
+
+# Whether an outcome's verdict is actually computed against this pack's
+# fixtures/corpus, or declared honest-but-unmeasured because the corpus this
+# pack ships against never emits the record the check would need (adversarial
+# review finding, [pack-harden-tau2-oracle]: previously this was a hardcoded
+# per-term "always inapplicable" lambda a future coder could point at ANY
+# term -- including one with a real fail -- with nothing to catch it).
+# "declared_not_measured" is not a permanent judgment about the STATEMENT;
+# it is a factual claim about THIS pack's fixtures, and ``corpus_verify.py``
+# is the oracle that makes the claim checkable rather than merely asserted.
+MEASURABILITY_VALUES = frozenset({"measured", "declared_not_measured"})
+
+# The closed set of evidence-instrument kinds ``corpus_verify.py`` knows how
+# to resolve against a corpus. Deliberately narrow and mechanical -- both
+# kinds ask "does any unit in the corpus carry this signal at all", never
+# "is the signal correct", which is exactly the honest, cheap-to-verify shape
+# of "this pack's corpus has -- or lacks -- the record type a term needs":
+#   * structured_field: a named key on a unit/message dict, outside whatever
+#     base schema the corpus's own reconstruction produces (e.g. a typed
+#     severity/efficacy label, a stated-constraint field, a restriction-
+#     reason-cited marker) -- present with a non-empty value anywhere means
+#     the corpus DOES carry it.
+#   * tool_call_name: a named tool/function call appearing anywhere in a
+#     unit's tool-call trail.
+# An unrecognized kind is a typo, same "unregistered is a typo" doctrine as
+# every other closed set in this module -- never silently accepted as data.
+EVIDENCE_INSTRUMENT_KINDS = frozenset({"structured_field", "tool_call_name"})
+
+# Whether an outcome gates a session's job-success (backward-judge design
+# §8.2). "must_have" terms are the ones §8.4's per-session rollup requires to
+# hold for every session they apply to; "informational" terms are reported
+# but never gate. No per-term target/ratio -- the gate is entirely at the
+# session level, so this is a single closed-set field, not a threshold shape.
+# "informational" is the default for a term with no ``tier`` declared, so
+# every pack written before this field existed keeps its current (gate-free)
+# behavior and digests identically.
+TIER_VALUES = frozenset({"must_have", "informational"})
+
+# The seven ways a ledger gets judged (standard-outcome-pack design §3) --
+# every standard outcome is tagged with exactly one. "structural" (presence/
+# absence over emitted fields, no model) is the default for an outcome with
+# no ``mode`` declared, because it's what every pre-``mode`` outcome already
+# was in practice (design §8.1: "the deterministic set is structural checks
+# over emitted fields -- nothing else"), so a pack written before this field
+# existed parses and digests identically to before.
+MODE_VALUES = frozenset(
+    {
+        "structural",
+        "value",
+        "judged",
+        "fold_rollup",
+        "fold_counterparty",
+        "fold_agent",
+        "fold_cohort",
+    }
+)
+
+# Relationship-topology profiles ([ldg-bp-topology-profiles], standard-
+# outcome-pack design §6b): who the agent works WITH -- the same standard
+# pack graded differently depending on whether the direct counterparty is an
+# external customer, an internal employee, a mediated employee-on-behalf-of-
+# a-downstream-customer, or another agent. P5 (autonomous, no direct
+# counterparty at all) is DEFERRED per the design until a real autonomous
+# case lands -- not in this closed set yet, so a pack cannot declare it as
+# though it were already specified.
+PROFILE_ID_VALUES = frozenset(
+    {
+        "p1_external_serve",
+        "p2_internal_assist",
+        "p3_mediated",
+        "p4_agent_to_agent",
+    }
+)
+
+# The judgment modes design §6b calls the "topology-invariant" trust floor --
+# structural presence/absence checks, arithmetic over sealed numbers, and the
+# per-session job-success rollup derived from them. None of these have a
+# "who" the way a judged conduct row or a counterparty-trend fold does, so a
+# topology profile is never allowed to override applicability/tier for an
+# outcome in one of these modes -- loader.py enforces this mechanically
+# rather than trusting a pack author's restraint (the same "unregistered is
+# a typo" / "invariant is compile-time, not convention" doctrine every other
+# closed-set check in this module already follows).
+TOPOLOGY_INVARIANT_MODES = frozenset({"structural", "value", "fold_rollup"})
 
 
 @dataclass(frozen=True)
@@ -187,6 +287,26 @@ class WindowSpec:
 
 
 @dataclass(frozen=True)
+class EvidenceInstrument:
+    """What ``corpus_verify.py`` resolves against a corpus to check a
+    ``measurability`` claim -- see ``EVIDENCE_INSTRUMENT_KINDS`` for the
+    closed set of ``kind``s and what each one means. Exactly one of
+    ``field``/``name`` is set, matching whichever ``kind`` this is."""
+
+    kind: str
+    field: str | None = None  # kind == "structured_field"
+    name: str | None = None  # kind == "tool_call_name"
+
+    def to_dict(self) -> dict:
+        out: dict[str, Any] = {"kind": self.kind}
+        if self.field is not None:
+            out["field"] = self.field
+        if self.name is not None:
+            out["name"] = self.name
+        return out
+
+
+@dataclass(frozen=True)
 class Outcome:
     """The sister table to ``Obligation`` (design §0: "one declaration ...
     compiled forward into a check ... compiled backward into a report").
@@ -217,6 +337,14 @@ class Outcome:
     vendor-led, customer accepts -- but the report-facing computed enum
     this cashes out to is design §7, still open). Free-form strings here on
     purpose -- do not read closed-vocabulary meaning into them yet.
+
+    ``tier`` (backward-judge design §8.2) says whether this outcome gates a
+    session's job-success (``"must_have"``) or is reported without gating
+    (``"informational"``, the default) -- see ``TIER_VALUES``.
+
+    ``mode`` (standard-outcome-pack design §3) says which of the seven ways
+    this outcome is judged -- see ``MODE_VALUES``. Lets a report group by
+    judgment mode and lets ``propose`` route grading.
     """
 
     id: str
@@ -233,6 +361,25 @@ class Outcome:
     required_assurance_grade: str | None = None
     exposure_denominator_ref: str | None = None
     retention_check: str | None = None
+    # measurability/evidence_instrument -- optional, additive
+    # ([pack-harden-tau2-oracle]); default "measured" so a pack declared
+    # before this field existed parses and DIGESTS identically to before
+    # (canonical_dict below omits it whenever it's the default, same
+    # convention every other optional Outcome field already follows).
+    measurability: str = "measured"
+    evidence_instrument: EvidenceInstrument | None = None
+    # tier -- optional, additive ([ldg-bj-tier-field], backward-judge design
+    # §8.2); default "informational" so a pack declared before this field
+    # existed parses and DIGESTS identically to before (canonical_dict below
+    # omits it whenever it's the default, same convention measurability
+    # already follows).
+    tier: str = "informational"
+    # mode -- optional, additive ([ldg-bp-mode-tag], standard-outcome-pack
+    # design §3); default "structural" so an outcome declared before this
+    # field existed parses and DIGESTS identically to before (canonical_dict
+    # below omits it whenever it's the default, same convention tier already
+    # follows).
+    mode: str = "structural"
 
 
 @dataclass(frozen=True)
@@ -247,6 +394,114 @@ class ScopeCensus:
     n: int
     m: int
     review_by: str
+
+
+@dataclass(frozen=True)
+class CounterpartyBinding:
+    """Which subject a profile's counterparty-scoped outcomes bind to
+    (design §6b). ``direct`` is who the agent actually talks to; ``ultimate``
+    is who the engagement is ultimately FOR -- equal for every profile except
+    P3 mediated, where the direct counterparty (the employee) is a conduit to
+    an ultimate one (their downstream customer) one hop further out. That
+    equality-except-P3 shape is exactly what makes P3's binding "dual"
+    without needing a separate field or profile-specific schema.
+
+    The binding fixes which role a counterparty-scoped outcome reads by its
+    own ``mode`` (``ProfiledOutcomes.subject_for``): a ``fold_counterparty``
+    row (the differentiated counterparty-CHANGE value-props, family E) always
+    binds to ``direct`` -- it is a trend over sessions with whoever the agent
+    actually engaged; a ``fold_rollup`` row (job success) binds to
+    ``ultimate`` -- job success is about whether the engagement's real end
+    beneficiary was served, which is the downstream customer in P3, not the
+    employee relaying to them.
+    """
+
+    direct: str
+    ultimate: str
+
+    def to_dict(self) -> dict:
+        return {"direct": self.direct, "ultimate": self.ultimate}
+
+
+@dataclass(frozen=True)
+class OutcomeOverride:
+    """One profile's ``{applies, tier}`` override for a single outcome_id
+    (design §6b/§7). ``applies=False`` means the outcome is N/A under this
+    profile (e.g. conduct/C-family under P4 agent-to-agent) -- it never
+    silently changes a REFUSED/verdict-pair outcome, only whether it's in
+    scope and, when in scope, which tier it gates at."""
+
+    outcome_id: str
+    applies: bool = True
+    tier: str | None = None
+
+    def to_dict(self) -> dict:
+        out: dict[str, Any] = {"outcome_id": self.outcome_id}
+        if not self.applies:
+            out["applies"] = False
+        if self.tier is not None:
+            out["tier"] = self.tier
+        return out
+
+
+@dataclass(frozen=True)
+class TopologyProfile:
+    """A named, T1-confirmed declaration over the standard outcomes (design
+    §6b/§7): a ``profile_id`` (one of ``PROFILE_ID_VALUES``) plus a
+    ``counterparty_binding`` plus a set of per-outcome ``{applies, tier}``
+    overrides. Not a forked pack -- the profile only ever *narrows or
+    re-tiers* outcomes the pack already declares; ``loader.py`` refuses an
+    override naming an outcome_id the pack doesn't have, or an outcome whose
+    ``mode`` is in ``TOPOLOGY_INVARIANT_MODES``."""
+
+    profile_id: str
+    counterparty_binding: CounterpartyBinding
+    overrides: tuple[OutcomeOverride, ...] = ()
+
+    def override_for(self, outcome_id: str) -> OutcomeOverride | None:
+        for o in self.overrides:
+            if o.outcome_id == outcome_id:
+                return o
+        return None
+
+    def canonical_dict(self) -> dict:
+        return {
+            "profile_id": self.profile_id,
+            "counterparty_binding": self.counterparty_binding.to_dict(),
+            "overrides": [o.to_dict() for o in sorted(self.overrides, key=lambda o: o.outcome_id)],
+        }
+
+
+@dataclass(frozen=True)
+class ProfiledOutcomes:
+    """The result of applying a ``TopologyProfile`` to a pack's outcomes
+    (``PackDefinition.outcomes_for_profile``): ``outcomes`` carries every
+    outcome that still applies under this profile (tier replaced where the
+    profile overrides it, same relative order as the pack's own
+    ``outcomes``), ``excluded`` names the ones this profile marks N/A, sorted
+    for a stable report. Never mutates the pack's own ``Outcome`` objects --
+    this is a view, recomputed from ``profile`` + the pack's outcomes every
+    time, so it can never drift from either."""
+
+    profile_id: str
+    counterparty_binding: CounterpartyBinding
+    outcomes: tuple[Outcome, ...]
+    excluded: tuple[str, ...]
+
+    def subject_for(self, outcome_id: str) -> str | None:
+        """Which counterparty subject this outcome's verdict is ABOUT under
+        this profile (``CounterpartyBinding``'s docstring) -- ``None`` for an
+        outcome whose mode isn't counterparty-scoped at all (structural/
+        value/judged/fold_agent/fold_cohort rows describe the agent's own
+        conduct or trajectory, not one counterparty)."""
+        for o in self.outcomes:
+            if o.id == outcome_id:
+                if o.mode == "fold_counterparty":
+                    return self.counterparty_binding.direct
+                if o.mode == "fold_rollup":
+                    return self.counterparty_binding.ultimate
+                return None
+        return None
 
 
 @dataclass(frozen=True)
@@ -272,6 +527,12 @@ class PackDefinition:
     # ("developer",)}. Required for every `caps` constraint (loader.py enforces
     # this); optional documentation for other check types.
     constraint_scopes: dict[str, tuple[str, ...]] = field(default_factory=dict)
+    # profiles[] -- relationship-topology profiles over this pack's own
+    # outcomes ([ldg-bp-topology-profiles], design §6b/§7). Defaults to empty
+    # so a pack declared before this field existed parses and DIGESTS
+    # identically to before (canonical_dict below includes it only when
+    # non-empty, same convention as ``proposers``/``outcomes``).
+    profiles: tuple[TopologyProfile, ...] = ()
 
     def canonical_dict(self) -> dict:
         """The JCS-canonicalizable form of this pack -- drives
@@ -339,6 +600,14 @@ class PackDefinition:
                     **({"required_assurance_grade": o.required_assurance_grade} if o.required_assurance_grade else {}),
                     **({"exposure_denominator_ref": o.exposure_denominator_ref} if o.exposure_denominator_ref else {}),
                     **({"retention_check": o.retention_check} if o.retention_check else {}),
+                    **({"measurability": o.measurability} if o.measurability != "measured" else {}),
+                    **({"tier": o.tier} if o.tier != "informational" else {}),
+                    **({"mode": o.mode} if o.mode != "structural" else {}),
+                    **(
+                        {"evidence_instrument": o.evidence_instrument.to_dict()}
+                        if o.evidence_instrument is not None
+                        else {}
+                    ),
                 }
                 for o in self.outcomes
             ]
@@ -349,6 +618,8 @@ class PackDefinition:
                 "m": self.scope_census.m,
                 "review_by": self.scope_census.review_by,
             }
+        if self.profiles:
+            out["profiles"] = [p.canonical_dict() for p in sorted(self.profiles, key=lambda p: p.profile_id)]
         return out
 
     def definition_digest(self) -> str:
@@ -378,3 +649,41 @@ class PackDefinition:
             if a.action_type == action_type:
                 return a
         return None
+
+    def profile_for(self, profile_id: str) -> TopologyProfile | None:
+        for p in self.profiles:
+            if p.profile_id == profile_id:
+                return p
+        return None
+
+    def outcomes_for_profile(self, profile_id: str) -> ProfiledOutcomes:
+        """Apply a declared ``TopologyProfile`` to this pack's own outcomes
+        (design §6b): every outcome whose override says ``applies=False`` is
+        dropped into ``excluded``; every other outcome is kept, with its
+        ``tier`` replaced by the override's when one is declared. Raises if
+        ``profile_id`` isn't one this pack actually declares -- there is no
+        silent "no profile selected" fallback, because a topology profile is
+        a T1-confirmed fact about the engagement, not an optional filter."""
+        profile = self.profile_for(profile_id)
+        if profile is None:
+            raise PackDefinitionError(
+                UNKNOWN_PROFILE_ID,
+                f"{profile_id!r} is not one of this pack's declared profiles: "
+                f"{sorted(p.profile_id for p in self.profiles) or '<none>'}",
+            )
+        included: list[Outcome] = []
+        excluded: list[str] = []
+        for o in self.outcomes:
+            override = profile.override_for(o.id)
+            if override is not None and not override.applies:
+                excluded.append(o.id)
+                continue
+            if override is not None and override.tier is not None:
+                o = replace(o, tier=override.tier)
+            included.append(o)
+        return ProfiledOutcomes(
+            profile_id=profile.profile_id,
+            counterparty_binding=profile.counterparty_binding,
+            outcomes=tuple(included),
+            excluded=tuple(sorted(excluded)),
+        )

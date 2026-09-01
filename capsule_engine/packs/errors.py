@@ -42,6 +42,34 @@ UNKNOWN_EFFECT_CLAIM = "unknown_effect_claim"
 INVALID_RE_DERIVABILITY_GRADE = "invalid_re_derivability_grade"
 INVALID_SCOPE_CENSUS = "invalid_scope_census"
 
+# tier ([ldg-bj-tier-field], backward-judge design §8.2): whether an outcome
+# gates a session's job-success (must_have) or is reported without gating
+# (informational, the default).
+INVALID_TIER = "invalid_tier"
+
+# mode ([ldg-bp-mode-tag], standard-outcome-pack design §3): which of the
+# seven ways an outcome is judged (structural/value/judged/fold_rollup/
+# fold_counterparty/fold_agent/fold_cohort).
+INVALID_MODE = "invalid_mode"
+
+# profiles[] -- relationship-topology profiles over a pack's own outcomes
+# ([ldg-bp-topology-profiles], standard-outcome-pack design §6b/§7).
+INVALID_PROFILE_ID = "invalid_profile_id"
+DUPLICATE_PROFILE_ID = "duplicate_profile_id"
+UNKNOWN_PROFILE_ID = "unknown_profile_id"
+INVALID_COUNTERPARTY_BINDING = "invalid_counterparty_binding"
+DUPLICATE_PROFILE_OVERRIDE_OUTCOME_ID = "duplicate_profile_override_outcome_id"
+UNKNOWN_OUTCOME_IN_PROFILE_OVERRIDE = "unknown_outcome_in_profile_override"
+TOPOLOGY_INVARIANT_OVERRIDE = "topology_invariant_override"
+
+# measurability / evidence_instrument (pack-harden-tau2-oracle: closes the
+# adversarial-review finding that a term's "declared, not measured on this
+# corpus" claim was an unchecked, hand-authored lambda -- see
+# corpus_verify.py's module docstring for the oracle this data feeds).
+INVALID_MEASURABILITY = "invalid_measurability"
+MISSING_EVIDENCE_INSTRUMENT = "missing_evidence_instrument"
+INVALID_EVIDENCE_INSTRUMENT = "invalid_evidence_instrument"
+
 # Constraint scope declaration + cross-constraint agreement (generalizes the
 # capsule-emit PR #54 finding: a lock/cap/aggregate scope mismatch let a
 # cross-class race jointly admit what sequential execution would deny --
@@ -75,6 +103,23 @@ class RegistryPinError(ValueError):
     """A pack or fold definition fails registry-pin verification: no pin on
     record, or the definition's real digest doesn't match the pinned one.
     Always fail-closed -- see ``pins.py``'s module docstring."""
+
+    def __init__(self, reason: str, message: str) -> None:
+        self.reason = reason
+        super().__init__(f"{reason}: {message}")
+
+
+# corpus_verify.py's oracle -- a distinct failure family from pack.yaml
+# parsing (PackDefinitionError): this is a trust/integrity failure found by
+# actually scanning a corpus against what the pack declared, not a malformed-
+# file failure, so it gets its own reason codes and exception type.
+DECLARED_NOT_MEASURED_EVIDENCE_RESOLVED = "declared_not_measured_evidence_resolved"
+
+
+class CorpusVerificationError(ValueError):
+    """A pack's declared ``measurability``/``evidence_instrument`` data does
+    not hold against a real corpus -- see ``corpus_verify.py``'s module
+    docstring. Always fail-closed, same discipline as ``RegistryPinError``."""
 
     def __init__(self, reason: str, message: str) -> None:
         self.reason = reason
