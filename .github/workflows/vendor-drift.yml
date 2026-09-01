@@ -21,3 +21,56 @@ jobs:
       - name: check vendored envcompat.py matches capsule-ledger
         working-directory: capsule-engine
         run: python scripts/vendor_envcompat.py --check ../capsule-ledger
+
+  registry-conventions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: capsule-engine
+      - uses: actions/checkout@v4
+        with:
+          repository: action-state-group/capsule-ledger
+          path: capsule-ledger
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: check registry/conventions.json's action_class_conventions matches capsule-ledger's shim
+        working-directory: capsule-engine
+        run: python scripts/check_registry_conventions_drift.py ../capsule-ledger
+
+  cpb-registry:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: capsule-engine
+      - uses: actions/checkout@v4
+        with:
+          repository: action-state-group/scitt-payload-binding
+          path: scitt-payload-binding
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: check vendored CPB registry matches scitt-payload-binding
+        working-directory: capsule-engine
+        run: python scripts/vendor_cpb_registry.py --check ../scitt-payload-binding
+
+  tau2-airline-conversations:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: capsule-engine
+      - uses: actions/checkout@v4
+        with:
+          repository: sierra-research/tau2-bench
+          path: tau2-bench
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: check vendored tau2-airline conversations match tau2-bench
+        working-directory: capsule-engine
+        run: >
+          python scripts/vendor_tau2_airline_conversations.py --check
+          --tau2-results-dir ../tau2-bench/data/tau2/results/final

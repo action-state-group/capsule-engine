@@ -50,6 +50,18 @@ record (capsule-emit-mesh docs/TRUST-MODEL.md §6).
 
 Run: ``python scripts/vendor_tau2_airline_conversations.py
 --tau2-results-dir <path to tau2-bench's data/tau2/results/final>``
+
+``--check`` (what CI's vendor-drift workflow runs, see
+``.github/workflows/vendor-drift.yml``) re-derives the dataset from
+``--tau2-results-dir`` in memory and fails if either the committed
+``tau2_conversations_<model>_airline_4trials.jsonl`` or its
+``PROVENANCE.json`` entry differs from what that re-derivation produces --
+writes nothing. Unlike ``vendor_cpb_registry.py``'s ``--check``, no
+provenance field is excluded from the comparison: ``source_git_commit`` is
+read out of the results JSON's own ``info.git_commit`` field (data the
+source file already carries), not stamped from the checkout's git state, so
+it doesn't drift out from under the check the way a real vendor-time commit
+sha would.
 """
 from __future__ import annotations
 
@@ -114,17 +126,13 @@ def _messages_for_sim(sim: dict) -> list[dict]:
     return out
 
 
-def _write_dataset(
-    sims: list[dict], out_path: Path, *, model: str, agent_llm_args: dict
-) -> tuple[int, int, int]:
-    n_sims = 0
-    n_messages = 0
-    n_with_usage = 0
-    with open(out_path, "w", encoding="utf-8") as fh:
-        for sim in sims:
-            messages = _messages_for_sim(sim)
-            usage = _agent_usage_for_sim(sim)
-            record = {
+def _records_for_sims(sims: list[dict], *, model: str, agent_llm_args: dict) -> list[dict]:
+    records = []
+    for sim in sims:
+        messages = _messages_for_sim(sim)
+        usage = _agent_usage_for_sim(sim)
+        records.append(
+            {
                 "sim_id": sim["id"],
                 "task_id": sim["task_id"],
                 "trial": sim["trial"],
@@ -139,46 +147,29 @@ def _write_dataset(
                 "usage": usage,
                 "messages": messages,
             }
-            fh.write(json.dumps(record, separators=(",", ":")) + "\n")
-            n_sims += 1
-            n_messages += len(messages)
-            if usage is not None:
-                n_with_usage += 1
-    return n_sims, n_messages, n_with_usage
+        )
+    return records
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--tau2-results-dir", required=True, help="tau2-bench's data/tau2/results/final directory")
-    parser.add_argument("--model", default="claude-3-7-sonnet", choices=sorted(MODEL_FILES))
-    parser.add_argument("--out-dir", default=str(OUT_DIR))
-    args = parser.parse_args()
+def _jsonl_content(records: list[dict]) -> str:
+    return "".join(json.dumps(record, separators=(",", ":")) + "\n" for record in records)
 
-    results_dir = Path(args.tau2_results_dir)
-    out_dir = Path(args.out_dir)
-    out_dir.mkdir(parents=True, exist_ok=True)
 
-    fname = MODEL_FILES[args.model]
-    src = results_dir / fname
-    d = json.loads(src.read_text())
-    agent_info = d["info"].get("agent_info") or {}
-    model = agent_info.get("llm")
-    agent_llm_args = agent_info.get("llm_args") or {}
-    sims = sorted(d["simulations"], key=lambda s: (int(s["task_id"]), s["trial"]))
-    out_path = out_dir / f"tau2_conversations_{args.model}_airline_4trials.jsonl"
-    n_sims, n_messages, n_with_usage = _write_dataset(
-        sims, out_path, model=model, agent_llm_args=agent_llm_args
-    )
-
-    entry = {
+def _provenance_entry(
+    records: list[dict], content: str, *, out_name: str, fname: str, d: dict, agent_llm_args: dict, model: str
+) -> dict:
+    n_sims = len(records)
+    n_messages = sum(len(r["messages"]) for r in records)
+    n_with_usage = sum(1 for r in records if r["usage"] is not None)
+    return {
         "source_repo": "https://github.com/sierra-research/tau2-bench",
         "source_file": f"data/tau2/results/final/{fname}",
         "source_git_commit": d["info"].get("git_commit"),
         "trials_used": "all (0-3)",
         "num_simulations": n_sims,
         "num_messages": n_messages,
-        "output_file": out_path.name,
-        "output_bytes": out_path.stat().st_size,
+        "output_file": out_name,
+        "output_bytes": len(content.encode("utf-8")),
         # Recovered inference metadata provenance: what model, what settings,
         # what meter -- exactly what leaves the capsule with the mesh
         # serving_provenance shape. Cost is deliberately excluded (meter-not-
@@ -197,12 +188,75 @@ def main() -> int:
             "now also carries recovered per-sim model/generation_parameters/usage"
         ),
     }
+
+
+def _check(
+    out_path: Path, content: str, provenance_path: Path, model_key: str, expected_entry: dict
+) -> int:
+    problems = []
+
+    if not out_path.exists():
+        raise SystemExit(
+            f"{out_path} does not exist -- run scripts/vendor_tau2_airline_conversations.py to create it"
+        )
+    if out_path.read_text(encoding="utf-8") != content:
+        problems.append(f"{out_path} is out of sync with --tau2-results-dir")
+
+    if not provenance_path.exists():
+        raise SystemExit(f"{provenance_path} does not exist")
+    provenance = json.loads(provenance_path.read_text(encoding="utf-8"))
+    key = f"conversations-{model_key}"
+    if provenance.get(key) != expected_entry:
+        problems.append(f"{provenance_path}'s {key!r} entry is out of sync with --tau2-results-dir")
+
+    if problems:
+        raise SystemExit(
+            "\n".join(problems) + "\n-- run scripts/vendor_tau2_airline_conversations.py and commit the result"
+        )
+    print(f"{out_path} and {provenance_path}'s {key!r} entry match --tau2-results-dir")
+    return 0
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--tau2-results-dir", required=True, help="tau2-bench's data/tau2/results/final directory")
+    parser.add_argument("--model", default="claude-3-7-sonnet", choices=sorted(MODEL_FILES))
+    parser.add_argument("--out-dir", default=str(OUT_DIR))
+    parser.add_argument(
+        "--check", action="store_true",
+        help="fail if the vendored copy diverges from --tau2-results-dir; write nothing",
+    )
+    args = parser.parse_args()
+
+    results_dir = Path(args.tau2_results_dir)
+    out_dir = Path(args.out_dir)
+
+    fname = MODEL_FILES[args.model]
+    src = results_dir / fname
+    d = json.loads(src.read_text())
+    agent_info = d["info"].get("agent_info") or {}
+    model = agent_info.get("llm")
+    agent_llm_args = agent_info.get("llm_args") or {}
+    sims = sorted(d["simulations"], key=lambda s: (int(s["task_id"]), s["trial"]))
+    out_path = out_dir / f"tau2_conversations_{args.model}_airline_4trials.jsonl"
+
+    records = _records_for_sims(sims, model=model, agent_llm_args=agent_llm_args)
+    content = _jsonl_content(records)
+    entry = _provenance_entry(
+        records, content, out_name=out_path.name, fname=fname, d=d, agent_llm_args=agent_llm_args, model=model
+    )
+    provenance_path = out_dir / "PROVENANCE.json"
+
+    if args.check:
+        return _check(out_path, content, provenance_path, args.model, entry)
+
+    out_dir.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(content, encoding="utf-8")
     print(
-        f"{args.model}: {n_sims} simulations, {n_messages} messages, "
-        f"{n_with_usage} with usage -> {out_path}"
+        f"{args.model}: {entry['num_simulations']} simulations, {entry['num_messages']} messages, "
+        f"{entry['num_simulations_with_usage']} with usage -> {out_path}"
     )
 
-    provenance_path = out_dir / "PROVENANCE.json"
     provenance = json.loads(provenance_path.read_text()) if provenance_path.exists() else {}
     provenance[f"conversations-{args.model}"] = entry
     provenance_path.write_text(json.dumps(provenance, indent=2) + "\n")

@@ -256,6 +256,10 @@ def _mandate_capsule_id(
         decision="accept",
         action_type="fyi",
         anchor=False,
+        # witness=False: this reference is offline, no network -- without it,
+        # capsule-emit's default checkpoint/witness stream POSTs to the live
+        # witness endpoint (anchor=False alone does not disable witnessing).
+        witness=False,
         # A real, writable, dataset-scoped path -- not os.devnull. capsule-emit
         # persists a lock file and a signing keypair beside whatever `ledger`
         # path it's given, and /dev (os.devnull's directory) isn't writable.
