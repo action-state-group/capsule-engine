@@ -96,6 +96,46 @@ def test_minimal_valid_pack_loads(tmp_path):
     assert pack.pack_id == "test_pub/test-pack/1.0.0"
 
 
+def _outcome_entry(**overrides: object) -> dict:
+    entry = {
+        "id": "outcome.test",
+        "statement": "The thing happened.",
+        "evidence_rule": "some capsule pattern",
+        "forward_verdict": "DETERMINISTIC",
+        "backward_verdict": "DETERMINISTIC",
+    }
+    entry.update(overrides)
+    return entry
+
+
+def test_outcome_clause_ref_is_optional_and_parses_when_declared(tmp_path):
+    _write_pack(tmp_path, overrides={"outcomes": [_outcome_entry(clause_ref="MSA-2026 §4.2(b)")]})
+    pack = load_pack_dir(tmp_path)
+    outcome = pack.outcome_for_id("outcome.test")
+    assert outcome.clause_ref == "MSA-2026 §4.2(b)"
+    assert pack.canonical_dict()["outcomes"][0]["clause_ref"] == "MSA-2026 §4.2(b)"
+
+
+def test_outcome_without_clause_ref_omits_it_from_the_canonical_form(tmp_path):
+    _write_pack(tmp_path, overrides={"outcomes": [_outcome_entry()]})
+    pack = load_pack_dir(tmp_path)
+    outcome = pack.outcome_for_id("outcome.test")
+    assert outcome.clause_ref is None
+    assert "clause_ref" not in pack.canonical_dict()["outcomes"][0]
+
+
+def test_declaring_clause_ref_changes_the_digest_but_nothing_else_does(tmp_path):
+    without = tmp_path / "without"
+    with_ref = tmp_path / "with_ref"
+    without.mkdir()
+    with_ref.mkdir()
+    _write_pack(without, overrides={"outcomes": [_outcome_entry()]})
+    _write_pack(with_ref, overrides={"outcomes": [_outcome_entry(clause_ref="MSA-2026 §4.2(b)")]})
+    digest_without = load_pack_dir(without).definition_digest()
+    digest_with_ref = load_pack_dir(with_ref).definition_digest()
+    assert digest_without != digest_with_ref
+
+
 @pytest.mark.parametrize(
     "overrides,omit,expected_reason",
     [

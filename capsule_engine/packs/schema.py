@@ -345,6 +345,15 @@ class Outcome:
     ``mode`` (standard-outcome-pack design §3) says which of the seven ways
     this outcome is judged -- see ``MODE_VALUES``. Lets a report group by
     judgment mode and lets ``propose`` route grading.
+
+    ``clause_ref`` is the obligations enabler (R3): a free-form citation
+    into the source document (contract clause, policy section) this
+    outcome derives from. ``compiler.terms_desk``/``terms_report`` already
+    carry and render ``clause_ref`` on their own term objects -- this field
+    just gives a pack-declared outcome a way to populate it, so an
+    obligations pack becomes a pack with citations rather than needing a
+    parallel mechanism. Optional and additive: a pack declared before this
+    field existed parses and digests identically to before.
     """
 
     id: str
@@ -380,6 +389,12 @@ class Outcome:
     # below omits it whenever it's the default, same convention tier already
     # follows).
     mode: str = "structural"
+    # clause_ref -- optional, additive ([ldg-clause-ref-outcome], R3
+    # obligations enabler); default None so an outcome declared before this
+    # field existed parses and DIGESTS identically to before (canonical_dict
+    # below omits it whenever it's None, same convention every other
+    # optional Outcome field already follows).
+    clause_ref: str | None = None
 
 
 @dataclass(frozen=True)
@@ -608,6 +623,7 @@ class PackDefinition:
                         if o.evidence_instrument is not None
                         else {}
                     ),
+                    **({"clause_ref": o.clause_ref} if o.clause_ref else {}),
                 }
                 for o in self.outcomes
             ]

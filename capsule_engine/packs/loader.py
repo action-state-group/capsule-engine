@@ -701,6 +701,7 @@ def _parse_outcomes(raw: Any) -> tuple[Outcome, ...]:
                 evidence_instrument=evidence_instrument,
                 tier=tier,
                 mode=mode,
+                clause_ref=entry.get("clause_ref"),
             )
         )
     return tuple(outcomes)
