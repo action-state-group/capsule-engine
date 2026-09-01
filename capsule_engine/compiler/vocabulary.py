@@ -85,6 +85,16 @@ REFUSAL_REASON_CODES = frozenset(
         # window cannot be compiled into a windowed proxy and must refuse
         # rather than ship as an opaque score.
         "unbounded_goal_unmonitorable",
+        # ldg-airline-engagement-pack A8 ("the customer was satisfied"): a
+        # DIFFERENT refusal from unbounded_goal_unmonitorable above -- that
+        # one is about a missing time window (a windowed proxy would fix
+        # it); this one is not fixed by any window, because a person's
+        # felt state is never witnessed by a record, only their own
+        # statement about it, which is testimony, not detection. "We do
+        # not measure feelings" (agent-human-engagement thesis): a claim
+        # about satisfaction/trust/comfort inferred from conduct or words
+        # alone is the exact overclaim this format refuses to make.
+        "subjective_state_unattestable",
     }
 )
 
@@ -162,6 +172,9 @@ DISPLAY_STRINGS: dict[str, dict[str, str]] = {
             "but not that the recommendation is what made them act"
         ),
         "unbounded_goal_unmonitorable": "this goal has no time window, so no record could ever settle it",
+        "subjective_state_unattestable": (
+            "a person's own felt state cannot be read off a record -- only what they said or did"
+        ),
     },
     "re_derivability_grade": {
         "pure_replay": "a stranger can recompute this verdict from the compiled plan alone",
