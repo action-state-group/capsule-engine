@@ -1,0 +1,39 @@
+{
+  "action_class_conventions": {
+    "money.transfer": {
+      "label": "Money transfer",
+      "description": "An action that moves funds -- dispatching a payment, initiating a transfer, or otherwise committing money to move. Seeded by the payments-safety starter pack (asg/payments-safety/1.0.0)."
+    }
+  },
+  "provisional_field_conventions": {
+    "_provenance": {
+      "status": "provisional",
+      "source": "action-state-group/capsule-emit-mesh (plugins/admission-policy/src/capsule_emit.rs, capsule_sidecar.py) via the CPB provisional payload class 'mesh-inference-exchange' (action-state-group/scitt-payload-binding@e0ad1c7, spec/cpb-provisional-registry.md)",
+      "note": "Vendored, provisional field-value labels for the mesh-inference-exchange payload class. These are the AAC six-registry values that class's producer sets on the surrounding capsule; they are known-with-status-provisional (resolved by agent_action_capsule.verify check 8 against the vendored CPB provisional snapshot), never a rejection. Refresh with scripts/vendor_cpb_registry.py."
+    },
+    "effect.type": {
+      "inference_completion": {
+        "label": "Inference completion",
+        "description": "A model inference the record attests as completed. Set by the mesh-inference-exchange provisional payload class.",
+        "payload_class": "mesh-inference-exchange",
+        "status": "provisional"
+      }
+    },
+    "effect_attestation": {
+      "host_served_observed": {
+        "label": "Host-served, observed",
+        "description": "The effect was observed by the serving host at the wire (passive collector vantage), not asserted by a gate. Set by the mesh-inference-exchange provisional payload class.",
+        "payload_class": "mesh-inference-exchange",
+        "status": "provisional"
+      }
+    },
+    "chain.relation": {
+      "follows": {
+        "label": "Follows",
+        "description": "Same-node sequential ordering: this record follows the prior record in a node-run chain. Emitted by the mesh capsule-producer plugin. Set by the mesh-inference-exchange provisional payload class.",
+        "payload_class": "mesh-inference-exchange",
+        "status": "provisional"
+      }
+    }
+  }
+}
