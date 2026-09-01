@@ -185,9 +185,14 @@ def test_an_invalid_tier_in_an_override_is_rejected(tmp_path):
 
 @pytest.mark.parametrize("mode", ["structural", "value", "fold_rollup"])
 def test_overriding_a_topology_invariant_mode_is_rejected(tmp_path, mode):
-    """RED: structural/value/fold_rollup outcomes (S1-S4/V1/F1 in the real
+    """RED: structural/value/fold_rollup outcomes (S1-S4/F1 in the real
     standard-vendor pack) are the invariant trust floor -- a profile may not
-    touch them, mechanically enforced, not by convention."""
+    touch them, mechanically enforced, not by convention. `value` stays a
+    real, checked mode here even though the shipped pack has no row using
+    it as of the V1/V2 ruling (2026-09-01, design doc [rev8]): both moved to
+    `judged`/MODEL-ASSISTED, labeled honestly rather than sitting at
+    WITH-INSTRUMENTATION -- see `_INTEGRITY_CORE_IDS` below, which no
+    longer includes V1."""
     pack_dir = _write_pack(
         tmp_path,
         {
@@ -311,7 +316,14 @@ def test_a_populated_profiles_block_renders_in_the_digest_and_is_sorted(tmp_path
 # selects different applicability/tier and different C-family counterparty,
 # with the integrity core identical")
 
-_INTEGRITY_CORE_IDS = ("S1", "S2", "S3", "S4", "V1", "F1")
+# V1 removed 2026-09-01 (design doc [rev8], the V1/V2 ruling): V1's mode
+# moved from `value` (topology-invariant, mechanically un-overridable) to
+# `judged` (not invariant) -- it still happens to be must_have/unexcluded
+# across every shipped profile today, but that's no longer a MECHANICALLY
+# GUARANTEED property the way it is for S1-S4/F1 (a future profile COULD
+# now legally override V1, where it couldn't before). This tuple checks the
+# guarantee, not an incidental current state, so V1 no longer belongs here.
+_INTEGRITY_CORE_IDS = ("S1", "S2", "S3", "S4", "F1")
 _CONDUCT_IDS = ("J1", "J2", "J3", "J5", "J6")  # J4 has no declared tier either way
 _COUNTERPARTY_CHANGE_IDS = ("C1", "C2", "C3", "C4", "C5", "C6")
 
@@ -379,3 +391,60 @@ def test_the_integrity_core_is_must_have_and_unexcluded_identically_across_every
         by_id = {o.id: o for o in profiled.outcomes}
         for oid in _INTEGRITY_CORE_IDS:
             assert by_id[oid].tier == "must_have", (profile_id, oid)
+
+
+# --- V1/V2 ruling (2026-09-01, design doc [rev8]) --------------------------
+# "the wall moves to the label, not the capability": a value-integrity row
+# may run LLM-Assisted, pinned and labeled MODEL-ASSISTED, rather than
+# sitting at WITH-INSTRUMENTATION forever for lack of a typed sealed field.
+
+
+def test_v1_and_v2_are_judged_model_assisted_not_with_instrumentation():
+    pack = load_pack_dir(STANDARD_VENDOR_DIR)
+    v1 = pack.outcome_for_id("V1")
+    v2 = pack.outcome_for_id("V2")
+    for outcome in (v1, v2):
+        assert outcome.mode == "judged", outcome.id
+        assert outcome.backward_verdict == "MODEL-ASSISTED", outcome.id
+        assert outcome.forward_verdict == "UNAVAILABLE-MODEL-REQUIRED", outcome.id
+        assert outcome.measurability == "measured", outcome.id  # not declared_not_measured
+        assert outcome.evidence_instrument is None, outcome.id  # no structured field to bind to anymore
+        # honesty check: the row must say MODEL-ASSISTED in its own evidence_rule,
+        # never claim DETERMINISTIC -- the label is the whole point of the ruling.
+        assert "MODEL-ASSISTED" in outcome.evidence_rule
+        assert "DETERMINISTIC" not in outcome.evidence_rule.replace("never DETERMINISTIC", "")
+
+
+def test_v1_tier_is_unchanged_must_have_v2_tier_is_unchanged_informational():
+    """The ruling changes mode/verdict/measurability, deliberately NOT tier
+    -- pin both original tiers so a future edit can't silently drift them."""
+    pack = load_pack_dir(STANDARD_VENDOR_DIR)
+    assert pack.outcome_for_id("V1").tier == "must_have"
+    assert pack.outcome_for_id("V2").tier == "informational"  # V2 declares no tier -> schema default
+
+
+def test_v1_is_no_longer_topology_invariant_a_profile_could_now_override_it():
+    """The real (not hypothetical) consequence of moving V1 off `value`: it
+    is no longer mechanically protected from a profile override the way
+    S1-S4/F1 still are. This is a positive assertion the new state permits
+    what the old one refused, not just an absence of a crash."""
+    pack_dir_data = {
+        "pack_id": "asg/test-v1-override/1.0.0",
+        "obligations": [{"id": "o1", "statement": "no dup", "check": "dedupe"}],
+        "action_semantics": [{"action_type": "t.a", "action_class": "info.query", "required_fields": ["target"]}],
+        "constraints": [{"wicket_id": "t.dedupe/1.0.0", "check": "dedupe", "config": {}}],
+        "folds": [{"file": "spend.yaml"}],
+        "outcomes": [_outcome(id="V1", mode="judged", tier="must_have")],
+        "profiles": [_profile(overrides=[{"outcome_id": "V1", "applies": False}])],
+    }
+    import tempfile
+
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp_path = Path(tmp)
+        (tmp_path / "pack.yaml").write_text(yaml.dump(pack_dir_data))
+        (tmp_path / "spend.yaml").write_text(
+            "fold_id: test.spend/1.0.0\nreads:\n  - path: developer\n    erasure_class: commitment-ok\n"
+            "key: developer\nreduce:\n  reducer: count\nemit: n\n"
+        )
+        pack = load_pack_dir(tmp_path)  # must NOT raise topology_invariant_override -- judged mode permits the override
+    assert pack.profile_for("p1_external_serve").overrides[0].applies is False
