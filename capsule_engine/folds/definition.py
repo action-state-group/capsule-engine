@@ -16,6 +16,13 @@ from typing import Any
 
 from agent_action_capsule.canonical import FloatInDigestError, UnsafeIntegerError, json_digest
 
+from .account_core import (
+    DEFAULT_DERIVATION_CLASS,
+    DERIVATION_CLASSES,
+    SELECTION_RANGE,
+    AccountDefinition,
+    parse_account_definition,
+)
 from .duration import parse_duration_seconds
 from .errors import (
     DUPLICATE_READ_PATH,
@@ -25,6 +32,7 @@ from .errors import (
     MISSING_REDUCE_FIELD,
     UNBOUNDED_FILTER_OP,
     UNDECLARED_FIELD_READ,
+    UNKNOWN_DERIVATION_CLASS,
     UNKNOWN_ERASURE_CLASS,
     UNKNOWN_REDUCER,
     UNSAFE_INTEGER_IN_DEFINITION,
@@ -92,9 +100,51 @@ class FoldDefinition:
     filter: tuple[FilterClause, ...] = ()
     key: str | None = None
     window: Window | None = None
+    # The derivation-class marker, mapped onto the neutral core's
+    # ``derivation_class`` (deterministic | model_assisted). Hand-authored /
+    # precondition-decomposable folds are ``deterministic`` (recompute+match);
+    # the compiler's model-judgment branch sets ``model_assisted`` on the fold
+    # it emits (see compiler/compile.py::_model_assisted_fold). Defaulted so
+    # every existing catalog YAML and fixture parses unchanged — the ledger's
+    # own ``definition_digest()`` (its authoring digest) does not include this
+    # field, so existing digests/vectors are untouched.
+    derivation_class: str = DEFAULT_DERIVATION_CLASS
 
     def read_paths(self) -> frozenset[str]:
         return frozenset(r.path for r in self.reads)
+
+    def to_account_definition(self) -> AccountDefinition:
+        """Project this fold onto a neutral ``capsule_emit.account.AccountDefinition``.
+
+        This is the de-fork bridge (Amendment E): the SAME definition document,
+        evaluated by the ledger or via the core, yields the identical CORE
+        ``definition_digest`` and identical result — the §7 cross-repo replay
+        property. The projection carries the fields the neutral account document
+        recognizes (name, selection_kind, reads, derivation_class, bounded
+        predicate); the ledger's authoring-only structure (erasure_class,
+        window, reduce, defaults) is NOT part of the neutral document by design,
+        so it cannot move the core digest.
+
+        A ledger fold selects over a contiguous ledger range, so its neutral
+        selection_kind is ``range``. The predicate is the fold's bounded filter,
+        whose op grammar is byte-identical to the core's bounded predicate ops.
+        """
+        return parse_account_definition(
+            {
+                "name": self.fold_id,
+                "selection_kind": SELECTION_RANGE,
+                "reads": [r.path for r in self.reads],
+                "derivation_class": self.derivation_class,
+                "predicate": [{"field": f.field, "op": f.op, "value": f.value} for f in self.filter],
+            }
+        )
+
+    def core_definition_digest(self) -> str:
+        """The neutral ``definition_digest`` for cross-repo replay — computed by
+        the core over ``to_account_definition()``. There is exactly one
+        implementation of this digest (in ``capsule_emit.account``); the ledger
+        never re-implements it."""
+        return self.to_account_definition().definition_digest()
 
     def canonical_dict(self) -> dict:
         """The JCS-canonicalizable form of this definition — drives definition_digest."""
@@ -285,6 +335,17 @@ def parse_definition(data: Any) -> FoldDefinition:
     if not isinstance(emit, str) or not emit:
         raise FoldDefinitionError(MALFORMED_DEFINITION, "emit is required and must be a non-empty string")
 
+    # derivation_class: optional on the wire (defaults to deterministic so every
+    # existing catalog YAML parses unchanged). When present it MUST be one of the
+    # neutral core's classes — validated against the re-imported vocabulary, not
+    # a ledger-local copy.
+    derivation_class = data.get("derivation_class", DEFAULT_DERIVATION_CLASS)
+    if derivation_class not in DERIVATION_CLASSES:
+        raise FoldDefinitionError(
+            UNKNOWN_DERIVATION_CLASS,
+            f"derivation_class {derivation_class!r} must be one of {sorted(DERIVATION_CLASSES)}",
+        )
+
     return FoldDefinition(
         fold_id=fold_id,
         reads=tuple(reads),
@@ -293,4 +354,5 @@ def parse_definition(data: Any) -> FoldDefinition:
         window=window,
         reduce=Reduce(reducer=reducer, field=reduce_field),
         emit=emit,
+        derivation_class=derivation_class,
     )

@@ -19,6 +19,7 @@ UNSAFE_INTEGER_IN_DEFINITION = "unsafe_integer_in_definition"
 MISSING_REDUCE_FIELD = "missing_reduce_field"
 DUPLICATE_READ_PATH = "duplicate_read_path"
 MALFORMED_DEFINITION = "malformed_definition"
+UNKNOWN_DERIVATION_CLASS = "unknown_derivation_class"
 
 # Evaluation-time (replay) reasons.
 FLOAT_IN_REDUCE_FIELD = "float_in_reduce_field"
