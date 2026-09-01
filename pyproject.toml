@@ -47,6 +47,7 @@ include = ["capsule_engine*"]
 capsule_engine = [
     "report/static/*.js",
     "bundle_viewer/static/*.html",
+    "bundle_viewer/static/*.js",
     "console/*.css",
     "console/*.html",
     "console/*.js",
