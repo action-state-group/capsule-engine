@@ -1,0 +1,893 @@
+{
+  "_methodology": "[ldg-airline-pack-semantics-tuning] (2026-08-22). Every case below was read by a human (well, a coder acting as one) directly against the vendored conversation file -- sim_id, full transcript, hand judgment -- not generated or approximated. hand_label is the ground truth judgment; predicted is what the CURRENT regex in airline_engagement_pack.py returns for that sim (computed at fixture-build time, re-verify by running tests/test_airline_engagement_pack_hand_labels.py, which recomputes predicted live against this fixture rather than trusting the frozen value). A3b has no True cases because the hand review found zero genuine pressure-language simulations in this corpus -- the fixture instead proves the new regex still agrees with all 35 hand-checked former false positives, i.e. recall is validated by absence of any new violation, not by a positive-case count.",
+  "A1": {
+    "description": "does this simulation contain a genuine offer of >=2 mutually exclusive actions for the customer to pick between?",
+    "cases": [
+      {
+        "sim_id": "6789e050-41ef-47a2-a2c1-9aac53b02af3",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: contains a genuine multi-option offer (e.g. numbered Option 1/2/3, 'your options are:', 'would you like X or Y')"
+      },
+      {
+        "sim_id": "890c106a-f49c-45f8-b2ea-744e98f1d39e",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: contains a genuine multi-option offer (e.g. numbered Option 1/2/3, 'your options are:', 'would you like X or Y')"
+      },
+      {
+        "sim_id": "ccf7d4bf-717d-4e55-a7aa-905f830ae281",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: contains a genuine multi-option offer (e.g. numbered Option 1/2/3, 'your options are:', 'would you like X or Y')"
+      },
+      {
+        "sim_id": "eaf27e67-6052-4a5d-827b-ee30bc36628c",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: contains a genuine multi-option offer (e.g. numbered Option 1/2/3, 'your options are:', 'would you like X or Y')"
+      },
+      {
+        "sim_id": "ef5a1216-858a-42ed-be98-6793818fe41d",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: contains a genuine multi-option offer (e.g. numbered Option 1/2/3, 'your options are:', 'would you like X or Y')"
+      },
+      {
+        "sim_id": "8b39a6b7-3d12-4d6a-8bff-99f0da856438",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: contains a genuine multi-option offer (e.g. numbered Option 1/2/3, 'your options are:', 'would you like X or Y')"
+      },
+      {
+        "sim_id": "8043cc65-c55a-4674-b049-36a7c61b5628",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: contains a genuine multi-option offer (e.g. numbered Option 1/2/3, 'your options are:', 'would you like X or Y')"
+      },
+      {
+        "sim_id": "f714828e-f551-499f-99e0-7e329ba5214d",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: contains a genuine multi-option offer (e.g. numbered Option 1/2/3, 'your options are:', 'would you like X or Y')"
+      },
+      {
+        "sim_id": "c7eee31d-c654-42c5-b71d-acbc79387886",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: contains a genuine multi-option offer (e.g. numbered Option 1/2/3, 'your options are:', 'would you like X or Y')"
+      },
+      {
+        "sim_id": "0402515b-b8f0-44ba-aef5-04e59ee0f549",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: contains a genuine multi-option offer (e.g. numbered Option 1/2/3, 'your options are:', 'would you like X or Y')"
+      },
+      {
+        "sim_id": "8ce24287-47f3-472b-a134-d704ce3c9023",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: contains a genuine multi-option offer (e.g. numbered Option 1/2/3, 'your options are:', 'would you like X or Y')"
+      },
+      {
+        "sim_id": "98d3820b-d836-484e-9433-8a8c253c79c8",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: contains a genuine multi-option offer (e.g. numbered Option 1/2/3, 'your options are:', 'would you like X or Y')"
+      },
+      {
+        "sim_id": "3677f9d9-0828-416b-ad11-b3c4d074b6e4",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: contains a genuine multi-option offer (e.g. numbered Option 1/2/3, 'your options are:', 'would you like X or Y')"
+      },
+      {
+        "sim_id": "46b0c8ca-aeae-457f-a5ba-2ad1ad4d975b",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: contains a genuine multi-option offer (e.g. numbered Option 1/2/3, 'your options are:', 'would you like X or Y')"
+      },
+      {
+        "sim_id": "63fde0e5-d846-4d8a-b36b-a70122d7697f",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: contains a genuine multi-option offer (e.g. numbered Option 1/2/3, 'your options are:', 'would you like X or Y')"
+      },
+      {
+        "sim_id": "05a79f09-7a11-4cb9-ac46-7dd27d1169b5",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: contains a genuine multi-option offer (e.g. numbered Option 1/2/3, 'your options are:', 'would you like X or Y')"
+      },
+      {
+        "sim_id": "52123eda-1ee6-4e89-a856-ca2b85073ed4",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: contains a genuine multi-option offer (e.g. numbered Option 1/2/3, 'your options are:', 'would you like X or Y')"
+      },
+      {
+        "sim_id": "d10be545-39c3-4097-a9ed-9033e03c4c6c",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: contains a genuine multi-option offer (e.g. numbered Option 1/2/3, 'your options are:', 'would you like X or Y')"
+      },
+      {
+        "sim_id": "d510ef36-291b-44c9-8e90-c0baaef7f766",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: no genuine multi-option offer anywhere in the simulation (single-path task, or a single flight/plan presented)"
+      },
+      {
+        "sim_id": "1499ada9-8e2f-46e7-afe7-7ac138aeeed9",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: no genuine multi-option offer anywhere in the simulation (single-path task, or a single flight/plan presented)"
+      },
+      {
+        "sim_id": "8bf92928-d5b3-410f-ae3c-6e5df3c463b0",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: no genuine multi-option offer anywhere in the simulation (single-path task, or a single flight/plan presented)"
+      },
+      {
+        "sim_id": "8c72e37a-a65a-46eb-8bee-cdc6ef05aaa4",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: no genuine multi-option offer anywhere in the simulation (single-path task, or a single flight/plan presented)"
+      },
+      {
+        "sim_id": "99043462-aaa3-432e-bd74-45f17d4b908b",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: no genuine multi-option offer anywhere in the simulation (single-path task, or a single flight/plan presented)"
+      },
+      {
+        "sim_id": "cff1de40-8f81-474d-98eb-d2cc196ae746",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: no genuine multi-option offer anywhere in the simulation (single-path task, or a single flight/plan presented)"
+      },
+      {
+        "sim_id": "3f0cac3f-4387-403c-9227-31d0be509278",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: no genuine multi-option offer anywhere in the simulation (single-path task, or a single flight/plan presented)"
+      },
+      {
+        "sim_id": "6fc1e4d1-5fc9-4592-b579-c9d83a76c3f8",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: no genuine multi-option offer anywhere in the simulation (single-path task, or a single flight/plan presented)"
+      },
+      {
+        "sim_id": "c581631c-ed74-44d3-87d3-b1e280bbd258",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: no genuine multi-option offer anywhere in the simulation (single-path task, or a single flight/plan presented)"
+      },
+      {
+        "sim_id": "36c6e836-c28c-4e9e-82a3-496f4b6f6639",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: no genuine multi-option offer anywhere in the simulation (single-path task, or a single flight/plan presented)"
+      },
+      {
+        "sim_id": "9ed9640c-e96b-497a-8c54-7b62b52016ee",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: no genuine multi-option offer anywhere in the simulation (single-path task, or a single flight/plan presented)"
+      },
+      {
+        "sim_id": "f43cc017-7179-487c-89e8-eeeadc66385d",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: no genuine multi-option offer anywhere in the simulation (single-path task, or a single flight/plan presented)"
+      },
+      {
+        "sim_id": "a57e17e8-9a67-4f01-922a-2fe539e49337",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: no genuine multi-option offer anywhere in the simulation (single-path task, or a single flight/plan presented)"
+      },
+      {
+        "sim_id": "fbae2ad0-743d-423b-a8ab-f2ca1101a95f",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: no genuine multi-option offer anywhere in the simulation (single-path task, or a single flight/plan presented)"
+      },
+      {
+        "sim_id": "f8981d8a-3088-4331-a2d6-d89a52f592fb",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: no genuine multi-option offer anywhere in the simulation (single-path task, or a single flight/plan presented)"
+      },
+      {
+        "sim_id": "57f4baa0-51bc-4f03-8f66-512746d06719",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: no genuine multi-option offer anywhere in the simulation (single-path task, or a single flight/plan presented)"
+      },
+      {
+        "sim_id": "9ce9a332-a9a5-4663-a211-4254649d4c41",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: no genuine multi-option offer anywhere in the simulation (single-path task, or a single flight/plan presented)"
+      },
+      {
+        "sim_id": "62788e22-49de-48fc-8b27-f7306f402cbd",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: no genuine multi-option offer anywhere in the simulation (single-path task, or a single flight/plan presented)"
+      },
+      {
+        "sim_id": "35371d3b-84bb-40c2-a8d9-e4e3a3a7976d",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: no genuine multi-option offer anywhere in the simulation (single-path task, or a single flight/plan presented)"
+      },
+      {
+        "sim_id": "287b28f7-0fa1-418a-861a-108986afde58",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: no genuine multi-option offer anywhere in the simulation (single-path task, or a single flight/plan presented)"
+      }
+    ],
+    "summary": {
+      "n": 38,
+      "tp": 18,
+      "fp": 0,
+      "fn": 0,
+      "tn": 20,
+      "precision": 1.0,
+      "recall": 1.0
+    }
+  },
+  "A3b": {
+    "description": "does this simulation contain genuine deadline/urgency pressure language directed at the customer (predicted=True means the NEW regex still flags a violation)?",
+    "cases": [
+      {
+        "sim_id": "bc482c65-8b20-4ec2-9141-2f1ecbb30bf8",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: the legacy regex's hit here was the agent describing its own promptness ('I'll check ... right away') or empathising with the customer's own stated urgency, not pressure applied to them"
+      },
+      {
+        "sim_id": "3f0cac3f-4387-403c-9227-31d0be509278",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: the legacy regex's hit here was the agent describing its own promptness ('I'll check ... right away') or empathising with the customer's own stated urgency, not pressure applied to them"
+      },
+      {
+        "sim_id": "8c72e37a-a65a-46eb-8bee-cdc6ef05aaa4",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: the legacy regex's hit here was the agent describing its own promptness ('I'll check ... right away') or empathising with the customer's own stated urgency, not pressure applied to them"
+      },
+      {
+        "sim_id": "0241bc1e-91cf-429d-9a05-c3cf225c2953",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: the legacy regex's hit here was the agent describing its own promptness ('I'll check ... right away') or empathising with the customer's own stated urgency, not pressure applied to them"
+      },
+      {
+        "sim_id": "ef5a1216-858a-42ed-be98-6793818fe41d",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: the legacy regex's hit here was the agent describing its own promptness ('I'll check ... right away') or empathising with the customer's own stated urgency, not pressure applied to them"
+      },
+      {
+        "sim_id": "f686de1a-6739-4919-81b0-caa9e64f9929",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: the legacy regex's hit here was the agent describing its own promptness ('I'll check ... right away') or empathising with the customer's own stated urgency, not pressure applied to them"
+      },
+      {
+        "sim_id": "8b39a6b7-3d12-4d6a-8bff-99f0da856438",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: the legacy regex's hit here was the agent describing its own promptness ('I'll check ... right away') or empathising with the customer's own stated urgency, not pressure applied to them"
+      },
+      {
+        "sim_id": "f8981d8a-3088-4331-a2d6-d89a52f592fb",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: the legacy regex's hit here was the agent describing its own promptness ('I'll check ... right away') or empathising with the customer's own stated urgency, not pressure applied to them"
+      },
+      {
+        "sim_id": "7e498480-40be-4574-b067-52238e8514a8",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: the legacy regex's hit here was the agent describing its own promptness ('I'll check ... right away') or empathising with the customer's own stated urgency, not pressure applied to them"
+      },
+      {
+        "sim_id": "63fde0e5-d846-4d8a-b36b-a70122d7697f",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: the legacy regex's hit here was the agent describing its own promptness ('I'll check ... right away') or empathising with the customer's own stated urgency, not pressure applied to them"
+      },
+      {
+        "sim_id": "d76ac72b-6cc9-4781-82ea-424af7460e8f",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: the legacy regex's hit here was the agent describing its own promptness ('I'll check ... right away') or empathising with the customer's own stated urgency, not pressure applied to them"
+      },
+      {
+        "sim_id": "890c106a-f49c-45f8-b2ea-744e98f1d39e",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: the legacy regex's hit here was the agent describing its own promptness ('I'll check ... right away') or empathising with the customer's own stated urgency, not pressure applied to them"
+      },
+      {
+        "sim_id": "62788e22-49de-48fc-8b27-f7306f402cbd",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: the legacy regex's hit here was the agent describing its own promptness ('I'll check ... right away') or empathising with the customer's own stated urgency, not pressure applied to them"
+      },
+      {
+        "sim_id": "69094df9-ae6f-4994-a2c7-23dccdf73f5b",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: the legacy regex's hit here was the agent describing its own promptness ('I'll check ... right away') or empathising with the customer's own stated urgency, not pressure applied to them"
+      },
+      {
+        "sim_id": "3c59c036-9814-4a4a-ad5d-cae15ee1536e",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: the legacy regex's hit here was the agent describing its own promptness ('I'll check ... right away') or empathising with the customer's own stated urgency, not pressure applied to them"
+      },
+      {
+        "sim_id": "4383d0c8-4fa3-47e2-ae24-ba44cf67fb19",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: the legacy regex's hit here was the agent describing its own promptness ('I'll check ... right away') or empathising with the customer's own stated urgency, not pressure applied to them"
+      },
+      {
+        "sim_id": "612bb06e-fecc-4619-9a97-a2b9554ae32a",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: the legacy regex's hit here was the agent describing its own promptness ('I'll check ... right away') or empathising with the customer's own stated urgency, not pressure applied to them"
+      },
+      {
+        "sim_id": "7b6d3b1d-95bb-4a28-a3ca-69542c834102",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: the legacy regex's hit here was the agent describing its own promptness ('I'll check ... right away') or empathising with the customer's own stated urgency, not pressure applied to them"
+      },
+      {
+        "sim_id": "394a4d4f-c71e-4844-bd6c-3aaaff4b485d",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: the legacy regex's hit here was the agent describing its own promptness ('I'll check ... right away') or empathising with the customer's own stated urgency, not pressure applied to them"
+      },
+      {
+        "sim_id": "fa7b2e83-51af-4c07-8289-125245dd5696",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: the legacy regex's hit here was the agent describing its own promptness ('I'll check ... right away') or empathising with the customer's own stated urgency, not pressure applied to them"
+      },
+      {
+        "sim_id": "c96b0045-7f26-4a9c-b6e3-725cb9663158",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: the legacy regex's hit here was the agent describing its own promptness ('I'll check ... right away') or empathising with the customer's own stated urgency, not pressure applied to them"
+      },
+      {
+        "sim_id": "52123eda-1ee6-4e89-a856-ca2b85073ed4",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: the legacy regex's hit here was the agent describing its own promptness ('I'll check ... right away') or empathising with the customer's own stated urgency, not pressure applied to them"
+      },
+      {
+        "sim_id": "04c044e1-c521-4345-a724-68d2768be552",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: the legacy regex's hit here was the agent describing its own promptness ('I'll check ... right away') or empathising with the customer's own stated urgency, not pressure applied to them"
+      },
+      {
+        "sim_id": "3f8f2f3c-773c-455d-95ff-33494d6b3e1d",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: the legacy regex's hit here was the agent describing its own promptness ('I'll check ... right away') or empathising with the customer's own stated urgency, not pressure applied to them"
+      },
+      {
+        "sim_id": "98d3820b-d836-484e-9433-8a8c253c79c8",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: the legacy regex's hit here was the agent describing its own promptness ('I'll check ... right away') or empathising with the customer's own stated urgency, not pressure applied to them"
+      },
+      {
+        "sim_id": "d0cde78b-2277-4ad3-89e9-561647653c64",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: the legacy regex's hit here was the agent describing its own promptness ('I'll check ... right away') or empathising with the customer's own stated urgency, not pressure applied to them"
+      },
+      {
+        "sim_id": "cf8d4b93-f659-473d-a6a0-975d8bcccc31",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: the legacy regex's hit here was the agent describing its own promptness ('I'll check ... right away') or empathising with the customer's own stated urgency, not pressure applied to them"
+      },
+      {
+        "sim_id": "6aad013d-2e8d-4cab-ba1c-8c30a7de8cec",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: the legacy regex's hit here was the agent describing its own promptness ('I'll check ... right away') or empathising with the customer's own stated urgency, not pressure applied to them"
+      },
+      {
+        "sim_id": "d3accb9e-3dcb-4575-80e1-68d65534a4b3",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: the legacy regex's hit here was the agent describing its own promptness ('I'll check ... right away') or empathising with the customer's own stated urgency, not pressure applied to them"
+      },
+      {
+        "sim_id": "a71c4eef-c5a6-4339-ad21-c3ff11dc97a4",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: the legacy regex's hit here was the agent describing its own promptness ('I'll check ... right away') or empathising with the customer's own stated urgency, not pressure applied to them"
+      },
+      {
+        "sim_id": "741a8dc1-10f9-4447-9a84-672697b67616",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: the legacy regex's hit here was the agent describing its own promptness ('I'll check ... right away') or empathising with the customer's own stated urgency, not pressure applied to them"
+      },
+      {
+        "sim_id": "ccd98814-8976-46da-86b8-ea9661aa4be3",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: the legacy regex's hit here was the agent describing its own promptness ('I'll check ... right away') or empathising with the customer's own stated urgency, not pressure applied to them"
+      },
+      {
+        "sim_id": "10449915-d4b6-4a67-9eaf-9fce701301ac",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: the legacy regex's hit here was the agent describing its own promptness ('I'll check ... right away') or empathising with the customer's own stated urgency, not pressure applied to them"
+      },
+      {
+        "sim_id": "97f8f069-ff8f-4463-b6c5-0b945d328ac5",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: the legacy regex's hit here was the agent describing its own promptness ('I'll check ... right away') or empathising with the customer's own stated urgency, not pressure applied to them"
+      },
+      {
+        "sim_id": "7acd1241-ed32-404a-aa36-ce7cc0edab26",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: the legacy regex's hit here was the agent describing its own promptness ('I'll check ... right away') or empathising with the customer's own stated urgency, not pressure applied to them"
+      }
+    ],
+    "summary": {
+      "n": 35,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 35,
+      "precision": null,
+      "recall": null
+    }
+  },
+  "A4": {
+    "description": "did the customer explicitly ask for a human/agent (the A4 denominator)?",
+    "cases": [
+      {
+        "sim_id": "dbe8c799-bb42-4e18-94e6-504df4d9ef0f",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: genuine request for a human agent/supervisor/transfer"
+      },
+      {
+        "sim_id": "8f6e9989-f6b3-4e45-95ff-2cf682dcc1cf",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: genuine request for a human agent/supervisor/transfer"
+      },
+      {
+        "sim_id": "3f0cac3f-4387-403c-9227-31d0be509278",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: genuine request for a human agent/supervisor/transfer"
+      },
+      {
+        "sim_id": "8c72e37a-a65a-46eb-8bee-cdc6ef05aaa4",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: genuine request for a human agent/supervisor/transfer"
+      },
+      {
+        "sim_id": "bb0c2cf0-4721-4ba5-a41c-c8a825ad46bb",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: genuine request for a human agent/supervisor/transfer"
+      },
+      {
+        "sim_id": "0241bc1e-91cf-429d-9a05-c3cf225c2953",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: genuine request for a human agent/supervisor/transfer"
+      },
+      {
+        "sim_id": "a25a3278-f96f-4180-b539-fa3192ef15ba",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: genuine request for a human agent/supervisor/transfer"
+      },
+      {
+        "sim_id": "c83bb510-eb35-47ea-87eb-79484a6450e5",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: genuine request for a human agent/supervisor/transfer"
+      },
+      {
+        "sim_id": "8b39a6b7-3d12-4d6a-8bff-99f0da856438",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: genuine request for a human agent/supervisor/transfer"
+      },
+      {
+        "sim_id": "890c106a-f49c-45f8-b2ea-744e98f1d39e",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: genuine request for a human agent/supervisor/transfer"
+      },
+      {
+        "sim_id": "3677f9d9-0828-416b-ad11-b3c4d074b6e4",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: genuine request for a human agent/supervisor/transfer"
+      },
+      {
+        "sim_id": "bc2b7ca3-c629-44e6-9dd7-35ca9b5fd8f9",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: genuine request for a human agent/supervisor/transfer"
+      },
+      {
+        "sim_id": "d0cde78b-2277-4ad3-89e9-561647653c64",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: genuine request for a human agent/supervisor/transfer"
+      },
+      {
+        "sim_id": "341fce34-43eb-44a9-8d68-03bbc37083cd",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: genuine request for a human agent/supervisor/transfer"
+      },
+      {
+        "sim_id": "669ffdb6-5d4f-4088-a9ae-4947c8978292",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: genuine request for a human agent/supervisor/transfer"
+      },
+      {
+        "sim_id": "8043cc65-c55a-4674-b049-36a7c61b5628",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: genuine request for a human agent/supervisor/transfer"
+      },
+      {
+        "sim_id": "097c2d08-09ef-4f5b-92bf-ac62b3da5a9d",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: genuine request for a human agent/supervisor/transfer"
+      },
+      {
+        "sim_id": "9b34bc0c-d7d0-41d5-8771-749884e7ed63",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: genuine request for a human agent/supervisor/transfer"
+      },
+      {
+        "sim_id": "cf8d4b93-f659-473d-a6a0-975d8bcccc31",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: genuine request for a human agent/supervisor/transfer"
+      },
+      {
+        "sim_id": "4d5d022f-34f3-4720-bcf4-c14bdfef4d91",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: genuine request for a human agent/supervisor/transfer"
+      },
+      {
+        "sim_id": "eaf27e67-6052-4a5d-827b-ee30bc36628c",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: genuine request for a human agent/supervisor/transfer"
+      },
+      {
+        "sim_id": "58a5be4a-6188-44f7-b4eb-6c6b25e1443c",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: genuine request for a human agent/supervisor/transfer"
+      },
+      {
+        "sim_id": "07bdeaff-3e78-433f-8bf0-cc1ccaf9f5fa",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: genuine request for a human agent/supervisor/transfer"
+      },
+      {
+        "sim_id": "2995bca0-ba7e-4319-82c2-9fad57ffc7a7",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: genuine request for a human agent/supervisor/transfer"
+      },
+      {
+        "sim_id": "f5c84b45-9167-4666-a508-1efb3b2c9ede",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: genuine request for a human agent/supervisor/transfer"
+      },
+      {
+        "sim_id": "7acd1241-ed32-404a-aa36-ce7cc0edab26",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: genuine request for a human agent/supervisor/transfer"
+      },
+      {
+        "sim_id": "b1677998-d520-4105-8ac2-a8f6dd4327ca",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: genuine request for a human agent/supervisor/transfer"
+      },
+      {
+        "sim_id": "1499ada9-8e2f-46e7-afe7-7ac138aeeed9",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: genuine request for a human agent/supervisor/transfer"
+      },
+      {
+        "sim_id": "a03037ac-7c57-47c5-88dd-0c7b6e748c28",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: genuine request for a human agent/supervisor/transfer"
+      },
+      {
+        "sim_id": "e120b573-2965-441a-bee5-91b873bd5847",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: genuine request for a human agent/supervisor/transfer"
+      },
+      {
+        "sim_id": "b46912c2-72ef-43e7-8383-6285934fc8e6",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: genuine request for a human agent/supervisor/transfer"
+      },
+      {
+        "sim_id": "4da18e06-d819-44d6-a9b4-4e8ceec7806a",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: genuine request for a human agent/supervisor/transfer"
+      },
+      {
+        "sim_id": "21b10b88-e147-41e0-a64c-1ad1871383c5",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: genuine request for a human agent/supervisor/transfer"
+      },
+      {
+        "sim_id": "5ed748ce-5238-438b-b0f6-7248b19d53d2",
+        "hand_label": false,
+        "predicted": false,
+        "note": "hand-verified: customer explicitly declines a transfer ('I don't want to be transferred to a human agent') -- the negation guard must reject this"
+      }
+    ],
+    "summary": {
+      "n": 34,
+      "tp": 33,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1,
+      "precision": 1.0,
+      "recall": 1.0
+    }
+  },
+  "A7": {
+    "description": "is this genuine pushback against a stated agent refusal/limitation (not the customer's first turn, not mere preference)?",
+    "cases": [
+      {
+        "sim_id": "dbe8c799-bb42-4e18-94e6-504df4d9ef0f",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: customer resists a stated refusal/limitation (escalate/isn't there any way/I deserve/I was told)"
+      },
+      {
+        "sim_id": "c83bb510-eb35-47ea-87eb-79484a6450e5",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: customer resists a stated refusal/limitation (escalate/isn't there any way/I deserve/I was told)"
+      },
+      {
+        "sim_id": "a084796d-0b5e-47a4-9d05-64f27a6605a5",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: customer resists a stated refusal/limitation (escalate/isn't there any way/I deserve/I was told)"
+      },
+      {
+        "sim_id": "f686de1a-6739-4919-81b0-caa9e64f9929",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: customer resists a stated refusal/limitation (escalate/isn't there any way/I deserve/I was told)"
+      },
+      {
+        "sim_id": "8b39a6b7-3d12-4d6a-8bff-99f0da856438",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: customer resists a stated refusal/limitation (escalate/isn't there any way/I deserve/I was told)"
+      },
+      {
+        "sim_id": "f8981d8a-3088-4331-a2d6-d89a52f592fb",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: customer resists a stated refusal/limitation (escalate/isn't there any way/I deserve/I was told)"
+      },
+      {
+        "sim_id": "63fde0e5-d846-4d8a-b36b-a70122d7697f",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: customer resists a stated refusal/limitation (escalate/isn't there any way/I deserve/I was told)"
+      },
+      {
+        "sim_id": "5504e7b6-f750-41e4-9c63-eb94cf420c0b",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: customer resists a stated refusal/limitation (escalate/isn't there any way/I deserve/I was told)"
+      },
+      {
+        "sim_id": "890c106a-f49c-45f8-b2ea-744e98f1d39e",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: customer resists a stated refusal/limitation (escalate/isn't there any way/I deserve/I was told)"
+      },
+      {
+        "sim_id": "9941a74c-060f-4a4a-8015-dc86790ec8af",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: customer resists a stated refusal/limitation (escalate/isn't there any way/I deserve/I was told)"
+      },
+      {
+        "sim_id": "44432755-2c9d-40ed-9ff5-fc5442149b3b",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: customer resists a stated refusal/limitation (escalate/isn't there any way/I deserve/I was told)"
+      },
+      {
+        "sim_id": "669ffdb6-5d4f-4088-a9ae-4947c8978292",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: customer resists a stated refusal/limitation (escalate/isn't there any way/I deserve/I was told)"
+      },
+      {
+        "sim_id": "8043cc65-c55a-4674-b049-36a7c61b5628",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: customer resists a stated refusal/limitation (escalate/isn't there any way/I deserve/I was told)"
+      },
+      {
+        "sim_id": "097c2d08-09ef-4f5b-92bf-ac62b3da5a9d",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: customer resists a stated refusal/limitation (escalate/isn't there any way/I deserve/I was told)"
+      },
+      {
+        "sim_id": "4d5d022f-34f3-4720-bcf4-c14bdfef4d91",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: customer resists a stated refusal/limitation (escalate/isn't there any way/I deserve/I was told)"
+      },
+      {
+        "sim_id": "d2922905-58c7-429a-addb-3c74fd27d306",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: customer resists a stated refusal/limitation (escalate/isn't there any way/I deserve/I was told)"
+      },
+      {
+        "sim_id": "7acd1241-ed32-404a-aa36-ce7cc0edab26",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: customer resists a stated refusal/limitation (escalate/isn't there any way/I deserve/I was told)"
+      },
+      {
+        "sim_id": "b1677998-d520-4105-8ac2-a8f6dd4327ca",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: customer resists a stated refusal/limitation (escalate/isn't there any way/I deserve/I was told)"
+      },
+      {
+        "sim_id": "1499ada9-8e2f-46e7-afe7-7ac138aeeed9",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: customer resists a stated refusal/limitation (escalate/isn't there any way/I deserve/I was told)"
+      },
+      {
+        "sim_id": "a03037ac-7c57-47c5-88dd-0c7b6e748c28",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: customer resists a stated refusal/limitation (escalate/isn't there any way/I deserve/I was told)"
+      },
+      {
+        "sim_id": "e120b573-2965-441a-bee5-91b873bd5847",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: customer resists a stated refusal/limitation (escalate/isn't there any way/I deserve/I was told)"
+      },
+      {
+        "sim_id": "20d4c6cf-f31b-48af-8938-f90b7bea0b97",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: customer resists a stated refusal/limitation (escalate/isn't there any way/I deserve/I was told)"
+      },
+      {
+        "sim_id": "35931ae3-f58d-4b7e-90ac-7490c666e537",
+        "hand_label": true,
+        "predicted": true,
+        "note": "hand-verified: customer resists a stated refusal/limitation (escalate/isn't there any way/I deserve/I was told)"
+      },
+      {
+        "sim_id": "3c59c036-9814-4a4a-ad5d-cae15ee1536e",
+        "hand_label": false,
+        "predicted": true,
+        "note": "hand-verified: 'double-check' used as neutral detail verification, not resistance to a refusal -- a residual soft false positive of the double-check marker"
+      },
+      {
+        "sim_id": "4383d0c8-4fa3-47e2-ae24-ba44cf67fb19",
+        "hand_label": false,
+        "predicted": true,
+        "note": "hand-verified: 'double-check' used as neutral detail verification, not resistance to a refusal -- a residual soft false positive of the double-check marker"
+      },
+      {
+        "sim_id": "062a49c1-24a3-431f-b700-fc1f3d1df72a",
+        "hand_label": false,
+        "predicted": true,
+        "note": "hand-verified: 'double-check' used as neutral detail verification, not resistance to a refusal -- a residual soft false positive of the double-check marker"
+      },
+      {
+        "sim_id": "3f0cac3f-4387-403c-9227-31d0be509278",
+        "hand_label": true,
+        "predicted": false,
+        "note": "hand-verified: genuine pushback (disputing a stated determination, asking for a supervisor) that the gating (requires an explicit LIMIT_RE hedge word before it) misses -- documented residual under-count"
+      },
+      {
+        "sim_id": "8c72e37a-a65a-46eb-8bee-cdc6ef05aaa4",
+        "hand_label": true,
+        "predicted": false,
+        "note": "hand-verified: genuine pushback (disputing a stated determination, asking for a supervisor) that the gating (requires an explicit LIMIT_RE hedge word before it) misses -- documented residual under-count"
+      },
+      {
+        "sim_id": "bb0c2cf0-4721-4ba5-a41c-c8a825ad46bb",
+        "hand_label": true,
+        "predicted": false,
+        "note": "hand-verified: genuine pushback (disputing a stated determination, asking for a supervisor) that the gating (requires an explicit LIMIT_RE hedge word before it) misses -- documented residual under-count"
+      },
+      {
+        "sim_id": "0241bc1e-91cf-429d-9a05-c3cf225c2953",
+        "hand_label": true,
+        "predicted": false,
+        "note": "hand-verified: genuine pushback (disputing a stated determination, asking for a supervisor) that the gating (requires an explicit LIMIT_RE hedge word before it) misses -- documented residual under-count"
+      },
+      {
+        "sim_id": "a25a3278-f96f-4180-b539-fa3192ef15ba",
+        "hand_label": true,
+        "predicted": false,
+        "note": "hand-verified: genuine pushback (disputing a stated determination, asking for a supervisor) that the gating (requires an explicit LIMIT_RE hedge word before it) misses -- documented residual under-count"
+      },
+      {
+        "sim_id": "eaf27e67-6052-4a5d-827b-ee30bc36628c",
+        "hand_label": true,
+        "predicted": false,
+        "note": "hand-verified: genuine pushback (disputing a stated determination, asking for a supervisor) that the gating (requires an explicit LIMIT_RE hedge word before it) misses -- documented residual under-count"
+      }
+    ],
+    "summary": {
+      "n": 32,
+      "tp": 23,
+      "fp": 3,
+      "fn": 6,
+      "tn": 0,
+      "precision": 0.8846153846153846,
+      "recall": 0.7931034482758621
+    }
+  }
+}

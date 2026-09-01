@@ -49,5 +49,22 @@
     "output_file": "pilot1_live_gemini-2-5-flash_airline_shift1.jsonl",
     "output_bytes": 199719,
     "note": "the only dataset here from a LIVE agent run through record-grounding-bench's own recording pipeline; the other four are replayed from tau2-bench's committed transcripts."
+  },
+  "conversations-claude-3-7-sonnet": {
+    "source_repo": "https://github.com/sierra-research/tau2-bench",
+    "source_file": "data/tau2/results/final/claude-3-7-sonnet-20250219_airline_default_gpt-4.1-2025-04-14_4trials.json",
+    "source_git_commit": "c30d59aaa71c65f9b9eb6a8f8636b48945028fcf",
+    "trials_used": "all (0-3)",
+    "num_simulations": 200,
+    "num_messages": 4122,
+    "output_file": "tau2_conversations_claude-3-7-sonnet_airline_4trials.jsonl",
+    "output_bytes": 1340938,
+    "agent_model": "claude-3-7-sonnet-20250219",
+    "agent_temperature": 0.0,
+    "served_by": "api",
+    "usage_meter": "prompt_tokens/completion_tokens summed over role:assistant messages (agent only; user-simulator tokens excluded)",
+    "num_simulations_with_usage": 200,
+    "cost_omitted": "per-message currency 'cost' deliberately not vendored (meter-not-price)",
+    "note": "conversation-grain companion to tau2_committed_<model>_airline_trial0.jsonl -- assistant/user message text + tool-call-name trail, for [ldg-airline-engagement-pack]'s text-reading claims (A1/A3/A5/A7); now also carries recovered per-sim model/generation_parameters/usage"
   }
 }
