@@ -31,6 +31,7 @@ from . import (
     constraints_cmd,
     guard_cmds,
     init_cmds,
+    packs_cmds,
     telemetry_cmd,
     tenant_cmds,
     verify_cmd,
@@ -50,6 +51,7 @@ def _build_parser(arm: str | None = None) -> argparse.ArgumentParser:
     guard_cmds.add_parser(sub)
     tenant_cmds.add_parser(sub)
     telemetry_cmd.add_parser(sub)
+    packs_cmds.add_parser(sub)
 
     # The record-query/evidence verbs -- capsule verify, the shareable
     # bundle, and the local console UI -- are the "evidence": registered
@@ -102,6 +104,12 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "telemetry":
         if getattr(args, "telemetry_command", None) is None:
             args.telemetry_parser.print_help()
+            return 0
+        return args.func(args)
+
+    if args.command == "packs":
+        if getattr(args, "packs_command", None) is None:
+            args.packs_parser.print_help()
             return 0
         return args.func(args)
 
