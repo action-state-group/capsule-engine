@@ -44,8 +44,8 @@ design, Apache-2.0) -- but Cedar decides authorization over entities with
 no concept of aggregates, so this repo would still own the fold half
 regardless. This field is what keeps that door open as a new registry
 entry later instead of a manifest-format break now: "any vendor's gate" is
-the intended story, since the moat is the recording/envelope layer, not the
-constraint language.
+the intended story, since the durable value this repo provides is the
+recording/envelope layer, not the constraint language.
 
 Design notes -- prior art considered, not adopted (2026-08-05, concept-only;
 no external code was read or copied as part of building this module, and no
