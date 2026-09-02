@@ -14,9 +14,10 @@ from datetime import datetime, timedelta, timezone
 
 from capsule_ledger.ledger.api import LedgerAPI
 
+from ..events.capsule import build_event_capsule
 from ..folds.definition import FoldDefinition
 from .action import Action
-from .capsule import ALLOW, DENY, ESCALATE, ConstraintOutcome, build_decision_capsule, build_event_capsule
+from .capsule import ALLOW, DENY, ESCALATE, ConstraintOutcome, build_decision_capsule
 from .checks import (
     CheckOutcome,
     check_caps,

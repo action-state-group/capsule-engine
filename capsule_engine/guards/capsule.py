@@ -1,6 +1,10 @@
 # SPDX-License-Identifier: Apache-2.0
 """Build and seal a guard decision as an Agent Action Capsule.
 
+Passive ``fyi`` events (degradation/recovery, policy-manifest activation,
+conversation turns, ...) are a separate, guard-vocabulary-free concern --
+see ``events/capsule.py``'s ``build_event_capsule`` (W3, 2026-09-01 split).
+
 A decision capsule never asserts that the underlying action executed --
 that is the downstream dispatcher's own capsule to emit, not this one's.
 Per the -02 disposition spec (§ Disposition and the verdict reason-class):
@@ -179,76 +183,6 @@ def build_decision_capsule(
     # as every other field, so a tampered signature is caught the same way
     # a tampered amount would be -- by digest_mismatch on recompute, not by
     # a separate signature-verification step this v0 doesn't have.
-    presig_digest = json_digest(body)
-    body["asg_signature"] = {
-        "key_id": signer.key_id,
-        "alg": signer.algorithm,
-        "sig": signer.sign(presig_digest),
-    }
-
-    capsule_id = compute_capsule_id(body)
-    sealed = {"spec_version": body["spec_version"], "format_version": body["format_version"], "capsule_id": capsule_id}
-    for k, v in body.items():
-        if k not in sealed:
-            sealed[k] = v
-    return sealed
-
-
-def build_event_capsule(
-    *,
-    operator: str,
-    developer: str,
-    signer: Signer,
-    event: str,
-    detail: dict,
-    timestamp: str | None = None,
-    action_id: str | None = None,
-    chain_parent: str | None = None,
-    chain_relation: str | None = None,
-) -> dict:
-    """Build a passive administrative record: a degradation/recovery event
-    (gap window, rebuild range, operator alert), a policy-manifest
-    activation (``capsule_ledger.policy``), or similar -- never a gate decision.
-    ``action_type: "fyi"`` per the reference library's own convention
-    ("passive observation; the emit tier records what happened but does not
-    gate or decide"). Requires a live ``signer`` for the same reason a
-    decision capsule does -- an unsigned record is not a record.
-
-    ``chain_parent``/``chain_relation`` are optional, same shape as
-    ``build_decision_capsule``'s -- e.g. a manifest activation cites its
-    predecessor activation (or a genesis sentinel) with
-    ``chain_relation="epoch_opens"`` (``cli/blame_cmd.py``'s / ``cli/
-    diff_cmd.py``'s existing epoch-boundary chain vocabulary).
-    """
-    from .action import Action  # local import: avoids a module cycle at import time
-
-    action = Action(
-        verb=event,
-        operator=operator,
-        developer=developer,
-        action_type="fyi",
-        action_id=action_id,
-        timestamp=timestamp,
-    )
-    chain = Chain(parent_capsule_id=chain_parent, relation=chain_relation) if chain_parent else None
-    capsule_obj = Capsule(
-        spec_version="draft-mih-scitt-agent-action-capsule-02",
-        format_version="2",
-        action_id=action.resolved_action_id(),
-        action_type="fyi",
-        operator=operator,
-        developer=developer,
-        timestamp=action.resolved_timestamp(),
-        assurance=AssuranceBlock(
-            attestation_mode="self_attested",
-            effect_mode="not_applicable",
-            ledger_mode="chained" if chain is not None else "standalone",
-        ),
-        chain=chain,
-    )
-    body = capsule_obj.to_dict()
-    body["asg_payload"] = {"event": event, "detail": detail}
-
     presig_digest = json_digest(body)
     body["asg_signature"] = {
         "key_id": signer.key_id,

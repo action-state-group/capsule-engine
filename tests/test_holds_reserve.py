@@ -11,11 +11,11 @@ import threading
 from pathlib import Path
 
 import pytest
+from capsule_ledger.ledger import LedgerStore
 
 from capsule_engine.folds.engine import evaluate_one
 from capsule_engine.guards import Action, LocalSigner
 from capsule_engine.holds import HoldEngine, HoldStatus
-from capsule_ledger.ledger import LedgerStore
 
 DEVELOPER = "procurement-agent@v1"
 OPERATOR = "acme-research"

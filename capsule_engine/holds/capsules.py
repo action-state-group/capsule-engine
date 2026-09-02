@@ -5,8 +5,8 @@
 A reservation is a capsule, not side-band state (design premise shared by
 capsule-emit #51/#52/#53): reserve/release/expire/reconcile are signed,
 appended records built the same way ``guards/capsule.py``'s
-``build_decision_capsule``/``build_event_capsule`` build every other capsule
-this codebase produces -- same ``Capsule``/``Disposition``/``Chain``/
+``build_decision_capsule`` and ``events/capsule.py``'s ``build_event_capsule``
+build every other capsule this codebase produces -- same ``Capsule``/``Disposition``/``Chain``/
 ``AssuranceBlock`` primitives, same digest-then-sign-then-reseal sequence, so
 these records are ordinary, independently verifiable ledger capsules with no
 special-cased verification path.
