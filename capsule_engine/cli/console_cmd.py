@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import argparse
 
-from capsule_ledger.cli.ledger_io import require_ledger_path
+from capsule_ledger.io import require_ledger_path
 
 from .format import build_echo
 

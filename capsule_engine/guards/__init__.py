@@ -6,18 +6,19 @@ decision appended to the ledger as a capsule (T2's ``LedgerStore.append``).
 See ``docs/failure-semantics.md`` for the guard's failure/degradation
 behavior.
 """
-from .action import Action
-from .capsule import ALLOW, DENY, ESCALATE, ConstraintOutcome, build_decision_capsule, build_event_capsule
-from .classes import ActionClass, classify
-from .engine import GuardDecision, GuardEngine
-from .plan import PlanDefinition, PlanPrecondition, parse_plan_definition
-from .revocation import (
+from capsule_ledger.ledger.revocation import (
     ROTATION_EVENT,
     KeyWindow,
     RevocationFinding,
     build_key_timeline,
     check_time_fenced_revocation,
 )
+
+from .action import Action
+from .capsule import ALLOW, DENY, ESCALATE, ConstraintOutcome, build_decision_capsule, build_event_capsule
+from .classes import ActionClass, classify
+from .engine import GuardDecision, GuardEngine
+from .plan import PlanDefinition, PlanPrecondition, parse_plan_definition
 from .signing import LocalSigner, Signer, SigningKeyUnavailable, key_fingerprint
 from .tool_call import TOOL_CALL_LANE, ToolCallLane
 

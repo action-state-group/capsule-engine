@@ -24,7 +24,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from capsule_ledger.cli.ledger_io import open_ledger
+from capsule_ledger.io import open_ledger
 from capsule_ledger.ledger.api import LedgerAPI
 
 from ..envcompat import env_get
