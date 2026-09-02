@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 """Fold definitions, reducers, and replay evaluation over the ledger (spec §1-4)."""
+
 from .account_core import (
     DEFAULT_DERIVATION_CLASS,
     DERIVATION_CLASSES,
@@ -13,17 +14,33 @@ from .account_core import (
     verify_account,
 )
 from .catalog import Catalog
+from .counterparty_signals import (
+    BASIC_QUESTION_COUNT,
+    CLARIFICATION_TURN_COUNT,
+    CounterpartySignal,
+    compute_clarification_turn_count,
+    counterparty_trajectory_for_signal,
+    signal_record,
+)
 from .definition import FilterClause, FoldDefinition, ReadField, Reduce, Window, parse_definition
 from .engine import EvaluationTrace, evaluate_all, evaluate_one
 from .errors import FoldDefinitionError, FoldDeterminismError
 from .loader import load_definition_file, load_definition_text
 from .reducers import REDUCERS
+from .taxonomy import (
+    AgentTrajectory,
+    CohortComparison,
+    CounterpartyTrajectory,
+    SessionPoint,
+    TrendPoint,
+    agent_trajectory,
+    cohort_comparison,
+    counterparty_change,
+)
 
 __all__ = [
     # de-fork: the neutral account/fold core, re-imported through the folds
-    # public interface (Amendment E) -- only the slice packs/measurability_report.py
-    # needs; the full folds/ runtime move (taxonomy.py, counterparty_signals.py) is
-    # a separate task.
+    # public interface (Amendment E) — not re-implemented in the ledger.
     "AccountDefinition",
     "build_account",
     "verify_account",
@@ -49,4 +66,18 @@ __all__ = [
     "REDUCERS",
     "FoldDefinitionError",
     "FoldDeterminismError",
+    "AgentTrajectory",
+    "CohortComparison",
+    "CounterpartyTrajectory",
+    "SessionPoint",
+    "TrendPoint",
+    "agent_trajectory",
+    "cohort_comparison",
+    "counterparty_change",
+    "CounterpartySignal",
+    "CLARIFICATION_TURN_COUNT",
+    "BASIC_QUESTION_COUNT",
+    "compute_clarification_turn_count",
+    "signal_record",
+    "counterparty_trajectory_for_signal",
 ]

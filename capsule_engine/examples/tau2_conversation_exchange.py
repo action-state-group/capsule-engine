@@ -4,7 +4,7 @@ user message text + flattened tool-call trail, from
 ``scripts/vendor_tau2_airline_conversations.py``) as a
 ``conversation_exchange`` capsule -- the same shape
 ``capsule-emit-mesh``'s ``mesh_record_emitter.py`` uses for its inference
-capsules (``capsule_ledger.conversation.build_conversation_exchange_capsule``).
+capsules (``capsule_engine.conversation.build_conversation_exchange_capsule``).
 
 [tau2-engagement-conversation-detail-capsules]: proves ONE capsule shape
 spans mesh inference, tau2, and (once wired) the real Alchemy/Amplifier
@@ -29,8 +29,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from capsule_ledger.conversation import build_conversation_exchange_capsule
-
+from ..conversation import build_conversation_exchange_capsule
 from ..guards.signing import Signer
 
 __all__ = ["TAU2_MODEL_ID", "TAU2_PROVIDER", "tau2_sim_to_exchange_messages", "seal_tau2_sim_exchange"]
