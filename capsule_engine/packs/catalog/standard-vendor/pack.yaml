@@ -112,35 +112,42 @@ outcomes:
     mode: structural
 
   # --- B. Numeric integrity -- value (design §4 B) ------------------------
+  # RULING (2026-09-01, Steven, design doc [rev8]): "the wall moves to the
+  # label, not the capability." A value-integrity row MAY run LLM-Assisted
+  # -- pinned, labeled MODEL-ASSISTED, never silently treated as
+  # DETERMINISTIC -- rather than sitting at WITH-INSTRUMENTATION forever.
+  # This is the judged->deterministic->optionally-forward ladder every
+  # other term already climbs, entered at the judged rung: a future
+  # accepted "record the typed field" offer compiles a deterministic
+  # wicket ALONGSIDE this row (never replacing it) -- that offer mechanism
+  # itself is tracked separately (convergence epic DECISION line), not
+  # built here. Until then: running both once typed data exists lets the
+  # sealed disagreement rate between the LLM's reading and the typed field
+  # become a measured extraction-quality number in its own right.
   - id: V1
     statement: "Value integrity: a sealed emitted amount or count satisfies its declared bound (e.g. a disclosed figure equals its sealed source, a retry count stays under its configured limit)."
     evidence_rule: >-
-      n/a on today's corpora -- needs the typed numeric field itself
-      sealed on a capsule, compared arithmetically against its declared
-      bound; neither corpus emits a typed amount/count field this pack can
-      bind to
-    forward_verdict: UNAVAILABLE-STATE-REQUIRED
-    backward_verdict: WITH-INSTRUMENTATION
-    measurability: declared_not_measured
-    evidence_instrument:
-      kind: structured_field
-      field: declared_bound_amount
+      an LLM judge reads the sealed conversation/thread prose against a
+      digest-pinned prompt and extracts the disclosed amount or count,
+      comparing it against the declared bound -- LABELED MODEL-ASSISTED,
+      a prose extraction, never DETERMINISTIC (no typed sealed field
+      exists yet to bind to)
+    forward_verdict: UNAVAILABLE-MODEL-REQUIRED
+    backward_verdict: MODEL-ASSISTED
     tier: must_have
-    mode: value
+    mode: judged
 
   - id: V2
     statement: "Timeliness: a sealed response or resolution time met its declared threshold."
     evidence_rule: >-
-      n/a on today's corpora -- needs a sealed response/resolution
-      timestamp pair compared against a declared SLA threshold; neither
-      corpus emits a typed, sealed timestamp pair this pack can bind to
-    forward_verdict: UNAVAILABLE-STATE-REQUIRED
-    backward_verdict: WITH-INSTRUMENTATION
-    measurability: declared_not_measured
-    evidence_instrument:
-      kind: structured_field
-      field: sealed_response_timestamps
-    mode: value
+      an LLM judge reads the sealed conversation/thread prose against a
+      digest-pinned prompt and extracts the disclosed response/resolution
+      timing, comparing it against the declared SLA threshold -- LABELED
+      MODEL-ASSISTED, a prose extraction, never DETERMINISTIC (no typed,
+      sealed timestamp pair exists yet to bind to)
+    forward_verdict: UNAVAILABLE-MODEL-REQUIRED
+    backward_verdict: MODEL-ASSISTED
+    mode: judged
 
   # --- C. Conduct quality -- judged (design §4 C, the airline A-rows, ----
   # --- generalized) --------------------------------------------------------
