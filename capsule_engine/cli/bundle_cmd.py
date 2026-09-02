@@ -32,7 +32,7 @@ from pathlib import Path
 from agent_action_capsule import verify as verify_capsule
 from capsule_emit.checkpoint import MmrLedger
 from capsule_emit.checkpoint import core as mmr_core
-from capsule_ledger.cli.ledger_io import (
+from capsule_ledger.io import (
     add_scan_query_args,
     build_scan_query,
     echo_parts,
