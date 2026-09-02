@@ -9,6 +9,7 @@ from __future__ import annotations
 import hashlib
 
 import pytest
+from capsule_ledger.ledger import ScanQuery
 
 from capsule_engine.conversation import (
     EVENT_CONVERSATION_TURN,
@@ -29,7 +30,6 @@ from capsule_engine.conversation import (
     verify_turn_inclusion,
 )
 from capsule_engine.guards.signing import SigningKeyUnavailable
-from capsule_ledger.ledger import ScanQuery
 
 OPERATOR = "acme-support"
 DEVELOPER = "workforce-assistant@v1"
