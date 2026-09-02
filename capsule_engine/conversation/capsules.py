@@ -4,7 +4,7 @@
 ``conversation_session_close`` (one per session, binding every turn's
 digest into a single session digest).
 
-Both are passive ``fyi`` records -- built via ``guards.capsule``'s
+Both are passive ``fyi`` records -- built via ``events.capsule``'s
 ``build_event_capsule``, the same mechanism this codebase already uses for
 degradation/recovery events and policy-manifest activations
 (``policy/activation.py``) -- so a conversation capsule is an ordinary,
@@ -26,7 +26,7 @@ from agent_action_capsule.contracts import is_hex64
 from capsule_ledger.ledger.api import LedgerAPI, ScanQuery
 from capsule_ledger.ledger.records import LedgerRecord
 
-from ..guards.capsule import build_event_capsule
+from ..events.capsule import build_event_capsule
 from ..guards.signing import Signer
 from .merkle import session_root
 

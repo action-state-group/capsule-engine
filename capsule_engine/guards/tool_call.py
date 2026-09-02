@@ -30,7 +30,7 @@ from dataclasses import dataclass
 from capsule_ledger.ledger.api import LedgerAPI
 from capsule_ledger.ledger.records import LedgerRecord
 
-from .capsule import build_event_capsule
+from ..events.capsule import build_event_capsule
 from .signing import Signer
 
 __all__ = ["TOOL_CALL_LANE", "ToolCallLane"]

@@ -14,6 +14,8 @@ reference library for capsule parsing — never vendored into this repo.
 artifacts (folds, packs, policy manifests) against the ledger, it does not
 compile them.
 
+**Visibility:** private pre-flip; public per the 08-31 ruling at [gate TBD].
+
 ## Install
 
 ```

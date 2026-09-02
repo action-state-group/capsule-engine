@@ -3,7 +3,7 @@
 history.
 
 Design intent (rotating a signing key is
-itself a recorded event (``build_event_capsule`` + ``LedgerAPI.append`` --
+itself a recorded event (``events.capsule.build_event_capsule`` + ``LedgerAPI.append`` --
 the same mechanism every other write path uses, see ``cli/key_cmds.py``).
 That event names the outgoing key's fingerprint, the incoming key's
 fingerprint, and the timestamp the rotation took effect. Because that event

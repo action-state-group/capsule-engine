@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 """Activation is a capsule: adopting or changing the policy manifest appends
-a signed, passive event record (``guards/capsule.py``'s ``build_event_capsule``
+a signed, passive event record (``events/capsule.py``'s ``build_event_capsule``
 -- the same mechanism this codebase already uses for degradation/recovery
 events, per that module's own docstring) citing the manifest's own digest.
 
@@ -20,7 +20,7 @@ from __future__ import annotations
 from capsule_ledger.ledger.api import LedgerAPI, ScanQuery
 from capsule_ledger.ledger.records import LedgerRecord
 
-from ..guards.capsule import build_event_capsule
+from ..events.capsule import build_event_capsule
 from ..guards.signing import Signer
 from .resolve import ResolvedManifest
 
