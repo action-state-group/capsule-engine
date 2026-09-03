@@ -5,8 +5,17 @@
 decision appended to the ledger as a capsule (T2's ``LedgerStore.append``).
 See ``docs/failure-semantics.md`` for the guard's failure/degradation
 behavior.
+
+Does NOT re-export ``build_event_capsule`` (moved to ``events.capsule`` in
+the W3 split, 2026-09-01) -- a prior backward-compat re-export here
+recreated the exact circular import (``guards`` -> ``events.capsule`` ->
+``guards.signing``) that split was meant to eliminate: anything that
+imported ``events``/``conversation`` before ``guards`` finished
+initializing hit ``ImportError: cannot import name 'build_event_capsule'
+from partially initialized module`` (found live 2026-09-02, real CI
+failure in a downstream repo). Every internal caller here already imports
+``events.capsule`` directly; import from there.
 """
-from ..events.capsule import build_event_capsule
 from .action import Action
 from .capsule import ALLOW, DENY, ESCALATE, ConstraintOutcome, build_decision_capsule
 from .classes import ActionClass, classify
@@ -29,7 +38,6 @@ __all__ = [
     "ESCALATE",
     "ConstraintOutcome",
     "build_decision_capsule",
-    "build_event_capsule",
     "ActionClass",
     "classify",
     "GuardDecision",

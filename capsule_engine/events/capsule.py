@@ -18,10 +18,19 @@ from __future__ import annotations
 
 import uuid
 from datetime import datetime, timezone
+from typing import TYPE_CHECKING
 
 from agent_action_capsule import AssuranceBlock, Capsule, Chain, compute_capsule_id, json_digest
 
-from ..guards.signing import Signer
+if TYPE_CHECKING:
+    # Signer is a type annotation only (PEP 563 lazy annotations, via the
+    # __future__ import above) -- a real runtime import here recreates the
+    # exact guards<->events circular dependency this module's own docstring
+    # says it exists to avoid (found live 2026-09-02: ImportError whenever
+    # something imports events/conversation before guards finishes
+    # initializing). guards/engine.py's own import of build_event_capsule is
+    # what closes the cycle if this import is eager.
+    from ..guards.signing import Signer
 
 __all__ = ["build_event_capsule"]
 
