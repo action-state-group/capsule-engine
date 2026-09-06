@@ -25,7 +25,15 @@ classifiers = [
 dependencies = [
     "agent-action-capsule>=0.1.0",
     "capsule-ledger>=0.0.1",
-    "capsule-emit>=0.8.0",
+    # ``ledger-io`` extra: capsule_emit.ledger_io/period, the read/verify seam
+    # and --period sugar moved here from capsule-ledger/this package
+    # respectively ([emit-ledger-io-home]). Floor NOT bumped past the
+    # released 0.8.0 -- which does not yet contain ledger_io/period -- same
+    # shape as the pre-0.8.0 capsule-emit pin: CI installs the real code from
+    # source (git, see .github/workflows/ci.yml) until the next release
+    # (0.8.1/0.9.0, TBD at cut time) ships it, then bump this floor to match
+    # and drop the CI git-install step.
+    "capsule-emit[ledger-io]>=0.8.0",
     "pyyaml>=6.0",
 ]
 

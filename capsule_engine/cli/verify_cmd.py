@@ -14,7 +14,7 @@ import json
 import sys
 
 from agent_action_capsule import verify as verify_capsule
-from capsule_ledger.io import open_ledger, require_ledger_path
+from capsule_emit.ledger_io import open_ledger, require_ledger_path
 
 from .format import build_echo
 

@@ -14,6 +14,20 @@ jobs:
           python-version: "3.12"
       - name: install capsule-ledger (not yet on PyPI)
         run: pip install "capsule-ledger @ git+https://github.com/action-state-group/capsule-ledger.git"
+      - name: install capsule-emit (ledger_io/period not yet in a PyPI release -- [emit-ledger-io-home])
+        # --force-reinstall: capsule-ledger's own install above already satisfies
+        # "capsule-emit" from PyPI at the pinned floor, so a plain `pip install`
+        # here is a silent no-op -- pip matches on version number, not source.
+        # Pinned to the emit-ledger-io-home branch because capsule-emit main
+        # does not have ledger_io/period yet -- repoint to plain
+        # "capsule-emit @ git+.../capsule-emit.git" (no @branch) once that PR
+        # merges, then drop this step entirely once the next capsule-emit
+        # release (>=0.9.0, see pyproject.toml's dependency comment) is cut
+        # and this repo's floor is bumped to match it. This PR is gated on
+        # the capsule-emit PR merging first.
+        run: >
+          pip install --force-reinstall --no-deps
+          "capsule-emit[ledger-io] @ git+https://github.com/action-state-group/capsule-emit.git@emit-ledger-io-home"
       - name: install
         run: pip install -e ".[dev]"
       - name: ruff
