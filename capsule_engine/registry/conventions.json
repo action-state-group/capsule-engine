@@ -3,6 +3,18 @@
     "money.transfer": {
       "label": "Money transfer",
       "description": "An action that moves funds -- dispatching a payment, initiating a transfer, or otherwise committing money to move. Seeded by the payments-safety starter pack (asg/payments-safety/1.0.0)."
+    },
+    "interaction.disclosure": {
+      "label": "Interaction disclosure",
+      "description": "An event informing a natural person they are interacting with an AI system, or that emotion-recognition/biometric categorisation is in use (Art 50(1)/(3)). Read by the ordering fold (folds/ordering.py) as the 'before' event for EU-50-1/50-3. Seeded by the GRC folds batch (ldg-grc-folds-batch, 2026-09-05)."
+    },
+    "incident.flag": {
+      "label": "Incident flag",
+      "description": "An event marking a serious-incident condition under Art 55/73, carrying an incident.severity_class value -- the trigger for the paired incident.report and the existing time-delta deadline fold's class-dependent threshold. Seeded by the GRC folds batch (ldg-grc-folds-batch, 2026-09-05)."
+    },
+    "incident.report": {
+      "label": "Incident report",
+      "description": "The report sealed in response to an incident.flag, addressed to the AI Office or the relevant authority (Art 55/73). Seeded by the GRC folds batch (ldg-grc-folds-batch, 2026-09-05)."
     }
   },
   "provisional_field_conventions": {
@@ -35,5 +47,92 @@
         "status": "provisional"
       }
     }
+  },
+  "grc_field_conventions": {
+    "_provenance": {
+      "status": "registered",
+      "source": "ldg-grc-folds-batch (2026-09-05), hand-authored for the eu-ai-act obligations pack.",
+      "note": "Company-authored field-value labels, NOT vendored CPB data -- scripts/vendor_cpb_registry.py and its --check drift gate never read or write this table (they are scoped exactly to provisional_field_conventions). Additive only; the never-reject invariant applies here too: an unregistered value renders as-is."
+    },
+    "interaction.disclosure_kind": {
+      "ai": {
+        "label": "AI-interaction disclosure",
+        "description": "Art 50(1): the person was informed they are interacting with an AI system.",
+        "status": "registered"
+      },
+      "emotion": {
+        "label": "Emotion-recognition disclosure",
+        "description": "Art 50(3): the person was informed emotion-recognition is in use.",
+        "status": "registered"
+      },
+      "biometric": {
+        "label": "Biometric-categorisation disclosure",
+        "description": "Art 50(3): the person was informed biometric categorisation is in use.",
+        "status": "registered"
+      }
+    },
+    "incident.severity_class": {
+      "standard": {
+        "label": "Standard serious incident",
+        "description": "Art 73(2): reported within 15 days of awareness.",
+        "status": "registered"
+      },
+      "death": {
+        "label": "Incident involving death",
+        "description": "Art 73(2): reported within 10 days of awareness.",
+        "status": "registered"
+      },
+      "widespread_or_critical": {
+        "label": "Widespread infringement or critical-infrastructure incident",
+        "description": "Art 73(2): reported within 2 days of awareness.",
+        "status": "registered"
+      }
+    },
+    "output.media_class": {
+      "text": {"label": "Text", "description": "AI-generated or manipulated text output (Art 50(2) marking).", "status": "registered"},
+      "image": {"label": "Image", "description": "AI-generated or manipulated image output (Art 50(2) marking).", "status": "registered"},
+      "audio": {"label": "Audio", "description": "AI-generated or manipulated audio output (Art 50(2) marking).", "status": "registered"},
+      "video": {"label": "Video", "description": "AI-generated or manipulated video output (Art 50(2) marking).", "status": "registered"}
+    },
+    "action.initiative": {
+      "directed": {
+        "label": "Directed",
+        "description": "The action was taken on an explicit human instruction. Human-oversight coverage fold facet (Art 14(3)).",
+        "status": "planned"
+      },
+      "responsive": {
+        "label": "Responsive",
+        "description": "The action was taken in response to an environmental/tool event, not a standing instruction. Human-oversight coverage fold facet (Art 14(3)).",
+        "status": "planned"
+      },
+      "discovered": {
+        "label": "Discovered",
+        "description": "The action was taken on the agent's own initiative, with no immediate human or environmental trigger. Human-oversight coverage fold facet (Art 14(3)).",
+        "status": "planned"
+      }
+    },
+    "input_class": {
+      "user_provided": {"label": "User-provided", "description": "Input supplied directly by the human principal.", "status": "registered"},
+      "tool_output": {"label": "Tool output", "description": "Input produced by a tool call the agent invoked.", "status": "registered"},
+      "retrieved_context": {"label": "Retrieved context", "description": "Input retrieved from a document/knowledge store, not authored live.", "status": "registered"},
+      "model_generated": {"label": "Model-generated", "description": "Input produced by a prior model generation (e.g. a planning step feeding an execution step).", "status": "registered"}
+    },
+    "chain.relation": {
+      "supersedes": {
+        "label": "Supersedes",
+        "description": "This record overrides/stops a prior record it cites -- the override relation the GRC folds batch's facets rely on (distinct from the vendored mesh 'follows' relation above).",
+        "status": "registered"
+      }
+    }
+  },
+  "grc_reference_fields": {
+    "_provenance": {
+      "status": "registered",
+      "source": "ldg-grc-folds-batch (2026-09-05).",
+      "note": "Bare identifier/reference fields with no enumerable value set -- registered here so their presence is documented, without forcing them into a value-label table they don't need."
+    },
+    "approver_id": "Identifies the human approver of an action -- read by the set-membership fold (folds/set_membership.py, EU-26-2) against a roster.",
+    "output.marking_ref": "Cites the AI-generated-content marking artifact for an output.media_class row (Art 50(2)) -- pairs with output.media_class above.",
+    "reference_db_ref": "Cites the EU database registration receipt (Art 49) by digest."
   }
 }
