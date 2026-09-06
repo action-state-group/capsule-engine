@@ -73,6 +73,7 @@ __all__ = [
     "PackFixtures",
     "WindowSpec",
     "EvidenceInstrument",
+    "ClauseSpec",
     "Outcome",
     "ScopeCensus",
     "CounterpartyBinding",
@@ -307,6 +308,65 @@ class EvidenceInstrument:
 
 
 @dataclass(frozen=True)
+class ClauseSpec:
+    """The structured legal/contractual anchor an outcome's ``clause_ref``
+    string can't carry alone ([ldg-grc-clause-ref-versioning]): the same
+    article means different things on different dates once an instrument is
+    amended, so ``clause_ref`` (a free-form citation string, unversioned)
+    is not enough on its own to say WHICH version of an article a term was
+    confirmed against. ``instrument``/``article`` name what's cited;
+    ``as_amended_by`` lists the amending instruments in force at
+    confirmation; ``text_snapshot_digest`` (SHA-256 hex over the clause
+    text as read at T1 confirmation -- see ``compiler.terms_desk.
+    clause_text_snapshot_digest`` on the compiler side this mirrors) makes
+    a later change to the underlying law a VISIBLE digest transition
+    instead of silent drift; ``effective_from`` (ISO-8601 date,
+    ``YYYY-MM-DD``) is what effective-date gating (``compiler.terms_desk.
+    compute_binding_status``) compares a report period against;
+    ``contested`` is a human-declared flag for an article whose effective
+    date is itself disputed (never computed).
+
+    This is capsule-engine's own copy of the same structured shape
+    ``capsule_compiler.compiler.terms_desk.ClauseRef`` declares -- the two
+    cannot share a class (capsule-engine never depends on capsule-compiler,
+    the reverse dependency direction), so ``pack_terms_bridge.py`` on the
+    compiler side converts field-for-field, same pattern ``clause_ref``
+    already established for the plain-string case.
+
+    Optional and additive, same convention as every other ``Outcome``
+    field added after the original schema: an outcome with no ``clause``
+    parses and digests identically to one that never mentions the field."""
+
+    instrument: str
+    article: str
+    as_amended_by: tuple[str, ...] = ()
+    paragraph: str | None = None
+    jurisdiction: str | None = None
+    text_snapshot_digest: str | None = None
+    effective_from: str | None = None
+    source_url: str | None = None
+    contested: bool = False
+
+    def to_dict(self) -> dict:
+        out: dict[str, Any] = {"instrument": self.instrument, "article": self.article}
+        if self.as_amended_by:
+            out["as_amended_by"] = list(self.as_amended_by)
+        if self.paragraph is not None:
+            out["paragraph"] = self.paragraph
+        if self.jurisdiction is not None:
+            out["jurisdiction"] = self.jurisdiction
+        if self.text_snapshot_digest is not None:
+            out["text_snapshot_digest"] = self.text_snapshot_digest
+        if self.effective_from is not None:
+            out["effective_from"] = self.effective_from
+        if self.source_url is not None:
+            out["source_url"] = self.source_url
+        if self.contested:
+            out["contested"] = True
+        return out
+
+
+@dataclass(frozen=True)
 class Outcome:
     """The sister table to ``Obligation`` (design §0: "one declaration ...
     compiled forward into a check ... compiled backward into a report").
@@ -395,6 +455,13 @@ class Outcome:
     # below omits it whenever it's None, same convention every other
     # optional Outcome field already follows).
     clause_ref: str | None = None
+    # clause -- optional, additive ([ldg-grc-clause-ref-versioning]): the
+    # structured legal anchor alongside the plain-string clause_ref above.
+    # Both may be set (clause_ref stays the free-form display citation;
+    # clause carries the versioned, digest-pinned anchor a GRC obligation
+    # needs). default None so an outcome declared before this field existed
+    # parses and DIGESTS identically to before -- see ClauseSpec.
+    clause: ClauseSpec | None = None
 
 
 @dataclass(frozen=True)
@@ -624,6 +691,7 @@ class PackDefinition:
                         else {}
                     ),
                     **({"clause_ref": o.clause_ref} if o.clause_ref else {}),
+                    **({"clause": o.clause.to_dict()} if o.clause is not None else {}),
                 }
                 for o in self.outcomes
             ]

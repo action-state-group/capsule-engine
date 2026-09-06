@@ -28,6 +28,7 @@ so a vague message is a real cost, not a style nit.
 """
 from __future__ import annotations
 
+import re
 from pathlib import Path
 from typing import Any
 
@@ -57,6 +58,7 @@ from .errors import (
     EFFECT_CLAIM_NOT_REFUSED,
     FOLD_FILE_NOT_FOUND,
     INVALID_ACTION_SEMANTIC,
+    INVALID_CLAUSE,
     INVALID_CONSTRAINT,
     INVALID_COUNTERPARTY_BINDING,
     INVALID_EVIDENCE_INSTRUMENT,
@@ -101,6 +103,7 @@ from .schema import (
     TIER_VALUES,
     TOPOLOGY_INVARIANT_MODES,
     ActionSemantic,
+    ClauseSpec,
     CounterpartyBinding,
     EvidenceInstrument,
     FixtureScenario,
@@ -127,6 +130,16 @@ _PROPOSER_STATUSES = frozenset({"planned"})  # "active" lands with P2's threshol
 # a pack author could plausibly (and wrongly) believe it's meant to be written
 # into a capsule's own action_type field.
 RESERVED_CAPSULE_ACTION_TYPES = frozenset({"fyi", "decide"})
+
+# clause.effective_from / clause.text_snapshot_digest -- ISO-8601 calendar
+# date and SHA-256 hex respectively. Both are compared/looked up as plain
+# strings downstream (compiler.terms_desk.compute_binding_status does a
+# lexicographic YYYY-MM-DD comparison against a report period), so a
+# malformed value here would silently miscompare rather than raise -- these
+# are validated at load time for the same reason every other closed shape
+# in this module is.
+_ISO_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+_SHA256_HEX_RE = re.compile(r"^[0-9a-f]{64}$")
 
 
 def _require_mapping(data: Any, what: str) -> dict:
@@ -542,6 +555,63 @@ def _parse_evidence_instrument(raw: Any, *, outcome_id: str) -> EvidenceInstrume
     return EvidenceInstrument(kind=kind, name=name)
 
 
+def _parse_clause_spec(raw: Any, *, outcome_id: str) -> ClauseSpec:
+    raw = _require_mapping(raw, f"outcomes[{outcome_id!r}].clause")
+    instrument = _require_nonempty_str(
+        raw.get("instrument"), f"outcomes[{outcome_id!r}].clause.instrument", "Regulation (EU) 2024/1689"
+    )
+    article = _require_nonempty_str(raw.get("article"), f"outcomes[{outcome_id!r}].clause.article", "Article 26")
+
+    as_amended_by_raw = raw.get("as_amended_by", [])
+    if not isinstance(as_amended_by_raw, list) or not all(isinstance(v, str) for v in as_amended_by_raw):
+        raise PackDefinitionError(
+            INVALID_CLAUSE,
+            f"outcomes[{outcome_id!r}].clause.as_amended_by must be a list of strings or omitted, "
+            "e.g. as_amended_by: [\"Regulation (EU) 2026/1744\"]",
+        )
+
+    for field_name, example in (("paragraph", "2"), ("jurisdiction", "EU"), ("source_url", "https://eur-lex.europa.eu/...")):
+        value = raw.get(field_name)
+        if value is not None and not isinstance(value, str):
+            raise PackDefinitionError(
+                INVALID_CLAUSE, f"outcomes[{outcome_id!r}].clause.{field_name} must be a string or omitted, e.g. {example!r}"
+            )
+
+    text_snapshot_digest = raw.get("text_snapshot_digest")
+    if text_snapshot_digest is not None and not _SHA256_HEX_RE.match(text_snapshot_digest):
+        raise PackDefinitionError(
+            INVALID_CLAUSE,
+            f"outcomes[{outcome_id!r}].clause.text_snapshot_digest must be a 64-char lowercase hex SHA-256 "
+            "digest or omitted",
+        )
+
+    effective_from = raw.get("effective_from")
+    if effective_from is not None and not _ISO_DATE_RE.match(effective_from):
+        raise PackDefinitionError(
+            INVALID_CLAUSE,
+            f"outcomes[{outcome_id!r}].clause.effective_from must be an ISO-8601 date (YYYY-MM-DD) or omitted, "
+            "e.g. effective_from: \"2026-08-02\"",
+        )
+
+    contested = raw.get("contested", False)
+    if not isinstance(contested, bool):
+        raise PackDefinitionError(
+            INVALID_CLAUSE, f"outcomes[{outcome_id!r}].clause.contested must be a boolean or omitted"
+        )
+
+    return ClauseSpec(
+        instrument=instrument,
+        article=article,
+        as_amended_by=tuple(as_amended_by_raw),
+        paragraph=raw.get("paragraph"),
+        jurisdiction=raw.get("jurisdiction"),
+        text_snapshot_digest=text_snapshot_digest,
+        effective_from=effective_from,
+        source_url=raw.get("source_url"),
+        contested=contested,
+    )
+
+
 def _parse_outcomes(raw: Any) -> tuple[Outcome, ...]:
     """``outcomes[]``, the sister table to ``obligations[]`` (design of
     record 2026-08-19). Every entry needs a confirming-evidence rule and a
@@ -681,6 +751,9 @@ def _parse_outcomes(raw: Any) -> tuple[Outcome, ...]:
                 "(defaults to 'structural')",
             )
 
+        clause_raw = entry.get("clause")
+        clause = _parse_clause_spec(clause_raw, outcome_id=outcome_id) if clause_raw is not None else None
+
         outcomes.append(
             Outcome(
                 id=outcome_id,
@@ -702,6 +775,7 @@ def _parse_outcomes(raw: Any) -> tuple[Outcome, ...]:
                 tier=tier,
                 mode=mode,
                 clause_ref=entry.get("clause_ref"),
+                clause=clause,
             )
         )
     return tuple(outcomes)
