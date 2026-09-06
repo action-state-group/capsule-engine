@@ -13,6 +13,7 @@ from .account_core import (
     build_account,
     verify_account,
 )
+from .approval_latency import INDICATOR_LABEL, ApprovalLatencyResult, evaluate_approval_latency
 from .catalog import Catalog
 from .counterparty_signals import (
     BASIC_QUESTION_COUNT,
@@ -26,7 +27,11 @@ from .definition import FilterClause, FoldDefinition, ReadField, Reduce, Window,
 from .engine import EvaluationTrace, evaluate_all, evaluate_one
 from .errors import FoldDefinitionError, FoldDeterminismError
 from .loader import load_definition_file, load_definition_text
+from .ordering import OrderingResult, SessionOrderingResult, evaluate_ordering
+from .record_type_coverage import RecordTypeCoverageResult, evaluate_record_type_coverage
 from .reducers import REDUCERS
+from .retention_continuity import RetentionContinuityResult, evaluate_retention_continuity
+from .set_membership import MembershipRecordResult, SetMembershipResult, evaluate_set_membership
 from .taxonomy import (
     AgentTrajectory,
     CohortComparison,
@@ -80,4 +85,19 @@ __all__ = [
     "compute_clarification_turn_count",
     "signal_record",
     "counterparty_trajectory_for_signal",
+    # GRC folds batch (ldg-grc-folds-batch, #24) -- stable package-namespace
+    # import surface for the skill layer ([grc-facets-upstream-registry-proposals]).
+    "SessionOrderingResult",
+    "OrderingResult",
+    "evaluate_ordering",
+    "RetentionContinuityResult",
+    "evaluate_retention_continuity",
+    "RecordTypeCoverageResult",
+    "evaluate_record_type_coverage",
+    "ApprovalLatencyResult",
+    "evaluate_approval_latency",
+    "INDICATOR_LABEL",
+    "MembershipRecordResult",
+    "SetMembershipResult",
+    "evaluate_set_membership",
 ]

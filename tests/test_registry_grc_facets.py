@@ -106,3 +106,24 @@ def test_mutant_removing_a_grc_entry_flips_it_back_to_unregistered():
     assert fc.registered is False
     real = describe_field_value("incident.severity_class", "death")
     assert real.registered is True
+
+
+# ---- [grc-facets-upstream-registry-proposals]: vendored copy labelled
+# provisional pending upstream registration at scitt-payload-binding ----
+def test_grc_tables_are_labelled_provisional_pending_upstream_registration():
+    raw = json.loads((REPO_ROOT / "capsule_engine" / "registry" / "conventions.json").read_text())
+    field_provenance = raw["grc_field_conventions"]["_provenance"]
+    reference_provenance = raw["grc_reference_fields"]["_provenance"]
+    assert field_provenance["provisional"] is True
+    assert "grc-facets-upstream-registry-proposals" in field_provenance["provisional_note"]
+    assert reference_provenance["provisional"] is True
+    assert "grc-facets-upstream-registry-proposals" in reference_provenance["provisional_note"]
+
+
+def test_mutant_removing_the_provisional_label_is_detectable():
+    """Mutant proving the label lives in the data, not asserted unconditionally:
+    a table missing the ``provisional`` key must fail the check above."""
+    raw = json.loads((REPO_ROOT / "capsule_engine" / "registry" / "conventions.json").read_text())
+    mutant = dict(raw["grc_field_conventions"]["_provenance"])
+    del mutant["provisional"]
+    assert "provisional" not in mutant
