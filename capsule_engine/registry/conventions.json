@@ -8,7 +8,7 @@
   "provisional_field_conventions": {
     "_provenance": {
       "status": "provisional",
-      "source": "action-state-group/capsule-emit-mesh (plugins/admission-policy/src/capsule_emit.rs, capsule_sidecar.py) via the CPB provisional payload class 'mesh-inference-exchange' (action-state-group/scitt-payload-binding@e0ad1c7, spec/cpb-provisional-registry.md)",
+      "source": "action-state-group/capsule-emit-mesh (plugins/admission-policy/src/capsule_emit.rs, capsule_sidecar.py) via the CPB provisional payload class 'mesh-inference-exchange' (action-state-group/scitt-payload-binding@c5e0435, spec/cpb-provisional-registry.md)",
       "note": "Vendored, provisional field-value labels for the mesh-inference-exchange payload class. These are the AAC six-registry values that class's producer sets on the surrounding capsule; they are known-with-status-provisional (resolved by agent_action_capsule.verify check 8 against the vendored CPB provisional snapshot), never a rejection. Refresh with scripts/vendor_cpb_registry.py."
     },
     "effect.type": {

@@ -70,6 +70,10 @@ INVALID_MEASURABILITY = "invalid_measurability"
 MISSING_EVIDENCE_INSTRUMENT = "missing_evidence_instrument"
 INVALID_EVIDENCE_INSTRUMENT = "invalid_evidence_instrument"
 
+# clause -- the structured legal anchor alongside clause_ref
+# ([ldg-grc-clause-ref-versioning]).
+INVALID_CLAUSE = "invalid_clause"
+
 # Constraint scope declaration + cross-constraint agreement (generalizes the
 # capsule-emit PR #54 finding: a lock/cap/aggregate scope mismatch let a
 # cross-class race jointly admit what sequential execution would deny --
