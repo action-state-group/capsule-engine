@@ -22,9 +22,13 @@ Determinism (spec §3), enforced here, not just documented:
 """
 from __future__ import annotations
 
+import hashlib
+import json
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from typing import Any
+
+from agent_action_capsule.canonical import FloatInDigestError, UnsafeIntegerError, json_digest
 
 from .definition import FoldDefinition
 from .duration import parse_duration_seconds
@@ -50,6 +54,38 @@ _FILTER_OPS = {
 def _parse_timestamp(ts: str) -> datetime:
     text = ts[:-1] + "+00:00" if ts.endswith("Z") else ts
     return datetime.fromisoformat(text)
+
+
+def _record_identity(record: dict) -> str:
+    """The digest a fold cites for one input record (design §10.1): a sealed
+    ledger capsule's own ``capsule_id`` when present -- every real capsule
+    carries one, already computed over its own canonical form, so this never
+    re-digests real ledger data -- else a content digest over the record
+    itself, so synthetic/fixture records (no capsule_id) used in unit tests
+    still get a stable, deterministic identity.
+
+    The fallback tries the JCS digest first, but a bare identity lookup must
+    never enforce spec §3 rule 2 ("no floats") on a record's *entire*
+    content -- that rule is about values entering arithmetic (``reducers.py``),
+    not about whether an unrelated field can exist at all. A record with a
+    float in a field this fold never reads must still get an identity."""
+    capsule_id = record.get("capsule_id")
+    if isinstance(capsule_id, str) and capsule_id:
+        return capsule_id
+    try:
+        return json_digest(record)
+    except (FloatInDigestError, UnsafeIntegerError):
+        return hashlib.sha256(json.dumps(record, sort_keys=True, default=str).encode("utf-8")).hexdigest()
+
+
+def _input_set_digest(capsule_ids: tuple[str, ...]) -> str:
+    """SHA-256 (JCS) over the ordered list of a fold's input capsule ids --
+    the third leg of fold identity (design §10.1):
+    ``(definition_digest, range, input_set_digest)``. The same range over the
+    same ledger contents always yields the same digest, which is what makes a
+    re-run of the same fold over the same range provably idempotent rather
+    than merely assumed so."""
+    return json_digest({"input_capsule_ids": list(capsule_ids)})
 
 
 def _passes_filter(definition: FoldDefinition, values: dict[str, Any]) -> bool:
@@ -92,7 +128,11 @@ def _resolve_reads(definition: FoldDefinition, record: dict) -> dict[str, Any] |
 
 @dataclass(frozen=True)
 class EvaluationTrace:
-    """The strict result envelope (spec §4) plus v0 replay diagnostics."""
+    """The strict result envelope (spec §4) plus v0 replay diagnostics, plus
+    the design §10.1 fold-identity fields: ``input_capsule_ids`` (every
+    record in the declared range, ledger order), ``matched_capsule_ids`` (the
+    subset that actually fed the reducer -- what a fold capsule cites as the
+    ones it reduced), and ``input_set_digest`` (a digest over the former)."""
 
     fold_digest: str
     range_: tuple[int, int]
@@ -104,6 +144,9 @@ class EvaluationTrace:
     skipped_count: int
     considered_count: int
     matched_count: int
+    input_capsule_ids: tuple[str, ...]
+    matched_capsule_ids: tuple[str, ...]
+    input_set_digest: str
 
     def to_envelope(self) -> dict:
         return {
@@ -116,10 +159,31 @@ class EvaluationTrace:
             "staleness": self.staleness,
         }
 
+    def fold_identity(self) -> tuple[str, tuple[int, int], str]:
+        """``(definition_digest, range, input_set_digest)`` (design §10.1):
+        the triple a fold-capsule builder dedups/idempotency-checks on. The
+        same fold run twice over the same range against the same ledger
+        contents always yields the same triple -- the second run is a no-op
+        replay, never a second capsule."""
+        return (self.fold_digest, self.range_, self.input_set_digest)
+
+    def citations(self) -> dict:
+        """What a fold capsule cites (design §10.1's "points at its inputs,
+        so '23 of 73' expands to the exact 73 sessions and 23 verdicts"):
+        every input considered, which of those actually matched, and the
+        digest over the input set. Deliberately separate from
+        ``to_envelope()``, which is the spec §4 strict result shape and must
+        not grow new keys."""
+        return {
+            "input_set_digest": self.input_set_digest,
+            "input_capsule_ids": list(self.input_capsule_ids),
+            "cited_capsule_ids": list(self.matched_capsule_ids),
+        }
+
 
 def _compute_groups(
     definition: FoldDefinition, records: list[dict], as_of: str | None
-) -> tuple[dict[Any, Any], int, int, int]:
+) -> tuple[dict[Any, Any], int, int, int, tuple[str, ...]]:
     anchor: datetime | None = None
     if definition.window is not None and definition.window.mode == "rolling":
         if as_of is None:
@@ -135,6 +199,7 @@ def _compute_groups(
     skipped = 0
     considered = 0
     matched = 0
+    matched_ids: list[str] = []
 
     for record in records:  # ledger order only (spec §3 rule 3) — never re-sorted
         considered += 1
@@ -149,12 +214,13 @@ def _compute_groups(
             continue
 
         matched += 1
+        matched_ids.append(_record_identity(record))
         group_key = _GLOBAL_KEY if definition.key is None else values[definition.key]
         acc = groups.get(group_key, reducer.initial())
         field_value = values.get(definition.reduce.field) if reducer.needs_field else None
         groups[group_key] = reducer.step(acc, field_value, definition.reduce.field or "")
 
-    return groups, skipped, considered, matched
+    return groups, skipped, considered, matched, tuple(matched_ids)
 
 
 def evaluate_all(
@@ -170,7 +236,7 @@ def evaluate_all(
     """Evaluate every group (key value) present in ``records``. Returns a dict
     keyed by the group's key value (or the engine's global-key sentinel when
     the definition declares no ``key``)."""
-    groups, skipped, considered, matched = _compute_groups(definition, records, as_of)
+    groups, skipped, considered, matched, matched_capsule_ids = _compute_groups(definition, records, as_of)
     reducer = REDUCERS[definition.reduce.reducer]
 
     fold_digest = definition.definition_digest()
@@ -181,6 +247,8 @@ def evaluate_all(
     # never consulted by filter/window/reduce logic above.
     env_evaluated_at = evaluated_at if evaluated_at is not None else datetime.now(timezone.utc).isoformat()
     env_staleness = {"checkpoint_age_ms": staleness_ms}
+    input_capsule_ids = tuple(_record_identity(r) for r in records)
+    input_digest = _input_set_digest(input_capsule_ids)
 
     return {
         group_key: EvaluationTrace(
@@ -194,6 +262,9 @@ def evaluate_all(
             skipped_count=skipped,
             considered_count=considered,
             matched_count=matched,
+            input_capsule_ids=input_capsule_ids,
+            matched_capsule_ids=matched_capsule_ids,
+            input_set_digest=input_digest,
         )
         for group_key, acc in groups.items()
     }
@@ -229,6 +300,7 @@ def evaluate_one(
     reducer = REDUCERS[definition.reduce.reducer]
     range_end = range_start + len(records) - 1 if records else range_start - 1
     tree_size = range_start + len(records)
+    input_capsule_ids = tuple(_record_identity(r) for r in records)
     return EvaluationTrace(
         fold_digest=definition.definition_digest(),
         range_=(range_start, range_end),
@@ -240,4 +312,7 @@ def evaluate_one(
         skipped_count=0,
         considered_count=len(records),
         matched_count=0,
+        input_capsule_ids=input_capsule_ids,
+        matched_capsule_ids=(),
+        input_set_digest=_input_set_digest(input_capsule_ids),
     )
