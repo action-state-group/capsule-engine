@@ -43,6 +43,7 @@ from capsule_ledger.ledger.api import ScanQuery
 
 from ..envcompat import env_get
 from .format import build_echo, format_staleness
+from .period import add_period_arg, apply_period
 
 __all__ = ["add_parser", "run"]
 
@@ -52,6 +53,7 @@ DEFAULT_VERIFY_BASE_URL = "https://verify.agentactioncapsule.org/bundle"
 def add_parser(sub: argparse._SubParsersAction) -> argparse.ArgumentParser:
     p = sub.add_parser("bundle", help="produce a self-contained verifiable slice of the ledger")
     add_scan_query_args(p)
+    add_period_arg(p)
     p.add_argument("--out", default="bundle.json", help="output path for the bundle file (default: %(default)s)")
     p.add_argument(
         "--verify-base-url",
@@ -180,6 +182,7 @@ def run(args: argparse.Namespace) -> int:
     if ledger_path is None:
         return 2
 
+    apply_period(args)  # --period fills in args.since/args.until in place when unset
     query = build_scan_query(args)
     with open_ledger(ledger_path) as store:
         matched = list(store.scan(query))
@@ -200,7 +203,9 @@ def run(args: argparse.Namespace) -> int:
         tree_size = sum(1 for _ in store.scan(ScanQuery()))
         completeness_certificate = _build_completeness_certificate(store, records, tree_size)
 
-    echo = build_echo("bundle", flags=[*echo_parts(args), ("--out", _echo_safe_out(args.out))])
+    echo = build_echo(
+        "bundle", flags=[*echo_parts(args), ("--period", args.period), ("--out", _echo_safe_out(args.out))]
+    )
     bundle = {
         "bundle_version": "1",
         "created_at": datetime.now(timezone.utc).isoformat(),
@@ -208,8 +213,13 @@ def run(args: argparse.Namespace) -> int:
             k: v
             for k, v in {
                 "agent": args.agent,
+                # args.since/args.until already reflect --period's resolved
+                # bounds (apply_period mutates them in place above) -- a
+                # bundle's recorded query must show what was actually
+                # scanned, not the pre-resolution flag.
                 "since": args.since,
                 "until": args.until,
+                "period": args.period,
                 "counterparty": args.counterparty,
                 "verdict": args.verdict,
                 "action_type": args.action_type,
