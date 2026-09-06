@@ -25,7 +25,7 @@ classifiers = [
 dependencies = [
     "agent-action-capsule>=0.1.0",
     "capsule-ledger>=0.0.1",
-    "capsule-emit>=0.6.0",
+    "capsule-emit>=0.8.0",
     "pyyaml>=6.0",
 ]
 

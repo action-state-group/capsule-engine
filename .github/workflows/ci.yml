@@ -14,12 +14,6 @@ jobs:
           python-version: "3.12"
       - name: install capsule-ledger (not yet on PyPI)
         run: pip install "capsule-ledger @ git+https://github.com/action-state-group/capsule-ledger.git"
-      - name: install capsule-emit (chain_segment/E14 not yet in a PyPI release -- 7 commits past v0.7.1)
-        # --force-reinstall: capsule-ledger's own install above already satisfies
-        # "capsule-emit" from PyPI at the same self-reported version (0.7.1, not yet
-        # bumped past the tag despite the newer commits), so a plain `pip install`
-        # here is a silent no-op -- pip matches on version number, not source.
-        run: pip install --force-reinstall --no-deps "capsule-emit @ git+https://github.com/action-state-group/capsule-emit.git"
       - name: install
         run: pip install -e ".[dev]"
       - name: ruff
