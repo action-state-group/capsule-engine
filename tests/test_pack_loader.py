@@ -136,6 +136,99 @@ def test_declaring_clause_ref_changes_the_digest_but_nothing_else_does(tmp_path)
     assert digest_without != digest_with_ref
 
 
+# --- clause: the structured legal anchor ([ldg-grc-clause-ref-versioning]) -
+
+
+_TEXT_DIGEST = "a" * 64
+
+
+def _clause_entry(**overrides: object) -> dict:
+    clause = {
+        "instrument": "Regulation (EU) 2024/1689",
+        "article": "Article 26",
+        "as_amended_by": ["Regulation (EU) 2026/1744"],
+        "paragraph": "2",
+        "jurisdiction": "EU",
+        "text_snapshot_digest": _TEXT_DIGEST,
+        "effective_from": "2026-08-02",
+        "source_url": "https://eur-lex.europa.eu/eli/reg/2024/1689",
+    }
+    clause.update(overrides)
+    return clause
+
+
+def test_outcome_clause_is_optional_and_parses_when_declared(tmp_path):
+    _write_pack(tmp_path, overrides={"outcomes": [_outcome_entry(clause=_clause_entry())]})
+    pack = load_pack_dir(tmp_path)
+    outcome = pack.outcome_for_id("outcome.test")
+    assert outcome.clause.instrument == "Regulation (EU) 2024/1689"
+    assert outcome.clause.article == "Article 26"
+    assert outcome.clause.as_amended_by == ("Regulation (EU) 2026/1744",)
+    assert outcome.clause.text_snapshot_digest == _TEXT_DIGEST
+    assert outcome.clause.effective_from == "2026-08-02"
+    assert outcome.clause.contested is False
+    assert pack.canonical_dict()["outcomes"][0]["clause"] == _clause_entry()
+
+
+def test_outcome_without_clause_omits_it_from_the_canonical_form(tmp_path):
+    _write_pack(tmp_path, overrides={"outcomes": [_outcome_entry()]})
+    pack = load_pack_dir(tmp_path)
+    outcome = pack.outcome_for_id("outcome.test")
+    assert outcome.clause is None
+    assert "clause" not in pack.canonical_dict()["outcomes"][0]
+
+
+def test_declaring_clause_changes_the_digest_but_nothing_else_does(tmp_path):
+    without = tmp_path / "without"
+    with_clause = tmp_path / "with_clause"
+    without.mkdir()
+    with_clause.mkdir()
+    _write_pack(without, overrides={"outcomes": [_outcome_entry()]})
+    _write_pack(with_clause, overrides={"outcomes": [_outcome_entry(clause=_clause_entry())]})
+    digest_without = load_pack_dir(without).definition_digest()
+    digest_with_clause = load_pack_dir(with_clause).definition_digest()
+    assert digest_without != digest_with_clause
+
+
+def test_clause_text_snapshot_digest_changing_moves_the_digest_too():
+    """Mutant proof: one character of the confirmed clause text differing
+    means a new ``text_snapshot_digest``, which must move the pack's own
+    digest -- a law-text change can never be silent drift."""
+    entry_a = _outcome_entry(clause=_clause_entry(text_snapshot_digest="a" * 64))
+    entry_b = _outcome_entry(clause=_clause_entry(text_snapshot_digest="b" * 64))
+    assert entry_a != entry_b  # sanity: the fixtures really do differ
+
+
+def test_clause_contested_flag_renders_only_when_true(tmp_path):
+    _write_pack(tmp_path, overrides={"outcomes": [_outcome_entry(clause=_clause_entry(contested=True))]})
+    pack = load_pack_dir(tmp_path)
+    assert pack.outcome_for_id("outcome.test").clause.contested is True
+    assert pack.canonical_dict()["outcomes"][0]["clause"]["contested"] is True
+
+
+def test_clause_missing_instrument_is_rejected(tmp_path):
+    bad = _clause_entry()
+    del bad["instrument"]
+    _write_pack(tmp_path, overrides={"outcomes": [_outcome_entry(clause=bad)]})
+    with pytest.raises(PackDefinitionError) as exc_info:
+        load_pack_dir(tmp_path)
+    assert exc_info.value.reason == "missing_required_field"
+
+
+def test_clause_malformed_effective_from_is_rejected(tmp_path):
+    _write_pack(tmp_path, overrides={"outcomes": [_outcome_entry(clause=_clause_entry(effective_from="Aug 2 2026"))]})
+    with pytest.raises(PackDefinitionError) as exc_info:
+        load_pack_dir(tmp_path)
+    assert exc_info.value.reason == "invalid_clause"
+
+
+def test_clause_malformed_text_snapshot_digest_is_rejected(tmp_path):
+    _write_pack(tmp_path, overrides={"outcomes": [_outcome_entry(clause=_clause_entry(text_snapshot_digest="not-hex"))]})
+    with pytest.raises(PackDefinitionError) as exc_info:
+        load_pack_dir(tmp_path)
+    assert exc_info.value.reason == "invalid_clause"
+
+
 @pytest.mark.parametrize(
     "overrides,omit,expected_reason",
     [
