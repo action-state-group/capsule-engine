@@ -17,28 +17,21 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from capsule_engine.registry import describe_action_class, describe_field_value
+from capsule_engine.registry import describe_field_value
 from capsule_engine.registry.conventions import is_known_reference_field
 
 REPO_ROOT = Path(__file__).parent.parent
 
 
-# ---- action-class facets: interaction.disclosure, incident.flag/report ----
-def test_interaction_disclosure_action_class_is_registered():
-    convention = describe_action_class("interaction.disclosure")
-    assert convention.registered is True
-    assert convention.label == "Interaction disclosure"
-
-
-def test_incident_flag_and_report_action_classes_are_registered():
-    flag = describe_action_class("incident.flag")
-    report = describe_action_class("incident.report")
-    assert flag.registered is True and report.registered is True
-    assert flag.label == "Incident flag"
-    assert report.label == "Incident report"
-
-
 # ---- field-value facets ----
+# Note: interaction.disclosure/incident.flag/incident.report are NOT
+# registered as action_class_conventions entries -- that table is
+# drift-checked against capsule-ledger's own independent shim copy
+# (scripts/check_registry_conventions_drift.py), a repo out of this task's
+# scope (and slated for archival, w3-engine-residual-moves). The facets land
+# only in the field-value tables below, which carry no cross-repo sync
+# requirement; an unregistered action_class still renders as-is (never an
+# error) per the never-reject invariant.
 def test_interaction_disclosure_kind_values_are_registered():
     for kind in ("ai", "emotion", "biometric"):
         fc = describe_field_value("interaction.disclosure_kind", kind)

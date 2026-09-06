@@ -3,18 +3,6 @@
     "money.transfer": {
       "label": "Money transfer",
       "description": "An action that moves funds -- dispatching a payment, initiating a transfer, or otherwise committing money to move. Seeded by the payments-safety starter pack (asg/payments-safety/1.0.0)."
-    },
-    "interaction.disclosure": {
-      "label": "Interaction disclosure",
-      "description": "An event informing a natural person they are interacting with an AI system, or that emotion-recognition/biometric categorisation is in use (Art 50(1)/(3)). Read by the ordering fold (folds/ordering.py) as the 'before' event for EU-50-1/50-3. Seeded by the GRC folds batch (ldg-grc-folds-batch, 2026-09-05)."
-    },
-    "incident.flag": {
-      "label": "Incident flag",
-      "description": "An event marking a serious-incident condition under Art 55/73, carrying an incident.severity_class value -- the trigger for the paired incident.report and the existing time-delta deadline fold's class-dependent threshold. Seeded by the GRC folds batch (ldg-grc-folds-batch, 2026-09-05)."
-    },
-    "incident.report": {
-      "label": "Incident report",
-      "description": "The report sealed in response to an incident.flag, addressed to the AI Office or the relevant authority (Art 55/73). Seeded by the GRC folds batch (ldg-grc-folds-batch, 2026-09-05)."
     }
   },
   "provisional_field_conventions": {
