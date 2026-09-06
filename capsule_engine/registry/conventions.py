@@ -58,6 +58,7 @@ __all__ = [
     "conventions_digest",
     "FieldConvention",
     "describe_field_value",
+    "is_known_reference_field",
 ]
 
 
@@ -107,6 +108,29 @@ def _provisional_field_table() -> dict[str, Any]:
 
 
 @lru_cache(maxsize=1)
+def _grc_field_table() -> dict[str, Any]:
+    """Company-authored (not vendored CPB) field-value conventions, keyed by
+    field name -- the GRC folds batch's registry facets. Distinct from
+    ``_provisional_field_table()`` so ``scripts/vendor_cpb_registry.py``'s
+    drift check, scoped exactly to ``provisional_field_conventions``, is
+    never touched by these additions."""
+    return _load_raw().get("grc_field_conventions", {})
+
+
+@lru_cache(maxsize=1)
+def _reference_fields() -> dict[str, str]:
+    return _load_raw().get("grc_reference_fields", {})
+
+
+def is_known_reference_field(field: str) -> bool:
+    """True for a bare identifier/reference field the GRC folds batch
+    registered (``approver_id``, ``output.marking_ref``, ``reference_db_ref``)
+    -- these carry no enumerable value set, so they are documented here
+    rather than forced into ``describe_field_value``'s per-value table."""
+    return field in _reference_fields()
+
+
+@lru_cache(maxsize=1)
 def conventions_digest() -> str:
     """The vendored snapshot's own content digest -- lets any surface state
     exactly which convention-table version it rendered a label from,
@@ -131,13 +155,26 @@ def describe_field_value(field: str, value: str | None) -> FieldConvention:
 
     A value carried by a vendored CPB *provisional* payload class resolves
     known-with-status-``provisional`` (``registered=True``, ``status=
-    "provisional"``); any other value renders as-is, unregistered -- never an
-    error (the never-reject invariant, mirroring ``describe_action_class`` and
-    the spec-level §12 binding)."""
+    "provisional"``); a value from the company-authored, hand-curated GRC
+    table (``_grc_field_table``, checked first since it never overlaps the
+    vendored table's field/value pairs) resolves with whatever ``status`` it
+    was registered under (``"registered"`` or ``"planned"``); any other value
+    renders as-is, unregistered -- never an error (the never-reject invariant,
+    mirroring ``describe_action_class`` and the spec-level §12 binding)."""
     if not value:
         return FieldConvention(
             field=field, value="", label="(no value recorded)", description=None,
             status=None, payload_class=None, registered=False,
+        )
+    entry = _grc_field_table().get(field, {}).get(value)
+    if entry is not None:
+        return FieldConvention(
+            field=field, value=value,
+            label=entry.get("label", value),
+            description=entry.get("description"),
+            status=entry.get("status", "registered"),
+            payload_class=None,
+            registered=True,
         )
     entry = _provisional_field_table().get(field, {}).get(value)
     if entry is None:
