@@ -136,6 +136,12 @@ def test_console_record_detail_shows_identity_verdict_checks_and_folds(running_s
     assert detail["disposition"]["verdict_class"] == "executed"
     assert detail["verify"]["ok"] is True
     assert detail["fold_strip"], "expected at least one live fold value"
+    # T2R rev9(a): a rendered fold number never appears without its coverage
+    # footnote beside it -- the default "capture: unknown" honesty line, when
+    # no capture boundary/rule has been declared for the fold.
+    for entry in detail["fold_strip"]:
+        assert entry["coverage_footnote"].startswith("range-complete through ")
+        assert "captured under boundary: unknown" in entry["coverage_footnote"]
     assert detail["cli_echo"] == f"≡ capsule show {APPROVE_ID}"
 
     # CONFIRM_ID cites APPROVE_ID as its chain parent (relation "confirms")
