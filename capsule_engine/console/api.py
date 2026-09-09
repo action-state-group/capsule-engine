@@ -21,6 +21,7 @@ from capsule_ledger.registry import describe_action_class
 from ..cli.format import (
     assurance_grade_parts,
     build_echo,
+    format_coverage_footnote,
     format_envelope_line,
     format_staleness,
     summarize_action,
@@ -182,6 +183,11 @@ def _fold_strip(store: LedgerAPI, developer: str) -> list[dict[str, Any]]:
                 "fold_id": definition.fold_id,
                 "result": trace.result,
                 "envelope_line": format_envelope_line(trace.to_envelope()),
+                # T2R rev9(a): "a report cannot render a number without its
+                # coverage statement" -- this is the one place today that
+                # renders a fold's `result` for a human, so it never does so
+                # without the footnote beside it.
+                "coverage_footnote": format_coverage_footnote(trace.coverage_statement()),
             }
         )
     return strip

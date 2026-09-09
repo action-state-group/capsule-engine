@@ -196,3 +196,64 @@ def test_envelope_shape_matches_spec_section_4():
     assert envelope["range"] == [0, 0]
     assert envelope["tree_size"] == 1
     assert envelope["staleness"] == {"checkpoint_age_ms": 0}
+
+
+def _count_definition(fold_id: str):
+    return parse_definition(
+        {
+            "fold_id": fold_id,
+            "reads": [{"path": "developer", "erasure_class": "commitment-ok"}],
+            "key": "developer",
+            "reduce": {"reducer": "count"},
+            "emit": "count",
+        }
+    )
+
+
+def test_coverage_statement_defaults_to_unknown_capture_and_no_reconciliation():
+    """T2R rev9(a): absent capture/reconciled inputs render honestly, never
+    silently -- ``capture: "unknown"``, ``reconciled: None`` -- rather than
+    a rendered number carrying no coverage statement at all."""
+    definition = _count_definition("test.coverage_default/1.0.0")
+    trace = evaluate_one(definition, [{"developer": "agent-a"}], key_value="agent-a")
+    coverage = trace.coverage_statement()
+    assert coverage == {"range": [0, 0], "capture": "unknown", "reconciled": None}
+
+
+def test_coverage_statement_carries_supplied_capture_and_reconciled():
+    definition = _count_definition("test.coverage_supplied/1.0.0")
+    trace = evaluate_one(
+        definition,
+        [{"developer": "agent-a"}],
+        key_value="agent-a",
+        capture={"boundary": "ledger-write", "rule": "every accepted capsule"},
+        reconciled={"source": "vendor-invoice-export", "interval": "2026-08-01/2026-08-31"},
+    )
+    coverage = trace.coverage_statement()
+    assert coverage["capture"] == {"boundary": "ledger-write", "rule": "every accepted capsule"}
+    assert coverage["reconciled"] == {"source": "vendor-invoice-export", "interval": "2026-08-01/2026-08-31"}
+
+
+def test_coverage_statement_range_matches_the_envelope_range():
+    """rev9(a): "the formal parameter and the rendered coverage statement
+    are the same value" -- never two competing sources for the same range."""
+    definition = _count_definition("test.coverage_range/1.0.0")
+    trace = evaluate_one(definition, [{"developer": "agent-a"}] * 3, key_value="agent-a")
+    assert trace.coverage_statement()["range"] == trace.to_envelope()["range"]
+
+
+def test_coverage_statement_never_grows_the_strict_envelope():
+    """``to_envelope()`` stays the spec §4 strict shape -- the coverage
+    statement is a sibling, exactly like ``citations()``, never a new key
+    folded into it."""
+    definition = _count_definition("test.coverage_no_grow/1.0.0")
+    trace = evaluate_one(
+        definition,
+        [{"developer": "agent-a"}],
+        key_value="agent-a",
+        capture={"boundary": "b", "rule": "r"},
+        reconciled={"source": "s", "interval": "i"},
+    )
+    assert set(trace.to_envelope().keys()) == {
+        "fold", "range", "tree_size", "checkpoint", "result", "evaluated_at", "staleness",
+    }

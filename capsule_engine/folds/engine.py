@@ -147,6 +147,8 @@ class EvaluationTrace:
     input_capsule_ids: tuple[str, ...]
     matched_capsule_ids: tuple[str, ...]
     input_set_digest: str
+    capture: dict | None = None
+    reconciled: dict | None = None
 
     def to_envelope(self) -> dict:
         return {
@@ -157,6 +159,26 @@ class EvaluationTrace:
             "result": self.result,
             "evaluated_at": self.evaluated_at,
             "staleness": self.staleness,
+        }
+
+    def coverage_statement(self) -> dict:
+        """The T2R rev9 coverage statement (`consistency-realignment-2026-09-06.md`
+        §2, `terms-to-report-design-2026-08-25.md` rev9(a)): ``{range, capture,
+        reconciled}``, beside ``to_envelope()`` rather than folded into it -- the
+        same reason ``citations()`` is separate: ``to_envelope()`` is the spec §4
+        strict result shape and must not grow new keys.
+
+        ``range`` is the same value as the envelope's own ``range`` -- "the
+        formal parameter and the rendered coverage statement are the same
+        value" (rev9). ``capture`` renders the literal string ``"unknown"``
+        when no capture boundary/rule was supplied for this evaluation --
+        rendered visibly, never omitted. ``reconciled`` is ``None`` when no
+        external comparison set exists -- rendered as "reconciled: none" by
+        ``format_coverage_footnote``, also never omitted."""
+        return {
+            "range": list(self.range_),
+            "capture": self.capture if self.capture is not None else "unknown",
+            "reconciled": self.reconciled,
         }
 
     def fold_identity(self) -> tuple[str, tuple[int, int], str]:
@@ -232,10 +254,18 @@ def evaluate_all(
     checkpoint: dict | None = None,
     evaluated_at: str | None = None,
     staleness_ms: int = 0,
+    capture: dict | None = None,
+    reconciled: dict | None = None,
 ) -> dict[Any, EvaluationTrace]:
     """Evaluate every group (key value) present in ``records``. Returns a dict
     keyed by the group's key value (or the engine's global-key sentinel when
-    the definition declares no ``key``)."""
+    the definition declares no ``key``).
+
+    ``capture``/``reconciled`` feed straight into every returned trace's
+    ``coverage_statement()`` (T2R rev9(a)) -- this function never infers
+    them; a caller with no capture boundary or no external comparison set
+    simply omits the argument and the statement renders that honestly
+    (``capture: "unknown"`` / ``reconciled: none``)."""
     groups, skipped, considered, matched, matched_capsule_ids = _compute_groups(definition, records, as_of)
     reducer = REDUCERS[definition.reduce.reducer]
 
@@ -265,6 +295,8 @@ def evaluate_all(
             input_capsule_ids=input_capsule_ids,
             matched_capsule_ids=matched_capsule_ids,
             input_set_digest=input_digest,
+            capture=capture,
+            reconciled=reconciled,
         )
         for group_key, acc in groups.items()
     }
@@ -280,6 +312,8 @@ def evaluate_one(
     checkpoint: dict | None = None,
     evaluated_at: str | None = None,
     staleness_ms: int = 0,
+    capture: dict | None = None,
+    reconciled: dict | None = None,
 ) -> EvaluationTrace:
     """Evaluate a single group. If the group never matched (or the fold has
     no ``key``), returns a defined empty result (the reducer's initial value)
@@ -292,6 +326,8 @@ def evaluate_one(
         checkpoint=checkpoint,
         evaluated_at=evaluated_at,
         staleness_ms=staleness_ms,
+        capture=capture,
+        reconciled=reconciled,
     )
     lookup_key = _GLOBAL_KEY if definition.key is None else key_value
     if lookup_key in traces:
@@ -315,4 +351,6 @@ def evaluate_one(
         input_capsule_ids=input_capsule_ids,
         matched_capsule_ids=(),
         input_set_digest=_input_set_digest(input_capsule_ids),
+        capture=capture,
+        reconciled=reconciled,
     )

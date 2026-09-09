@@ -21,6 +21,7 @@ from capsule_ledger.registry import describe_action_class
 __all__ = [
     "format_staleness",
     "format_envelope_line",
+    "format_coverage_footnote",
     "build_echo",
     "cli_echo_leaks_absolute_path",
     "summarize_action",
@@ -63,6 +64,35 @@ def format_envelope_line(envelope: dict) -> str:
         f"fold {envelope['fold']} · records {r0}–{r1} · "
         f"checkpoint #{checkpoint_num} · as of {format_staleness(staleness_ms)}"
     )
+
+
+def format_coverage_footnote(coverage: dict) -> str:
+    """Render a fold's coverage statement (T2R rev9(a),
+    ``EvaluationTrace.coverage_statement()``) as the design's literal
+    per-number footnote: "range-complete through C · captured under boundary
+    B, rule R · reconciled against O over interval T". The rule this
+    enforces (rev9(a)): *a report cannot render a number without its
+    coverage statement* -- every caller that shows a fold's ``result`` shows
+    this alongside it, never bare.
+
+    ``capture: "unknown"`` (no boundary/rule declared for this evaluation)
+    renders visibly rather than being silently dropped from the footnote;
+    ``reconciled: None`` (no external comparison set) renders as
+    "reconciled: none" for the same reason.
+    """
+    _, range_end = coverage["range"]
+    capture = coverage["capture"]
+    if capture == "unknown":
+        capture_part = "captured under boundary: unknown"
+    else:
+        capture_part = f"captured under boundary {capture['boundary']}, rule {capture['rule']}"
+    reconciled = coverage["reconciled"]
+    reconciled_part = (
+        "reconciled: none"
+        if reconciled is None
+        else f"reconciled against {reconciled['source']} over interval {reconciled['interval']}"
+    )
+    return f"range-complete through {range_end} · {capture_part} · {reconciled_part}"
 
 
 def build_echo(verb: str, *, positional: str | None = None, flags: list[tuple[str, object]] = ()) -> str:
