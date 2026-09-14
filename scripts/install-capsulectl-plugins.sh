@@ -25,28 +25,40 @@ if [ -z "$guard_bin" ]; then
   echo "error: capsulectl-guard is not on PATH after install (run: uv tool update-shell)." >&2
   exit 1
 fi
-# Resolve the FULL path (including a symlinked final component) to a real target,
-# then validate it: an absolute regular file, owned by us, not group/other-writable,
-# no shell metacharacters.
+# Validate a path fail-closed via Python (already a dependency): the resolved target
+# must be an absolute regular file owned by the current user, and neither it nor any
+# ancestor up to "/" may be group/other-writable. A stat error terminates the check
+# (nonzero exit) rather than being read as "safe". Used for the exec target and the
+# installed launcher, so a writable ancestor cannot let another user swap either.
+trusted_file() {
+  python3 - "$1" <<'PY'
+import os, sys, stat
+p = os.path.realpath(sys.argv[1])
+if not os.path.isfile(p):
+    sys.exit("not a regular file: %s" % p)
+if os.stat(p).st_uid != os.getuid():
+    sys.exit("not owned by the current user: %s" % p)
+cur = p
+while True:
+    st = os.stat(cur)  # OSError -> uncaught -> nonzero exit (fail closed)
+    if st.st_mode & (stat.S_IWGRP | stat.S_IWOTH):
+        sys.exit("group/other-writable on the trusted path: %s" % cur)
+    parent = os.path.dirname(cur)
+    if parent == cur:
+        break
+    cur = parent
+PY
+}
+
 guard_bin=$(python3 -c 'import os,sys; print(os.path.realpath(sys.argv[1]))' "$guard_bin")
 case $guard_bin in
   *[!A-Za-z0-9._/-]*) echo "error: resolved binary path has unexpected characters: $guard_bin" >&2; exit 1;;
 esac
-[ -f "$guard_bin" ] || { echo "error: $guard_bin is not a regular file" >&2; exit 1; }
-[ -O "$guard_bin" ] || { echo "error: $guard_bin is not owned by the current user" >&2; exit 1; }
-# group-writable (-perm -0020) or other-writable (-perm -0002); find -perm -mode is
-# POSIX and correct across GNU/BSD, unlike parsing ls columns.
-writable() { [ -n "$(find "$1" -maxdepth 0 \( -perm -0020 -o -perm -0002 \) 2>/dev/null)" ]; }
-if writable "$guard_bin"; then echo "error: $guard_bin is group- or other-writable" >&2; exit 1; fi
+trusted_file "$guard_bin" || { echo "error: $guard_bin is not a trusted exec target (see above)" >&2; exit 1; }
 
 root="$HOME/.local/lib/capsulectl/plugins"
 mkdir -p "$root"
-# Harden each directory up to the root; a swallowed failure would produce an
-# install capsulectl silently refuses, so check the result instead of `|| true`.
-for dir in "$HOME/.local" "$HOME/.local/lib" "$HOME/.local/lib/capsulectl" "$root"; do
-  chmod go-w "$dir"
-  if writable "$dir"; then echo "error: $dir remains group/other-writable after chmod" >&2; exit 1; fi
-done
+chmod go-w "$HOME/.local" "$HOME/.local/lib" "$HOME/.local/lib/capsulectl" "$root"
 
 launcher="$root/capsulectl-guard"
 {
@@ -54,6 +66,7 @@ launcher="$root/capsulectl-guard"
   printf 'exec %s "$@"\n' "$guard_bin"
 } > "$launcher"
 chmod 0755 "$launcher"
+trusted_file "$launcher" || { echo "error: the installed launcher $launcher is not on a trusted path (see above); capsulectl would refuse it" >&2; exit 1; }
 
 # Fail closed: capsulectl is a prerequisite, and we only report success once it
 # actually lists the plugin (proving the trusted-path check accepts the launcher).
