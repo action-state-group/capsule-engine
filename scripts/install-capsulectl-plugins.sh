@@ -25,18 +25,19 @@ if [ -z "$guard_bin" ]; then
   echo "error: capsulectl-guard is not on PATH after install (run: uv tool update-shell)." >&2
   exit 1
 fi
-# Resolve to a real path and validate it is a plausible, safe target: an absolute
-# regular file, owned by us, not group/other-writable, no shell metacharacters.
-guard_bin=$(cd -- "$(dirname -- "$guard_bin")" && printf '%s/%s' "$(pwd -P)" "$(basename -- "$guard_bin")")
+# Resolve the FULL path (including a symlinked final component) to a real target,
+# then validate it: an absolute regular file, owned by us, not group/other-writable,
+# no shell metacharacters.
+guard_bin=$(python3 -c 'import os,sys; print(os.path.realpath(sys.argv[1]))' "$guard_bin")
 case $guard_bin in
   *[!A-Za-z0-9._/-]*) echo "error: resolved binary path has unexpected characters: $guard_bin" >&2; exit 1;;
 esac
 [ -f "$guard_bin" ] || { echo "error: $guard_bin is not a regular file" >&2; exit 1; }
 [ -O "$guard_bin" ] || { echo "error: $guard_bin is not owned by the current user" >&2; exit 1; }
-case $(ls -ld -- "$guard_bin" | cut -c1-10) in
-  *w??) echo "error: $guard_bin is other-writable" >&2; exit 1;;
-  *w?) echo "error: $guard_bin is group-writable" >&2; exit 1;;
-esac
+# group-writable (-perm -0020) or other-writable (-perm -0002); find -perm -mode is
+# POSIX and correct across GNU/BSD, unlike parsing ls columns.
+writable() { [ -n "$(find "$1" -maxdepth 0 \( -perm -0020 -o -perm -0002 \) 2>/dev/null)" ]; }
+if writable "$guard_bin"; then echo "error: $guard_bin is group- or other-writable" >&2; exit 1; fi
 
 root="$HOME/.local/lib/capsulectl/plugins"
 mkdir -p "$root"
@@ -44,9 +45,7 @@ mkdir -p "$root"
 # install capsulectl silently refuses, so check the result instead of `|| true`.
 for dir in "$HOME/.local" "$HOME/.local/lib" "$HOME/.local/lib/capsulectl" "$root"; do
   chmod go-w "$dir"
-  case $(ls -ld -- "$dir" | cut -c1-10) in
-    *w???|*w??) echo "error: $dir remains group/other-writable after chmod" >&2; exit 1;;
-  esac
+  if writable "$dir"; then echo "error: $dir remains group/other-writable after chmod" >&2; exit 1; fi
 done
 
 launcher="$root/capsulectl-guard"
@@ -56,14 +55,14 @@ launcher="$root/capsulectl-guard"
 } > "$launcher"
 chmod 0755 "$launcher"
 
-# Confirm capsulectl actually accepts and lists the plugin; if the trusted-path
-# check refuses it, fail rather than report a success the runtime won't honor.
-if command -v capsulectl >/dev/null 2>&1; then
-  if ! capsulectl plugin ls 2>/dev/null | grep -q '"name": *"guard"'; then
-    echo "error: capsulectl did not list the guard plugin after install (trusted-path check refused it?)" >&2
-    exit 1
-  fi
-  echo "installed and verified: capsulectl lists the guard plugin"
-else
-  echo "installed launcher $launcher -> $guard_bin (capsulectl not on PATH to verify; run: capsulectl plugin ls)"
+# Fail closed: capsulectl is a prerequisite, and we only report success once it
+# actually lists the plugin (proving the trusted-path check accepts the launcher).
+if ! command -v capsulectl >/dev/null 2>&1; then
+  echo "error: capsulectl is not on PATH; install the core CLI first" >&2
+  exit 1
 fi
+if ! capsulectl plugin ls 2>/dev/null | grep -q '"name": *"guard"'; then
+  echo "error: capsulectl did not list the guard plugin after install (trusted-path check refused it?)" >&2
+  exit 1
+fi
+echo "installed and verified: capsulectl lists the guard plugin"
