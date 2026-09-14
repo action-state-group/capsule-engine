@@ -42,6 +42,7 @@ mcp = ["mcp>=1.0,<2.0"]
 
 [project.scripts]
 capsule-engine = "capsule_engine.cli:main"
+capsulectl-guard = "capsule_engine.cli.plugin_launcher:capsulectl_guard"
 
 [tool.setuptools.packages.find]
 where = ["."]
