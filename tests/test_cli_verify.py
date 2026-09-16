@@ -13,6 +13,11 @@ from capsule_engine.cli.main import main
 FIXTURE_LEDGER = Path(__file__).parent / "fixtures" / "sample_ledger.jsonl"
 APPROVE_ID = "705955419ca6f944a75db77ae2a59844fdd99d355866c6c1dbc4ebe655c024c7"
 
+def _write_bundle(path: Path) -> None:
+    records = [json.loads(line) for line in FIXTURE_LEDGER.read_text().splitlines() if line.strip()]
+    path.write_text(json.dumps({"records": records}))
+
+
 
 def test_verify_ok_exits_zero(capsys):
     rc = main(["verify", APPROVE_ID, "--ledger", str(FIXTURE_LEDGER)])
@@ -65,9 +70,7 @@ def test_verify_catches_a_tampered_record_exit_code_1(tmp_path, capsys):
 
 def test_verify_bundle_offline_round_trips_clean(tmp_path, capsys):
     bundle_path = tmp_path / "bundle.json"
-    rc = main(["bundle", "--ledger", str(FIXTURE_LEDGER), "--out", str(bundle_path)])
-    assert rc == 0
-    capsys.readouterr()
+    _write_bundle(bundle_path)
 
     rc = main(["verify", "--bundle", str(bundle_path)])
     assert rc == 0
@@ -78,9 +81,7 @@ def test_verify_bundle_offline_round_trips_clean(tmp_path, capsys):
 
 def test_verify_bundle_catches_tampering_after_the_fact(tmp_path, capsys):
     bundle_path = tmp_path / "bundle.json"
-    rc = main(["bundle", "--ledger", str(FIXTURE_LEDGER), "--out", str(bundle_path)])
-    assert rc == 0
-    capsys.readouterr()
+    _write_bundle(bundle_path)
 
     bundle = json.loads(bundle_path.read_text())
     bundle["records"][0]["operator"] = "tampered-corp"

@@ -37,7 +37,7 @@ def add_parser(sub: argparse._SubParsersAction) -> argparse.ArgumentParser:
 def run(args: argparse.Namespace) -> int:
     # The console only exists at all in the "full" packaging arm (see
     # ``cli/main.py``) -- it renders capsule vocabulary and verification
-    # state throughout, matching log/show/verify/bundle's own M5 marker.
+    # state throughout, matching log/show/verify's own M5 marker.
     from ..telemetry.record import record_evidence_touch
 
     record_evidence_touch("full")
