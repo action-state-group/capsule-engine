@@ -6,7 +6,7 @@ caps/dedupe/verify-before-dispatch checks and ``dry_run`` fully functional;
 the evidence machinery underneath (capsules, permalinks, verify surfaces)
 stays present in the code but is not surfaced: no capsule vocabulary in CLI
 output, no share/verify links printed or rendered, and the record-query verbs
-(``log``/``show``/``verify``/``bundle``) are not registered at all. ``full``
+(``log``/``show``/``verify``) are not registered at all. ``full``
 is today's existing behavior, unchanged.
 
 ``guards-only`` changes what is shown, never what is recorded:

@@ -26,7 +26,6 @@ import sys
 
 from .. import packaging
 from . import (
-    bundle_cmd,
     console_cmd,
     constraints_cmd,
     guard_cmds,
@@ -59,7 +58,6 @@ def _build_parser(arm: str | None = None) -> argparse.ArgumentParser:
     # why an env var, not a fork, drives this.
     if packaging.evidence_visible(arm):
         verify_cmd.add_parser(sub)
-        bundle_cmd.add_parser(sub)
         console_cmd.add_parser(sub)
 
     return parser

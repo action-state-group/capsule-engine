@@ -37,8 +37,7 @@ pip install -e .
   published from the company side.
 - `policy/` — the policy manifest: a lockfile of active fold/wicket
   definitions cited by digest, never by copy.
-- `console/`, `report/`, `bundle_viewer/` — the local investigation, report,
-  and offline-verify surfaces.
+- `console/`, `report/` — local investigation and report surfaces.
 - `mcp/`, `telemetry/`, `holds/` — MCP server surface, telemetry, and
   reservation-as-capsule engine-side plumbing.
 

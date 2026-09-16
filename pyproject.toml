@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "capsule-engine"
 version = "0.0.1"
-description = "The thin single-node engine: guard, append-only fold compute, packs, policy activation, and the local console/report/bundle-viewer runtime for AI agent actions."
+description = "The thin single-node engine: guard, append-only fold compute, packs, policy activation, and local console/report runtime for AI agent actions."
 requires-python = ">=3.10"
 license = { text = "Apache-2.0" }
 authors = [{ name = "Action State Group" }]
@@ -51,8 +51,6 @@ include = ["capsule_engine*"]
 [tool.setuptools.package-data]
 capsule_engine = [
     "report/static/*.js",
-    "bundle_viewer/static/*.html",
-    "bundle_viewer/static/*.js",
     "console/*.css",
     "console/*.html",
     "console/*.js",

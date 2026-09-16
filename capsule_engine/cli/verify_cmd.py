@@ -26,7 +26,7 @@ def add_parser(sub: argparse._SubParsersAction) -> argparse.ArgumentParser:
     p.add_argument("capsule_id", nargs="?", help="a capsule_id or an unambiguous prefix (omit with --bundle)")
     p.add_argument("--ledger", help="ledger store directory or a JSONL fixture file (default: $CAPSULE_LEDGER)")
     p.add_argument(
-        "--bundle", help="verify every record in a bundle file produced by `capsule bundle`, offline and self-contained"
+        "--bundle", help="verify every record in a bundle file produced by `capsulectl`, offline and self-contained"
     )
     p.add_argument("--json", action="store_true", help="print the raw verification result(s) as JSON")
     p.set_defaults(func=run)
