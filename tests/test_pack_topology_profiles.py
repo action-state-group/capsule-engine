@@ -258,7 +258,7 @@ def test_outcomes_for_profile_replaces_tier_and_keeps_the_outcome(tmp_path):
     assert profiled.excluded == ()
     j1 = next(o for o in profiled.outcomes if o.id == "J1")
     assert j1.tier == "informational"
-    # the pack's own Outcome is untouched -- outcomes_for_profile is a view.
+    # the pack's own EvidenceContract is untouched -- outcomes_for_profile is a view.
     assert pack.outcome_for_id("J1").tier == "must_have"
 
 

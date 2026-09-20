@@ -61,7 +61,9 @@ from .errors import (
     INVALID_CLAUSE,
     INVALID_CONSTRAINT,
     INVALID_COUNTERPARTY_BINDING,
+    INVALID_EPISTEMIC_TYPE,
     INVALID_EVIDENCE_INSTRUMENT,
+    INVALID_EVIDENCE_PROFILE,
     INVALID_FIXTURES,
     INVALID_FOLD_REF,
     INVALID_HOLDS_INTEGRATION,
@@ -92,7 +94,9 @@ from .errors import (
     PackDefinitionError,
 )
 from .schema import (
+    EPISTEMIC_TYPE_VALUES,
     EVIDENCE_INSTRUMENT_KINDS,
+    EVIDENCE_PROFILE_VALUES,
     HOLDS_INTEGRATION_VALUES,
     KNOWN_SCOPE_DIMENSIONS,
     MEASURABILITY_VALUES,
@@ -105,10 +109,10 @@ from .schema import (
     ActionSemantic,
     ClauseSpec,
     CounterpartyBinding,
+    EvidenceContract,
     EvidenceInstrument,
     FixtureScenario,
     Obligation,
-    Outcome,
     OutcomeOverride,
     PackDefinition,
     PackFixtures,
@@ -612,18 +616,25 @@ def _parse_clause_spec(raw: Any, *, outcome_id: str) -> ClauseSpec:
     )
 
 
-def _parse_outcomes(raw: Any) -> tuple[Outcome, ...]:
+def _parse_outcomes(raw: Any) -> tuple[EvidenceContract, ...]:
     """``outcomes[]``, the sister table to ``obligations[]`` (design of
     record 2026-08-19). Every entry needs a confirming-evidence rule and a
     verdict pair; an ``effect_claim`` of ``agent.caused_resolution`` MUST
     compile REFUSED -- this is where "REFUSED at compile time" becomes a
-    load-time error rather than a convention someone could forget."""
+    load-time error rather than a convention someone could forget.
+
+    Every entry here is an ``EvidenceContract`` -- the fields validated below
+    are the **outcome profile's** field set (Steven's 2026-09-21 Evidence-
+    Contract reframe ruling), still required regardless of a declared
+    ``profile``/``epistemic_type`` because the non-outcome profiles are typed
+    stubs only (their own field-level validation is Evidence Contract v3,
+    a spec-lane task -- see ``schema.EVIDENCE_PROFILE_VALUES``)."""
     if not raw:
         return ()
     if not isinstance(raw, list):
         raise PackDefinitionError(MALFORMED_PACK, "'outcomes' must be a list")
 
-    outcomes: list[Outcome] = []
+    outcomes: list[EvidenceContract] = []
     seen_ids: set[str] = set()
     for idx, entry in enumerate(raw):
         entry = _require_mapping(entry, f"outcomes[{idx}]")
@@ -754,13 +765,31 @@ def _parse_outcomes(raw: Any) -> tuple[Outcome, ...]:
         clause_raw = entry.get("clause")
         clause = _parse_clause_spec(clause_raw, outcome_id=outcome_id) if clause_raw is not None else None
 
+        profile = entry.get("profile", "outcome")
+        if profile not in EVIDENCE_PROFILE_VALUES:
+            raise PackDefinitionError(
+                INVALID_EVIDENCE_PROFILE,
+                f"outcomes[{outcome_id!r}].profile={profile!r} must be one of {sorted(EVIDENCE_PROFILE_VALUES)}, "
+                "or omitted (defaults to 'outcome')",
+            )
+
+        epistemic_type = entry.get("epistemic_type")
+        if epistemic_type is not None and epistemic_type not in EPISTEMIC_TYPE_VALUES:
+            raise PackDefinitionError(
+                INVALID_EPISTEMIC_TYPE,
+                f"outcomes[{outcome_id!r}].epistemic_type={epistemic_type!r} must be one of "
+                f"{sorted(EPISTEMIC_TYPE_VALUES)}, or omitted",
+            )
+
         outcomes.append(
-            Outcome(
+            EvidenceContract(
                 id=outcome_id,
                 statement=statement,
                 evidence_rule=evidence_rule,
                 forward_verdict=forward_verdict,
                 backward_verdict=backward_verdict,
+                profile=profile,
+                epistemic_type=epistemic_type,
                 window=window,
                 effect_claim=effect_claim,
                 refusal_reason_code=refusal_reason_code,
@@ -817,7 +846,7 @@ def _parse_counterparty_binding(raw: Any, *, profile_id: str) -> CounterpartyBin
 
 
 def _parse_profile_overrides(
-    raw: Any, *, profile_id: str, outcomes_by_id: dict[str, Outcome]
+    raw: Any, *, profile_id: str, outcomes_by_id: dict[str, EvidenceContract]
 ) -> tuple[OutcomeOverride, ...]:
     if raw is None:
         return ()
@@ -868,7 +897,7 @@ def _parse_profile_overrides(
     return tuple(out)
 
 
-def _parse_profiles(raw: Any, *, outcomes: tuple[Outcome, ...]) -> tuple[TopologyProfile, ...]:
+def _parse_profiles(raw: Any, *, outcomes: tuple[EvidenceContract, ...]) -> tuple[TopologyProfile, ...]:
     """``profiles[]`` -- relationship-topology profiles over this pack's own
     outcomes ([ldg-bp-topology-profiles], design §6b/§7). Optional: a pack
     with no ``profiles`` key ships zero profiles, same additive convention as

@@ -19,8 +19,11 @@ import yaml
 
 from capsule_engine.packs.errors import PackDefinitionError
 from capsule_engine.packs.loader import load_pack_dir
+from capsule_engine.packs.schema import EvidenceContract
 
 PAYMENTS_SAFETY_DIR = Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog" / "payments-safety"
+AIRLINE_ENGAGEMENT_DIR = Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog" / "airline-engagement"
+STANDARD_VENDOR_DIR = Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog" / "standard-vendor"
 
 BASE_PACK = {
     "pack_id": "test_pub/test-pack/1.0.0",
@@ -519,3 +522,103 @@ def test_every_closed_set_mode_loads_clean(tmp_path, mode):
     pack_dir = _write_pack(tmp_path, {"outcomes": [_outcome(mode=mode)]})
     pack = load_pack_dir(pack_dir)
     assert pack.outcomes[0].mode == mode
+
+
+# --- profile / epistemic_type (Steven's 2026-09-21 Evidence-Contract
+# reframe ruling, [evidence-contract-reframe-capsule-engine]) --------------
+#
+# Evidence Contract is the root abstraction (renamed from Outcome); an
+# existing pack's outcomes[] entries are the OUTCOME profile's field set,
+# reclassified in place. ``profile``/``epistemic_type`` are additive, same
+# optional-with-default backward-compat pattern as tier/mode above.
+
+
+def test_outcome_class_is_now_named_evidence_contract(tmp_path):
+    pack_dir = _write_pack(tmp_path, {"outcomes": [_outcome()]})
+    pack = load_pack_dir(pack_dir)
+    assert isinstance(pack.outcomes[0], EvidenceContract)
+
+
+def test_default_profile_is_outcome_and_omitted_from_the_digest(tmp_path):
+    """An outcome that doesn't mention profile at all -- the ordinary case
+    for every pre-existing outcome -- parses as 'outcome' and the digest
+    renders identically to before this field existed (no 'profile' key at
+    all), so no already-sealed pack pin moves."""
+    pack_dir = _write_pack(tmp_path, {"outcomes": [_outcome()]})
+    pack = load_pack_dir(pack_dir)
+    assert pack.outcomes[0].profile == "outcome"
+    assert "profile" not in pack.canonical_dict()["outcomes"][0]
+
+
+def test_invalid_profile_value_is_rejected(tmp_path):
+    pack_dir = _write_pack(tmp_path, {"outcomes": [_outcome(profile="made_up_profile")]})
+    with pytest.raises(PackDefinitionError) as exc:
+        load_pack_dir(pack_dir)
+    assert exc.value.reason == "invalid_evidence_profile"
+
+
+@pytest.mark.parametrize(
+    "profile",
+    ["outcome", "obligation", "process", "quality", "human_role", "attribution", "settlement"],
+)
+def test_every_closed_set_profile_loads_clean(tmp_path, profile):
+    pack_dir = _write_pack(tmp_path, {"outcomes": [_outcome(profile=profile)]})
+    pack = load_pack_dir(pack_dir)
+    assert pack.outcomes[0].profile == profile
+
+
+def test_non_default_profile_renders_in_the_digest(tmp_path):
+    pack_dir = _write_pack(tmp_path, {"outcomes": [_outcome(profile="obligation")]})
+    pack = load_pack_dir(pack_dir)
+    assert pack.canonical_dict()["outcomes"][0]["profile"] == "obligation"
+
+
+def test_default_epistemic_type_is_none_and_omitted_from_the_digest(tmp_path):
+    pack_dir = _write_pack(tmp_path, {"outcomes": [_outcome()]})
+    pack = load_pack_dir(pack_dir)
+    assert pack.outcomes[0].epistemic_type is None
+    assert "epistemic_type" not in pack.canonical_dict()["outcomes"][0]
+
+
+def test_invalid_epistemic_type_value_is_rejected(tmp_path):
+    pack_dir = _write_pack(tmp_path, {"outcomes": [_outcome(epistemic_type="MADE_UP_TYPE")]})
+    with pytest.raises(PackDefinitionError) as exc:
+        load_pack_dir(pack_dir)
+    assert exc.value.reason == "invalid_epistemic_type"
+
+
+@pytest.mark.parametrize(
+    "epistemic_type",
+    [
+        "OBSERVED_EVENT",
+        "SYSTEM_OF_RECORD_FACT",
+        "PRODUCER_CLAIM",
+        "HUMAN_REPORT",
+        "SEMANTIC_JUDGMENT",
+        "DERIVED_METRIC",
+        "ADJUDICATION",
+        "OBLIGATION_REFERENCE",
+    ],
+)
+def test_every_closed_set_epistemic_type_loads_clean_and_renders_in_the_digest(tmp_path, epistemic_type):
+    pack_dir = _write_pack(tmp_path, {"outcomes": [_outcome(epistemic_type=epistemic_type)]})
+    pack = load_pack_dir(pack_dir)
+    assert pack.outcomes[0].epistemic_type == epistemic_type
+    assert pack.canonical_dict()["outcomes"][0]["epistemic_type"] == epistemic_type
+
+
+# --- HARD CONSTRAINT: the reframe must not move a single already-sealed
+# digest. Pinned against the real, committed catalog packs (not just a
+# synthetic fixture) -- computed against the pre-reframe code at base_sha
+# cfb64f1 (origin/main, [evidence-contract-reframe-capsule-engine]) and
+# reproduced byte-for-byte after the rename + new fields landed.
+
+
+def test_the_real_airline_engagement_pack_digest_is_byte_identical_after_the_reframe():
+    pack = load_pack_dir(AIRLINE_ENGAGEMENT_DIR)
+    assert pack.definition_digest() == "f2f2c5f0225cb3de76817f5244b0abac5ba622412f4d1b852b7074c8640b74d7"
+
+
+def test_the_real_standard_vendor_pack_digest_is_byte_identical_after_the_reframe():
+    pack = load_pack_dir(STANDARD_VENDOR_DIR)
+    assert pack.definition_digest() == "4890a1bc31040af19726251f464391690bff5b32f82a6eed8a98f96a7748ffb6"

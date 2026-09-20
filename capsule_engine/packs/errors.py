@@ -47,6 +47,14 @@ INVALID_SCOPE_CENSUS = "invalid_scope_census"
 # (informational, the default).
 INVALID_TIER = "invalid_tier"
 
+# evidence-contract profile discriminator + epistemic_type
+# ([evidence-contract-reframe-capsule-engine], Steven's 2026-09-21 Evidence-
+# Contract reframe ruling): distinct from PROFILE_ID_VALUES/INVALID_PROFILE_ID
+# above, which is the unrelated relationship-topology profile axis
+# (p1_external_serve etc.) over a pack's own outcomes.
+INVALID_EVIDENCE_PROFILE = "invalid_evidence_profile"
+INVALID_EPISTEMIC_TYPE = "invalid_epistemic_type"
+
 # mode ([ldg-bp-mode-tag], standard-outcome-pack design §3): which of the
 # seven ways an outcome is judged (structural/value/judged/fold_rollup/
 # fold_counterparty/fold_agent/fold_cohort).
