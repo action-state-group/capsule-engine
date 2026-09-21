@@ -684,6 +684,82 @@ async function verifyConsistency(rootAHex, sizeA, rootBHex, sizeB, proof){
   }
 }
 
+/* Rebuilds the hash of the subtree rooted at `pos` (height `height`,
+ * covering leaf indices [leafStart, leafStart + 2**height - 1]) from
+ * `bodyDigestsByIndex` for any leaf inside [lo, hi] and one witness hash
+ * per maximal subtree wholly outside [lo, hi] -- recursing into any
+ * subtree the range only partially covers. `cursor` is a one-element
+ * array used as a mutable int (JS has no pass-by-reference for numbers).
+ * Mirrors cll.checkpoint.core._reconstruct_range_subtree. */
+async function reconstructRangeSubtree(pos, height, leafStart, lo, hi, bodyDigestsByIndex, witnessBytes, cursor){
+  var leafEnd = leafStart + Math.pow(2, height) - 1;
+  if(leafEnd < lo || leafStart > hi){
+    if(cursor[0] >= witnessBytes.length) throw new MmrError("range proof witness exhausted");
+    var w = witnessBytes[cursor[0]];
+    cursor[0] += 1;
+    return w;
+  }
+  if(height === 0){
+    return await leafHash(bodyDigestsByIndex[leafStart]);
+  }
+  var half = Math.pow(2, height - 1);
+  var left = await reconstructRangeSubtree(pos - Math.pow(2, height), height - 1, leafStart, lo, hi, bodyDigestsByIndex, witnessBytes, cursor);
+  var right = await reconstructRangeSubtree(pos - 1, height - 1, leafStart + half, lo, hi, bodyDigestsByIndex, witnessBytes, cursor);
+  return interiorHash(left, right, pos);
+}
+
+/* Pure range-membership verification. Never throws. Mirrors
+ * cll.checkpoint.index.verify_range / cll.checkpoint.core.verify_range:
+ * rebuilds every peak the range touches from `bodyDigestHexes` (one per
+ * leaf, bodyDigestHexes[i] for seq fromSeq + i) folded with `proof`'s
+ * witness hashes -- an altered, deleted, or replaced interior leaf
+ * changes the peak it falls under and is caught here, unlike a
+ * two-boundary inclusion check that never looks at any leaf strictly
+ * between the two endpoints. */
+async function verifyRange(rootHex, fromSeq, toSeq, bodyDigestHexes, proof){
+  try{
+    var root = hexToBytes(rootHex);
+    assertDigest(root, "root");
+    if(!proof || proof.from_seq !== fromSeq || proof.to_seq !== toSeq) return false;
+    if(fromSeq < 1 || toSeq < fromSeq) return false;
+    if(leafCountFromSize(proof.size) !== toSeq) return false;
+
+    var size = proof.size;
+    var fromIndex = proof.from_index, toIndex = proof.to_index;
+    if(fromIndex !== fromSeq - 1 || toIndex !== toSeq - 1) return false;
+    if(!Array.isArray(proof.witness)) return false;
+    if(!Array.isArray(bodyDigestHexes)) return false;
+    if(bodyDigestHexes.length !== toIndex - fromIndex + 1) return false;
+
+    var bodyDigestsByIndex = {};
+    for(var i = 0; i < bodyDigestHexes.length; i++){
+      var d = hexToBytes(bodyDigestHexes[i]);
+      assertDigest(d, "body_digest");
+      bodyDigestsByIndex[fromIndex + i] = d;
+    }
+
+    var witnessBytes = proof.witness.map(parseDigestHex);
+
+    var pks = peaks(size);
+    var cursor = [0];
+    var leafStart = 0;
+    var reconstructedPeaks = [];
+    for(var pi = 0; pi < pks.length; pi++){
+      var p = pks[pi];
+      var h = heightAt(p);
+      reconstructedPeaks.push(await reconstructRangeSubtree(p, h, leafStart, fromIndex, toIndex, bodyDigestsByIndex, witnessBytes, cursor));
+      leafStart += Math.pow(2, h);
+    }
+
+    if(cursor[0] !== witnessBytes.length) return false; // unconsumed witnesses -- malformed/oversized proof
+
+    var computedRoot = await rootFromPeaks(reconstructedPeaks);
+    return bytesEqual(computedRoot, root);
+  }catch(e){
+    return false;
+  }
+}
+
 return {
   DIGEST_LEN: DIGEST_LEN,
   MAX_MMR_SIZE: MAX_MMR_SIZE,
@@ -698,7 +774,8 @@ return {
   leafCountFromSize: leafCountFromSize,
   leafIndexToPos: leafIndexToPos,
   verifyInclusion: verifyInclusion,
-  verifyConsistency: verifyConsistency
+  verifyConsistency: verifyConsistency,
+  verifyRange: verifyRange
 };
 })();
 if(typeof globalThis !== "undefined"){ globalThis.MMR = MMR; }
@@ -989,27 +1066,29 @@ function encodeFragment(obj){
  * Optional bundle field this viewer knows how to check (capsule-ledger's
  * `capsule bundle` does not populate it yet as of this viewer shipping --
  * a bundle without one is handled honestly as "not available", never a
- * fabricated pass. Schema, mirroring capsule_ledger.mmr.index.MmrLedger's own
- * RangeProof/ConsistencyProof shapes 1:1 so a future capsule-ledger CLI
- * change can populate it directly from that module's own output:
+ * fabricated pass. Schema, mirroring cll.checkpoint.index.MmrLedger's own
+ * RangeProof/ConsistencyProof shapes 1:1 so capsule-engine's CLI populates
+ * it directly from that module's own output:
  *
  * completeness_certificate: {
  *   v: 1,
- *   range_proof: {from_seq, to_seq, size, inclusion_from: <InclusionProof>, inclusion_to: <InclusionProof>},
+ *   range_proof: {from_seq, to_seq, size, from_index, to_index, witness: [hex, ...]},
  *   range_root: "<hex>",         // MMR root at `range_proof.size` (the tree as it stood right after to_seq)
  *   checkpoint_size: <int>,      // MMR node_count(checkpoint.tree_size); omitted/equal to range_proof.size if no growth since
  *   checkpoint_root: "<hex>",    // MMR root at checkpoint_size
  *   consistency_proof: <ConsistencyProof> | null   // bridges range_root/size -> checkpoint_root/size; null if they coincide
  * }
  *
- * Each <InclusionProof>/<ConsistencyProof> is exactly the JSON shape
- * capsule_ledger.mmr.core's dataclasses serialize to (v, kind, size, leaf_index,
- * witness, peaks_left, peaks_right / v, kind, size_a, size_b, old_peaks,
- * witness, new_peaks) -- see mmr.js's verifyInclusion/verifyConsistency.
- * Boundary leaf body digests are the bundle's own first/last record
- * capsule_id (hex) -- MmrLedger indexes leaf i's body_digest as
- * bytes.fromhex(record.capsule_id), so no extra data is needed beyond what
- * bundle.records already carries. */
+ * `range_proof` is exactly the JSON shape cll.checkpoint.index.RangeProof
+ * serializes to -- a flat, seq-indexed per-record membership proof (every
+ * leaf in [from_seq, to_seq] participates in rebuilding the root, not just
+ * the two boundary leaves) -- see mmr.js's/this file's verifyRange.
+ * `consistency_proof` is exactly the JSON shape cll.checkpoint.core's
+ * ConsistencyProof dataclass serializes to (v, kind, size_a, size_b,
+ * old_peaks, witness, new_peaks) -- see verifyConsistency. Boundary leaf
+ * body digests are the bundle's own record capsule_ids (hex) -- MmrLedger
+ * indexes leaf i's body_digest as bytes.fromhex(record.capsule_id), so no
+ * extra data is needed beyond what bundle.records already carries. */
 async function checkCompleteness(bundle){
   var cc=bundle.completeness_certificate;
   var records=bundle.records||[];
@@ -1021,13 +1100,16 @@ async function checkCompleteness(bundle){
   }
   try{
     var rp=cc.range_proof;
-    if(!rp||!rp.inclusion_from||!rp.inclusion_to)return{status:"fail",detail:"malformed completeness certificate: missing range_proof"};
-    var fromRec=records[0],toRec=records[records.length-1];
-    var okFrom=await MMR.verifyInclusion(cc.range_root,rp.size,rp.inclusion_from.leaf_index,fromRec.capsule_id,rp.inclusion_from);
-    var okTo=await MMR.verifyInclusion(cc.range_root,rp.size,rp.inclusion_to.leaf_index,toRec.capsule_id,rp.inclusion_to);
-    if(!okFrom||!okTo){
-      return{status:"fail",detail:"range boundary inclusion proof did not verify — this bundle's "+
-        "claimed record range is not provably complete against its cited root"};
+    if(!rp||!Array.isArray(rp.witness))return{status:"fail",detail:"malformed completeness certificate: missing range_proof"};
+    if(records.length!==rp.to_seq-rp.from_seq+1){
+      return{status:"fail",detail:"bundle holds "+records.length+" records but the range proof claims "+
+        (rp.to_seq-rp.from_seq+1)+" (seq "+rp.from_seq+"–"+rp.to_seq+")"};
+    }
+    var bodyDigests=records.map(function(r){return r.capsule_id;});
+    var okRange=await MMR.verifyRange(cc.range_root,rp.from_seq,rp.to_seq,bodyDigests,rp);
+    if(!okRange){
+      return{status:"fail",detail:"range proof did not verify — this bundle's claimed records "+
+        rp.from_seq+"–"+rp.to_seq+" are not provably present and unaltered under its cited root"};
     }
     if(cc.consistency_proof){
       var okC=await MMR.verifyConsistency(cc.range_root,rp.size,cc.checkpoint_root,cc.checkpoint_size,cc.consistency_proof);
@@ -1037,8 +1119,9 @@ async function checkCompleteness(bundle){
       }
     }
     var ckpt=bundle.checkpoint||{};
-    return{status:"pass",detail:"records "+rp.from_seq+"–"+rp.to_seq+" are provably complete under root "+
-      cc.range_root.slice(0,12)+"…"+(cc.consistency_proof?(" · extends to checkpoint #"+(ckpt.tree_size!=null?ckpt.tree_size:cc.checkpoint_size)):"")};
+    return{status:"pass",detail:"records "+rp.from_seq+"–"+rp.to_seq+" are present, unaltered, and bound to checkpoint "+
+      cc.range_root.slice(0,12)+"…"+(cc.consistency_proof?(" · extends to checkpoint #"+(ckpt.tree_size!=null?ckpt.tree_size:cc.checkpoint_size)):"")+
+      " — this does not show that no other records exist"};
   }catch(e){
     return{status:"fail",detail:"completeness certificate malformed or unverifiable: "+e.message};
   }
