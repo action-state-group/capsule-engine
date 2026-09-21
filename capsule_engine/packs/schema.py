@@ -789,6 +789,18 @@ class PackDefinition:
                 return o
         return None
 
+    def obligation_requirements(self) -> tuple[EvidenceContract, ...]:
+        """The obligation-profile projection of this pack's outcomes[]
+        ([evidence-obligation-profile-scaffold]): under the obligation
+        profile, every register row IS a requirement -- an
+        ``EvidenceContract`` with ``profile == "obligation"``, anchored to
+        a ``clause`` (``loader.py`` refuses one with no clause, so every
+        entry returned here is guaranteed to carry one). Pack order, not
+        sorted, same convention as ``outcomes`` itself; this is a read-only
+        view, recomputed every call, so it can never drift from
+        ``self.outcomes``."""
+        return tuple(o for o in self.outcomes if o.profile == "obligation")
+
     def action_semantic_for(self, action_type: str) -> ActionSemantic | None:
         for a in self.action_semantics:
             if a.action_type == action_type:

@@ -82,6 +82,14 @@ INVALID_EVIDENCE_INSTRUMENT = "invalid_evidence_instrument"
 # ([ldg-grc-clause-ref-versioning]).
 INVALID_CLAUSE = "invalid_clause"
 
+# obligation profile ([evidence-obligation-profile-scaffold]): unlike the
+# other five non-outcome profiles (still typed stubs -- see
+# schema.EVIDENCE_PROFILE_VALUES), obligation is fleshed out with its one
+# real constraint -- a clause anchor is what makes a register row an
+# obligation at all, so profile=='obligation' with no clause is a schema
+# error here, not a silently-accepted stub.
+MISSING_OBLIGATION_CLAUSE = "missing_obligation_clause"
+
 # Constraint scope declaration + cross-constraint agreement (generalizes the
 # capsule-emit PR #54 finding: a lock/cap/aggregate scope mismatch let a
 # cross-class race jointly admit what sequential execution would deny --
