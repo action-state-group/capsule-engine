@@ -30,7 +30,7 @@ from capsule_engine.guards import Action, GuardEngine, LocalSigner
 FIXTURES = Path(__file__).parent / "fixtures"
 AMAURY = FIXTURES / "amaury_sample_ledger.jsonl"
 
-CD0692B3 = "cd0692b3349fadfeabe618008301b625059cc819eeb5ca1fb660699be9b6504e"
+CD0692B3 = "2c1d729753b302811af57458406c66fb1a9e54f035a2ab78420332c732ac2a5f"
 DEVELOPER = "procurement-agent@v1"
 OPERATOR = "acme-research"
 EUR150K_MINOR = 15_000_000  # EUR 150,000.00 in minor units (cents)
