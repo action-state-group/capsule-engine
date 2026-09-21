@@ -29,6 +29,7 @@ from __future__ import annotations
 from typing import Any
 
 from agent_action_capsule import (
+    DEFAULT_FORMAT_VERSION,
     AssuranceBlock,
     Capsule,
     Chain,
@@ -36,6 +37,7 @@ from agent_action_capsule import (
     compute_capsule_id,
     json_digest,
 )
+from agent_action_capsule.canonical import CANONICALIZATION_JCS
 
 from ..guards.action import Action
 from ..guards.signing import Signer
@@ -49,7 +51,7 @@ __all__ = [
 ]
 
 _SPEC_VERSION = "draft-mih-scitt-agent-action-capsule-02"
-_FORMAT_VERSION = "2"
+_FORMAT_VERSION = DEFAULT_FORMAT_VERSION
 
 # The only registered chain.relation this task uses: "supersedes" for a
 # terminal transition that closes/replaces the reserve's open state
@@ -114,6 +116,7 @@ def _build(*, hold_action: Action, chain: Chain | None, asg_payload: dict, signe
     capsule_obj = Capsule(
         spec_version=_SPEC_VERSION,
         format_version=_FORMAT_VERSION,
+        canonicalization_id=CANONICALIZATION_JCS,
         action_id=hold_action.resolved_action_id(),
         action_type="decide",
         operator=hold_action.operator,
