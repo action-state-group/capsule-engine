@@ -20,7 +20,15 @@ import uuid
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 
-from agent_action_capsule import AssuranceBlock, Capsule, Chain, compute_capsule_id, json_digest
+from agent_action_capsule import (
+    DEFAULT_FORMAT_VERSION,
+    AssuranceBlock,
+    Capsule,
+    Chain,
+    compute_capsule_id,
+    json_digest,
+)
+from agent_action_capsule.canonical import CANONICALIZATION_JCS
 
 if TYPE_CHECKING:
     # Signer is a type annotation only (PEP 563 lazy annotations, via the
@@ -74,7 +82,8 @@ def build_event_capsule(
     chain = Chain(parent_capsule_id=chain_parent, relation=chain_relation) if chain_parent else None
     capsule_obj = Capsule(
         spec_version="draft-mih-scitt-agent-action-capsule-02",
-        format_version="2",
+        format_version=DEFAULT_FORMAT_VERSION,
+        canonicalization_id=CANONICALIZATION_JCS,
         action_id=resolved_action_id,
         action_type="fyi",
         operator=operator,

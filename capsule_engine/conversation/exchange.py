@@ -34,6 +34,7 @@ from datetime import datetime, timezone
 from typing import Any
 
 from agent_action_capsule import (
+    DEFAULT_FORMAT_VERSION,
     AssuranceBlock,
     Capsule,
     Chain,
@@ -41,6 +42,7 @@ from agent_action_capsule import (
     compute_capsule_id,
     json_digest,
 )
+from agent_action_capsule.canonical import CANONICALIZATION_JCS
 
 from ..guards.signing import Signer
 
@@ -53,7 +55,7 @@ __all__ = [
 ]
 
 _SPEC_VERSION = "draft-mih-scitt-agent-action-capsule-02"
-_FORMAT_VERSION = "2"
+_FORMAT_VERSION = DEFAULT_FORMAT_VERSION
 
 EVENT_CONVERSATION_EXCHANGE = "conversation_exchange"
 
@@ -237,6 +239,7 @@ def build_conversation_exchange_capsule(
     capsule_obj = Capsule(
         spec_version=_SPEC_VERSION,
         format_version=_FORMAT_VERSION,
+        canonicalization_id=CANONICALIZATION_JCS,
         action_id=action_id or f"conversation.exchange/{session_id}/{exchange_id}",
         action_type="fyi",
         operator=operator,

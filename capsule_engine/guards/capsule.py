@@ -43,6 +43,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 
 from agent_action_capsule import (
+    DEFAULT_FORMAT_VERSION,
     AssuranceBlock,
     Capsule,
     Chain,
@@ -51,6 +52,7 @@ from agent_action_capsule import (
     compute_capsule_id,
     json_digest,
 )
+from agent_action_capsule.canonical import CANONICALIZATION_JCS
 
 from .action import Action
 from .signing import Signer
@@ -159,7 +161,8 @@ def build_decision_capsule(
 
     capsule_obj = Capsule(
         spec_version="draft-mih-scitt-agent-action-capsule-02",
-        format_version="2",
+        format_version=DEFAULT_FORMAT_VERSION,
+        canonicalization_id=CANONICALIZATION_JCS,
         action_id=action.resolved_action_id(),
         action_type=action.action_type,
         operator=action.operator,
