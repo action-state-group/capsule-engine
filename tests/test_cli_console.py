@@ -15,8 +15,8 @@ from capsule_engine.cli.main import _build_parser
 from capsule_engine.console.server import build_server
 
 FIXTURE_LEDGER = Path(__file__).parent / "fixtures" / "sample_ledger.jsonl"
-APPROVE_ID = "705955419ca6f944a75db77ae2a59844fdd99d355866c6c1dbc4ebe655c024c7"
-CONFIRM_ID = "94c877c7ff0240cf7dafe2067f7016e5412d59b05f9eefa4baf90fc792f16142"
+APPROVE_ID = "76f263fef08da2470b4c3dbf0b4c6e52b818cdd20c3c08936d1c79dc6bf07c0a"
+CONFIRM_ID = "f51b56ab6267acb2123d7b46a9ec69e0bf1c8a12980b3008b1926b684b39dcbb"
 
 
 def test_console_registered_as_a_full_arm_verb():
