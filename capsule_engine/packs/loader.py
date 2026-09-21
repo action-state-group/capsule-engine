@@ -25,6 +25,15 @@ Every raised error is a ``PackDefinitionError`` (``errors.py``): a reason
 code plus a message that names the field, says what was expected, and shows
 a correct example -- the pack.yaml author is very often an AI coding tool,
 so a vague message is a real cost, not a style nit.
+
+**Backward-only packs** ([ldg-obligations-pack-reads-trace]): a pack that
+declares at least one ``outcomes[]`` entry is not required to also declare
+``obligations``/``action_semantics``/``constraints`` -- a GRC obligations
+pack with no forward guard integration at all (e.g. ``catalog/eu-ai-act``)
+makes its claims entirely through outcomes, and requiring an unused forward
+triple just to satisfy this loader would be a fake declaration, not a real
+one. A pack declaring NEITHER outcomes nor the forward triple is still
+rejected -- see ``load_pack_dir``.
 """
 from __future__ import annotations
 
@@ -161,18 +170,24 @@ def _require_nonempty_str(value: Any, field_name: str, example: str) -> str:
     return value
 
 
-def _parse_obligations(raw: Any, *, declared_checks: set[str]) -> tuple[Obligation, ...]:
+def _parse_obligations(
+    raw: Any, *, declared_checks: set[str], allow_empty: bool = False
+) -> tuple[Obligation, ...]:
     if raw is None:
+        if allow_empty:
+            return ()  # see _parse_constraints' allow_empty docstring note
         raise PackDefinitionError(
             MISSING_REQUIRED_FIELD,
-            "'obligations' is required (a pack ships at least one) -- each entry needs 'id', 'statement', "
-            "and 'check', e.g.:\n"
+            "'obligations' is required (a pack ships at least one, unless it declares 'outcomes' instead) -- "
+            "each entry needs 'id', 'statement', and 'check', e.g.:\n"
             "obligations:\n"
             "  - id: caps-per-window\n"
             "    statement: \"No payment may exceed the configured weekly cap without escalation.\"\n"
             "    check: caps",
         )
     if not isinstance(raw, list) or not raw:
+        if allow_empty and isinstance(raw, list):
+            return ()
         raise PackDefinitionError(MALFORMED_PACK, "'obligations' must be a non-empty list")
 
     obligations: list[Obligation] = []
@@ -210,12 +225,15 @@ def _parse_obligations(raw: Any, *, declared_checks: set[str]) -> tuple[Obligati
     return tuple(obligations)
 
 
-def _parse_action_semantics(raw: Any) -> tuple[ActionSemantic, ...]:
+def _parse_action_semantics(raw: Any, *, allow_empty: bool = False) -> tuple[ActionSemantic, ...]:
     if not raw:
+        if allow_empty:
+            return ()  # see _parse_constraints' allow_empty docstring note
         raise PackDefinitionError(
             MISSING_REQUIRED_FIELD,
-            "'action_semantics' is required (a pack ships at least one action type) -- each entry needs "
-            "'action_type', 'action_class', and 'required_fields', e.g.:\n"
+            "'action_semantics' is required (a pack ships at least one action type, unless it declares "
+            "'outcomes' instead) -- each entry needs 'action_type', 'action_class', and 'required_fields', "
+            "e.g.:\n"
             "action_semantics:\n"
             "  - action_type: payment.dispatch\n"
             "    action_class: money.transfer\n"
@@ -346,12 +364,22 @@ def _parse_scope(raw: Any, *, wicket_id: str) -> tuple[str, ...]:
     return tuple(dims)
 
 
-def _parse_constraints(raw: Any) -> tuple[tuple[WicketDefinition, ...], dict[str, tuple[str, ...]]]:
+def _parse_constraints(
+    raw: Any, *, allow_empty: bool = False
+) -> tuple[tuple[WicketDefinition, ...], dict[str, tuple[str, ...]]]:
     if not raw:
+        if allow_empty:
+            # A pack declaring at least one outcome (backward-only, e.g. a GRC
+            # obligations pack with no forward guard integration at all --
+            # [ldg-obligations-pack-reads-trace]) has somewhere else to make
+            # its claims; the forward obligations/action_semantics/constraints
+            # triple is then genuinely optional, not merely omitted.
+            return (), {}
         raise PackDefinitionError(
             MISSING_REQUIRED_FIELD,
-            "'constraints' is required (a pack ships at least one) -- each entry is a wicket definition "
-            "('wicket_id', 'check', 'config') plus, for 'caps', a declared 'scope', e.g.:\n"
+            "'constraints' is required (a pack ships at least one, unless it declares 'outcomes' instead) -- "
+            "each entry is a wicket definition ('wicket_id', 'check', 'config') plus, for 'caps', a declared "
+            "'scope', e.g.:\n"
             "constraints:\n"
             "  - wicket_id: payments_safety.caps/1.0.0\n"
             "    check: caps\n"
@@ -436,12 +464,15 @@ def _validate_caps_scope_against_folds(
                 )
 
 
-def _parse_folds(raw: Any, *, pack_dir: Path) -> tuple[FoldDefinition, ...]:
+def _parse_folds(raw: Any, *, pack_dir: Path, allow_empty: bool = False) -> tuple[FoldDefinition, ...]:
     if not raw:
+        if allow_empty:
+            return ()  # see _parse_constraints' allow_empty docstring note
         raise PackDefinitionError(
             MISSING_REQUIRED_FIELD,
-            "'folds' is required (a pack's numbers must be computable on day one) -- each entry references "
-            "a fold definition file relative to the pack directory, e.g.:\n"
+            "'folds' is required (a pack's numbers must be computable on day one, unless it declares "
+            "'outcomes' instead) -- each entry references a fold definition file relative to the pack "
+            "directory, e.g.:\n"
             "folds:\n"
             "  - file: folds/spend_weekly.yaml",
         )
@@ -964,15 +995,23 @@ def load_pack_dir(pack_dir: str | Path) -> PackDefinition:
             "prefix (registry-architecture ruling, 2026-08-10), not a display name",
         )
 
-    constraints, constraint_scopes = _parse_constraints(data.get("constraints"))
+    # outcomes[] parsed before the forward obligations/action_semantics/constraints
+    # triple: a pack declaring at least one outcome is backward-only-eligible,
+    # so whether that triple may be empty depends on outcomes, not the other
+    # way around (see _parse_constraints' allow_empty docstring note).
+    outcomes = _parse_outcomes(data.get("outcomes"))
+    allow_empty_forward = bool(outcomes)
+
+    constraints, constraint_scopes = _parse_constraints(data.get("constraints"), allow_empty=allow_empty_forward)
     declared_checks = {c.check for c in constraints}
-    obligations = _parse_obligations(data.get("obligations"), declared_checks=declared_checks)
-    action_semantics = _parse_action_semantics(data.get("action_semantics"))
-    folds = _parse_folds(data.get("folds"), pack_dir=pack_dir)
+    obligations = _parse_obligations(
+        data.get("obligations"), declared_checks=declared_checks, allow_empty=allow_empty_forward
+    )
+    action_semantics = _parse_action_semantics(data.get("action_semantics"), allow_empty=allow_empty_forward)
+    folds = _parse_folds(data.get("folds"), pack_dir=pack_dir, allow_empty=allow_empty_forward)
     _validate_caps_scope_against_folds(constraints, constraint_scopes, folds)
     proposers = _parse_proposers(data.get("proposers"))
     fixtures = _parse_fixtures(data.get("fixtures"))
-    outcomes = _parse_outcomes(data.get("outcomes"))
     scope_census = _parse_scope_census(data.get("scope_census"))
     profiles = _parse_profiles(data.get("profiles"), outcomes=outcomes)
 
