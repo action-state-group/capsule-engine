@@ -1,0 +1,51 @@
+# Sample obligation register v0 ([batch1-obligation-register-v0-sample-compiler]):
+# two rows, one internal control clause and one external legal clause, to prove
+# the format loads and round-trips through `EvidenceCompiler` regardless of
+# which kind of source a row cites.
+register_id: asg/obligation-register-sample/0.1.0
+
+rows:
+  # A generic internal dual-control policy -- "NN" (nomen nescio) is a
+  # deliberately anonymized policy label, never a real counterparty's name
+  # (repo boundary: no partner names in tree). A deterministic rule check
+  # (two distinct approver ids required before dispatch), evidence_class RULE.
+  - id: nn/four-eyes/1
+    statement: >-
+      A payment above the configured threshold is not released without a
+      second, independent approver distinct from the initiator.
+    source: Policy NN
+    scope: every payment-dispatch action requiring dual approval
+    owner: compliance-team
+    version: "1.0.0"
+    evidence_class: RULE
+    effective_from: "2026-01-01"
+    clause:
+      instrument: Policy NN
+      article: "§4 (Four-Eyes Approval)"
+      effective_from: "2026-01-01"
+
+  # EU AI Act Article 12(1) -- automatic event logging over the agent's
+  # lifetime. Same row this register's evidence_class taxonomy was
+  # reconciled against ([ldg-eu-ai-act-pack]'s pack.yaml, EU-12-1),
+  # evidence_class FACT.
+  - id: EU-12-1
+    statement: >-
+      The agent automatically records events over its lifetime -- every
+      consequential action sealed at the time it occurred.
+    source: EU AI Act
+    scope: all agent actions producing a consequential capsule
+    owner: compliance-team
+    version: "1.0.0"
+    evidence_class: FACT
+    effective_from: "2027-12-02"
+    clause:
+      instrument: Regulation (EU) 2024/1689
+      article: Article 12
+      paragraph: "1"
+      as_amended_by: ["Regulation (EU) 2026/1744"]
+      jurisdiction: EU
+      effective_from: "2027-12-02"
+      source_url: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+    evidence_instrument:
+      kind: structured_field
+      field: native_log_event_kind
