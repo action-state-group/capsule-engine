@@ -522,6 +522,58 @@ class EvidenceContract:
     # parses and DIGESTS identically to before -- see ClauseSpec.
     clause: ClauseSpec | None = None
 
+    def canonical_dict(self) -> dict:
+        """The JCS-canonicalizable form of one Evidence Contract entry --
+        the same dict shape ``PackDefinition.canonical_dict()`` cites for
+        each of its ``outcomes``, extracted here so it has exactly one
+        author (schema validation, e.g. ``schemas/evidence-contract-v0.json``,
+        cross-checks THIS method's output, not a second hand-rolled copy).
+        Every optional field is omitted at its documented default, same
+        convention as every other ``canonical_dict``/``to_dict`` in this
+        module."""
+        out: dict[str, Any] = {
+            "id": self.id,
+            "statement": self.statement,
+            "evidence_rule": self.evidence_rule,
+            "forward_verdict": self.forward_verdict,
+            "backward_verdict": self.backward_verdict,
+        }
+        if self.window:
+            out["window"] = {"duration": self.window.duration, "cure": self.window.cure, "grace": self.window.grace}
+        if self.effect_claim:
+            out["effect_claim"] = self.effect_claim
+        if self.refusal_reason_code:
+            out["refusal_reason_code"] = self.refusal_reason_code
+        if self.re_derivability_grade:
+            out["re_derivability_grade"] = self.re_derivability_grade
+        if self.declared_by:
+            out["declared_by"] = self.declared_by
+        if self.evidence_mapping_by:
+            out["evidence_mapping_by"] = self.evidence_mapping_by
+        if self.required_assurance_grade:
+            out["required_assurance_grade"] = self.required_assurance_grade
+        if self.exposure_denominator_ref:
+            out["exposure_denominator_ref"] = self.exposure_denominator_ref
+        if self.retention_check:
+            out["retention_check"] = self.retention_check
+        if self.measurability != "measured":
+            out["measurability"] = self.measurability
+        if self.tier != "informational":
+            out["tier"] = self.tier
+        if self.mode != "structural":
+            out["mode"] = self.mode
+        if self.evidence_instrument is not None:
+            out["evidence_instrument"] = self.evidence_instrument.to_dict()
+        if self.clause_ref:
+            out["clause_ref"] = self.clause_ref
+        if self.clause is not None:
+            out["clause"] = self.clause.to_dict()
+        if self.profile != "outcome":
+            out["profile"] = self.profile
+        if self.epistemic_type is not None:
+            out["epistemic_type"] = self.epistemic_type
+        return out
+
 
 @dataclass(frozen=True)
 class ScopeCensus:
@@ -721,41 +773,7 @@ class PackDefinition:
                 {"id": p.id, "fold_id": p.fold_id, "strategy": p.strategy, "status": p.status} for p in self.proposers
             ]
         if self.outcomes:
-            out["outcomes"] = [
-                {
-                    "id": o.id,
-                    "statement": o.statement,
-                    "evidence_rule": o.evidence_rule,
-                    "forward_verdict": o.forward_verdict,
-                    "backward_verdict": o.backward_verdict,
-                    **(
-                        {"window": {"duration": o.window.duration, "cure": o.window.cure, "grace": o.window.grace}}
-                        if o.window
-                        else {}
-                    ),
-                    **({"effect_claim": o.effect_claim} if o.effect_claim else {}),
-                    **({"refusal_reason_code": o.refusal_reason_code} if o.refusal_reason_code else {}),
-                    **({"re_derivability_grade": o.re_derivability_grade} if o.re_derivability_grade else {}),
-                    **({"declared_by": o.declared_by} if o.declared_by else {}),
-                    **({"evidence_mapping_by": o.evidence_mapping_by} if o.evidence_mapping_by else {}),
-                    **({"required_assurance_grade": o.required_assurance_grade} if o.required_assurance_grade else {}),
-                    **({"exposure_denominator_ref": o.exposure_denominator_ref} if o.exposure_denominator_ref else {}),
-                    **({"retention_check": o.retention_check} if o.retention_check else {}),
-                    **({"measurability": o.measurability} if o.measurability != "measured" else {}),
-                    **({"tier": o.tier} if o.tier != "informational" else {}),
-                    **({"mode": o.mode} if o.mode != "structural" else {}),
-                    **(
-                        {"evidence_instrument": o.evidence_instrument.to_dict()}
-                        if o.evidence_instrument is not None
-                        else {}
-                    ),
-                    **({"clause_ref": o.clause_ref} if o.clause_ref else {}),
-                    **({"clause": o.clause.to_dict()} if o.clause is not None else {}),
-                    **({"profile": o.profile} if o.profile != "outcome" else {}),
-                    **({"epistemic_type": o.epistemic_type} if o.epistemic_type is not None else {}),
-                }
-                for o in self.outcomes
-            ]
+            out["outcomes"] = [o.canonical_dict() for o in self.outcomes]
         if self.scope_census:
             out["scope_census"] = {
                 "document_digest": self.scope_census.document_digest,
