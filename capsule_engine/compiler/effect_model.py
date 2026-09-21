@@ -12,9 +12,9 @@ mechanical rather than a reviewer's judgment call: ``compile_effect_claim``
 returns a verdict pair plus (for the refused claim) the reason code, and
 raises nothing -- refusing IS the successful, expected return for that
 claim, not an exceptional path. ``packs/loader.py`` is what turns an
-Outcome that gets this wrong into a load-time error (an outcome cannot
-declare ``effect_claim="agent.caused_resolution"`` with anything other than
-the verdict pair this module computes for it).
+``EvidenceContract`` that gets this wrong into a load-time error (an outcome
+cannot declare ``effect_claim="agent.caused_resolution"`` with anything
+other than the verdict pair this module computes for it).
 """
 from __future__ import annotations
 

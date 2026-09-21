@@ -54,7 +54,7 @@ from typing import Any
 
 from ..folds import DERIVATION_DETERMINISTIC, FoldDefinition, ReadField, Reduce
 from .corpus_verify import resolves_instrument
-from .schema import Outcome, PackDefinition
+from .schema import EvidenceContract, PackDefinition
 
 __all__ = [
     "STATUS_RESOLVES",
@@ -124,13 +124,13 @@ class MeasurabilityRow:
     projection_digest: str | None = None
 
 
-def _instrument_field_path(outcome: Outcome) -> str:
+def _instrument_field_path(outcome: EvidenceContract) -> str:
     instrument = outcome.evidence_instrument
     assert instrument is not None
     return instrument.field or instrument.name or outcome.id
 
 
-def _fold_definition_for(outcome: Outcome) -> FoldDefinition:
+def _fold_definition_for(outcome: EvidenceContract) -> FoldDefinition:
     """Project ``outcome`` onto a ``FoldDefinition`` purely to obtain a real,
     cross-repo-checkable digest through the de-fork seam -- this NEVER
     evaluates, rolls up, or asserts a result; the digest is the only thing
@@ -165,7 +165,7 @@ def _has_repeat_entity(units: list[Mapping[str, Any]], entity_key: Callable[[Map
     return False
 
 
-def _instrument_status(outcome: Outcome, units: list[Mapping[str, Any]]) -> tuple[str, str]:
+def _instrument_status(outcome: EvidenceContract, units: list[Mapping[str, Any]]) -> tuple[str, str]:
     """The plain resolve-check shared by structural/judged/value rows AND
     the two fold modes that aren't repeat-traffic gated (fold_rollup,
     fold_agent) -- identical logic regardless of mode, since the underlying

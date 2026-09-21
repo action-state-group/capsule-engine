@@ -66,6 +66,8 @@ __all__ = [
     "MODE_VALUES",
     "PROFILE_ID_VALUES",
     "TOPOLOGY_INVARIANT_MODES",
+    "EVIDENCE_PROFILE_VALUES",
+    "EPISTEMIC_TYPE_VALUES",
     "Obligation",
     "ActionSemantic",
     "ProposerStub",
@@ -74,7 +76,7 @@ __all__ = [
     "WindowSpec",
     "EvidenceInstrument",
     "ClauseSpec",
-    "Outcome",
+    "EvidenceContract",
     "ScopeCensus",
     "CounterpartyBinding",
     "OutcomeOverride",
@@ -200,6 +202,35 @@ PROFILE_ID_VALUES = frozenset(
 # a typo" / "invariant is compile-time, not convention" doctrine every other
 # closed-set check in this module already follows).
 TOPOLOGY_INVARIANT_MODES = frozenset({"structural", "value", "fold_rollup"})
+
+# The seven Evidence Contract profiles (Steven's 2026-09-21 Evidence-Contract
+# reframe ruling, `_work/doc2-evidence-reframe-delta-2026-09-21.md`): Evidence
+# Contract is the root abstraction, Outcome is one profile of it -- the
+# existing outcome-declaration schema below (``EvidenceContract``'s field set)
+# is the "outcome" profile's fields; the other six are typed stubs only --
+# their own field sets are Evidence Contract v3, a spec-lane task, not
+# invented here. Unrelated to ``PROFILE_ID_VALUES`` above, which is the
+# relationship-topology axis (``TopologyProfile.profile_id``) over a pack's
+# own outcomes -- two different, unconnected uses of the word "profile".
+EVIDENCE_PROFILE_VALUES = frozenset(
+    {"outcome", "obligation", "process", "quality", "human_role", "attribution", "settlement"}
+)
+
+# The eight epistemic types (doc1 "Evidence Fabric Architecture v2" §4) an
+# Evidence Contract's evidence can carry -- what KIND of claim a piece of
+# evidence is, independent of which profile the contract belongs to.
+EPISTEMIC_TYPE_VALUES = frozenset(
+    {
+        "OBSERVED_EVENT",
+        "SYSTEM_OF_RECORD_FACT",
+        "PRODUCER_CLAIM",
+        "HUMAN_REPORT",
+        "SEMANTIC_JUDGMENT",
+        "DERIVED_METRIC",
+        "ADJUDICATION",
+        "OBLIGATION_REFERENCE",
+    }
+)
 
 
 @dataclass(frozen=True)
@@ -333,7 +364,7 @@ class ClauseSpec:
     compiler side converts field-for-field, same pattern ``clause_ref``
     already established for the plain-string case.
 
-    Optional and additive, same convention as every other ``Outcome``
+    Optional and additive, same convention as every other ``EvidenceContract``
     field added after the original schema: an outcome with no ``clause``
     parses and digests identically to one that never mentions the field."""
 
@@ -367,9 +398,26 @@ class ClauseSpec:
 
 
 @dataclass(frozen=True)
-class Outcome:
+class EvidenceContract:
     """The sister table to ``Obligation`` (design §0: "one declaration ...
     compiled forward into a check ... compiled backward into a report").
+
+    Evidence Contract is the root abstraction; ``profile`` (one of
+    ``EVIDENCE_PROFILE_VALUES``, default ``"outcome"``) says which of the
+    seven profiles a declared contract is (Steven's 2026-09-21 Evidence-
+    Contract reframe ruling). This class was named ``Outcome`` before that
+    ruling -- every field below this docstring except ``profile`` and
+    ``epistemic_type`` is the **outcome profile's** field set, reclassified
+    in place rather than rebuilt. The other six profiles
+    (obligation/process/quality/human_role/attribution/settlement) are typed
+    stubs: their own normative field sets are Evidence Contract v3, a
+    spec-lane task (`_work/doc2-evidence-reframe-delta-2026-09-21.md` §8),
+    not invented here.
+
+    ``epistemic_type`` (doc1 "Evidence Fabric Architecture v2" §4, one of
+    ``EPISTEMIC_TYPE_VALUES``) names what KIND of claim this contract's
+    evidence is -- optional and additive, same convention as every other
+    field added after the original schema.
 
     ``evidence_rule`` is a reference/expression naming which capsule
     pattern counts as confirming evidence (Outcome Compiler doc §4.1) --
@@ -421,6 +469,17 @@ class Outcome:
     evidence_rule: str
     forward_verdict: str
     backward_verdict: str
+    # profile -- optional, additive; default "outcome" so a contract declared
+    # before this field existed parses and DIGESTS identically to before
+    # (canonical_dict below omits it whenever it's the default, same
+    # convention every other optional field on this class already follows).
+    profile: str = "outcome"
+    # epistemic_type -- optional, additive, no default reused from an older
+    # field (this concept didn't exist before the reframe); None so a
+    # contract declared before this field existed parses and DIGESTS
+    # identically to before (canonical_dict below omits it whenever it's
+    # None).
+    epistemic_type: str | None = None
     window: WindowSpec | None = None
     effect_claim: str | None = None
     refusal_reason_code: str | None = None
@@ -434,7 +493,7 @@ class Outcome:
     # ([pack-harden-tau2-oracle]); default "measured" so a pack declared
     # before this field existed parses and DIGESTS identically to before
     # (canonical_dict below omits it whenever it's the default, same
-    # convention every other optional Outcome field already follows).
+    # convention every other optional EvidenceContract field already follows).
     measurability: str = "measured"
     evidence_instrument: EvidenceInstrument | None = None
     # tier -- optional, additive ([ldg-bj-tier-field], backward-judge design
@@ -453,7 +512,7 @@ class Outcome:
     # obligations enabler); default None so an outcome declared before this
     # field existed parses and DIGESTS identically to before (canonical_dict
     # below omits it whenever it's None, same convention every other
-    # optional Outcome field already follows).
+    # optional EvidenceContract field already follows).
     clause_ref: str | None = None
     # clause -- optional, additive ([ldg-grc-clause-ref-versioning]): the
     # structured legal anchor alongside the plain-string clause_ref above.
@@ -561,13 +620,13 @@ class ProfiledOutcomes:
     outcome that still applies under this profile (tier replaced where the
     profile overrides it, same relative order as the pack's own
     ``outcomes``), ``excluded`` names the ones this profile marks N/A, sorted
-    for a stable report. Never mutates the pack's own ``Outcome`` objects --
-    this is a view, recomputed from ``profile`` + the pack's outcomes every
-    time, so it can never drift from either."""
+    for a stable report. Never mutates the pack's own ``EvidenceContract``
+    objects -- this is a view, recomputed from ``profile`` + the pack's
+    outcomes every time, so it can never drift from either."""
 
     profile_id: str
     counterparty_binding: CounterpartyBinding
-    outcomes: tuple[Outcome, ...]
+    outcomes: tuple[EvidenceContract, ...]
     excluded: tuple[str, ...]
 
     def subject_for(self, outcome_id: str) -> str | None:
@@ -603,7 +662,7 @@ class PackDefinition:
     # before this field existed parses and DIGESTS identically to before
     # (canonical_dict below includes them only when non-empty, same
     # convention as ``proposers``).
-    outcomes: tuple[Outcome, ...] = ()
+    outcomes: tuple[EvidenceContract, ...] = ()
     scope_census: ScopeCensus | None = None
     # wicket_id -> declared scope dimensions, e.g. {"payments_safety.caps/1.0.0":
     # ("developer",)}. Required for every `caps` constraint (loader.py enforces
@@ -692,6 +751,8 @@ class PackDefinition:
                     ),
                     **({"clause_ref": o.clause_ref} if o.clause_ref else {}),
                     **({"clause": o.clause.to_dict()} if o.clause is not None else {}),
+                    **({"profile": o.profile} if o.profile != "outcome" else {}),
+                    **({"epistemic_type": o.epistemic_type} if o.epistemic_type is not None else {}),
                 }
                 for o in self.outcomes
             ]
@@ -722,7 +783,7 @@ class PackDefinition:
                 return o
         return None
 
-    def outcome_for_id(self, outcome_id: str) -> Outcome | None:
+    def outcome_for_id(self, outcome_id: str) -> EvidenceContract | None:
         for o in self.outcomes:
             if o.id == outcome_id:
                 return o
@@ -755,7 +816,7 @@ class PackDefinition:
                 f"{profile_id!r} is not one of this pack's declared profiles: "
                 f"{sorted(p.profile_id for p in self.profiles) or '<none>'}",
             )
-        included: list[Outcome] = []
+        included: list[EvidenceContract] = []
         excluded: list[str] = []
         for o in self.outcomes:
             override = profile.override_for(o.id)
