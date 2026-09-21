@@ -48,6 +48,20 @@ emit: n
 
 _DOC_DIGEST = "a" * 64
 
+# A real EU AI Act clause (Regulation (EU) 2024/1689 Article 26(6), log
+# retention continuity) -- the same citation as row EU-26-6 in the held
+# `ldg-eu-ai-act-pack` catalog (PR #27, not yet merged), reused here inline
+# rather than depending on that unmerged pack.yaml.
+_EU_AI_ACT_CLAUSE = {
+    "instrument": "Regulation (EU) 2024/1689",
+    "article": "Article 26",
+    "paragraph": "6",
+    "as_amended_by": ["Regulation (EU) 2026/1744"],
+    "jurisdiction": "EU",
+    "effective_from": "2027-12-02",
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj",
+}
+
 
 def _write_pack(tmp_path: Path, overrides: dict | None = None) -> Path:
     data = {**BASE_PACK, **(overrides or {})}
@@ -562,15 +576,21 @@ def test_invalid_profile_value_is_rejected(tmp_path):
     ["outcome", "obligation", "process", "quality", "human_role", "attribution", "settlement"],
 )
 def test_every_closed_set_profile_loads_clean(tmp_path, profile):
-    pack_dir = _write_pack(tmp_path, {"outcomes": [_outcome(profile=profile)]})
+    # obligation is the one profile fleshed beyond a typed stub -- it
+    # requires a clause (see the dedicated obligation-profile section
+    # below), so give every profile one; the other five stubs ignore it.
+    pack_dir = _write_pack(tmp_path, {"outcomes": [_outcome(profile=profile, clause=_EU_AI_ACT_CLAUSE)]})
     pack = load_pack_dir(pack_dir)
     assert pack.outcomes[0].profile == profile
 
 
 def test_non_default_profile_renders_in_the_digest(tmp_path):
-    pack_dir = _write_pack(tmp_path, {"outcomes": [_outcome(profile="obligation")]})
+    # "process" stays a pure typed stub (no extra field-level requirement),
+    # keeping this test about generic digest rendering only -- obligation's
+    # own digest/round-trip behavior is covered in its dedicated section.
+    pack_dir = _write_pack(tmp_path, {"outcomes": [_outcome(profile="process")]})
     pack = load_pack_dir(pack_dir)
-    assert pack.canonical_dict()["outcomes"][0]["profile"] == "obligation"
+    assert pack.canonical_dict()["outcomes"][0]["profile"] == "process"
 
 
 def test_default_epistemic_type_is_none_and_omitted_from_the_digest(tmp_path):
@@ -605,6 +625,82 @@ def test_every_closed_set_epistemic_type_loads_clean_and_renders_in_the_digest(t
     pack = load_pack_dir(pack_dir)
     assert pack.outcomes[0].epistemic_type == epistemic_type
     assert pack.canonical_dict()["outcomes"][0]["epistemic_type"] == epistemic_type
+
+
+# --- obligation profile ([evidence-obligation-profile-scaffold]) ----------
+#
+# Of the six non-outcome profiles, obligation is the one fleshed out beyond
+# a typed stub: a clause anchor is what makes a register row an obligation
+# at all, so loader.py requires one. The other five stay pure stubs (see
+# test_every_closed_set_profile_loads_clean above).
+
+
+def test_obligation_profile_with_no_clause_is_rejected(tmp_path):
+    pack_dir = _write_pack(tmp_path, {"outcomes": [_outcome(profile="obligation")]})
+    with pytest.raises(PackDefinitionError) as exc:
+        load_pack_dir(pack_dir)
+    assert exc.value.reason == "missing_obligation_clause"
+
+
+def test_obligation_profile_with_a_clause_loads_clean(tmp_path):
+    pack_dir = _write_pack(
+        tmp_path, {"outcomes": [_outcome(profile="obligation", clause=_EU_AI_ACT_CLAUSE)]}
+    )
+    pack = load_pack_dir(pack_dir)
+    assert pack.outcomes[0].profile == "obligation"
+    assert pack.outcomes[0].clause is not None
+    assert pack.outcomes[0].clause.article == "Article 26"
+
+
+def test_obligation_requirements_returns_only_the_obligation_profile_rows(tmp_path):
+    pack_dir = _write_pack(
+        tmp_path,
+        {
+            "outcomes": [
+                _outcome(id="outcome.a"),
+                _outcome(id="obligation.eu_26_6", profile="obligation", clause=_EU_AI_ACT_CLAUSE),
+            ]
+        },
+    )
+    pack = load_pack_dir(pack_dir)
+    requirements = pack.obligation_requirements()
+    assert [r.id for r in requirements] == ["obligation.eu_26_6"]
+    assert requirements[0].clause.instrument == "Regulation (EU) 2024/1689"
+
+
+def test_a_real_eu_ai_act_clause_round_trips_through_the_obligation_profile(tmp_path):
+    """The obligation profile fleshed against a REAL clause (Article 26(6)
+    retention continuity, the same citation as the held eu-ai-act pack's
+    EU-26-6 row): loads clean, the clause survives canonical_dict verbatim,
+    and the digest is reproducible across two independent loads of the same
+    pack.yaml -- the "round trips" acceptance check."""
+    pack_dir = _write_pack(
+        tmp_path,
+        {
+            "outcomes": [
+                _outcome(
+                    id="EU-26-6",
+                    statement="Automatically generated logs were retained for at least six months.",
+                    profile="obligation",
+                    epistemic_type="OBLIGATION_REFERENCE",
+                    clause=_EU_AI_ACT_CLAUSE,
+                )
+            ]
+        },
+    )
+    pack_first_load = load_pack_dir(pack_dir)
+    pack_second_load = load_pack_dir(pack_dir)
+    assert pack_first_load.definition_digest() == pack_second_load.definition_digest()
+
+    canonical = pack_first_load.canonical_dict()["outcomes"][0]
+    assert canonical["profile"] == "obligation"
+    assert canonical["epistemic_type"] == "OBLIGATION_REFERENCE"
+    assert canonical["clause"] == _EU_AI_ACT_CLAUSE
+
+    requirement = pack_first_load.obligation_requirements()[0]
+    assert requirement.id == "EU-26-6"
+    assert requirement.clause.article == "Article 26"
+    assert requirement.clause.paragraph == "6"
 
 
 # --- HARD CONSTRAINT: the reframe must not move a single already-sealed

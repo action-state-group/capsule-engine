@@ -81,6 +81,7 @@ from .errors import (
     MISSING_CONSTRAINT_SCOPE,
     MISSING_EVIDENCE_INSTRUMENT,
     MISSING_EVIDENCE_RULE,
+    MISSING_OBLIGATION_CLAUSE,
     MISSING_REFUSAL_REASON,
     MISSING_REQUIRED_FIELD,
     OBLIGATION_CHECK_NOT_DECLARED,
@@ -771,6 +772,17 @@ def _parse_outcomes(raw: Any) -> tuple[EvidenceContract, ...]:
                 INVALID_EVIDENCE_PROFILE,
                 f"outcomes[{outcome_id!r}].profile={profile!r} must be one of {sorted(EVIDENCE_PROFILE_VALUES)}, "
                 "or omitted (defaults to 'outcome')",
+            )
+        if profile == "obligation" and clause is None:
+            raise PackDefinitionError(
+                MISSING_OBLIGATION_CLAUSE,
+                f"outcomes[{outcome_id!r}].profile=='obligation' requires a clause -- an obligation-profile "
+                "entry is a register row anchored to a specific legal/contractual clause, so one with no "
+                "clause at all is not yet a real obligation, e.g.:\n"
+                "clause:\n"
+                "  instrument: Regulation (EU) 2024/1689\n"
+                "  article: Article 26\n"
+                '  paragraph: "6"',
             )
 
         epistemic_type = entry.get("epistemic_type")
