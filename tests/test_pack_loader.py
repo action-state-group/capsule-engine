@@ -96,6 +96,53 @@ def test_minimal_valid_pack_loads(tmp_path):
     assert pack.pack_id == "test_pub/test-pack/1.0.0"
 
 
+def test_backward_only_pack_needs_no_forward_declarations(tmp_path):
+    """[ldg-obligations-pack-reads-trace]: a pack declaring outcomes[] may
+    omit obligations/action_semantics/constraints/folds entirely -- a GRC
+    obligations pack (e.g. catalog/eu-ai-act) has no forward guard
+    integration to declare."""
+    _write_pack(
+        tmp_path,
+        overrides={"outcomes": [_outcome_entry()]},
+        omit=["obligations", "action_semantics", "constraints", "folds"],
+    )
+    pack = load_pack_dir(tmp_path)
+    assert pack.obligations == ()
+    assert pack.action_semantics == ()
+    assert pack.constraints == ()
+    assert pack.folds == ()
+    assert {o.id for o in pack.outcomes} == {"outcome.test"}
+
+
+def test_backward_only_pack_tolerates_explicit_empty_lists_too(tmp_path):
+    """Same allowance whether the forward fields are omitted or spelled out
+    as empty lists -- both are 'nothing forward to declare', not two
+    different states."""
+    _write_pack(
+        tmp_path,
+        overrides={
+            "outcomes": [_outcome_entry()],
+            "obligations": [],
+            "action_semantics": [],
+            "constraints": [],
+        },
+        omit=["folds"],
+    )
+    pack = load_pack_dir(tmp_path)
+    assert pack.obligations == ()
+    assert pack.action_semantics == ()
+    assert pack.constraints == ()
+
+
+def test_pack_with_neither_outcomes_nor_forward_declarations_still_rejected(tmp_path):
+    """The backward-only allowance does not relax the base invariant: a pack
+    with no outcomes[] still needs the forward triple, exactly as before."""
+    _write_pack(tmp_path, omit=["obligations"])
+    with pytest.raises(PackDefinitionError) as exc_info:
+        load_pack_dir(tmp_path)
+    assert exc_info.value.reason == "missing_required_field"
+
+
 def _outcome_entry(**overrides: object) -> dict:
     entry = {
         "id": "outcome.test",

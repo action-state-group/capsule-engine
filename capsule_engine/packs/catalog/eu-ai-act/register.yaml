@@ -1,0 +1,99 @@
+# SPDX-License-Identifier: Apache-2.0
+# EU AI Act obligation register, TRACE-mapped subset ([ldg-obligations-pack-reads-trace]).
+#
+# This is deliberately NOT the full obligation set from
+# `_work/eu-ai-act-agent-obligations-2026-09-03.md` (T1-T5, ~30 rows) -- that
+# full port is a separate, larger migration (the prior [ldg-eu-ai-act-pack]
+# attempt never reached capsule-engine main; see this task's DONE note for
+# why porting it here would have been out of scope). This register holds the
+# five rows chosen to exercise every path a TRACE-sourced attainment report
+# can take: two resolve against TRACE v0.2 fields (one established, one
+# failed-by-rule), one resolves to a field that is legitimately absent on a
+# verified record (not_present), and two have no TRACE-side mapping at all
+# because TRACE v0.2 (hardware/model/policy attestation) does not carry
+# session-level disclosure ordering or document-by-digest artifacts
+# (not_present, honestly -- most obligations look like this on TRACE alone,
+# per the source report's own "most rows on airline data will be not present"
+# finding for the AAC-only case).
+#
+# `capsule_engine.register.compiler.EvidenceCompiler` compiles each row below
+# into an obligation-profile EvidenceContract; `packs/catalog/eu-ai-act/pack.yaml`
+# carries the compiled result as its `outcomes[]` (a human-confirmed candidate,
+# per `register/compiler.py`'s own docstring) --
+# `tests/test_pack_eu_ai_act_trace.py` asserts the two never drift apart.
+register_id: asg/eu-ai-act-register/0.1.0
+rows:
+  - id: EU-53
+    statement: >-
+      The agent's model epoch cites the provider's downstream documentation
+      (Annex XII) for the model version actually used.
+    source: EU AI Act
+    scope: every TRACE-attested execution naming a GPAI model
+    owner: compliance-team
+    version: 0.1.0
+    evidence_class: FACT
+    clause:
+      instrument: Regulation (EU) 2024/1689
+      article: Article 53
+      paragraph: "1(b)"
+      jurisdiction: EU
+
+  - id: EU-14-3
+    statement: >-
+      Human-oversight measures commensurate with the agent's autonomy were in
+      place and operated -- not merely declared.
+    source: EU AI Act
+    scope: every TRACE-attested execution carrying a policy binding
+    owner: compliance-team
+    version: 0.1.0
+    evidence_class: RULE
+    clause:
+      instrument: Regulation (EU) 2024/1689
+      article: Article 14
+      paragraph: "3"
+      jurisdiction: EU
+
+  - id: EU-75
+    statement: >-
+      Records demanded by the AI Office were producible: complete,
+      checkpointed, and verifiable offline via a transparency-log receipt.
+    source: EU AI Act
+    scope: every TRACE-attested execution of a GPAI-based or VLOP-embedded system
+    owner: compliance-team
+    version: 0.1.0
+    evidence_class: CONFIRM
+    clause:
+      instrument: Regulation (EU) 2024/1689
+      as_amended_by: ["Regulation (EU) 2026/1744"]
+      article: Article 75
+      jurisdiction: EU
+
+  - id: EU-04
+    statement: >-
+      The deployer took measures to support AI literacy of staff operating
+      the agent.
+    source: EU AI Act
+    scope: all deployments
+    owner: compliance-team
+    version: 0.1.0
+    evidence_class: DOC
+    clause:
+      instrument: Regulation (EU) 2024/1689
+      as_amended_by: ["Regulation (EU) 2026/1744"]
+      article: Article 4
+      jurisdiction: EU
+
+  - id: EU-50-1
+    statement: >-
+      Each natural person interacting with the agent was informed they were
+      interacting with an AI system, at the latest at first interaction.
+    source: EU AI Act
+    scope: every person-facing session
+    owner: compliance-team
+    version: 0.1.0
+    evidence_class: FACT
+    clause:
+      instrument: Regulation (EU) 2024/1689
+      article: Article 50
+      paragraph: "1"
+      jurisdiction: EU

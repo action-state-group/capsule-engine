@@ -45,11 +45,18 @@ Homepage = "https://github.com/action-state-group/capsule-engine"
 Source = "https://github.com/action-state-group/capsule-engine"
 
 [project.optional-dependencies]
-dev = ["pytest>=7.0", "ruff>=0.4", "mcp>=1.0,<2.0"]
+dev = ["pytest>=7.0", "ruff>=0.4", "mcp>=1.0,<2.0", "agentrust-trace>=0.10.0"]
 # Pinned below 2.0: the 2.0 release restructured the package (split out
 # mcp-types) and dropped the `mcp.server.fastmcp` import path this server
 # uses -- see capsule_engine/mcp/server.py.
 mcp = ["mcp>=1.0,<2.0"]
+# trace-record/1 reader ([ldg-obligations-pack-reads-trace]): depends on the
+# published agentrust-trace package for TRACE v0.2 schema validation and
+# signature verification -- never re-implemented or vendored. Optional: a
+# deployment that never reads a TRACE record does not need this installed
+# (packs/trace_reader.py imports it locally, same pattern
+# capsule-emit-mesh's trace_citation.py already established).
+trace = ["agentrust-trace>=0.10.0"]
 
 [project.scripts]
 capsule-engine = "capsule_engine.cli:main"
@@ -75,6 +82,8 @@ capsule_engine = [
     "packs/catalog/*/folds/*.yaml",
     "packs/catalog/*/wickets/*.yaml",
     "packs/catalog/*/fixtures/*.jsonl",
+    "packs/catalog/*/register.yaml",
+    "packs/catalog/*/fixtures/trace/*.json",
     "examples/data/tau2_airline/*.jsonl",
     "examples/data/tau2_airline/*.json",
     "registry/*.json",

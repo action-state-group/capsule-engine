@@ -1,0 +1,36 @@
+{
+  "appraisal": {
+    "status": "none",
+    "verifier": "https://verifier.example.org/v1"
+  },
+  "build_provenance": {
+    "digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "slsa_level": 0
+  },
+  "cnf": {
+    "jwk": {
+      "crv": "Ed25519",
+      "kty": "OKP",
+      "x": "R9sb2EhvXQQvfRhfGNNigjNGM_RCTFKqkk9VsDuaCps"
+    }
+  },
+  "data_class": "internal",
+  "eat_profile": "tag:agentrust-io.com,2026:trace-v0.2",
+  "iat": 1758400000,
+  "model": {
+    "aibom_uri": "https://models.example.org/aibom/claude-fable-5",
+    "model_id": "claude-fable-5",
+    "provider": "anthropic",
+    "version": "2026-09"
+  },
+  "policy": {
+    "bundle_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "enforcement_mode": "declared"
+  },
+  "runtime": {
+    "measurement": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+    "platform": "software-only"
+  },
+  "signature": "1YsK89GCHytjdxfrHpxuVrNnxM-otVBQkFYdYAyB3Rjk9uvsw3nvl8hOOdjCb4ffiTbOddXoc4fCBSvtVb0IDw",
+  "subject": "spiffe://action-state.example/agent/eu-ai-act-demo/prod"
+}
