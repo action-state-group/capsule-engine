@@ -2,19 +2,22 @@
 """``[ldg-obligations-pack-reads-trace]``: the ``trace-record/1`` reader plus
 the EU AI Act obligations pack, run end to end over TRACE v0.2 fixtures.
 
-Skips whole-file if ``agentrust-trace`` (the ``trace`` extra) is not
-installed -- the reader's own module never requires it at import time
-(local import, see ``trace_reader.py``), and neither does this test file's
-collection, but every test body needs it to build/read a real record.
+``requires_agentrust_trace`` skips only the tests that actually read or
+verify a TRACE record -- neither the reader's own module nor this test
+file's collection needs ``agentrust-trace`` (the ``trace`` extra) at import
+time (local import, see ``trace_reader.py``). ``test_pack_loads`` and
+``test_pack_outcomes_match_the_compiled_register_exactly`` exercise only
+``load_pack_dir``/``load_register_file``/``EvidenceCompiler`` -- none of
+which touch TRACE at all -- so they run (and the pack/register drift check
+they perform stays live) even without the extra installed.
 """
 from __future__ import annotations
 
+import importlib.util
 import json
 from pathlib import Path
 
 import pytest
-
-pytest.importorskip("agentrust_trace")
 
 from capsule_engine.packs.eu_ai_act_trace_field_map import EU_AI_ACT_TRACE_FIELD_MAP
 from capsule_engine.packs.loader import load_pack_dir
@@ -34,6 +37,11 @@ from capsule_engine.packs.trace_reader import (
 )
 from capsule_engine.register.compiler import EvidenceCompiler
 from capsule_engine.register.loader import load_register_file
+
+requires_agentrust_trace = pytest.mark.skipif(
+    importlib.util.find_spec("agentrust_trace") is None,
+    reason="agentrust-trace (the trace extra) is not installed",
+)
 
 PACK_DIR = Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog" / "eu-ai-act"
 FIXTURES_DIR = PACK_DIR / "fixtures" / "trace"
@@ -80,6 +88,7 @@ def test_pack_outcomes_match_the_compiled_register_exactly():
 # --------------------------------------------------------------------------- trace_reader.read_trace_record
 
 
+@requires_agentrust_trace
 def test_read_trace_record_verified():
     record = _load_fixture("good_execution.json")
     result = read_trace_record(record, _trusted_jwk())
@@ -89,6 +98,7 @@ def test_read_trace_record_verified():
     assert result.record.policy.enforcement_mode == record["policy"]["enforcement_mode"]
 
 
+@requires_agentrust_trace
 def test_read_trace_record_tampered_fails_closed():
     """The core dependency this whole reader stands on: a record whose bytes
     were altered after signing must NOT verify, and the failure must name a
@@ -100,6 +110,7 @@ def test_read_trace_record_tampered_fails_closed():
     assert "InvalidSignature" in result.detail
 
 
+@requires_agentrust_trace
 def test_read_trace_record_schema_invalid_also_fails_closed():
     """Schema violations are caught by the same verifier, distinct from a
     signature failure -- exercised here with a record missing a required
@@ -114,6 +125,7 @@ def test_read_trace_record_schema_invalid_also_fails_closed():
 # --------------------------------------------------------------------------- build_attainment_report: the happy path
 
 
+@requires_agentrust_trace
 def test_attainment_report_over_a_verified_record():
     pack = load_pack_dir(PACK_DIR)
     read = read_trace_record(_load_fixture("good_execution.json"), _trusted_jwk())
@@ -131,6 +143,7 @@ def test_attainment_report_over_a_verified_record():
     assert len(rows) == len(pack.outcomes)
 
 
+@requires_agentrust_trace
 def test_attainment_report_rule_violation_is_failed_not_not_present():
     """A verified record whose declared field genuinely violates the rule
     (oversight bound but never evaluated) is FAILED -- a real negative
@@ -148,6 +161,7 @@ def test_attainment_report_rule_violation_is_failed_not_not_present():
     assert by_id["EU-53"].status == STATUS_ESTABLISHED
 
 
+@requires_agentrust_trace
 def test_field_absent_on_a_verified_record_is_not_present_not_failed():
     """EU-75 has no mapping (asserted above); this test proves the OTHER
     absence path -- a mapped outcome whose field genuinely isn't on this
@@ -172,6 +186,7 @@ def test_field_absent_on_a_verified_record_is_not_present_not_failed():
 # --------------------------------------------------------------------------- the negative test the task asks for by name
 
 
+@requires_agentrust_trace
 def test_tampered_record_reports_failed_never_not_present():
     """ACCEPTANCE: a tampered TRACE record's own verifier fails, and every
     outcome mapped to it reports `failed` -- not `not_present`. Reporting
@@ -206,6 +221,7 @@ def test_tampered_record_reports_failed_never_not_present():
 # --------------------------------------------------------------------------- render_terminal smoke test
 
 
+@requires_agentrust_trace
 def test_render_terminal_includes_every_row_and_its_source():
     pack = load_pack_dir(PACK_DIR)
     read = read_trace_record(_load_fixture("good_execution.json"), _trusted_jwk())
