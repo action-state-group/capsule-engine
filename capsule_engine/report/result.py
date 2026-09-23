@@ -10,12 +10,12 @@ a second legitimate spelling. At the time this module was written, that
 schema had landed on ``agent-action-capsule`` branch
 ``batch4-evidence-result-schema-v0`` (Steven-ruled, no longer DRAFT) but was
 still held for EM push -- not yet importable from the ``agent-action-capsule``
-dependency this repo already pins -- so ``schemas/vendor/evidence-result-v0.
-json`` carries a vendored copy (see that file's own ``$comment`` for the
-drop-vendoring-once-shipped note).
+dependency this repo already pins -- so ``capsule_engine/schemas/vendor/
+evidence-result-v0.json`` carries a vendored copy (see that file's own
+``$comment`` for the drop-vendoring-once-shipped note).
 
 **Claims never self-declare.** Exactly like ``EvidenceContract`` upstream
-(``schemas/evidence-contract-v0.json``'s ``$comment``: "the evidence record
+(``capsule_engine/schemas/evidence-contract-v0.json``'s ``$comment``: "the evidence record
 never self-declares that it satisfies a requirement"), nothing in this module
 computes sufficiency or verdict from data it also emits as evidence -- both
 are supplied by the caller, who is expected to have derived them from real
@@ -94,7 +94,10 @@ DISCLOSED_STATUS_VALUES = EVIDENCE_STATUS_VALUES - {"WITHHELD", "NOT_COMMITTED"}
 
 _HEX_DIGEST_RE = re.compile(r"^[0-9a-f]{64}$")
 
-SCHEMA_PATH = Path(__file__).resolve().parents[2] / "schemas" / "vendor" / "evidence-result-v0.json"
+# capsule_engine/schemas/ is vendored INSIDE the package (parents[1], not
+# a project-root dir) specifically so it ships in a built wheel, not just
+# an editable/source install -- see tests/test_wheel_install.py.
+SCHEMA_PATH = Path(__file__).resolve().parents[1] / "schemas" / "vendor" / "evidence-result-v0.json"
 
 
 def load_schema() -> dict[str, Any]:
