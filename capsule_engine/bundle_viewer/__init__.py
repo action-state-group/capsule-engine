@@ -4,27 +4,19 @@ viewer -- see ``capsule_engine.bundle_viewer.viewer`` for the renderer and
 ``scripts/vendor_bundle_viewer.py`` for how the vendored template is kept
 in sync with scitt-cose's offline shell.
 
-Also the fragment-carried BASE viewer + its domain-module plug-in seam
-(``base_viewer.py``) -- moved here from capsule-ledger
-([ldg-ledger-scope-re-extraction] RESIDUALS pass, §3.2): presenting/narrating
-evidence is operational, not the neutral honest-records core. NOTE: the
-``conversation_exchange_card.js`` narration strings were authored directly
-here (in the company repo), not vendored from a neutral upstream verifier
-first -- a known F.1.2 gap, tracked, not blocking this move.
+The fragment-carried BASE viewer + its domain-module plug-in seam
+(previously ``base_viewer.py`` here, moved from capsule-ledger by the
+[ldg-ledger-scope-re-extraction] RESIDUALS pass) has moved OUT of this
+package entirely, to the standalone ``capsule-viewer`` repo/package
+([batch4-capsule-viewer-three-buckets]): presenting/narrating evidence is
+neutral, donation-bound surface, not this engine's product core, and it now
+also renders Evidence Result v0 documents (``result/v0``), which have no
+capsule concept to justify living here at all. capsule-engine keeps no copy
+-- if this package ever needs that viewer again, it depends on
+``capsule-viewer`` rather than re-vendoring it.
 """
-from .base_viewer import (
-    build_entry,
-    build_payload,
-    encode_fragment,
-    render_base_viewer_html,
-)
 from .viewer import render_offline_viewer_html
 
 __all__ = [
     "render_offline_viewer_html",
-    # The fragment-carried base viewer + its domain-module plug-in seam.
-    "render_base_viewer_html",
-    "build_entry",
-    "build_payload",
-    "encode_fragment",
 ]
