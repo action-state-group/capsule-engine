@@ -1,7 +1,7 @@
 {
   "_vendored_from": "action-state-group/scitt-payload-binding",
   "_vendored_source": "registry.json",
-  "_vendored_commit": "c5e0435f3e00221f87b39c6f5d14b2b5211e9db9",
+  "_vendored_commit": "6ba7c778df77fa4954a45f2d996c81a4ab575e39",
   "_vendored_note": "Vendored verbatim by scripts/vendor_cpb_registry.py. Do not hand-edit; re-run against a scitt-payload-binding checkout.",
   "registry": {
     "schema_version": "1",

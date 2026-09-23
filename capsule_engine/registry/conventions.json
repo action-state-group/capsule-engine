@@ -8,7 +8,7 @@
   "provisional_field_conventions": {
     "_provenance": {
       "status": "provisional",
-      "source": "action-state-group/capsule-emit-mesh (plugins/admission-policy/src/capsule_emit.rs, capsule_sidecar.py) via the CPB provisional payload class 'mesh-inference-exchange' (action-state-group/scitt-payload-binding@c5e0435, spec/cpb-provisional-registry.md)",
+      "source": "action-state-group/capsule-emit-mesh (plugins/admission-policy/src/capsule_emit.rs, capsule_sidecar.py) via the CPB provisional payload class 'mesh-inference-exchange' (action-state-group/scitt-payload-binding@6ba7c77, spec/cpb-provisional-registry.md)",
       "note": "Vendored, provisional field-value labels for the mesh-inference-exchange payload class. These are the AAC six-registry values that class's producer sets on the surrounding capsule; they are known-with-status-provisional (resolved by agent_action_capsule.verify check 8 against the vendored CPB provisional snapshot), never a rejection. Refresh with scripts/vendor_cpb_registry.py."
     },
     "effect.type": {
@@ -79,10 +79,26 @@
       }
     },
     "output.media_class": {
-      "text": {"label": "Text", "description": "AI-generated or manipulated text output (Art 50(2) marking).", "status": "registered"},
-      "image": {"label": "Image", "description": "AI-generated or manipulated image output (Art 50(2) marking).", "status": "registered"},
-      "audio": {"label": "Audio", "description": "AI-generated or manipulated audio output (Art 50(2) marking).", "status": "registered"},
-      "video": {"label": "Video", "description": "AI-generated or manipulated video output (Art 50(2) marking).", "status": "registered"}
+      "text": {
+        "label": "Text",
+        "description": "AI-generated or manipulated text output (Art 50(2) marking).",
+        "status": "registered"
+      },
+      "image": {
+        "label": "Image",
+        "description": "AI-generated or manipulated image output (Art 50(2) marking).",
+        "status": "registered"
+      },
+      "audio": {
+        "label": "Audio",
+        "description": "AI-generated or manipulated audio output (Art 50(2) marking).",
+        "status": "registered"
+      },
+      "video": {
+        "label": "Video",
+        "description": "AI-generated or manipulated video output (Art 50(2) marking).",
+        "status": "registered"
+      }
     },
     "action.initiative": {
       "directed": {
@@ -102,10 +118,26 @@
       }
     },
     "input_class": {
-      "user_provided": {"label": "User-provided", "description": "Input supplied directly by the human principal.", "status": "registered"},
-      "tool_output": {"label": "Tool output", "description": "Input produced by a tool call the agent invoked.", "status": "registered"},
-      "retrieved_context": {"label": "Retrieved context", "description": "Input retrieved from a document/knowledge store, not authored live.", "status": "registered"},
-      "model_generated": {"label": "Model-generated", "description": "Input produced by a prior model generation (e.g. a planning step feeding an execution step).", "status": "registered"}
+      "user_provided": {
+        "label": "User-provided",
+        "description": "Input supplied directly by the human principal.",
+        "status": "registered"
+      },
+      "tool_output": {
+        "label": "Tool output",
+        "description": "Input produced by a tool call the agent invoked.",
+        "status": "registered"
+      },
+      "retrieved_context": {
+        "label": "Retrieved context",
+        "description": "Input retrieved from a document/knowledge store, not authored live.",
+        "status": "registered"
+      },
+      "model_generated": {
+        "label": "Model-generated",
+        "description": "Input produced by a prior model generation (e.g. a planning step feeding an execution step).",
+        "status": "registered"
+      }
     },
     "chain.relation": {
       "supersedes": {
