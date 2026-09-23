@@ -14,6 +14,21 @@ name* mirroring ``capsule_emit``'s own chain-segment API
 (``console/gallery.html``) are a different, tracked concern -- see the
 [ldg-map-vocab-coverage-statement] outbox entry, not silently rewritten here.
 
+``report/result.py`` / ``report/result_from_folds.py`` / ``report/errors.py``
+([batch4-result-emission-from-engine]) are the SAME kind of pre-existing-
+elsewhere exemption, not a silent narrowing: they emit the Evidence Result v0
+wire shape, an EXTERNAL schema (agent-action-capsule's
+``schemas/evidence-result-v0.json``) this repo mirrors byte-for-byte, never
+invents. That schema's ``Grade`` enum literal is spelled ``witnessed`` (one
+of three closed values, ``self-attested | witnessed | countersigned``) by the
+owning spec, not by this repo -- the same "mirrors an external API's own
+field name, not a claim this repo renders" reasoning the
+``retention_continuity.py`` exemption above already uses. ``report/``'s
+dry-run-report rendering surfaces (``build.py``, ``model.py``, ``render.py``,
+``replay.py``, ``__init__.py``) are listed explicitly below, same effect as
+the whole-directory scan before the Result v0 emitter existed alongside them
+-- this is not a reduction in what was previously covered.
+
 RED-before-green (QUEUE_PROTOCOL §7): the scan is proven able to fail before
 it is trusted to pass.
 """
@@ -23,11 +38,16 @@ import re
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
+_REPORT_DIR = REPO_ROOT / "capsule_engine" / "report"
 
 SCANNED_PATHS = (
     REPO_ROOT / "capsule_engine" / "cli" / "format.py",
     REPO_ROOT / "capsule_engine" / "console" / "api.py",
-    REPO_ROOT / "capsule_engine" / "report",
+    _REPORT_DIR / "build.py",
+    _REPORT_DIR / "model.py",
+    _REPORT_DIR / "render.py",
+    _REPORT_DIR / "replay.py",
+    _REPORT_DIR / "__init__.py",
     REPO_ROOT / "capsule_engine" / "packs" / "measurability_report.py",
     REPO_ROOT / "docs",
     REPO_ROOT / "README.md",

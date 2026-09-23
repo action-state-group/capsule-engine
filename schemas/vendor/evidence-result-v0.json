@@ -1,0 +1,417 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentactioncapsule.org/schemas/evidence-result-v0.json",
+  "$comment": "Vendored, not owned here. This is a literal transcription of agent-action-capsule's schemas/evidence-result-v0.json (spec/evidence-result-v0.md, sections 1-3 Steven-ruled 2026-09-22) -- created here because at [batch4-result-emission-from-engine] time that repo's schema/spec lands on branch batch4-evidence-result-schema-v0, held for EM push (not yet on agent-action-capsule's origin/main, so not importable from the agent-action-capsule>=0.1.0 PyPI dependency this repo already pins). A change to the owning schema is a drift that must be re-vendored here, not silently re-derived -- same discipline as schemas/vendor/epistemic-types.json. Drop this vendored copy and import the schema from agent-action-capsule directly once that repo ships it (PyPI release or an importable schema resource) -- see capsule_engine/report/result.py's module docstring.",
+  "x_vendor_source": {
+    "repo": "agent-action-capsule",
+    "path": "schemas/evidence-result-v0.json",
+    "branch": "batch4-evidence-result-schema-v0",
+    "commit": "24ee05af4b620ce85a5d6aabeeb9e4f0ad394ebb",
+    "vendored_at": "2026-09-22"
+  },
+  "title": "Evidence Result v0",
+  "description": "Companion schema for spec/evidence-result-v0.md. Sections 1-3 of the companion document (result semantics, disclosure policy, aggregate/coverage) carry Steven's ruling (2026-09-22, quoted verbatim there); this schema encodes that ruling and is no longer DRAFT. The root schema validates an Evidence Result document.",
+  "$ref": "#/$defs/EvidenceResult",
+  "$defs": {
+    "HexDigest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "DigestRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "digest_alg",
+        "digest"
+      ],
+      "properties": {
+        "digest_alg": {
+          "const": "SHA-256"
+        },
+        "digest": {
+          "$ref": "#/$defs/HexDigest"
+        }
+      }
+    },
+    "ContractRef": {
+      "description": "Compact versioned Evidence Contract reference: <contract_id>@<version>. Same convention as evidence-plan-ir-v0.json's ContractRef -- a claim never carries a bare, unversioned contract id.",
+      "type": "string",
+      "pattern": "^[^@\\s]+@[^@\\s]+$"
+    },
+    "Tier": {
+      "description": "spec/evidence-result-v0.md section 1 -- mirrored from evidence-plan-ir-v0.md section 4.2, not redefined here.",
+      "enum": [
+        "recomputed",
+        "judged"
+      ]
+    },
+    "Grade": {
+      "description": "The three-value assurance grade owned by [grade-vocabulary-reconcile]; mirrored here, never redefined.",
+      "enum": [
+        "self-attested",
+        "witnessed",
+        "countersigned"
+      ]
+    },
+    "Sufficiency": {
+      "description": "The four-value Evidence Contract result (evidence-contract-internal-spec-v3.md section 5.2), owned there, mirrored here.",
+      "enum": [
+        "SATISFIED",
+        "GAP",
+        "INSUFFICIENT",
+        "UNKNOWN"
+      ]
+    },
+    "Verdict": {
+      "description": "The three-value judged-outcome vocabulary (evidence-contract-internal-spec-v3.md section 8), owned there, mirrored here.",
+      "enum": [
+        "met",
+        "not_met",
+        "not_evaluable"
+      ]
+    },
+    "EvidenceStatus": {
+      "description": "The eight-value per-requirement bundle assertion status (evidence-contract-internal-spec-v3.md section 5.1), the same closed set evidence-plan-ir-v0.json's ResultEnvelope.status mirrors. Owned there, mirrored here for the same reason: the disclosure policy (spec section 2) needs the WITHHELD/NOT_COMMITTED distinction section 5.2's Sufficiency projection collapses into GAP.",
+      "enum": [
+        "SATISFIED",
+        "INSUFFICIENT",
+        "NOT_FOUND",
+        "NOT_COMMITTED",
+        "WITHHELD",
+        "CONTRADICTED",
+        "NOT_APPLICABLE",
+        "UNKNOWN"
+      ]
+    },
+    "DisclosedStatus": {
+      "description": "EvidenceStatus minus the two statuses the disclosure policy (spec section 2) reserves for the analysis/story carriers: WITHHELD and NOT_COMMITTED.",
+      "enum": [
+        "SATISFIED",
+        "INSUFFICIENT",
+        "NOT_FOUND",
+        "CONTRADICTED",
+        "NOT_APPLICABLE",
+        "UNKNOWN"
+      ]
+    },
+    "ProofRef": {
+      "description": "An inclusion proof or receipt ref, by digest only -- never inline bytes (spec section 5).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "digest_alg",
+        "digest"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "inclusion_proof",
+            "receipt"
+          ]
+        },
+        "digest_alg": {
+          "const": "SHA-256"
+        },
+        "digest": {
+          "$ref": "#/$defs/HexDigest"
+        }
+      }
+    },
+    "DisclosureCarrier": {
+      "description": "spec section 2 -- the full carrier. Legal only when status is not WITHHELD/NOT_COMMITTED. Never carries payload bytes: evidence is by digest only, identical in shape to Claim.evidence.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "status",
+        "evidence"
+      ],
+      "properties": {
+        "kind": {
+          "const": "disclosure"
+        },
+        "status": {
+          "$ref": "#/$defs/DisclosedStatus"
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/DigestRef"
+          }
+        }
+      }
+    },
+    "AnalysisCarrier": {
+      "description": "spec section 2 -- a derived characterization of evidence that is not (fully) disclosed. summary MUST NOT quote or closely paraphrase the underlying payload -- it characterizes, it does not disclose.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "status",
+        "summary"
+      ],
+      "properties": {
+        "kind": {
+          "const": "analysis"
+        },
+        "status": {
+          "$ref": "#/$defs/EvidenceStatus"
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "StoryCarrier": {
+      "description": "spec section 2 -- narrative-only, the weakest carrier, for claims with no derived characterization to share. narrative describes the process, never the withheld content itself.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "status",
+        "narrative"
+      ],
+      "properties": {
+        "kind": {
+          "const": "story"
+        },
+        "status": {
+          "$ref": "#/$defs/EvidenceStatus"
+        },
+        "narrative": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "Presentation": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/DisclosureCarrier"
+        },
+        {
+          "$ref": "#/$defs/AnalysisCarrier"
+        },
+        {
+          "$ref": "#/$defs/StoryCarrier"
+        }
+      ]
+    },
+    "Claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "contract_ref",
+        "requirement_ref",
+        "tier",
+        "grade",
+        "sufficiency",
+        "verdict",
+        "evidence",
+        "proofs",
+        "presentation"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "contract_ref": {
+          "$ref": "#/$defs/ContractRef"
+        },
+        "requirement_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tier": {
+          "$ref": "#/$defs/Tier"
+        },
+        "grade": {
+          "$ref": "#/$defs/Grade"
+        },
+        "sufficiency": {
+          "$ref": "#/$defs/Sufficiency"
+        },
+        "verdict": {
+          "$ref": "#/$defs/Verdict"
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/DigestRef"
+          }
+        },
+        "proofs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ProofRef"
+          }
+        },
+        "presentation": {
+          "$ref": "#/$defs/Presentation"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "sufficiency": {
+                "const": "SATISFIED"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "verdict": {
+                "enum": [
+                  "met",
+                  "not_met"
+                ]
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "verdict": {
+                "const": "not_evaluable"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "Coverage": {
+      "description": "spec section 3 -- MANDATORY on every aggregate. An aggregate without this fails validation.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evaluated_population",
+        "excluded_not_applicable",
+        "unknown_count"
+      ],
+      "properties": {
+        "evaluated_population": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "excluded_not_applicable": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unknown_count": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "Buckets": {
+      "description": "spec section 3 -- every evaluated claim, grouped by verdict. Always three keys, never a single number; an empty bucket is an empty array, not an absent key.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "met",
+        "not_met",
+        "not_evaluable"
+      ],
+      "properties": {
+        "met": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "not_met": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "not_evaluable": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "Aggregate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "coverage",
+        "buckets"
+      ],
+      "properties": {
+        "coverage": {
+          "$ref": "#/$defs/Coverage"
+        },
+        "buckets": {
+          "$ref": "#/$defs/Buckets"
+        }
+      }
+    },
+    "View": {
+      "description": "spec section 8 -- presentation hints only, never data. presentation/v1 header fields from [report-three-carriers-and-verification-page]: producer name, logo data URL, title.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "spec_version"
+      ],
+      "properties": {
+        "spec_version": {
+          "const": "presentation/v1"
+        },
+        "producer_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "logo_data_url": {
+          "type": "string",
+          "pattern": "^data:"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "EvidenceResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "result_version",
+        "generated_at",
+        "claims",
+        "aggregate"
+      ],
+      "properties": {
+        "result_version": {
+          "const": "evidence-result-v0"
+        },
+        "generated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "claims": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/Claim"
+          }
+        },
+        "aggregate": {
+          "$ref": "#/$defs/Aggregate"
+        },
+        "view": {
+          "$ref": "#/$defs/View"
+        }
+      }
+    }
+  }
+}

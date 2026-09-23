@@ -1,0 +1,125 @@
+{
+  "aggregate": {
+    "buckets": {
+      "met": [
+        "claim-1"
+      ],
+      "not_evaluable": [
+        "claim-3"
+      ],
+      "not_met": [
+        "claim-2"
+      ]
+    },
+    "coverage": {
+      "evaluated_population": 3,
+      "excluded_not_applicable": 1,
+      "unknown_count": 0
+    }
+  },
+  "claims": [
+    {
+      "contract_ref": "ec:oo-retention-continuity:2026-09-22@1",
+      "evidence": [
+        {
+          "digest": "a93ae1e3bbb4bb1c73ff9d05a440d5e285f2b79df9de89b2ec0c65ef3f261b0d",
+          "digest_alg": "SHA-256"
+        }
+      ],
+      "grade": "self-attested",
+      "id": "claim-1",
+      "presentation": {
+        "evidence": [
+          {
+            "digest": "a93ae1e3bbb4bb1c73ff9d05a440d5e285f2b79df9de89b2ec0c65ef3f261b0d",
+            "digest_alg": "SHA-256"
+          }
+        ],
+        "kind": "disclosure",
+        "status": "SATISFIED"
+      },
+      "proofs": [
+        {
+          "digest": "3ef2e7c95bdfea61f0994fc96398d20ef63b42917d6b6c600d136a5850507d78",
+          "digest_alg": "SHA-256",
+          "kind": "receipt"
+        }
+      ],
+      "requirement_ref": "req-retention-immediate",
+      "sufficiency": "SATISFIED",
+      "tier": "recomputed",
+      "verdict": "met"
+    },
+    {
+      "contract_ref": "ec:oo-retention-continuity:2026-09-22@1",
+      "evidence": [
+        {
+          "digest": "a93ae1e3bbb4bb1c73ff9d05a440d5e285f2b79df9de89b2ec0c65ef3f261b0d",
+          "digest_alg": "SHA-256"
+        }
+      ],
+      "grade": "self-attested",
+      "id": "claim-2",
+      "presentation": {
+        "evidence": [
+          {
+            "digest": "a93ae1e3bbb4bb1c73ff9d05a440d5e285f2b79df9de89b2ec0c65ef3f261b0d",
+            "digest_alg": "SHA-256"
+          }
+        ],
+        "kind": "disclosure",
+        "status": "SATISFIED"
+      },
+      "proofs": [
+        {
+          "digest": "3ef2e7c95bdfea61f0994fc96398d20ef63b42917d6b6c600d136a5850507d78",
+          "digest_alg": "SHA-256",
+          "kind": "receipt"
+        }
+      ],
+      "requirement_ref": "req-retention-continuity-unbroken",
+      "sufficiency": "SATISFIED",
+      "tier": "recomputed",
+      "verdict": "not_met"
+    },
+    {
+      "contract_ref": "ec:oo-retention-continuity:2026-09-22@1",
+      "evidence": [
+        {
+          "digest": "a93ae1e3bbb4bb1c73ff9d05a440d5e285f2b79df9de89b2ec0c65ef3f261b0d",
+          "digest_alg": "SHA-256"
+        }
+      ],
+      "grade": "self-attested",
+      "id": "claim-3",
+      "presentation": {
+        "evidence": [
+          {
+            "digest": "a93ae1e3bbb4bb1c73ff9d05a440d5e285f2b79df9de89b2ec0c65ef3f261b0d",
+            "digest_alg": "SHA-256"
+          }
+        ],
+        "kind": "disclosure",
+        "status": "INSUFFICIENT"
+      },
+      "proofs": [
+        {
+          "digest": "3ef2e7c95bdfea61f0994fc96398d20ef63b42917d6b6c600d136a5850507d78",
+          "digest_alg": "SHA-256",
+          "kind": "receipt"
+        }
+      ],
+      "requirement_ref": "req-retention-6mo",
+      "sufficiency": "INSUFFICIENT",
+      "tier": "recomputed",
+      "verdict": "not_evaluable"
+    }
+  ],
+  "generated_at": "2026-09-23T04:07:38.676402+00:00",
+  "result_version": "evidence-result-v0",
+  "view": {
+    "producer_name": "OO",
+    "spec_version": "presentation/v1",
+    "title": "OO Retention Continuity -- Result v0"
+  }
+}
