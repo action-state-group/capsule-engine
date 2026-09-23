@@ -8,6 +8,26 @@ without a private repo checkout.
 This document names repos and their class. It does not describe what any
 private repo contains.
 
+## The boundary
+
+> Everything a counterparty needs to independently verify evidence is open:
+> the specifications, proof and canonicalization rules, reference libraries,
+> verifier, interoperability vectors, and neutral witness infrastructure.
+>
+> What Action State sells is the intelligence, operation, and assurance
+> around that open verification layer: managed evidence infrastructure,
+> entity-backed countersign, current obligation packs, Evidence Contract
+> compilation, evidence discovery and delivery, proof generation and
+> optimization, reconciliation, and the services we operate and stand
+> behind.
+>
+> The boundary is not who wrote the code. If an independent counterparty
+> must trust it in order to verify the evidence, it belongs in the open
+> layer. If it helps create, operate, interpret, optimize, assure, or clear
+> that evidence, it may be commercial.
+>
+> Verification must not require trusting Action State.
+
 ## The three classes
 
 **Donatable** — the open standard and the neutral libraries a counterparty
@@ -19,16 +39,17 @@ needs to interoperate, intended for a neutral foundation:
 | `scitt-cose` | Vendor-neutral RFC9162_SHA256 receipt verifier |
 | `capsule-emit` | Neutral capsule producer/emission layer |
 | `capsule-anchor` | Neutral SCITT Transparency Service (the witness) |
-| `capsule-registry` | Semantics registry: composition slot profiles, action-type/outcome conventions, purpose labels |
-| `capsule-viewer` | Offline bundle-verification viewer |
 | `capsule-gate-hermes` | Runtime adapter for `capsule-emit` |
 | `agentactioncapsule-site` | The standard's public site and docs |
 
-**Company OSS** — built and roadmapped by us, shipped open:
+**Company OSS** — built and roadmapped by us, shipped open. A repo's code
+being public here does not make it donatable — the semantics a repo defines
+may be open while the deployed/operated instance of it is not:
 
 | Repo | What it is |
 | --- | --- |
 | `capsule-engine` | The thin single-node enforcement engine: guard, append-only fold compute, packs runtime, local console/report/bundle-viewer |
+| `capsule-registry` | Semantics registry: composition slot profiles, action-type/outcome conventions, purpose labels — the conventions are open source, the registry deployment is company-operated |
 | `capsule-skills` | The evaluation/obligations compiler, packaged as installable skills |
 | `capsule-cli` | CLI plugins we ship open |
 
@@ -70,9 +91,10 @@ here — see the company site for those.
 ## Change log
 
 - 2026-09-22 — drafted from the workspace's private classification (Amendment
-  J). The one-sentence public test of the boundary ("everything a stranger
-  can check is donated; the party that runs it … is paid") is held out of
-  this draft pending Steven's ruling on whether it is public-safe language;
-  see the routing note in the ledger lane outbox. Column headings stand on
-  their own until that ruling lands.
-- Steven's ruling: **pending.**
+  J), boundary language held pending ruling.
+- 2026-09-22 — **Steven ruled:** the boundary text above is quoted verbatim.
+  `capsule-registry` and a standalone viewer repo are NOT listed as
+  donatable — their semantics are open, but the deployed/operated instance
+  is not; `capsule-registry` moved to the company-OSS table with that
+  distinction noted, and no separate viewer repo is listed (the offline
+  bundle-viewer surface ships inside `capsule-engine`, company OSS).
