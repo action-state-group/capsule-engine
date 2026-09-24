@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""``schemas/evidence-contract-v0.json`` + its validator entry point
+"""``capsule_engine/schemas/evidence-contract-v0.json`` + its validator entry point
 (``capsule_engine.packs.contract_validate``), [batch1-evidence-contract-jsonschema-v0].
 
 Three groups: (1) the schema itself is valid JSON Schema and the three
@@ -31,7 +31,7 @@ from capsule_engine.packs.schema import EPISTEMIC_TYPE_VALUES, ClauseSpec, Evide
 REPO_ROOT = Path(__file__).parent.parent
 EXAMPLES_DIR = REPO_ROOT / "examples" / "contracts"
 NEGATIVE_DIR = EXAMPLES_DIR / "negative"
-VENDORED_EPISTEMIC_TYPES = REPO_ROOT / "schemas" / "vendor" / "epistemic-types.json"
+VENDORED_EPISTEMIC_TYPES = REPO_ROOT / "capsule_engine" / "schemas" / "vendor" / "epistemic-types.json"
 
 CATALOG_DIR = REPO_ROOT / "capsule_engine" / "packs" / "catalog"
 
@@ -86,20 +86,21 @@ def test_negative_fixture_near_miss_corrections_validate():
 
 
 def test_epistemic_type_parity_schema_vendor_and_implementation():
-    """The one owner is spec-evidencebook-v3.md §3; schemas/vendor/epistemic-types.json
-    is the vendored transcription of it (created here -- none existed yet); this test
-    is the parity gate the spec (evidence-contract-internal-spec-v3.md §4) requires:
-    packs/schema.py's EPISTEMIC_TYPE_VALUES and this schema's own enum must both equal
+    """The one owner is spec-evidencebook-v3.md §3; capsule_engine/schemas/vendor/
+    epistemic-types.json is the vendored transcription of it (created here -- none
+    existed yet); this test is the parity gate the spec
+    (evidence-contract-internal-spec-v3.md §4) requires: packs/schema.py's
+    EPISTEMIC_TYPE_VALUES and this schema's own enum must both equal
     the vendored set, never independently re-derived."""
     vendored = set(json.loads(VENDORED_EPISTEMIC_TYPES.read_text())["values"])
     assert vendored == EPISTEMIC_TYPE_VALUES, (
-        f"schemas/vendor/epistemic-types.json drifted from capsule_engine.packs.schema."
+        f"capsule_engine/schemas/vendor/epistemic-types.json drifted from capsule_engine.packs.schema."
         f"EPISTEMIC_TYPE_VALUES: vendored-only={vendored - EPISTEMIC_TYPE_VALUES}, "
         f"impl-only={EPISTEMIC_TYPE_VALUES - vendored}"
     )
     schema_enum = set(load_schema()["$defs"]["epistemicType"]["enum"])
     assert schema_enum == vendored, (
-        f"schemas/evidence-contract-v0.json's epistemicType enum drifted from the vendored "
+        f"capsule_engine/schemas/evidence-contract-v0.json's epistemicType enum drifted from the vendored "
         f"copy: schema-only={schema_enum - vendored}, vendor-only={vendored - schema_enum}"
     )
 

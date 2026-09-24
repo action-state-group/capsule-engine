@@ -526,7 +526,7 @@ class EvidenceContract:
         """The JCS-canonicalizable form of one Evidence Contract entry --
         the same dict shape ``PackDefinition.canonical_dict()`` cites for
         each of its ``outcomes``, extracted here so it has exactly one
-        author (schema validation, e.g. ``schemas/evidence-contract-v0.json``,
+        author (schema validation, e.g. ``capsule_engine/schemas/evidence-contract-v0.json``,
         cross-checks THIS method's output, not a second hand-rolled copy).
         Every optional field is omitted at its documented default, same
         convention as every other ``canonical_dict``/``to_dict`` in this

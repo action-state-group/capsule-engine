@@ -20,7 +20,7 @@ a caller to remember (RULED 2026-09-22, decisions-log §6.4):
    independent counting; the contemporaneous parent's own status governs.
 
 **Statuses use the schema's own vocabulary, not the fold verdict
-vocabulary.** ``schemas/evidence-contract-v0.json``'s ``bundleAssertionStatus``
+vocabulary.** ``capsule_engine/schemas/evidence-contract-v0.json``'s ``bundleAssertionStatus``
 (``SATISFIED``/``INSUFFICIENT``/``NOT_FOUND``/...) is about **evidence
 sufficiency and availability** -- the question this module answers.
 ``met``/``not_met``/``insufficient_evidence`` (``folds/ordering.py`` and
@@ -64,7 +64,7 @@ __all__ = [
     "evaluate_requirement_coverage",
 ]
 
-# schemas/evidence-contract-v0.json $defs.bundleAssertionStatus (the three
+# capsule_engine/schemas/evidence-contract-v0.json $defs.bundleAssertionStatus (the three
 # values a coverage/sufficiency check can produce; SATISFIED/GAP/UNKNOWN's
 # other bundle-level siblings -- NOT_COMMITTED, WITHHELD, CONTRADICTED,
 # NOT_APPLICABLE, UNKNOWN -- are a different check's business, not this one's).

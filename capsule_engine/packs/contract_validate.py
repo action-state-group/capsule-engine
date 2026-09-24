@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""Validator entry point for ``schemas/evidence-contract-v0.json``
+"""Validator entry point for ``capsule_engine/schemas/evidence-contract-v0.json``
 ([batch1-evidence-contract-jsonschema-v0]).
 
 This module is deliberately independent of the pack loader (``loader.py``):
@@ -23,7 +23,10 @@ from typing import Any
 
 import jsonschema
 
-SCHEMA_PATH = Path(__file__).resolve().parents[2] / "schemas" / "evidence-contract-v0.json"
+# capsule_engine/schemas/ is vendored INSIDE the package (parents[1], not
+# a project-root dir) specifically so it ships in a built wheel, not just
+# an editable/source install -- see tests/test_wheel_install.py.
+SCHEMA_PATH = Path(__file__).resolve().parents[1] / "schemas" / "evidence-contract-v0.json"
 
 __all__ = ["SCHEMA_PATH", "load_schema", "validate_evidence_contract", "validate_requirement", "main"]
 
