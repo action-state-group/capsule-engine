@@ -15,7 +15,7 @@ name* mirroring ``capsule_emit``'s own chain-segment API
 [ldg-map-vocab-coverage-statement] outbox entry, not silently rewritten here.
 
 ``report/result.py`` / ``report/result_from_folds.py`` / ``report/errors.py``
-([batch4-result-emission-from-engine]) are the SAME kind of pre-existing-
+are the SAME kind of pre-existing-
 elsewhere exemption, not a silent narrowing: they emit the Evidence Result v0
 wire shape, an EXTERNAL schema (agent-action-capsule's
 ``schemas/evidence-result-v0.json``) this repo mirrors byte-for-byte, never

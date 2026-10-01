@@ -26,7 +26,7 @@ dependencies = [
     "agent-action-capsule>=0.1.0",
     "capsule-ledger>=0.0.1",
     # schemas/evidence-contract-v0.json's validator entry point
-    # (packs/contract_validate.py, [batch1-evidence-contract-jsonschema-v0]).
+    # (packs/contract_validate.py).
     "jsonschema>=4.18",
     # ``ledger-io`` extra: capsule_emit.ledger_io/period, the read/verify seam
     # and --period sugar moved here from capsule-ledger/this package

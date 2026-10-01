@@ -7,8 +7,8 @@ in sync with scitt-cose's offline shell.
 The fragment-carried BASE viewer + its domain-module plug-in seam
 (previously ``base_viewer.py`` here, moved from capsule-ledger by the
 [ldg-ledger-scope-re-extraction] RESIDUALS pass) has moved OUT of this
-package entirely, to the standalone ``capsule-viewer`` repo/package
-([batch4-capsule-viewer-three-buckets]): presenting/narrating evidence is
+package entirely, to the standalone ``capsule-viewer`` repo/package:
+presenting/narrating evidence is
 neutral, donation-bound surface, not this engine's product core, and it now
 also renders Evidence Result v0 documents (``result/v0``), which have no
 capsule concept to justify living here at all. capsule-engine keeps no copy

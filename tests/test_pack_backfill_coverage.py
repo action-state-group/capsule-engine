@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
-"""[batch3-backfill-builder-provenance-mode]. Every negative case flips
-exactly one thing and confirms the mutant is caught, per QUEUE_PROTOCOL §7."""
+"""Backfill provenance mode. Every negative case flips exactly one thing
+and confirms the mutant is caught."""
 from __future__ import annotations
 
 from capsule_engine.packs.backfill_coverage import (

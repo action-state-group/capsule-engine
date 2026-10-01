@@ -112,7 +112,7 @@ outcomes:
     mode: structural
 
   # --- B. Numeric integrity -- value (design §4 B) ------------------------
-  # RULING (2026-09-01, Steven, design doc [rev8]): "the wall moves to the
+  # RULING (2026-09-01): "the wall moves to the
   # label, not the capability." A value-integrity row MAY run LLM-Assisted
   # -- pinned, labeled MODEL-ASSISTED, never silently treated as
   # DETERMINISTIC -- rather than sitting at WITH-INSTRUMENTATION forever.

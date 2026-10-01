@@ -2,7 +2,7 @@
 """``result_from_folds`` adapters, exercised over REAL signed
 ``capsule_emit`` chain data (same real-not-mocked discipline
 ``test_fold_retention_continuity.py`` uses), plus the committed OO fixture
-these adapters produce ([batch4-result-emission-from-engine] DONE line).
+these adapters produce.
 
 The committed fixture lives at
 ``tests/fixtures/evidence-result/oo-claims-result.json`` -- regenerate via

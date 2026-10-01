@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: Apache-2.0
 """Regenerate ``tests/fixtures/evidence-result/oo-claims-result.json`` --
-the synthetic OO Evidence Result [batch4-result-emission-from-engine] emits.
+the synthetic OO Evidence Result the ``report/`` emitter produces.
 
 Every claim is a REAL ``evaluate_retention_continuity`` verdict over a REAL
 signed ``capsule_emit`` chain (three checkpoints, ``CAPSULE_WITNESS=stub`` --
@@ -15,8 +15,8 @@ with an empty ``registered_kinds`` declaration (that fold's own honest
 Not run by the test suite -- ``tests/test_report_result_from_folds.py``
 reads this committed, static file, the same "commit static bytes, don't
 re-sign every run" convention ``scripts/generate_eu_ai_act_trace_fixtures.
-py`` already follows. [batch4-capsule-viewer-three-buckets] (neutral lane)
-is the intended second consumer of this exact file.
+py`` already follows. ``capsule-viewer`` is the intended second consumer
+of this exact file.
 """
 from __future__ import annotations
 

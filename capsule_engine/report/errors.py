@@ -22,8 +22,8 @@ SCHEMA_VALIDATION_FAILED = "schema_validation_failed"
 
 class ResultError(ValueError):
     """A Result v0 document, or one of its parts, fails to validate --
-    "an untiered claim is a bug here, not a rendering problem"
-    ([batch4-result-emission-from-engine]). Always fail-closed at
+    "an untiered claim is a bug here, not a rendering problem".
+    Always fail-closed at
     construction time, same discipline as ``PackDefinitionError``."""
 
     def __init__(self, reason: str, message: str) -> None:

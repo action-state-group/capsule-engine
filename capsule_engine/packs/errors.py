@@ -48,8 +48,7 @@ INVALID_SCOPE_CENSUS = "invalid_scope_census"
 INVALID_TIER = "invalid_tier"
 
 # evidence-contract profile discriminator + epistemic_type
-# ([evidence-contract-reframe-capsule-engine], Steven's 2026-09-21 Evidence-
-# Contract reframe ruling): distinct from PROFILE_ID_VALUES/INVALID_PROFILE_ID
+# (the 2026-09-21 Evidence-Contract reframe ruling): distinct from PROFILE_ID_VALUES/INVALID_PROFILE_ID
 # above, which is the unrelated relationship-topology profile axis
 # (p1_external_serve etc.) over a pack's own outcomes.
 INVALID_EVIDENCE_PROFILE = "invalid_evidence_profile"

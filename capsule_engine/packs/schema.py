@@ -26,7 +26,7 @@ declared per ``action_class``, and the aggregate query summed
 developer-wide across ALL classes with no class filter. Two concurrent
 reserves under different classes for the same developer each took a
 different lock, both read the same (stale, pre-write) dev-wide aggregate,
-and jointly admitted what sequential execution would have denied. Steven's
+and jointly admitted what sequential execution would have denied. The
 ruling: a cap is per ``(developer, action_class)`` -- lock, cap, and
 aggregate must all agree at that granularity. This repo's own ``caps``
 check has the identical shape of risk even without a separate lock: the
@@ -203,13 +203,12 @@ PROFILE_ID_VALUES = frozenset(
 # closed-set check in this module already follows).
 TOPOLOGY_INVARIANT_MODES = frozenset({"structural", "value", "fold_rollup"})
 
-# The seven Evidence Contract profiles (Steven's 2026-09-21 Evidence-Contract
-# reframe ruling, `_work/doc2-evidence-reframe-delta-2026-09-21.md`): Evidence
+# The seven Evidence Contract profiles (the 2026-09-21 Evidence-Contract
+# reframe ruling): Evidence
 # Contract is the root abstraction, Outcome is one profile of it -- the
 # existing outcome-declaration schema below (``EvidenceContract``'s field set)
 # is the "outcome" profile's fields; the other six are typed stubs only --
-# their own field sets are Evidence Contract v3, a spec-lane task, not
-# invented here. Unrelated to ``PROFILE_ID_VALUES`` above, which is the
+# their own field sets are still to be specified, not invented here. Unrelated to ``PROFILE_ID_VALUES`` above, which is the
 # relationship-topology axis (``TopologyProfile.profile_id``) over a pack's
 # own outcomes -- two different, unconnected uses of the word "profile".
 EVIDENCE_PROFILE_VALUES = frozenset(
@@ -404,18 +403,16 @@ class EvidenceContract:
 
     Evidence Contract is the root abstraction; ``profile`` (one of
     ``EVIDENCE_PROFILE_VALUES``, default ``"outcome"``) says which of the
-    seven profiles a declared contract is (Steven's 2026-09-21 Evidence-
+    seven profiles a declared contract is (the 2026-09-21 Evidence-
     Contract reframe ruling). This class was named ``Outcome`` before that
     ruling -- every field below this docstring except ``profile`` and
     ``epistemic_type`` is the **outcome profile's** field set, reclassified
     in place rather than rebuilt. The other six profiles
     (obligation/process/quality/human_role/attribution/settlement) are typed
-    stubs: their own normative field sets are Evidence Contract v3, a
-    spec-lane task (`_work/doc2-evidence-reframe-delta-2026-09-21.md` §8),
-    not invented here.
+    stubs: their own normative field sets are still to be specified, not
+    invented here.
 
-    ``epistemic_type`` (doc1 "Evidence Fabric Architecture v2" §4, one of
-    ``EPISTEMIC_TYPE_VALUES``) names what KIND of claim this contract's
+    ``epistemic_type`` (one of ``EPISTEMIC_TYPE_VALUES``) names what KIND of claim this contract's
     evidence is -- optional and additive, same convention as every other
     field added after the original schema.
 

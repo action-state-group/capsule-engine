@@ -7,7 +7,7 @@ See ``capsule_ledger.report.build.build_dry_run_report`` for the entry point and
 
 ``result.py`` is a separate, unrelated artifact despite living in the same
 package: the public Evidence Result v0 emitter (``report`` -> ``result``
-projection, [batch4-result-emission-from-engine]) -- see that module's
+projection) -- see that module's
 docstring. It shares no code with the dry-run report above; both simply
 report on this engine's own decisions/folds.
 """

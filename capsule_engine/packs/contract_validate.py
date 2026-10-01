@@ -1,11 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
-"""Validator entry point for ``schemas/evidence-contract-v0.json``
-([batch1-evidence-contract-jsonschema-v0]).
+"""Validator entry point for ``schemas/evidence-contract-v0.json``.
 
 This module is deliberately independent of the pack loader (``loader.py``):
 it validates a *file on disk* against the Evidence Contract JSON Schema, the
-same file the neutral lane and any future ``capsulectl contract validate``
-consume -- there is no private compiler/planner dependency here, only the
+same file ``capsulectl contract validate`` and any other consumer read -- there is no private compiler/planner dependency here, only the
 schema plus ``jsonschema``.
 
 ``validate_requirement`` is what cross-checks

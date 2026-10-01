@@ -538,8 +538,8 @@ def test_every_closed_set_mode_loads_clean(tmp_path, mode):
     assert pack.outcomes[0].mode == mode
 
 
-# --- profile / epistemic_type (Steven's 2026-09-21 Evidence-Contract
-# reframe ruling, [evidence-contract-reframe-capsule-engine]) --------------
+# --- profile / epistemic_type (the 2026-09-21 Evidence-Contract reframe
+# ruling) ------------------------------------------------------------------
 #
 # Evidence Contract is the root abstraction (renamed from Outcome); an
 # existing pack's outcomes[] entries are the OUTCOME profile's field set,
