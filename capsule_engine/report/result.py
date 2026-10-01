@@ -9,8 +9,8 @@ a second legitimate spelling. At the time this module was written, that
 schema had landed on an ``agent-action-capsule`` branch (ruled, no longer
 DRAFT) but was not yet on its main branch -- not yet importable from the ``agent-action-capsule``
 dependency this repo already pins -- so ``schemas/vendor/evidence-result-v0.
-json`` carries a vendored copy (see that file's own ``$comment`` for the
-drop-vendoring-once-shipped note).
+json`` carries a vendored copy (see ``schemas/vendor/README.md`` for its
+provenance and the drop-vendoring-once-shipped note).
 
 **Claims never self-declare.** Exactly like ``EvidenceContract`` upstream
 (``schemas/evidence-contract-v0.json``'s ``$comment``: "the evidence record
