@@ -19,10 +19,10 @@
   },
   "claims": [
     {
-      "contract_ref": "ec:oo-retention-continuity:2026-09-22@1",
+      "contract_ref": "ec:example-retention-continuity:2026-09-22@1",
       "evidence": [
         {
-          "digest": "a93ae1e3bbb4bb1c73ff9d05a440d5e285f2b79df9de89b2ec0c65ef3f261b0d",
+          "digest": "6d1fba6624f7a5c3bc6597a50be354b4a16675115402bfb579a0369b8dbeb5a0",
           "digest_alg": "SHA-256"
         }
       ],
@@ -31,7 +31,7 @@
       "presentation": {
         "evidence": [
           {
-            "digest": "a93ae1e3bbb4bb1c73ff9d05a440d5e285f2b79df9de89b2ec0c65ef3f261b0d",
+            "digest": "6d1fba6624f7a5c3bc6597a50be354b4a16675115402bfb579a0369b8dbeb5a0",
             "digest_alg": "SHA-256"
           }
         ],
@@ -40,7 +40,7 @@
       },
       "proofs": [
         {
-          "digest": "3ef2e7c95bdfea61f0994fc96398d20ef63b42917d6b6c600d136a5850507d78",
+          "digest": "d4ce5c9d6c99cb6cac0d20a135cec0547d32d8ce51bd94e94230f3b66640ab3d",
           "digest_alg": "SHA-256",
           "kind": "receipt"
         }
@@ -51,10 +51,10 @@
       "verdict": "met"
     },
     {
-      "contract_ref": "ec:oo-retention-continuity:2026-09-22@1",
+      "contract_ref": "ec:example-retention-continuity:2026-09-22@1",
       "evidence": [
         {
-          "digest": "a93ae1e3bbb4bb1c73ff9d05a440d5e285f2b79df9de89b2ec0c65ef3f261b0d",
+          "digest": "6d1fba6624f7a5c3bc6597a50be354b4a16675115402bfb579a0369b8dbeb5a0",
           "digest_alg": "SHA-256"
         }
       ],
@@ -63,7 +63,7 @@
       "presentation": {
         "evidence": [
           {
-            "digest": "a93ae1e3bbb4bb1c73ff9d05a440d5e285f2b79df9de89b2ec0c65ef3f261b0d",
+            "digest": "6d1fba6624f7a5c3bc6597a50be354b4a16675115402bfb579a0369b8dbeb5a0",
             "digest_alg": "SHA-256"
           }
         ],
@@ -72,7 +72,7 @@
       },
       "proofs": [
         {
-          "digest": "3ef2e7c95bdfea61f0994fc96398d20ef63b42917d6b6c600d136a5850507d78",
+          "digest": "d4ce5c9d6c99cb6cac0d20a135cec0547d32d8ce51bd94e94230f3b66640ab3d",
           "digest_alg": "SHA-256",
           "kind": "receipt"
         }
@@ -83,10 +83,10 @@
       "verdict": "not_met"
     },
     {
-      "contract_ref": "ec:oo-retention-continuity:2026-09-22@1",
+      "contract_ref": "ec:example-retention-continuity:2026-09-22@1",
       "evidence": [
         {
-          "digest": "a93ae1e3bbb4bb1c73ff9d05a440d5e285f2b79df9de89b2ec0c65ef3f261b0d",
+          "digest": "6d1fba6624f7a5c3bc6597a50be354b4a16675115402bfb579a0369b8dbeb5a0",
           "digest_alg": "SHA-256"
         }
       ],
@@ -95,7 +95,7 @@
       "presentation": {
         "evidence": [
           {
-            "digest": "a93ae1e3bbb4bb1c73ff9d05a440d5e285f2b79df9de89b2ec0c65ef3f261b0d",
+            "digest": "6d1fba6624f7a5c3bc6597a50be354b4a16675115402bfb579a0369b8dbeb5a0",
             "digest_alg": "SHA-256"
           }
         ],
@@ -104,7 +104,7 @@
       },
       "proofs": [
         {
-          "digest": "3ef2e7c95bdfea61f0994fc96398d20ef63b42917d6b6c600d136a5850507d78",
+          "digest": "d4ce5c9d6c99cb6cac0d20a135cec0547d32d8ce51bd94e94230f3b66640ab3d",
           "digest_alg": "SHA-256",
           "kind": "receipt"
         }
@@ -115,11 +115,11 @@
       "verdict": "not_evaluable"
     }
   ],
-  "generated_at": "2026-09-23T04:07:38.676402+00:00",
+  "generated_at": "2026-10-01T06:09:54.882994+00:00",
   "result_version": "evidence-result-v0",
   "view": {
-    "producer_name": "OO",
+    "producer_name": "Example Operator",
     "spec_version": "presentation/v1",
-    "title": "OO Retention Continuity -- Result v0"
+    "title": "Example Retention Continuity -- Result v0"
   }
 }

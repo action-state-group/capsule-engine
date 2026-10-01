@@ -1,12 +1,12 @@
 # SPDX-License-Identifier: Apache-2.0
 """``result_from_folds`` adapters, exercised over REAL signed
 ``capsule_emit`` chain data (same real-not-mocked discipline
-``test_fold_retention_continuity.py`` uses), plus the committed OO fixture
+``test_fold_retention_continuity.py`` uses), plus the committed example fixture
 these adapters produce.
 
 The committed fixture lives at
-``tests/fixtures/evidence-result/oo-claims-result.json`` -- regenerate via
-``python scripts/generate_evidence_result_oo_fixture.py``. This file's own
+``tests/fixtures/evidence-result/example-claims-result.json`` -- regenerate via
+``python scripts/generate_evidence_result_example_fixture.py``. This file's own
 tests only READ that committed copy (never regenerate at test time -- real
 signing is nondeterministic across runs, and a committed fixture is meant to
 be a stable, reviewable artifact); the live-adapter tests below independently
@@ -35,8 +35,8 @@ from capsule_engine.report.result_from_folds import (
     is_excluded_not_applicable,
 )
 
-FIXTURE_PATH = Path(__file__).parent / "fixtures" / "evidence-result" / "oo-claims-result.json"
-CONTRACT_REF = "ec:oo-retention-continuity:2026-09-22@1"
+FIXTURE_PATH = Path(__file__).parent / "fixtures" / "evidence-result" / "example-claims-result.json"
+CONTRACT_REF = "ec:example-retention-continuity:2026-09-22@1"
 
 
 @pytest.fixture(autouse=True)
@@ -67,7 +67,7 @@ def three_checkpoint_segment(tmp_path, stub_witness):
     checkpoints = []
     for batch in range(3):
         for i in range(2):
-            seal(None, action=f"batch{batch}-{i}", operator="OO", anchor=False, ledger=ledger_path)
+            seal(None, action=f"batch{batch}-{i}", operator="Example Operator", anchor=False, ledger=ledger_path)
         cp = witness.push(str(ledger_path))
         assert cp is not None
         checkpoints.append(cp)
@@ -206,16 +206,16 @@ def test_live_build_produces_a_schema_valid_three_bucket_result(three_checkpoint
     verify_result(doc)
 
 
-# --- the committed OO fixture ----------------------------------------------
+# --- the committed example fixture -----------------------------------------
 
 
-def test_committed_oo_fixture_exists_and_is_schema_valid():
+def test_committed_example_fixture_exists_and_is_schema_valid():
     doc = json.loads(FIXTURE_PATH.read_text())
     validate_against_schema(doc)
     verify_result(doc)
 
 
-def test_committed_oo_fixture_coverage_matches_hand_count():
+def test_committed_example_fixture_coverage_matches_hand_count():
     """The hand count this task's DONE line requires: 3 requirements
     evaluated (one per retention-continuity call), 1 excluded as
     NOT_APPLICABLE (the empty-registered_kinds record-type-coverage call),
@@ -229,10 +229,10 @@ def test_committed_oo_fixture_coverage_matches_hand_count():
     assert len(doc["aggregate"]["buckets"]["met"]) == 1
     assert len(doc["aggregate"]["buckets"]["not_met"]) == 1
     assert len(doc["aggregate"]["buckets"]["not_evaluable"]) == 1
-    assert doc["view"]["producer_name"] == "OO"
+    assert doc["view"]["producer_name"] == "Example Operator"
 
 
-def test_mutant_committed_oo_fixture_rejects_a_stripped_aggregate():
+def test_mutant_committed_example_fixture_rejects_a_stripped_aggregate():
     """Proves the schema-validity test above is actually looking at the
     fixture's real content, not vacuously passing."""
     doc = json.loads(FIXTURE_PATH.read_text())

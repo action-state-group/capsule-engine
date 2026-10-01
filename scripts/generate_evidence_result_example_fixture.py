@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: Apache-2.0
-"""Regenerate ``tests/fixtures/evidence-result/oo-claims-result.json`` --
-the synthetic OO Evidence Result the ``report/`` emitter produces.
+"""Regenerate ``tests/fixtures/evidence-result/example-claims-result.json`` --
+the synthetic example Evidence Result the ``report/`` emitter produces.
 
 Every claim is a REAL ``evaluate_retention_continuity`` verdict over a REAL
 signed ``capsule_emit`` chain (three checkpoints, ``CAPSULE_WITNESS=stub`` --
@@ -40,15 +40,15 @@ from capsule_engine.report.result_from_folds import (  # noqa: E402
     is_excluded_not_applicable,
 )
 
-FIXTURE_PATH = Path(__file__).parent.parent / "tests" / "fixtures" / "evidence-result" / "oo-claims-result.json"
-CONTRACT_REF = "ec:oo-retention-continuity:2026-09-22@1"
+FIXTURE_PATH = Path(__file__).parent.parent / "tests" / "fixtures" / "evidence-result" / "example-claims-result.json"
+CONTRACT_REF = "ec:example-retention-continuity:2026-09-22@1"
 
 
 def _signed_segment(ledger_path: Path) -> ChainSegment:
     checkpoints = []
     for batch in range(3):
         for i in range(2):
-            seal(None, action=f"batch{batch}-{i}", operator="OO", anchor=False, ledger=ledger_path)
+            seal(None, action=f"batch{batch}-{i}", operator="Example Operator", anchor=False, ledger=ledger_path)
         cp = witness.push(str(ledger_path))
         assert cp is not None
         checkpoints.append(cp)
@@ -56,7 +56,7 @@ def _signed_segment(ledger_path: Path) -> ChainSegment:
     return chain_segment(entries, from_size=0, to_size=checkpoints[-1].mmr_size)
 
 
-def build_oo_result():
+def build_example_result():
     with tempfile.TemporaryDirectory() as tmp:
         segment = _signed_segment(Path(tmp) / "ledger.jsonl")
 
@@ -97,12 +97,12 @@ def build_oo_result():
         [met_claim, not_met_claim, insufficient_claim],
         generated_at=as_of,
         excluded_not_applicable=1,
-        view=View(producer_name="OO", title="OO Retention Continuity -- Result v0"),
+        view=View(producer_name="Example Operator", title="Example Retention Continuity -- Result v0"),
     )
 
 
 def main() -> None:
-    result = build_oo_result()
+    result = build_example_result()
     FIXTURE_PATH.parent.mkdir(parents=True, exist_ok=True)
     FIXTURE_PATH.write_text(json.dumps(result.to_dict(), indent=2, sort_keys=True) + "\n")
     print(f"wrote {FIXTURE_PATH}")
