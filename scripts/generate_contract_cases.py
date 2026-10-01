@@ -670,8 +670,16 @@ diff("shape-changed-generic-to-native", "moving a requirement between shapes com
      ch(f"{R1}/forward_verdict", "changed"), ch(f"{R1}/tier", "changed"))
 
 
-def diff_error(case_id: str, rationale: str, a: dict[str, Any], b: dict[str, Any], code: str) -> None:
-    _case(f"diff-bad-{case_id}", "diff", rationale, {"error": code}, a=a, b=b)
+def diff_error(case_id: str, rationale: str, a: dict[str, Any], b: dict[str, Any], code: str,
+               *unvalidated: dict[str, str]) -> None:
+    """``unvalidated``, when given, is the exact change list a diff that skips
+    validation must still produce: defence in depth for a caller that diffs
+    without validating first. Every such change list is breaking."""
+    expect: dict[str, Any] = {"error": code}
+    if unvalidated:
+        expect["unvalidated"] = {"breaking": True,
+                                 "changes": sorted(unvalidated, key=lambda c: (c["path"], c["kind"]))}
+    _case(f"diff-bad-{case_id}", "diff", rationale, expect, a=a, b=b)
 
 
 diff_error("a-invalid", "an invalid contract is refused before any diffing",
@@ -682,6 +690,33 @@ diff_error("duplicate-requirement-id", "two requirements with one id cannot be m
            BASE, v2(lambda d: d["requirements"].append(dict(_req(d, "req-a")))), "duplicate_requirement_id")
 diff_error("b-self-declared-status", "a contract that self-declares a status is refused, not diffed",
            BASE, v2(on_req("req-a", lambda r: r.update(status="SATISFIED"))), "invalid_contract")
+
+# Type changes: invalid, so refused; a diff that skips validation must still
+# never rank a value of the wrong type.
+diff_error("approvals-not-a-list", "approvals turned from a list into a string is refused, never 'loosened'",
+           BASE, v2(on_req("req-b", lambda r: r.update(approvals="one reviewer who is not the author"))),
+           "invalid_contract", VC, ch(f"{RB}/approvals", "changed"))
+diff_error("required-sources-not-a-list", "required_sources as a string is refused, never 'loosened'",
+           BASE, v2(on_er("req-a", lambda e: e.update(required_sources="source-one"))),
+           "invalid_contract", VC, ch(f"{ERA}/required_sources", "changed"))
+diff_error("epistemic-types-not-a-list", "accepted types as a string is refused, never ranked",
+           BASE, v2(on_er("req-a", lambda e: e.update(accepted_epistemic_types="OBSERVED_EVENT"))),
+           "invalid_contract", VC, ch(f"{ERA}/accepted_epistemic_types", "changed"))
+diff_error("sequence-not-a-list", "a required sequence as a string is refused, never ranked",
+           BASE, v2(on_req("req-b", lambda r: r.update(required_sequence="requested"))),
+           "invalid_contract", VC, ch(f"{RB}/required_sequence", "changed"))
+diff_error("escalation-path-null", "a null escalation path is refused; unvalidated it is a change, not editorial",
+           mutate(BASE, on_req("req-b", lambda r: r.update(escalation_path=None))), v2(_noop),
+           "invalid_contract", VC, ch(f"{RB}/escalation_path", "changed"))
+diff_error("assurance-not-a-list", "a minimum assurance that is a number is refused, never ranked",
+           BASE, v2(on_er("req-a", lambda e: e.update(minimum_assurance=3))),
+           "invalid_contract", VC, ch(f"{ERA}/minimum_assurance", "changed"))
+diff_error("native-tier-not-a-string", "a tier that is a list is refused; unvalidated it is a change, never a crash",
+           NATIVE, v2(on_req("req-n", lambda r: r.update(tier=["must_have"])), NATIVE),
+           "invalid_contract", VC, ch(f"{RN}/tier", "changed"))
+diff_error("unknown-epistemic-type-added", "adding a type outside the closed set is refused, not 'loosened'",
+           BASE, v2(on_er("req-a", lambda e: e["accepted_epistemic_types"].append("ATTESTED_CLAIM"))),
+           "invalid_contract")
 
 
 # -- pin ---------------------------------------------------------------------

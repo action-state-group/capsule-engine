@@ -52,7 +52,12 @@ def test_case(entry):
             found = [(i.path, i.keyword) for i in issues]
             assert (expect["error"]["path"], expect["error"]["keyword"]) in found, found
     elif case["kind"] == "diff":
-        assert _run_diff(case) == expect
+        unvalidated = expect.get("unvalidated")
+        assert _run_diff(case) == {k: v for k, v in expect.items() if k != "unvalidated"}
+        if unvalidated is not None:
+            raw = diff_contracts(case["a"], case["b"])
+            assert {"breaking": raw.breaking,
+                    "changes": [{"path": c.path, "kind": c.kind} for c in raw.changes]} == unvalidated
     else:
         assert contract_pin(case["contract"]) == expect
 

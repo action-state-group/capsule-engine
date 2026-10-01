@@ -181,6 +181,12 @@ def contract_pin(doc: dict[str, Any]) -> dict[str, Any]:
 # -- field rules -------------------------------------------------------------
 
 
+def _not_a(kind: type, *values: Any) -> bool:
+    """Defence in depth for unvalidated input: a value of the wrong JSON type
+    is never ranked, only reported as changed."""
+    return any(v is not _MISSING and not isinstance(v, kind) for v in values)
+
+
 def _set(value: Any) -> set[str] | None:
     return None if value is _MISSING else set(value)
 
@@ -193,6 +199,8 @@ def _compare_sets(path: str, a: Any, b: Any, *, more_is_tighter: bool, what: str
     """``more_is_tighter``: each added member is one more thing owed (sources,
     approvals). Otherwise each added member is one more thing accepted
     (epistemic types), and absence means "everything is accepted"."""
+    if _not_a(list, a, b):
+        return [Change(path, "changed", f"{what}: not a list; direction cannot be determined")]
     sa, sb = _set(a), _set(b)
     if more_is_tighter:
         sa, sb = sa or set(), sb or set()
@@ -216,6 +224,8 @@ def _grade_floor(value: Any) -> int | None:
     """Rank of the lowest grade named, -1 for no floor, None if a grade is unknown."""
     if value is _MISSING:
         return -1
+    if not isinstance(value, (str, list)):
+        return None
     grades = [value] if isinstance(value, str) else list(value)
     if not grades:
         return -1
@@ -318,6 +328,8 @@ def _compare_tier(path: str, a: Any, b: Any) -> list[Change]:
     tb = "informational" if b is _MISSING else b
     if ta == tb:
         return []
+    if _not_a(str, ta, tb):
+        return [Change(path, "changed", "tier changed")]
     ra, rb = _TIER_RANK.get(ta), _TIER_RANK.get(tb)
     if ra is None or rb is None:
         return [Change(path, "changed", "tier changed")]
@@ -330,6 +342,8 @@ def _is_subsequence(short: list[Any], long: list[Any]) -> bool:
 
 
 def _compare_sequence(path: str, a: Any, b: Any) -> list[Change]:
+    if a != b and _not_a(list, a, b):
+        return [Change(path, "changed", "required sequence is not a list; direction cannot be determined")]
     la = [] if a is _MISSING else list(a)
     lb = [] if b is _MISSING else list(b)
     if la == lb:
@@ -342,7 +356,11 @@ def _compare_sequence(path: str, a: Any, b: Any) -> list[Change]:
 
 
 def _editorial(path: str, a: Any, b: Any) -> list[Change]:
-    return [] if a == b else [Change(path, "editorial", "not read when sufficiency is decided")]
+    if a == b:
+        return []
+    if _not_a(str, a, b):
+        return [Change(path, "changed", "not a string; no rule says this is safe")]
+    return [Change(path, "editorial", "not read when sufficiency is decided")]
 
 
 _EVIDENCE_REQUIREMENTS_RULES: dict[str, Any] = {
