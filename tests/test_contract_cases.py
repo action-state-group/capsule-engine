@@ -79,6 +79,19 @@ def test_index_lists_every_case_file():
     assert on_disk == {e["file"] for e in INDEX}
 
 
+def test_sha256sums_covers_every_file():
+    """Copies of this library pin the digest of SHA256SUMS; it must list every
+    other file in the directory with its current digest."""
+    import hashlib
+
+    listed = {}
+    for line in (CASES_DIR / "SHA256SUMS").read_text().splitlines():
+        digest, name = line.split("  ", 1)
+        listed[name] = digest
+    actual = {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in CASES_DIR.iterdir() if p.name != "SHA256SUMS"}
+    assert listed == actual
+
+
 def test_diff_inputs_are_valid_unless_the_case_is_about_invalid_input():
     for entry in INDEX:
         case = _load(entry)

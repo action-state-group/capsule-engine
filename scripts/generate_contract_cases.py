@@ -25,6 +25,7 @@ Usage: python scripts/generate_contract_cases.py [OUT_DIR]
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
 import sys
 from collections.abc import Callable
@@ -401,8 +402,8 @@ diff("contract-id-changed", "claims name their contract by id; a new id is a dif
 diff("requirement-added", "a new requirement owes new evidence",
      BASE, v2(lambda d: d["requirements"].append({"id": "req-d", "profile": "quality", "statement": "s"})), True,
      VC, ch("requirements[req-d]", "requirement_added"))
-diff("requirement-removed", "removing a requirement asks for nothing new (reported: assurance drops)",
-     BASE, v2(lambda d: d["requirements"].pop(1)), False, VC, ch(RB, "requirement_removed"))
+diff("requirement-removed", "a claim against A that cites a removed requirement no longer resolves in B",
+     BASE, v2(lambda d: d["requirements"].pop(1)), True, VC, ch(RB, "requirement_removed"))
 diff("requirement-reid", "re-identifying a requirement orphans every claim that cites the old id",
      BASE, v2(on_req("req-a", lambda r: r.update(id="req-a2"))), True, VC, ch(RA, "requirement_reid"))
 diff("requirement-reid-with-change", "a new id with different content is a removal plus an addition",
@@ -481,6 +482,30 @@ diff("freshness-overlong-component", "a duration component over nine digits does
      BASE, v2(on_er("req-a", lambda e: e.update(freshness="P1234567890D"))), True, VC, ch(f"{ERA}/freshness", "changed"))
 diff("freshness-dangling-t", "a time designator with no time component is not a duration",
      BASE, v2(on_er("req-a", lambda e: e.update(freshness="P7DT"))), True, VC, ch(f"{ERA}/freshness", "changed"))
+diff("freshness-month-vs-days", "a month is not a fixed number of days: P1M to P30D is not comparable",
+     mutate(BASE, on_er("req-a", lambda e: e.update(freshness="P1M"))),
+     v2(on_er("req-a", lambda e: e.update(freshness="P30D"))), True, VC, ch(f"{ERA}/freshness", "changed"))
+diff("freshness-month-vs-one-day", "months and days are never ordered against each other, even when obvious",
+     mutate(BASE, on_er("req-a", lambda e: e.update(freshness="P1M"))),
+     v2(on_er("req-a", lambda e: e.update(freshness="P1D"))), True, VC, ch(f"{ERA}/freshness", "changed"))
+diff("freshness-year-as-months", "a year is exactly twelve months: P1Y to P12M is a respelling",
+     mutate(BASE, on_er("req-a", lambda e: e.update(freshness="P1Y"))),
+     v2(on_er("req-a", lambda e: e.update(freshness="P12M"))), False, VC, ch(f"{ERA}/freshness", "editorial"))
+diff("freshness-months-lengthened", "months compare with months: P1M to P2M is longer",
+     mutate(BASE, on_er("req-a", lambda e: e.update(freshness="P1M"))),
+     v2(on_er("req-a", lambda e: e.update(freshness="P2M"))), False, VC, ch(f"{ERA}/freshness", "loosened"))
+diff("freshness-month-plus-hours", "same months and more hours is longer in one part and equal in the other",
+     mutate(BASE, on_er("req-a", lambda e: e.update(freshness="P1M"))),
+     v2(on_er("req-a", lambda e: e.update(freshness="P1MT1H"))), False, VC, ch(f"{ERA}/freshness", "loosened"))
+diff("freshness-mixed-opposite", "longer in months but shorter in days cannot be ordered",
+     mutate(BASE, on_er("req-a", lambda e: e.update(freshness="P1M10D"))),
+     v2(on_er("req-a", lambda e: e.update(freshness="P2M"))), True, VC, ch(f"{ERA}/freshness", "changed"))
+diff("freshness-month-from-unbounded", "any limit where there was none tightens, months included",
+     mutate(BASE, on_er("req-a", lambda e: e.pop("freshness"))),
+     v2(on_er("req-a", lambda e: e.update(freshness="P1M"))), True, VC, ch(f"{ERA}/freshness", "tightened"))
+diff("native-window-days-to-month", "a window in days replaced by one in months is not comparable",
+     NATIVE, v2(on_req("req-n", lambda r: r["window"].update(duration="P1M")), NATIVE), True,
+     VC, ch(f"{RN}/window/duration", "changed"))
 diff("freshness-dropped", "no freshness limit at all is the loosest",
      BASE, v2(on_er("req-a", lambda e: e.pop("freshness"))), False, VC, ch(f"{ERA}/freshness", "loosened"))
 diff("independence-changed", "independence is an opaque predicate: any change is breaking",
@@ -589,9 +614,60 @@ diff("mixed-tighten-and-loosen", "one tightening makes the whole diff breaking, 
      ch(f"{RB}/approvals", "tightened"))
 diff("all-non-breaking", "loosenings and editorial changes together stay non-breaking",
      BASE, v2(lambda d: (_req(d, "req-a").update(statement="reworded"),
-                         _req(d, "req-b").update(escalation_path="queue-two"),
-                         d["requirements"].pop(2))), False,
-     VC, ch(f"{RA}/statement", "editorial"), ch(f"{RB}/escalation_path", "editorial"), ch(RC, "requirement_removed"))
+                         _req(d, "req-a")["evidence_requirements"].update(freshness="P30D"),
+                         _req(d, "req-b").update(escalation_path="queue-two"))), False,
+     VC, ch(f"{RA}/statement", "editorial"), ch(f"{ERA}/freshness", "loosened"),
+     ch(f"{RB}/escalation_path", "editorial"))
+diff("requirement-removed-among-loosenings", "one removed requirement makes an otherwise loosening diff breaking",
+     BASE, v2(lambda d: (_req(d, "req-a")["evidence_requirements"].update(freshness="P30D"),
+                         d["requirements"].pop(2))), True,
+     VC, ch(f"{ERA}/freshness", "loosened"), ch(RC, "requirement_removed"))
+
+# Extension fields on open profiles (process, quality, human_role accept any
+# extra field): a field rule applies only where the schema defines the field,
+# so an extension that shares a rule's name is compared with no rule.
+R1 = "requirements[r1]"
+
+
+def ext(profile: str, **fields: Any) -> dict[str, Any]:
+    return minimal({"id": "r1", "profile": profile, "statement": "s", **fields})
+
+
+def ext2(profile: str, **fields: Any) -> dict[str, Any]:
+    return mutate(ext(profile, **fields), lambda d: d.update(version="2"))
+
+
+diff("ext-window-extra-field", "an unknown member inside an extension window is still a change, not dropped",
+     ext("quality", window={"duration": "P7D", "anchor": "start"}),
+     ext2("quality", window={"duration": "P7D", "anchor": "end"}), True, VC, ch(f"{R1}/window/anchor", "changed"))
+diff("ext-window-string", "an extension window that is not an object has no rule: breaking, never a crash",
+     ext("process", window="P7D"), ext2("process", window="P1D"), True, VC, ch(f"{R1}/window", "changed"))
+diff("ext-window-shortened", "the window rule is the native shape's; on quality a shorter window is just a change",
+     ext("quality", window={"duration": "P7D"}), ext2("quality", window={"duration": "P14D"}), True,
+     VC, ch(f"{R1}/window/duration", "changed"))
+diff("ext-source-url", "source_url is editorial only inside a native clause, not as an extension field",
+     ext("quality", source_url="x"), ext2("quality", source_url="y"), True, VC, ch(f"{R1}/source_url", "changed"))
+diff("ext-tier", "tier is ranked only on the native shape; an extension tier has no direction",
+     ext("quality", tier="must_have"), ext2("quality", tier="informational"), True, VC, ch(f"{R1}/tier", "changed"))
+diff("ext-escalation-path-on-human-role", "escalation_path is editorial on process, not as a human_role extension",
+     ext("human_role", escalation_path="q1"), ext2("human_role", escalation_path="q2"), True,
+     VC, ch(f"{R1}/escalation_path", "changed"))
+diff("ext-evidence-requirements-on-quality", "quality defines no evidence_requirements; its freshness has no rule",
+     ext("quality", evidence_requirements={"freshness": "P7D"}),
+     ext2("quality", evidence_requirements={"freshness": "P30D"}), True,
+     VC, ch(f"{R1}/evidence_requirements/freshness", "changed"))
+diff("ext-adjudication-on-process", "an extension adjudication cannot make a process statement editorial",
+     ext("process", adjudication={"mode": "deterministic"}),
+     mutate(ext2("process", adjudication={"mode": "deterministic"}), on_req("r1", lambda r: r.update(statement="t"))),
+     True, VC, ch(f"{R1}/statement", "changed"))
+diff("process-sequence-rule-still-applies", "on process, required_sequence is defined and keeps its rule",
+     ext("process", required_sequence=["a", "b"]), ext2("process", required_sequence=["a"]), False,
+     VC, ch(f"{R1}/required_sequence", "loosened"))
+diff("shape-changed-generic-to-native", "moving a requirement between shapes compares fields with no rule",
+     ext("outcome"), mutate(ext2("outcome"), on_req("r1", lambda r: r.update(
+         evidence_rule="e", forward_verdict="DETERMINISTIC", backward_verdict="DETERMINISTIC", tier="informational"))),
+     True, VC, ch(f"{R1}/backward_verdict", "changed"), ch(f"{R1}/evidence_rule", "changed"),
+     ch(f"{R1}/forward_verdict", "changed"), ch(f"{R1}/tier", "changed"))
 
 
 def diff_error(case_id: str, rationale: str, a: dict[str, Any], b: dict[str, Any], code: str) -> None:
@@ -652,8 +728,9 @@ def _outcome(case: dict[str, Any]) -> str:
 
 def write(out: Path) -> None:
     out.mkdir(parents=True, exist_ok=True)
-    for stale in out.glob("*.json"):
-        stale.unlink()
+    for stale in [*out.glob("*.json"), out / "SHA256SUMS"]:
+        if stale.exists():
+            stale.unlink()
     index = []
     for case in CASES:
         name = f"{case['id']}.json"
@@ -675,6 +752,11 @@ def write(out: Path) -> None:
     ]
     lines += [f"| `{i['id']}` | {i['kind']} | {i['outcome']} | {i['rationale']} |" for i in index]
     (out / "INDEX.md").write_text("\n".join(lines) + "\n")
+    # One line per file, in `sha256sum` format: a copy of this library
+    # elsewhere pins the digest of this file to prove it has not drifted.
+    sums = [f"{hashlib.sha256(p.read_bytes()).hexdigest()}  {p.name}\n"
+            for p in sorted(out.iterdir(), key=lambda p: p.name) if p.name != "SHA256SUMS"]
+    (out / "SHA256SUMS").write_text("".join(sums))
 
 
 if __name__ == "__main__":

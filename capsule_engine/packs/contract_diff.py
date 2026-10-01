@@ -25,11 +25,16 @@ non-breaking but is still reported, so a reader sees assurance going down.
 Anything without an explicit rule below is breaking: a field is safe to change
 only because a rule here says so.
 
-The rules, by field (paths are relative to one requirement unless rooted):
+The rules, by field (paths are relative to one requirement unless rooted). A
+field rule applies only where the schema defines that field for the
+requirement's shape on both sides -- e.g. ``tier`` and ``window`` only on the
+native shape, ``required_sequence`` only on ``process``. An extension field on
+an open profile (process, quality, human_role) that happens to share a rule's
+name gets no rule, so any change to it is breaking.
 
 * requirement added -- breaking (``requirement_added``): new evidence is owed.
-* requirement removed -- non-breaking (``requirement_removed``): nothing B asks
-  for is new; the loss of assurance is reported.
+* requirement removed -- breaking (``requirement_removed``): a claim made
+  against A that cites it no longer names a requirement of B.
 * requirement re-id (same content, new id) -- breaking (``requirement_reid``):
   claims cite requirements by id, so every prior claim stops resolving.
 * requirements reordered -- non-breaking (``requirements_reordered``):
@@ -50,13 +55,18 @@ The rules, by field (paths are relative to one requirement unless rooted):
 * ``freshness``, ``window.duration``, ``window.cure``, ``window.grace`` --
   ISO-8601 durations; shorter is ``tightened``, longer is ``loosened``. An
   absent ``freshness`` or ``window`` is unbounded; an absent or null cure or
-  grace is zero. A duration that does not parse is ``changed``.
+  grace is zero. Years and months are compared with each other (a year is
+  twelve months), and weeks, days, hours, minutes and seconds with each other,
+  but a month is never equated with a number of days: when one side is longer
+  in months and the other in days, the two are not comparable and the change is
+  ``changed``. A duration that does not parse is ``changed``.
 * ``tier`` -- informational to must_have is ``tightened``, the reverse
   ``loosened``. Absent means informational.
 * ``required_sequence`` -- B a subsequence of A is ``loosened``, A a
   subsequence of B is ``tightened``, otherwise ``changed``.
-* ``escalation_path``, ``clause.source_url`` -- ``editorial``: neither is read
-  when sufficiency is decided.
+* ``escalation_path`` (process, and ``authority.escalation_path`` on the
+  abstract outcome shape), ``clause.source_url`` (native shape) --
+  ``editorial``: neither is read when sufficiency is decided.
 * everything else, at the root or in a requirement -- ``changed`` (breaking).
 """
 from __future__ import annotations
@@ -95,7 +105,7 @@ _SEVERITY = {
     "version_reused": BREAKING,
     "version_changed": NON_BREAKING,
     "requirement_added": BREAKING,
-    "requirement_removed": NON_BREAKING,
+    "requirement_removed": BREAKING,
     "requirement_reid": BREAKING,
     "requirements_reordered": NON_BREAKING,
     "tightened": BREAKING,
@@ -231,31 +241,52 @@ _DURATION = re.compile(
     r"^P(?!$)(?:(\d{1,9})Y)?(?:(\d{1,9})M)?(?:(\d{1,9})W)?(?:(\d{1,9})D)?"
     r"(?:T(?=\d)(?:(\d{1,9})H)?(?:(\d{1,9})M)?(?:(\d{1,9})S)?)?$"
 )
-# Calendar units at their nominal length: comparison only, never date arithmetic.
-_DURATION_SECONDS = (365 * 86400, 30 * 86400, 7 * 86400, 86400, 3600, 60, 1)
+# A duration is (months, seconds): years and months are calendar units of
+# varying length, so they are never converted into seconds.
+_UNBOUNDED = "unbounded"
+_ZERO = (0, 0)
 
 
-def _duration_seconds(value: Any) -> int | None:
+def _duration_parts(value: Any) -> tuple[int, int] | None:
     if not isinstance(value, str):
         return None
     m = _DURATION.match(value)
     if not m:
         return None
-    return sum(int(g) * s for g, s in zip(m.groups(), _DURATION_SECONDS, strict=True) if g)
+    y, mo, w, d, h, mi, sec = (int(g) if g else 0 for g in m.groups())
+    return 12 * y + mo, (((7 * w + d) * 24 + h) * 60 + mi) * 60 + sec
 
 
-def _compare_durations(path: str, a: Any, b: Any, *, absent: float, what: str) -> list[Change]:
-    """A longer duration is looser. ``absent`` is the length an absent (or
-    null) value stands for: infinity for an unbounded limit, 0 for no grace."""
+def _sign(n: int) -> int:
+    return (n > 0) - (n < 0)
+
+
+def _order(da: Any, db: Any) -> int | None:
+    """-1 if ``db`` is shorter, 0 if equal, 1 if longer, None if the two
+    cannot be ordered (one longer in months, the other in seconds)."""
+    if da == _UNBOUNDED or db == _UNBOUNDED:
+        return 0 if da == db else (1 if db == _UNBOUNDED else -1)
+    dm, ds = _sign(db[0] - da[0]), _sign(db[1] - da[1])
+    if dm == 0 or ds == 0 or dm == ds:
+        return dm or ds
+    return None
+
+
+def _compare_durations(path: str, a: Any, b: Any, *, absent: Any, what: str) -> list[Change]:
+    """A longer duration is looser. ``absent`` is what an absent (or null)
+    value stands for: ``_UNBOUNDED`` for a limit, ``_ZERO`` for a grace."""
     if a == b:
         return []
-    da = absent if a is _MISSING or a is None else _duration_seconds(a)
-    db = absent if b is _MISSING or b is None else _duration_seconds(b)
+    da = absent if a is _MISSING or a is None else _duration_parts(a)
+    db = absent if b is _MISSING or b is None else _duration_parts(b)
     if da is None or db is None:
         return [Change(path, "changed", f"{what}: not an ISO-8601 duration; direction cannot be determined")]
-    if da == db:
+    order = _order(da, db)
+    if order is None:
+        return [Change(path, "changed", f"{what}: months and days are not exactly comparable")]
+    if order == 0:
         return [Change(path, "editorial", f"{what}: same length, spelled differently")]
-    if db < da:
+    if order < 0:
         return [Change(path, "tightened", f"{what}: shortened")]
     return [Change(path, "loosened", f"{what}: lengthened")]
 
@@ -267,9 +298,15 @@ def _compare_window(path: str, a: Any, b: Any) -> list[Change]:
         return [Change(path, "tightened", "window added: evidence must now fall inside it")]
     if b is _MISSING:
         return [Change(path, "loosened", "window removed")]
-    out = _compare_durations(f"{path}/duration", a.get("duration", _MISSING), b.get("duration", _MISSING), absent=float("inf"), what="window duration")
+    if not isinstance(a, dict) or not isinstance(b, dict):
+        return [Change(path, "changed", "value changed; no rule says this is safe")]
+    out = _compare_durations(f"{path}/duration", a.get("duration", _MISSING), b.get("duration", _MISSING),
+                             absent=_UNBOUNDED, what="window duration")
     for key in ("cure", "grace"):
-        out += _compare_durations(f"{path}/{key}", a.get(key, _MISSING), b.get(key, _MISSING), absent=0, what=f"window {key}")
+        out += _compare_durations(f"{path}/{key}", a.get(key, _MISSING), b.get(key, _MISSING),
+                                  absent=_ZERO, what=f"window {key}")
+    for key in sorted((set(a) | set(b)) - {"duration", "cure", "grace"}):
+        out += _compare(f"{path}/{key}", key, a.get(key, _MISSING), b.get(key, _MISSING), {})
     return out
 
 
@@ -306,30 +343,57 @@ def _editorial(path: str, a: Any, b: Any) -> list[Change]:
     return [] if a == b else [Change(path, "editorial", "not read when sufficiency is decided")]
 
 
-_RULES: dict[str, Any] = {
-    "accepted_epistemic_types": lambda p, a, b: _compare_sets(p, a, b, more_is_tighter=False, what="accepted epistemic types"),
-    "required_sources": lambda p, a, b: _compare_sets(p, a, b, more_is_tighter=True, what="required sources"),
-    "approvals": lambda p, a, b: _compare_sets(p, a, b, more_is_tighter=True, what="approvals"),
-    "minimum_assurance": _compare_grades,
-    "required_assurance_grade": _compare_grades,
-    "freshness": lambda p, a, b: _compare_durations(p, a, b, absent=float("inf"), what="freshness"),
-    "window": _compare_window,
-    "tier": _compare_tier,
-    "required_sequence": _compare_sequence,
-    "escalation_path": _editorial,
-    "source_url": _editorial,
+_EVIDENCE_REQUIREMENTS_RULES: dict[str, Any] = {
+    "evidence_requirements/accepted_epistemic_types":
+        lambda p, a, b: _compare_sets(p, a, b, more_is_tighter=False, what="accepted epistemic types"),
+    "evidence_requirements/required_sources":
+        lambda p, a, b: _compare_sets(p, a, b, more_is_tighter=True, what="required sources"),
+    "evidence_requirements/minimum_assurance": _compare_grades,
+    "evidence_requirements/freshness":
+        lambda p, a, b: _compare_durations(p, a, b, absent=_UNBOUNDED, what="freshness"),
+}
+
+# Field rules by requirement shape, keyed by the path relative to the
+# requirement: a rule applies only where the schema defines that field.
+_SHAPE_RULES: dict[str, dict[str, Any]] = {
+    "native": {
+        "window": _compare_window,
+        "tier": _compare_tier,
+        "required_assurance_grade": _compare_grades,
+        "clause/source_url": _editorial,
+    },
+    "outcome": {**_EVIDENCE_REQUIREMENTS_RULES, "authority/escalation_path": _editorial},
+    "obligation": dict(_EVIDENCE_REQUIREMENTS_RULES),
+    "process": {
+        **_EVIDENCE_REQUIREMENTS_RULES,
+        "required_sequence": _compare_sequence,
+        "approvals": lambda p, a, b: _compare_sets(p, a, b, more_is_tighter=True, what="approvals"),
+        "escalation_path": _editorial,
+    },
+    "human_role": dict(_EVIDENCE_REQUIREMENTS_RULES),
 }
 
 
-def _compare(path: str, key: str, a: Any, b: Any) -> list[Change]:
-    if key in _RULES:
-        return _RULES[key](path, a, b)
+def _shape(req: dict[str, Any]) -> str | None:
+    """``native`` for the pack-declared shape (outcome or obligation with an
+    ``evidence_rule``), otherwise the profile."""
+    profile = req.get("profile")
+    if "evidence_rule" in req and profile in (None, "outcome", "obligation"):
+        return "native"
+    return profile
+
+
+def _compare(path: str, rel: str, a: Any, b: Any, rules: dict[str, Any]) -> list[Change]:
+    """``rel`` is ``path`` relative to the requirement (or the root), the key
+    ``rules`` is looked up by."""
+    if rel in rules:
+        return rules[rel](path, a, b)
     if a == b:
         return []
     if isinstance(a, dict) and isinstance(b, dict):
         out: list[Change] = []
         for k in sorted(set(a) | set(b)):
-            out += _compare(f"{path}/{k}", k, a.get(k, _MISSING), b.get(k, _MISSING))
+            out += _compare(f"{path}/{k}", f"{rel}/{k}", a.get(k, _MISSING), b.get(k, _MISSING), rules)
         return out
     if a is _MISSING:
         return [Change(path, "changed", "field added; no rule says this is safe")]
@@ -341,16 +405,19 @@ def _compare(path: str, key: str, a: Any, b: Any) -> list[Change]:
 def _deterministic(req: dict[str, Any]) -> bool:
     """Positively evaluated without a judge: the only case where rewording
     the statement cannot move a result."""
-    adjudication = req.get("adjudication")
-    if isinstance(adjudication, dict):
-        return adjudication.get("mode") == "deterministic"
-    if "evidence_rule" in req:
+    shape = _shape(req)
+    if shape == "outcome":
+        adjudication = req.get("adjudication")
+        return isinstance(adjudication, dict) and adjudication.get("mode") == "deterministic"
+    if shape == "native":
         return req.get("backward_verdict") == "DETERMINISTIC" and req.get("mode") != "judged"
     return False
 
 
 def _compare_requirement(rid: str, a: dict[str, Any], b: dict[str, Any]) -> list[Change]:
     base = f"requirements[{rid}]"
+    shape = _shape(a)
+    rules = _SHAPE_RULES.get(shape, {}) if shape is not None and shape == _shape(b) else {}
     out: list[Change] = []
     for key in sorted((set(a) | set(b)) - {"id"}):
         va, vb = a.get(key, _MISSING), b.get(key, _MISSING)
@@ -364,7 +431,7 @@ def _compare_requirement(rid: str, a: dict[str, Any], b: dict[str, Any]) -> list
         if key == "profile" and va != vb:
             out.append(Change(path, "changed", "profile changed: a different kind of requirement"))
             continue
-        out += _compare(path, key, va, vb)
+        out += _compare(path, key, va, vb, rules)
     return out
 
 
@@ -396,7 +463,7 @@ def diff_contracts(a: dict[str, Any], b: dict[str, Any]) -> ContractDiff:
         changes.append(Change("version", "version_changed", f"version {a['version']} -> {b['version']}"))
 
     for key in sorted((set(a) | set(b)) - {"id", "version", "requirements"}):
-        changes += _compare(key, key, a.get(key, _MISSING), b.get(key, _MISSING))
+        changes += _compare(key, key, a.get(key, _MISSING), b.get(key, _MISSING), {})
 
     removed = [rid for rid in reqs_a if rid not in reqs_b]
     added = [rid for rid in reqs_b if rid not in reqs_a]
@@ -407,7 +474,7 @@ def diff_contracts(a: dict[str, Any], b: dict[str, Any]) -> ContractDiff:
             added.remove(match)
             changes.append(Change(f"requirements[{old}]", "requirement_reid", f"re-identified as {match}; claims citing {old} no longer resolve"))
     for rid in removed:
-        changes.append(Change(f"requirements[{rid}]", "requirement_removed", "no longer required; assurance this contract gives is lower"))
+        changes.append(Change(f"requirements[{rid}]", "requirement_removed", "no longer required: claims against A that cite it do not resolve in B"))
     for rid in added:
         changes.append(Change(f"requirements[{rid}]", "requirement_added", "new requirement: evidence that satisfied A says nothing about it"))
 
