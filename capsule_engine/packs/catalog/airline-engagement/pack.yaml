@@ -22,7 +22,7 @@
 # oracle that proves each `evidence_instrument` genuinely never resolves on
 # whatever corpus this pack is run against -- a violation raises rather than
 # silently rendering an inapplicable row.
-pack_id: asg/airline-engagement/1.0.0
+pack_id: asg/airline-engagement/1.0.1
 
 obligations:
   - id: no-duplicate-judge-review
@@ -48,7 +48,7 @@ outcomes:
   - id: A1
     statement: "Choice, not ultimatum: the agent presented the customer more than one viable path to resolution, never a single take-it-or-leave-it."
     evidence_rule: >-
-      n/a on this corpus today -- [ldg-bj-91-a1-to-llm-judge] removed the
+      n/a on this corpus today -- a later change removed the
       deterministic keyword stand-in this row used to render
       (_OPTION_LANGUAGE_RE/measure_a1_option_shaped_language, a
       option-shaped-phrasing regex reported as if it were a judgment);
@@ -92,7 +92,7 @@ outcomes:
   - id: A3b
     statement: "No pressure: the agent did not push, rush, or coerce the customer toward a decision."
     evidence_rule: >-
-      n/a on this corpus today -- [remove-keyword-scorers] removed the
+      n/a on this corpus today -- a later change removed the
       deterministic keyword stand-in this row used to render (a
       pressure-language regex reported as if it were a judgment); "no
       pressure" is a prose-quality claim that needs a live judge reading
