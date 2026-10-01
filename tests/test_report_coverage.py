@@ -464,12 +464,12 @@ def test_upper_case_catalog_type_is_refused():
         build_coverage_report(_contract(), [], source_of=_source_of, source_catalog={"review-events": "OBSERVED_EVENT"})
 
 
-def test_lowercase_catalog_type_is_accepted_and_carried_uppercase():
+def test_catalog_type_is_carried_as_given_in_lower_case():
     report = build_coverage_report(
         _contract(), _full_records(), source_of=_source_of, source_catalog={"review-events": "observed_event"}
     )
     src = next(s for s in _req(report, "req-human-role-3").sources if s.source == "review-events")
-    assert src.epistemic_type == "OBSERVED_EVENT"
+    assert src.epistemic_type == "observed_event"
 
 
 @pytest.mark.parametrize(
@@ -619,8 +619,8 @@ CATALOG = {"review-events": "observed_event", "override-events": "human_report"}
 def test_source_catalog_types_the_named_sources_only():
     report = build_coverage_report(_contract(), _full_records(), source_of=_source_of, source_catalog=CATALOG)
     rows = {s.source: s.to_dict() for s in _req(report, "req-human-role-3").sources}
-    assert rows["review-events"]["epistemic_type"] == "OBSERVED_EVENT"
-    assert rows["override-events"]["epistemic_type"] == "HUMAN_REPORT"
+    assert rows["review-events"]["epistemic_type"] == "observed_event"
+    assert rows["override-events"]["epistemic_type"] == "human_report"
     assert "epistemic_type" not in rows["exception-events"]
 
 
@@ -629,7 +629,7 @@ def test_missing_source_keeps_its_declared_type():
     report = build_coverage_report(_contract(), records, source_of=_source_of, source_catalog=CATALOG)
     src = next(s for s in _req(report, "req-human-role-3").sources if s.source == "override-events")
     assert src.status == "NOT_FOUND"
-    assert src.epistemic_type == "HUMAN_REPORT"
+    assert src.epistemic_type == "human_report"
 
 
 def test_type_never_changes_status():
@@ -657,8 +657,7 @@ def test_vendored_epistemic_type_enum_matches_engine_values():
     from capsule_engine.packs.schema import EPISTEMIC_TYPE_VALUES
     from capsule_engine.report.result import load_schema
 
-    # TODO(epistemic-lowercase): exact equality once the Result schema is lower-cased.
-    assert {v.lower() for v in load_schema()["$defs"]["EpistemicType"]["enum"]} == EPISTEMIC_TYPE_VALUES
+    assert set(load_schema()["$defs"]["EpistemicType"]["enum"]) == EPISTEMIC_TYPE_VALUES
 
 
 # --- name tokens: empty is absent, normalized, linked one token at a time --

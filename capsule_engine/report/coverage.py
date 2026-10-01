@@ -113,12 +113,6 @@ from ..packs.schema import EPISTEMIC_TYPE_VALUES
 from .errors import INVALID_COVERAGE_REPORT, ResultError
 from .result import Claim, DigestRef
 
-# TODO(epistemic-lowercase): the Result schema's coverage section (vendored
-# from agent-action-capsule) still spells epistemic types in upper case. Emit
-# EPISTEMIC_TYPE_VALUES (lower case) instead once that schema is lower-cased
-# and re-vendored here.
-_RESULT_EPISTEMIC_TYPES = frozenset(v.upper() for v in EPISTEMIC_TYPE_VALUES)
-
 __all__ = [
     "COVERAGE_REPORT_VERSION",
     "CONNECTOR_VALUES",
@@ -205,10 +199,10 @@ class SourceCoverage:
     epistemic_type: str | None = None  # declared by the caller's source catalog, never inferred
 
     def __post_init__(self) -> None:
-        if self.epistemic_type is not None and self.epistemic_type not in _RESULT_EPISTEMIC_TYPES:
+        if self.epistemic_type is not None and self.epistemic_type not in EPISTEMIC_TYPE_VALUES:
             raise ResultError(
                 INVALID_COVERAGE_REPORT,
-                f"source {self.source!r} epistemic_type must be one of {sorted(_RESULT_EPISTEMIC_TYPES)}, got {self.epistemic_type!r}",
+                f"source {self.source!r} epistemic_type must be one of {sorted(EPISTEMIC_TYPE_VALUES)}, got {self.epistemic_type!r}",
             )
 
     def to_dict(self) -> dict:
@@ -673,9 +667,6 @@ def build_coverage_report(
                 INVALID_COVERAGE_REPORT,
                 f"source catalog types {source!r} as {epistemic_type!r}, not one of {sorted(EPISTEMIC_TYPE_VALUES)}",
             )
-    # TODO(epistemic-lowercase): emit as given (lower case) once the Result
-    # schema is lower-cased and re-vendored; see _RESULT_EPISTEMIC_TYPES.
-    source_catalog = {k: v.upper() for k, v in source_catalog.items()}
     requirements = tuple(
         _requirement_coverage(
             req,
