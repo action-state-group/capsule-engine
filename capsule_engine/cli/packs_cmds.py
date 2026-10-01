@@ -6,7 +6,7 @@
              INSTRUMENT per outcome, from the pack's own tier/mode/
              evidence_instrument fields, over a JSONL corpus. Ported from
              capsule-ledger's ``capsule setup propose --pack`` (moved here
-             per Amendment H.4 -- the packs runtime's post-move home) --
+             -- the packs runtime's home) --
              this mode never touches ``.capsule-setup/`` and persists
              nothing, so it carries no dependency on the setup/Candidate
              machinery that stayed in capsule-compiler.

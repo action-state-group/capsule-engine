@@ -45,7 +45,7 @@ from .taxonomy import (
 
 __all__ = [
     # de-fork: the neutral account/fold core, re-imported through the folds
-    # public interface (Amendment E) — not re-implemented in the ledger.
+    # public interface — not re-implemented in the ledger.
     "AccountDefinition",
     "build_account",
     "verify_account",

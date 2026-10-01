@@ -6,7 +6,7 @@ MMRIVER-compatible, position-committed hashing scheme the ledger's own
 whole-ledger completeness certificate uses (``capsule_emit.checkpoint``'s
 ``MmrLedger``), just scoped to one session's turn ids instead of the whole
 ledger's append order. capsule-ledger consumes this MMR/CLL core from the
-neutral producer library rather than forking it (Amendment E, 2026-08-21). A
+neutral producer library rather than forking it. A
 session's turns are not generally contiguous in the shared ledger (other
 sessions/agents interleave), so this builds a fresh, throwaway MMR from the
 explicit ordered id list the session-close capsule itself carries, rather
