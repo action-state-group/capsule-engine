@@ -42,6 +42,10 @@ pip install -e .
 - `mcp/`, `telemetry/`, `holds/` — MCP server surface, telemetry, and
   reservation-as-capsule engine-side plumbing.
 
+For the parts you can use on their own (the Evidence Contract schema and
+validator, the obligation register format and its sample compiler, and the
+examples), see [docs/WHATS-IN-THIS-REPO.md](docs/WHATS-IN-THIS-REPO.md).
+
 ## License
 
 Apache-2.0. See `LICENSE`.
