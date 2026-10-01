@@ -51,7 +51,9 @@ name gets no rule, so any change to it is breaking.
 * ``minimum_assurance``, ``required_assurance_grade`` -- compared on the
   assurance ladder self-attested < witnessed < countersigned (the Evidence
   Result's ``Grade`` values); a higher floor is ``tightened``. An unknown
-  grade is ``changed``. Absent means no floor.
+  grade is ``changed``. Absent means no floor. A list whose members change
+  but whose floor does not is ``changed`` (breaking): what a list of several
+  grades means is not yet defined by the schema.
 * ``freshness``, ``window.duration``, ``window.cure``, ``window.grace`` --
   ISO-8601 durations; shorter is ``tightened``, longer is ``loosened``. An
   absent ``freshness`` or ``window`` is unbounded; an absent or null cure or
@@ -229,7 +231,7 @@ def _compare_grades(path: str, a: Any, b: Any) -> list[Change]:
     if fa is None or fb is None:
         return [Change(path, "changed", "assurance grade not on the ladder; direction cannot be determined")]
     if fa == fb:
-        return [Change(path, "editorial", "same assurance floor, spelled differently")]
+        return [Change(path, "changed", "grades listed changed at the same floor; multi-grade lists are not yet defined")]
     if fb > fa:
         return [Change(path, "tightened", "assurance floor raised")]
     return [Change(path, "loosened", "assurance floor lowered")]

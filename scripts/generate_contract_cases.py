@@ -459,9 +459,9 @@ diff("assurance-raised", "a higher assurance floor tightens the requirement",
 diff("assurance-lowered", "a lower assurance floor loosens the requirement",
      BASE, v2(on_er("req-a", lambda e: e.update(minimum_assurance=["self-attested"]))), False,
      VC, ch(f"{ERA}/minimum_assurance", "loosened"))
-diff("assurance-same-floor", "listing a higher grade beside the same floor does not move the floor",
-     BASE, v2(on_er("req-a", lambda e: e.update(minimum_assurance=["witnessed", "countersigned"]))), False,
-     VC, ch(f"{ERA}/minimum_assurance", "editorial"))
+diff("assurance-same-floor", "a multi-grade list is undefined, so changing its members at the same floor is breaking",
+     BASE, v2(on_er("req-a", lambda e: e.update(minimum_assurance=["witnessed", "countersigned"]))), True,
+     VC, ch(f"{ERA}/minimum_assurance", "changed"))
 diff("assurance-unknown-grade", "a grade off the ladder has no direction: breaking",
      BASE, v2(on_er("req-a", lambda e: e.update(minimum_assurance=["notarised"]))), True,
      VC, ch(f"{ERA}/minimum_assurance", "changed"))
