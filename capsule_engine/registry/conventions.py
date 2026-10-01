@@ -4,8 +4,7 @@ where a capsule's ``asg_payload.action_class`` matches a registered
 convention, every display surface shows its human label/description from
 this module instead of a hardcoded string.
 
-**Registry-of-record note (moved here from capsule-ledger,
-[ldg-ledger-scope-re-extraction] RESIDUALS pass, §3.1(a)):** this module and
+**Registry-of-record note (moved here from capsule-ledger):** this module and
 its two vendored snapshots (``conventions.json``, ``cpb_registry.json``) are
 an INTERIM company-side vendor copy, not the canonical registry. The real
 registry-of-record for the CPB tables (``cpb_registry.json``) is

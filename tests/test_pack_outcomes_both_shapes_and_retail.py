@@ -11,8 +11,8 @@ Three committed, synthetic, neutrally-named fixture packs under
   all, read-only advisory (design §1: "agent authority | cannot act").
 - ``retail_synthetic_shaped`` -- hand-built, retail-domain-shaped (refund /
   exchange tool families), NOT a generated tau2-bench shift; see the
-  fixture's own header comment and the ``[ldg-cs-p1-schema]`` outbox report
-  for why (Track C has not produced a real corpus yet).
+  fixture's own header comment for why (no real generated corpus existed
+  yet).
 
 A single-shape fixture set would not discharge this acceptance line --
 the undecomposed-trust claim (``agent.caused_resolution``) must be shown

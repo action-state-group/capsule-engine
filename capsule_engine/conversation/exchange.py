@@ -10,7 +10,7 @@ turns, model provenance (``model_id``/``provider``, plus ``quant``/
 registry entry #70, ``scitt-payload-binding``'s
 ``spec/cpb-provisional-registry.md``).
 
-[tau2-engagement-conversation-detail-capsules]: ONE capsule shape spans
+Conversation-detail capsules: ONE capsule shape spans
 mesh inference, tau2, and (once wired) the real Alchemy/Amplifier Security
 engagements. The labeled sub-digests are what make tier-2 fold-scoped
 disclosure possible: a holder can later disclose just the tool-call bytes

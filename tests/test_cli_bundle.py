@@ -79,7 +79,7 @@ def test_bundle_flags_a_tampered_record_in_the_slice(tmp_path, capsys):
     assert "capsule_id_mismatch" in codes
 
 
-# [ldg-demo-artifact-path-leak] `cli_echo` is rendered on the public bundle
+# `cli_echo` is rendered on the public bundle
 # permalink and the offline viewer -- verbatim, on a page a stranger opens.
 # It leaked the operator's home directory (`/Users/intangible/...`) via a raw
 # `--out` echo. This is the actual string that leaked (`_work/capsule-ledger/

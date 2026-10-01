@@ -1,6 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""``[ldg-bp-topology-profiles]``: relationship-topology profiles over a
-pack's own outcomes (standard-outcome-pack design §6b/§7). A profile is a
+"""Relationship-topology profiles over a pack's own outcomes. A profile is a
 thin, additive declaration -- ``profile_id`` + a counterparty binding + a
 handful of per-outcome ``{applies, tier}`` overrides -- never a forked pack.
 Two properties matter most and get their own tests: (1) the agent-integrity
@@ -180,7 +179,7 @@ def test_an_invalid_tier_in_an_override_is_rejected(tmp_path):
     assert exc.value.reason == "invalid_tier"
 
 
-# --- the topology-invariant enforcement (RED/GREEN, QUEUE_PROTOCOL §7) ----
+# --- the topology-invariant enforcement (RED/GREEN) ----------------------
 
 
 @pytest.mark.parametrize("mode", ["structural", "value", "fold_rollup"])
@@ -312,7 +311,7 @@ def test_a_populated_profiles_block_renders_in_the_digest_and_is_sorted(tmp_path
 
 
 # --- the acceptance scenario, run over the REAL standard-vendor pack ------
-# (inbox [ldg-bp-topology-profiles]: "the same standard pack under P2 vs P3
+# ("the same standard pack under P2 vs P3
 # selects different applicability/tier and different C-family counterparty,
 # with the integrity core identical")
 

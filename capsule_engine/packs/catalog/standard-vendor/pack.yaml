@@ -1,7 +1,5 @@
 # standard-vendor pack: the STANDARD outcome catalog over the GENERAL
-# capsule vocabulary ([ldg-bp-standard-vendor-pack], design:
-# action-state-ops/_work/backward-judge-buildout/standard-outcome-pack-
-# design.md). The airline-engagement pack (A1-A7) is a domain-specific
+# capsule vocabulary. The airline-engagement pack (A1-A7) is a domain-specific
 # DEMO; this pack is deliberately NOT airline voice -- every statement is
 # phrased against capsule shapes any emit layer already produces (a stated
 # constraint the counterparty emitted, a read chained to a write, a
@@ -228,7 +226,7 @@ outcomes:
   # --- E. Counterparty-change -- fold_counterparty (design §4 E / §5) ----
   # Each row is a fold over a per-session signal this pack does not yet
   # declare on its own (design §5's two-layer composition;
-  # [ldg-bp-counterparty-change-family] wires the signal + fold pair) --
+  # a separate change wires the signal + fold pair) --
   # min-N gated, correlation-not-cause framed, never re-judging.
   - id: C1
     statement: "Capability growth: the counterparty grew more knowledgeable or self-sufficient across their sessions with this agent."
