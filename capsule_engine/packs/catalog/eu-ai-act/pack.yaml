@@ -4,7 +4,7 @@
 # EvidenceCompiler-compiled candidate from `register.yaml`, transcribed
 # verbatim -- `tests/test_pack_eu_ai_act_trace.py`
 # recompiles the register and asserts the two never drift apart.
-pack_id: asg/eu-ai-act-obligations/0.1.0
+pack_id: asg/eu-ai-act-obligations/0.1.1
 
 outcomes:
   - id: EU-53

@@ -60,7 +60,11 @@ def _trusted_jwk() -> dict:
 
 def test_pack_loads():
     pack = load_pack_dir(PACK_DIR)
-    assert pack.pack_id == "asg/eu-ai-act-obligations/0.1.0"
+    assert pack.pack_id == "asg/eu-ai-act-obligations/0.1.1"
+    # Re-pinned at asg/eu-ai-act-obligations/0.1.1: the four epistemic_type
+    # values were lower-cased (no other field or structure change). 0.1.0
+    # pinned to 4871978b789e3cc01776369fb9671c5008ebdc9cacf36dab21d70d518bc00265.
+    assert pack.definition_digest() == "9d3197935b6b002ccd4682c7cfa2bacf01d9dbc2b3b04811e94dd50e6a2b9cfa"
     assert {o.id for o in pack.outcomes} == {"EU-53", "EU-14-3", "EU-75", "EU-04", "EU-50-1"}
 
 
