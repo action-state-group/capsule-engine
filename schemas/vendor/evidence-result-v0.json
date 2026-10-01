@@ -279,6 +279,152 @@
         "buckets": { "$ref": "#/$defs/Buckets" }
       }
     },
+    "CoverageStatus": {
+      "description": "PROPOSED (spec section 7.1). The per-requirement coverage status: the subset of EvidenceStatus a coverage computation over ledger records can produce. Coverage says whether evidence is there to evaluate; it is never a verdict.",
+      "enum": ["SATISFIED", "INSUFFICIENT", "NOT_FOUND", "UNKNOWN"]
+    },
+    "Connector": {
+      "description": "PROPOSED (spec section 7.1). The hook class that would capture a missing source.",
+      "enum": ["otel", "mcp_proxy", "gateway", "git_ci", "system_of_record", "native_emission", "human_approval"]
+    },
+    "AssuranceMode": {
+      "description": "PROPOSED (spec section 7.1). The assurance mode a connector raises a source to.",
+      "enum": ["retrospectively_evidenced", "observed", "committed"]
+    },
+    "EpistemicType": {
+      "description": "PROPOSED (spec section 7.1). The closed epistemic-type set of the EvidenceBook record header, in the Evidence Contract's uppercase spelling (accepted_epistemic_types). The checker pins parity with schemas/vendor/epistemic-types.json.",
+      "enum": ["OBSERVED_EVENT", "SYSTEM_OF_RECORD_FACT", "PRODUCER_CLAIM", "HUMAN_REPORT", "SEMANTIC_JUDGMENT", "DERIVED_METRIC", "ADJUDICATION", "OBLIGATION_REFERENCE"]
+    },
+    "Remedy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["connector", "raises_to"],
+      "properties": {
+        "connector": { "$ref": "#/$defs/Connector" },
+        "raises_to": { "$ref": "#/$defs/AssuranceMode" }
+      }
+    },
+    "SourceCoverage": {
+      "description": "PROPOSED (spec section 7.1). What evidence exists for one required source: counts after duplicate collapse, distinct producers, and the record digests. NOT_FOUND exactly when record_count is 0. epistemic_type is OPTIONAL: present only when the producer's source catalog declares the source's type.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "status", "record_count", "contemporaneous_count", "backfilled_count", "duplicates_collapsed", "producer_count", "evidence"],
+      "properties": {
+        "source": { "type": "string", "minLength": 1 },
+        "epistemic_type": { "$ref": "#/$defs/EpistemicType" },
+        "status": { "enum": ["SATISFIED", "INSUFFICIENT", "NOT_FOUND"] },
+        "record_count": { "type": "integer", "minimum": 0 },
+        "contemporaneous_count": { "type": "integer", "minimum": 0 },
+        "backfilled_count": { "type": "integer", "minimum": 0 },
+        "duplicates_collapsed": { "type": "integer", "minimum": 0 },
+        "producer_count": { "type": "integer", "minimum": 0 },
+        "evidence": { "type": "array", "items": { "$ref": "#/$defs/DigestRef" } }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "status": { "const": "NOT_FOUND" } } },
+          "then": { "properties": { "record_count": { "const": 0 }, "evidence": { "maxItems": 0 } } },
+          "else": { "properties": { "record_count": { "minimum": 1 }, "evidence": { "minItems": 1 } } }
+        }
+      ]
+    },
+    "Independence": {
+      "description": "PROPOSED (spec section 7.1). Producers, not records, are counted: records from one producer are correlation, never corroboration. A record naming no producer counts toward none (unattributed_records). producer_basis says what identifies a producer: key (signer key id), asserted (self-asserted operator/developer, not authenticated), or none (no producer counted).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required_producers", "independent_producers", "correlated_records", "unattributed_records", "producer_basis", "met"],
+      "properties": {
+        "required_producers": { "type": "integer", "minimum": 1 },
+        "independent_producers": { "type": "integer", "minimum": 0 },
+        "correlated_records": { "type": "integer", "minimum": 0 },
+        "unattributed_records": { "type": "integer", "minimum": 0 },
+        "producer_basis": { "enum": ["key", "asserted", "none"] },
+        "met": { "type": "boolean" }
+      }
+    },
+    "CoverageGap": {
+      "description": "PROPOSED (spec section 7.1). What is missing, and the source and connector that would close it. remedy is null when no connector is named; that gap is counted in summary.gaps_without_remedy, never dropped.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "detail", "remedy"],
+      "properties": {
+        "kind": { "enum": ["missing_source", "assurance_below_minimum", "correlated_only", "unattributed_only", "no_sources_declared"] },
+        "source": { "type": "string", "minLength": 1 },
+        "detail": { "type": "string", "minLength": 1 },
+        "remedy": { "oneOf": [{ "$ref": "#/$defs/Remedy" }, { "type": "null" }] }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "kind": { "enum": ["missing_source", "assurance_below_minimum"] } } },
+          "then": { "required": ["source"] }
+        }
+      ]
+    },
+    "RequirementCoverage": {
+      "description": "PROPOSED (spec section 7.1). One requirement's coverage. sufficiency is derived from status by a fixed mapping (SATISFIED->SATISFIED, NOT_FOUND->GAP, INSUFFICIENT->INSUFFICIENT, UNKNOWN->UNKNOWN). A SATISFIED row has no gaps and met independence.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requirement_ref", "obligation_refs", "status", "sufficiency", "claim_ids", "sources", "independence", "gaps"],
+      "properties": {
+        "requirement_ref": { "type": "string", "minLength": 1 },
+        "obligation_refs": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "status": { "$ref": "#/$defs/CoverageStatus" },
+        "sufficiency": { "$ref": "#/$defs/Sufficiency" },
+        "claim_ids": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "sources": { "type": "array", "items": { "$ref": "#/$defs/SourceCoverage" } },
+        "independence": { "$ref": "#/$defs/Independence" },
+        "gaps": { "type": "array", "items": { "$ref": "#/$defs/CoverageGap" } }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "status": { "const": "SATISFIED" } } },
+          "then": {
+            "properties": {
+              "sufficiency": { "const": "SATISFIED" },
+              "gaps": { "maxItems": 0 },
+              "independence": { "properties": { "met": { "const": true } } }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "status": { "const": "NOT_FOUND" } } },
+          "then": { "properties": { "sufficiency": { "const": "GAP" }, "gaps": { "minItems": 1 } } }
+        },
+        {
+          "if": { "properties": { "status": { "const": "INSUFFICIENT" } } },
+          "then": { "properties": { "sufficiency": { "const": "INSUFFICIENT" }, "gaps": { "minItems": 1 } } }
+        },
+        {
+          "if": { "properties": { "status": { "const": "UNKNOWN" } } },
+          "then": { "properties": { "sufficiency": { "const": "UNKNOWN" } } }
+        }
+      ]
+    },
+    "CoverageSummary": {
+      "description": "PROPOSED (spec section 7.1). Counts recomputed from the requirement rows; a summary that does not recompute is rejected by the cross-element check, not by this schema.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requirements", "satisfied", "with_gaps", "gaps", "gaps_without_remedy"],
+      "properties": {
+        "requirements": { "type": "integer", "minimum": 0 },
+        "satisfied": { "type": "integer", "minimum": 0 },
+        "with_gaps": { "type": "integer", "minimum": 0 },
+        "gaps": { "type": "integer", "minimum": 0 },
+        "gaps_without_remedy": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "CoverageReport": {
+      "description": "PROPOSED (spec section 7.1). Coverage per requirement of one contract version: what evidence exists, what is missing, and which source would close it. Optional; aggregate.coverage stays mandatory and renders first.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["spec_version", "contract_ref", "requirements", "summary"],
+      "properties": {
+        "spec_version": { "const": "coverage-report/v0" },
+        "contract_ref": { "$ref": "#/$defs/ContractRef" },
+        "requirements": { "type": "array", "items": { "$ref": "#/$defs/RequirementCoverage" } },
+        "summary": { "$ref": "#/$defs/CoverageSummary" }
+      }
+    },
     "View": {
       "description": "spec section 8 -- presentation hints only, never data. presentation/v1 header fields: producer name, logo data URL, title.",
       "type": "object",
@@ -304,7 +450,8 @@
           "items": { "$ref": "#/$defs/Claim" }
         },
         "aggregate": { "$ref": "#/$defs/Aggregate" },
-        "view": { "$ref": "#/$defs/View" }
+        "view": { "$ref": "#/$defs/View" },
+        "coverage_report": { "$ref": "#/$defs/CoverageReport" }
       }
     }
   }

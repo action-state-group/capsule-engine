@@ -8,10 +8,12 @@ here, never re-derived by hand.
 
 - **Owner:** agent-action-capsule, `schemas/evidence-result-v0.json` (spec:
   `spec/evidence-result-v0.md`)
-- **Copied from commit:** `24aaa2fae69ea0fbd4d0122d5a3ebe5971968beb`
+- **Copied from commit:** `d6911a1bfbe8f02239a0890540f45ea93ee3f4cf` (agent-action-capsule
+  branch `feat/result-coverage-report`: main at `24aaa2f` plus the PROPOSED `coverage_report`
+  section, spec section 7.1). Re-copy from agent-action-capsule's main once that branch merges.
 - **Copied on:** 2026-10-01
 - **Form:** byte-for-byte; the file carries no local additions. Check with
-  `git -C <agent-action-capsule checkout> cat-file blob 24aaa2fae69ea0fbd4d0122d5a3ebe5971968beb:schemas/evidence-result-v0.json | cmp - schemas/vendor/evidence-result-v0.json`.
+  `git -C <agent-action-capsule checkout> cat-file blob d6911a1bfbe8f02239a0890540f45ea93ee3f4cf:schemas/evidence-result-v0.json | cmp - schemas/vendor/evidence-result-v0.json`.
 - **Why it is vendored:** the agent-action-capsule release this repository pins
   does not ship the schema as an importable resource. Drop this copy and import
   the schema from agent-action-capsule once it does (see

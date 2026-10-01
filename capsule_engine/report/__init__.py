@@ -9,9 +9,11 @@ See ``capsule_ledger.report.build.build_dry_run_report`` for the entry point and
 package: the public Evidence Result v0 emitter (``report`` -> ``result``
 projection) -- see that module's
 docstring. It shares no code with the dry-run report above; both simply
-report on this engine's own decisions/folds.
+report on this engine's own decisions/folds. ``coverage.py`` builds the
+Result's optional per-requirement ``coverage_report`` section.
 """
 from .build import build_dry_run_report, build_dry_run_report_with_proposal
+from .coverage import CoverageReport, Remedy, build_coverage_report
 from .model import DryRunReport, GuardSection, ModelNote, ReportRow
 from .render import encode_fragment, render_report_html
 from .result import (
@@ -54,4 +56,7 @@ __all__ = [
     "build_result",
     "validate_against_schema",
     "verify_result",
+    "CoverageReport",
+    "Remedy",
+    "build_coverage_report",
 ]

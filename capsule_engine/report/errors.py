@@ -18,6 +18,7 @@ DISCLOSURE_NOT_LEGAL_FOR_STATUS = "disclosure_not_legal_for_status"
 DUPLICATE_CLAIM_ID = "duplicate_claim_id"
 BUCKET_CLAIM_MISMATCH = "bucket_claim_mismatch"
 SCHEMA_VALIDATION_FAILED = "schema_validation_failed"
+INVALID_COVERAGE_REPORT = "invalid_coverage_report"
 
 
 class ResultError(ValueError):
