@@ -1,14 +1,12 @@
 # SPDX-License-Identifier: Apache-2.0
-"""outcomes[] -- the sister table to obligations[] (compiler-and-setup
-design of record 2026-08-19; supersedes [ldg-outcome-declaration-schema]).
+"""outcomes[] -- the sister table to obligations[].
 
 Digest preservation for existing zero-outcome packs, required-field
 validation, and the mechanical enforcement that ``agent.caused_resolution``
 can only be declared as a refusal -- never silently accepted as a provable
 claim. Every negative case here is exercised twice: once as the failure
-(RED) and once as the corrected near-miss that loads clean (GREEN), per
-QUEUE_PROTOCOL §7 ("a refusal test that never rejected anything proves
-nothing").
+(RED) and once as the corrected near-miss that loads clean (GREEN): a
+refusal test that never rejected anything proves nothing.
 """
 from __future__ import annotations
 
@@ -298,7 +296,7 @@ def test_valid_re_derivability_grade_on_an_obligation_loads_clean(tmp_path):
     assert pack.obligations[0].re_derivability_grade == "ledger_state_dependent"
 
 
-# --- measurability / evidence_instrument ([pack-harden-tau2-oracle]) ------
+# --- measurability / evidence_instrument ---------------------------------
 #
 # Closes the adversarial-review finding (adv-tau2-demo.md Area 1/4) that a
 # term's "declared, not measured on this corpus" status was a hardcoded
@@ -444,10 +442,9 @@ def test_measured_outcome_may_still_declare_an_evidence_instrument(tmp_path):
 def test_the_real_airline_engagement_pack_loads_clean_with_expected_measurability_split():
     """The real, committed catalog pack this task templatizes -- not a
     synthetic fixture. 3 measured (A4, A6, A7), 5 declared_not_measured
-    (A1, A2, A3a, A3b, A5). ``[remove-keyword-scorers]`` moved A3b from
+    (A1, A2, A3a, A3b, A5). A later change moved A3b from
     measured (a keyword regex reported as a finding) to declared_not_measured
-    (honest pending-judge state); ``[ldg-bj-91-a1-to-llm-judge]`` (review
-    bounce B2) did the identical move for A1 -- it no longer matches
+    (honest pending-judge state), and another did the identical move for A1 -- it no longer matches
     ``record_grounding_bench.judge_run.airline_terms``'s split over the tau2
     airline corpus for either row."""
     pack_dir = Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog" / "airline-engagement"
@@ -462,7 +459,7 @@ def test_the_real_airline_engagement_pack_loads_clean_with_expected_measurabilit
         assert by_id[oid].evidence_instrument is not None
 
 
-# --- tier ([ldg-bj-tier-field], backward-judge design §8.2) ---------------
+# --- tier ------------------------------------------------------------------
 #
 # Whether an outcome gates a session's job-success (must_have) or is
 # reported without gating (informational, the default). Additive, closed-
@@ -495,7 +492,7 @@ def test_must_have_tier_loads_clean_and_renders_in_the_digest(tmp_path):
     assert pack.canonical_dict()["outcomes"][0]["tier"] == "must_have"
 
 
-# --- mode ([ldg-bp-mode-tag], standard-outcome-pack design §3) ------------
+# --- mode ------------------------------------------------------------------
 #
 # Which of the seven ways an outcome is judged (structural/value/judged/
 # fold_rollup/fold_counterparty/fold_agent/fold_cohort). Additive, closed-
@@ -627,7 +624,7 @@ def test_every_closed_set_epistemic_type_loads_clean_and_renders_in_the_digest(t
     assert pack.canonical_dict()["outcomes"][0]["epistemic_type"] == epistemic_type
 
 
-# --- obligation profile ([evidence-obligation-profile-scaffold]) ----------
+# --- obligation profile ----------------------------------------------------
 #
 # Of the six non-outcome profiles, obligation is the one fleshed out beyond
 # a typed stub: a clause anchor is what makes a register row an obligation
@@ -706,15 +703,21 @@ def test_a_real_eu_ai_act_clause_round_trips_through_the_obligation_profile(tmp_
 # --- HARD CONSTRAINT: the reframe must not move a single already-sealed
 # digest. Pinned against the real, committed catalog packs (not just a
 # synthetic fixture) -- computed against the pre-reframe code at base_sha
-# cfb64f1 (origin/main, [evidence-contract-reframe-capsule-engine]) and
+# cfb64f1 (origin/main) and
 # reproduced byte-for-byte after the rename + new fields landed.
 
 
 def test_the_real_airline_engagement_pack_digest_is_byte_identical_after_the_reframe():
     pack = load_pack_dir(AIRLINE_ENGAGEMENT_DIR)
-    assert pack.definition_digest() == "f2f2c5f0225cb3de76817f5244b0abac5ba622412f4d1b852b7074c8640b74d7"
+    # Re-pinned at asg/airline-engagement/1.0.1: A1's and A3b's evidence_rule
+    # text was reworded (no field or structure change). 1.0.0 pinned to
+    # f2f2c5f0225cb3de76817f5244b0abac5ba622412f4d1b852b7074c8640b74d7.
+    assert pack.definition_digest() == "ea74a099524b5f7a82047cc883e211a25ef230a29c34438e68bfac22c9169277"
 
 
 def test_the_real_standard_vendor_pack_digest_is_byte_identical_after_the_reframe():
     pack = load_pack_dir(STANDARD_VENDOR_DIR)
-    assert pack.definition_digest() == "4890a1bc31040af19726251f464391690bff5b32f82a6eed8a98f96a7748ffb6"
+    # Re-pinned at asg/standard-vendor/1.0.1: S1's evidence_rule text was
+    # reworded (no field or structure change). 1.0.0 pinned to
+    # 4890a1bc31040af19726251f464391690bff5b32f82a6eed8a98f96a7748ffb6.
+    assert pack.definition_digest() == "9ae420d59ebfb1f87ecd740c948be4d0df16cefac97d8640da24934302359ae2"

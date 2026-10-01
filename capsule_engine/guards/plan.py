@@ -14,9 +14,8 @@ definition.py``'s ``WicketDefinition`` are -- SHA-256 over the JCS-canonical
 bytes of ``canonical_dict()``, via the same ``agent_action_capsule.canonical.
 json_digest`` every other digest-pinned definition in this codebase uses.
 
-Hand-declared for the demo (``[ldg-plan-containment]`` C1) -- there is no
-outcome-declaration compiler yet (``[ldg-outcome-declaration-schema]``,
-Wave 2). This shape is kept schema-compatible on purpose: when a real
+Hand-declared for the demo -- there is no outcome-declaration compiler
+yet. This shape is kept schema-compatible on purpose: when a real
 compiler exists, it emits exactly this shape, and every caller of
 ``parse_plan_definition``/``PlanDefinition`` is a straight substitution, not
 a rewrite.

@@ -23,8 +23,7 @@ This package already vendors ``capsule_engine/registry/conventions.json``
   vendored CPB snapshot; this file carries the *display* labels for the same
   values so this package's own display surfaces render them consistently.
 
-**Interim vendor copy, not the registry-of-record** ([ldg-ledger-scope-re-extraction]
-RESIDUALS pass §3.1(a)): this is a company-side vendor copy of the neutral
+**Interim vendor copy, not the registry-of-record**: this is a company-side vendor copy of the neutral
 ``scitt-payload-binding`` registry, moved here from capsule-ledger. A future
 neutral ``capsule-registry`` repo would supersede it the same way this copy
 supersedes capsule-ledger's; never read this copy as the registry-of-record

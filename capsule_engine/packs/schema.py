@@ -121,8 +121,8 @@ KNOWN_SCOPE_DIMENSIONS = frozenset({"developer", "operator", "action_class", "ta
 
 # Whether an outcome's verdict is actually computed against this pack's
 # fixtures/corpus, or declared honest-but-unmeasured because the corpus this
-# pack ships against never emits the record the check would need (adversarial
-# review finding, [pack-harden-tau2-oracle]: previously this was a hardcoded
+# pack ships against never emits the record the check would need (an
+# adversarial-review finding: previously this was a hardcoded
 # per-term "always inapplicable" lambda a future coder could point at ANY
 # term -- including one with a real fail -- with nothing to catch it).
 # "declared_not_measured" is not a permanent judgment about the STATEMENT;
@@ -175,8 +175,7 @@ MODE_VALUES = frozenset(
     }
 )
 
-# Relationship-topology profiles ([ldg-bp-topology-profiles], standard-
-# outcome-pack design §6b): who the agent works WITH -- the same standard
+# Relationship-topology profiles: who the agent works WITH -- the same standard
 # pack graded differently depending on whether the direct counterparty is an
 # external customer, an internal employee, a mediated employee-on-behalf-of-
 # a-downstream-customer, or another agent. P5 (autonomous, no direct
@@ -340,7 +339,7 @@ class EvidenceInstrument:
 @dataclass(frozen=True)
 class ClauseSpec:
     """The structured legal/contractual anchor an outcome's ``clause_ref``
-    string can't carry alone ([ldg-grc-clause-ref-versioning]): the same
+    string can't carry alone: the same
     article means different things on different dates once an instrument is
     amended, so ``clause_ref`` (a free-form citation string, unversioned)
     is not enough on its own to say WHICH version of an article a term was
@@ -486,32 +485,28 @@ class EvidenceContract:
     required_assurance_grade: str | None = None
     exposure_denominator_ref: str | None = None
     retention_check: str | None = None
-    # measurability/evidence_instrument -- optional, additive
-    # ([pack-harden-tau2-oracle]); default "measured" so a pack declared
+    # measurability/evidence_instrument -- optional, additive; default "measured" so a pack declared
     # before this field existed parses and DIGESTS identically to before
     # (canonical_dict below omits it whenever it's the default, same
     # convention every other optional EvidenceContract field already follows).
     measurability: str = "measured"
     evidence_instrument: EvidenceInstrument | None = None
-    # tier -- optional, additive ([ldg-bj-tier-field], backward-judge design
-    # §8.2); default "informational" so a pack declared before this field
+    # tier -- optional, additive; default "informational" so a pack declared before this field
     # existed parses and DIGESTS identically to before (canonical_dict below
     # omits it whenever it's the default, same convention measurability
     # already follows).
     tier: str = "informational"
-    # mode -- optional, additive ([ldg-bp-mode-tag], standard-outcome-pack
-    # design §3); default "structural" so an outcome declared before this
+    # mode -- optional, additive; default "structural" so an outcome declared before this
     # field existed parses and DIGESTS identically to before (canonical_dict
     # below omits it whenever it's the default, same convention tier already
     # follows).
     mode: str = "structural"
-    # clause_ref -- optional, additive ([ldg-clause-ref-outcome], R3
-    # obligations enabler); default None so an outcome declared before this
+    # clause_ref -- optional, additive; default None so an outcome declared before this
     # field existed parses and DIGESTS identically to before (canonical_dict
     # below omits it whenever it's None, same convention every other
     # optional EvidenceContract field already follows).
     clause_ref: str | None = None
-    # clause -- optional, additive ([ldg-grc-clause-ref-versioning]): the
+    # clause -- optional, additive: the
     # structured legal anchor alongside the plain-string clause_ref above.
     # Both may be set (clause_ref stays the free-form display citation;
     # clause carries the versioned, digest-pinned anchor a GRC obligation
@@ -718,7 +713,7 @@ class PackDefinition:
     # this); optional documentation for other check types.
     constraint_scopes: dict[str, tuple[str, ...]] = field(default_factory=dict)
     # profiles[] -- relationship-topology profiles over this pack's own
-    # outcomes ([ldg-bp-topology-profiles], design §6b/§7). Defaults to empty
+    # outcomes. Defaults to empty
     # so a pack declared before this field existed parses and DIGESTS
     # identically to before (canonical_dict below includes it only when
     # non-empty, same convention as ``proposers``/``outcomes``).
@@ -805,9 +800,8 @@ class PackDefinition:
         return None
 
     def obligation_requirements(self) -> tuple[EvidenceContract, ...]:
-        """The obligation-profile projection of this pack's outcomes[]
-        ([evidence-obligation-profile-scaffold]): under the obligation
-        profile, every register row IS a requirement -- an
+        """The obligation-profile projection of this pack's outcomes[]: under
+        the obligation profile, every register row IS a requirement -- an
         ``EvidenceContract`` with ``profile == "obligation"``, anchored to
         a ``clause`` (``loader.py`` refuses one with no clause, so every
         entry returned here is guaranteed to carry one). Pack order, not

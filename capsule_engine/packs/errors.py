@@ -30,8 +30,7 @@ INVALID_FIXTURES = "invalid_fixtures"
 FLOAT_IN_PACK_DIGEST = "float_in_pack_digest"
 UNSAFE_INTEGER_IN_PACK_DIGEST = "unsafe_integer_in_pack_digest"
 
-# outcomes[] -- the sister table to obligations[] (compiler-and-setup design
-# 2026-08-19 §4b; supersedes [ldg-outcome-declaration-schema]).
+# outcomes[] -- the sister table to obligations[].
 DUPLICATE_OUTCOME_ID = "duplicate_outcome_id"
 INVALID_OUTCOME = "invalid_outcome"
 MISSING_EVIDENCE_RULE = "missing_evidence_rule"
@@ -42,7 +41,7 @@ UNKNOWN_EFFECT_CLAIM = "unknown_effect_claim"
 INVALID_RE_DERIVABILITY_GRADE = "invalid_re_derivability_grade"
 INVALID_SCOPE_CENSUS = "invalid_scope_census"
 
-# tier ([ldg-bj-tier-field], backward-judge design §8.2): whether an outcome
+# tier: whether an outcome
 # gates a session's job-success (must_have) or is reported without gating
 # (informational, the default).
 INVALID_TIER = "invalid_tier"
@@ -54,13 +53,12 @@ INVALID_TIER = "invalid_tier"
 INVALID_EVIDENCE_PROFILE = "invalid_evidence_profile"
 INVALID_EPISTEMIC_TYPE = "invalid_epistemic_type"
 
-# mode ([ldg-bp-mode-tag], standard-outcome-pack design §3): which of the
+# mode: which of the
 # seven ways an outcome is judged (structural/value/judged/fold_rollup/
 # fold_counterparty/fold_agent/fold_cohort).
 INVALID_MODE = "invalid_mode"
 
-# profiles[] -- relationship-topology profiles over a pack's own outcomes
-# ([ldg-bp-topology-profiles], standard-outcome-pack design §6b/§7).
+# profiles[] -- relationship-topology profiles over a pack's own outcomes.
 INVALID_PROFILE_ID = "invalid_profile_id"
 DUPLICATE_PROFILE_ID = "duplicate_profile_id"
 UNKNOWN_PROFILE_ID = "unknown_profile_id"
@@ -77,11 +75,10 @@ INVALID_MEASURABILITY = "invalid_measurability"
 MISSING_EVIDENCE_INSTRUMENT = "missing_evidence_instrument"
 INVALID_EVIDENCE_INSTRUMENT = "invalid_evidence_instrument"
 
-# clause -- the structured legal anchor alongside clause_ref
-# ([ldg-grc-clause-ref-versioning]).
+# clause -- the structured legal anchor alongside clause_ref.
 INVALID_CLAUSE = "invalid_clause"
 
-# obligation profile ([evidence-obligation-profile-scaffold]): unlike the
+# obligation profile: unlike the
 # other five non-outcome profiles (still typed stubs -- see
 # schema.EVIDENCE_PROFILE_VALUES), obligation is fleshed out with its one
 # real constraint -- a clause anchor is what makes a register row an

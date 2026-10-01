@@ -126,9 +126,8 @@ def test_canonical_dict_of_an_obligation_requires_clause_to_validate():
     )
     validate_requirement(obligation.canonical_dict())
 
-    # R4: the same obligation with its clause dropped is EXACTLY
-    # [evidence-obligation-profile-scaffold]'s missing_obligation_clause
-    # rule at load time, but here it must also fail schema validation --
+    # R4: the same obligation with its clause dropped is EXACTLY the
+    # loader's missing_obligation_clause rule at load time, but here it must also fail schema validation --
     # a schema that let this through would silently accept a register row
     # with no clause anchor at all.
     from dataclasses import replace

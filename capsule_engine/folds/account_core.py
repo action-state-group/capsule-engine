@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""De-fork seam onto the neutral account/fold core (Amendment E, 2026-08-31).
+"""De-fork seam onto the neutral account/fold core.
 
 The definition-as-DATA + ``definition_digest`` + replay/verify contracts, and
 the ``deterministic`` / ``model_assisted`` split, are OWNED by

@@ -44,7 +44,7 @@ WICKET_ID_RE = re.compile(r"^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)*/\d+\.\d+\.\d+$"
 # py``'s ``CHECKS`` catalog lists, plus ``hold_reconcile`` (``holds/engine.
 # py``'s tolerance check for planned-vs-executed reconciliation, capsule-emit
 # #53), plus ``plan_containment`` (``guards/checks/plan_containment.py`` --
-# forward-compiled-plan containment, ``[ldg-plan-containment]``). Closed for
+# forward-compiled-plan containment). Closed for
 # the same reason ``folds/definition.py``'s ``KNOWN_REDUCERS`` is: an
 # unregistered name is a typo or a not-yet-built check, never silently
 # accepted as data.

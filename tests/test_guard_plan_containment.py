@@ -1,7 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 """C2/C3: ``GuardEngine`` wired with a bound ``plan`` -- containment governs
-real allow/deny decisions and the decision capsule carries the constraint
-(``[ldg-plan-containment]``)."""
+real allow/deny decisions and the decision capsule carries the constraint."""
 from __future__ import annotations
 
 import threading
@@ -90,7 +89,7 @@ def test_uncited_precondition_hard_denies(store, caps_fold, signer):
 # item requires ("assert containment's verdict is unchanged under concurrent
 # ledger mutation. This is the property that lets it enforce ahead of the
 # caps work; if it is not tested it is not a property, it is a hope").
-# ``[ldg-guardengine-caps-race]`` proved ``caps`` unsafe this exact way: two
+# A caps race proved ``caps`` unsafe this exact way: two
 # concurrent ``GuardEngine.check()`` calls sharing one ledger, racing a
 # read-decide-append window (``tests/test_pack_differential_concurrency.py``).
 # This test races the SAME shape of concurrent writers against the SAME

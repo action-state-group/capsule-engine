@@ -1,6 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""Word-discipline gate (manifesto v2.1 / `consistency-realignment-2026-09-06.md`,
-[ldg-map-vocab-coverage-statement] build item 5): no unqualified
+"""Word-discipline gate: no unqualified
 "contemporaneous", "non-repudiation", "witnessed" (bare), "complete history",
 or "trust ladder" in the report/render surfaces and docs this vocabulary
 realignment touches.
@@ -11,8 +10,8 @@ human (``cli/format.py``, ``console/api.py``, ``report/``,
 repo-wide sweep. Pre-existing, unrelated uses of "witnessed" as a *field
 name* mirroring ``capsule_emit``'s own chain-segment API
 (``folds/retention_continuity.py``) and the standalone design-system gallery
-(``console/gallery.html``) are a different, tracked concern -- see the
-[ldg-map-vocab-coverage-statement] outbox entry, not silently rewritten here.
+(``console/gallery.html``) are a different, tracked concern, not silently
+rewritten here.
 
 ``report/result.py`` / ``report/result_from_folds.py`` / ``report/errors.py``
 are the SAME kind of pre-existing-
@@ -29,7 +28,7 @@ dry-run-report rendering surfaces (``build.py``, ``model.py``, ``render.py``,
 the whole-directory scan before the Result v0 emitter existed alongside them
 -- this is not a reduction in what was previously covered.
 
-RED-before-green (QUEUE_PROTOCOL §7): the scan is proven able to fail before
+RED-before-green: the scan is proven able to fail before
 it is trusted to pass.
 """
 from __future__ import annotations

@@ -14,7 +14,7 @@ jobs:
           python-version: "3.12"
       - name: install capsule-ledger (not yet on PyPI)
         run: pip install "capsule-ledger @ git+https://github.com/action-state-group/capsule-ledger.git"
-      - name: install capsule-emit (ledger_io/period not yet in a PyPI release -- [emit-ledger-io-home])
+      - name: install capsule-emit (ledger_io/period not yet in a PyPI release)
         # --force-reinstall: capsule-ledger's own install above already satisfies
         # "capsule-emit" from PyPI at the pinned floor, so a plain `pip install`
         # here is a silent no-op -- pip matches on version number, not source.

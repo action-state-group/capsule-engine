@@ -3,8 +3,7 @@
 (design principle item 2) -- the local, vendored stand-in for the
 not-yet-existing ``capsule-registry`` "Action-type conventions" table.
 
-Moved here from capsule-ledger during the [ldg-ledger-scope-re-extraction]
-RESIDUALS pass (§3.1(a)): this repo carries the full vendor copy
+Moved here from capsule-ledger: this repo carries the full vendor copy
 (``describe_field_value``, ``conventions_digest``, the CPB provisional
 tables); capsule-ledger keeps only its own minimal, self-contained
 ``describe_action_class`` shim with its own tiny embedded label data --

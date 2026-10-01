@@ -1,12 +1,10 @@
 # standard-vendor pack: the STANDARD outcome catalog over the GENERAL
-# capsule vocabulary ([ldg-bp-standard-vendor-pack], design:
-# action-state-ops/_work/backward-judge-buildout/standard-outcome-pack-
-# design.md). The airline-engagement pack (A1-A7) is a domain-specific
+# capsule vocabulary. The airline-engagement pack (A1-A7) is a domain-specific
 # DEMO; this pack is deliberately NOT airline voice -- every statement is
 # phrased against capsule shapes any emit layer already produces (a stated
 # constraint the counterparty emitted, a read chained to a write, a
 # citation digest), so ONE pack grades any vendor's ledger: conversational
-# (tau2), read-only investigation (Alchemy), coding, sales (design §1/§6).
+# (tau2), read-only investigation, coding, sales.
 #
 # Rows are organized by the seven-mode axis (design §3): structural (no
 # model), value (arithmetic over sealed numbers, no model), judged (an LLM
@@ -19,7 +17,8 @@
 # **measurability / evidence_instrument, reused verbatim from the
 # airline-engagement pack's A2/A3a/A5 pattern.** Every row below that needs
 # a typed, structured capsule field or tool call neither the tau2-bench
-# transcripts nor the Alchemy GitHub-thread exports emit today is declared
+# transcripts nor a read-only investigation deployment's thread exports
+# emit today is declared
 # `measurability: declared_not_measured` naming the missing
 # `evidence_instrument` -- an honest, corpus-checkable claim
 # (`capsule_ledger.packs.corpus_verify.verify_declared_not_measured` is the
@@ -27,7 +26,7 @@
 # no special instrument -- an LLM judge reads the sealed free text/prose
 # every corpus already carries (a conversation turn, an issue comment), so
 # those stay `measurability: measured` (the default).
-pack_id: asg/standard-vendor/1.0.0
+pack_id: asg/standard-vendor/1.0.1
 
 obligations:
   - id: no-duplicate-judge-verdict
@@ -56,9 +55,9 @@ outcomes:
     evidence_rule: >-
       n/a on today's corpora -- needs a read/observation capsule and a
       write/dispatch capsule where the write's chain_parent points back at
-      the read (design §12); neither tau2-bench's free-text transcripts
-      nor the Alchemy GitHub-thread exports emit a sealed read-side capsule
-      yet ([ldg-bj-emit-read-side-python], queued separately)
+      the read; neither tau2-bench's free-text transcripts nor a read-only
+      investigation deployment's thread exports emit a sealed read-side
+      capsule yet
     forward_verdict: UNAVAILABLE-STATE-REQUIRED
     backward_verdict: WITH-INSTRUMENTATION
     measurability: declared_not_measured
@@ -228,7 +227,7 @@ outcomes:
   # --- E. Counterparty-change -- fold_counterparty (design §4 E / §5) ----
   # Each row is a fold over a per-session signal this pack does not yet
   # declare on its own (design §5's two-layer composition;
-  # [ldg-bp-counterparty-change-family] wires the signal + fold pair) --
+  # a separate change wires the signal + fold pair) --
   # min-N gated, correlation-not-cause framed, never re-judging.
   - id: C1
     statement: "Capability growth: the counterparty grew more knowledgeable or self-sufficient across their sessions with this agent."
@@ -380,7 +379,8 @@ profiles:
     counterparty_binding:
       direct: customer
 
-  # P2 internal-assist (Amplifier): the employee IS the beneficiary -- the
+  # P2 internal-assist (an internal-assist deployment): the employee IS the
+  # beneficiary -- the
   # agent makes THEM better at their own job. Conduct matters less than
   # bounded-authority (S2, already must_have in the invariant core); the
   # differentiated value-prop is the employee's own capability growth (C1)
@@ -400,7 +400,8 @@ profiles:
       - outcome_id: J6
         tier: informational
 
-  # P3 mediated (Alchemy): still internal (direct counterparty = the
+  # P3 mediated (a read-only investigation deployment): still internal
+  # (direct counterparty = the
   # engineer), but the engineer is a CONDUIT to their own downstream
   # customer/incident. Two layers: conduct (J) is informational because it's
   # about how the agent treats the employee it's actually talking to, same

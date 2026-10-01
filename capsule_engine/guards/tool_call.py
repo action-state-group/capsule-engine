@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""The tool-call lane (C3, ``[ldg-plan-containment]``): reads emit passive
+"""The tool-call path: reads emit passive
 ``fyi`` records; writes route through ``GuardEngine.check()``, which already
 IS the enforcement point -- a departure fails the ``plan_containment``
 constraint, ``GuardEngine`` denies, and the resulting decision capsule (with

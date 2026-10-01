@@ -6,14 +6,13 @@ user message text + flattened tool-call trail, from
 ``capsule-emit-mesh``'s ``mesh_record_emitter.py`` uses for its inference
 capsules (``capsule_engine.conversation.build_conversation_exchange_capsule``).
 
-[tau2-engagement-conversation-detail-capsules]: proves ONE capsule shape
-spans mesh inference, tau2, and (once wired) the real Alchemy/Amplifier
-Security engagements. Model identity is supplied by the caller rather than
+Conversation-detail capsules: proves ONE capsule shape
+spans mesh inference, tau2, and (once wired) real read-only investigation
+and internal-assist deployments. Model identity is supplied by the caller rather than
 guessed from the sim record -- a real engagement transcript's own metadata
 (not a filename convention) is where that identity actually lives, and
 keeping the capsule-building side agnostic to WHERE model identity came
-from is what lets it generalize to Alchemy/Amplifier Security without
-change. ``TAU2_MODEL_ID``/``TAU2_PROVIDER`` below are just this module's own
+from is what lets it generalize to those deployments without change. ``TAU2_MODEL_ID``/``TAU2_PROVIDER`` below are just this module's own
 default for the one dataset it vendors
 (``vendor_tau2_airline_conversations.py``: ``claude-3-7-sonnet``).
 

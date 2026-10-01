@@ -97,7 +97,7 @@ def test_minimal_valid_pack_loads(tmp_path):
 
 
 def test_backward_only_pack_needs_no_forward_declarations(tmp_path):
-    """[ldg-obligations-pack-reads-trace]: a pack declaring outcomes[] may
+    """A pack declaring outcomes[] may
     omit obligations/action_semantics/constraints/folds entirely -- a GRC
     obligations pack (e.g. catalog/eu-ai-act) has no forward guard
     integration to declare."""
@@ -183,7 +183,7 @@ def test_declaring_clause_ref_changes_the_digest_but_nothing_else_does(tmp_path)
     assert digest_without != digest_with_ref
 
 
-# --- clause: the structured legal anchor ([ldg-grc-clause-ref-versioning]) -
+# --- clause: the structured legal anchor -----------------------------------
 
 
 _TEXT_DIGEST = "a" * 64

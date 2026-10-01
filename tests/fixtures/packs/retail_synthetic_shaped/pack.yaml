@@ -1,9 +1,8 @@
 # Synthetic, hand-built fixture shaped like tau2-bench's retail domain
 # (refund / exchange / cancel-order tool families: real WRITE tool calls
 # alongside read-only recommend paths) -- NOT a generated tau2-bench shift.
-# [ldg-tau2-shift-generation] (Track C) has not produced a real generated
-# corpus yet at the time this schema landed; see the outbox report for
-# [ldg-cs-p1-schema]. This fixture exists to satisfy the P1 acceptance line
+# No real generated tau2-bench shift corpus existed when this schema
+# landed. This fixture exists to satisfy the P1 acceptance line
 # "tau2-bench retail traces demonstrably express both gaps" at the SCHEMA
 # level -- it is retail-shaped, not retail-generated. Phase 6's demo is
 # where a real generated shift replaces this.

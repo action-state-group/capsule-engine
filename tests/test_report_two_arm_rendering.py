@@ -1,8 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 """``render_report_html``'s ``arm`` parameter ("full" vs "guards-only"):
 one codebase, one flag, never a fork -- ported from capsule-ledger's
-test_two_arm_packaging.py's "report rendering" section during the
-[ldg-ledger-scope-re-extraction] RESIDUALS pass. That file's CLI-registration
+test_two_arm_packaging.py's "report rendering" section. That file's CLI-registration
 tests (which verbs "full"/"guards-only" register) stayed in capsule-ledger,
 since packaging.py and the CLI arm mechanism are core there; this is the
 report-rendering half, which only ever lived here (capsule-engine's

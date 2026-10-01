@@ -1,7 +1,6 @@
 # Synthetic, neutral fixture -- the "agent acts" counterpoint (design §1 table:
 # agent authority ACTS, changes state directly). No partner name, customer name,
-# or partner-specific vocabulary: see action-state-ops/ledger/CLAUDE.md boundary
-# rule and QUEUE_PROTOCOL §8. Exists so the agent.caused_resolution refusal is
+# or partner-specific vocabulary. Exists so the agent.caused_resolution refusal is
 # demonstrated on the causal shape as well as the advisory one (P1 acceptance:
 # "an [advisory-only]-only fixture set does not discharge this").
 pack_id: test_pub/causal-remediation-shaped/1.0.0

@@ -116,7 +116,7 @@ class FoldDefinition:
     def to_account_definition(self) -> AccountDefinition:
         """Project this fold onto a neutral ``capsule_emit.account.AccountDefinition``.
 
-        This is the de-fork bridge (Amendment E): the SAME definition document,
+        This is the de-fork bridge: the SAME definition document,
         evaluated by the ledger or via the core, yields the identical CORE
         ``definition_digest`` and identical result — the §7 cross-repo replay
         property. The projection carries the fields the neutral account document

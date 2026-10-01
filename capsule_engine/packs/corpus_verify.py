@@ -1,8 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 """The oracle cross-check a ``measurability: declared_not_measured`` claim
-needs to be DATA rather than merely asserted ([pack-harden-tau2-oracle]:
-closes an adversarial-review finding -- see ``adv-tau2-demo.md`` Area 1/4 --
-that the airline-engagement pack's A2/A3a/A5 rows were rendered inapplicable
+needs to be DATA rather than merely asserted (this closes an
+adversarial-review finding that the airline-engagement pack's A2/A3a/A5 rows were rendered inapplicable
 on every unit via a hardcoded ``always_false`` lambda, with nothing in the
 framework checking that the claim "this term is genuinely unmeasurable on
 this corpus" was actually true. A future coder could point that same lambda
@@ -71,7 +70,7 @@ def resolves_instrument(instrument: EvidenceInstrument, messages: Iterable[Mappi
     signal) resolves anywhere in one unit's ``messages``. The single
     resolve-check implementation in this codebase -- ``verify_declared_not_measured``
     below and ``packs.measurability_report`` (the generic "would this pack
-    work" report, a second real caller as of ``[pack-propose-generic]``) both
+    work" report, a second real caller) both
     call this rather than each carrying their own copy. Public (was
     ``_resolves``): promoted the moment a second caller needed it."""
     if instrument.kind == "structured_field":

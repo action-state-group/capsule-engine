@@ -3,8 +3,7 @@
 a member of the deployer's authorised roster." Per-record membership check
 against a caller-supplied roster — the roster itself is a declared pack
 parameter (like the ordering fold's ``before``/``after`` classifiers), never
-mined from the records under test (QUEUE_PROTOCOL §7a rule 2: the party
-under test must not be the one defining what counts as compliant).
+mined from the records under test (the party under test must not be the one defining what counts as compliant).
 """
 from __future__ import annotations
 

@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""``[ldg-obligations-pack-reads-trace]``: the ``trace-record/1`` reader plus
+"""The ``trace-record/1`` reader plus
 the EU AI Act obligations pack, run end to end over TRACE v0.2 fixtures.
 
 ``requires_agentrust_trace`` skips only the tests that actually read or

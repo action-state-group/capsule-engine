@@ -1,12 +1,12 @@
 # SPDX-License-Identifier: Apache-2.0
 """``capsule-engine packs`` verbs -- the packs-runtime's own CLI surface.
 
-  propose -- [pack-propose-generic] the GENERIC, READ-ONLY "would this pack
+  propose -- the GENERIC, READ-ONLY "would this pack
              work" measurability report for ANY pack: resolves/MISSING-
              INSTRUMENT per outcome, from the pack's own tier/mode/
              evidence_instrument fields, over a JSONL corpus. Ported from
              capsule-ledger's ``capsule setup propose --pack`` (moved here
-             per Amendment H.4 -- the packs runtime's post-move home) --
+             -- the packs runtime's home) --
              this mode never touches ``.capsule-setup/`` and persists
              nothing, so it carries no dependency on the setup/Candidate
              machinery that stayed in capsule-compiler.
@@ -81,7 +81,7 @@ def add_parser(sub: argparse._SubParsersAction) -> argparse.ArgumentParser:
 
     p_propose = packs_sub.add_parser(
         "propose",
-        help="[pack-propose-generic] GENERIC READ-ONLY measurability report for any pack over a JSONL corpus",
+        help="GENERIC READ-ONLY measurability report for any pack over a JSONL corpus",
     )
     p_propose.add_argument("--pack", required=True, help="path to a pack directory (pack.yaml)")
     p_propose.add_argument("--corpus", default=None, help="path to a JSONL file of units shaped {'messages': [...]}")

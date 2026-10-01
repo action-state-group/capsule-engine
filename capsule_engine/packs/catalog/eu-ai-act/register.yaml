@@ -1,11 +1,8 @@
 # SPDX-License-Identifier: Apache-2.0
-# EU AI Act obligation register, TRACE-mapped subset ([ldg-obligations-pack-reads-trace]).
+# EU AI Act obligation register, TRACE-mapped subset.
 #
-# This is deliberately NOT the full obligation set from
-# `_work/eu-ai-act-agent-obligations-2026-09-03.md` (T1-T5, ~30 rows) -- that
-# full port is a separate, larger migration (the prior [ldg-eu-ai-act-pack]
-# attempt never reached capsule-engine main; see this task's DONE note for
-# why porting it here would have been out of scope). This register holds the
+# This is deliberately NOT the full EU AI Act obligation set (~30 rows) --
+# that full port is a separate, larger migration. This register holds the
 # five rows chosen to exercise every path a TRACE-sourced attainment report
 # can take: two resolve against TRACE v0.2 fields (one established, one
 # failed-by-rule), one resolves to a field that is legitimately absent on a
