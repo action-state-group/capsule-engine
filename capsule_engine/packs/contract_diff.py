@@ -1,0 +1,462 @@
+# SPDX-License-Identifier: Apache-2.0
+"""Versioning and diff rules for ``schemas/evidence-contract-v0.json``.
+
+Two things live here:
+
+* ``contract_pin`` -- how a Result names the exact contract it was evaluated
+  against: the compact ``<id>@<version>`` reference every claim already
+  carries, plus the SHA-256 digest of the contract's RFC 8785 (JCS) bytes. The
+  version label is what a reader quotes; the digest is what a verifier
+  recomputes. A version label names exactly one digest: the same
+  ``<id>@<version>`` with two different digests is reported as
+  ``version_reused`` (always breaking).
+
+* ``diff_contracts`` -- classify every difference between two contracts as
+  ``breaking`` or ``non_breaking``, with a reason.
+
+What "breaking" means. A change from A to B is non-breaking only when every
+evidence set that satisfied a requirement of B's under A still satisfies it
+under B, and every claim made against A still names a requirement of B. Put
+the other way: a change is breaking if evidence that satisfied A might not
+satisfy B (a tightening), if a requirement's identity changed (id, profile,
+clause), or if the direction of the change cannot be determined (an opaque
+predicate string, a new evidence source in place of an old one). Loosening is
+non-breaking but is still reported, so a reader sees assurance going down.
+Anything without an explicit rule below is breaking: a field is safe to change
+only because a rule here says so.
+
+The rules, by field (paths are relative to one requirement unless rooted):
+
+* requirement added -- breaking (``requirement_added``): new evidence is owed.
+* requirement removed -- non-breaking (``requirement_removed``): nothing B asks
+  for is new; the loss of assurance is reported.
+* requirement re-id (same content, new id) -- breaking (``requirement_reid``):
+  claims cite requirements by id, so every prior claim stops resolving.
+* requirements reordered -- non-breaking (``requirements_reordered``):
+  requirements are keyed by id.
+* root ``id`` changed -- breaking (``contract_id_changed``).
+* root ``version`` changed -- non-breaking on its own (``version_changed``).
+* ``statement`` reworded -- non-breaking (``editorial``) only when the
+  requirement is deterministically evaluated on both sides; otherwise breaking,
+  because the statement is what a judge or a human evaluates.
+* ``accepted_epistemic_types`` -- narrower is ``tightened``, wider is
+  ``loosened``, neither is ``changed``. Absent means any type is accepted.
+* ``required_sources``, ``approvals`` -- more is ``tightened``, fewer is
+  ``loosened``, a swap (a source changed) is ``changed``. Absent means none.
+* ``minimum_assurance``, ``required_assurance_grade`` -- compared on the
+  assurance ladder self-attested < witnessed < countersigned (the Evidence
+  Result's ``Grade`` values); a higher floor is ``tightened``. An unknown
+  grade is ``changed``. Absent means no floor.
+* ``freshness``, ``window.duration``, ``window.cure``, ``window.grace`` --
+  ISO-8601 durations; shorter is ``tightened``, longer is ``loosened``. An
+  absent ``freshness`` or ``window`` is unbounded; an absent or null cure or
+  grace is zero. A duration that does not parse is ``changed``.
+* ``tier`` -- informational to must_have is ``tightened``, the reverse
+  ``loosened``. Absent means informational.
+* ``required_sequence`` -- B a subsequence of A is ``loosened``, A a
+  subsequence of B is ``tightened``, otherwise ``changed``.
+* ``escalation_path``, ``clause.source_url`` -- ``editorial``: neither is read
+  when sufficiency is decided.
+* everything else, at the root or in a requirement -- ``changed`` (breaking).
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import re
+import sys
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any
+
+import jsonschema
+from agent_action_capsule.canonical import json_digest
+
+from capsule_engine.packs.contract_validate import validate_evidence_contract
+
+__all__ = [
+    "BREAKING",
+    "NON_BREAKING",
+    "Change",
+    "ContractDiff",
+    "ContractDiffError",
+    "contract_digest",
+    "contract_pin",
+    "contract_ref",
+    "diff_contracts",
+    "main",
+]
+
+BREAKING = "breaking"
+NON_BREAKING = "non_breaking"
+
+_SEVERITY = {
+    "contract_id_changed": BREAKING,
+    "version_reused": BREAKING,
+    "version_changed": NON_BREAKING,
+    "requirement_added": BREAKING,
+    "requirement_removed": NON_BREAKING,
+    "requirement_reid": BREAKING,
+    "requirements_reordered": NON_BREAKING,
+    "tightened": BREAKING,
+    "loosened": NON_BREAKING,
+    "changed": BREAKING,
+    "editorial": NON_BREAKING,
+}
+
+ASSURANCE_LADDER = ("self-attested", "witnessed", "countersigned")
+_TIER_RANK = {"informational": 0, "must_have": 1}
+_JUDGED_ADJUDICATION = {"semantic", "human", "hybrid"}
+
+_MISSING = object()
+
+
+class ContractDiffError(ValueError):
+    """The inputs cannot be diffed (e.g. two requirements share an id)."""
+
+
+@dataclass(frozen=True)
+class Change:
+    path: str
+    kind: str
+    reason: str
+
+    @property
+    def severity(self) -> str:
+        return _SEVERITY[self.kind]
+
+    def to_dict(self) -> dict[str, str]:
+        return {"path": self.path, "kind": self.kind, "severity": self.severity, "reason": self.reason}
+
+
+@dataclass(frozen=True)
+class ContractDiff:
+    a: dict[str, Any]
+    b: dict[str, Any]
+    changes: list[Change] = field(default_factory=list)
+
+    @property
+    def breaking(self) -> bool:
+        return any(c.severity == BREAKING for c in self.changes)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "a": self.a,
+            "b": self.b,
+            "breaking": self.breaking,
+            "changes": [c.to_dict() for c in self.changes],
+        }
+
+
+def contract_ref(doc: dict[str, Any]) -> str:
+    return f"{doc['id']}@{doc['version']}"
+
+
+def contract_digest(doc: dict[str, Any]) -> str:
+    """Lowercase-hex SHA-256 of the contract's RFC 8785 (JCS) serialization."""
+    return json_digest(doc)
+
+
+def contract_pin(doc: dict[str, Any]) -> dict[str, Any]:
+    """The exact contract a Result was evaluated against: the compact
+    reference a reader quotes, and the digest a verifier recomputes."""
+    return {
+        "contract_ref": contract_ref(doc),
+        "contract_digest": {"digest_alg": "SHA-256", "digest": contract_digest(doc)},
+    }
+
+
+# -- field rules -------------------------------------------------------------
+
+
+def _set(value: Any) -> set[str] | None:
+    return None if value is _MISSING else set(value)
+
+
+def _names(values: set[str]) -> str:
+    return ", ".join(sorted(values))
+
+
+def _compare_sets(path: str, a: Any, b: Any, *, more_is_tighter: bool, what: str) -> list[Change]:
+    """``more_is_tighter``: each added member is one more thing owed (sources,
+    approvals). Otherwise each added member is one more thing accepted
+    (epistemic types), and absence means "everything is accepted"."""
+    sa, sb = _set(a), _set(b)
+    if more_is_tighter:
+        sa, sb = sa or set(), sb or set()
+    if sa == sb:
+        return []
+    if not more_is_tighter:
+        if sa is None:
+            return [Change(path, "tightened", f"{what}: was unrestricted, now only {_names(sb)}")]
+        if sb is None:
+            return [Change(path, "loosened", f"{what}: was {_names(sa)}, now unrestricted")]
+    added, removed = sb - sa, sa - sb
+    if added and removed:
+        return [Change(path, "changed", f"{what}: {_names(removed)} replaced by {_names(added)}; evidence for the old members may not count")]
+    grew = bool(added)
+    tighter = grew if more_is_tighter else not grew
+    detail = f"added {_names(added)}" if grew else f"removed {_names(removed)}"
+    return [Change(path, "tightened" if tighter else "loosened", f"{what}: {detail}")]
+
+
+def _grade_floor(value: Any) -> int | None:
+    """Rank of the lowest grade named, -1 for no floor, None if a grade is unknown."""
+    if value is _MISSING:
+        return -1
+    grades = [value] if isinstance(value, str) else list(value)
+    if not grades:
+        return -1
+    if any(g not in ASSURANCE_LADDER for g in grades):
+        return None
+    return min(ASSURANCE_LADDER.index(g) for g in grades)
+
+
+def _compare_grades(path: str, a: Any, b: Any) -> list[Change]:
+    if a == b:
+        return []
+    fa, fb = _grade_floor(a), _grade_floor(b)
+    if fa is None or fb is None:
+        return [Change(path, "changed", "assurance grade not on the ladder; direction cannot be determined")]
+    if fa == fb:
+        return [Change(path, "editorial", "same assurance floor, spelled differently")]
+    if fb > fa:
+        return [Change(path, "tightened", "assurance floor raised")]
+    return [Change(path, "loosened", "assurance floor lowered")]
+
+
+# Each component is at most 9 digits so every implementation can compare in a
+# 64-bit integer; a longer component does not parse.
+_DURATION = re.compile(
+    r"^P(?!$)(?:(\d{1,9})Y)?(?:(\d{1,9})M)?(?:(\d{1,9})W)?(?:(\d{1,9})D)?"
+    r"(?:T(?=\d)(?:(\d{1,9})H)?(?:(\d{1,9})M)?(?:(\d{1,9})S)?)?$"
+)
+# Calendar units at their nominal length: comparison only, never date arithmetic.
+_DURATION_SECONDS = (365 * 86400, 30 * 86400, 7 * 86400, 86400, 3600, 60, 1)
+
+
+def _duration_seconds(value: Any) -> int | None:
+    if not isinstance(value, str):
+        return None
+    m = _DURATION.match(value)
+    if not m:
+        return None
+    return sum(int(g) * s for g, s in zip(m.groups(), _DURATION_SECONDS, strict=True) if g)
+
+
+def _compare_durations(path: str, a: Any, b: Any, *, absent: float, what: str) -> list[Change]:
+    """A longer duration is looser. ``absent`` is the length an absent (or
+    null) value stands for: infinity for an unbounded limit, 0 for no grace."""
+    if a == b:
+        return []
+    da = absent if a is _MISSING or a is None else _duration_seconds(a)
+    db = absent if b is _MISSING or b is None else _duration_seconds(b)
+    if da is None or db is None:
+        return [Change(path, "changed", f"{what}: not an ISO-8601 duration; direction cannot be determined")]
+    if da == db:
+        return [Change(path, "editorial", f"{what}: same length, spelled differently")]
+    if db < da:
+        return [Change(path, "tightened", f"{what}: shortened")]
+    return [Change(path, "loosened", f"{what}: lengthened")]
+
+
+def _compare_window(path: str, a: Any, b: Any) -> list[Change]:
+    if a == b:
+        return []
+    if a is _MISSING:
+        return [Change(path, "tightened", "window added: evidence must now fall inside it")]
+    if b is _MISSING:
+        return [Change(path, "loosened", "window removed")]
+    out = _compare_durations(f"{path}/duration", a.get("duration", _MISSING), b.get("duration", _MISSING), absent=float("inf"), what="window duration")
+    for key in ("cure", "grace"):
+        out += _compare_durations(f"{path}/{key}", a.get(key, _MISSING), b.get(key, _MISSING), absent=0, what=f"window {key}")
+    return out
+
+
+def _compare_tier(path: str, a: Any, b: Any) -> list[Change]:
+    # An absent tier is "informational" (EvidenceContract.tier's default).
+    ta = "informational" if a is _MISSING else a
+    tb = "informational" if b is _MISSING else b
+    if ta == tb:
+        return []
+    ra, rb = _TIER_RANK.get(ta), _TIER_RANK.get(tb)
+    if ra is None or rb is None:
+        return [Change(path, "changed", "tier changed")]
+    return [Change(path, "tightened" if rb > ra else "loosened", f"tier {ta} -> {tb}")]
+
+
+def _is_subsequence(short: list[Any], long: list[Any]) -> bool:
+    it = iter(long)
+    return all(x in it for x in short)
+
+
+def _compare_sequence(path: str, a: Any, b: Any) -> list[Change]:
+    la = [] if a is _MISSING else list(a)
+    lb = [] if b is _MISSING else list(b)
+    if la == lb:
+        return []
+    if _is_subsequence(lb, la):
+        return [Change(path, "loosened", "required sequence has fewer steps")]
+    if _is_subsequence(la, lb):
+        return [Change(path, "tightened", "required sequence has more steps")]
+    return [Change(path, "changed", "required sequence reordered or replaced")]
+
+
+def _editorial(path: str, a: Any, b: Any) -> list[Change]:
+    return [] if a == b else [Change(path, "editorial", "not read when sufficiency is decided")]
+
+
+_RULES: dict[str, Any] = {
+    "accepted_epistemic_types": lambda p, a, b: _compare_sets(p, a, b, more_is_tighter=False, what="accepted epistemic types"),
+    "required_sources": lambda p, a, b: _compare_sets(p, a, b, more_is_tighter=True, what="required sources"),
+    "approvals": lambda p, a, b: _compare_sets(p, a, b, more_is_tighter=True, what="approvals"),
+    "minimum_assurance": _compare_grades,
+    "required_assurance_grade": _compare_grades,
+    "freshness": lambda p, a, b: _compare_durations(p, a, b, absent=float("inf"), what="freshness"),
+    "window": _compare_window,
+    "tier": _compare_tier,
+    "required_sequence": _compare_sequence,
+    "escalation_path": _editorial,
+    "source_url": _editorial,
+}
+
+
+def _compare(path: str, key: str, a: Any, b: Any) -> list[Change]:
+    if key in _RULES:
+        return _RULES[key](path, a, b)
+    if a == b:
+        return []
+    if isinstance(a, dict) and isinstance(b, dict):
+        out: list[Change] = []
+        for k in sorted(set(a) | set(b)):
+            out += _compare(f"{path}/{k}", k, a.get(k, _MISSING), b.get(k, _MISSING))
+        return out
+    if a is _MISSING:
+        return [Change(path, "changed", "field added; no rule says this is safe")]
+    if b is _MISSING:
+        return [Change(path, "changed", "field removed; no rule says this is safe")]
+    return [Change(path, "changed", "value changed; no rule says this is safe")]
+
+
+def _deterministic(req: dict[str, Any]) -> bool:
+    """Positively evaluated without a judge: the only case where rewording
+    the statement cannot move a result."""
+    adjudication = req.get("adjudication")
+    if isinstance(adjudication, dict):
+        return adjudication.get("mode") == "deterministic"
+    if "evidence_rule" in req:
+        return req.get("backward_verdict") == "DETERMINISTIC" and req.get("mode") != "judged"
+    return False
+
+
+def _compare_requirement(rid: str, a: dict[str, Any], b: dict[str, Any]) -> list[Change]:
+    base = f"requirements[{rid}]"
+    out: list[Change] = []
+    for key in sorted((set(a) | set(b)) - {"id"}):
+        va, vb = a.get(key, _MISSING), b.get(key, _MISSING)
+        path = f"{base}/{key}"
+        if key == "statement" and va != vb:
+            if _deterministic(a) and _deterministic(b):
+                out.append(Change(path, "editorial", "statement reworded; the requirement is evaluated deterministically"))
+            else:
+                out.append(Change(path, "changed", "statement reworded; a judge or human evaluates this wording"))
+            continue
+        if key == "profile" and va != vb:
+            out.append(Change(path, "changed", "profile changed: a different kind of requirement"))
+            continue
+        out += _compare(path, key, va, vb)
+    return out
+
+
+def _by_id(doc: dict[str, Any], side: str) -> dict[str, dict[str, Any]]:
+    out: dict[str, dict[str, Any]] = {}
+    for req in doc["requirements"]:
+        if req["id"] in out:
+            raise ContractDiffError(f"contract {side} has two requirements with id {req['id']}")
+        out[req["id"]] = req
+    return out
+
+
+def _without_id(req: dict[str, Any]) -> dict[str, Any]:
+    return {k: v for k, v in req.items() if k != "id"}
+
+
+def diff_contracts(a: dict[str, Any], b: dict[str, Any]) -> ContractDiff:
+    """Classify every difference from contract ``a`` to contract ``b``. Both
+    are expected to be schema-valid; see the module docstring for the rules."""
+    reqs_a, reqs_b = _by_id(a, "A"), _by_id(b, "B")
+    pin_a, pin_b = contract_pin(a), contract_pin(b)
+    changes: list[Change] = []
+
+    if a["id"] != b["id"]:
+        changes.append(Change("id", "contract_id_changed", "claims name their contract by id; claims against A do not name B"))
+    elif a["version"] == b["version"] and pin_a["contract_digest"] != pin_b["contract_digest"]:
+        changes.append(Change("version", "version_reused", "one version label now names two different contracts"))
+    if a["version"] != b["version"]:
+        changes.append(Change("version", "version_changed", f"version {a['version']} -> {b['version']}"))
+
+    for key in sorted((set(a) | set(b)) - {"id", "version", "requirements"}):
+        changes += _compare(key, key, a.get(key, _MISSING), b.get(key, _MISSING))
+
+    removed = [rid for rid in reqs_a if rid not in reqs_b]
+    added = [rid for rid in reqs_b if rid not in reqs_a]
+    for old in list(removed):
+        match = next((new for new in added if _without_id(reqs_a[old]) == _without_id(reqs_b[new])), None)
+        if match is not None:
+            removed.remove(old)
+            added.remove(match)
+            changes.append(Change(f"requirements[{old}]", "requirement_reid", f"re-identified as {match}; claims citing {old} no longer resolve"))
+    for rid in removed:
+        changes.append(Change(f"requirements[{rid}]", "requirement_removed", "no longer required; assurance this contract gives is lower"))
+    for rid in added:
+        changes.append(Change(f"requirements[{rid}]", "requirement_added", "new requirement: evidence that satisfied A says nothing about it"))
+
+    common_a = [rid for rid in reqs_a if rid in reqs_b]
+    common_b = [rid for rid in reqs_b if rid in reqs_a]
+    if common_a != common_b:
+        changes.append(Change("requirements", "requirements_reordered", "requirements are keyed by id; order carries no meaning"))
+    for rid in common_a:
+        changes += _compare_requirement(rid, reqs_a[rid], reqs_b[rid])
+
+    changes.sort(key=lambda c: (c.path, c.kind))
+    return ContractDiff(a=pin_a, b=pin_b, changes=changes)
+
+
+# -- CLI ---------------------------------------------------------------------
+
+
+def _load(path: Path) -> dict[str, Any]:
+    doc = json.loads(path.read_text())
+    validate_evidence_contract(doc)
+    return doc
+
+
+def main(argv: list[str] | None = None) -> int:
+    """Exit 0: identical or non-breaking. Exit 1: breaking. Exit 2: an input
+    is missing, malformed, or not a valid Evidence Contract."""
+    parser = argparse.ArgumentParser(prog="python -m capsule_engine.packs.contract_diff")
+    parser.add_argument("a", type=Path)
+    parser.add_argument("b", type=Path)
+    parser.add_argument("--json", action="store_true", help="emit the diff as JSON")
+    args = parser.parse_args(argv)
+    try:
+        diff = diff_contracts(_load(args.a), _load(args.b))
+    except (OSError, json.JSONDecodeError, jsonschema.exceptions.ValidationError, ContractDiffError) as exc:
+        message = exc.message if isinstance(exc, jsonschema.exceptions.ValidationError) else str(exc)
+        print(f"contract diff: {message}", file=sys.stderr)
+        return 2
+    if args.json:
+        print(json.dumps(diff.to_dict(), indent=2))
+    else:
+        print(f"A: {diff.a['contract_ref']} sha256:{diff.a['contract_digest']['digest']}")
+        print(f"B: {diff.b['contract_ref']} sha256:{diff.b['contract_digest']['digest']}")
+        if not diff.changes:
+            print("identical")
+        for c in diff.changes:
+            print(f"  {c.severity:<12} {c.kind:<22} {c.path}: {c.reason}")
+        print("BREAKING" if diff.breaking else "non-breaking")
+    return 1 if diff.breaking else 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
