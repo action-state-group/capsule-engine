@@ -41,7 +41,9 @@ whether evidence is there to evaluate, not what the evaluation found.
 source name or ``None``) is REQUIRED, the same explicit-injection convention
 ``backfill_coverage``'s ``matches`` uses; ``producer_of`` defaults to the
 capsule's ``operator`` + ``developer`` pair. No producer identity is written
-into the report -- only counts and record digests.
+into the report -- only counts and record digests. A source row's optional
+``epistemic_type`` comes from a caller-supplied source catalog; nothing here
+infers it from the records.
 """
 from __future__ import annotations
 
@@ -61,6 +63,7 @@ from ..packs.backfill_coverage import (
     _record_id,
     evaluate_requirement_coverage,
 )
+from ..packs.schema import EPISTEMIC_TYPE_VALUES
 from .errors import INVALID_COVERAGE_REPORT, ResultError
 from .result import Claim, DigestRef
 
@@ -143,10 +146,20 @@ class SourceCoverage:
     duplicates_collapsed: int
     producer_count: int
     evidence: tuple[DigestRef, ...]
+    epistemic_type: str | None = None  # declared by the caller's source catalog, never inferred
+
+    def __post_init__(self) -> None:
+        if self.epistemic_type is not None and self.epistemic_type not in EPISTEMIC_TYPE_VALUES:
+            raise ResultError(
+                INVALID_COVERAGE_REPORT,
+                f"source {self.source!r} epistemic_type must be one of {sorted(EPISTEMIC_TYPE_VALUES)}, got {self.epistemic_type!r}",
+            )
 
     def to_dict(self) -> dict:
-        return {
-            "source": self.source,
+        out: dict[str, Any] = {"source": self.source}
+        if self.epistemic_type is not None:
+            out["epistemic_type"] = self.epistemic_type
+        return out | {
             "status": self.status,
             "record_count": self.record_count,
             "contemporaneous_count": self.contemporaneous_count,
@@ -313,6 +326,7 @@ def _source_coverage(
     source_of: Callable[[dict], str | None],
     producer_of: Callable[[Mapping[str, Any]], Hashable],
     minimum_assurance: frozenset[str],
+    epistemic_type: str | None,
 ) -> tuple[SourceCoverage, list[dict]]:
     result = evaluate_requirement_coverage(
         records, matches=lambda r: source_of(r) == source, minimum_assurance=minimum_assurance
@@ -328,6 +342,7 @@ def _source_coverage(
         duplicates_collapsed=result.duplicates_collapsed_count,
         producer_count=len({producer_of(r) for r in surviving}),
         evidence=tuple(DigestRef(digest=_record_digest(r)) for r in surviving),
+        epistemic_type=epistemic_type,
     )
     return coverage, surviving
 
@@ -341,6 +356,7 @@ def _requirement_coverage(
     producer_of: Callable[[Mapping[str, Any]], Hashable],
     remedies: Mapping[str, Remedy],
     corroboration_remedy: Remedy | None,
+    source_catalog: Mapping[str, str],
 ) -> RequirementCoverage:
     req_id = requirement["id"]
     ev = requirement.get("evidence_requirements") or {}
@@ -373,7 +389,12 @@ def _requirement_coverage(
     evidence_records: list[dict] = []
     for source in declared:
         coverage, surviving = _source_coverage(
-            source, records, source_of=source_of, producer_of=producer_of, minimum_assurance=minimum_assurance
+            source,
+            records,
+            source_of=source_of,
+            producer_of=producer_of,
+            minimum_assurance=minimum_assurance,
+            epistemic_type=source_catalog.get(source),
         )
         sources.append(coverage)
         evidence_records.extend(surviving)
@@ -453,6 +474,7 @@ def build_coverage_report(
     producer_of: Callable[[Mapping[str, Any]], Hashable] = default_producer_of,
     remedies: Mapping[str, Remedy] | None = None,
     corroboration_remedy: Remedy | None = None,
+    source_catalog: Mapping[str, str] | None = None,
 ) -> CoverageReport:
     """Compute the coverage report for every requirement of ``contract``
     over ``records`` (ledger order). ``claims`` are the Result's claims;
@@ -460,7 +482,10 @@ def build_coverage_report(
     matches it. ``remedies`` maps a source name to the connector that would
     capture it; a gap on a source with no entry gets ``remedy: null``.
     ``corroboration_remedy`` is the remedy named on a ``correlated_only``
-    gap (the connector that would bring in a second producer), if any."""
+    gap (the connector that would bring in a second producer), if any.
+    ``source_catalog`` maps a source name to its declared epistemic type
+    (one of ``packs.schema.EPISTEMIC_TYPE_VALUES``); a source row carries
+    ``epistemic_type`` only when the catalog names it."""
     contract_ref = f"{contract['id']}@{contract['version']}"
     for claim in claims:
         if claim.contract_ref != contract_ref:
@@ -469,6 +494,13 @@ def build_coverage_report(
                 f"claim {claim.id!r} is for {claim.contract_ref!r}, not this report's contract {contract_ref!r}",
             )
     remedies = remedies or {}
+    source_catalog = source_catalog or {}
+    for source, epistemic_type in source_catalog.items():
+        if epistemic_type not in EPISTEMIC_TYPE_VALUES:
+            raise ResultError(
+                INVALID_COVERAGE_REPORT,
+                f"source catalog types {source!r} as {epistemic_type!r}, not one of {sorted(EPISTEMIC_TYPE_VALUES)}",
+            )
     requirements = tuple(
         _requirement_coverage(
             req,
@@ -478,6 +510,7 @@ def build_coverage_report(
             producer_of=producer_of,
             remedies=remedies,
             corroboration_remedy=corroboration_remedy,
+            source_catalog=source_catalog,
         )
         for req in contract["requirements"]
     )

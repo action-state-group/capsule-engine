@@ -9,7 +9,8 @@ signing and no clock, so the output is a pure function of this file and
 ``tests/test_report_coverage_fixture.py`` re-runs it and compares bytes.
 The contract is ``examples/contracts/ai-act-human-oversight.json`` with one
 change: ``req-human-role-3`` asks for independent producers, so the
-fixture shows a correlated-only gap.
+fixture shows a correlated-only gap. Four sources are typed through a
+source catalog; the others carry no ``epistemic_type``.
 
 What the fixture shows, one requirement each:
 
@@ -44,6 +45,14 @@ CONTRACT_PATH = ROOT / "examples" / "contracts" / "ai-act-human-oversight.json"
 FIXTURE_PATH = ROOT / "tests" / "fixtures" / "evidence-result" / "coverage-report-result.json"
 GENERATED_AT = "2026-10-01T00:00:00Z"
 OTEL_BLOCK_KEY = "org.agentactioncapsule.otel"
+
+# Declared types for some sources; the rest stay untyped (no key).
+SOURCE_CATALOG = {
+    "role-assignment-record": "SYSTEM_OF_RECORD_FACT",
+    "ui-explanation-capability-record": "SYSTEM_OF_RECORD_FACT",
+    "review-events": "OBSERVED_EVENT",
+    "override-events": "HUMAN_REPORT",
+}
 
 REMEDIES = {
     "ui-explanation-capability-record": Remedy(connector="system_of_record", raises_to="retrospectively_evidenced"),
@@ -146,7 +155,9 @@ def build_coverage_fixture() -> dict:
     doc = contract()
     contract_ref = f"{doc['id']}@{doc['version']}"
     claims = _claims(contract_ref)
-    coverage = build_coverage_report(doc, records(), source_of=_source_of, claims=claims, remedies=REMEDIES)
+    coverage = build_coverage_report(
+        doc, records(), source_of=_source_of, claims=claims, remedies=REMEDIES, source_catalog=SOURCE_CATALOG
+    )
     view = View(producer_name="OO", title="Human oversight evidence coverage (synthetic)")
     return build_result(claims, generated_at=GENERATED_AT, view=view, coverage_report=coverage).to_dict()
 

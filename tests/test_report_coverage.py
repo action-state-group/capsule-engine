@@ -409,3 +409,52 @@ def test_status_to_sufficiency_is_the_fixed_mapping():
     assert STATUS_TO_SUFFICIENCY == {
         "SATISFIED": "SATISFIED", "NOT_FOUND": "GAP", "INSUFFICIENT": "INSUFFICIENT", "UNKNOWN": "UNKNOWN"
     }
+
+
+# --- optional epistemic_type, from a caller-supplied source catalog --------
+
+CATALOG = {"review-events": "OBSERVED_EVENT", "override-events": "HUMAN_REPORT"}
+
+
+def test_source_catalog_types_the_named_sources_only():
+    report = build_coverage_report(_contract(), _full_records(), source_of=_source_of, source_catalog=CATALOG)
+    rows = {s.source: s.to_dict() for s in _req(report, "req-human-role-3").sources}
+    assert rows["review-events"]["epistemic_type"] == "OBSERVED_EVENT"
+    assert rows["override-events"]["epistemic_type"] == "HUMAN_REPORT"
+    assert "epistemic_type" not in rows["exception-events"]
+
+
+def test_missing_source_keeps_its_declared_type():
+    records = [r for r in _full_records() if _source_of(r) != "override-events"]
+    report = build_coverage_report(_contract(), records, source_of=_source_of, source_catalog=CATALOG)
+    src = next(s for s in _req(report, "req-human-role-3").sources if s.source == "override-events")
+    assert src.status == "NOT_FOUND"
+    assert src.epistemic_type == "HUMAN_REPORT"
+
+
+def test_type_never_changes_status():
+    with_catalog = build_coverage_report(_contract(), [], source_of=_source_of, source_catalog=CATALOG)
+    without = build_coverage_report(_contract(), [], source_of=_source_of)
+    assert [r.status for r in with_catalog.requirements] == [r.status for r in without.requirements]
+
+
+def test_unknown_epistemic_type_in_catalog_is_refused():
+    with pytest.raises(ResultError):
+        build_coverage_report(_contract(), [], source_of=_source_of, source_catalog={"review-events": "TRUSTED_FACT"})
+
+
+def test_result_with_typed_sources_validates():
+    claims = [_claim("c-3", "req-human-role-3")]
+    coverage = build_coverage_report(
+        _contract(), _full_records(), source_of=_source_of, claims=claims, source_catalog=CATALOG
+    )
+    doc = build_result(claims, generated_at="2026-10-01T00:00:00Z", coverage_report=coverage).to_dict()
+    validate_against_schema(doc)
+    verify_result(doc)
+
+
+def test_vendored_epistemic_type_enum_matches_engine_values():
+    from capsule_engine.packs.schema import EPISTEMIC_TYPE_VALUES
+    from capsule_engine.report.result import load_schema
+
+    assert set(load_schema()["$defs"]["EpistemicType"]["enum"]) == EPISTEMIC_TYPE_VALUES

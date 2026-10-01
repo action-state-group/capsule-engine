@@ -48,3 +48,10 @@ def test_claim_sufficiency_agrees_with_coverage():
     for row in doc["coverage_report"]["requirements"]:
         for claim_id in row["claim_ids"]:
             assert claims[claim_id]["sufficiency"] == row["sufficiency"]
+
+
+def test_fixture_types_catalogued_sources_only():
+    rows = json.loads(gen.FIXTURE_PATH.read_text())["coverage_report"]["requirements"]
+    types = {s["source"]: s.get("epistemic_type") for r in rows for s in r["sources"]}
+    assert types["override-events"] == "HUMAN_REPORT"
+    assert types["authority-competence-record"] is None

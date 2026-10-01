@@ -9,9 +9,9 @@
     "commit": "24ee05af4b620ce85a5d6aabeeb9e4f0ad394ebb",
     "vendored_at": "2026-09-22",
     "coverage_report": {
-      "comment": "The PROPOSED coverage_report section (CoverageStatus through CoverageReport in $defs, and EvidenceResult.properties.coverage_report) is transcribed from this branch and commit; the rest of the file is unchanged from the base above.",
+      "comment": "The PROPOSED coverage_report section (EpistemicType through CoverageReport in $defs, and EvidenceResult.properties.coverage_report) is transcribed from this branch and commit; the rest of the file is unchanged from the base above.",
       "branch": "feat/result-coverage-report",
-      "commit": "8fab359fe1f61310dd47ccb7d8779913f33482e2",
+      "commit": "07a6cca77b3877ab6fb85015cd35249d5a1ee92b",
       "vendored_at": "2026-09-30"
     }
   },
@@ -362,6 +362,19 @@
         }
       }
     },
+    "EpistemicType": {
+      "description": "PROPOSED (spec section 7.1). The closed epistemic-type set of the EvidenceBook record header, in the Evidence Contract's uppercase spelling (accepted_epistemic_types). The checker pins parity with schemas/vendor/epistemic-types.json.",
+      "enum": [
+        "OBSERVED_EVENT",
+        "SYSTEM_OF_RECORD_FACT",
+        "PRODUCER_CLAIM",
+        "HUMAN_REPORT",
+        "SEMANTIC_JUDGMENT",
+        "DERIVED_METRIC",
+        "ADJUDICATION",
+        "OBLIGATION_REFERENCE"
+      ]
+    },
     "CoverageStatus": {
       "description": "PROPOSED (spec section 7.1). The per-requirement coverage status: the subset of EvidenceStatus a coverage computation over ledger records can produce. Coverage says whether evidence is there to evaluate; it is never a verdict.",
       "enum": [
@@ -408,7 +421,7 @@
       }
     },
     "SourceCoverage": {
-      "description": "PROPOSED (spec section 7.1). What evidence exists for one required source: counts after duplicate collapse, distinct producers, and the record digests. NOT_FOUND exactly when record_count is 0.",
+      "description": "PROPOSED (spec section 7.1). What evidence exists for one required source: counts after duplicate collapse, distinct producers, and the record digests. NOT_FOUND exactly when record_count is 0. epistemic_type is OPTIONAL: present only when the producer's source catalog declares the source's type.",
       "type": "object",
       "additionalProperties": false,
       "required": [
@@ -425,6 +438,9 @@
         "source": {
           "type": "string",
           "minLength": 1
+        },
+        "epistemic_type": {
+          "$ref": "#/$defs/EpistemicType"
         },
         "status": {
           "enum": [
