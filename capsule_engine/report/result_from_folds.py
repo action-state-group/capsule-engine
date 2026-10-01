@@ -9,8 +9,7 @@ until a real, non-stub, offline-verified witness stamp lands, then
 ``CheckpointRecord.digest()`` / ``WitnessRecord.entry_hash`` for
 ``evidence``/``proofs``. Nothing here asserts a grade or invents a digest;
 that is the module's whole point -- "grade read from the bundle's
-witness/countersign state, never asserted"
-([batch4-result-emission-from-engine]).
+witness/countersign state, never asserted".
 
 ``tier`` is always ``"recomputed"`` in this module: every fold in
 ``capsule_engine/folds/`` is a deterministic recomputation over sealed

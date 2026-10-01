@@ -656,11 +656,11 @@ def _parse_outcomes(raw: Any) -> tuple[EvidenceContract, ...]:
     load-time error rather than a convention someone could forget.
 
     Every entry here is an ``EvidenceContract`` -- the fields validated below
-    are the **outcome profile's** field set (Steven's 2026-09-21 Evidence-
+    are the **outcome profile's** field set (the 2026-09-21 Evidence-
     Contract reframe ruling), still required regardless of a declared
     ``profile``/``epistemic_type`` because the non-outcome profiles are typed
-    stubs only (their own field-level validation is Evidence Contract v3,
-    a spec-lane task -- see ``schema.EVIDENCE_PROFILE_VALUES``)."""
+    stubs only (their own field-level validation is still to be specified
+    -- see ``schema.EVIDENCE_PROFILE_VALUES``)."""
     if not raw:
         return ()
     if not isinstance(raw, list):

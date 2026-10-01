@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""[batch3-backfill-builder-provenance-mode]: per-requirement evidence
+"""Backfill provenance mode: per-requirement evidence
 sufficiency over a capsule stream that may mix contemporaneous and
 backfilled records (AAC -05 ``draft-mih-scitt-agent-action-capsule-05``
 §provenancemode, "Provenance mode and backfilled records").

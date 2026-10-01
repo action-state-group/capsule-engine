@@ -1,7 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 """Result v0 model: construction guards, aggregate computation, schema
-validation, and the two normative cross-checks
-([batch4-result-emission-from-engine])."""
+validation, and the two normative cross-checks."""
 from __future__ import annotations
 
 import jsonschema

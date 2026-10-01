@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""[grc-facets-upstream-registry-proposals] (Steven's #24 review nit): the
+"""A review follow-up: the
 skill layer needs a stable import surface for the five GRC-batch folds --
 callers currently import each fold module directly (``capsule_engine.folds.
 ordering``, etc). This proves every fold's entry point and result/classifier

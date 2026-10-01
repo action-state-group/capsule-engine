@@ -1,15 +1,13 @@
 # SPDX-License-Identifier: Apache-2.0
-"""Evidence Result v0 emitter -- ``report/`` -> ``result`` projection
-([batch4-result-emission-from-engine]).
+"""Evidence Result v0 emitter -- ``report/`` -> ``result`` projection.
 
 The wire shape and every closed vocabulary below mirror
 ``agent-action-capsule``'s ``spec/evidence-result-v0.md`` /
 ``schemas/evidence-result-v0.json`` field-for-field -- that document governs,
 this module is the encoding. A drift between the two is a defect here, never
 a second legitimate spelling. At the time this module was written, that
-schema had landed on ``agent-action-capsule`` branch
-``batch4-evidence-result-schema-v0`` (Steven-ruled, no longer DRAFT) but was
-still held for EM push -- not yet importable from the ``agent-action-capsule``
+schema had landed on an ``agent-action-capsule`` branch (ruled, no longer
+DRAFT) but was not yet on its main branch -- not yet importable from the ``agent-action-capsule``
 dependency this repo already pins -- so ``schemas/vendor/evidence-result-v0.
 json`` carries a vendored copy (see that file's own ``$comment`` for the
 drop-vendoring-once-shipped note).
