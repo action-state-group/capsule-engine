@@ -5,22 +5,20 @@
 register_id: asg/obligation-register-sample/0.1.0
 
 rows:
-  # A generic internal dual-control policy -- "NN" (nomen nescio) is a
-  # deliberately anonymized policy label, never a real counterparty's name
-  # (repo boundary: no partner names in tree). A deterministic rule check
+  # A generic internal dual-control policy. A deterministic rule check
   # (two distinct approver ids required before dispatch), evidence_class RULE.
-  - id: nn/four-eyes/1
+  - id: sample/four-eyes/1
     statement: >-
       A payment above the configured threshold is not released without a
       second, independent approver distinct from the initiator.
-    source: Policy NN
+    source: Policy P-1
     scope: every payment-dispatch action requiring dual approval
     owner: compliance-team
     version: "1.0.0"
     evidence_class: RULE
     effective_from: "2026-01-01"
     clause:
-      instrument: Policy NN
+      instrument: Policy P-1
       article: "§4 (Four-Eyes Approval)"
       effective_from: "2026-01-01"
 

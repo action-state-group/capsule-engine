@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 """EvidenceCompiler ([batch1-obligation-register-v0-sample-compiler]): register
 row -> obligation-profile EvidenceContract, with clause trace preserved. Proves
-the acceptance line directly: the NN four-eyes policy row and the EU AI Act
+the acceptance line directly: the sample four-eyes policy row and the EU AI Act
 Article 12(1) logging row (the same evidence-class taxonomy
 ``[ldg-eu-ai-act-pack]``'s pack.yaml established) both round-trip into a valid
 requirement."""
@@ -22,7 +22,7 @@ SAMPLE_REGISTER_PATH = (
     Path(__file__).parent.parent / "capsule_engine" / "register" / "examples" / "obligation-register-v0-sample.yaml"
 )
 
-_GENERIC_CLAUSE = ClauseSpec(instrument="Policy NN", article="§1")
+_GENERIC_CLAUSE = ClauseSpec(instrument="Policy P-1", article="§1")
 
 
 @pytest.fixture()
@@ -39,12 +39,12 @@ def test_evidence_class_defaults_cover_every_declared_value():
     assert set(EVIDENCE_CLASS_DEFAULTS) == EVIDENCE_CLASS_VALUES
 
 
-def test_nn_four_eyes_row_compiles_to_a_valid_obligation_requirement(register, compiler):
-    row = register.row("nn/four-eyes/1")
+def test_sample_four_eyes_row_compiles_to_a_valid_obligation_requirement(register, compiler):
+    row = register.row("sample/four-eyes/1")
     requirement = compiler.compile_requirement(row)
 
     assert isinstance(requirement, EvidenceContract)
-    assert requirement.id == "nn/four-eyes/1"
+    assert requirement.id == "sample/four-eyes/1"
     assert requirement.profile == "obligation"
     assert requirement.profile in EVIDENCE_PROFILE_VALUES
     assert requirement.mode in MODE_VALUES
@@ -53,7 +53,7 @@ def test_nn_four_eyes_row_compiles_to_a_valid_obligation_requirement(register, c
     assert requirement.evidence_rule.startswith("RULE. ")
     # clause trace: the exact same ClauseSpec object, not re-derived
     assert requirement.clause is row.clause
-    assert requirement.clause.instrument == "Policy NN"
+    assert requirement.clause.instrument == "Policy P-1"
     assert requirement.clause.article == "§4 (Four-Eyes Approval)"
 
 
@@ -108,7 +108,7 @@ def test_every_evidence_class_compiles_without_error(compiler, evidence_class):
     row = RegisterRow(
         id=f"row-{evidence_class.lower()}",
         statement="Some obligation is satisfied.",
-        source="Policy NN",
+        source="Policy P-1",
         scope="some scope",
         owner="compliance-team",
         version="1.0.0",
