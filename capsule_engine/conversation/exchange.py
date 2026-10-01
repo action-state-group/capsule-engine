@@ -11,8 +11,8 @@ registry entry #70, ``scitt-payload-binding``'s
 ``spec/cpb-provisional-registry.md``).
 
 Conversation-detail capsules: ONE capsule shape spans
-mesh inference, tau2, and (once wired) the real Alchemy/Amplifier Security
-engagements. The labeled sub-digests are what make tier-2 fold-scoped
+mesh inference, tau2, and (once wired) real read-only investigation and
+internal-assist deployments. The labeled sub-digests are what make tier-2 fold-scoped
 disclosure possible: a holder can later disclose just the tool-call bytes
 (``payload_store.PayloadStore``) without disclosing the prompt or reasoning
 content, because each is committed under its own label rather than folded

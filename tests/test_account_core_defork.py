@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""De-fork onto the neutral account/fold core (Amendment E, 2026-08-31).
+"""De-fork onto the neutral account/fold core.
 
 Pins the §7 cross-repo replay property and the class-marker mapping:
 
