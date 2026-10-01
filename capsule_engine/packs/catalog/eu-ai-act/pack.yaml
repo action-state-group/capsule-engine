@@ -15,7 +15,7 @@ outcomes:
     forward_verdict: DETERMINISTIC
     backward_verdict: DETERMINISTIC
     profile: obligation
-    epistemic_type: OBSERVED_EVENT
+    epistemic_type: observed_event
     clause_ref: EU AI Act Article 53
     clause:
       instrument: Regulation (EU) 2024/1689
@@ -46,7 +46,7 @@ outcomes:
     forward_verdict: DETERMINISTIC
     backward_verdict: DETERMINISTIC
     profile: obligation
-    epistemic_type: PRODUCER_CLAIM
+    epistemic_type: producer_claim
     clause_ref: EU AI Act Article 75
     clause:
       instrument: Regulation (EU) 2024/1689
@@ -62,7 +62,7 @@ outcomes:
     forward_verdict: DETERMINISTIC
     backward_verdict: DETERMINISTIC
     profile: obligation
-    epistemic_type: OBLIGATION_REFERENCE
+    epistemic_type: obligation_reference
     clause_ref: EU AI Act Article 4
     clause:
       instrument: Regulation (EU) 2024/1689
@@ -78,7 +78,7 @@ outcomes:
     forward_verdict: DETERMINISTIC
     backward_verdict: DETERMINISTIC
     profile: obligation
-    epistemic_type: OBSERVED_EVENT
+    epistemic_type: observed_event
     tier: must_have
     clause_ref: EU AI Act Article 50
     clause:

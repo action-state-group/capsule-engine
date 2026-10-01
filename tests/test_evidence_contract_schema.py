@@ -76,7 +76,7 @@ def test_negative_fixture_near_miss_corrections_validate():
     dogfood-change-control.json's req-obligation-1)."""
     unknown_epistemic_type = json.loads((NEGATIVE_DIR / "unknown-epistemic-type.json").read_text())
     corrected = json.loads(json.dumps(unknown_epistemic_type))
-    corrected["requirements"][0]["evidence_requirements"]["accepted_epistemic_types"] = ["SYSTEM_OF_RECORD_FACT"]
+    corrected["requirements"][0]["evidence_requirements"]["accepted_epistemic_types"] = ["system_of_record_fact"]
     validate_evidence_contract(corrected)
 
     self_declared = json.loads((NEGATIVE_DIR / "requirement-self-declares-satisfied.json").read_text())
@@ -147,3 +147,12 @@ def test_every_real_catalog_packs_outcomes_validate(pack_dir):
 def test_at_least_one_real_catalog_pack_has_outcomes_to_cross_check():
     packs = [load_pack_dir(p) for p in CATALOG_DIR.iterdir() if p.is_dir()]
     assert any(pack.outcomes for pack in packs), "no catalog pack declares outcomes[] -- the cross-check above is vacuous"
+
+
+
+def test_upper_case_epistemic_types_are_rejected():
+    doc = json.loads((EXAMPLES_DIR / "ai-act-human-oversight.json").read_text())
+    er = doc["requirements"][0]["evidence_requirements"]
+    er["accepted_epistemic_types"] = [t.upper() for t in er["accepted_epistemic_types"]]
+    with pytest.raises(jsonschema.exceptions.ValidationError):
+        validate_evidence_contract(doc)

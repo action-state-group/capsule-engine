@@ -459,6 +459,11 @@ def test_caller_producer_of_is_asserted_and_none_means_unattributed():
     assert row.independence.producer_basis == "none"
 
 
+def test_upper_case_catalog_type_is_refused():
+    with pytest.raises(ResultError):
+        build_coverage_report(_contract(), [], source_of=_source_of, source_catalog={"review-events": "OBSERVED_EVENT"})
+
+
 def test_lowercase_catalog_type_is_accepted_and_carried_uppercase():
     report = build_coverage_report(
         _contract(), _full_records(), source_of=_source_of, source_catalog={"review-events": "observed_event"}
@@ -608,7 +613,7 @@ def test_status_to_sufficiency_is_the_fixed_mapping():
 
 # --- optional epistemic_type, from a caller-supplied source catalog --------
 
-CATALOG = {"review-events": "OBSERVED_EVENT", "override-events": "HUMAN_REPORT"}
+CATALOG = {"review-events": "observed_event", "override-events": "human_report"}
 
 
 def test_source_catalog_types_the_named_sources_only():
@@ -652,7 +657,8 @@ def test_vendored_epistemic_type_enum_matches_engine_values():
     from capsule_engine.packs.schema import EPISTEMIC_TYPE_VALUES
     from capsule_engine.report.result import load_schema
 
-    assert set(load_schema()["$defs"]["EpistemicType"]["enum"]) == EPISTEMIC_TYPE_VALUES
+    # TODO(epistemic-lowercase): exact equality once the Result schema is lower-cased.
+    assert {v.lower() for v in load_schema()["$defs"]["EpistemicType"]["enum"]} == EPISTEMIC_TYPE_VALUES
 
 
 # --- name tokens: empty is absent, normalized, linked one token at a time --

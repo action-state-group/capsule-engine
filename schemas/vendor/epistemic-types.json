@@ -1,5 +1,5 @@
 {
-  "$comment": "Vendored, not owned here. The epistemic_type value set is defined ONCE, on EvidenceBook's record header (its `epistemic_type` field, as of 2026-09-20). This file is a literal, case-folded transcription of that closed set -- created here because no machine-readable copy existed yet for capsule-engine's EPISTEMIC_TYPE_VALUES parity test to read; the parity test reads this vendored JSON, never a second hand-typed enum. A change to the owning set is a drift that must be re-vendored here, not silently re-derived.",
+  "$comment": "Vendored, not owned here. The epistemic_type value set is defined ONCE, on the record header's `epistemic_type` field. This file is a literal, lower-case transcription of that closed set (the same values as agent-action-capsule's schemas/vendor/epistemic-types.json), so capsule-engine's EPISTEMIC_TYPE_VALUES parity test reads a machine-readable copy, never a second hand-typed enum. A change to the owning set is a drift that must be re-vendored here, not silently re-derived.",
   "source": {
     "document": "EvidenceBook record header",
     "section": "Record header",
@@ -7,13 +7,13 @@
     "owning_field": "record.epistemic_type"
   },
   "values": [
-    "OBSERVED_EVENT",
-    "SYSTEM_OF_RECORD_FACT",
-    "PRODUCER_CLAIM",
-    "HUMAN_REPORT",
-    "SEMANTIC_JUDGMENT",
-    "DERIVED_METRIC",
-    "ADJUDICATION",
-    "OBLIGATION_REFERENCE"
+    "observed_event",
+    "system_of_record_fact",
+    "producer_claim",
+    "human_report",
+    "semantic_judgment",
+    "derived_metric",
+    "adjudication",
+    "obligation_reference"
   ]
 }

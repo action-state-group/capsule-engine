@@ -64,7 +64,7 @@ def test_eu_ai_act_logging_row_compiles_to_a_valid_obligation_requirement(regist
     assert requirement.id == "EU-12-1"
     assert requirement.profile == "obligation"
     assert requirement.mode == "structural"  # FACT -> structural
-    assert requirement.epistemic_type == "OBSERVED_EVENT"
+    assert requirement.epistemic_type == "observed_event"
     assert requirement.measurability == "declared_not_measured"  # row names an evidence_instrument
     assert requirement.evidence_instrument is row.evidence_instrument
     assert requirement.evidence_instrument.field == "native_log_event_kind"
