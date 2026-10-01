@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""Obligation register format v0 ([batch1-obligation-register-v0-sample-compiler]):
+"""Obligation register format v0:
 a flat, loadable list of register rows -- the GRC-shaped input a compliance team
 maintains directly (a spreadsheet of citations), distinct from and upstream of a
 pack.yaml's own ``outcomes[]``. ``compiler.compile_requirement`` is what turns one
@@ -10,7 +10,7 @@ forward" split ``packs.schema.Obligation``/``EvidenceContract`` already draw for
 pack's own obligations/outcomes.
 
 **Evidence-class taxonomy: FACT/RULE/JUDGED/CONFIRM/STATE/DOC.** Reconciled to be
-ONE definition with ``[ldg-eu-ai-act-pack]``'s pack.yaml, which already established
+ONE definition with the ``eu-ai-act`` catalog pack's pack.yaml, which already established
 FACT/RULE/JUDGED/CONFIRM/DOC as its own "Evidence-class -> schema mapping" comment
 (mode: FACT -> structural/value, RULE -> structural, JUDGED -> judged, CONFIRM ->
 structural + an external-confirmation evidence_instrument, DOC -> structural,

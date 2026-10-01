@@ -1,6 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""YAML front door for the obligation register
-([batch1-obligation-register-v0-sample-compiler]): a register file/dict ->
+"""YAML front door for the obligation register: a register file/dict ->
 a validated ``ObligationRegister``.
 
 Mirrors ``packs/loader.py``'s own discipline for the ``clause``/

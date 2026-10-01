@@ -1,6 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""Register row -> requirement compiler
-([batch1-obligation-register-v0-sample-compiler]): the OSS SAMPLE path from a
+"""Register row -> requirement compiler: the OSS SAMPLE path from a
 loadable ``RegisterRow`` to a ``packs.schema.EvidenceContract``
 (profile=='obligation'), carrying the row's ``clause`` through UNCHANGED -- the
 "clause trace" a report renderer needs to walk a compiled requirement back to the
@@ -41,7 +40,7 @@ class _ClassDefaults:
 
 # The ONE reconciliation of the register's evidence-class taxonomy into
 # ``packs.schema.EvidenceContract``'s own fields -- see ``schema.py``'s module
-# docstring for what each class means. ``[ldg-eu-ai-act-pack]``'s pack.yaml
+# docstring for what each class means. The ``eu-ai-act`` catalog pack's pack.yaml
 # already established FACT/RULE/JUDGED/CONFIRM/DOC -> mode (its own
 # "Evidence-class -> schema mapping" comment); this table is that SAME mapping
 # plus STATE, so a register row and a hand-written pack.yaml outcome never
@@ -79,7 +78,7 @@ class EvidenceCompiler:
         ``evidence_rule`` is synthesized, not authored: ``"{evidence_class}.
         {scope}"``, mirroring the pack.yaml convention of prefixing
         evidence_rule prose with the evidence-class token
-        (``[ldg-eu-ai-act-pack]``'s own rows all read "FACT. ...", "JUDGED.
+        (the ``eu-ai-act`` catalog pack's own rows all read "FACT. ...", "JUDGED.
         ...", etc.). A DOC row's evidence_rule always appends the same
         never-graded-compliant disclaimer that pack's own DOC rows carry, so a
         report renderer can never round a DOC hit up to a compliance claim.

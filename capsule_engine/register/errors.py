@@ -1,6 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""Named-reason errors for the obligation register
-([batch1-obligation-register-v0-sample-compiler]) -- mirrors ``packs/errors.py``'s
+"""Named-reason errors for the obligation register -- mirrors ``packs/errors.py``'s
 convention: a reason code for tests/tooling, a message that names the field, says
 what was expected, and shows a correct example.
 

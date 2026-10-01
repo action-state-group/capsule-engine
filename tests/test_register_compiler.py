@@ -1,9 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
-"""EvidenceCompiler ([batch1-obligation-register-v0-sample-compiler]): register
+"""EvidenceCompiler: register
 row -> obligation-profile EvidenceContract, with clause trace preserved. Proves
 the acceptance line directly: the sample four-eyes policy row and the EU AI Act
 Article 12(1) logging row (the same evidence-class taxonomy
-``[ldg-eu-ai-act-pack]``'s pack.yaml established) both round-trip into a valid
+the ``eu-ai-act`` catalog pack's pack.yaml established) both round-trip into a valid
 requirement."""
 from __future__ import annotations
 
