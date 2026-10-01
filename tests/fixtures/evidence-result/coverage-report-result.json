@@ -116,7 +116,9 @@
           "correlated_records": 0,
           "independent_producers": 2,
           "met": true,
-          "required_producers": 1
+          "producer_basis": "asserted",
+          "required_producers": 1,
+          "unattributed_records": 0
         },
         "obligation_refs": [
           "eu-ai-act:article-14"
@@ -177,7 +179,9 @@
           "correlated_records": 0,
           "independent_producers": 1,
           "met": true,
-          "required_producers": 1
+          "producer_basis": "asserted",
+          "required_producers": 1,
+          "unattributed_records": 0
         },
         "obligation_refs": [
           "eu-ai-act:article-14"
@@ -229,7 +233,9 @@
           "correlated_records": 3,
           "independent_producers": 1,
           "met": false,
-          "required_producers": 2
+          "producer_basis": "asserted",
+          "required_producers": 2,
+          "unattributed_records": 0
         },
         "obligation_refs": [
           "eu-ai-act:article-14"

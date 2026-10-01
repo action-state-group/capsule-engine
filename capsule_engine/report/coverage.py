@@ -27,6 +27,26 @@ they never raise ``independent_producers``. A requirement whose
 ``independence`` field asks for corroboration is met only by evidence from
 at least that many distinct producers.
 
+**Who the producer is.** For each requirement, if every attributed record
+carries a signer ``key_id`` (the local envelope field next to
+``signature``), the producer is the key id and ``producer_basis`` is
+``"key"``. Otherwise the producer is the capsule's self-asserted
+``operator`` + ``developer`` strings and ``producer_basis`` is
+``"asserted"``: anyone can write those strings, so an asserted producer is
+NOT authenticated, and a renderer should say so. A key id binds records to
+one key, but it does not show that two keys belong to two parties: AAC's
+``kid`` is self-attested, and a producer can mint a second key. One basis is
+used per requirement, so a producer that signs some records and not others
+is never counted twice. A caller-supplied ``producer_of`` is always
+``"asserted"``.
+
+**Unattributed records count toward no producer.** A record with no
+``key_id``, ``operator`` or ``developer`` is counted in
+``unattributed_records`` and never raises ``independent_producers``. Evidence
+that is entirely unattributed is ``INSUFFICIENT`` with an
+``unattributed_only`` gap, even when no independence is asked for: nobody is
+named as having produced it.
+
 **Per-source sufficiency reuses** ``packs.backfill_coverage``'s
 ``evaluate_requirement_coverage`` unchanged (duplicate collapse and the
 backfilled-record cap below ``committed``), one call per required source.
@@ -40,7 +60,7 @@ whether evidence is there to evaluate, not what the evaluation found.
 **Which record answers which source is injected.** ``source_of`` (record ->
 source name or ``None``) is REQUIRED, the same explicit-injection convention
 ``backfill_coverage``'s ``matches`` uses; ``producer_of`` defaults to the
-capsule's ``operator`` + ``developer`` pair. No producer identity is written
+key-or-asserted rule above. No producer identity is written
 into the report -- only counts and record digests. A source row's optional
 ``epistemic_type`` comes from a caller-supplied source catalog; nothing here
 infers it from the records.
@@ -60,6 +80,7 @@ from ..packs.backfill_coverage import (
     STATUS_INSUFFICIENT,
     STATUS_NOT_FOUND,
     STATUS_SATISFIED,
+    RequirementCoverageResult,
     _record_id,
     evaluate_requirement_coverage,
 )
@@ -72,6 +93,7 @@ __all__ = [
     "CONNECTOR_VALUES",
     "RAISES_TO_VALUES",
     "GAP_KIND_VALUES",
+    "PRODUCER_BASIS_VALUES",
     "STATUS_UNKNOWN",
     "STATUS_TO_SUFFICIENCY",
     "Remedy",
@@ -98,10 +120,13 @@ RAISES_TO_VALUES = frozenset({"retrospectively_evidenced", "observed", "committe
 GAP_MISSING_SOURCE = "missing_source"
 GAP_ASSURANCE_BELOW_MINIMUM = "assurance_below_minimum"
 GAP_CORRELATED_ONLY = "correlated_only"
+GAP_UNATTRIBUTED_ONLY = "unattributed_only"
 GAP_NO_SOURCES_DECLARED = "no_sources_declared"
 GAP_KIND_VALUES = frozenset(
-    {GAP_MISSING_SOURCE, GAP_ASSURANCE_BELOW_MINIMUM, GAP_CORRELATED_ONLY, GAP_NO_SOURCES_DECLARED}
+    {GAP_MISSING_SOURCE, GAP_ASSURANCE_BELOW_MINIMUM, GAP_CORRELATED_ONLY, GAP_UNATTRIBUTED_ONLY, GAP_NO_SOURCES_DECLARED}
 )
+
+PRODUCER_BASIS_VALUES = frozenset({"key", "asserted", "none"})
 
 STATUS_UNKNOWN = "UNKNOWN"
 _STATUS_VALUES = frozenset({STATUS_SATISFIED, STATUS_INSUFFICIENT, STATUS_NOT_FOUND, STATUS_UNKNOWN})
@@ -175,13 +200,21 @@ class Independence:
     required_producers: int
     independent_producers: int
     correlated_records: int  # records beyond the first from each producer
+    unattributed_records: int  # records naming no producer; never counted toward one
+    producer_basis: str  # "key" | "asserted" | "none" (no producer counted)
     met: bool
+
+    def __post_init__(self) -> None:
+        if self.producer_basis not in PRODUCER_BASIS_VALUES:
+            raise ResultError(INVALID_COVERAGE_REPORT, f"producer_basis must be one of {sorted(PRODUCER_BASIS_VALUES)}, got {self.producer_basis!r}")
 
     def to_dict(self) -> dict:
         return {
             "required_producers": self.required_producers,
             "independent_producers": self.independent_producers,
             "correlated_records": self.correlated_records,
+            "unattributed_records": self.unattributed_records,
+            "producer_basis": self.producer_basis,
             "met": self.met,
         }
 
@@ -280,16 +313,51 @@ def _summarize(requirements: Sequence[RequirementCoverage]) -> CoverageSummary:
     )
 
 
-def default_producer_of(record: Mapping[str, Any]) -> Hashable:
-    """The party that emitted the record: the capsule's ``operator`` +
-    ``developer`` pair. A record with neither is its own producer (keyed by
-    its digest), so an unattributed record can never inflate another
-    producer's count -- nor be merged with one."""
+def _key_id(record: Mapping[str, Any]) -> str | None:
+    key_id = record.get("key_id")
+    return key_id if isinstance(key_id, str) and key_id else None
+
+
+def _asserted(record: Mapping[str, Any]) -> tuple[Any, Any] | None:
     operator = record.get("operator")
     developer = record.get("developer")
     if operator is None and developer is None:
-        return ("unattributed", _record_digest(record))
+        return None
     return (operator, developer)
+
+
+def default_producer_of(record: Mapping[str, Any]) -> Hashable | None:
+    """One record's producer on its own: the signer ``key_id`` when present,
+    else the asserted ``operator`` + ``developer`` pair, else ``None``
+    (unattributed -- counts toward no producer). ``build_coverage_report``
+    applies one basis per requirement (see the module docstring); this is the
+    single-record view of the same rule."""
+    key_id = _key_id(record)
+    if key_id is not None:
+        return ("key", key_id)
+    asserted = _asserted(record)
+    return None if asserted is None else ("asserted", asserted)
+
+
+def _producer_rule(
+    records: Sequence[Mapping[str, Any]],
+    producer_of: Callable[[Mapping[str, Any]], Hashable | None] | None,
+) -> tuple[Callable[[Mapping[str, Any]], Hashable | None], str]:
+    """The producer function and its basis for one requirement's records."""
+    if producer_of is not None:
+        return producer_of, "asserted"
+    attributed = [r for r in records if _key_id(r) is not None or _asserted(r) is not None]
+    if attributed and all(_key_id(r) is not None for r in attributed):
+        return _key_id, "key"
+
+    def asserted_or_key(r: Mapping[str, Any]) -> Hashable | None:
+        asserted = _asserted(r)
+        if asserted is not None:
+            return ("asserted", asserted)
+        key_id = _key_id(r)  # a keyed record with no operator/developer stays its key's
+        return None if key_id is None else ("key", key_id)
+
+    return asserted_or_key, "asserted"
 
 
 def _record_digest(record: Mapping[str, Any]) -> str:
@@ -319,32 +387,19 @@ def required_producers(independence: str | None) -> int:
     return 2
 
 
-def _source_coverage(
+def _source_records(
     source: str,
     records: list[dict],
     *,
     source_of: Callable[[dict], str | None],
-    producer_of: Callable[[Mapping[str, Any]], Hashable],
     minimum_assurance: frozenset[str],
-    epistemic_type: str | None,
-) -> tuple[SourceCoverage, list[dict]]:
+) -> tuple[RequirementCoverageResult, list[dict]]:
     result = evaluate_requirement_coverage(
         records, matches=lambda r: source_of(r) == source, minimum_assurance=minimum_assurance
     )
     surviving_ids = set(result.matched_capsule_ids)
     surviving = [r for r in records if source_of(r) == source and _record_id(r) in surviving_ids]
-    coverage = SourceCoverage(
-        source=source,
-        status=result.status,
-        record_count=len(surviving),
-        contemporaneous_count=result.contemporaneous_count,
-        backfilled_count=result.backfilled_count,
-        duplicates_collapsed=result.duplicates_collapsed_count,
-        producer_count=len({producer_of(r) for r in surviving}),
-        evidence=tuple(DigestRef(digest=_record_digest(r)) for r in surviving),
-        epistemic_type=epistemic_type,
-    )
-    return coverage, surviving
+    return result, surviving
 
 
 def _requirement_coverage(
@@ -353,7 +408,7 @@ def _requirement_coverage(
     claims: Sequence[Claim],
     *,
     source_of: Callable[[dict], str | None],
-    producer_of: Callable[[Mapping[str, Any]], Hashable],
+    producer_of: Callable[[Mapping[str, Any]], Hashable | None] | None,
     remedies: Mapping[str, Remedy],
     corroboration_remedy: Remedy | None,
     source_catalog: Mapping[str, str],
@@ -375,7 +430,14 @@ def _requirement_coverage(
             status=STATUS_UNKNOWN,
             claim_ids=claim_ids,
             sources=(),
-            independence=Independence(required_producers=need, independent_producers=0, correlated_records=0, met=False),
+            independence=Independence(
+                required_producers=need,
+                independent_producers=0,
+                correlated_records=0,
+                unattributed_records=0,
+                producer_basis="none",
+                met=False,
+            ),
             gaps=(
                 Gap(
                     kind=GAP_NO_SOURCES_DECLARED,
@@ -384,20 +446,32 @@ def _requirement_coverage(
             ),
         )
 
+    per_source = [
+        (source, *_source_records(source, records, source_of=source_of, minimum_assurance=minimum_assurance))
+        for source in declared
+    ]
+    # One record can answer two sources; count it once.
+    evidence: dict[str, dict] = {}
+    for _, _, surviving in per_source:
+        for record in surviving:
+            evidence.setdefault(_record_id(record), record)
+    producer, basis = _producer_rule(list(evidence.values()), producer_of)
+
     sources: list[SourceCoverage] = []
     gaps: list[Gap] = []
-    evidence_records: list[dict] = []
-    for source in declared:
-        coverage, surviving = _source_coverage(
-            source,
-            records,
-            source_of=source_of,
-            producer_of=producer_of,
-            minimum_assurance=minimum_assurance,
+    for source, result, surviving in per_source:
+        coverage = SourceCoverage(
+            source=source,
+            status=result.status,
+            record_count=len(surviving),
+            contemporaneous_count=result.contemporaneous_count,
+            backfilled_count=result.backfilled_count,
+            duplicates_collapsed=result.duplicates_collapsed_count,
+            producer_count=len({p for r in surviving if (p := producer(r)) is not None}),
+            evidence=tuple(DigestRef(digest=_record_digest(r)) for r in surviving),
             epistemic_type=source_catalog.get(source),
         )
         sources.append(coverage)
-        evidence_records.extend(surviving)
         if coverage.status == STATUS_NOT_FOUND:
             gaps.append(
                 Gap(
@@ -421,37 +495,57 @@ def _requirement_coverage(
                 )
             )
 
-    # Correlation vs corroboration: count producers, never records.
+    # Correlation vs corroboration: count producers, never records; an
+    # unattributed record counts toward no producer at all.
     per_producer: dict[Hashable, int] = {}
-    seen: set[str] = set()
-    for record in evidence_records:
-        rid = _record_id(record)
-        if rid in seen:  # one record can answer two sources; count it once
+    unattributed = 0
+    for record in evidence.values():
+        key = producer(record)
+        if key is None:
+            unattributed += 1
             continue
-        seen.add(rid)
-        key = producer_of(record)
         per_producer[key] = per_producer.get(key, 0) + 1
     independent = len(per_producer)
     correlated = sum(n - 1 for n in per_producer.values())
     met = independent >= need
     independence = Independence(
-        required_producers=need, independent_producers=independent, correlated_records=correlated, met=met
+        required_producers=need,
+        independent_producers=independent,
+        correlated_records=correlated,
+        unattributed_records=unattributed,
+        producer_basis=basis if independent else "none",
+        met=met,
     )
-    if not met and evidence_records:
-        gaps.append(
-            Gap(
-                kind=GAP_CORRELATED_ONLY,
-                detail=(
-                    f"the requirement asks for {need} independent producer(s); its "
-                    f"{len(seen)} record(s) come from {independent} producer(s) -- records from one "
-                    "producer correlate, they do not corroborate; add a source another party produces"
-                ),
-                remedy=corroboration_remedy,
+    if not met and evidence:
+        if independent == 0:
+            gaps.append(
+                Gap(
+                    kind=GAP_UNATTRIBUTED_ONLY,
+                    detail=(
+                        f"all {unattributed} record(s) name no producer (no key_id, operator or developer); "
+                        "unattributed records count toward no producer, so nobody is named as having "
+                        "produced this evidence; capture the source with producer attribution"
+                    ),
+                    remedy=corroboration_remedy,
+                )
             )
-        )
+        else:
+            gaps.append(
+                Gap(
+                    kind=GAP_CORRELATED_ONLY,
+                    detail=(
+                        f"the requirement asks for {need} independent producer(s); its "
+                        f"{len(evidence)} record(s) come from {independent} producer(s)"
+                        + (f" plus {unattributed} unattributed record(s)" if unattributed else "")
+                        + " -- records from one producer correlate, they do not corroborate; "
+                        "add a source another party produces"
+                    ),
+                    remedy=corroboration_remedy,
+                )
+            )
 
     statuses = [s.status for s in sources]
-    if not met and evidence_records:
+    if not met and evidence:
         statuses.append(STATUS_INSUFFICIENT)
     status = next(s for s in _STATUS_ORDER if s in statuses) if statuses else STATUS_UNKNOWN
     return RequirementCoverage(
@@ -471,7 +565,7 @@ def build_coverage_report(
     *,
     source_of: Callable[[dict], str | None],
     claims: Sequence[Claim] = (),
-    producer_of: Callable[[Mapping[str, Any]], Hashable] = default_producer_of,
+    producer_of: Callable[[Mapping[str, Any]], Hashable | None] | None = None,
     remedies: Mapping[str, Remedy] | None = None,
     corroboration_remedy: Remedy | None = None,
     source_catalog: Mapping[str, str] | None = None,
@@ -484,7 +578,8 @@ def build_coverage_report(
     ``corroboration_remedy`` is the remedy named on a ``correlated_only``
     gap (the connector that would bring in a second producer), if any.
     ``source_catalog`` maps a source name to its declared epistemic type
-    (one of ``packs.schema.EPISTEMIC_TYPE_VALUES``); a source row carries
+    (one of ``packs.schema.EPISTEMIC_TYPE_VALUES``, compared
+    case-insensitively); a source row carries
     ``epistemic_type`` only when the catalog names it."""
     contract_ref = f"{contract['id']}@{contract['version']}"
     for claim in claims:
@@ -494,7 +589,10 @@ def build_coverage_report(
                 f"claim {claim.id!r} is for {claim.contract_ref!r}, not this report's contract {contract_ref!r}",
             )
     remedies = remedies or {}
-    source_catalog = source_catalog or {}
+    # Case-insensitive: the owning EvidenceBook list is lowercase, the
+    # Evidence Contract and the Result spell it uppercase (an open spelling
+    # question); either is accepted and the Result carries uppercase.
+    source_catalog = {k: v.upper() if isinstance(v, str) else v for k, v in (source_catalog or {}).items()}
     for source, epistemic_type in source_catalog.items():
         if epistemic_type not in EPISTEMIC_TYPE_VALUES:
             raise ResultError(
@@ -522,9 +620,19 @@ def verify_coverage_report(doc: Mapping[str, Any], claims_by_id: Mapping[str, Ma
     entry names a claim with the same ``requirement_ref`` and
     ``contract_ref``; ``sufficiency`` matches ``status`` by the fixed
     mapping; each source's counts add up; independent producers plus
-    correlated records equal the distinct records; ``independence.met``
-    agrees with the producer counts; and ``summary`` recomputes from the
-    requirement rows. Raises ``ResultError`` on the first violation."""
+    correlated plus unattributed records equal the distinct records;
+    ``producer_basis`` is ``"none"`` exactly when no producer was counted;
+    ``independence.met`` agrees with the producer counts; and ``summary``
+    recomputes from the requirement rows. Raises ``ResultError`` on the first
+    violation.
+
+    **What this cannot catch.** The report carries producer counts, never
+    producer identities (by design: no identity goes into a disclosed
+    document), and ``required_producers`` as the producer computed it. So a
+    hand edit that raises ``independent_producers`` and lowers
+    ``correlated_records`` by the same amount, or that lowers
+    ``required_producers``, passes this check. Only a recompute from the
+    records and the contract (``build_coverage_report``) detects it."""
     contract_ref = doc.get("contract_ref")
     rows = doc.get("requirements", [])
     gaps_total = 0
@@ -568,10 +676,18 @@ def verify_coverage_report(doc: Mapping[str, Any], claims_by_id: Mapping[str, Ma
                 )
         ind = row.get("independence", {})
         distinct = {e.get("digest") for src in row.get("sources", []) for e in src.get("evidence", [])}
-        if ind.get("independent_producers", 0) + ind.get("correlated_records", 0) != len(distinct):
+        counted = ind.get("independent_producers", 0) + ind.get("correlated_records", 0) + ind.get("unattributed_records", 0)
+        if counted != len(distinct):
             raise ResultError(
                 INVALID_COVERAGE_REPORT,
-                f"requirement {ref!r}: independent_producers + correlated_records != {len(distinct)} distinct records",
+                f"requirement {ref!r}: independent_producers + correlated_records + unattributed_records != {len(distinct)} distinct records",
+            )
+        if ind.get("producer_basis") not in PRODUCER_BASIS_VALUES or (
+            (ind.get("producer_basis") == "none") != (ind.get("independent_producers", 0) == 0)
+        ):
+            raise ResultError(
+                INVALID_COVERAGE_REPORT,
+                f"requirement {ref!r}: producer_basis {ind.get('producer_basis')!r} disagrees with independent_producers",
             )
         if ind.get("met") !=(ind.get("independent_producers", 0) >= ind.get("required_producers", 1)):
             raise ResultError(INVALID_COVERAGE_REPORT, f"requirement {ref!r}: independence.met disagrees with its producer counts")

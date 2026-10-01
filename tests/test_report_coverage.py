@@ -301,10 +301,106 @@ def test_one_record_answering_two_sources_counts_once():
     assert _req(report, "req-human-role-3").independence.correlated_records == 0
 
 
-def test_unattributed_records_are_each_their_own_producer():
+def _unattributed(record: dict) -> dict:
+    out = dict(record)
+    out.pop("operator", None)
+    out.pop("developer", None)
+    return out
+
+
+def test_unattributed_records_count_toward_no_producer():
     a = {"capsule_id": _hex("u1"), "payload": {"source": "x"}}
-    b = {"capsule_id": _hex("u2"), "payload": {"source": "x"}}
-    assert default_producer_of(a) != default_producer_of(b)
+    assert default_producer_of(a) is None
+
+
+def test_probe_stripped_attribution_does_not_manufacture_corroboration():
+    """The review probe: ten single-producer spans with the attribution
+    removed must not become ten independent producers."""
+    records = [_unattributed(r) for r in _one_producer_span_records()]
+    row = _req(build_coverage_report(_independent_contract(), records, source_of=_source_of), "req-human-role-3")
+    assert row.independence.independent_producers == 0
+    assert row.independence.unattributed_records == 10
+    assert row.independence.producer_basis == "none"
+    assert row.independence.met is False
+    assert row.status == "INSUFFICIENT"
+    assert [g.kind for g in row.gaps] == ["unattributed_only"]
+
+
+def test_unattributed_only_is_insufficient_even_without_independence():
+    records = [_unattributed(r) for r in _full_records()]
+    row = _req(build_coverage_report(_contract(), records, source_of=_source_of), "req-human-role-1")
+    assert row.independence.required_producers == 1
+    assert row.status == "INSUFFICIENT"
+    assert [g.kind for g in row.gaps] == ["unattributed_only"]
+
+
+def test_unattributed_records_beside_one_producer_do_not_corroborate():
+    records = _one_producer_span_records()[:3] + [_unattributed(r) for r in _one_producer_span_records()[3:]]
+    row = _req(build_coverage_report(_independent_contract(), records, source_of=_source_of), "req-human-role-3")
+    assert row.independence.independent_producers == 1
+    assert row.independence.unattributed_records == 7
+    assert row.independence.correlated_records == 2
+    assert [g.kind for g in row.gaps] == ["correlated_only"]
+
+
+def _keyed(record: dict, key: str) -> dict:
+    return dict(record, key_id=key)
+
+
+def test_signer_key_is_the_producer_when_every_record_has_one():
+    # Two key ids under one asserted operator/developer: two producers by key.
+    records = [_keyed(r, _hex("k1") if i % 2 else _hex("k2")) for i, r in enumerate(_one_producer_span_records())]
+    row = _req(build_coverage_report(_independent_contract(), records, source_of=_source_of), "req-human-role-3")
+    assert row.independence.producer_basis == "key"
+    assert row.independence.independent_producers == 2
+    assert row.status == "SATISFIED"
+
+
+def test_one_key_under_two_asserted_names_is_one_producer():
+    records = [
+        _keyed(_record("a", "review-events", operator="op-a"), _hex("k1")),
+        _keyed(_record("b", "override-events", operator="op-b"), _hex("k1")),
+        _keyed(_record("c", "exception-events", operator="op-c"), _hex("k1")),
+    ]
+    row = _req(build_coverage_report(_independent_contract(), records, source_of=_source_of), "req-human-role-3")
+    assert row.independence.producer_basis == "key"
+    assert row.independence.independent_producers == 1
+    assert row.status == "INSUFFICIENT"
+
+
+def test_without_keys_the_producer_is_asserted():
+    row = _req(build_coverage_report(_contract(), _full_records(), source_of=_source_of), "req-human-role-3")
+    assert row.independence.producer_basis == "asserted"
+
+
+def test_partly_signed_producer_is_not_counted_twice():
+    # One producer signs some records and not others: one asserted basis for
+    # the whole requirement, so it stays one producer.
+    records = _one_producer_span_records()
+    records = [_keyed(r, _hex("k1")) if i < 5 else r for i, r in enumerate(records)]
+    row = _req(build_coverage_report(_independent_contract(), records, source_of=_source_of), "req-human-role-3")
+    assert row.independence.producer_basis == "asserted"
+    assert row.independence.independent_producers == 1
+
+
+def test_caller_producer_of_is_asserted_and_none_means_unattributed():
+    records = _one_producer_span_records()
+    row = _req(
+        build_coverage_report(
+            _independent_contract(), records, source_of=_source_of, producer_of=lambda r: None
+        ),
+        "req-human-role-3",
+    )
+    assert row.independence.unattributed_records == 10
+    assert row.independence.producer_basis == "none"
+
+
+def test_lowercase_catalog_type_is_accepted_and_carried_uppercase():
+    report = build_coverage_report(
+        _contract(), _full_records(), source_of=_source_of, source_catalog={"review-events": "observed_event"}
+    )
+    src = next(s for s in _req(report, "req-human-role-3").sources if s.source == "review-events")
+    assert src.epistemic_type == "OBSERVED_EVENT"
 
 
 @pytest.mark.parametrize(
@@ -382,6 +478,14 @@ def test_claim_from_another_contract_is_refused():
             lambda d: d["requirements"][0]["independence"].__setitem__("correlated_records", 5),
             id="producer-counts-do-not-match-records",
         ),
+        pytest.param(
+            lambda d: d["requirements"][0]["independence"].__setitem__("unattributed_records", 3),
+            id="unattributed-count-does-not-match-records",
+        ),
+        pytest.param(
+            lambda d: d["requirements"][0]["independence"].__setitem__("producer_basis", "none"),
+            id="basis-none-with-producers",
+        ),
     ],
 )
 def test_verify_rejects_a_tampered_coverage_report(mutate):
@@ -403,6 +507,33 @@ def test_schema_rejects_satisfied_row_with_a_gap():
     )
     with pytest.raises(jsonschema.ValidationError):
         validate_against_schema(doc)
+
+
+def test_verifier_limit_counts_moved_to_independent_pass_the_document_check():
+    """Documented limit: without producer identities, a hand edit that moves
+    correlated records to independent producers passes verify_result. Only
+    a recompute catches it -- this pins that the limit is real, so the
+    docstring stays honest."""
+    records = _one_producer_span_records()
+    claims = [_claim("c-3", "req-human-role-3")]
+    contract = _independent_contract()
+    coverage = build_coverage_report(contract, records, source_of=_source_of, claims=claims)
+    doc = build_result(claims, generated_at="2026-10-01T00:00:00Z", coverage_report=coverage).to_dict()
+    row = doc["coverage_report"]["requirements"][2]
+    row["independence"].update({"independent_producers": 2, "correlated_records": 8, "met": True})
+    row["status"], row["sufficiency"], row["gaps"] = "SATISFIED", "SATISFIED", []
+    rows = doc["coverage_report"]["requirements"]
+    gaps = [g for r in rows for g in r["gaps"]]
+    doc["coverage_report"]["summary"] = {
+        "requirements": len(rows),
+        "satisfied": sum(r["status"] == "SATISFIED" for r in rows),
+        "with_gaps": sum(bool(r["gaps"]) for r in rows),
+        "gaps": len(gaps),
+        "gaps_without_remedy": sum(g["remedy"] is None for g in gaps),
+    }
+    verify_result(doc)  # passes: the limit
+    recomputed = build_coverage_report(contract, records, source_of=_source_of, claims=claims).to_dict()
+    assert recomputed["requirements"][2]["independence"]["independent_producers"] == 1
 
 
 def test_status_to_sufficiency_is_the_fixed_mapping():

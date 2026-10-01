@@ -11,7 +11,7 @@
     "coverage_report": {
       "comment": "The PROPOSED coverage_report section (EpistemicType through CoverageReport in $defs, and EvidenceResult.properties.coverage_report) is transcribed from this branch and commit; the rest of the file is unchanged from the base above.",
       "branch": "feat/result-coverage-report",
-      "commit": "07a6cca77b3877ab6fb85015cd35249d5a1ee92b",
+      "commit": "d6911a1bfbe8f02239a0890540f45ea93ee3f4cf",
       "vendored_at": "2026-09-30"
     }
   },
@@ -509,13 +509,15 @@
       ]
     },
     "Independence": {
-      "description": "PROPOSED (spec section 7.1). Producers, not records, are counted: records from one producer are correlation, never corroboration.",
+      "description": "PROPOSED (spec section 7.1). Producers, not records, are counted: records from one producer are correlation, never corroboration. A record naming no producer counts toward none (unattributed_records). producer_basis says what identifies a producer: key (signer key id), asserted (self-asserted operator/developer, not authenticated), or none (no producer counted).",
       "type": "object",
       "additionalProperties": false,
       "required": [
         "required_producers",
         "independent_producers",
         "correlated_records",
+        "unattributed_records",
+        "producer_basis",
         "met"
       ],
       "properties": {
@@ -530,6 +532,17 @@
         "correlated_records": {
           "type": "integer",
           "minimum": 0
+        },
+        "unattributed_records": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "producer_basis": {
+          "enum": [
+            "key",
+            "asserted",
+            "none"
+          ]
         },
         "met": {
           "type": "boolean"
@@ -551,6 +564,7 @@
             "missing_source",
             "assurance_below_minimum",
             "correlated_only",
+            "unattributed_only",
             "no_sources_declared"
           ]
         },

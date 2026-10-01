@@ -38,7 +38,12 @@ def test_fixture_shows_one_requirement_per_state():
     assert rows[1]["gaps"][0]["remedy"] == {"connector": "system_of_record", "raises_to": "retrospectively_evidenced"}
     assert rows[2]["gaps"][0]["kind"] == "correlated_only"
     assert rows[2]["independence"] == {
-        "required_producers": 2, "independent_producers": 1, "correlated_records": 3, "met": False
+        "required_producers": 2,
+        "independent_producers": 1,
+        "correlated_records": 3,
+        "unattributed_records": 0,
+        "producer_basis": "asserted",
+        "met": False,
     }
 
 
