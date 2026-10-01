@@ -709,7 +709,10 @@ def test_a_real_eu_ai_act_clause_round_trips_through_the_obligation_profile(tmp_
 
 def test_the_real_airline_engagement_pack_digest_is_byte_identical_after_the_reframe():
     pack = load_pack_dir(AIRLINE_ENGAGEMENT_DIR)
-    assert pack.definition_digest() == "f2f2c5f0225cb3de76817f5244b0abac5ba622412f4d1b852b7074c8640b74d7"
+    # Re-pinned at asg/airline-engagement/1.0.1: A1's and A3b's evidence_rule
+    # text was reworded (no field or structure change). 1.0.0 pinned to
+    # f2f2c5f0225cb3de76817f5244b0abac5ba622412f4d1b852b7074c8640b74d7.
+    assert pack.definition_digest() == "ea74a099524b5f7a82047cc883e211a25ef230a29c34438e68bfac22c9169277"
 
 
 def test_the_real_standard_vendor_pack_digest_is_byte_identical_after_the_reframe():
