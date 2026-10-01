@@ -70,13 +70,13 @@ def _record(seed: str, source: str, operator: str, developer: str) -> dict:
 
 
 def _span(seed: str, source: str) -> dict:
-    record = _record(seed, source, "oo-operator", "oo-agent@v1")
+    record = _record(seed, source, "example-org-operator", "example-org-agent@v1")
     record["model_attestation"] = {
         "compute_attestation": {
             OTEL_BLOCK_KEY: {
-                "trace_id": _hex("oo-trace"),
-                "span_id": _hex(f"oo-span-{seed}"),
-                "resource": {"service.name": "oo-agent"},
+                "trace_id": _hex("example-org-trace"),
+                "span_id": _hex(f"example-org-span-{seed}"),
+                "resource": {"service.name": "example-org-agent"},
             }
         }
     }
@@ -89,7 +89,7 @@ def _backfilled(seed: str, source: str, operator: str, developer: str) -> dict:
         "mode": "backfilled",
         "source_ref": {"type": "source_record", "digest_alg": "sha256", "digest": _hex(f"src-{seed}")},
         "source_asserted_at": "2026-08-15T00:00:00Z",
-        "import_batch": "oo-import-1",
+        "import_batch": "example-org-import-1",
         "imported_at": "2026-09-22T00:00:00Z",
     }
     return record
@@ -103,13 +103,13 @@ def contract() -> dict:
 
 def records() -> list[dict]:
     return [
-        _backfilled("oo-r1", "role-assignment-record", "oo-hr", "sor@v1"),
-        _record("oo-r2", "authority-competence-record", "oo-training", "sor@v1"),
-        _record("oo-r3", "review-interaction-records", "oo-review", "ui@v2"),
-        _span("oo-s1", "review-events"),
-        _span("oo-s2", "review-events"),
-        _span("oo-s3", "override-events"),
-        _span("oo-s4", "exception-events"),
+        _backfilled("example-org-r1", "role-assignment-record", "example-org-hr", "sor@v1"),
+        _record("example-org-r2", "authority-competence-record", "example-org-training", "sor@v1"),
+        _record("example-org-r3", "review-interaction-records", "example-org-review", "ui@v2"),
+        _span("example-org-s1", "review-events"),
+        _span("example-org-s2", "review-events"),
+        _span("example-org-s3", "override-events"),
+        _span("example-org-s4", "exception-events"),
     ]
 
 
@@ -159,7 +159,7 @@ def build_coverage_fixture() -> dict:
     coverage = build_coverage_report(
         doc, records(), source_of=_source_of, claims=claims, remedies=REMEDIES, source_catalog=SOURCE_CATALOG
     )
-    view = View(producer_name="OO", title="Human oversight evidence coverage (synthetic)")
+    view = View(producer_name="EXAMPLE-ORG", title="Human oversight evidence coverage (synthetic)")
     return build_result(claims, generated_at=GENERATED_AT, view=view, coverage_report=coverage).to_dict()
 
 

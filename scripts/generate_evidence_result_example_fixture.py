@@ -41,14 +41,14 @@ from capsule_engine.report.result_from_folds import (  # noqa: E402
 )
 
 FIXTURE_PATH = Path(__file__).parent.parent / "tests" / "fixtures" / "evidence-result" / "example-claims-result.json"
-CONTRACT_REF = "ec:example-retention-continuity:2026-09-22@1"
+CONTRACT_REF = "ec:example-org-retention-continuity:2026-09-22@1"
 
 
 def _signed_segment(ledger_path: Path) -> ChainSegment:
     checkpoints = []
     for batch in range(3):
         for i in range(2):
-            seal(None, action=f"batch{batch}-{i}", operator="Example Operator", anchor=False, ledger=ledger_path)
+            seal(None, action=f"batch{batch}-{i}", operator="EXAMPLE-ORG", anchor=False, ledger=ledger_path)
         cp = witness.push(str(ledger_path))
         assert cp is not None
         checkpoints.append(cp)
@@ -97,7 +97,7 @@ def build_example_result():
         [met_claim, not_met_claim, insufficient_claim],
         generated_at=as_of,
         excluded_not_applicable=1,
-        view=View(producer_name="Example Operator", title="Example Retention Continuity -- Result v0"),
+        view=View(producer_name="EXAMPLE-ORG", title="EXAMPLE-ORG Retention Continuity -- Result v0"),
     )
 
 
