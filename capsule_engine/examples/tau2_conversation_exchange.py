@@ -6,7 +6,7 @@ user message text + flattened tool-call trail, from
 ``capsule-emit-mesh``'s ``mesh_record_emitter.py`` uses for its inference
 capsules (``capsule_engine.conversation.build_conversation_exchange_capsule``).
 
-[tau2-engagement-conversation-detail-capsules]: proves ONE capsule shape
+Conversation-detail capsules: proves ONE capsule shape
 spans mesh inference, tau2, and (once wired) the real Alchemy/Amplifier
 Security engagements. Model identity is supplied by the caller rather than
 guessed from the sim record -- a real engagement transcript's own metadata

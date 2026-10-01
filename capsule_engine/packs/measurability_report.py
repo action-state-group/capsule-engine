@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""``[pack-propose-generic]``: a GENERIC "would this pack work" report --
+"""A GENERIC "would this pack work" report --
 for ANY pack (``standard-vendor``, a prospect's edited copy, airline-engagement,
 whatever ``load_pack_dir`` can parse), read each outcome's already-existing
 ``tier``/``mode``/``evidence_instrument`` fields and report, per outcome,
@@ -22,7 +22,7 @@ report-local ``folds.FoldDefinition`` (an invented ``reducer``/``emit``/
 ``fold_id`` -- there is no real, registered fold behind an outcome that has
 never been compiled into one) purely so its digest can be computed through
 the real de-fork seam (``folds/account_core.py`` -> ``capsule_emit.account``,
-the same seam ``[account-fold-core-unify]``/#107 landed) rather than a
+the same seam the account fold uses) rather than a
 hand-rolled one. The COMPUTATION is real and cross-repo-checkable; what it
 is computed OVER is this report's own invented stand-in, not the pack's
 actual fold definition. ``MeasurabilityRow.projection_digest`` is named to

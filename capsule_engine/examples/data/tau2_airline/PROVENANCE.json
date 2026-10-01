@@ -65,6 +65,6 @@
     "usage_meter": "prompt_tokens/completion_tokens summed over role:assistant messages (agent only; user-simulator tokens excluded)",
     "num_simulations_with_usage": 200,
     "cost_omitted": "per-message currency 'cost' deliberately not vendored (meter-not-price)",
-    "note": "conversation-grain companion to tau2_committed_<model>_airline_trial0.jsonl -- assistant/user message text + tool-call-name trail, for [ldg-airline-engagement-pack]'s text-reading claims (A1/A3/A5/A7); now also carries recovered per-sim model/generation_parameters/usage"
+    "note": "conversation-grain companion to tau2_committed_<model>_airline_trial0.jsonl -- assistant/user message text + tool-call-name trail, for the airline-engagement pack's text-reading claims (A1/A3/A5/A7); now also carries recovered per-sim model/generation_parameters/usage"
   }
 }

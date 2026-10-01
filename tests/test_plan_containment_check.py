@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 """C2: ``plan_containment`` check -- pass/fail/n-a semantics, evidence shape,
 and the lock-independence property the design doc cites as the reason this
-check may ship into enforce mode ahead of ``[ldg-guardengine-caps-race]``."""
+check may ship into enforce mode ahead of a fix for the caps race."""
 from __future__ import annotations
 
 import inspect
@@ -126,7 +126,7 @@ def test_binding_mismatch_fails():
 # field set) would have. Contrast ``caps``, whose evidence is a function of
 # ledger state read at decision time and so cannot be replayed this way from
 # the record alone -- that asymmetry is why this check may enforce ahead of
-# ``[ldg-guardengine-caps-race]`` and why it is called out explicitly rather
+# a fix for the caps race and why it is called out explicitly rather
 # than left implicit.
 
 

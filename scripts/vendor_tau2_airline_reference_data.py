@@ -24,9 +24,7 @@ auditable and re-derivable rather than a hand-edited artifact:
 2. **record-grounding-bench's pilot-1 run** (2026-08-15, vertex_ai/
    gemini-2.5-flash, live agent, 24-task shift, seed=1) -- already in this
    exact flat shape (it's what record-grounding-bench's own LogRecorder
-   writes), copied verbatim from
-   ``_work/capsule-vs-logs-benchmark/pilot-1/log.jsonl`` with no
-   transformation. This is the one dataset in the set that came from a
+   writes), copied verbatim from that run's log with no transformation. This is the one dataset in the set that came from a
    live agent run rather than a replayed third-party transcript.
 
 Run: ``python scripts/vendor_tau2_airline_reference_data.py

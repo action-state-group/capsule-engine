@@ -4,7 +4,7 @@
 dated 2026-07-06, see ``tests/fixtures/sample_ledger.jsonl``).
 
 The pure calendar math (``period_bounds``/``apply_period``) moved to
-``capsule_emit.period`` ([emit-ledger-io-home]) and is unit-tested there;
+``capsule_emit.period`` and is unit-tested there;
 this file keeps only the integration tests that are genuinely this
 package's own -- they exercise ``capsule bundle``, not the sugar in
 isolation.

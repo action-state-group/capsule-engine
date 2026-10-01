@@ -1,7 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 """Tests for tau2_conversation_exchange.py -- previously zero test coverage
-in either capsule-ledger (where this module lived before the
-[ldg-ledger-scope-re-extraction] RESIDUALS pass) or here. Covers the two
+in either capsule-ledger (where this module used to live) or here. Covers the two
 functions the module exports: the sim-to-exchange-message shape conversion,
 and the actual capsule seal end to end."""
 from __future__ import annotations

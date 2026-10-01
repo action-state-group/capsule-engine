@@ -1,7 +1,6 @@
 # airline-engagement starter pack: A1-A7 of the (not yet built) human-
-# engagement pack's airline analogue ([ldg-airline-engagement-pack],
-# [ldg-t2r-tau2-demo]) -- templatized as REUSABLE, VERIFIABLE pack data,
-# not hand-authored Python, per [pack-harden-tau2-oracle].
+# engagement pack's airline analogue -- templatized as REUSABLE, VERIFIABLE
+# pack data, not hand-authored Python.
 #
 # This is a JUDGE/REPORT-time pack: the payload that matters is `outcomes[]`
 # below, each one a term a judge run (capsule_compiler.judge_agent) scores
@@ -16,7 +15,7 @@
 # free-text transcripts never emit the typed, structured record (or the
 # live judge call) each one would need (see each row's
 # `evidence_rule`/`evidence_instrument` below).
-# Before [pack-harden-tau2-oracle] this was a hardcoded `always_false`
+# Before this field existed this was a hardcoded `always_false`
 # lambda in consuming code, with nothing to stop a future edit from pointing
 # it at a term with a real fail. Now it is DATA, and
 # `capsule_ledger.packs.corpus_verify.verify_declared_not_measured` is the

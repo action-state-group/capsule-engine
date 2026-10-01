@@ -4,7 +4,7 @@
 Companion to ``vendor_tau2_airline_reference_data.py``, not a replacement for it.
 That script flattens tool-call events only (span_start/tool_call/span_end), which
 is everything ``examples/tau2_airline_reference.py``'s guard replay needs, but is
-insufficient for ``[ldg-airline-engagement-pack]``'s claims A1/A3/A5/A7 -- those
+insufficient for the airline-engagement pack's claims A1/A3/A5/A7 -- those
 read the AGENT'S AND USER'S OWN WORDS ("here are three options", "I really need
 this now"), which is not present in a tool-call-only extraction. This script
 instead vendors the conversation grain: one JSON line per simulation, carrying
@@ -184,7 +184,7 @@ def _provenance_entry(
         "note": (
             "conversation-grain companion to tau2_committed_<model>_airline_trial0.jsonl -- "
             "assistant/user message text + tool-call-name trail, for "
-            "[ldg-airline-engagement-pack]'s text-reading claims (A1/A3/A5/A7); "
+            "the airline-engagement pack's text-reading claims (A1/A3/A5/A7); "
             "now also carries recovered per-sim model/generation_parameters/usage"
         ),
     }

@@ -85,8 +85,8 @@ __all__ = [
     "compute_clarification_turn_count",
     "signal_record",
     "counterparty_trajectory_for_signal",
-    # GRC folds batch (ldg-grc-folds-batch, #24) -- stable package-namespace
-    # import surface for the skill layer ([grc-facets-upstream-registry-proposals]).
+    # GRC folds -- stable package-namespace import surface for the skill
+    # layer.
     "SessionOrderingResult",
     "OrderingResult",
     "evaluate_ordering",

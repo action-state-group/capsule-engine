@@ -20,7 +20,7 @@ classifiers = [
 # separate capsule-ledger package. capsule-ledger keeps its own minimal,
 # self-contained action-class label shim for its own core display surface;
 # this package's registry/ is the fuller interim vendor-of-record copy
-# ([ldg-ledger-scope-re-extraction] RESIDUALS pass §3.1(a)) -- the two are
+# -- the two are
 # independent by design, not two forks of one truth.
 dependencies = [
     "agent-action-capsule>=0.1.0",
@@ -30,7 +30,7 @@ dependencies = [
     "jsonschema>=4.18",
     # ``ledger-io`` extra: capsule_emit.ledger_io/period, the read/verify seam
     # and --period sugar moved here from capsule-ledger/this package
-    # respectively ([emit-ledger-io-home]). Floor NOT bumped past the
+    # respectively. Floor NOT bumped past the
     # released 0.8.0 -- which does not yet contain ledger_io/period -- same
     # shape as the pre-0.8.0 capsule-emit pin: CI installs the real code from
     # source (git, see .github/workflows/ci.yml) until the next release
@@ -50,7 +50,7 @@ dev = ["pytest>=7.0", "ruff>=0.4", "mcp>=1.0,<2.0", "agentrust-trace>=0.10.0"]
 # mcp-types) and dropped the `mcp.server.fastmcp` import path this server
 # uses -- see capsule_engine/mcp/server.py.
 mcp = ["mcp>=1.0,<2.0"]
-# trace-record/1 reader ([ldg-obligations-pack-reads-trace]): depends on the
+# trace-record/1 reader: depends on the
 # published agentrust-trace package for TRACE v0.2 schema validation and
 # signature verification -- never re-implemented or vendored. Optional: a
 # deployment that never reads a TRACE record does not need this installed

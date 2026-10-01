@@ -95,7 +95,7 @@ class GuardEngine:
         self._witness_reachable = witness_reachable
         self._checkpoint_age_ms = checkpoint_age_ms
         # The forward-compiled plan this engine checks containment against
-        # (``[ldg-plan-containment]``) -- ``None`` when no plan is configured
+        # -- ``None`` when no plan is configured
         # for this engine instance, in which case ``check_plan_containment``
         # reports ``n/a`` for every action (same "absent config -> n/a"
         # shape ``caps`` already uses when no per-class cap is configured).
