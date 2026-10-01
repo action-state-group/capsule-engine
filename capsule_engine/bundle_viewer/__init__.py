@@ -5,8 +5,7 @@ viewer -- see ``capsule_engine.bundle_viewer.viewer`` for the renderer and
 in sync with scitt-cose's offline shell.
 
 The fragment-carried BASE viewer + its domain-module plug-in seam
-(previously ``base_viewer.py`` here, moved from capsule-ledger by the
-[ldg-ledger-scope-re-extraction] RESIDUALS pass) has moved OUT of this
+(previously ``base_viewer.py`` here, moved from capsule-ledger) has moved OUT of this
 package entirely, to the standalone ``capsule-viewer`` repo/package:
 presenting/narrating evidence is
 neutral, donation-bound surface, not this engine's product core, and it now

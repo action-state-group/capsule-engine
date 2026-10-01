@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 """The launch reference checks (dev-persona doc: "policy that runs like CI"),
-plus ``plan_containment`` (``[ldg-plan-containment]``): forward-compiled-plan
+plus ``plan_containment``: forward-compiled-plan
 containment, a pure function of ``(action, plan)`` with no ledger read."""
 from .base import CheckOutcome
 from .caps import check_caps

@@ -26,7 +26,7 @@ code plus a message that names the field, says what was expected, and shows
 a correct example -- the pack.yaml author is very often an AI coding tool,
 so a vague message is a real cost, not a style nit.
 
-**Backward-only packs** ([ldg-obligations-pack-reads-trace]): a pack that
+**Backward-only packs**: a pack that
 declares at least one ``outcomes[]`` entry is not required to also declare
 ``obligations``/``action_semantics``/``constraints`` -- a GRC obligations
 pack with no forward guard integration at all (e.g. ``catalog/eu-ai-act``)
@@ -370,8 +370,8 @@ def _parse_constraints(
     if not raw:
         if allow_empty:
             # A pack declaring at least one outcome (backward-only, e.g. a GRC
-            # obligations pack with no forward guard integration at all --
-            # [ldg-obligations-pack-reads-trace]) has somewhere else to make
+            # obligations pack with no forward guard integration at all)
+            # has somewhere else to make
             # its claims; the forward obligations/action_semantics/constraints
             # triple is then genuinely optional, not merely omitted.
             return (), {}
@@ -942,7 +942,7 @@ def _parse_profile_overrides(
 
 def _parse_profiles(raw: Any, *, outcomes: tuple[EvidenceContract, ...]) -> tuple[TopologyProfile, ...]:
     """``profiles[]`` -- relationship-topology profiles over this pack's own
-    outcomes ([ldg-bp-topology-profiles], design §6b/§7). Optional: a pack
+    outcomes. Optional: a pack
     with no ``profiles`` key ships zero profiles, same additive convention as
     ``proposers``/``outcomes``."""
     if not raw:

@@ -1,7 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 """GRC folds batch item 1: the ordering fold (EU-50-1/50-3/26-7/27). Every
-negative case flips exactly one thing and confirms the mutant is caught, per
-QUEUE_PROTOCOL §7."""
+negative case flips exactly one thing and confirms the mutant is caught."""
 from __future__ import annotations
 
 from capsule_engine.folds.ordering import evaluate_ordering

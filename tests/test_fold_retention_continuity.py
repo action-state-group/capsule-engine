@@ -2,8 +2,8 @@
 """GRC folds batch item 2: the retention-continuity fold (EU-26-6/75). Builds
 a REAL signed 3-checkpoint chain via ``capsule_emit`` (the same fixture shape
 ``capsule-emit``'s own ``tests/test_chain_segment.py`` uses) so the wrapped
-``verify_chain_segment`` call does real, not mocked, verification -- per
-QUEUE_PROTOCOL §7a rule 2, nothing on this verdict path is trusted from a
+``verify_chain_segment`` call does real, not mocked, verification --
+nothing on this verdict path is trusted from a
 party-under-test without independent verification.
 """
 from __future__ import annotations

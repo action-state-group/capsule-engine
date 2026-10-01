@@ -2,7 +2,7 @@
 """``trace-record/1``: read a foreign TRACE v0.2 Trust Record (agentrust-io/
 trace-spec) as backward evidence for a pack's ``EvidenceContract`` outcomes.
 
-**Why this exists** (`[ldg-obligations-pack-reads-trace]`): the format-agnostic
+**Why this exists**: the format-agnostic
 read side is a real capability only if a pack can consume TRACE evidence
 without asking the producer to reshape it into an Agent Action Capsule first.
 This module is the read path: it does not grade TRACE, does not claim

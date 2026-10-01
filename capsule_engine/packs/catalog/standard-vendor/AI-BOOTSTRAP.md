@@ -24,8 +24,8 @@ investigator, a coding agent, or a sales agent with the same 22 rows.
   own `must_have`-tier rows (§8.4); no new judge call.
 - `fold_counterparty` (C1-C6) -- the differentiated value-props: each is a
   fold over a per-session signal, min-N gated, correlation-not-cause
-  framed. Wiring the underlying signal declarations is
-  `[ldg-bp-counterparty-change-family]`, not this pack alone.
+  framed. Wiring the underlying signal declarations is separate work, not
+  this pack alone.
 - `fold_agent` (T1-T2) / `fold_cohort` (X1) -- trajectory and cohort-
   comparison folds over the same rollup, no new judge call.
 

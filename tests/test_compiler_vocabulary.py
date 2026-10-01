@@ -2,7 +2,7 @@
 """Every enum in the outcome compiler's closed vocabulary renders (P1
 acceptance line), and the reserved-verdict-word deny-list is shown RED on
 a violating string before it is shown green on the real table -- a check
-that has only ever passed proves nothing (QUEUE_PROTOCOL §7)."""
+that has only ever passed proves nothing."""
 from __future__ import annotations
 
 import pytest

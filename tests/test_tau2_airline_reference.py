@@ -186,7 +186,7 @@ def test_capsule_verify_offline_for_a_denied_call(tmp_path):
 
 
 def test_basic_economy_mutant_collapses_the_refusal(tmp_path, monkeypatch):
-    """QUEUE_PROTOCOL.md §7: every check must fail its mutant. Force the
+    """Every check must fail its mutant. Force the
     basic-economy predicate to always pass; the update_reservation_flights
     refusal on pilot-1's task 17 must disappear -- proving the refusal in
     test_task_17_basic_economy_denial_is_consistent_across_every_model

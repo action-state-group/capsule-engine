@@ -2,7 +2,7 @@
 # EU AI Act obligations pack -- backward-only (no forward guard/constraint
 # integration; see AI-BOOTSTRAP.md for scope). `outcomes[]` below is the
 # EvidenceCompiler-compiled candidate from `register.yaml`, transcribed
-# verbatim ([ldg-obligations-pack-reads-trace]) -- `tests/test_pack_eu_ai_act_trace.py`
+# verbatim -- `tests/test_pack_eu_ai_act_trace.py`
 # recompiles the register and asserts the two never drift apart.
 pack_id: asg/eu-ai-act-obligations/0.1.0
 
