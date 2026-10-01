@@ -42,7 +42,7 @@ def _claim(
     presentation = presentation or DisclosureCarrier(status="SATISFIED", evidence=(_digest_ref(),))
     return Claim(
         id=claim_id,
-        contract_ref="ec:oo-test:2026-09-22@1",
+        contract_ref="ec:example-org-test:2026-09-22@1",
         requirement_ref=f"req-{claim_id}",
         tier="recomputed",
         grade="self-attested",

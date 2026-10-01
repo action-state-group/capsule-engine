@@ -132,7 +132,7 @@
             "epistemic_type": "SYSTEM_OF_RECORD_FACT",
             "evidence": [
               {
-                "digest": "c0b932b05f1424e2ed3583ec801d06fa6c468994e4596a1c9b3d6ee59cfdffa3",
+                "digest": "810dca8fd316f3df13abbb96edfcb1927727d7f63bc42b0282d2986df17e1e6d",
                 "digest_alg": "SHA-256"
               }
             ],
@@ -147,7 +147,7 @@
             "duplicates_collapsed": 0,
             "evidence": [
               {
-                "digest": "0c0286c482d26bd2921c8e9389acd9daa6a2044ffd5089d92243fca0fc1a79c2",
+                "digest": "3825a0ad72b008649b17822e6c3de246b58059b6e95964397ebde47fa247674c",
                 "digest_alg": "SHA-256"
               }
             ],
@@ -205,7 +205,7 @@
             "duplicates_collapsed": 0,
             "evidence": [
               {
-                "digest": "4a355776951ecb2596b3b4788693fe82e22f9054703fefb162efe8f5224daceb",
+                "digest": "e9e38467d798fb4ec2d3d99dec3df32a77e57a27cf981b20055c665203722ad9",
                 "digest_alg": "SHA-256"
               }
             ],
@@ -249,11 +249,11 @@
             "epistemic_type": "OBSERVED_EVENT",
             "evidence": [
               {
-                "digest": "4d725ec6019ca0f4b282e04165ecb62074adebe35e5c747af593ec18da9c76d5",
+                "digest": "5565230ae586b657135b4af39d9cfed8d9f8884f4dbc5d4c3651f4e55435af0c",
                 "digest_alg": "SHA-256"
               },
               {
-                "digest": "3390c3733b686676cb58c0c682695fb359102c5814dea152993ac66dfb1e1bc7",
+                "digest": "29adcafad5e5acb1b4a2679fec05f0ebfd98fce04fc628453c69641a669f63f4",
                 "digest_alg": "SHA-256"
               }
             ],
@@ -269,7 +269,7 @@
             "epistemic_type": "HUMAN_REPORT",
             "evidence": [
               {
-                "digest": "42cc35ac4c954c06bbcc746c9f23fe067f9e83eb2ecbd21a9d3b2f6d3dcb17f0",
+                "digest": "7447bb7e826e95e5392462e0bf08b67f9fb05215bdcd20ea021a04a853fbda17",
                 "digest_alg": "SHA-256"
               }
             ],
@@ -284,7 +284,7 @@
             "duplicates_collapsed": 0,
             "evidence": [
               {
-                "digest": "73beca7d4be4af5f9d11ac03412de23e18f19df60bde904825350e9e9477e582",
+                "digest": "fdfb654b4543dc74554218755d78b8a12a47af72b5e137fd3df80b06e4741d49",
                 "digest_alg": "SHA-256"
               }
             ],
@@ -310,7 +310,7 @@
   "generated_at": "2026-10-01T00:00:00Z",
   "result_version": "evidence-result-v0",
   "view": {
-    "producer_name": "OO",
+    "producer_name": "EXAMPLE-ORG",
     "spec_version": "presentation/v1",
     "title": "Human oversight evidence coverage (synthetic)"
   }
