@@ -22,12 +22,12 @@ SAMPLE_REGISTER_PATH = (
 BASE_ROW = {
     "id": "row-1",
     "statement": "The agent does the thing.",
-    "source": "Policy NN",
+    "source": "Policy P-1",
     "scope": "every relevant action",
     "owner": "compliance-team",
     "version": "1.0.0",
     "evidence_class": "RULE",
-    "clause": {"instrument": "Policy NN", "article": "§4"},
+    "clause": {"instrument": "Policy P-1", "article": "§4"},
 }
 
 BASE_REGISTER = {"register_id": "test_pub/test-register/0.1.0", "rows": [BASE_ROW]}
@@ -52,7 +52,7 @@ def test_loads_the_shipped_sample_register_from_data():
     register = load_register_file(SAMPLE_REGISTER_PATH)
     assert isinstance(register, ObligationRegister)
     assert register.register_id == "asg/obligation-register-sample/0.1.0"
-    assert [r.id for r in register.rows] == ["nn/four-eyes/1", "EU-12-1"]
+    assert [r.id for r in register.rows] == ["sample/four-eyes/1", "EU-12-1"]
 
 
 def test_row_lookup_by_id():
@@ -71,7 +71,7 @@ def test_minimal_row_round_trips():
     assert isinstance(row, RegisterRow)
     assert row.id == "row-1"
     assert isinstance(row.clause, ClauseSpec)
-    assert row.clause.instrument == "Policy NN"
+    assert row.clause.instrument == "Policy P-1"
     assert row.effective_from is None
     assert row.evidence_instrument is None
 
