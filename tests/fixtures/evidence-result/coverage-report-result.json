@@ -1,0 +1,307 @@
+{
+  "aggregate": {
+    "buckets": {
+      "met": [
+        "claim-1"
+      ],
+      "not_evaluable": [
+        "claim-2",
+        "claim-3"
+      ],
+      "not_met": []
+    },
+    "coverage": {
+      "evaluated_population": 3,
+      "excluded_not_applicable": 0,
+      "unknown_count": 0
+    }
+  },
+  "claims": [
+    {
+      "contract_ref": "ec:ai-act-human-oversight:2026-09-21@1",
+      "evidence": [
+        {
+          "digest": "58c218f4e9073be9f795ba38e33070484d9c617375e9ade86f200cfd643da87f",
+          "digest_alg": "SHA-256"
+        }
+      ],
+      "grade": "self-attested",
+      "id": "claim-1",
+      "presentation": {
+        "evidence": [
+          {
+            "digest": "58c218f4e9073be9f795ba38e33070484d9c617375e9ade86f200cfd643da87f",
+            "digest_alg": "SHA-256"
+          }
+        ],
+        "kind": "disclosure",
+        "status": "SATISFIED"
+      },
+      "proofs": [
+        {
+          "digest": "8c44aaf0bacd77a5704708e79cdbf02fb6c476f71346e3cee863c0ee0bda6a8a",
+          "digest_alg": "SHA-256",
+          "kind": "inclusion_proof"
+        }
+      ],
+      "requirement_ref": "req-human-role-1",
+      "sufficiency": "SATISFIED",
+      "tier": "recomputed",
+      "verdict": "met"
+    },
+    {
+      "contract_ref": "ec:ai-act-human-oversight:2026-09-21@1",
+      "evidence": [
+        {
+          "digest": "738c4baaf6e68450f37693dd388c09fce4f21be3e8fd4f5fc3264b0fda195447",
+          "digest_alg": "SHA-256"
+        }
+      ],
+      "grade": "self-attested",
+      "id": "claim-2",
+      "presentation": {
+        "kind": "analysis",
+        "status": "NOT_FOUND",
+        "summary": "no UI explanation capability record in the period"
+      },
+      "proofs": [
+        {
+          "digest": "c6aff143056f04236505632cdef9462f0a913d4b1c19c8cd2981bccf53af7367",
+          "digest_alg": "SHA-256",
+          "kind": "inclusion_proof"
+        }
+      ],
+      "requirement_ref": "req-human-role-2",
+      "sufficiency": "GAP",
+      "tier": "recomputed",
+      "verdict": "not_evaluable"
+    },
+    {
+      "contract_ref": "ec:ai-act-human-oversight:2026-09-21@1",
+      "evidence": [
+        {
+          "digest": "de13ac2d0c976ba4cb11c17798a6041d3d857461f89411d56cf106f7d497ceb9",
+          "digest_alg": "SHA-256"
+        }
+      ],
+      "grade": "self-attested",
+      "id": "claim-3",
+      "presentation": {
+        "kind": "analysis",
+        "status": "INSUFFICIENT",
+        "summary": "review evidence comes from one producer only"
+      },
+      "proofs": [
+        {
+          "digest": "6a612e1cfcead363f906cba05a21ce580e277084ad3f1f3fae3ba46a3f573f1d",
+          "digest_alg": "SHA-256",
+          "kind": "inclusion_proof"
+        }
+      ],
+      "requirement_ref": "req-human-role-3",
+      "sufficiency": "INSUFFICIENT",
+      "tier": "recomputed",
+      "verdict": "not_evaluable"
+    }
+  ],
+  "coverage_report": {
+    "contract_ref": "ec:ai-act-human-oversight:2026-09-21@1",
+    "requirements": [
+      {
+        "claim_ids": [
+          "claim-1"
+        ],
+        "gaps": [],
+        "independence": {
+          "correlated_records": 0,
+          "independent_producers": 2,
+          "met": true,
+          "required_producers": 1
+        },
+        "obligation_refs": [
+          "eu-ai-act:article-14"
+        ],
+        "requirement_ref": "req-human-role-1",
+        "sources": [
+          {
+            "backfilled_count": 1,
+            "contemporaneous_count": 0,
+            "duplicates_collapsed": 0,
+            "evidence": [
+              {
+                "digest": "c0b932b05f1424e2ed3583ec801d06fa6c468994e4596a1c9b3d6ee59cfdffa3",
+                "digest_alg": "SHA-256"
+              }
+            ],
+            "producer_count": 1,
+            "record_count": 1,
+            "source": "role-assignment-record",
+            "status": "SATISFIED"
+          },
+          {
+            "backfilled_count": 0,
+            "contemporaneous_count": 1,
+            "duplicates_collapsed": 0,
+            "evidence": [
+              {
+                "digest": "0c0286c482d26bd2921c8e9389acd9daa6a2044ffd5089d92243fca0fc1a79c2",
+                "digest_alg": "SHA-256"
+              }
+            ],
+            "producer_count": 1,
+            "record_count": 1,
+            "source": "authority-competence-record",
+            "status": "SATISFIED"
+          }
+        ],
+        "status": "SATISFIED",
+        "sufficiency": "SATISFIED"
+      },
+      {
+        "claim_ids": [
+          "claim-2"
+        ],
+        "gaps": [
+          {
+            "detail": "no record from source 'ui-explanation-capability-record' is in the evaluated records",
+            "kind": "missing_source",
+            "remedy": {
+              "connector": "system_of_record",
+              "raises_to": "retrospectively_evidenced"
+            },
+            "source": "ui-explanation-capability-record"
+          }
+        ],
+        "independence": {
+          "correlated_records": 0,
+          "independent_producers": 1,
+          "met": true,
+          "required_producers": 1
+        },
+        "obligation_refs": [
+          "eu-ai-act:article-14"
+        ],
+        "requirement_ref": "req-human-role-2",
+        "sources": [
+          {
+            "backfilled_count": 0,
+            "contemporaneous_count": 0,
+            "duplicates_collapsed": 0,
+            "evidence": [],
+            "producer_count": 0,
+            "record_count": 0,
+            "source": "ui-explanation-capability-record",
+            "status": "NOT_FOUND"
+          },
+          {
+            "backfilled_count": 0,
+            "contemporaneous_count": 1,
+            "duplicates_collapsed": 0,
+            "evidence": [
+              {
+                "digest": "4a355776951ecb2596b3b4788693fe82e22f9054703fefb162efe8f5224daceb",
+                "digest_alg": "SHA-256"
+              }
+            ],
+            "producer_count": 1,
+            "record_count": 1,
+            "source": "review-interaction-records",
+            "status": "SATISFIED"
+          }
+        ],
+        "status": "NOT_FOUND",
+        "sufficiency": "GAP"
+      },
+      {
+        "claim_ids": [
+          "claim-3"
+        ],
+        "gaps": [
+          {
+            "detail": "the requirement asks for 2 independent producer(s); its 4 record(s) come from 1 producer(s) -- records from one producer correlate, they do not corroborate; add a source another party produces",
+            "kind": "correlated_only",
+            "remedy": null
+          }
+        ],
+        "independence": {
+          "correlated_records": 3,
+          "independent_producers": 1,
+          "met": false,
+          "required_producers": 2
+        },
+        "obligation_refs": [
+          "eu-ai-act:article-14"
+        ],
+        "requirement_ref": "req-human-role-3",
+        "sources": [
+          {
+            "backfilled_count": 0,
+            "contemporaneous_count": 2,
+            "duplicates_collapsed": 0,
+            "evidence": [
+              {
+                "digest": "4d725ec6019ca0f4b282e04165ecb62074adebe35e5c747af593ec18da9c76d5",
+                "digest_alg": "SHA-256"
+              },
+              {
+                "digest": "3390c3733b686676cb58c0c682695fb359102c5814dea152993ac66dfb1e1bc7",
+                "digest_alg": "SHA-256"
+              }
+            ],
+            "producer_count": 1,
+            "record_count": 2,
+            "source": "review-events",
+            "status": "SATISFIED"
+          },
+          {
+            "backfilled_count": 0,
+            "contemporaneous_count": 1,
+            "duplicates_collapsed": 0,
+            "evidence": [
+              {
+                "digest": "42cc35ac4c954c06bbcc746c9f23fe067f9e83eb2ecbd21a9d3b2f6d3dcb17f0",
+                "digest_alg": "SHA-256"
+              }
+            ],
+            "producer_count": 1,
+            "record_count": 1,
+            "source": "override-events",
+            "status": "SATISFIED"
+          },
+          {
+            "backfilled_count": 0,
+            "contemporaneous_count": 1,
+            "duplicates_collapsed": 0,
+            "evidence": [
+              {
+                "digest": "73beca7d4be4af5f9d11ac03412de23e18f19df60bde904825350e9e9477e582",
+                "digest_alg": "SHA-256"
+              }
+            ],
+            "producer_count": 1,
+            "record_count": 1,
+            "source": "exception-events",
+            "status": "SATISFIED"
+          }
+        ],
+        "status": "INSUFFICIENT",
+        "sufficiency": "INSUFFICIENT"
+      }
+    ],
+    "spec_version": "coverage-report/v0",
+    "summary": {
+      "gaps": 2,
+      "gaps_without_remedy": 1,
+      "requirements": 3,
+      "satisfied": 1,
+      "with_gaps": 2
+    }
+  },
+  "generated_at": "2026-10-01T00:00:00Z",
+  "result_version": "evidence-result-v0",
+  "view": {
+    "producer_name": "OO",
+    "spec_version": "presentation/v1",
+    "title": "Human oversight evidence coverage (synthetic)"
+  }
+}

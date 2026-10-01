@@ -31,7 +31,7 @@ import json
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import jsonschema
 
@@ -49,6 +49,9 @@ from .errors import (
     SUFFICIENCY_VERDICT_MISMATCH,
     ResultError,
 )
+
+if TYPE_CHECKING:
+    from .coverage import CoverageReport
 
 __all__ = [
     "RESULT_VERSION",
@@ -357,6 +360,7 @@ class EvidenceResult:
     claims: tuple[Claim, ...]
     aggregate: Aggregate
     view: View | None = None
+    coverage_report: CoverageReport | None = None
     result_version: str = field(default=RESULT_VERSION, init=False)
 
     def to_dict(self) -> dict:
@@ -368,6 +372,8 @@ class EvidenceResult:
         }
         if self.view is not None:
             out["view"] = self.view.to_dict()
+        if self.coverage_report is not None:
+            out["coverage_report"] = self.coverage_report.to_dict()
         return out
 
 
@@ -377,6 +383,7 @@ def build_result(
     generated_at: str,
     excluded_not_applicable: int = 0,
     view: View | None = None,
+    coverage_report: CoverageReport | None = None,
 ) -> EvidenceResult:
     """The projection's aggregate step (spec section 3): coverage and
     buckets are COMPUTED from ``claims``, never templated or accepted
@@ -388,6 +395,10 @@ def build_result(
     ``result_from_folds`` adapter, which sees the excluded requirements
     directly) supplies the count of what it declined to emit as claims.
     Every other coverage/bucket field is counted off ``claims`` itself.
+
+    ``coverage_report`` is the optional per-requirement section built by
+    ``coverage.build_coverage_report`` over the same claims; it is carried
+    as built, and ``verify_result`` re-checks it against the claims.
     """
     if excluded_not_applicable < 0:
         raise ResultError(INVALID_SUFFICIENCY, f"excluded_not_applicable must be >= 0, got {excluded_not_applicable}")
@@ -421,6 +432,7 @@ def build_result(
         claims=tuple(claims),
         aggregate=Aggregate(coverage=coverage, buckets=buckets),
         view=view,
+        coverage_report=coverage_report,
     )
 
 
@@ -437,7 +449,9 @@ def verify_result(doc: dict[str, Any]) -> None:
     """The cross-element checks spec/evidence-result-v0.md section 4 names
     as "normative, not schema-enforced in v0": claim ``id`` uniqueness, and
     every ``aggregate.buckets`` entry naming a claim that actually exists
-    with the matching verdict. Raises ``ResultError`` on the first
+    with the matching verdict -- plus, when the document carries a
+    ``coverage_report``, ``coverage.verify_coverage_report``'s checks
+    against the same claims. Raises ``ResultError`` on the first
     violation. Callers wanting full conformance run this AND
     ``validate_against_schema`` -- neither alone is the whole check."""
     claims_by_id: dict[str, dict] = {}
@@ -462,3 +476,8 @@ def verify_result(doc: dict[str, Any]) -> None:
     for claim_id, claim in claims_by_id.items():
         if claim_id not in bucketed_ids:
             raise ResultError(BUCKET_CLAIM_MISMATCH, f"claim {claim_id!r} (verdict {claim.get('verdict')!r}) is in no bucket")
+
+    if "coverage_report" in doc:
+        from .coverage import verify_coverage_report
+
+        verify_coverage_report(doc["coverage_report"], claims_by_id)
