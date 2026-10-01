@@ -58,5 +58,5 @@ def test_claim_sufficiency_agrees_with_coverage():
 def test_fixture_types_catalogued_sources_only():
     rows = json.loads(gen.FIXTURE_PATH.read_text())["coverage_report"]["requirements"]
     types = {s["source"]: s.get("epistemic_type") for r in rows for s in r["sources"]}
-    assert types["override-events"] == "HUMAN_REPORT"
+    assert types["override-events"] == "human_report"
     assert types["authority-competence-record"] is None
