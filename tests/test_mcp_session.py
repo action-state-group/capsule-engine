@@ -8,7 +8,7 @@ mocked tool could equally well have returned.
 Note: `outcome` ("allow"/"deny"/"escalate") is the guard engine's own stable
 vocabulary (`guards/capsule.py`'s `ALLOW`/`DENY`/`ESCALATE`) and is asserted on
 directly below. `disposition.decision`/`verdict_class` are a separate,
-in-flux vocabulary (see the workspace's `ldg-verdict-vocab` track) -- this
+in-flux vocabulary -- this
 file deliberately asserts only that they are *present*, never their literal
 value, so it stays correct regardless of which token set lands.
 """
