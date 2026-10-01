@@ -85,7 +85,7 @@ REFUSAL_REASON_CODES = frozenset(
         # window cannot be compiled into a windowed proxy and must refuse
         # rather than ship as an opaque score.
         "unbounded_goal_unmonitorable",
-        # ldg-airline-engagement-pack A8 ("the customer was satisfied"): a
+        # airline-engagement A8 ("the customer was satisfied"): a
         # DIFFERENT refusal from unbounded_goal_unmonitorable above -- that
         # one is about a missing time window (a windowed proxy would fix
         # it); this one is not fixed by any window, because a person's

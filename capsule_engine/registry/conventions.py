@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""Action-class convention labels (ldg-registry-driven-viewer item 2):
+"""Action-class convention labels:
 where a capsule's ``asg_payload.action_class`` matches a registered
 convention, every display surface shows its human label/description from
 this module instead of a hardcoded string.

@@ -39,7 +39,7 @@
   "grc_field_conventions": {
     "_provenance": {
       "status": "registered",
-      "source": "ldg-grc-folds-batch (2026-09-05), hand-authored for the eu-ai-act obligations pack.",
+      "source": "Hand-authored 2026-09-05 for the eu-ai-act obligations pack.",
       "note": "Company-authored field-value labels, NOT vendored CPB data -- scripts/vendor_cpb_registry.py and its --check drift gate never read or write this table (they are scoped exactly to provisional_field_conventions). Additive only; the never-reject invariant applies here too: an unregistered value renders as-is.",
       "provisional": true,
       "provisional_note": "[grc-facets-upstream-registry-proposals]: this whole table is a vendored, engine-local copy, not the registry of record -- the eight GRC facets here are staged for upstream registration at action-state-group/scitt-payload-binding per H.4 (facet values are substrate). Provisional at the TABLE level until the upstream entries land; each entry's own \"status\" (registered/planned) is unrelated ENGINE-internal wiring state, not an upstream registration state."
@@ -150,7 +150,7 @@
   "grc_reference_fields": {
     "_provenance": {
       "status": "registered",
-      "source": "ldg-grc-folds-batch (2026-09-05).",
+      "source": "Hand-authored 2026-09-05.",
       "note": "Bare identifier/reference fields with no enumerable value set -- registered here so their presence is documented, without forcing them into a value-label table they don't need.",
       "provisional": true,
       "provisional_note": "[grc-facets-upstream-registry-proposals]: staged for upstream registration at action-state-group/scitt-payload-binding alongside grc_field_conventions -- see that table's provisional_note. Provisional at the TABLE level until the upstream entries land."

@@ -48,8 +48,8 @@ _DOC_DIGEST = "a" * 64
 
 # A real EU AI Act clause (Regulation (EU) 2024/1689 Article 26(6), log
 # retention continuity) -- the same citation as row EU-26-6 in the held
-# `ldg-eu-ai-act-pack` catalog (PR #27, not yet merged), reused here inline
-# rather than depending on that unmerged pack.yaml.
+# eu-ai-act catalog, reused here inline rather than depending on that
+# pack.yaml.
 _EU_AI_ACT_CLAUSE = {
     "instrument": "Regulation (EU) 2024/1689",
     "article": "Article 26",

@@ -211,11 +211,10 @@ class Claim:
 
     ``contract_ref`` is the compact ``<contract_id>@<version>`` shape
     (evidence-plan-ir-v0.md section 2's convention, mirrored by
-    evidence-result-v0.md section 1) -- not the two separate
-    ``contract_id``/``contract_version`` fields this task's own inbox text
-    names; the frozen schema uses ``contract_ref`` (the sibling-flagged
-    rename already applied before the schema froze), so this module follows
-    the shipped schema, not the stale inbox wording.
+    evidence-result-v0.md section 1) -- not two separate
+    ``contract_id``/``contract_version`` fields; the frozen schema uses
+    ``contract_ref`` (a rename applied before the schema froze), so this
+    module follows the shipped schema.
     """
 
     id: str

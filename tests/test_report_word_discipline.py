@@ -54,7 +54,7 @@ SCANNED_PATHS = (
 
 _SCANNED_SUFFIXES = {".py", ".md", ".html"}
 
-# "witnessed (bare)" per the inbox item's own wording: qualified forms this
+# "witnessed (bare)": qualified forms this
 # realignment introduces (e.g. "continuity-witnessed") are not the overclaim
 # being caught here.
 BANNED_PATTERNS = {

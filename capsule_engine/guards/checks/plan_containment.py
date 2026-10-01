@@ -18,9 +18,8 @@ point).
 **Pure function of ``(action, plan)`` -- no ledger read.** Unlike ``caps``
 (``guards/checks/caps.py``, a real fold replay over ledger history), this
 check never calls ``ledger.scan``/``ledger.fetch``. That means it has no
-read-decide-append window and is not exposed to ``[ldg-guardengine-caps-
-race]`` -- see ``tests/test_plan_containment_check.py``'s explicit
-lock-independence test, which is the property under test, not a comment
+read-decide-append window and is not exposed to the caps race -- see
+``tests/test_plan_containment_check.py``'s explicit lock-independence test, which is the property under test, not a comment
 asserting it.
 
 That purity has one direct consequence for how preconditions are checked:
