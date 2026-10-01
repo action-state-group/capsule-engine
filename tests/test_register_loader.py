@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""Obligation register loader ([batch1-obligation-register-v0-sample-compiler]):
+"""Obligation register loader:
 loads the shipped sample register from data, plus must-fail validation cases --
 every failure must carry an actionable message, same discipline
 ``test_pack_loader.py`` already holds ``packs/loader.py`` to."""

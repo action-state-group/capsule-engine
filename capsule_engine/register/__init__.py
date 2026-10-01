@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""Obligation register format v0 ([batch1-obligation-register-v0-sample-compiler]):
+"""Obligation register format v0:
 a loadable, GRC-shaped list of register rows, plus the OSS sample compiler that
 turns one into an obligation-profile ``packs.schema.EvidenceContract``.
 

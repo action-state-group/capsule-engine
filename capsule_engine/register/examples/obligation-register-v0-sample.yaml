@@ -1,4 +1,4 @@
-# Sample obligation register v0 ([batch1-obligation-register-v0-sample-compiler]):
+# Sample obligation register v0:
 # two rows, one internal control clause and one external legal clause, to prove
 # the format loads and round-trips through `EvidenceCompiler` regardless of
 # which kind of source a row cites.
@@ -24,7 +24,7 @@ rows:
 
   # EU AI Act Article 12(1) -- automatic event logging over the agent's
   # lifetime. Same row this register's evidence_class taxonomy was
-  # reconciled against ([ldg-eu-ai-act-pack]'s pack.yaml, EU-12-1),
+  # reconciled against (the eu-ai-act catalog pack's pack.yaml, EU-12-1),
   # evidence_class FACT.
   - id: EU-12-1
     statement: >-
