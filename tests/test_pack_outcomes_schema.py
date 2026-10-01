@@ -714,4 +714,7 @@ def test_the_real_airline_engagement_pack_digest_is_byte_identical_after_the_ref
 
 def test_the_real_standard_vendor_pack_digest_is_byte_identical_after_the_reframe():
     pack = load_pack_dir(STANDARD_VENDOR_DIR)
-    assert pack.definition_digest() == "4890a1bc31040af19726251f464391690bff5b32f82a6eed8a98f96a7748ffb6"
+    # Re-pinned at asg/standard-vendor/1.0.1: S1's evidence_rule text was
+    # reworded (no field or structure change). 1.0.0 pinned to
+    # 4890a1bc31040af19726251f464391690bff5b32f82a6eed8a98f96a7748ffb6.
+    assert pack.definition_digest() == "9ae420d59ebfb1f87ecd740c948be4d0df16cefac97d8640da24934302359ae2"
