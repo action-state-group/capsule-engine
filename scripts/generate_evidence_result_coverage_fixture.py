@@ -15,7 +15,8 @@ source catalog; the others carry no ``epistemic_type``.
 What the fixture shows, one requirement each:
 
 - ``req-human-role-1`` -- SATISFIED: both sources present, one from a
-  backfilled import, one contemporaneous, from two producers.
+  backfilled import, one contemporaneous. The two records share a developer
+  token, so they count as one producer (no independence is asked).
 - ``req-human-role-2`` -- NOT_FOUND: ``ui-explanation-capability-record``
   is missing; the remedy names the connector that would capture it.
 - ``req-human-role-3`` -- INSUFFICIENT: all three sources present, but every
