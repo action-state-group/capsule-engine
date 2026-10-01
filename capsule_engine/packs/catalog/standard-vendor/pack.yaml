@@ -25,7 +25,7 @@
 # no special instrument -- an LLM judge reads the sealed free text/prose
 # every corpus already carries (a conversation turn, an issue comment), so
 # those stay `measurability: measured` (the default).
-pack_id: asg/standard-vendor/1.0.0
+pack_id: asg/standard-vendor/1.0.1
 
 obligations:
   - id: no-duplicate-judge-verdict
@@ -54,9 +54,9 @@ outcomes:
     evidence_rule: >-
       n/a on today's corpora -- needs a read/observation capsule and a
       write/dispatch capsule where the write's chain_parent points back at
-      the read (design §12); neither tau2-bench's free-text transcripts
-      nor the Alchemy GitHub-thread exports emit a sealed read-side capsule
-      yet ([ldg-bj-emit-read-side-python], queued separately)
+      the read; neither tau2-bench's free-text transcripts nor a read-only
+      investigation deployment's thread exports emit a sealed read-side
+      capsule yet
     forward_verdict: UNAVAILABLE-STATE-REQUIRED
     backward_verdict: WITH-INSTRUMENTATION
     measurability: declared_not_measured
