@@ -347,13 +347,77 @@ def _keyed(record: dict, key: str) -> dict:
     return dict(record, key_id=key)
 
 
-def test_signer_key_is_the_producer_when_every_record_has_one():
-    # Two key ids under one asserted operator/developer: two producers by key.
+def test_two_keys_under_one_name_are_one_producer():
+    # Union-find: K1 and K2 both appear beside the same name, so one party.
     records = [_keyed(r, _hex("k1") if i % 2 else _hex("k2")) for i, r in enumerate(_one_producer_span_records())]
+    row = _req(build_coverage_report(_independent_contract(), records, source_of=_source_of), "req-human-role-3")
+    assert row.independence.producer_basis == "key"
+    assert row.independence.independent_producers == 1
+    assert row.status == "INSUFFICIENT"
+
+
+def test_two_keys_under_two_names_are_two_producers():
+    records = [
+        _keyed(_record("a", "review-events", operator="op-a"), _hex("k1")),
+        _keyed(_record("b", "override-events", operator="op-b"), _hex("k2")),
+        _keyed(_record("c", "exception-events", operator="op-a"), _hex("k1")),
+    ]
     row = _req(build_coverage_report(_independent_contract(), records, source_of=_source_of), "req-human-role-3")
     assert row.independence.producer_basis == "key"
     assert row.independence.independent_producers == 2
     assert row.status == "SATISFIED"
+
+
+def test_probe_one_key_two_names_plus_unsigned_is_one_producer():
+    """Review probe: records signed with K as op-a and as op-b, plus one
+    unsigned op-a record, were two producers under the all-or-nothing basis."""
+    records = [
+        _keyed(_record("a", "review-events", operator="op-a"), _hex("k")),
+        _keyed(_record("b", "override-events", operator="op-b"), _hex("k")),
+        _record("c", "exception-events", operator="op-a"),
+    ]
+    row = _req(build_coverage_report(_independent_contract(), records, source_of=_source_of), "req-human-role-3")
+    assert row.independence.producer_basis == "asserted"
+    assert row.independence.independent_producers == 1
+    assert row.independence.met is False
+    assert row.status == "INSUFFICIENT"
+
+
+def test_probe_partly_signed_producer_without_names_is_not_a_second_producer():
+    """Review probe: records signed with K and no operator/developer, beside
+    unsigned records from one named party, were two producers. K never
+    appears beside a name, so with unsigned records present it is ambiguous
+    and counts as unattributed (fail closed)."""
+    keyed_only = [
+        {"capsule_id": _hex(f"k{i}"), "key_id": _hex("k"), "payload": {"source": src}}
+        for i, src in enumerate(["review-events", "override-events"])
+    ]
+    records = keyed_only + [_record("u", "exception-events", operator="op-a")]
+    row = _req(build_coverage_report(_independent_contract(), records, source_of=_source_of), "req-human-role-3")
+    assert row.independence.independent_producers == 1
+    assert row.independence.unattributed_records == 2
+    assert row.independence.met is False
+    assert row.status == "INSUFFICIENT"
+
+
+def test_nameless_key_joins_its_named_component_elsewhere_in_the_ledger():
+    # K is linked to op-a by a record outside this requirement's sources.
+    link = _keyed(_record("link", "unrelated-source", operator="op-a"), _hex("k"))
+    keyed_only = {"capsule_id": _hex("ko"), "key_id": _hex("k"), "payload": {"source": "review-events"}}
+    records = [link, keyed_only, _record("u", "override-events", operator="op-a")]
+    row = _req(build_coverage_report(_independent_contract(), records, source_of=_source_of), "req-human-role-3")
+    assert row.independence.independent_producers == 1
+    assert row.independence.unattributed_records == 0
+
+
+def test_nameless_keys_stand_alone_when_nothing_is_unsigned():
+    records = [
+        {"capsule_id": _hex(f"n{i}"), "key_id": _hex(f"key-{i}"), "payload": {"source": src}}
+        for i, src in enumerate(["review-events", "override-events"])
+    ]
+    row = _req(build_coverage_report(_independent_contract(), records, source_of=_source_of), "req-human-role-3")
+    assert row.independence.producer_basis == "key"
+    assert row.independence.independent_producers == 2
 
 
 def test_one_key_under_two_asserted_names_is_one_producer():

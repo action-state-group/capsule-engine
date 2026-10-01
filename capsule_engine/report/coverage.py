@@ -27,18 +27,29 @@ they never raise ``independent_producers``. A requirement whose
 ``independence`` field asks for corroboration is met only by evidence from
 at least that many distinct producers.
 
-**Who the producer is.** For each requirement, if every attributed record
-carries a signer ``key_id`` (the local envelope field next to
-``signature``), the producer is the key id and ``producer_basis`` is
-``"key"``. Otherwise the producer is the capsule's self-asserted
-``operator`` + ``developer`` strings and ``producer_basis`` is
-``"asserted"``: anyone can write those strings, so an asserted producer is
-NOT authenticated, and a renderer should say so. A key id binds records to
-one key, but it does not show that two keys belong to two parties: AAC's
-``kid`` is self-attested, and a producer can mint a second key. One basis is
-used per requirement, so a producer that signs some records and not others
-is never counted twice. A caller-supplied ``producer_of`` is always
-``"asserted"``.
+**Who the producer is.** A record names a producer by its signer
+``key_id`` (the local envelope field next to ``signature``), by its
+self-asserted ``operator`` + ``developer`` name, or by both. Every key and
+every name that appear together on any record in the ledger passed in are
+ONE producer (union-find over the identities): a record signed with key K
+and named N joins K and N, so one key under two names, or two keys under one
+name, is one producer. The rule only ever merges, so it can under-count
+independence but never over-count it.
+
+A record signed with a key that never appears beside a name is ambiguous
+when the requirement's evidence also holds unsigned records: the key could
+belong to any of those named parties. It is then counted as unattributed
+(fail closed). With no unsigned records in the evidence, such a key stands
+as its own producer.
+
+``producer_basis`` is ``"key"`` when every attributed record of the
+requirement is signed, else ``"asserted"``: some producer is identified only
+by the self-asserted strings, which anyone can write, so it is NOT
+authenticated and a renderer should say so. A key binds records to one key,
+but it does not show that two keys belong to two parties: AAC's ``kid`` is
+self-attested, and a producer can mint a second key that never appears
+beside its name. A caller-supplied ``producer_of`` replaces this rule
+entirely and is always ``"asserted"``.
 
 **Unattributed records count toward no producer.** A record with no
 ``key_id``, ``operator`` or ``developer`` is counted in
@@ -329,9 +340,10 @@ def _asserted(record: Mapping[str, Any]) -> tuple[Any, Any] | None:
 def default_producer_of(record: Mapping[str, Any]) -> Hashable | None:
     """One record's producer on its own: the signer ``key_id`` when present,
     else the asserted ``operator`` + ``developer`` pair, else ``None``
-    (unattributed -- counts toward no producer). ``build_coverage_report``
-    applies one basis per requirement (see the module docstring); this is the
-    single-record view of the same rule."""
+    (unattributed -- counts toward no producer). This is the single-record
+    view, before identities are linked: ``build_coverage_report`` joins every
+    key and name that appear together anywhere in the ledger into one
+    producer (see the module docstring)."""
     key_id = _key_id(record)
     if key_id is not None:
         return ("key", key_id)
@@ -339,25 +351,58 @@ def default_producer_of(record: Mapping[str, Any]) -> Hashable | None:
     return None if asserted is None else ("asserted", asserted)
 
 
+def _identities(record: Mapping[str, Any]) -> list[tuple[str, Hashable]]:
+    ids: list[tuple[str, Hashable]] = []
+    key_id = _key_id(record)
+    if key_id is not None:
+        ids.append(("key", key_id))
+    asserted = _asserted(record)
+    if asserted is not None:
+        ids.append(("name", asserted))
+    return ids
+
+
 def _producer_rule(
-    records: Sequence[Mapping[str, Any]],
+    evidence: Sequence[Mapping[str, Any]],
+    ledger: Sequence[Mapping[str, Any]],
     producer_of: Callable[[Mapping[str, Any]], Hashable | None] | None,
 ) -> tuple[Callable[[Mapping[str, Any]], Hashable | None], str]:
-    """The producer function and its basis for one requirement's records."""
+    """The producer function and its basis for one requirement's evidence.
+    Identities are linked over the whole ``ledger`` (see the module
+    docstring): more links can only merge producers."""
     if producer_of is not None:
         return producer_of, "asserted"
-    attributed = [r for r in records if _key_id(r) is not None or _asserted(r) is not None]
-    if attributed and all(_key_id(r) is not None for r in attributed):
-        return _key_id, "key"
 
-    def asserted_or_key(r: Mapping[str, Any]) -> Hashable | None:
-        asserted = _asserted(r)
-        if asserted is not None:
-            return ("asserted", asserted)
-        key_id = _key_id(r)  # a keyed record with no operator/developer stays its key's
-        return None if key_id is None else ("key", key_id)
+    parent: dict[tuple[str, Hashable], tuple[str, Hashable]] = {}
 
-    return asserted_or_key, "asserted"
+    def find(node: tuple[str, Hashable]) -> tuple[str, Hashable]:
+        parent.setdefault(node, node)
+        while parent[node] != node:
+            parent[node] = parent[parent[node]]
+            node = parent[node]
+        return node
+
+    for record in list(ledger) + list(evidence):
+        ids = _identities(record)
+        for other in ids[1:]:
+            a, b = find(ids[0]), find(other)
+            if a != b:
+                parent[b] = a
+    named_roots = {find(node) for node in list(parent) if node[0] == "name"}
+    unsigned_present = any(_key_id(r) is None and _asserted(r) is not None for r in evidence)
+
+    def producer(record: Mapping[str, Any]) -> Hashable | None:
+        ids = _identities(record)
+        if not ids:
+            return None
+        root = find(ids[0])
+        if ids[0][0] == "key" and len(ids) == 1 and root not in named_roots and unsigned_present:
+            return None  # a key never seen beside a name could be any unsigned party: fail closed
+        return root
+
+    attributed = [r for r in evidence if _identities(r)]
+    basis = "key" if attributed and all(_key_id(r) is not None for r in attributed) else "asserted"
+    return producer, basis
 
 
 def _record_digest(record: Mapping[str, Any]) -> str:
@@ -455,7 +500,7 @@ def _requirement_coverage(
     for _, _, surviving in per_source:
         for record in surviving:
             evidence.setdefault(_record_id(record), record)
-    producer, basis = _producer_rule(list(evidence.values()), producer_of)
+    producer, basis = _producer_rule(list(evidence.values()), records, producer_of)
 
     sources: list[SourceCoverage] = []
     gaps: list[Gap] = []
@@ -522,7 +567,8 @@ def _requirement_coverage(
                 Gap(
                     kind=GAP_UNATTRIBUTED_ONLY,
                     detail=(
-                        f"all {unattributed} record(s) name no producer (no key_id, operator or developer); "
+                        f"all {unattributed} record(s) name no producer (no key_id, operator or developer, "
+                        "or only a key never seen beside a name while unsigned records are present); "
                         "unattributed records count toward no producer, so nobody is named as having "
                         "produced this evidence; capture the source with producer attribution"
                     ),
