@@ -358,9 +358,9 @@ def test_two_keys_under_one_name_are_one_producer():
 
 def test_two_keys_under_two_names_are_two_producers():
     records = [
-        _keyed(_record("a", "review-events", operator="op-a"), _hex("k1")),
-        _keyed(_record("b", "override-events", operator="op-b"), _hex("k2")),
-        _keyed(_record("c", "exception-events", operator="op-a"), _hex("k1")),
+        _keyed(_record("a", "review-events", operator="op-a", developer="dev-a"), _hex("k1")),
+        _keyed(_record("b", "override-events", operator="op-b", developer="dev-b"), _hex("k2")),
+        _keyed(_record("c", "exception-events", operator="op-a", developer="dev-a"), _hex("k1")),
     ]
     row = _req(build_coverage_report(_independent_contract(), records, source_of=_source_of), "req-human-role-3")
     assert row.independence.producer_basis == "key"
@@ -653,3 +653,71 @@ def test_vendored_epistemic_type_enum_matches_engine_values():
     from capsule_engine.report.result import load_schema
 
     assert set(load_schema()["$defs"]["EpistemicType"]["enum"]) == EPISTEMIC_TYPE_VALUES
+
+
+# --- name tokens: empty is absent, normalized, linked one token at a time --
+
+
+def _named(seed: str, source: str, **fields) -> dict:
+    return {"capsule_id": _hex(seed), "payload": {"source": source}, **fields}
+
+
+def _row3(records):
+    return _req(build_coverage_report(_independent_contract(), records, source_of=_source_of), "req-human-role-3")
+
+
+def test_probe_empty_names_are_absent_not_three_producers():
+    row = _row3([
+        _named("e1", "review-events", operator=""),
+        _named("e2", "override-events", developer=""),
+        _named("e3", "exception-events", operator="", developer="  "),
+    ])
+    assert row.independence.independent_producers == 0
+    assert row.independence.unattributed_records == 3
+    assert [g.kind for g in row.gaps] == ["unattributed_only"]
+
+
+def test_probe_names_are_normalized():
+    row = _row3([
+        _named("n1", "review-events", operator="Op-A"),
+        _named("n2", "override-events", operator="op-a "),
+        _named("n3", "exception-events", operator="\uff2f\uff50-\uff21"),  # fullwidth "Op-A"; NFKC maps it
+    ])
+    assert row.independence.independent_producers == 1
+    assert row.independence.met is False
+
+
+def test_probe_key_ids_are_normalized():
+    k = "AB" * 32
+    row = _row3([
+        _named("k1", "review-events", key_id=k),
+        _named("k2", "override-events", key_id=k.lower()),
+        _named("k3", "exception-events", key_id=f" {k} "),
+    ])
+    assert row.independence.producer_basis == "key"
+    assert row.independence.independent_producers == 1
+
+
+def test_probe_partial_pairs_link_through_a_shared_token():
+    row = _row3([
+        _named("p1", "review-events", operator="a"),
+        _named("p2", "override-events", operator="a", developer="x"),
+        _named("p3", "exception-events", developer="x"),
+    ])
+    assert row.independence.independent_producers == 1
+    assert row.independence.met is False
+
+
+def test_shared_developer_alone_links_two_operators():
+    # Conservative: a shared developer token makes one producer (it may
+    # under-count two parties running the same agent; never over-counts).
+    row = _row3([
+        _named("d1", "review-events", operator="op-a", developer="agent@v1"),
+        _named("d2", "override-events", operator="op-b", developer="agent@v1"),
+    ])
+    assert row.independence.independent_producers == 1
+
+
+def test_non_string_names_are_absent():
+    row = _row3([_named("x1", "review-events", operator=7, developer=None)])
+    assert row.independence.unattributed_records == 1

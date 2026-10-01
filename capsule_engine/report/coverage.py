@@ -29,12 +29,25 @@ at least that many distinct producers.
 
 **Who the producer is.** A record names a producer by its signer
 ``key_id`` (the local envelope field next to ``signature``), by its
-self-asserted ``operator`` + ``developer`` name, or by both. Every key and
-every name that appear together on any record in the ledger passed in are
-ONE producer (union-find over the identities): a record signed with key K
-and named N joins K and N, so one key under two names, or two keys under one
-name, is one producer. The rule only ever merges, so it can under-count
-independence but never over-count it.
+self-asserted ``operator`` and ``developer`` tokens, or by both. Tokens are
+normalized before comparison: names by Unicode NFKC, then whitespace strip,
+then casefold; key ids by strip and casefold (AAC key ids are lowercase hex,
+the canonical form; a base64url id is compared case-insensitively, which can
+only merge). An empty or whitespace-only token is absent, and a record with
+no token at all is unattributed.
+
+Every token that appears together with another on any record in the ledger
+passed in belongs to ONE producer (union-find over INDIVIDUAL tokens): a
+shared key, a shared ``operator`` or a shared ``developer`` links two
+records. So one key under two names, two keys under one name, or
+``("a", -)``, ``("a", "x")`` and ``(-, "x")`` are each one producer. Linking
+only ever merges, so it never counts more producers than there are groups of
+unlinked tokens -- and so it can under-count independence: two parties that
+share a developer string (the same agent product, say) count as one. What it
+cannot do is see through one party writing two unrelated names, including
+homoglyphs NFKC does not map, or minting a second key it never uses beside
+its name. Asserted names are not an authenticated path; keys are the
+stronger one.
 
 A record signed with a key that never appears beside a name is ambiguous
 when the requirement's evidence also holds unsigned records: the key could
@@ -81,6 +94,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import unicodedata
 from collections.abc import Callable, Hashable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any
@@ -326,29 +340,42 @@ def _summarize(requirements: Sequence[RequirementCoverage]) -> CoverageSummary:
 
 def _key_id(record: Mapping[str, Any]) -> str | None:
     key_id = record.get("key_id")
-    return key_id if isinstance(key_id, str) and key_id else None
-
-
-def _asserted(record: Mapping[str, Any]) -> tuple[Any, Any] | None:
-    operator = record.get("operator")
-    developer = record.get("developer")
-    if operator is None and developer is None:
+    if not isinstance(key_id, str):
         return None
-    return (operator, developer)
+    key_id = key_id.strip().casefold()
+    return key_id or None
+
+
+def _name(value: Any) -> str | None:
+    if not isinstance(value, str):
+        return None
+    value = unicodedata.normalize("NFKC", value).strip().casefold()
+    return value or None
+
+
+def _names(record: Mapping[str, Any]) -> list[tuple[str, str]]:
+    """The record's normalized ``operator`` / ``developer`` tokens, each its
+    own union-find node; empty or whitespace-only tokens are absent."""
+    out = []
+    for field in ("operator", "developer"):
+        token = _name(record.get(field))
+        if token is not None:
+            out.append((field, token))
+    return out
 
 
 def default_producer_of(record: Mapping[str, Any]) -> Hashable | None:
-    """One record's producer on its own: the signer ``key_id`` when present,
-    else the asserted ``operator`` + ``developer`` pair, else ``None``
-    (unattributed -- counts toward no producer). This is the single-record
-    view, before identities are linked: ``build_coverage_report`` joins every
-    key and name that appear together anywhere in the ledger into one
-    producer (see the module docstring)."""
+    """One record's producer on its own: the normalized signer ``key_id``
+    when present, else its normalized ``operator`` / ``developer`` tokens,
+    else ``None`` (unattributed -- counts toward no producer). This is the
+    single-record view, before tokens are linked: ``build_coverage_report``
+    joins every key, operator and developer token that appear together
+    anywhere in the ledger into one producer (see the module docstring)."""
     key_id = _key_id(record)
     if key_id is not None:
         return ("key", key_id)
-    asserted = _asserted(record)
-    return None if asserted is None else ("asserted", asserted)
+    names = _names(record)
+    return tuple(names) if names else None
 
 
 def _identities(record: Mapping[str, Any]) -> list[tuple[str, Hashable]]:
@@ -356,9 +383,7 @@ def _identities(record: Mapping[str, Any]) -> list[tuple[str, Hashable]]:
     key_id = _key_id(record)
     if key_id is not None:
         ids.append(("key", key_id))
-    asserted = _asserted(record)
-    if asserted is not None:
-        ids.append(("name", asserted))
+    ids.extend(_names(record))
     return ids
 
 
@@ -388,8 +413,8 @@ def _producer_rule(
             a, b = find(ids[0]), find(other)
             if a != b:
                 parent[b] = a
-    named_roots = {find(node) for node in list(parent) if node[0] == "name"}
-    unsigned_present = any(_key_id(r) is None and _asserted(r) is not None for r in evidence)
+    named_roots = {find(node) for node in list(parent) if node[0] != "key"}
+    unsigned_present = any(_key_id(r) is None and _names(r) for r in evidence)
 
     def producer(record: Mapping[str, Any]) -> Hashable | None:
         ids = _identities(record)

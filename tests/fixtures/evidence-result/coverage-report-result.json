@@ -113,8 +113,8 @@
         ],
         "gaps": [],
         "independence": {
-          "correlated_records": 0,
-          "independent_producers": 2,
+          "correlated_records": 1,
+          "independent_producers": 1,
           "met": true,
           "producer_basis": "asserted",
           "required_producers": 1,
