@@ -4,7 +4,7 @@
 # EvidenceCompiler-compiled candidate from `register.yaml`, transcribed
 # verbatim -- `tests/test_pack_eu_ai_act_trace.py`
 # recompiles the register and asserts the two never drift apart.
-pack_id: asg/eu-ai-act-obligations/0.1.0
+pack_id: asg/eu-ai-act-obligations/0.1.1
 
 outcomes:
   - id: EU-53
@@ -15,7 +15,7 @@ outcomes:
     forward_verdict: DETERMINISTIC
     backward_verdict: DETERMINISTIC
     profile: obligation
-    epistemic_type: OBSERVED_EVENT
+    epistemic_type: observed_event
     clause_ref: EU AI Act Article 53
     clause:
       instrument: Regulation (EU) 2024/1689
@@ -46,7 +46,7 @@ outcomes:
     forward_verdict: DETERMINISTIC
     backward_verdict: DETERMINISTIC
     profile: obligation
-    epistemic_type: PRODUCER_CLAIM
+    epistemic_type: producer_claim
     clause_ref: EU AI Act Article 75
     clause:
       instrument: Regulation (EU) 2024/1689
@@ -62,7 +62,7 @@ outcomes:
     forward_verdict: DETERMINISTIC
     backward_verdict: DETERMINISTIC
     profile: obligation
-    epistemic_type: OBLIGATION_REFERENCE
+    epistemic_type: obligation_reference
     clause_ref: EU AI Act Article 4
     clause:
       instrument: Regulation (EU) 2024/1689
@@ -78,7 +78,7 @@ outcomes:
     forward_verdict: DETERMINISTIC
     backward_verdict: DETERMINISTIC
     profile: obligation
-    epistemic_type: OBSERVED_EVENT
+    epistemic_type: observed_event
     tier: must_have
     clause_ref: EU AI Act Article 50
     clause:

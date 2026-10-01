@@ -607,14 +607,14 @@ def test_invalid_epistemic_type_value_is_rejected(tmp_path):
 @pytest.mark.parametrize(
     "epistemic_type",
     [
-        "OBSERVED_EVENT",
-        "SYSTEM_OF_RECORD_FACT",
-        "PRODUCER_CLAIM",
-        "HUMAN_REPORT",
-        "SEMANTIC_JUDGMENT",
-        "DERIVED_METRIC",
-        "ADJUDICATION",
-        "OBLIGATION_REFERENCE",
+        "observed_event",
+        "system_of_record_fact",
+        "producer_claim",
+        "human_report",
+        "semantic_judgment",
+        "derived_metric",
+        "adjudication",
+        "obligation_reference",
     ],
 )
 def test_every_closed_set_epistemic_type_loads_clean_and_renders_in_the_digest(tmp_path, epistemic_type):
@@ -622,6 +622,15 @@ def test_every_closed_set_epistemic_type_loads_clean_and_renders_in_the_digest(t
     pack = load_pack_dir(pack_dir)
     assert pack.outcomes[0].epistemic_type == epistemic_type
     assert pack.canonical_dict()["outcomes"][0]["epistemic_type"] == epistemic_type
+
+
+def test_upper_case_epistemic_type_is_rejected(tmp_path):
+    # Lower-case is the only spelling; capsule-engine never released an
+    # upper-case one, so there is no legacy read path.
+    pack_dir = _write_pack(tmp_path, {"outcomes": [_outcome(epistemic_type="OBSERVED_EVENT")]})
+    with pytest.raises(PackDefinitionError) as exc:
+        load_pack_dir(pack_dir)
+    assert exc.value.reason == "invalid_epistemic_type"
 
 
 # --- obligation profile ----------------------------------------------------
@@ -679,7 +688,7 @@ def test_a_real_eu_ai_act_clause_round_trips_through_the_obligation_profile(tmp_
                     id="EU-26-6",
                     statement="Automatically generated logs were retained for at least six months.",
                     profile="obligation",
-                    epistemic_type="OBLIGATION_REFERENCE",
+                    epistemic_type="obligation_reference",
                     clause=_EU_AI_ACT_CLAUSE,
                 )
             ]
@@ -691,7 +700,7 @@ def test_a_real_eu_ai_act_clause_round_trips_through_the_obligation_profile(tmp_
 
     canonical = pack_first_load.canonical_dict()["outcomes"][0]
     assert canonical["profile"] == "obligation"
-    assert canonical["epistemic_type"] == "OBLIGATION_REFERENCE"
+    assert canonical["epistemic_type"] == "obligation_reference"
     assert canonical["clause"] == _EU_AI_ACT_CLAUSE
 
     requirement = pack_first_load.obligation_requirements()[0]

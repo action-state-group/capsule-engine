@@ -113,6 +113,12 @@ from ..packs.schema import EPISTEMIC_TYPE_VALUES
 from .errors import INVALID_COVERAGE_REPORT, ResultError
 from .result import Claim, DigestRef
 
+# TODO(epistemic-lowercase): the Result schema's coverage section (vendored
+# from agent-action-capsule) still spells epistemic types in upper case. Emit
+# EPISTEMIC_TYPE_VALUES (lower case) instead once that schema is lower-cased
+# and re-vendored here.
+_RESULT_EPISTEMIC_TYPES = frozenset(v.upper() for v in EPISTEMIC_TYPE_VALUES)
+
 __all__ = [
     "COVERAGE_REPORT_VERSION",
     "CONNECTOR_VALUES",
@@ -199,10 +205,10 @@ class SourceCoverage:
     epistemic_type: str | None = None  # declared by the caller's source catalog, never inferred
 
     def __post_init__(self) -> None:
-        if self.epistemic_type is not None and self.epistemic_type not in EPISTEMIC_TYPE_VALUES:
+        if self.epistemic_type is not None and self.epistemic_type not in _RESULT_EPISTEMIC_TYPES:
             raise ResultError(
                 INVALID_COVERAGE_REPORT,
-                f"source {self.source!r} epistemic_type must be one of {sorted(EPISTEMIC_TYPE_VALUES)}, got {self.epistemic_type!r}",
+                f"source {self.source!r} epistemic_type must be one of {sorted(_RESULT_EPISTEMIC_TYPES)}, got {self.epistemic_type!r}",
             )
 
     def to_dict(self) -> dict:
@@ -649,8 +655,8 @@ def build_coverage_report(
     ``corroboration_remedy`` is the remedy named on a ``correlated_only``
     gap (the connector that would bring in a second producer), if any.
     ``source_catalog`` maps a source name to its declared epistemic type
-    (one of ``packs.schema.EPISTEMIC_TYPE_VALUES``, compared
-    case-insensitively); a source row carries
+    (one of ``packs.schema.EPISTEMIC_TYPE_VALUES``, lower case); a source
+    row carries
     ``epistemic_type`` only when the catalog names it."""
     contract_ref = f"{contract['id']}@{contract['version']}"
     for claim in claims:
@@ -660,16 +666,16 @@ def build_coverage_report(
                 f"claim {claim.id!r} is for {claim.contract_ref!r}, not this report's contract {contract_ref!r}",
             )
     remedies = remedies or {}
-    # Case-insensitive: the owning EvidenceBook list is lowercase, the
-    # Evidence Contract and the Result spell it uppercase (an open spelling
-    # question); either is accepted and the Result carries uppercase.
-    source_catalog = {k: v.upper() if isinstance(v, str) else v for k, v in (source_catalog or {}).items()}
+    source_catalog = dict(source_catalog or {})
     for source, epistemic_type in source_catalog.items():
         if epistemic_type not in EPISTEMIC_TYPE_VALUES:
             raise ResultError(
                 INVALID_COVERAGE_REPORT,
                 f"source catalog types {source!r} as {epistemic_type!r}, not one of {sorted(EPISTEMIC_TYPE_VALUES)}",
             )
+    # TODO(epistemic-lowercase): emit as given (lower case) once the Result
+    # schema is lower-cased and re-vendored; see _RESULT_EPISTEMIC_TYPES.
+    source_catalog = {k: v.upper() for k, v in source_catalog.items()}
     requirements = tuple(
         _requirement_coverage(
             req,

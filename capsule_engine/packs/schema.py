@@ -217,18 +217,20 @@ EVIDENCE_PROFILE_VALUES = frozenset(
 # The eight epistemic types (doc1 "Evidence Fabric Architecture v2" §4) an
 # Evidence Contract's evidence can carry -- what KIND of claim a piece of
 # evidence is, independent of which profile the contract belongs to.
+# Lower-case, as the owning record header spells them (2026-10-01 decision).
 EPISTEMIC_TYPE_VALUES = frozenset(
     {
-        "OBSERVED_EVENT",
-        "SYSTEM_OF_RECORD_FACT",
-        "PRODUCER_CLAIM",
-        "HUMAN_REPORT",
-        "SEMANTIC_JUDGMENT",
-        "DERIVED_METRIC",
-        "ADJUDICATION",
-        "OBLIGATION_REFERENCE",
+        "observed_event",
+        "system_of_record_fact",
+        "producer_claim",
+        "human_report",
+        "semantic_judgment",
+        "derived_metric",
+        "adjudication",
+        "obligation_reference",
     }
 )
+
 
 
 @dataclass(frozen=True)

@@ -55,7 +55,7 @@ BASE: dict[str, Any] = {
             "profile": "outcome",
             "statement": "the record was written before the action was dispatched",
             "evidence_requirements": {
-                "accepted_epistemic_types": ["OBSERVED_EVENT", "SYSTEM_OF_RECORD_FACT"],
+                "accepted_epistemic_types": ["observed_event", "system_of_record_fact"],
                 "required_sources": ["source-one"],
                 "minimum_assurance": ["witnessed"],
                 "freshness": "P7D",
@@ -76,7 +76,7 @@ BASE: dict[str, Any] = {
             "profile": "obligation",
             "statement": "the example policy's review control was evidenced",
             "clause_ref": "example-policy/section-1/v1",
-            "evidence_requirements": {"accepted_epistemic_types": ["OBSERVED_EVENT"]},
+            "evidence_requirements": {"accepted_epistemic_types": ["observed_event"]},
         },
     ],
     "temporal": {"evaluation_period": "2026-09"},
@@ -169,8 +169,8 @@ ok("mixed-profiles", "one contract may mix all seven profiles across its require
 ))
 ok("all-epistemic-types", "all eight epistemic types may be accepted at once", minimal(
     {"id": "r1", "profile": "outcome", "statement": "s", "evidence_requirements": {"accepted_epistemic_types": [
-        "OBSERVED_EVENT", "SYSTEM_OF_RECORD_FACT", "PRODUCER_CLAIM", "HUMAN_REPORT",
-        "SEMANTIC_JUDGMENT", "DERIVED_METRIC", "ADJUDICATION", "OBLIGATION_REFERENCE"]}}))
+        "observed_event", "system_of_record_fact", "producer_claim", "human_report",
+        "semantic_judgment", "derived_metric", "adjudication", "obligation_reference"]}}))
 ok("empty-evidence-requirements", "an empty evidence_requirements block is valid and constrains nothing",
    minimal({"id": "r1", "profile": "outcome", "statement": "s", "evidence_requirements": {}}))
 ok("principal-nostr", "a principal_ref is scheme:value; the scheme is profile-defined",
@@ -291,8 +291,8 @@ bad("native-obligation-missing-clause", "a native obligation must carry its clau
 bad("unknown-epistemic-type", "epistemic types are a closed set of eight",
     mutate(BASE, on_er("req-a", lambda e: e.update(accepted_epistemic_types=["RUMOUR"]))),
     "requirements/0/evidence_requirements/accepted_epistemic_types/0", "enum")
-bad("lowercase-epistemic-type", "epistemic type values are upper-case",
-    mutate(BASE, on_er("req-a", lambda e: e.update(accepted_epistemic_types=["observed_event"]))),
+bad("uppercase-epistemic-type", "epistemic type values are lower-case, as the owning record header spells them",
+    mutate(BASE, on_er("req-a", lambda e: e.update(accepted_epistemic_types=["OBSERVED_EVENT"]))),
     "requirements/0/evidence_requirements/accepted_epistemic_types/0", "enum")
 bad("empty-epistemic-types", "an empty accepted list would accept nothing; omit the field instead",
     mutate(BASE, on_er("req-a", lambda e: e.update(accepted_epistemic_types=[]))),
@@ -393,6 +393,7 @@ def _noop(d: dict[str, Any]) -> None:
 diff("identical", "a contract diffed against itself has no changes", BASE, BASE, False)
 diff("key-order-only", "member order is not content: same JCS bytes, no changes",
      BASE, json.loads(json.dumps(BASE, sort_keys=True)), False)
+
 diff("version-bump-only", "a new version label with no other change is non-breaking", BASE, v2(_noop), False, VC)
 diff("version-reused", "one version label must never name two different contracts",
      BASE, mutate(BASE, on_req("req-a", lambda r: r.update(statement="reworded"))), True,
@@ -425,13 +426,13 @@ diff("statement-becomes-judged", "a statement reworded while adjudication moves 
      BASE, v2(on_req("req-a", lambda r: r.update(adjudication={"mode": "human"}, statement="reworded"))), True,
      VC, ch(f"{RA}/statement", "changed"), ch(f"{RA}/adjudication/mode", "changed"))
 diff("epistemic-narrowed", "accepting fewer epistemic types tightens the requirement",
-     BASE, v2(on_er("req-a", lambda e: e.update(accepted_epistemic_types=["OBSERVED_EVENT"]))), True,
+     BASE, v2(on_er("req-a", lambda e: e.update(accepted_epistemic_types=["observed_event"]))), True,
      VC, ch(f"{ERA}/accepted_epistemic_types", "tightened"))
 diff("epistemic-widened", "accepting more epistemic types loosens the requirement",
-     BASE, v2(on_er("req-a", lambda e: e["accepted_epistemic_types"].append("PRODUCER_CLAIM"))), False,
+     BASE, v2(on_er("req-a", lambda e: e["accepted_epistemic_types"].append("producer_claim"))), False,
      VC, ch(f"{ERA}/accepted_epistemic_types", "loosened"))
 diff("epistemic-swapped", "swapping an accepted type may orphan evidence of the old type",
-     BASE, v2(on_er("req-a", lambda e: e.update(accepted_epistemic_types=["OBSERVED_EVENT", "HUMAN_REPORT"]))), True,
+     BASE, v2(on_er("req-a", lambda e: e.update(accepted_epistemic_types=["observed_event", "human_report"]))), True,
      VC, ch(f"{ERA}/accepted_epistemic_types", "changed"))
 diff("epistemic-reordered", "accepted types are a set: reordering them is no change",
      BASE, v2(on_er("req-a", lambda e: e["accepted_epistemic_types"].reverse())), False, VC)
@@ -686,6 +687,9 @@ diff_error("a-invalid", "an invalid contract is refused before any diffing",
            mutate(BASE, drop("version")), BASE, "invalid_contract")
 diff_error("b-invalid", "both sides are validated, not just the first",
            BASE, mutate(BASE, lambda d: d.update(requirements=[])), "invalid_contract")
+diff_error("b-uppercase-epistemic-type", "an upper-case epistemic type is not the lower-case one: the contract is refused, not diffed",
+           BASE, mutate(BASE, on_er("req-a", lambda e: e.update(
+               accepted_epistemic_types=[t.upper() for t in e["accepted_epistemic_types"]]))), "invalid_contract")
 diff_error("duplicate-requirement-id", "two requirements with one id cannot be matched to claims",
            BASE, v2(lambda d: d["requirements"].append(dict(_req(d, "req-a")))), "duplicate_requirement_id")
 diff_error("b-self-declared-status", "a contract that self-declares a status is refused, not diffed",
@@ -700,7 +704,7 @@ diff_error("required-sources-not-a-list", "required_sources as a string is refus
            BASE, v2(on_er("req-a", lambda e: e.update(required_sources="source-one"))),
            "invalid_contract", VC, ch(f"{ERA}/required_sources", "changed"))
 diff_error("epistemic-types-not-a-list", "accepted types as a string is refused, never ranked",
-           BASE, v2(on_er("req-a", lambda e: e.update(accepted_epistemic_types="OBSERVED_EVENT"))),
+           BASE, v2(on_er("req-a", lambda e: e.update(accepted_epistemic_types="observed_event"))),
            "invalid_contract", VC, ch(f"{ERA}/accepted_epistemic_types", "changed"))
 diff_error("sequence-not-a-list", "a required sequence as a string is refused, never ranked",
            BASE, v2(on_req("req-b", lambda r: r.update(required_sequence="requested"))),

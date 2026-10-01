@@ -16,7 +16,7 @@ FACT/RULE/JUDGED/CONFIRM/DOC as its own "Evidence-class -> schema mapping" comme
 structural + an external-confirmation evidence_instrument, DOC -> structural,
 presence-by-digest only, never graded "compliant"). This register adds exactly one
 class that pack didn't need: STATE, for a live system-of-record read (doc1
-"Evidence Fabric Architecture v2" Section 4's SYSTEM_OF_RECORD_FACT epistemic type,
+"Evidence Fabric Architecture v2" Section 4's system_of_record_fact epistemic type,
 e.g. "payment state == settled") -- a claim that needs a record which doesn't
 exist in a capsule at seal time, same shape as FACT/DOC, but about EXTERNAL system
 state rather than the agent's own sealed action stream. ``compiler.

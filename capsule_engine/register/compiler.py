@@ -52,12 +52,12 @@ class _ClassDefaults:
 # an external system-of-record whose value a capsule doesn't carry until
 # instrumented (UNAVAILABLE-STATE-REQUIRED/WITH-INSTRUMENTATION).
 EVIDENCE_CLASS_DEFAULTS: dict[str, _ClassDefaults] = {
-    "FACT": _ClassDefaults("structural", "DETERMINISTIC", "DETERMINISTIC", "OBSERVED_EVENT"),
+    "FACT": _ClassDefaults("structural", "DETERMINISTIC", "DETERMINISTIC", "observed_event"),
     "RULE": _ClassDefaults("structural", "DETERMINISTIC", "DETERMINISTIC", None),
-    "JUDGED": _ClassDefaults("judged", "UNAVAILABLE-MODEL-REQUIRED", "MODEL-ASSISTED", "SEMANTIC_JUDGMENT"),
-    "CONFIRM": _ClassDefaults("structural", "DETERMINISTIC", "DETERMINISTIC", "PRODUCER_CLAIM"),
-    "STATE": _ClassDefaults("value", "UNAVAILABLE-STATE-REQUIRED", "WITH-INSTRUMENTATION", "SYSTEM_OF_RECORD_FACT"),
-    "DOC": _ClassDefaults("structural", "DETERMINISTIC", "DETERMINISTIC", "OBLIGATION_REFERENCE"),
+    "JUDGED": _ClassDefaults("judged", "UNAVAILABLE-MODEL-REQUIRED", "MODEL-ASSISTED", "semantic_judgment"),
+    "CONFIRM": _ClassDefaults("structural", "DETERMINISTIC", "DETERMINISTIC", "producer_claim"),
+    "STATE": _ClassDefaults("value", "UNAVAILABLE-STATE-REQUIRED", "WITH-INSTRUMENTATION", "system_of_record_fact"),
+    "DOC": _ClassDefaults("structural", "DETERMINISTIC", "DETERMINISTIC", "obligation_reference"),
 }
 
 

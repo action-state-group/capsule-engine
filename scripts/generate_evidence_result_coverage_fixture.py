@@ -49,10 +49,10 @@ OTEL_BLOCK_KEY = "org.agentactioncapsule.otel"
 
 # Declared types for some sources; the rest stay untyped (no key).
 SOURCE_CATALOG = {
-    "role-assignment-record": "SYSTEM_OF_RECORD_FACT",
-    "ui-explanation-capability-record": "SYSTEM_OF_RECORD_FACT",
-    "review-events": "OBSERVED_EVENT",
-    "override-events": "HUMAN_REPORT",
+    "role-assignment-record": "system_of_record_fact",
+    "ui-explanation-capability-record": "system_of_record_fact",
+    "review-events": "observed_event",
+    "override-events": "human_report",
 }
 
 REMEDIES = {
