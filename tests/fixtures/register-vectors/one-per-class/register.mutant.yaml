@@ -1,0 +1,99 @@
+# Same register as register.yaml with every key reordered, every scalar
+# quoted and every statement re-wrapped: must compile to identical bytes.
+rows:
+  - evidence_instrument:
+      field: "native_log_event_kind"
+      kind: "structured_field"
+    clause:
+      effective_from: "2026-01-01"
+      article: "§1"
+      instrument: "Policy P-1"
+    effective_from: "2026-01-01"
+    evidence_class: "FACT"
+    version: "1.0.0"
+    owner: "compliance-team"
+    scope: "all consequential actions"
+    source: "Policy P-1"
+    statement: >-
+      Every consequential action
+      is sealed when it occurs.
+    id: "fact-1"
+  - clause:
+      article: "§2"
+      instrument: "Policy P-1"
+    evidence_class: "RULE"
+    version: "1.0.0"
+    owner: "compliance-team"
+    scope: "every payment dispatch above the threshold"
+    source: "Policy P-1"
+    statement: >-
+      A payment above
+      the threshold has two distinct approvers.
+    id: "rule-1"
+  - clause:
+      article: "§3"
+      instrument: "Policy P-1"
+    evidence_class: "JUDGED"
+    version: "1.0.0"
+    owner: "compliance-team"
+    scope: "every customer-facing turn"
+    source: "Policy P-1"
+    statement: >-
+      The agent did
+      not pressure the customer.
+    id: "judged-1"
+  - evidence_instrument:
+      name: "issue_refund"
+      kind: "tool_call_name"
+    clause:
+      article: "§4"
+      instrument: "Policy P-1"
+    evidence_class: "CONFIRM"
+    version: "1.0.0"
+    owner: "compliance-team"
+    scope: "every refund action"
+    source: "Policy P-1"
+    statement: >-
+      Every refund is
+      acknowledged by the payment processor.
+    id: "confirm-1"
+  - clause:
+      article: "§5"
+      instrument: "Policy P-1"
+    evidence_class: "STATE"
+    version: "1.0.0"
+    owner: "compliance-team"
+    scope: "every released payment"
+    source: "Policy P-1"
+    statement: >-
+      Every released payment
+      is settled at the processor.
+    id: "state-1"
+  - clause:
+      article: "§6"
+      instrument: "Policy P-1"
+    effective_until: "2027-12-31"
+    evidence_class: "DOC"
+    version: "1.0.0"
+    owner: "compliance-team"
+    scope: "the operating-procedure artifact"
+    source: "Policy P-1"
+    statement: >-
+      The operating procedure
+      is on record.
+    id: "doc-1"
+  - clause:
+      contested: true
+      jurisdiction: "EU"
+      article: "Article 72"
+      instrument: "Regulation (EU) 2024/1689"
+    evidence_class: "FACT"
+    version: "1.0.0"
+    owner: "compliance-team"
+    scope: "every declared monitoring period"
+    source: "EU AI Act"
+    statement: >-
+      Monitoring reports are
+      sealed every period.
+    id: "contested-1"
+register_id: "test/one-per-class/0.1.0"

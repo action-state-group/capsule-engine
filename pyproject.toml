@@ -82,6 +82,8 @@ capsule_engine = [
     "packs/catalog/*/wickets/*.yaml",
     "packs/catalog/*/fixtures/*.jsonl",
     "packs/catalog/*/register.yaml",
+    "packs/catalog/*/obligations-register.yaml",
+    "packs/catalog/*/obligations-pack-note.md",
     "packs/catalog/*/fixtures/trace/*.json",
     "examples/data/tau2_airline/*.jsonl",
     "examples/data/tau2_airline/*.json",

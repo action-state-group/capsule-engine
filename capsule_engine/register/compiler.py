@@ -23,11 +23,31 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from agent_action_capsule.canonical import jcs
+
 from ..packs.schema import EvidenceContract
 from .errors import INVALID_EVIDENCE_CLASS, RegisterCompilerError
-from .schema import EVIDENCE_CLASS_VALUES, RegisterRow
+from .schema import EVIDENCE_CLASS_VALUES, ObligationRegister, RegisterRow
 
-__all__ = ["EvidenceCompiler", "EVIDENCE_CLASS_DEFAULTS"]
+__all__ = [
+    "EvidenceCompiler",
+    "EVIDENCE_CLASS_DEFAULTS",
+    "ObligationsPack",
+    "ExcludedRow",
+    "EXCLUDED_JUDGMENT_REQUIRED",
+    "EXCLUDED_SYSTEM_OF_RECORD_READ_REQUIRED",
+    "EXCLUDED_CONTESTED_CLAUSE",
+]
+
+# Why ``compile_obligations`` leaves a row out of the deterministic pack.
+# A row needing a model or human reading of free text:
+EXCLUDED_JUDGMENT_REQUIRED = "judgment_required"
+# A row needing a live read of an external system of record, which a sealed
+# record does not carry:
+EXCLUDED_SYSTEM_OF_RECORD_READ_REQUIRED = "system_of_record_read_required"
+# A row whose clause is marked contested: whether it binds at all is a legal
+# reading, not a check, even when its evidence class is deterministic.
+EXCLUDED_CONTESTED_CLAUSE = "contested_clause"
 
 
 @dataclass(frozen=True)
@@ -118,3 +138,82 @@ class EvidenceCompiler:
             clause_ref=f"{row.source} {row.clause.article}",
             clause=row.clause,
         )
+
+    def compile_obligations(self, register: ObligationRegister) -> ObligationsPack:
+        """Compile every deterministic row of ``register`` and name the rest.
+
+        A row is deterministic when its evidence class's forward AND
+        backward verdicts are both ``DETERMINISTIC`` in the class table --
+        with the default table that is FACT, RULE, CONFIRM and DOC. JUDGED
+        rows are excluded as ``judgment_required``, STATE rows as
+        ``system_of_record_read_required``. A deterministic row whose
+        ``clause.contested`` is true is excluded as ``contested_clause``.
+
+        No model call and no judgment: the result depends only on the
+        register's rows and the class table, so the same register always
+        compiles to the same ``canonical_bytes()``.
+        """
+        compiled: list[EvidenceContract] = []
+        excluded: list[ExcludedRow] = []
+        for row in register.rows:
+            requirement = self.compile_requirement(row)
+            if requirement.forward_verdict != "DETERMINISTIC" or requirement.backward_verdict != "DETERMINISTIC":
+                reason = (
+                    EXCLUDED_JUDGMENT_REQUIRED
+                    if requirement.mode == "judged"
+                    else EXCLUDED_SYSTEM_OF_RECORD_READ_REQUIRED
+                )
+                excluded.append(ExcludedRow(id=row.id, evidence_class=row.evidence_class, reason=reason))
+            elif row.clause.contested:
+                excluded.append(
+                    ExcludedRow(id=row.id, evidence_class=row.evidence_class, reason=EXCLUDED_CONTESTED_CLAUSE)
+                )
+            else:
+                compiled.append(requirement)
+        return ObligationsPack(
+            register_id=register.register_id,
+            register_digest=register.definition_digest(),
+            compiled=tuple(compiled),
+            excluded=tuple(excluded),
+        )
+
+
+@dataclass(frozen=True)
+class ExcludedRow:
+    """A register row ``compile_obligations`` did not compile, with the
+    named reason (one of the ``EXCLUDED_*`` constants)."""
+
+    id: str
+    evidence_class: str
+    reason: str
+
+    def to_dict(self) -> dict:
+        return {"id": self.id, "evidence_class": self.evidence_class, "reason": self.reason}
+
+
+@dataclass(frozen=True)
+class ObligationsPack:
+    """The deterministic obligations pack compiled from one register:
+    ``compiled`` holds an obligation-profile ``EvidenceContract`` per row that
+    can be checked mechanically from sealed records, ``excluded`` names every
+    other row and why. Both keep register row order. ``register_digest`` is
+    the source register's ``definition_digest()``, so a compiled pack names
+    exactly which register it came from."""
+
+    register_id: str
+    register_digest: str
+    compiled: tuple[EvidenceContract, ...]
+    excluded: tuple[ExcludedRow, ...]
+
+    def canonical_dict(self) -> dict:
+        return {
+            "register_id": self.register_id,
+            "register_digest": self.register_digest,
+            "compiled": [c.canonical_dict() for c in self.compiled],
+            "excluded": [e.to_dict() for e in self.excluded],
+        }
+
+    def canonical_bytes(self) -> bytes:
+        """The JCS bytes of ``canonical_dict()``: the byte-stable form the
+        register vectors pin."""
+        return jcs(self.canonical_dict())
