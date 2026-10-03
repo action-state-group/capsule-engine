@@ -1,10 +1,9 @@
 /* SPDX-License-Identifier: Apache-2.0
  *
  * Design tokens for the capsule-ledger console, transcribed verbatim from
- * `action-state-strategy/docs/design/design_handoff_capsule_ledger_ux/
- * designs/Visual Language Spec.dc.html` (spec v1 · 2026-08-04, capsule
- * format draft-02). Values are copied from that file's inline styles, not
- * approximated from the handoff README summary.
+ * its visual language spec (spec v1 · 2026-08-04, capsule format draft-02).
+ * Values are copied from that spec's inline styles, not approximated from a
+ * summary.
  *
  * No grays: every neutral in this system is warm (cream/bark/sand ladder).
  * --asg-brick below is reserved for verification failure ONLY -- see
