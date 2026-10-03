@@ -8,7 +8,15 @@ the parsed register shape), ``loader.py`` (a register file/dict -> a validated
 ``ObligationRegister``), and ``compiler.py`` (``EvidenceCompiler``, the row ->
 requirement path) for the pieces.
 """
-from .compiler import EVIDENCE_CLASS_DEFAULTS, EvidenceCompiler
+from .compiler import (
+    EVIDENCE_CLASS_DEFAULTS,
+    EXCLUDED_CONTESTED_CLAUSE,
+    EXCLUDED_JUDGMENT_REQUIRED,
+    EXCLUDED_SYSTEM_OF_RECORD_READ_REQUIRED,
+    EvidenceCompiler,
+    ExcludedRow,
+    ObligationsPack,
+)
 from .errors import RegisterCompilerError, RegisterDefinitionError
 from .loader import load_register_dict, load_register_file
 from .schema import EVIDENCE_CLASS_VALUES, ObligationRegister, RegisterRow
@@ -23,4 +31,9 @@ __all__ = [
     "EvidenceCompiler",
     "EVIDENCE_CLASS_DEFAULTS",
     "RegisterCompilerError",
+    "ObligationsPack",
+    "ExcludedRow",
+    "EXCLUDED_JUDGMENT_REQUIRED",
+    "EXCLUDED_SYSTEM_OF_RECORD_READ_REQUIRED",
+    "EXCLUDED_CONTESTED_CLAUSE",
 ]

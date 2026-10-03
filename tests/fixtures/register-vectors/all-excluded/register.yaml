@@ -1,0 +1,24 @@
+# Nothing deterministic: the compiled list is empty and both rows are named.
+register_id: test/all-excluded/0.1.0
+rows:
+  - id: judged-only
+    statement: Explanations given to affected persons were meaningful.
+    source: EU AI Act
+    scope: every delivered explanation
+    owner: compliance-team
+    version: "1.0.0"
+    evidence_class: JUDGED
+    clause:
+      instrument: Regulation (EU) 2024/1689
+      article: Article 86
+  - id: state-only
+    statement: The agent stayed inside the provider's allowed actions.
+    source: EU AI Act
+    scope: every action against the current allowed-actions list
+    owner: compliance-team
+    version: "1.0.0"
+    evidence_class: STATE
+    clause:
+      instrument: Regulation (EU) 2024/1689
+      article: Article 26
+      paragraph: "1"

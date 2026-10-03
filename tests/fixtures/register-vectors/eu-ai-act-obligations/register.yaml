@@ -1,0 +1,761 @@
+# SPDX-License-Identifier: Apache-2.0
+# EU AI Act obligation register: the agent-relevant obligations of
+# Regulation (EU) 2024/1689, as amended by Regulation (EU) 2026/1744, one row
+# per obligation.
+#
+# `EvidenceCompiler.compile_obligations` turns this register into the
+# deterministic obligations pack: every row whose evidence class can be
+# checked mechanically from sealed records (FACT, RULE, CONFIRM, DOC) is
+# compiled into an obligation-profile EvidenceContract, and every other row
+# is listed as excluded with a named reason. See `obligations-pack-note.md`
+# beside this file for the compiled and excluded lists.
+#
+# How each row's `evidence_class` was assigned: a row with any judged
+# component (a model or human reading of free text, even as a fallback) is
+# JUDGED, and a row that needs a live read of an external system of record is
+# STATE -- neither can be established from sealed records alone, so neither
+# is compiled. A row whose evidence combines only deterministic classes takes
+# the first class its evidence description names (for example "DOC + FACT"
+# is DOC, so it keeps the presence-by-digest-only disclaimer).
+#
+# The five rows `register.yaml` already carries (EU-04, EU-14-3, EU-50-1,
+# EU-53, EU-75) are copied here verbatim; `tests/test_register_obligations.py`
+# fails if the two files drift apart on any of them.
+#
+# The Annex I row (agents embedded in Annex I products) is not a row here: it
+# adds no evidence of its own, it only changes when the Article 6-27 rows
+# below apply.
+#
+# `clause.contested: true` marks the rows whose literal text applies from
+# 2 Aug 2026 but presupposes the high-risk regime that applies from
+# 2 Dec 2027. Whether such a row binds a given deployment before then is a
+# legal reading, not a check, so the compiler excludes contested rows too.
+register_id: asg/eu-ai-act-obligations-register/0.1.0
+rows:
+  - id: EU-05a
+    statement: >-
+      The agent did not use manipulative or deceptive techniques that
+      materially distorted a person's decision toward significant harm.
+    source: EU AI Act
+    scope: every person-facing conversation turn
+    owner: compliance-team
+    version: 0.1.0
+    evidence_class: JUDGED
+    clause:
+      instrument: "Regulation (EU) 2024/1689"
+      article: "Article 5"
+      paragraph: "1(a)"
+      as_amended_by: ["Regulation (EU) 2026/1744"]
+      jurisdiction: "EU"
+      effective_from: "2025-02-02"
+      source_url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+
+  - id: EU-05b
+    statement: >-
+      The agent did not exploit age, disability or socio-economic
+      vulnerability to distort behaviour toward significant harm.
+    source: EU AI Act
+    scope: every person-facing conversation turn where vulnerability context is lawfully recorded
+    owner: compliance-team
+    version: 0.1.0
+    evidence_class: JUDGED
+    clause:
+      instrument: "Regulation (EU) 2024/1689"
+      article: "Article 5"
+      paragraph: "1(b)"
+      as_amended_by: ["Regulation (EU) 2026/1744"]
+      jurisdiction: "EU"
+      effective_from: "2025-02-02"
+      source_url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+
+  - id: EU-05c
+    statement: >-
+      No decision by the agent treated a person unfavourably on the basis of a
+      social score derived from unrelated context.
+    source: EU AI Act
+    scope: every decision capsule citing its inputs
+    owner: compliance-team
+    version: 0.1.0
+    evidence_class: JUDGED
+    clause:
+      instrument: "Regulation (EU) 2024/1689"
+      article: "Article 5"
+      paragraph: "1(c)"
+      as_amended_by: ["Regulation (EU) 2026/1744"]
+      jurisdiction: "EU"
+      effective_from: "2025-02-02"
+      source_url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+    evidence_instrument:
+      kind: structured_field
+      field: input_class
+
+  - id: EU-05d
+    statement: >-
+      The agent generated no intimate/sexual imagery of an identifiable person
+      without explicit consent, and no CSAM.
+    source: EU AI Act
+    scope: every content-generation action; refusals for prohibited content classes are sealed and none executed
+    owner: compliance-team
+    version: 0.1.0
+    evidence_class: RULE
+    clause:
+      instrument: "Regulation (EU) 2024/1689"
+      article: "Article 5"
+      paragraph: "1(ba)/(bb)"
+      as_amended_by: ["Regulation (EU) 2026/1744"]
+      jurisdiction: "EU"
+      effective_from: "2026-12-02"
+      source_url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+    evidence_instrument:
+      kind: structured_field
+      field: refusal_verdict_class
+
+  # Verbatim from register.yaml (the merged TRACE subset).
+  - id: EU-04
+    statement: >-
+      The deployer took measures to support AI literacy of staff operating the
+      agent.
+    source: EU AI Act
+    scope: all deployments
+    owner: compliance-team
+    version: 0.1.0
+    evidence_class: DOC
+    clause:
+      instrument: "Regulation (EU) 2024/1689"
+      article: "Article 4"
+      as_amended_by: ["Regulation (EU) 2026/1744"]
+      jurisdiction: "EU"
+
+  # Verbatim from register.yaml (the merged TRACE subset).
+  - id: EU-53
+    statement: >-
+      The agent's model epoch cites the provider's downstream documentation
+      (Annex XII) for the model version actually used.
+    source: EU AI Act
+    scope: every TRACE-attested execution naming a GPAI model
+    owner: compliance-team
+    version: 0.1.0
+    evidence_class: FACT
+    clause:
+      instrument: "Regulation (EU) 2024/1689"
+      article: "Article 53"
+      paragraph: "1(b)"
+      jurisdiction: "EU"
+
+  - id: EU-55
+    statement: >-
+      Serious incidents involving the model were tracked and reported to the
+      AI Office without undue delay.
+    source: EU AI Act
+    scope: every model serious incident, flag to AI Office report, within the declared deadline
+    owner: compliance-team
+    version: 0.1.0
+    evidence_class: FACT
+    clause:
+      instrument: "Regulation (EU) 2024/1689"
+      article: "Article 55"
+      paragraph: "1(c)"
+      as_amended_by: ["Regulation (EU) 2026/1744"]
+      jurisdiction: "EU"
+      effective_from: "2025-08-02"
+      source_url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+    evidence_instrument:
+      kind: structured_field
+      field: ai_office_acknowledgement_digest
+
+  # Verbatim from register.yaml (the merged TRACE subset).
+  - id: EU-50-1
+    statement: >-
+      Each natural person interacting with the agent was informed they were
+      interacting with an AI system, at the latest at first interaction.
+    source: EU AI Act
+    scope: every person-facing session
+    owner: compliance-team
+    version: 0.1.0
+    evidence_class: FACT
+    clause:
+      instrument: "Regulation (EU) 2024/1689"
+      article: "Article 50"
+      paragraph: "1"
+      jurisdiction: "EU"
+
+  - id: EU-50-2
+    statement: >-
+      Synthetic audio/image/video/text output by the agent carried
+      machine-readable marking.
+    source: EU AI Act
+    scope: every output capsule of a synthetic media class carries a marking reference
+    owner: compliance-team
+    version: 0.1.0
+    evidence_class: FACT
+    clause:
+      instrument: "Regulation (EU) 2024/1689"
+      article: "Article 50"
+      paragraph: "2"
+      as_amended_by: ["Regulation (EU) 2026/1744"]
+      jurisdiction: "EU"
+      effective_from: "2026-08-02"
+      source_url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+    evidence_instrument:
+      kind: structured_field
+      field: output_media_class
+
+  - id: EU-50-3
+    statement: >-
+      Persons exposed to emotion-recognition or biometric categorisation by
+      the agent were informed.
+    source: EU AI Act
+    scope: an emotion or biometric disclosure is sealed before the relevant action
+    owner: compliance-team
+    version: 0.1.0
+    evidence_class: FACT
+    clause:
+      instrument: "Regulation (EU) 2024/1689"
+      article: "Article 50"
+      paragraph: "3"
+      as_amended_by: ["Regulation (EU) 2026/1744"]
+      jurisdiction: "EU"
+      effective_from: "2026-08-02"
+      source_url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+    evidence_instrument:
+      kind: structured_field
+      field: interaction_disclosure_kind
+
+  - id: EU-50-4
+    statement: >-
+      Deepfakes and AI-generated public-interest text published via the agent
+      were disclosed as such, unless human-reviewed under editorial
+      responsibility.
+    source: EU AI Act
+    scope: every publish action carries a disclosure flag or a chained human-review approval
+    owner: compliance-team
+    version: 0.1.0
+    evidence_class: FACT
+    clause:
+      instrument: "Regulation (EU) 2024/1689"
+      article: "Article 50"
+      paragraph: "4"
+      as_amended_by: ["Regulation (EU) 2026/1744"]
+      jurisdiction: "EU"
+      effective_from: "2026-08-02"
+      source_url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+    evidence_instrument:
+      kind: structured_field
+      field: publish_disclosure_flag
+
+  - id: EU-49
+    statement: >-
+      The high-risk system (or self-assessed not-high-risk system) is
+      registered in the EU database, with the registration receipt on the
+      record.
+    source: EU AI Act
+    scope: the system's epoch capsule cites the EU database registration receipt
+    owner: compliance-team
+    version: 0.1.0
+    evidence_class: CONFIRM
+    clause:
+      instrument: "Regulation (EU) 2024/1689"
+      article: "Article 49"
+      paragraph: "1/2/3"
+      as_amended_by: ["Regulation (EU) 2026/1744"]
+      jurisdiction: "EU"
+      effective_from: "2026-08-02"
+      source_url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+      contested: true
+    evidence_instrument:
+      kind: structured_field
+      field: reference_db_ref
+
+  - id: EU-72
+    statement: >-
+      Performance data on the agent was actively and systematically collected
+      and analysed post-market, per the documented plan.
+    source: EU AI Act
+    scope: a monitoring report is sealed and checkpointed for every declared period
+    owner: compliance-team
+    version: 0.1.0
+    evidence_class: FACT
+    clause:
+      instrument: "Regulation (EU) 2024/1689"
+      article: "Article 72"
+      paragraph: "1-2"
+      as_amended_by: ["Regulation (EU) 2026/1744"]
+      jurisdiction: "EU"
+      effective_from: "2026-08-02"
+      source_url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+      contested: true
+    evidence_instrument:
+      kind: structured_field
+      field: monitoring_report_sealed_per_period
+
+  - id: EU-73
+    statement: >-
+      Every serious incident was reported within 15 days (10 days if death; 2
+      days if widespread infringement/critical infrastructure) of awareness.
+    source: EU AI Act
+    scope: every serious incident, awareness to report, within the severity-class deadline
+    owner: compliance-team
+    version: 0.1.0
+    evidence_class: FACT
+    clause:
+      instrument: "Regulation (EU) 2024/1689"
+      article: "Article 73"
+      paragraph: "2-4"
+      as_amended_by: ["Regulation (EU) 2026/1744"]
+      jurisdiction: "EU"
+      effective_from: "2026-08-02"
+      source_url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+      contested: true
+    evidence_instrument:
+      kind: structured_field
+      field: incident_severity_class
+
+  - id: EU-86
+    statement: >-
+      Each affected person who requested it received a clear, meaningful
+      explanation of the agent's role and the main elements of the decision.
+    source: EU AI Act
+    scope: every explanation request paired with a delivered explanation
+    owner: compliance-team
+    version: 0.1.0
+    evidence_class: JUDGED
+    clause:
+      instrument: "Regulation (EU) 2024/1689"
+      article: "Article 86"
+      paragraph: "1"
+      as_amended_by: ["Regulation (EU) 2026/1744"]
+      jurisdiction: "EU"
+      effective_from: "2026-08-02"
+      source_url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+      contested: true
+    evidence_instrument:
+      kind: structured_field
+      field: explanation_delivered_at
+
+  # Verbatim from register.yaml (the merged TRACE subset).
+  - id: EU-75
+    statement: >-
+      Records demanded by the AI Office were producible: complete,
+      checkpointed, and verifiable offline via a transparency-log receipt.
+    source: EU AI Act
+    scope: every TRACE-attested execution of a GPAI-based or VLOP-embedded system
+    owner: compliance-team
+    version: 0.1.0
+    evidence_class: CONFIRM
+    clause:
+      instrument: "Regulation (EU) 2024/1689"
+      article: "Article 75"
+      as_amended_by: ["Regulation (EU) 2026/1744"]
+      jurisdiction: "EU"
+
+  - id: EU-12-1
+    statement: >-
+      The agent automatically records events over its lifetime -- every
+      consequential action sealed at the time it occurred.
+    source: EU AI Act
+    scope: all agent actions producing a consequential capsule, reconciled against the runtime's native event log
+    owner: compliance-team
+    version: 0.1.0
+    evidence_class: FACT
+    clause:
+      instrument: "Regulation (EU) 2024/1689"
+      article: "Article 12"
+      paragraph: "1"
+      as_amended_by: ["Regulation (EU) 2026/1744"]
+      jurisdiction: "EU"
+      effective_from: "2027-12-02"
+      source_url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+    evidence_instrument:
+      kind: structured_field
+      field: native_log_event_kind
+
+  - id: EU-12-2
+    statement: >-
+      The logs are sufficient to identify risk situations, support post-market
+      monitoring, and support the deployer's monitoring duty.
+    source: EU AI Act
+    scope: the registered log schema, plus the record types present in each range
+    owner: compliance-team
+    version: 0.1.0
+    evidence_class: DOC
+    clause:
+      instrument: "Regulation (EU) 2024/1689"
+      article: "Article 12"
+      paragraph: "2(a)-(c)"
+      as_amended_by: ["Regulation (EU) 2026/1744"]
+      jurisdiction: "EU"
+      effective_from: "2027-12-02"
+      source_url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+    evidence_instrument:
+      kind: structured_field
+      field: record_kind
+
+  - id: EU-12-3
+    statement: >-
+      For each use: period of use (start/end), reference database checked,
+      input data, and the natural persons who verified the result are
+      recorded. Remote biometric identification only.
+    source: EU AI Act
+    scope: "every remote biometric identification use: session start/end, reference database and input digests, verifier"
+    owner: compliance-team
+    version: 0.1.0
+    evidence_class: FACT
+    clause:
+      instrument: "Regulation (EU) 2024/1689"
+      article: "Article 12"
+      paragraph: "3"
+      as_amended_by: ["Regulation (EU) 2026/1744"]
+      jurisdiction: "EU"
+      effective_from: "2027-12-02"
+      source_url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+    evidence_instrument:
+      kind: structured_field
+      field: biometric_reference_db_digest
+
+  - id: EU-13
+    statement: >-
+      The deployer was given the means to collect, store and interpret the
+      agent's logs.
+    source: EU AI Act
+    scope: the instructions-of-use artifact provided to the deployer
+    owner: compliance-team
+    version: 0.1.0
+    evidence_class: DOC
+    clause:
+      instrument: "Regulation (EU) 2024/1689"
+      article: "Article 13"
+      paragraph: "3(f)"
+      as_amended_by: ["Regulation (EU) 2026/1744"]
+      jurisdiction: "EU"
+      effective_from: "2027-12-02"
+      source_url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+    evidence_instrument:
+      kind: structured_field
+      field: instructions_of_use_digest
+
+  # Verbatim from register.yaml (the merged TRACE subset).
+  - id: EU-14-3
+    statement: >-
+      Human-oversight measures commensurate with the agent's autonomy were in
+      place and operated -- not merely declared.
+    source: EU AI Act
+    scope: every TRACE-attested execution carrying a policy binding
+    owner: compliance-team
+    version: 0.1.0
+    evidence_class: RULE
+    clause:
+      instrument: "Regulation (EU) 2024/1689"
+      article: "Article 14"
+      paragraph: "3"
+      jurisdiction: "EU"
+
+  - id: EU-14-4d
+    statement: >-
+      The overseer could and did disregard, override or reverse the agent's
+      output where warranted.
+    source: EU AI Act
+    scope: override and reversal capsules chained to the output they supersede
+    owner: compliance-team
+    version: 0.1.0
+    evidence_class: FACT
+    clause:
+      instrument: "Regulation (EU) 2024/1689"
+      article: "Article 14"
+      paragraph: "4(d)"
+      as_amended_by: ["Regulation (EU) 2026/1744"]
+      jurisdiction: "EU"
+      effective_from: "2027-12-02"
+      source_url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+    evidence_instrument:
+      kind: structured_field
+      field: chain_relation_supersedes
+
+  - id: EU-14-4e
+    statement: >-
+      The agent could be interrupted or brought to a safe halt; every stop was
+      recorded.
+    source: EU AI Act
+    scope: every stop or interrupt is sealed as its own capsule
+    owner: compliance-team
+    version: 0.1.0
+    evidence_class: FACT
+    clause:
+      instrument: "Regulation (EU) 2024/1689"
+      article: "Article 14"
+      paragraph: "4(e)"
+      as_amended_by: ["Regulation (EU) 2026/1744"]
+      jurisdiction: "EU"
+      effective_from: "2027-12-02"
+      source_url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+    evidence_instrument:
+      kind: structured_field
+      field: stop_interrupt_capsule
+
+  - id: EU-14-4b
+    statement: >-
+      Overseers were made aware of automation bias; approvals were not rubber
+      stamps.
+    source: EU AI Act
+    scope: every approval capsule and its review latency
+    owner: compliance-team
+    version: 0.1.0
+    evidence_class: JUDGED
+    clause:
+      instrument: "Regulation (EU) 2024/1689"
+      article: "Article 14"
+      paragraph: "4(b)"
+      as_amended_by: ["Regulation (EU) 2026/1744"]
+      jurisdiction: "EU"
+      effective_from: "2027-12-02"
+      source_url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+    evidence_instrument:
+      kind: structured_field
+      field: approval_reviewed_at
+
+  - id: EU-15
+    statement: >-
+      The agent performed consistently through its lifecycle; feedback loops
+      in continually-learning systems were mitigated.
+    source: EU AI Act
+    scope: per-epoch results, never blended across epochs
+    owner: compliance-team
+    version: 0.1.0
+    evidence_class: FACT
+    clause:
+      instrument: "Regulation (EU) 2024/1689"
+      article: "Article 15"
+      paragraph: "1, 4"
+      as_amended_by: ["Regulation (EU) 2026/1744"]
+      jurisdiction: "EU"
+      effective_from: "2027-12-02"
+      source_url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+    evidence_instrument:
+      kind: structured_field
+      field: epoch_id
+
+  - id: EU-17
+    statement: >-
+      Post-market monitoring and incident reporting operated as documented QMS
+      components.
+    source: EU AI Act
+    scope: the quality-management-system artifact
+    owner: compliance-team
+    version: 0.1.0
+    evidence_class: DOC
+    clause:
+      instrument: "Regulation (EU) 2024/1689"
+      article: "Article 17"
+      paragraph: "1(i), 1(j)"
+      as_amended_by: ["Regulation (EU) 2026/1744"]
+      jurisdiction: "EU"
+      effective_from: "2027-12-02"
+      source_url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+    evidence_instrument:
+      kind: structured_field
+      field: qms_artifact_digest
+
+  - id: EU-26-1
+    statement: >-
+      The agent was used in accordance with the provider's instructions for
+      use.
+    source: EU AI Act
+    scope: every action checked against the allowed actions compiled from the instructions for use
+    owner: compliance-team
+    version: 0.1.0
+    evidence_class: STATE
+    clause:
+      instrument: "Regulation (EU) 2024/1689"
+      article: "Article 26"
+      paragraph: "1"
+      as_amended_by: ["Regulation (EU) 2026/1744"]
+      jurisdiction: "EU"
+      effective_from: "2027-12-02"
+      source_url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+    evidence_instrument:
+      kind: structured_field
+      field: allowed_actions_scope
+
+  - id: EU-26-2
+    statement: >-
+      Human oversight was assigned to competent, trained, authorised persons.
+    source: EU AI Act
+    scope: every approval capsule's approver id against the declared roster
+    owner: compliance-team
+    version: 0.1.0
+    evidence_class: DOC
+    clause:
+      instrument: "Regulation (EU) 2024/1689"
+      article: "Article 26"
+      paragraph: "2"
+      as_amended_by: ["Regulation (EU) 2026/1744"]
+      jurisdiction: "EU"
+      effective_from: "2027-12-02"
+      source_url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+    evidence_instrument:
+      kind: structured_field
+      field: approver_id
+
+  - id: EU-26-4
+    statement: >-
+      Input data under the deployer's control was relevant and sufficiently
+      representative for the intended purpose.
+    source: EU AI Act
+    scope: input data cited by action capsules, read against the declared input policy
+    owner: compliance-team
+    version: 0.1.0
+    evidence_class: JUDGED
+    clause:
+      instrument: "Regulation (EU) 2024/1689"
+      article: "Article 26"
+      paragraph: "4"
+      as_amended_by: ["Regulation (EU) 2026/1744"]
+      jurisdiction: "EU"
+      effective_from: "2027-12-02"
+      source_url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+
+  - id: EU-26-5
+    statement: >-
+      Operation was monitored; risks to health/safety/rights were escalated
+      (suspend + notify) and serious incidents were reported to the provider
+      immediately.
+    source: EU AI Act
+    scope: incident flag to suspend to provider notification, within the declared deadline
+    owner: compliance-team
+    version: 0.1.0
+    evidence_class: FACT
+    clause:
+      instrument: "Regulation (EU) 2024/1689"
+      article: "Article 26"
+      paragraph: "5"
+      as_amended_by: ["Regulation (EU) 2026/1744"]
+      jurisdiction: "EU"
+      effective_from: "2027-12-02"
+      source_url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+    evidence_instrument:
+      kind: structured_field
+      field: suspend_notify_capsule
+
+  - id: EU-26-6
+    statement: >-
+      Automatically generated logs were retained for at least six months.
+    source: EU AI Act
+    scope: log chain continuity over at least six months
+    owner: compliance-team
+    version: 0.1.0
+    evidence_class: FACT
+    clause:
+      instrument: "Regulation (EU) 2024/1689"
+      article: "Article 26"
+      paragraph: "6"
+      as_amended_by: ["Regulation (EU) 2026/1744"]
+      jurisdiction: "EU"
+      effective_from: "2027-12-02"
+      source_url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+    evidence_instrument:
+      kind: structured_field
+      field: retention_checkpoint_at
+
+  - id: EU-26-7
+    statement: >-
+      Workers' representatives and affected workers were informed before the
+      agent was deployed at the workplace.
+    source: EU AI Act
+    scope: a worker notice is sealed before the first workplace action
+    owner: compliance-team
+    version: 0.1.0
+    evidence_class: FACT
+    clause:
+      instrument: "Regulation (EU) 2024/1689"
+      article: "Article 26"
+      paragraph: "7"
+      as_amended_by: ["Regulation (EU) 2026/1744"]
+      jurisdiction: "EU"
+      effective_from: "2027-12-02"
+      source_url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+    evidence_instrument:
+      kind: structured_field
+      field: worker_notice_at
+
+  - id: EU-26-11
+    statement: >-
+      Natural persons subject to decisions made or assisted by the agent were
+      informed of that fact.
+    source: EU AI Act
+    scope: every decision capsule paired with a subject notice
+    owner: compliance-team
+    version: 0.1.0
+    evidence_class: FACT
+    clause:
+      instrument: "Regulation (EU) 2024/1689"
+      article: "Article 26"
+      paragraph: "11"
+      as_amended_by: ["Regulation (EU) 2026/1744"]
+      jurisdiction: "EU"
+      effective_from: "2027-12-02"
+      source_url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+    evidence_instrument:
+      kind: structured_field
+      field: subject_notice_at
+
+  - id: EU-27
+    statement: >-
+      A fundamental-rights impact assessment was performed before first use
+      and notified to the authority. Narrow trigger: public bodies;
+      credit/insurance uses.
+    source: EU AI Act
+    scope: the impact-assessment artifact, sealed before the first-use capsule
+    owner: compliance-team
+    version: 0.1.0
+    evidence_class: DOC
+    clause:
+      instrument: "Regulation (EU) 2024/1689"
+      article: "Article 27"
+      as_amended_by: ["Regulation (EU) 2026/1744"]
+      jurisdiction: "EU"
+      effective_from: "2027-12-02"
+      source_url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+    evidence_instrument:
+      kind: structured_field
+      field: fria_artifact_digest
+
+  - id: EU-09
+    statement: >-
+      Risk management consumed post-market monitoring data across the
+      lifecycle.
+    source: EU AI Act
+    scope: the risk-management artifact citing the period reports
+    owner: compliance-team
+    version: 0.1.0
+    evidence_class: DOC
+    clause:
+      instrument: "Regulation (EU) 2024/1689"
+      article: "Article 9"
+      paragraph: "2(c)"
+      as_amended_by: ["Regulation (EU) 2026/1744"]
+      jurisdiction: "EU"
+      effective_from: "2027-12-02"
+      source_url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+    evidence_instrument:
+      kind: structured_field
+      field: risk_management_citation_digest
+
+  - id: EU-11
+    statement: >-
+      Technical documentation describes the logging capability actually
+      deployed.
+    source: EU AI Act
+    scope: the technical documentation cited by the epoch capsule
+    owner: compliance-team
+    version: 0.1.0
+    evidence_class: DOC
+    clause:
+      instrument: "Regulation (EU) 2024/1689"
+      article: "Article 11 / Annex IV"
+      as_amended_by: ["Regulation (EU) 2026/1744"]
+      jurisdiction: "EU"
+      effective_from: "2027-12-02"
+      source_url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"
+    evidence_instrument:
+      kind: structured_field
+      field: technical_documentation_digest
+

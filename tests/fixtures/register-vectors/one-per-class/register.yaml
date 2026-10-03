@@ -1,0 +1,86 @@
+# One row per evidence class, plus a contested deterministic row: every path
+# compile_obligations can take (compiled, judgment_required,
+# system_of_record_read_required, contested_clause).
+register_id: test/one-per-class/0.1.0
+rows:
+  - id: fact-1
+    statement: Every consequential action is sealed when it occurs.
+    source: Policy P-1
+    scope: all consequential actions
+    owner: compliance-team
+    version: "1.0.0"
+    evidence_class: FACT
+    effective_from: "2026-01-01"
+    clause:
+      instrument: Policy P-1
+      article: "§1"
+      effective_from: "2026-01-01"
+    evidence_instrument:
+      kind: structured_field
+      field: native_log_event_kind
+  - id: rule-1
+    statement: A payment above the threshold has two distinct approvers.
+    source: Policy P-1
+    scope: every payment dispatch above the threshold
+    owner: compliance-team
+    version: "1.0.0"
+    evidence_class: RULE
+    clause:
+      instrument: Policy P-1
+      article: "§2"
+  - id: judged-1
+    statement: The agent did not pressure the customer.
+    source: Policy P-1
+    scope: every customer-facing turn
+    owner: compliance-team
+    version: "1.0.0"
+    evidence_class: JUDGED
+    clause:
+      instrument: Policy P-1
+      article: "§3"
+  - id: confirm-1
+    statement: Every refund is acknowledged by the payment processor.
+    source: Policy P-1
+    scope: every refund action
+    owner: compliance-team
+    version: "1.0.0"
+    evidence_class: CONFIRM
+    clause:
+      instrument: Policy P-1
+      article: "§4"
+    evidence_instrument:
+      kind: tool_call_name
+      name: issue_refund
+  - id: state-1
+    statement: Every released payment is settled at the processor.
+    source: Policy P-1
+    scope: every released payment
+    owner: compliance-team
+    version: "1.0.0"
+    evidence_class: STATE
+    clause:
+      instrument: Policy P-1
+      article: "§5"
+  - id: doc-1
+    statement: The operating procedure is on record.
+    source: Policy P-1
+    scope: the operating-procedure artifact
+    owner: compliance-team
+    version: "1.0.0"
+    evidence_class: DOC
+    effective_until: "2027-12-31"
+    clause:
+      instrument: Policy P-1
+      article: "§6"
+  - id: contested-1
+    statement: Monitoring reports are sealed every period.
+    source: EU AI Act
+    scope: every declared monitoring period
+    owner: compliance-team
+    version: "1.0.0"
+    evidence_class: FACT
+    clause:
+      instrument: Regulation (EU) 2024/1689
+      article: Article 72
+      jurisdiction: EU
+      contested: true
