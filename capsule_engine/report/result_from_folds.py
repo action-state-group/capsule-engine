@@ -15,11 +15,10 @@ witness/countersign state, never asserted".
 ``capsule_engine/folds/`` is a deterministic recomputation over sealed
 records (this repo's own report/build.py docstring: "nothing in this module
 invents a number"), never a semantic judgment. A ``"judged"`` claim's source
-is a ``capsule-judge`` verdict record -- a different repo/subsystem this one
-does not import (lane boundary: "planner/executor internals stay in
-action-state-engine and are not imported here") -- so no adapter in this
-module ever emits ``tier="judged"``; ``result.py``'s ``Claim`` supports it
-for a caller that has one.
+is a ``capsule-judge`` verdict record -- a different subsystem this repo
+does not import -- so no adapter in this module ever emits
+``tier="judged"``; ``result.py``'s ``Claim`` supports it for a caller that
+has one.
 """
 from __future__ import annotations
 

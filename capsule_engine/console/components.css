@@ -178,18 +178,6 @@ body {
 .rung-name { font-weight: 600; font-size: 14.5px; color: var(--asg-bark); }
 .rung-mode { font-family: var(--asg-font-mono); font-size: 11px; color: var(--asg-text-muted); margin-top: 2px; }
 .rung-plain { font-size: 13.5px; line-height: 1.6; color: var(--asg-text-muted); }
-.rung-enterprise-badge {
-  display: inline-block;
-  font-size: 10.5px;
-  font-weight: 600;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: var(--asg-sage);
-  background: rgba(122, 140, 110, 0.08);
-  border: 1px solid rgba(122, 140, 110, 0.25);
-  border-radius: var(--asg-radius-pill);
-  padding: 4px 12px;
-}
 
 /* the rung chip: a compact standalone label (mono), used inline in headers/rows */
 .rung-chip {
