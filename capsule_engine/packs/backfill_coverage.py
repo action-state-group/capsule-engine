@@ -24,8 +24,10 @@ vocabulary.** ``schemas/evidence-contract-v0.json``'s ``bundleAssertionStatus``
 (``SATISFIED``/``INSUFFICIENT``/``NOT_FOUND``/...) is about **evidence
 sufficiency and availability** -- the question this module answers.
 ``met``/``not_met``/``insufficient_evidence`` (``folds/ordering.py`` and
-siblings) is the DIFFERENT, judged-OUTCOME axis (whether an obligation was
-met) and is not reused here.
+siblings) is the DIFFERENT, judged-OUTCOME axis and is not reused here. Its
+authority is the judged-outcome axis: claim.verdict, met | not_met |
+not_evaluable (agent-action-capsule spec/evidence-result-v0.md §1, Verdict;
+read at agent-action-capsule commit ee7888df15f1db7eecfe9da62626d290eeabcce6).
 
 **Trusted-dict input, same as every fold in this package.** This module
 re-derives only the ``provenance_mode``/duplicate facts it needs directly
