@@ -7,6 +7,7 @@ produces a decision, which is what becomes a Capsule (``guards/capsule.py``).
 """
 from __future__ import annotations
 
+import re
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -18,6 +19,17 @@ def _new_action_id(verb: str) -> str:
 
 def _utc_now() -> str:
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+# All digits once spaces, hyphens and dots are removed, six or more of them
+# (card, account and routing numbers), or IBAN-shaped.
+_RAW_DIGITS = re.compile(r"^\d{6,}$")
+_IBAN = re.compile(r"^[A-Z]{2}\d{2}[A-Z0-9]{11,30}$", re.IGNORECASE)
+
+
+def _looks_like_raw_account_number(value: str) -> bool:
+    compact = re.sub(r"[\s.\-]", "", value)
+    return bool(_RAW_DIGITS.match(compact) or _IBAN.match(compact))
 
 
 @dataclass(frozen=True)
@@ -36,9 +48,12 @@ class Action:
 
     ``rail`` names the payment rail or destination type (e.g. ``"card"``,
     ``"p2p"``), read by ``destination_rail``. ``counterparty_account_ref`` is
-    an opaque reference to the account a counterparty is paid into, read by
-    ``counterparty_identity_change`` -- pass a stable reference or digest,
-    never a raw account number, because it is recorded on the capsule.
+    an OPAQUE reference to the account a counterparty is paid into, read by
+    ``counterparty_identity_change`` and sealed on the capsule: a token or a
+    digest that is stable per account, never the account, card or IBAN number
+    itself. A value shaped like a raw number is refused at construction (see
+    ``_looks_like_raw_account_number``); that check catches the common shapes,
+    it cannot prove a value is opaque.
     ``outgoing_content`` is text the action sends out, read by
     ``credential_pattern``; it is never written to the capsule.
     ``recurrence`` says whether a payment repeats (e.g. ``"one_time"``,
@@ -64,6 +79,15 @@ class Action:
     outgoing_content: str | None = None
     recurrence: str | None = None
     extra: dict = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        if self.counterparty_account_ref is not None and _looks_like_raw_account_number(
+            self.counterparty_account_ref
+        ):
+            raise ValueError(
+                "counterparty_account_ref looks like a raw account, card or IBAN number; it is sealed on the "
+                "capsule, so pass an opaque reference (a token or a digest) instead"
+            )
 
     def resolved_action_id(self) -> str:
         return self.action_id or _new_action_id(self.verb)

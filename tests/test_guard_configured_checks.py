@@ -103,6 +103,52 @@ def test_credential_pattern_never_puts_the_content_on_the_capsule(store, caps_fo
     assert "outgoing_content" not in capsule["asg_payload"]
 
 
+def test_credential_evidence_digest_does_not_depend_on_the_content(store, caps_fold, signer):
+    """Two different one-time codes that match the same pattern must seal the
+    same evidence_digest; otherwise the sealed digest is a guessable hash of
+    the content."""
+    engine = GuardEngine(ledger=store, caps_fold=caps_fold, signer_provider=lambda: signer, wickets=(CREDENTIAL,))
+    first = engine.check(_action(outgoing_content="Your verification code is 482913", action_id="pay/d1",
+                                 equivalence_key="d1"), dry_run=True).capsule
+    second = engine.check(_action(outgoing_content="Your verification code is 105377", action_id="pay/d2",
+                                  equivalence_key="d2"), dry_run=True).capsule
+    a, b = _record_for(first, "credential_pattern"), _record_for(second, "credential_pattern")
+    assert a["result"] == b["result"] == "fail"
+    assert a["evidence_digest"] == b["evidence_digest"]
+    assert a["evidence_digest"] == json_digest(
+        {"matched_pattern_ids": ["one_time_code"], "pattern_ids": ["card_security_code", "one_time_code", "password_value"]}
+    )
+
+
+def _evidence_reads_of_content(source: str) -> list[str]:
+    """Names of evidence keys whose value reads ``outgoing_content``, in every
+    ``evidence = {...}`` / ``evidence = SomeType(...)`` assignment of a module."""
+    import ast
+
+    offenders = []
+    for node in ast.walk(ast.parse(source)):
+        if not (isinstance(node, ast.Assign) and any(getattr(t, "id", None) == "evidence" for t in node.targets)):
+            continue
+        match node.value:
+            case ast.Dict(keys=keys, values=values):
+                pairs = [(getattr(k, "value", "?"), v) for k, v in zip(keys, values, strict=True)]
+            case ast.Call(keywords=keywords):
+                pairs = [(k.arg, k.value) for k in keywords]
+            case _:
+                pairs = []
+        for key, expr in pairs:
+            if any(isinstance(n, ast.Attribute) and n.attr == "outgoing_content" for n in ast.walk(expr)):
+                offenders.append(key)
+    return offenders
+
+
+def test_credential_evidence_has_no_key_derived_from_outgoing_content():
+    planted = 'evidence = {"content_sha256": sha(action.outgoing_content.encode()), "ids": ids}\n'
+    assert _evidence_reads_of_content(planted) == ["content_sha256"]  # positive control
+    source = (Path(__file__).parent.parent / "capsule_engine" / "guards" / "checks" / "credential_pattern.py").read_text()
+    assert _evidence_reads_of_content(source) == []
+
+
 def test_credential_pattern_without_content_is_out_of_scope():
     out = check_credential_pattern(_action(), patterns=CREDENTIAL.config["patterns"]).constraint
     assert out.result == "n/a"
@@ -261,3 +307,23 @@ def test_engine_refuses_a_wicket_it_cannot_run_per_decision(store, caps_fold, si
     dedupe = load_definition_file(CATALOG / "dedupe.yaml")
     with pytest.raises(ValueError, match="cannot run per decision"):
         _engine(store, caps_fold, signer, dedupe)
+
+
+# -- counterparty_account_ref is opaque ------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "raw",
+    ["4111 1111 1111 1111", "4111-1111-1111-1111", "12345678", "021000021", "DE89 3704 0044 0532 0130 00", "gb82west12345698765432"],
+)
+def test_a_raw_account_card_or_iban_number_is_refused(raw):
+    with pytest.raises(ValueError, match="opaque reference"):
+        _action(counterparty_account_ref=raw)
+
+
+@pytest.mark.parametrize(
+    "opaque",
+    ["acct-ref-water-1", "tok_8f3a2c", "9b74c9897bac770ffc029102a200c5de2f4a1c3e5d8e7f6a0b1c2d3e4f5a6b7c"],
+)
+def test_an_opaque_reference_is_accepted(opaque):
+    assert _action(counterparty_account_ref=opaque).counterparty_account_ref == opaque

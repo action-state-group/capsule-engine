@@ -22,7 +22,7 @@ invent others):
 | `currency` | -- | ISO 4217 code, e.g. `"EUR"` |
 | `target` (pack-facing name: **payee_ref**) | `dedupe`, `counterparty_identity_change` | a stable reference for who is paid or messaged |
 | `rail` | `destination_rail` | the payment rail, e.g. `"card"`, `"bank_transfer"`, `"p2p"`, `"gift_card"`, `"crypto"` |
-| `counterparty_account_ref` | `counterparty_identity_change` | an opaque reference to the account the payee is paid into -- a digest or token, never a raw account number, because it is recorded |
+| `counterparty_account_ref` | `counterparty_identity_change` | an opaque reference to the account the payee is paid into -- a token or digest that is stable per account, never the account, card or IBAN number, because it is recorded on the capsule. A value shaped like a raw number is refused |
 | `outgoing_content` | `credential_pattern` | the text the action sends; it is matched and then discarded, never recorded |
 | `recurrence` | `recurring_charge` | whether the payment repeats: `"one_time"`, or e.g. `"monthly"` for a subscription |
 | `equivalence_key` | `dedupe` | optional: your own idempotency key, if two payments to one payee are genuinely different payments (two monthly bills) |

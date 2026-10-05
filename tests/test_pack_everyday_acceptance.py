@@ -224,6 +224,10 @@ def test_outgoing_content_is_not_on_any_record(run):
     for name in ("credential-in-content", "credential-absent"):
         assert "outgoing_content" not in capsules[name]["asg_payload"]
     assert "482913" not in FIXTURE_PATH.read_text()
+    # The sealed evidence carries pattern ids only, nothing derived from the content.
+    assert _constraint(capsules["credential-in-content"], "credential_pattern")["evidence_digest"] == json_digest(
+        {"matched_pattern_ids": ["one_time_code"], "pattern_ids": ["card_security_code", "one_time_code", "password_value"]}
+    )
 
 
 def test_fixture_is_reproducible_byte_for_byte(run):
