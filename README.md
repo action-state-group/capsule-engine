@@ -25,13 +25,14 @@ to requirements, which produced the EU AI Act packs' outcomes).
 ## Install
 
 capsule-engine is installed from source. Neither it nor capsule-ledger is on
-PyPI, so install capsule-ledger from its (archived) repository first:
+PyPI, so install capsule-ledger from its (archived) repository first, at its
+final commit (pinned the same way in `pyproject.toml`):
 
 ```
 git clone https://github.com/action-state-group/capsule-engine.git
 cd capsule-engine
 python3 -m venv .venv && source .venv/bin/activate
-pip install "capsule-ledger @ git+https://github.com/action-state-group/capsule-ledger.git"
+pip install "capsule-ledger @ git+https://github.com/action-state-group/capsule-ledger.git@42fb45f69b067f623a4b9915ae8883dff22d5d27"
 pip install -e .
 ```
 
