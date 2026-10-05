@@ -1,10 +1,11 @@
 {
-  "$comment": "Vendored, not owned here. The epistemic_type value set is defined ONCE, by the published Internet-Draft draft-mih-agent-evidence-layer-00 (Evidence Layer), section 4.1 'Epistemic Type', which states that \"epistemic_type is closed and is this document's\"; its source is agent-action-capsule spec/draft-mih-agent-evidence-layer-00.md. This file is a literal, lower-case transcription of that closed set (the same values as agent-action-capsule's schemas/vendor/epistemic-types.json), so capsule-engine's EPISTEMIC_TYPE_VALUES parity test reads a machine-readable copy, never a second hand-typed enum. A change to the owning set is a drift that must be re-vendored here, not silently re-derived.",
+  "$comment": "Vendored, not owned here. The epistemic_type value set is defined ONCE, by the Internet-Draft draft-mih-agent-evidence-layer-00 (Evidence Layer, posted to the IETF datatracker as revision 00), section 4.1 'Epistemic Type', which states that \"epistemic_type is closed and is this document's\". Until IANA creates the 'Evidence Layer Epistemic Types' registry, the interim registry is agent-action-capsule spec/REGISTRY.md section 17. This file is a literal, lower-case transcription of that closed set (the same values as agent-action-capsule's schemas/vendor/epistemic-types.json), so capsule-engine's EPISTEMIC_TYPE_VALUES parity test reads a machine-readable copy, never a second hand-typed enum. A change to the owning set is a drift that must be re-vendored here, not silently re-derived.",
   "source": {
     "document": "draft-mih-agent-evidence-layer-00",
     "section": "4.1 Epistemic Type",
-    "url": "https://github.com/action-state-group/agent-action-capsule/blob/main/spec/draft-mih-agent-evidence-layer-00.md",
-    "date": "2026-09-25",
+    "url": "https://datatracker.ietf.org/doc/draft-mih-agent-evidence-layer/",
+    "interim_registry": "https://github.com/action-state-group/agent-action-capsule/blob/main/spec/REGISTRY.md (section 17)",
+    "date": "2026-10-04",
     "owning_field": "record.epistemic_type"
   },
   "values": [
