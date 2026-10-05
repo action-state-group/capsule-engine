@@ -10,20 +10,34 @@ fixture built to pass.
 ```console
 $ pip install -e ".[dev]"
 $ python -m capsule_engine.examples.tau2_airline_reference --all --out-dir /tmp/tau2-airline
-dataset                     ALLOW   DENY   WITH-INSTRUMENTATION   sample refusal capsule
-pilot1-gemini-2-5-flash         9      4                      0   f42fe531878454c8… (cancel_reservation, task 7)
-  -> 22 capsule(s) written to /tmp/tau2-airline/pilot1-gemini-2-5-flash.jsonl
+dataset                        ALLOW      DENY   WITH-INSTRUMENTATION   CAPSULES   sample refusal capsule
+pilot1-gemini-2-5-flash        9 [1]     4 [1]                  0 [1]     22 [1]   f42fe531878454c8… (cancel_reservation, task "7")
+  -> 22 [1] capsule(s) written to /tmp/tau2-airline/pilot1-gemini-2-5-flash.jsonl
   -> verify one row offline:  capsule verify f42fe531878454c892488227c05de581068461ad26d1fac8fb2af7d4bd80345a --ledger /tmp/tau2-airline/pilot1-gemini-2-5-flash.jsonl
-tau2-claude-3-7-sonnet         24     24                      0   5924a1a4e5c353b0… (cancel_reservation, task 1)
-  -> 72 capsule(s) written to /tmp/tau2-airline/tau2-claude-3-7-sonnet.jsonl
+tau2-claude-3-7-sonnet        24 [2]    24 [2]                  0 [2]     72 [2]   5924a1a4e5c353b0… (cancel_reservation, task "1")
+  -> 72 [2] capsule(s) written to /tmp/tau2-airline/tau2-claude-3-7-sonnet.jsonl
   ...
-tau2-gpt-4-1                   26     12                      1   c5bf5bd64b0d1fa6… (cancel_reservation, task 1)
-  -> WITH-INSTRUMENTATION example: capsule 865986e82de9aafc… (cancel_reservation, task 48): no prior
+tau2-gpt-4-1                  26 [3]    12 [3]                  1 [3]     65 [3]   c5bf5bd64b0d1fa6… (cancel_reservation, task "1")
+  -> WITH-INSTRUMENTATION example: capsule 865986e82de9aafc… (cancel_reservation, task "48"): no prior
      get_reservation_details for this reservation_id in the replayed log -- eligibility cannot be
      evaluated without a live DB read or an instrumented snapshot connector
   ...
-tau2-o4-mini                   19     12                      4   6dc692748efe47b0… (cancel_reservation, task 1)
+tau2-o4-mini                  19 [5]    12 [5]                  4 [5]     54 [5]   6dc692748efe47b0… (cancel_reservation, task "1")
+  ...
+
+[1] pilot1-gemini-2-5-flash: range-complete through 21 · captured under boundary: unknown · reconciled: none
+[2] tau2-claude-3-7-sonnet: range-complete through 71 · captured under boundary: unknown · reconciled: none
+[3] tau2-gpt-4-1: range-complete through 64 · captured under boundary: unknown · reconciled: none
+[4] tau2-gpt-4-1-mini: range-complete through 81 · captured under boundary: unknown · reconciled: none
+[5] tau2-o4-mini: range-complete through 53 · captured under boundary: unknown · reconciled: none
 ```
+
+Every number carries a footnote marker. The footnote is that dataset's
+coverage statement: the record range the replay sealed (counted by the
+catalog `actions.count_by_developer` fold, which is also the CAPSULES
+column), the capture boundary, and any external reconciliation. No capture
+boundary is declared for this replay, so it says `unknown` instead of
+leaving it out, and nothing is reconciled against an outside source.
 
 Then verify one denied row independently, with a different command than the
 one that wrote it:
