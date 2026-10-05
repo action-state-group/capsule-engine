@@ -1,0 +1,108 @@
+# everyday pack: the deterministic checks for an assistant that makes
+# payments and sends messages for a household. Every check here is a
+# deterministic predicate over normalized action fields; none calls a model.
+#
+# Every constraint and the fold cite a built-in definition by id and digest
+# (wicket_ref / fold_ref + digest) -- nothing is copied into this directory.
+# The loader refuses the pack if a cited definition has changed.
+#
+# Statements name what is detected and recorded -- the observable, never an intent.
+# default_disposition is declared data the guard engine does not read.
+pack_id: asg/everyday/0.1.0
+
+obligations:
+  - id: purchase-over-limit
+    statement: >-
+      Checks each payment against the configured weekly spending limit for
+      the agent making it, and flags a payment that would take that week's
+      total over the limit.
+    check: caps
+    default_disposition: ASK
+  - id: duplicate-commitment
+    statement: >-
+      Detects a payment that repeats one already recorded for the same
+      payee by the same agent within the dedupe window, and records which
+      earlier payment it matches.
+    check: dedupe
+    default_disposition: ASK
+  - id: payment-rail-or-destination-change
+    statement: >-
+      Flags a payment sent over a watched rail (peer-to-peer, gift card or
+      crypto) and records the rail it read.
+    check: destination_rail
+    default_disposition: ASK
+  - id: counterparty-identity-change
+    statement: >-
+      Detects when the account a payee is paid into differs from the account
+      last recorded for that payee, and records both account references.
+    check: counterparty_identity_change
+    default_disposition: ASK
+  - id: credential-or-auth-code-in-outgoing-content
+    statement: >-
+      Detects a one-time code, a password or a card security code in
+      outgoing content, and records which pattern matched without recording
+      the content.
+    check: credential_pattern
+    default_disposition: NEVER
+
+action_semantics:
+  - action_type: payment.make
+    action_class: money.transfer
+    required_fields: [amount_minor, currency, target, rail, counterparty_account_ref]
+    optional_fields: [equivalence_key, outgoing_content]
+    field_aliases:
+      target: payee_ref
+  - action_type: message.send
+    action_class: comms.external
+    required_fields: [target, outgoing_content]
+
+constraints:
+  - wicket_ref: caps/1.0.0
+    digest: 906a75a0b908d38fa7b05823ba11f229c3d593516119ad757b541cee7083f54b
+    scope: [developer]
+  - wicket_ref: dedupe/1.0.0
+    digest: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
+  - wicket_ref: destination_rail/1.0.0
+    digest: 4d76251eba138b37e6be3e83390072315ebcea42cd8d790f7e9765ecf1f63429
+  - wicket_ref: counterparty_identity_change/1.0.0
+    digest: 0cfb1cb380b355abb88ea385334f3bb31f2e145269a2768022f85005665fc6fe
+  - wicket_ref: credential_pattern/1.0.0
+    digest: 3617fdcaa39c03cf70a3254490328ccee5eaac0faba7cd52d9e3dc3fc50336c0
+
+folds:
+  - fold_ref: spend.weekly/1.0.0
+    digest: 3e7f6a3e8707de92b120bbc2aa0b5a78032df5d36e99f9955dd3ba948bba5e9c
+
+holds_integration: none
+
+fixtures:
+  ledger: fixtures/mini_ledger.jsonl
+  scenarios:
+    - id: baseline-allow
+      outcome: allow
+    - id: counterparty-same-account
+      outcome: allow
+    - id: counterparty-account-changed
+      outcome: deny
+    - id: rail-watched
+      outcome: deny
+    - id: credential-in-content
+      outcome: deny
+    - id: credential-absent
+      outcome: allow
+    - id: dedupe-original
+      outcome: allow
+    - id: dedupe-repeat
+      outcome: deny
+    - id: caps-boundary-at-cap
+      outcome: allow
+    - id: caps-first-draw
+      outcome: allow
+    - id: caps-over-limit-on-watched-rail
+      outcome: deny
+    - id: caps-in-scope-amount-missing
+      outcome: allow
+    - id: out-of-scope-action
+      outcome: allow
+
+bootstrap: AI-BOOTSTRAP.md

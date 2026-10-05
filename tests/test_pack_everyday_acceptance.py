@@ -1,0 +1,231 @@
+# SPDX-License-Identifier: Apache-2.0
+"""everyday pack acceptance: install in observe mode, run a deterministic
+scenario set through a pack-installed ``GuardEngine``, and check every
+declared obligation fires both ways, on pack-attributed records.
+
+Same discipline as ``test_pack_payments_safety_acceptance.py``: this script
+regenerates the pack's checked-in ``fixtures/mini_ledger.jsonl`` and proves
+it reproduces byte-for-byte. Run ``python -m tests.test_pack_everyday_acceptance``
+to rewrite the fixture after an intended change.
+
+Every assertion names the field on the named record.
+"""
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+import pytest
+from agent_action_capsule import json_digest
+from capsule_ledger.ledger import LedgerStore
+
+from capsule_engine.guards import Action, LocalSigner
+from capsule_engine.guards.capsule import ALLOW, DENY
+from capsule_engine.packs import build_engine, install_pack, load_pack_dir, record_pack_activation
+
+PACK_DIR = Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog" / "everyday"
+FIXTURE_PATH = PACK_DIR / "fixtures" / "mini_ledger.jsonl"
+
+OPERATOR = "household-fixture"
+CAP_MINOR = 10_000_000  # caps/1.0.0's money.transfer limit, cited by the pack
+SIGNER_SECRET = b"everyday-acceptance-fixture-fixed-key"
+
+
+def _signer() -> LocalSigner:
+    return LocalSigner(key_id="everyday-fixture-key", secret=SIGNER_SECRET)
+
+
+def _payment(name: str, minute: int, developer: str, **fields) -> Action:
+    return Action(
+        verb="make_payment",
+        operator=OPERATOR,
+        developer=developer,
+        action_class="money.transfer",
+        currency="EUR",
+        action_id=f"make_payment/everyday-fixture-{name}",
+        timestamp=f"2026-08-10T10:{minute:02d}:00Z",
+        **fields,
+    )
+
+
+def _message(name: str, minute: int, developer: str, **fields) -> Action:
+    return Action(
+        verb="send_message",
+        operator=OPERATOR,
+        developer=developer,
+        action_class="comms.external",
+        action_id=f"send_message/everyday-fixture-{name}",
+        timestamp=f"2026-08-10T10:{minute:02d}:00Z",
+        **fields,
+    )
+
+
+def _scenarios() -> list[tuple[str, Action, str]]:
+    water = dict(target="utility/water-co", rail="bank_transfer", developer="household-assistant-a@v1")
+    dup = dict(
+        target="shop/hardware-store",
+        rail="card",
+        counterparty_account_ref="acct-ref-hardware-1",
+        amount_minor=12_000,
+        developer="household-assistant-d@v1",
+    )
+    return [
+        # First recorded payment to the water company: nothing to compare the
+        # account against yet, so counterparty_identity_change is out of scope.
+        ("baseline-allow", _payment("baseline", 1, **water, amount_minor=4_500,
+         counterparty_account_ref="acct-ref-water-1", equivalence_key="water-co/2026-08"), ALLOW),
+        ("counterparty-same-account", _payment("same-account", 2, **water, amount_minor=4_700,
+         counterparty_account_ref="acct-ref-water-1", equivalence_key="water-co/2026-09"), ALLOW),
+        ("counterparty-account-changed", _payment("account-changed", 3, **water, amount_minor=4_600,
+         counterparty_account_ref="acct-ref-water-2", equivalence_key="water-co/2026-10"), DENY),
+        ("rail-watched", _payment("rail-watched", 4, "household-assistant-b@v1", amount_minor=20_000,
+         target="person/neighbour-1", rail="p2p", counterparty_account_ref="acct-ref-neighbour-1"), DENY),
+        ("credential-in-content", _message("credential-in-content", 5, "household-assistant-c@v1",
+         target="contact/support-desk", outgoing_content="Your verification code is 482913"), DENY),
+        ("credential-absent", _message("credential-absent", 6, "household-assistant-c@v1",
+         target="contact/landlord", outgoing_content="The March rent is paid; the receipt is attached."), ALLOW),
+        ("dedupe-original", _payment("dedupe-original", 7, **dup), ALLOW),
+        ("dedupe-repeat", _payment("dedupe-repeat", 8, **dup), DENY),
+        # Boundary: spend == cap exactly; caps compares with <=, so this passes.
+        ("caps-boundary-at-cap", _payment("caps-boundary", 9, "household-assistant-e@v1", amount_minor=CAP_MINOR,
+         target="dealer/car", rail="card", counterparty_account_ref="acct-ref-dealer-1"), ALLOW),
+        ("caps-first-draw", _payment("caps-first-draw", 10, "household-assistant-f@v1", amount_minor=6_000_000,
+         target="contractor/roof", rail="bank_transfer", counterparty_account_ref="acct-ref-roof-1"), ALLOW),
+        # caps fails here alongside destination_rail, so the decision is a
+        # deny. A row where caps is the SOLE failure escalates; that row is
+        # added with the escalate disposition token.
+        ("caps-over-limit-on-watched-rail", _payment("caps-over-limit", 11, "household-assistant-f@v1",
+         amount_minor=5_000_000, target="contractor/roof-extra", rail="p2p",
+         counterparty_account_ref="acct-ref-roof-2"), DENY),
+        # Population (a): a cap IS configured for money.transfer and the
+        # action carries no amount_minor -- the rule applied and could not be
+        # evaluated. The engine still allows it; the record says why.
+        ("caps-in-scope-amount-missing", _payment("caps-amount-missing", 12, "household-assistant-g@v1",
+         target="utility/power-co", rail="card", counterparty_account_ref="acct-ref-power-1"), ALLOW),
+        # Population (c): no cap is configured for info.query, and none of the
+        # configured checks applies to it.
+        ("out-of-scope-action", Action(verb="check_balance", operator=OPERATOR, developer="household-assistant-g@v1",
+         action_class="info.query", target="bank/account-summary",
+         action_id="check_balance/everyday-fixture-out-of-scope", timestamp="2026-08-10T10:13:00Z"), ALLOW),
+    ]
+
+
+def _run_scenarios(ledger, *, project_dir):
+    installed = install_pack(load_pack_dir(PACK_DIR), project_dir=project_dir, mode="observe")
+    signer = _signer()
+    engine = build_engine(installed, ledger=ledger, signer_provider=lambda: signer)
+    activation = record_pack_activation(
+        installed,
+        ledger=ledger,
+        operator=OPERATOR,
+        developer="capsule-init-tool",
+        signer=signer,
+        timestamp="2026-08-10T10:00:00Z",
+        action_id="policy_manifest_activated/everyday-fixture-install",
+    )
+    capsules: dict[str, dict] = {}
+    for name, action, expected in _scenarios():
+        decision = engine.check(action, dry_run=True)
+        if decision.outcome != expected:
+            raise AssertionError(f"scenario {name!r}: expected {expected!r}, got {decision.outcome!r} ({decision.reason})")
+        capsules[name] = decision.capsule
+    return installed, activation, capsules, list(ledger.scan())
+
+
+@pytest.fixture(scope="module")
+def run(tmp_path_factory):
+    tmp = tmp_path_factory.mktemp("everyday")
+    store = LedgerStore(tmp / "ledger")
+    try:
+        installed, activation, capsules, records = _run_scenarios(store, project_dir=tmp / "project")
+        verified = {name: store.verify(c["capsule_id"]) for name, c in capsules.items()}
+    finally:
+        store.close()
+    return installed, activation, capsules, records, verified
+
+
+def _constraint(capsule: dict, constraint_id: str) -> dict:
+    (record,) = [c for c in capsule["constraints"] if c["id"] == constraint_id]
+    return record
+
+
+def test_every_declared_scenario_ran_at_its_declared_outcome(run):
+    installed, _, capsules, records, verified = run
+    declared = {s.id: s.outcome for s in installed.pack.fixtures.scenarios}
+    assert set(declared) == set(capsules)
+    for name, result in verified.items():
+        assert result.ok, f"{name}: {[f.detail for f in result.findings]}"
+    assert len(records) == 1 + len(capsules)
+
+
+def test_records_are_pack_attributed_and_observe_mode(run):
+    installed, activation, capsules, _, _ = run
+    for name, capsule in capsules.items():
+        assert capsule["asg_payload"]["manifest_digest"] == installed.resolved.manifest_digest, name
+        assert capsule["asg_payload"]["checkpoint"]["dry_run"] is True, name
+    assert activation["asg_payload"]["detail"]["packs"] == [
+        {"pack_id": "asg/everyday/0.1.0", "digest": installed.pack.definition_digest(), "mode": "observe"}
+    ]
+
+
+def test_cited_definitions_resolve_to_the_built_in_digests(run):
+    installed, _, _, _, _ = run
+    pinned = {w.wicket_id: w.digest for w in installed.manifest.wickets}
+    assert pinned["caps/1.0.0"] == "906a75a0b908d38fa7b05823ba11f229c3d593516119ad757b541cee7083f54b"
+    assert pinned["dedupe/1.0.0"] == "18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb"
+
+
+def test_caps_in_scope_missing_amount_and_out_of_scope_seal_different_facts(run):
+    _, _, capsules, _, _ = run
+    in_scope = _constraint(capsules["caps-in-scope-amount-missing"], "caps")
+    out_of_scope = _constraint(capsules["out-of-scope-action"], "caps")
+    assert in_scope["result"] == "n/a"
+    assert out_of_scope["result"] == "n/a"
+    assert in_scope["evidence_digest"] != out_of_scope["evidence_digest"]
+    assert in_scope["evidence_digest"] == json_digest(
+        {"constraint_id": "caps", "in_scope": True, "missing_field": "amount_minor"}
+    )
+    assert out_of_scope["evidence_digest"] == json_digest(
+        {"constraint_id": "caps", "in_scope": False, "missing_field": None}
+    )
+
+
+def test_a_repeat_payment_chains_to_the_payment_it_repeats(run):
+    _, _, capsules, _, _ = run
+    repeat = capsules["dedupe-repeat"]
+    assert repeat["chain"]["parent_capsule_id"] == capsules["dedupe-original"]["capsule_id"]
+    assert repeat["chain"]["relation"] == "confirms"
+
+
+def test_outgoing_content_is_not_on_any_record(run):
+    _, _, capsules, _, _ = run
+    for name in ("credential-in-content", "credential-absent"):
+        assert "outgoing_content" not in capsules[name]["asg_payload"]
+    assert "482913" not in FIXTURE_PATH.read_text()
+
+
+def test_fixture_is_reproducible_byte_for_byte(run):
+    _, _, _, records, _ = run
+    regenerated = [json.dumps(r.capsule, separators=(",", ":")) for r in records]
+    assert regenerated == FIXTURE_PATH.read_text().splitlines()
+
+
+def _regenerate_fixture() -> None:
+    import tempfile
+
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp = Path(tmp)
+        store = LedgerStore(tmp / "ledger")
+        try:
+            _, _, _, records = _run_scenarios(store, project_dir=tmp / "project")
+        finally:
+            store.close()
+    FIXTURE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with open(FIXTURE_PATH, "w", encoding="utf-8") as fh:
+        for record in records:
+            fh.write(json.dumps(record.capsule, separators=(",", ":")) + "\n")
+    print(f"wrote {len(records)} record(s) to {FIXTURE_PATH}")
+
+
+if __name__ == "__main__":
+    _regenerate_fixture()
