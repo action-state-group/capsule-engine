@@ -24,7 +24,15 @@ classifiers = [
 # independent by design, not two forks of one truth.
 dependencies = [
     "agent-action-capsule>=0.1.0",
-    "capsule-ledger>=0.0.1",
+    # FROZEN 2026-10-04: capsule-ledger is archived (read-only since 2026-09-02).
+    # This pins its final commit (42fb45f69b06), which is what its main resolves
+    # to, so nothing changes; nothing new will land there.
+    # What replaces it (a later change): capsule_ledger.ledger.api, .store and
+    # .records are already aliases for checkpointed-local-log's cll.ledger.api,
+    # .store and .records, so those imports can move to cll; capsule_ledger.payload_store,
+    # .registry and .vectors live only in capsule-ledger and must move into this
+    # package (or cll) first.
+    "capsule-ledger @ git+https://github.com/action-state-group/capsule-ledger.git@42fb45f69b067f623a4b9915ae8883dff22d5d27",
     # schemas/evidence-contract-v0.json's validator entry point
     # (packs/contract_validate.py).
     "jsonschema>=4.18",

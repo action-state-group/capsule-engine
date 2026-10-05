@@ -12,8 +12,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      # capsule-ledger is archived: FROZEN at its final commit, as in pyproject.toml (2026-10-04).
       - name: install capsule-ledger (not yet on PyPI)
-        run: pip install "capsule-ledger @ git+https://github.com/action-state-group/capsule-ledger.git"
+        run: pip install "capsule-ledger @ git+https://github.com/action-state-group/capsule-ledger.git@42fb45f69b067f623a4b9915ae8883dff22d5d27"
       - name: install capsule-emit (ledger_io/period not yet in a PyPI release)
         # --force-reinstall: capsule-ledger's own install above already satisfies
         # "capsule-emit" from PyPI at the pinned floor, so a plain `pip install`

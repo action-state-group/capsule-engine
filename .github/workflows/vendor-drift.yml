@@ -14,6 +14,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: action-state-group/capsule-ledger
+          ref: 42fb45f69b067f623a4b9915ae8883dff22d5d27  # FROZEN 2026-10-04: archived; its final commit
           path: capsule-ledger
       - uses: actions/setup-python@v5
         with:
@@ -31,6 +32,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: action-state-group/capsule-ledger
+          ref: 42fb45f69b067f623a4b9915ae8883dff22d5d27  # FROZEN 2026-10-04: archived; its final commit
           path: capsule-ledger
       - uses: actions/setup-python@v5
         with:
