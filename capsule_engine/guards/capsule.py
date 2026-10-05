@@ -122,6 +122,10 @@ def _payload_extension(action: Action, checkpoint: dict, manifest_digest: str | 
         ext["target"] = action.target
     if action.action_class is not None:
         ext["action_class"] = action.action_class
+    if action.taxonomy_version is not None:
+        # Written only when set, so existing records keep their bytes; read
+        # back with ``classes.record_taxonomy_version``.
+        ext["taxonomy_version"] = action.taxonomy_version
     if manifest_digest is not None:
         ext["manifest_digest"] = manifest_digest
     return ext

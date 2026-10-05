@@ -24,7 +24,7 @@ def _utc_now() -> str:
 class Action:
     """One candidate action, as presented to the guard for a decision.
 
-    ``action_class`` is looked up in the starter taxonomy (``classes.py``);
+    ``action_class`` is looked up in the taxonomy (``classes.py``);
     absent or unrecognized both resolve to the consequential/fail-closed
     default. ``amount_minor``/``currency`` are integer-minor-units money
     fields (never floats, per the fold engine's own determinism rule) read
@@ -33,6 +33,10 @@ class Action:
     is the prior capsule this action claims authorization from, checked by
     ``verify_before_dispatch``. ``equivalence_key`` lets a caller override the
     dedupe check's default equivalence formula for this action.
+    ``taxonomy_version`` (normally ``classes.TAXONOMY_VERSION``) is sealed
+    beside ``action_class`` when set, so a count over trigger classes can be
+    recomputed against the table that was live; unset, the record keeps its
+    prior bytes.
     """
 
     verb: str
@@ -50,6 +54,7 @@ class Action:
     model_id: str | None = None
     provider: str | None = None
     extra: dict = field(default_factory=dict)
+    taxonomy_version: str | None = None
 
     def resolved_action_id(self) -> str:
         return self.action_id or _new_action_id(self.verb)
@@ -95,4 +100,5 @@ class Action:
             currency=payload.get("currency"),
             target=payload.get("target"),
             cited_mandate_capsule_id=cited_mandate_capsule_id,
+            taxonomy_version=payload.get("taxonomy_version"),
         )
