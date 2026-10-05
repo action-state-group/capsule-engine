@@ -44,6 +44,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from dataclasses import dataclass
+from typing import TypedDict
 
 from agent_action_capsule import (
     DEFAULT_FORMAT_VERSION,
@@ -65,6 +66,7 @@ __all__ = [
     "DENY",
     "ESCALATE",
     "ConstraintOutcome",
+    "NotApplicableEvidence",
     "build_decision_capsule",
     "not_applicable_evidence",
     "outcome_from_disposition",
@@ -89,6 +91,8 @@ _OUTCOME_BY_DECISION = {"accept": ALLOW, "reject": DENY, "needs_input": ESCALATE
 _LEGACY_ESCALATE_DECISION = "hitl_dispatched"
 
 
+# `disposition` is the raw JSON object of a sealed capsule, possibly one this
+# engine did not write; its keys are the capsule spec's and are read here.
 def outcome_from_disposition(disposition: dict) -> str:
     """allow | deny | escalate for a sealed decision capsule's disposition,
     including records sealed with the legacy escalate pairing (decision and
@@ -133,7 +137,15 @@ class ConstraintOutcome:
             )
 
 
-def not_applicable_evidence(constraint_id: str, *, in_scope: bool, missing_field: str | None = None) -> dict:
+class NotApplicableEvidence(TypedDict):
+    constraint_id: str
+    in_scope: bool
+    missing_field: str | None
+
+
+def not_applicable_evidence(
+    constraint_id: str, *, in_scope: bool, missing_field: str | None = None
+) -> NotApplicableEvidence:
     """The evidence object every ``n/a`` constraint carries: facts only.
 
     ``in_scope`` says whether the rule applied to this action at all (e.g. a
@@ -145,7 +157,7 @@ def not_applicable_evidence(constraint_id: str, *, in_scope: bool, missing_field
     """
     if not in_scope and missing_field is not None:
         raise ValueError("missing_field is only meaningful for an in-scope n/a")
-    return {"constraint_id": constraint_id, "in_scope": in_scope, "missing_field": missing_field}
+    return NotApplicableEvidence(constraint_id=constraint_id, in_scope=in_scope, missing_field=missing_field)
 
 
 def _to_constraint_record(outcome: ConstraintOutcome) -> ConstraintRecord:

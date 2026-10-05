@@ -116,6 +116,7 @@ def _engine(store, caps_fold, signer, *wickets):
     return GuardEngine(ledger=store, caps_fold=caps_fold, signer_provider=lambda: signer, wickets=wickets)
 
 
+# Reads raw capsule or fixture JSON/YAML: the test's decoding boundary.
 def _record_for(capsule: dict, constraint_id: str) -> dict:
     (record,) = [c for c in capsule["constraints"] if c["id"] == constraint_id]
     return record

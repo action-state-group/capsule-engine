@@ -35,6 +35,7 @@ PRE_FIX_CAPSULE = {
 }
 
 
+# Reads raw capsule or fixture JSON/YAML: the test's decoding boundary.
 def _capsules() -> dict[str, dict]:
     out = {}
     for line in LEDGER.read_text().splitlines():
@@ -44,11 +45,13 @@ def _capsules() -> dict[str, dict]:
     return out
 
 
+# Reads raw capsule or fixture JSON/YAML: the test's decoding boundary.
 def _caps(capsule: dict) -> dict:
     (record,) = [c for c in capsule["constraints"] if c["id"] == "caps"]
     return record
 
 
+# Reads raw capsule or fixture JSON/YAML: the test's decoding boundary.
 def _claim(capsule: dict, record: dict, n: int = 0):
     return claim_from_guard_constraint(
         capsule,

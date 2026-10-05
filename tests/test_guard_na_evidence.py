@@ -25,6 +25,7 @@ PACKAGE_DIR = Path(__file__).parent.parent / "capsule_engine"
 CAP_MINOR = 1_000_000
 
 
+# Reads raw capsule or fixture JSON/YAML: the test's decoding boundary.
 def _caps_record(capsule: dict) -> dict:
     (record,) = [c for c in capsule["constraints"] if c["id"] == "caps"]
     return record

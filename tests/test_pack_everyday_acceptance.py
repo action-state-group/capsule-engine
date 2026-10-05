@@ -156,6 +156,7 @@ def run(tmp_path_factory):
     return installed, activation, capsules, records, verified
 
 
+# Reads raw capsule or fixture JSON/YAML: the test's decoding boundary.
 def _constraint(capsule: dict, constraint_id: str) -> dict:
     (record,) = [c for c in capsule["constraints"] if c["id"] == constraint_id]
     return record

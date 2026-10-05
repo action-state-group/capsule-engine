@@ -40,10 +40,12 @@ def test_the_parameterization_finds_both_tabled_packs():
     assert {p.name for p in PACK_DIRS} >= {"payments-safety", "everyday"}
 
 
+# Reads raw capsule or fixture JSON/YAML: the test's decoding boundary.
 def _load_table(pack_dir: Path) -> list[dict]:
     return yaml.safe_load((pack_dir / "fixtures" / "decision_table.yaml").read_text())["rows"]
 
 
+# Reads raw capsule or fixture JSON/YAML: the test's decoding boundary.
 def _load_fixture_by_action_id(pack_dir: Path) -> dict[str, dict]:
     """Maps each guard-decision capsule's exact ``action_id`` to itself --
     excludes the policy_manifest_activated event, which carries no
@@ -74,6 +76,7 @@ def test_decision_table_matches_the_real_fixture_row_for_row(pack_dir):
         assert actual_verdict == row["verdict"], f"{row['scenario']}: table says {row['verdict']!r}, fixture is {actual_verdict!r}"
 
 
+# Reads raw capsule or fixture JSON/YAML: the test's decoding boundary.
 def _declared_facts(constraint_id: str, declaration: dict) -> dict:
     if declaration["population"] == "a":
         return {"constraint_id": constraint_id, "in_scope": True, "missing_field": declaration["missing_field"]}

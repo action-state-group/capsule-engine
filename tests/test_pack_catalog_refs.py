@@ -17,6 +17,7 @@ CAPS = WicketCatalog(CORE_WICKET_CATALOG_DIR).get("caps/1.0.0")
 SPEND = FoldCatalog(CORE_FOLD_CATALOG_DIR).get("spend.weekly/1.0.0")
 
 
+# Reads raw capsule or fixture JSON/YAML: the test's decoding boundary.
 def _pack(tmp_path: Path, *, constraint: dict, fold: dict) -> Path:
     pack_dir = tmp_path / "pack"
     (pack_dir / "folds").mkdir(parents=True)

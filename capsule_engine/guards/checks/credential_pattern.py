@@ -10,18 +10,26 @@ from __future__ import annotations
 
 import hashlib
 import re
+from typing import TypedDict
 
 from ..action import Action
 from ..capsule import ConstraintOutcome, not_applicable_evidence
 from .base import CheckOutcome
 
-__all__ = ["check_credential_pattern"]
+__all__ = ["CredentialPattern", "check_credential_pattern"]
 
 _CHECK_ID = "credential_pattern"
 _METHOD = "regex_match_v0"
 
 
-def check_credential_pattern(action: Action, *, patterns: list[dict]) -> CheckOutcome:
+class CredentialPattern(TypedDict):
+    """One entry of the credential_pattern wicket's ``patterns`` config."""
+
+    id: str
+    regex: str
+
+
+def check_credential_pattern(action: Action, *, patterns: list[CredentialPattern]) -> CheckOutcome:
     if action.outgoing_content is None:
         return CheckOutcome(
             constraint=ConstraintOutcome(

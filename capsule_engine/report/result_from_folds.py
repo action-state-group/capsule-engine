@@ -128,6 +128,8 @@ class GuardProjection:
     recording_defect: bool = False
 
 
+# `record` is one raw constraint object of a sealed capsule's JSON, possibly
+# from a producer other than this engine; it is decoded field by field here.
 def project_guard_constraint(record: dict, *, candidate_fields: frozenset[str]) -> GuardProjection:
     """Project one sealed guard constraint record (``capsule["constraints"][i]``).
 
@@ -176,6 +178,9 @@ def project_guard_constraint(record: dict, *, candidate_fields: frozenset[str]) 
     )
 
 
+# `capsule` and `record` are raw sealed-capsule JSON, as for
+# project_guard_constraint; only capsule_id, assurance and the record's own
+# fields are read.
 def claim_from_guard_constraint(
     capsule: dict,
     record: dict,

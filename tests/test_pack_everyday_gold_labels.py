@@ -130,6 +130,7 @@ class GoldLabelError(ValueError):
     pass
 
 
+# Reads raw capsule or fixture JSON/YAML: the test's decoding boundary.
 def classify(row: dict) -> str:
     """Validate one gold-label row and return the population it is scored in.
 
@@ -163,6 +164,7 @@ def classify(row: dict) -> str:
     return row["declared_population"]
 
 
+# Reads raw capsule or fixture JSON/YAML: the test's decoding boundary.
 def build_rows(pack, installed_wickets: dict[str, str], ledger_lines: list[str], code_value: str) -> list[dict]:
     rows = []
     for line in ledger_lines:
@@ -199,6 +201,7 @@ def _run_scenarios(ledger, *, project_dir):
     return module._run_scenarios(ledger, project_dir=project_dir)
 
 
+# Reads raw capsule or fixture JSON/YAML: the test's decoding boundary.
 def _write(rows: list[dict]) -> None:
     body = yaml.safe_dump({"rows": rows + [RECORDING_DEFECT_ROW]}, sort_keys=False, width=120)
     GOLD_PATH.write_text(HEADER + body)
@@ -226,6 +229,7 @@ def _regenerate() -> None:
 # -- tests ---------------------------------------------------------------------
 
 
+# Reads raw capsule or fixture JSON/YAML: the test's decoding boundary.
 def _gold() -> list[dict]:
     return yaml.safe_load(GOLD_PATH.read_text())["rows"]
 
@@ -294,6 +298,7 @@ def test_rerunning_each_row_from_its_recorded_pins_reproduces_its_record():
 # -- the validator itself --------------------------------------------------------
 
 
+# Reads raw capsule or fixture JSON/YAML: the test's decoding boundary.
 def _row(**overrides) -> dict:
     row = {
         "evaluator_tier": "recomputed",

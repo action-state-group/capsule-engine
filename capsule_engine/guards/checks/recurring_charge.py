@@ -7,8 +7,10 @@ repeats. Applies only to the configured ``action_classes``.
 """
 from __future__ import annotations
 
+from typing import TypedDict
+
 from ..action import Action
-from ..capsule import ConstraintOutcome, not_applicable_evidence
+from ..capsule import ConstraintOutcome, NotApplicableEvidence, not_applicable_evidence
 from .base import CheckOutcome
 
 __all__ = ["check_recurring_charge"]
@@ -17,7 +19,12 @@ _CHECK_ID = "recurring_charge"
 _METHOD = "structured_field_v0"
 
 
-def _outcome(result: str, reason: str, evidence: dict) -> CheckOutcome:
+class RecurrenceEvidence(TypedDict):
+    recurrence: str
+    one_time_values: list[str]
+
+
+def _outcome(result: str, reason: str, evidence: NotApplicableEvidence | RecurrenceEvidence) -> CheckOutcome:
     return CheckOutcome(
         constraint=ConstraintOutcome(
             id=_CHECK_ID, result=result, reason=reason, evidence=evidence, check_type="policy", method=_METHOD
@@ -36,7 +43,7 @@ def check_recurring_charge(action: Action, *, one_time_values: list[str], action
             "the action carries no recurrence; whether it repeats could not be read",
             not_applicable_evidence(_CHECK_ID, in_scope=True, missing_field="recurrence"),
         )
-    evidence = {"recurrence": action.recurrence, "one_time_values": sorted(one_time_values)}
+    evidence = RecurrenceEvidence(recurrence=action.recurrence, one_time_values=sorted(one_time_values))
     if action.recurrence in one_time_values:
         return _outcome("pass", f"recurrence {action.recurrence!r} is a one-time payment", evidence)
     return _outcome("fail", f"recurrence {action.recurrence!r} sets up a repeating charge", evidence)

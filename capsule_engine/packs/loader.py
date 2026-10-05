@@ -391,6 +391,7 @@ def _parse_scope(raw: Any, *, wicket_id: str) -> tuple[str, ...]:
     return tuple(dims)
 
 
+# `entry` is one raw pack.yaml mapping, decoded here at the loader boundary.
 def _resolve_catalog_ref(entry: dict, *, ref_key: str, catalog, what: str):
     ref = _require_nonempty_str(entry.get(ref_key), f"{what}.{ref_key}", "caps/1.0.0")
     digest = _require_nonempty_str(entry.get("digest"), f"{what}.digest", "<64-char sha-256 hex>")
