@@ -43,7 +43,7 @@ per the design doc's lines-to-hold; it has no role in this check or in
 from __future__ import annotations
 
 from ..action import Action
-from ..capsule import ConstraintOutcome
+from ..capsule import ConstraintOutcome, not_applicable_evidence
 from ..plan import PlanDefinition
 from .base import CheckOutcome
 
@@ -75,6 +75,7 @@ def check_plan_containment(action: Action, plan: PlanDefinition | None) -> Check
                 id=_CHECK_ID,
                 result="n/a",
                 reason="no plan is bound to this decision",
+                evidence=not_applicable_evidence(_CHECK_ID, in_scope=False),
                 check_type="policy",
                 method=_METHOD,
             )

@@ -17,7 +17,7 @@ from capsule_ledger.ledger.api import LedgerAPI
 from ..events.capsule import build_event_capsule
 from ..folds.definition import FoldDefinition
 from .action import Action
-from .capsule import ALLOW, DENY, ESCALATE, ConstraintOutcome, build_decision_capsule
+from .capsule import ALLOW, DENY, ESCALATE, ConstraintOutcome, build_decision_capsule, not_applicable_evidence
 from .checks import (
     CheckOutcome,
     check_caps,
@@ -229,6 +229,7 @@ class GuardEngine:
                     id="caps",
                     result="n/a",
                     reason="no cap configured for this action class",
+                    evidence=not_applicable_evidence("caps", in_scope=False),
                     check_type="policy",
                     method=self._caps_fold.fold_id,
                 )

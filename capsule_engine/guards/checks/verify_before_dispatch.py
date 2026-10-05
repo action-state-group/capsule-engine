@@ -14,7 +14,7 @@ from __future__ import annotations
 from capsule_ledger.ledger.api import LedgerAPI
 
 from ..action import Action
-from ..capsule import ConstraintOutcome
+from ..capsule import ConstraintOutcome, not_applicable_evidence
 from .base import CheckOutcome
 
 __all__ = ["check_verify_before_dispatch"]
@@ -28,6 +28,7 @@ def check_verify_before_dispatch(action: Action, ledger: LedgerAPI) -> CheckOutc
                 id="verify_before_dispatch",
                 result="n/a",
                 reason="action cites no mandate capsule",
+                evidence=not_applicable_evidence("verify_before_dispatch", in_scope=False),
                 check_type="policy",
                 method="agent_action_capsule.verify",
             )

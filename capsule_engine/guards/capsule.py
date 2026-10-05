@@ -63,6 +63,7 @@ __all__ = [
     "ESCALATE",
     "ConstraintOutcome",
     "build_decision_capsule",
+    "not_applicable_evidence",
 ]
 
 ALLOW = "allow"
@@ -97,6 +98,32 @@ class ConstraintOutcome:
     blocking: bool | None = None
     check_type: str | None = "policy"
     method: str | None = None
+
+    def __post_init__(self) -> None:
+        # An n/a with no evidence seals with no evidence_digest, so every n/a
+        # cause would produce the same constraint record and a reader could
+        # not tell "this rule did not apply" from "this rule applied and
+        # could not be evaluated". Refuse to build one.
+        if self.result == "n/a" and self.evidence is None:
+            raise ValueError(
+                f"constraint {self.id!r}: result 'n/a' requires an evidence object "
+                "(see not_applicable_evidence)"
+            )
+
+
+def not_applicable_evidence(constraint_id: str, *, in_scope: bool, missing_field: str | None = None) -> dict:
+    """The evidence object every ``n/a`` constraint carries: facts only.
+
+    ``in_scope`` says whether the rule applied to this action at all (e.g. a
+    cap is configured for its action class). ``missing_field`` names the
+    normalized action field that was absent when an in-scope rule could not
+    be evaluated, and is ``None`` otherwise. The object is small, canonical
+    and holds no private data, so anyone can recompute the candidate digests
+    and tell the cases apart from ``evidence_digest`` alone.
+    """
+    if not in_scope and missing_field is not None:
+        raise ValueError("missing_field is only meaningful for an in-scope n/a")
+    return {"constraint_id": constraint_id, "in_scope": in_scope, "missing_field": missing_field}
 
 
 def _to_constraint_record(outcome: ConstraintOutcome) -> ConstraintRecord:
