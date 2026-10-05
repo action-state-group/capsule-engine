@@ -20,7 +20,7 @@ from agent_action_capsule import json_digest
 from capsule_ledger.ledger import LedgerStore
 
 from capsule_engine.guards import Action, LocalSigner
-from capsule_engine.guards.capsule import ALLOW, DENY
+from capsule_engine.guards.capsule import ALLOW, DENY, ESCALATE
 from capsule_engine.packs import build_engine, install_pack, load_pack_dir, record_pack_activation
 
 PACK_DIR = Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog" / "everyday"
@@ -93,8 +93,7 @@ def _scenarios() -> list[tuple[str, Action, str]]:
         ("caps-first-draw", _payment("caps-first-draw", 10, "household-assistant-f@v1", amount_minor=6_000_000,
          target="contractor/roof", rail="bank_transfer", counterparty_account_ref="acct-ref-roof-1"), ALLOW),
         # caps fails here alongside destination_rail, so the decision is a
-        # deny. A row where caps is the SOLE failure escalates; that row is
-        # added with the escalate disposition token.
+        # deny; caps-over-limit-escalates below is the sole-failure case.
         ("caps-over-limit-on-watched-rail", _payment("caps-over-limit", 11, "household-assistant-f@v1",
          amount_minor=5_000_000, target="contractor/roof-extra", rail="p2p",
          counterparty_account_ref="acct-ref-roof-2"), DENY),
@@ -111,6 +110,15 @@ def _scenarios() -> list[tuple[str, Action, str]]:
         ("recurring-charge-set-up", _payment("recurring-charge", 14, "household-assistant-h@v1", amount_minor=1_299,
          target="service/streaming", rail="card", counterparty_account_ref="acct-ref-streaming-1",
          recurrence="monthly"), DENY),
+        ("caps-second-first-draw", _payment("caps-second-first-draw", 15, "household-assistant-i@v1",
+         amount_minor=6_000_000, target="builder/extension", rail="card",
+         counterparty_account_ref="acct-ref-builder-1"), ALLOW),
+        # caps is the SOLE failing check and money.transfer has an approver
+        # role, so the decision escalates: disposition.decision needs_input,
+        # disposition.verdict_class hitl_dispatched.
+        ("caps-over-limit-escalates", _payment("caps-escalates", 16, "household-assistant-i@v1",
+         amount_minor=5_000_000, target="builder/extension-phase-2", rail="card",
+         counterparty_account_ref="acct-ref-builder-2"), ESCALATE),
     ]
 
 
@@ -192,6 +200,15 @@ def test_caps_in_scope_missing_amount_and_out_of_scope_seal_different_facts(run)
     assert out_of_scope["evidence_digest"] == json_digest(
         {"constraint_id": "caps", "in_scope": False, "missing_field": None}
     )
+
+
+def test_the_sole_caps_failure_escalates_with_the_donated_disposition_pair(run):
+    _, _, capsules, _, _ = run
+    escalated = capsules["caps-over-limit-escalates"]
+    assert _constraint(escalated, "caps")["result"] == "fail"
+    assert [c["id"] for c in escalated["constraints"] if c["result"] == "fail"] == ["caps"]
+    assert escalated["disposition"]["decision"] == "needs_input"
+    assert escalated["disposition"]["verdict_class"] == "hitl_dispatched"
 
 
 def test_a_repeat_payment_chains_to_the_payment_it_repeats(run):

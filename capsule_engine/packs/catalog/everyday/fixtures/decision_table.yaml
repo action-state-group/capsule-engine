@@ -16,10 +16,10 @@
 # Population b (a recording defect: n/a with no evidence) cannot be produced
 # by this engine and has no row here.
 #
-# Not here yet: a row where caps is the SOLE failing check. That decision
-# escalates, and its disposition tokens are added in a separate commit.
-# caps-over-limit-on-watched-rail fires caps 'fail' alongside
-# destination_rail, so it denies.
+# caps-over-limit-escalates is the row where caps is the SOLE failing check:
+# it escalates, sealed as disposition.decision needs_input with
+# disposition.verdict_class hitl_dispatched. caps-over-limit-on-watched-rail
+# fires caps 'fail' alongside destination_rail, so it denies.
 rows:
   - scenario: baseline-allow
     action_id: make_payment/everyday-fixture-baseline
@@ -143,3 +143,20 @@ rows:
       counterparty_identity_change: {population: c}
       credential_pattern: {population: c}
     verdict: deny
+  - scenario: caps-second-first-draw
+    action_id: make_payment/everyday-fixture-caps-second-first-draw
+    checks: {dedupe: pass, caps: pass, verify_before_dispatch: n/a, destination_rail: pass, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: pass}
+    n_a:
+      verify_before_dispatch: {population: c}
+      counterparty_identity_change: {population: c}
+      credential_pattern: {population: c}
+    verdict: allow
+  - scenario: caps-over-limit-escalates
+    action_id: make_payment/everyday-fixture-caps-escalates
+    note: "pooled with caps-second-first-draw: 6,000,000 + 5,000,000 > 10,000,000, and caps is the only failing check"
+    checks: {dedupe: pass, caps: fail, verify_before_dispatch: n/a, destination_rail: pass, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: pass}
+    n_a:
+      verify_before_dispatch: {population: c}
+      counterparty_identity_change: {population: c}
+      credential_pattern: {population: c}
+    verdict: escalate

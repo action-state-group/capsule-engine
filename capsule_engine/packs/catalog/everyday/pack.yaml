@@ -114,5 +114,9 @@ fixtures:
       outcome: allow
     - id: recurring-charge-set-up
       outcome: deny
+    - id: caps-second-first-draw
+      outcome: allow
+    - id: caps-over-limit-escalates
+      outcome: escalate
 
 bootstrap: AI-BOOTSTRAP.md

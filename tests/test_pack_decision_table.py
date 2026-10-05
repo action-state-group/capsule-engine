@@ -29,10 +29,11 @@ import pytest
 import yaml
 from agent_action_capsule import json_digest
 
+from capsule_engine.guards.capsule import outcome_from_disposition
+
 CATALOG = Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog"
 PACK_DIRS = sorted(p.parent.parent for p in CATALOG.glob("*/fixtures/decision_table.yaml"))
 
-_VERDICT_BY_DECISION = {"accept": "allow", "reject": "deny", "hitl_dispatched": "escalate"}
 
 
 def test_the_parameterization_finds_both_tabled_packs():
@@ -69,7 +70,7 @@ def test_decision_table_matches_the_real_fixture_row_for_row(pack_dir):
         actual_checks = {c["id"]: c["result"] for c in capsule["constraints"]}
         assert actual_checks == row["checks"], f"{row['scenario']}: table says {row['checks']}, fixture has {actual_checks}"
 
-        actual_verdict = _VERDICT_BY_DECISION[capsule["disposition"]["decision"]]
+        actual_verdict = outcome_from_disposition(capsule["disposition"])
         assert actual_verdict == row["verdict"], f"{row['scenario']}: table says {row['verdict']!r}, fixture is {actual_verdict!r}"
 
 

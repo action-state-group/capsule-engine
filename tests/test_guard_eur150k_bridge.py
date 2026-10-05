@@ -6,8 +6,9 @@ fresh, independently re-evaluates it on its own caps evidence and -- per D2
 (2026-08-05) -- escalates rather than blocks: `money.transfer` has an
 `approver_role` configured (matching the HITL Bridge design's dev/GC
 screens, real capsule cd0692b3, checkpoint #217), so a pure cap-exceeded
-hold routes to a human (`hitl_dispatched`) instead of an automatic deny. The
-new `hitl_dispatched` capsule still closes the stale `blocked` item with a
+hold routes to a human (decision `needs_input`, verdict_class
+`hitl_dispatched`) instead of an automatic deny. The new escalation capsule
+still closes the stale `blocked` item with a
 `supersedes`-chained decision capsule: the registry's own definition of
 `supersedes` -- "Terminal transition over the parent -- resolution, expiry,
 escalation close/replace the parent's open state" -- covers an escalation
@@ -83,7 +84,7 @@ def test_eur150k_bridge_scenario_escalates_with_fold_evidence_and_supersedes_cha
     capsule = decision.capsule
     assert capsule is not None
     assert capsule["chain"] == {"parent_capsule_id": CD0692B3, "relation": "supersedes"}
-    assert capsule["disposition"]["decision"] == "hitl_dispatched"
+    assert capsule["disposition"]["decision"] == "needs_input"
     assert capsule["disposition"]["verdict_class"] == "hitl_dispatched"
 
     # -- the capsule is real: it verifies, and it closes the parent's open item --

@@ -11,16 +11,19 @@ Per the -02 disposition spec (§ Disposition and the verdict reason-class):
 ``verdict_class`` is "legitimately absent for a clean executed verdict", so
 ``allow`` leaves it absent rather than claiming ``executed`` for something
 this capsule did not itself do. ``deny`` uses the registry-seeded ``blocked``
-token. ``escalate`` uses ``hitl_dispatched``: the guard is the one routing the action to a human who has not yet
-acted, which is what -02 §verdictclass defines ``hitl_dispatched`` as
-("routed to a human operator; awaiting resolution") -- ``deferred`` is a
-*human*-elected postponement, a different, later state. ``disposition.decision``
-also takes ``hitl_dispatched`` under the same decision; it sits outside the
-seeded ``accept``/``reject``/``needs_input``/``deferred`` set, but an
-unregistered ``decision`` value is informational to a verifier, never a
-rejection, per -02's conformance rules (see STATUS.md's Needs decision
-section for the still-open ``supersedes`` vs. requested-but-unregistered
-``resolves`` relation question -- unrelated to D1, not resolved here).
+token. ``escalate`` sets ``verdict_class`` to ``hitl_dispatched``: the guard
+is the one routing the action to a human who has not yet acted, which is
+what -02 §verdictclass defines ``hitl_dispatched`` as ("routed to a human
+operator; awaiting resolution") -- ``deferred`` is a *human*-elected
+postponement, a different, later state. ``disposition.decision`` is
+``needs_input``, a seeded decision value, so the pair matches the donated
+conformance vector ``vectors/capsule/pos-hitl-dispatched`` exactly.
+
+This supersedes the 2026-08-05 decision (D1) that also wrote
+``hitl_dispatched`` into ``disposition.decision``: that put one token on
+both axes, and ``hitl_dispatched`` is not a seeded decision value. Records
+sealed under D1 are never rewritten; ``outcome_from_disposition`` reads
+their legacy pairing as ``escalate``.
 
 Money amounts have no field in the core -02 schema. ``asg_payload`` is a
 single namespaced, non-spec payload extension (never a repurposed spec-
@@ -64,19 +67,38 @@ __all__ = [
     "ConstraintOutcome",
     "build_decision_capsule",
     "not_applicable_evidence",
+    "outcome_from_disposition",
 ]
 
 ALLOW = "allow"
 DENY = "deny"
 ESCALATE = "escalate"
 
-# Disposition mapping (see module docstring). `escalate` -> `hitl_dispatched`
-# for both `decision` and `verdict_class`, per D1 (2026-08-05).
+# Disposition mapping (see module docstring). `escalate` -> decision
+# `needs_input` with verdict_class `hitl_dispatched`, the donated vector's pair.
 _DISPOSITION_BY_OUTCOME = {
     ALLOW: {"decision": "accept", "verdict_class": None},
     DENY: {"decision": "reject", "verdict_class": "blocked"},
-    ESCALATE: {"decision": "hitl_dispatched", "verdict_class": "hitl_dispatched"},
+    ESCALATE: {"decision": "needs_input", "verdict_class": "hitl_dispatched"},
 }
+
+# Reader side: every decision value this engine has ever sealed. The legacy
+# `hitl_dispatched` decision was written before the change above and still
+# reads as an escalation.
+_OUTCOME_BY_DECISION = {"accept": ALLOW, "reject": DENY, "needs_input": ESCALATE}
+_LEGACY_ESCALATE_DECISION = "hitl_dispatched"
+
+
+def outcome_from_disposition(disposition: dict) -> str:
+    """allow | deny | escalate for a sealed decision capsule's disposition,
+    including records sealed with the legacy escalate pairing (decision and
+    verdict_class both ``hitl_dispatched``)."""
+    decision = disposition.get("decision")
+    if decision in _OUTCOME_BY_DECISION:
+        return _OUTCOME_BY_DECISION[decision]
+    if decision == _LEGACY_ESCALATE_DECISION and disposition.get("verdict_class") == _LEGACY_ESCALATE_DECISION:
+        return ESCALATE
+    raise ValueError(f"no guard outcome for disposition.decision {decision!r}")
 
 
 @dataclass(frozen=True)
