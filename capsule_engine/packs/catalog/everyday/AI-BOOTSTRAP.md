@@ -65,6 +65,13 @@ learns HOW MANY rules were excluded, but not WHICH rules or WHY. The facts
 object above makes the two `n/a` cases distinguishable on the constraint
 record only; the projection does not carry that distinction further.
 
+**What the fixture corpus records about itself.** Each row of this pack's
+fixture corpus records the pack and wicket digests it ran under and an
+identity for the code that produced it, captured when the row was produced.
+That code identity is a claim by whoever built the artifact (self-attested):
+it lets rows be compared across a window as coming from the same code, but a
+stranger cannot confirm it from the receipt.
+
 **What I need from you:**
 
 1. Scan this codebase for every call that moves money or sends a message
