@@ -214,10 +214,12 @@ EVIDENCE_PROFILE_VALUES = frozenset(
     {"outcome", "obligation", "process", "quality", "human_role", "attribution", "settlement"}
 )
 
-# The eight epistemic types (doc1 "Evidence Fabric Architecture v2" §4) an
-# Evidence Contract's evidence can carry -- what KIND of claim a piece of
-# evidence is, independent of which profile the contract belongs to.
-# Lower-case, as the owning record header spells them (2026-10-01 decision).
+# The eight epistemic types an Evidence Contract's evidence can carry -- what
+# KIND of claim a piece of evidence is, independent of which profile the
+# contract belongs to. The closed set is owned by the Internet-Draft
+# draft-mih-agent-evidence-layer-00, section 4.1 "Epistemic Type" (interim
+# registry: agent-action-capsule spec/REGISTRY.md section 17), lower-case as
+# it spells them; schemas/vendor/epistemic-types.json is the vendored copy.
 EPISTEMIC_TYPE_VALUES = frozenset(
     {
         "observed_event",
