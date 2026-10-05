@@ -19,7 +19,7 @@ postponement, a different, later state. ``disposition.decision`` is
 ``needs_input``, a seeded decision value, so the pair matches the donated
 conformance vector ``vectors/capsule/pos-hitl-dispatched`` exactly.
 
-This supersedes the 2026-08-05 decision (D1) that also wrote
+Superseded 2026-10-04: the 2026-08-05 decision (D1) that also wrote
 ``hitl_dispatched`` into ``disposition.decision``: that put one token on
 both axes, and ``hitl_dispatched`` is not a seeded decision value. Records
 sealed under D1 are never rewritten; ``outcome_from_disposition`` reads
