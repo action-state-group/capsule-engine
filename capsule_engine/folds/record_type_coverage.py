@@ -19,7 +19,10 @@ class RecordTypeCoverageResult:
     present: frozenset[str]
     missing: frozenset[str]
     considered_count: int
-    verdict: str  # "met" | "not_met" | "not_applicable"
+    # False when nothing was declared: the requirement is excluded from the
+    # evaluated population, and ``verdict`` is None rather than any verdict.
+    applicable: bool
+    verdict: str | None  # "met" | "not_met"; None when not applicable
 
 
 def evaluate_record_type_coverage(
@@ -32,12 +35,13 @@ def evaluate_record_type_coverage(
     log-schema registry entry) -- this fold never invents which kinds
     "should" appear, it only reports which of the DECLARED kinds actually do.
 
-    An empty ``registered_kinds`` is ``not_applicable`` (nothing was declared
-    to check coverage against), never a vacuous ``met``.
+    An empty ``registered_kinds`` (nothing was declared to check coverage
+    against) is a population exclusion: ``applicable=False`` with no verdict
+    at all, never a vacuous ``met``.
     """
     if not registered_kinds:
         return RecordTypeCoverageResult(
-            present=frozenset(), missing=frozenset(), considered_count=len(records), verdict="not_applicable"
+            present=frozenset(), missing=frozenset(), considered_count=len(records), applicable=False, verdict=None
         )
 
     seen: set[str] = set()
@@ -50,5 +54,5 @@ def evaluate_record_type_coverage(
     missing = registered_kinds - present
     verdict = "met" if not missing else "not_met"
     return RecordTypeCoverageResult(
-        present=present, missing=missing, considered_count=len(records), verdict=verdict
+        present=present, missing=missing, considered_count=len(records), applicable=True, verdict=verdict
     )

@@ -20,6 +20,8 @@ BUCKET_CLAIM_MISMATCH = "bucket_claim_mismatch"
 COVERAGE_CLAIM_MISMATCH = "coverage_claim_mismatch"
 SCHEMA_VALIDATION_FAILED = "schema_validation_failed"
 INVALID_COVERAGE_REPORT = "invalid_coverage_report"
+INVALID_LAYER_TALLY = "invalid_layer_tally"
+COVERAGE_NOT_COMPUTED = "coverage_not_computed"
 
 
 class ResultError(ValueError):

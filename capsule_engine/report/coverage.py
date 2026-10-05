@@ -730,7 +730,7 @@ def verify_coverage_report(doc: Mapping[str, Any], claims_by_id: Mapping[str, Ma
             if src.get("contemporaneous_count", 0) + src.get("backfilled_count", 0) != src.get("record_count"):
                 raise ResultError(
                     INVALID_COVERAGE_REPORT,
-                    f"requirement {ref!r} source {src.get('source')!r}: contemporaneous + backfilled != record_count",
+                    f"requirement {ref!r} source {src.get('source')!r}: contemporaneous_count + backfilled_count != record_count",
                 )
             if len(src.get("evidence", [])) != src.get("record_count"):
                 raise ResultError(

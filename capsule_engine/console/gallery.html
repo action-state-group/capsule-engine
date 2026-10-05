@@ -146,7 +146,7 @@
       </div>
       <div class="rung-row" style="border-top:none; border-radius:0 0 12px 12px; background:rgba(122,140,110,0.06)">
         <div class="rung-dot-wrap"><span class="rung-dot" style="width:13px; height:13px; background:var(--asg-sage)"></span></div>
-        <div><div class="rung-name">Independently witnessed</div><div class="rung-mode">ledger_mode: anchored · 3 external witnesses</div></div>
+        <div><div class="rung-name">Externally registered</div><div class="rung-mode">ledger_mode: anchored · 3 external witnesses</div></div>
         <div class="rung-plain">A summary was lodged with independent public logs — this history cannot be quietly rewritten afterwards.</div>
         <div></div>
       </div>
@@ -154,7 +154,7 @@
 
     <div class="chip-stack">
       <div class="state-slot"><span class="state-label">normal</span><span class="rung-chip"><span class="rung-dot" style="width:8px; height:8px; background:var(--asg-sage)"></span>locally receipted</span></div>
-      <div class="state-slot"><span class="state-label">rung held (downgrade)</span><span class="rung-chip rung-chip--held"><span class="rung-dot" style="width:8px; height:8px"></span>witnessed 1 of 3 · retrying</span></div>
+      <div class="state-slot"><span class="state-label">rung held (downgrade)</span><span class="rung-chip rung-chip--held"><span class="rung-dot" style="width:8px; height:8px"></span>registered with 1 of 3 logs · retrying</span></div>
     </div>
   </section>
 
@@ -240,7 +240,7 @@
       <div class="fail-card">
         <div class="fail-card-head"><span class="fail-icon">✕</span><span class="fail-stage mono">inclusion_unproven</span></div>
         <div class="fail-title">The witness receipt doesn't check out</div>
-        <div class="fail-render">"This record claims to be witnessed, but the log's receipt doesn't check out (or can't be reached — retry when online)." Distinguishes unreachable from disproven, always — and never claims more independence than the witnessing rung actually held (an operated default witness is not the same claim as the "Independently witnessed" rung above).</div>
+        <div class="fail-render">"This record claims external registration, but the log's receipt doesn't check out (or can't be reached — retry when online)." Distinguishes unreachable from disproven, always — and never claims more independence than the witnessing rung actually held (an operated default witness is not the same claim as the "Externally registered" rung above).</div>
       </div>
     </div>
 
@@ -263,7 +263,7 @@
           <div class="verify-stage verify-stage--fail"><span class="verify-stage-glyph">✕</span><span class="verify-stage-name">Integrity</span><span class="verify-stage-detail">digest_mismatch — see failure card above</span></div>
           <div class="verify-stage verify-stage--pass"><span class="verify-stage-glyph">✓</span><span class="verify-stage-name">Sequence</span><span class="verify-stage-detail">nothing missing between the first and last record shown</span></div>
           <div class="verify-stage verify-stage--pass"><span class="verify-stage-glyph">✓</span><span class="verify-stage-name">Authenticity</span><span class="verify-stage-detail">signed by acme-research</span></div>
-          <div class="verify-stage verify-stage--pass"><span class="verify-stage-glyph">✓</span><span class="verify-stage-name">Witness</span><span class="verify-stage-detail">witnessed by 3 of 3 logs</span></div>
+          <div class="verify-stage verify-stage--pass"><span class="verify-stage-glyph">✓</span><span class="verify-stage-name">Witness</span><span class="verify-stage-detail">registered with 3 of 3 logs</span></div>
         </div>
       </div>
     </div>
