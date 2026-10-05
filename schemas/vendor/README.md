@@ -22,7 +22,9 @@ here, never re-derived by hand.
 
 ## `epistemic-types.json`
 
-A transcription of the closed `epistemic_type` value set owned by
-EvidenceBook's record header. Its provenance is recorded inside the file (the
+A transcription of the closed `epistemic_type` value set owned by the
+published Internet-Draft `draft-mih-agent-evidence-layer-00`, section 4.1
+"Epistemic Type" (source: agent-action-capsule
+`spec/draft-mih-agent-evidence-layer-00.md`). Its provenance is recorded inside the file (the
 `$comment` and `source` fields), because no machine-readable copy exists
 upstream to copy byte-for-byte.
