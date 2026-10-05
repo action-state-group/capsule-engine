@@ -44,7 +44,7 @@ def _copy_payments_safety(tmp_path: Path, **obligation_fields) -> Path:
     return pack_dir
 
 
-@pytest.mark.parametrize("value", ["GO", "ASK", "NEVER"])
+@pytest.mark.parametrize("value", ["DO", "ASK", "NEVER"])
 def test_declared_default_disposition_is_parsed_and_digested(tmp_path, value):
     pack = load_pack_dir(_copy_payments_safety(tmp_path, default_disposition=value))
     assert pack.obligations[0].default_disposition == value
@@ -57,7 +57,7 @@ def test_undeclared_default_disposition_is_absent_from_the_canonical_form(tmp_pa
     assert "default_disposition" not in pack.canonical_dict()["obligations"][0]
 
 
-@pytest.mark.parametrize("value", ["ask", "ESCALATE", "", 1])
+@pytest.mark.parametrize("value", ["ask", "ESCALATE", "", 1, "GO"])
 def test_default_disposition_outside_the_closed_set_is_refused(tmp_path, value):
     with pytest.raises(PackDefinitionError) as exc:
         load_pack_dir(_copy_payments_safety(tmp_path, default_disposition=value))

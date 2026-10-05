@@ -170,11 +170,11 @@ EVIDENCE_INSTRUMENT_KINDS = frozenset({"structured_field", "tool_call_name"})
 TIER_VALUES = frozenset({"must_have", "informational"})
 
 # What an obligation's check failing should mean to the person the action is
-# for, by default: proceed (GO), stop and ask them (ASK), or never proceed
-# (NEVER). Declared data only -- the guard engine does not read it. Optional
+# for, by default: the agent may do it (DO), stop and ask them (ASK), or never
+# do it (NEVER). Declared data only -- the guard engine does not read it. Optional
 # and additive like ``re_derivability_grade``: an obligation with no
 # ``default_disposition`` parses and digests identically to before.
-DEFAULT_DISPOSITION_VALUES = frozenset({"GO", "ASK", "NEVER"})
+DEFAULT_DISPOSITION_VALUES = frozenset({"DO", "ASK", "NEVER"})
 
 # The seven ways a ledger gets judged (standard-outcome-pack design §3) --
 # every standard outcome is tagged with exactly one. "structural" (presence/
