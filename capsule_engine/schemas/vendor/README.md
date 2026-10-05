@@ -14,7 +14,7 @@ here, never re-derived by hand.
   Re-copy from agent-action-capsule's main once that branch merges.
 - **Copied on:** 2026-10-01
 - **Form:** byte-for-byte; the file carries no local additions. Check with
-  `git -C <agent-action-capsule checkout> cat-file blob 8fdf5b9bfdce069ac83568b6e1ad71f72e7904e6:schemas/evidence-result-v0.json | cmp - schemas/vendor/evidence-result-v0.json`.
+  `git -C <agent-action-capsule checkout> cat-file blob 8fdf5b9bfdce069ac83568b6e1ad71f72e7904e6:schemas/evidence-result-v0.json | cmp - capsule_engine/schemas/vendor/evidence-result-v0.json`.
 - **Why it is vendored:** the agent-action-capsule release this repository pins
   does not ship the schema as an importable resource. Drop this copy and import
   the schema from agent-action-capsule once it does (see

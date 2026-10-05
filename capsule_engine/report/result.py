@@ -8,12 +8,13 @@ this module is the encoding. A drift between the two is a defect here, never
 a second legitimate spelling. At the time this module was written, that
 schema had landed on an ``agent-action-capsule`` branch (ruled, no longer
 DRAFT) but was not yet on its main branch -- not yet importable from the ``agent-action-capsule``
-dependency this repo already pins -- so ``schemas/vendor/evidence-result-v0.
-json`` carries a vendored copy (see ``schemas/vendor/README.md`` for its
+dependency this repo already pins -- so ``capsule_engine/schemas/vendor/
+evidence-result-v0.json`` carries a vendored copy (see
+``capsule_engine/schemas/vendor/README.md`` for its
 provenance and the drop-vendoring-once-shipped note).
 
 **Claims never self-declare.** Exactly like ``EvidenceContract`` upstream
-(``schemas/evidence-contract-v0.json``'s ``$comment``: "the evidence record
+(``capsule_engine/schemas/evidence-contract-v0.json``'s ``$comment``: "the evidence record
 never self-declares that it satisfies a requirement"), nothing in this module
 computes sufficiency or verdict from data it also emits as evidence -- both
 are supplied by the caller, who is expected to have derived them from real
@@ -30,7 +31,7 @@ from __future__ import annotations
 import json
 import re
 from dataclasses import dataclass, field
-from pathlib import Path
+from importlib import resources
 from typing import TYPE_CHECKING, Any
 
 import jsonschema
@@ -95,11 +96,13 @@ DISCLOSED_STATUS_VALUES = EVIDENCE_STATUS_VALUES - {"WITHHELD", "NOT_COMMITTED"}
 
 _HEX_DIGEST_RE = re.compile(r"^[0-9a-f]{64}$")
 
-SCHEMA_PATH = Path(__file__).resolve().parents[2] / "schemas" / "vendor" / "evidence-result-v0.json"
+# Resolved inside the installed package, so it is present in a wheel install
+# and not only in a source checkout (scripts/clean_room_wheel.sh checks this).
+SCHEMA_PATH = resources.files("capsule_engine") / "schemas" / "vendor" / "evidence-result-v0.json"
 
 
 def load_schema() -> dict[str, Any]:
-    return json.loads(SCHEMA_PATH.read_text())
+    return json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
 
 
 def _check_hex_digest(digest: str) -> None:

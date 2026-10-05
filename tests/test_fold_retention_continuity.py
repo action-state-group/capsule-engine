@@ -69,10 +69,10 @@ def test_unbroken_chain_within_a_trivially_short_window_is_met(three_checkpoint_
 
 def test_freshly_created_chain_has_not_reached_a_six_month_window_yet(three_checkpoint_segment):
     """A brand-new log cannot possibly have 183 days of history -- this MUST
-    be insufficient_evidence, never a graded failure, for a log's own youth."""
+    be not_evaluable, never a graded failure, for a log's own youth."""
     segment, _ = three_checkpoint_segment
     result = evaluate_retention_continuity(segment, as_of=_now(), window_days=183)
-    assert result.verdict == "insufficient_evidence"
+    assert result.verdict == "not_evaluable"
 
 
 def test_require_witnessed_with_no_witnessing_ts_is_not_met(three_checkpoint_segment):
@@ -82,7 +82,7 @@ def test_require_witnessed_with_no_witnessing_ts_is_not_met(three_checkpoint_seg
     assert segment.links and all(link.checkpoint.witnesses for link in segment.links)
     result = evaluate_retention_continuity(segment, as_of=_now(), window_days=0, require_witnessed=True)
     assert result.verdict == "not_met"
-    assert "witnessed grade" in result.detail
+    assert "grade 'witnessed'" in result.detail
 
 
 def test_mutant_drop_middle_checkpoint_breaks_continuity(three_checkpoint_segment):

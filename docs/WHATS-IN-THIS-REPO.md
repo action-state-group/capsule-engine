@@ -5,11 +5,11 @@ on their own, and shows how to run each one. Everything here is Apache-2.0.
 
 ## Evidence Contract schema
 
-`schemas/evidence-contract-v0.json` is a JSON Schema (draft 2020-12) for an
+`capsule_engine/schemas/evidence-contract-v0.json` is a JSON Schema (draft 2020-12) for an
 Evidence Contract: a document listing the requirements an agent's recorded
 actions must meet, with each requirement stating how it is checked.
 
-`schemas/vendor/` holds copies of two schemas the contract refers to
+`capsule_engine/schemas/vendor/` holds copies of two schemas the contract refers to
 (`epistemic-types.json`, `evidence-result-v0.json`).
 
 ## Validator

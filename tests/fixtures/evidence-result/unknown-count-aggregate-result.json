@@ -1,0 +1,170 @@
+{
+  "aggregate": {
+    "buckets": {
+      "met": [
+        "claim-1"
+      ],
+      "not_evaluable": [
+        "claim-2",
+        "claim-3",
+        "claim-5",
+        "claim-6"
+      ],
+      "not_met": [
+        "claim-4"
+      ]
+    },
+    "coverage": {
+      "evaluated_population": 6,
+      "excluded_not_applicable": 0,
+      "unknown_count": 2
+    }
+  },
+  "claims": [
+    {
+      "contract_ref": "ec:example-org-unknown-sufficiency:2026-10-04@1",
+      "evidence": [
+        {
+          "digest": "ce460bb1a59fafc1b43117ee51313b30e4799211d04b44d024f2a331ce370530",
+          "digest_alg": "SHA-256"
+        }
+      ],
+      "grade": "witnessed",
+      "id": "claim-1",
+      "presentation": {
+        "evidence": [
+          {
+            "digest": "ce460bb1a59fafc1b43117ee51313b30e4799211d04b44d024f2a331ce370530",
+            "digest_alg": "SHA-256"
+          }
+        ],
+        "kind": "disclosure",
+        "status": "SATISFIED"
+      },
+      "proofs": [
+        {
+          "digest": "7c892be46aacd79da1ba983111b296b4dd59c7203b31a23bda902d40af0757e3",
+          "digest_alg": "SHA-256",
+          "kind": "receipt"
+        }
+      ],
+      "requirement_ref": "req-1",
+      "sufficiency": "SATISFIED",
+      "tier": "recomputed",
+      "verdict": "met"
+    },
+    {
+      "contract_ref": "ec:example-org-unknown-sufficiency:2026-10-04@1",
+      "evidence": [],
+      "grade": "self-attested",
+      "id": "claim-2",
+      "presentation": {
+        "kind": "analysis",
+        "status": "UNKNOWN",
+        "summary": "The requirement was not evaluated and the cause was not determined."
+      },
+      "proofs": [],
+      "requirement_ref": "req-2",
+      "sufficiency": "UNKNOWN",
+      "tier": "recomputed",
+      "verdict": "not_evaluable"
+    },
+    {
+      "contract_ref": "ec:example-org-unknown-sufficiency:2026-10-04@1",
+      "evidence": [],
+      "grade": "self-attested",
+      "id": "claim-3",
+      "presentation": {
+        "kind": "analysis",
+        "status": "NOT_FOUND",
+        "summary": "The required source has no record in the range."
+      },
+      "proofs": [],
+      "requirement_ref": "req-3",
+      "sufficiency": "GAP",
+      "tier": "recomputed",
+      "verdict": "not_evaluable"
+    },
+    {
+      "contract_ref": "ec:example-org-unknown-sufficiency:2026-10-04@1",
+      "evidence": [
+        {
+          "digest": "05732dcd75f071ee766bc2c033271b075a260a2c36ffc6eb8ae07fcf635b104f",
+          "digest_alg": "SHA-256"
+        }
+      ],
+      "grade": "witnessed",
+      "id": "claim-4",
+      "presentation": {
+        "evidence": [
+          {
+            "digest": "05732dcd75f071ee766bc2c033271b075a260a2c36ffc6eb8ae07fcf635b104f",
+            "digest_alg": "SHA-256"
+          }
+        ],
+        "kind": "disclosure",
+        "status": "SATISFIED"
+      },
+      "proofs": [
+        {
+          "digest": "b350174d3592fa011ec73e412446223abf7a61c0daf8ddce8f7a2338d3cb5e32",
+          "digest_alg": "SHA-256",
+          "kind": "receipt"
+        }
+      ],
+      "requirement_ref": "req-4",
+      "sufficiency": "SATISFIED",
+      "tier": "recomputed",
+      "verdict": "not_met"
+    },
+    {
+      "contract_ref": "ec:example-org-unknown-sufficiency:2026-10-04@1",
+      "evidence": [],
+      "grade": "self-attested",
+      "id": "claim-5",
+      "presentation": {
+        "kind": "story",
+        "narrative": "The requirement was not evaluated and the cause was not determined.",
+        "status": "UNKNOWN"
+      },
+      "proofs": [],
+      "requirement_ref": "req-5",
+      "sufficiency": "UNKNOWN",
+      "tier": "recomputed",
+      "verdict": "not_evaluable"
+    },
+    {
+      "contract_ref": "ec:example-org-unknown-sufficiency:2026-10-04@1",
+      "evidence": [
+        {
+          "digest": "24fcde7e4cc17912bb05c3cbe7087af9d0c87eb61fc81a21f5ff5e94994528eb",
+          "digest_alg": "SHA-256"
+        }
+      ],
+      "grade": "self-attested",
+      "id": "claim-6",
+      "presentation": {
+        "evidence": [
+          {
+            "digest": "24fcde7e4cc17912bb05c3cbe7087af9d0c87eb61fc81a21f5ff5e94994528eb",
+            "digest_alg": "SHA-256"
+          }
+        ],
+        "kind": "disclosure",
+        "status": "INSUFFICIENT"
+      },
+      "proofs": [],
+      "requirement_ref": "req-6",
+      "sufficiency": "INSUFFICIENT",
+      "tier": "recomputed",
+      "verdict": "not_evaluable"
+    }
+  ],
+  "generated_at": "2026-10-04T00:00:00Z",
+  "result_version": "evidence-result-v0",
+  "view": {
+    "producer_name": "EXAMPLE-ORG",
+    "spec_version": "presentation/v1",
+    "title": "EXAMPLE-ORG UNKNOWN count -- Result v0"
+  }
+}

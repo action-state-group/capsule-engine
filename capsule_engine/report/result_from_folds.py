@@ -41,11 +41,14 @@ __all__ = [
 
 # spec/evidence-result-v0.md section 1's rule, restated: sufficiency SATISFIED
 # only when the fold actually reached a met/not_met judgment; INSUFFICIENT
-# otherwise (this fold's own "insufficient_evidence" word, spelled onto the
-# Evidence Contract v3 section 5.2 vocabulary it mirrors).
+# otherwise. "insufficient_evidence" is the fold's retired spelling of
+# not_evaluable, still read as an alias for results written before the
+# rename and always projected under the one canonical spelling.
+# Accepted alias, never emitted: removing it breaks reading older results.
 _RETENTION_VERDICT_MAP = {
     "met": ("SATISFIED", "met", "SATISFIED"),
     "not_met": ("SATISFIED", "not_met", "SATISFIED"),
+    "not_evaluable": ("INSUFFICIENT", "not_evaluable", "INSUFFICIENT"),
     "insufficient_evidence": ("INSUFFICIENT", "not_evaluable", "INSUFFICIENT"),
 }
 
@@ -92,12 +95,12 @@ def is_excluded_not_applicable(result: RecordTypeCoverageResult) -> bool:
     """spec section 3: a requirement excluded as NOT_APPLICABLE never
     becomes a claim at all -- it only contributes to
     ``aggregate.coverage.excluded_not_applicable`` (``build_result``'s
-    ``excluded_not_applicable`` count). This fold's own ``verdict`` already
-    carries that exclusion (an empty ``registered_kinds`` declaration, per
-    ``record_type_coverage.py``'s docstring: "nothing was declared to check
-    coverage against"), so this is a pure read, not a second judgment.
+    ``excluded_not_applicable`` count). This fold's own ``applicable`` flag
+    already carries that exclusion (an empty ``registered_kinds`` declaration,
+    per ``record_type_coverage.py``'s docstring: "nothing was declared to
+    check coverage against"), so this is a pure read, not a second judgment.
     """
-    return result.verdict == "not_applicable"
+    return not result.applicable
 
 
 # A guard constraint record's result (pass | fail | n/a) projected onto the
