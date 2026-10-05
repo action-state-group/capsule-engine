@@ -133,9 +133,13 @@ def _n_a_constructions_without_evidence(path: Path) -> list[int]:
     return lines
 
 
-def test_no_source_in_guards_or_holds_builds_an_n_a_without_evidence():
+def test_no_source_in_guards_or_holds_builds_an_n_a_without_evidence(tmp_path):
     """Static half of the invariant: a check added later that writes
     ``result="n/a"`` with no ``evidence=`` fails here before it ever runs."""
+    planted = tmp_path / "planted.py"  # positive control: the scan must see this
+    planted.write_text('ConstraintOutcome(id="x", result="n/a", reason="r")\n')
+    assert _n_a_constructions_without_evidence(planted) == [1]
+
     offenders = {}
     for sub in ("guards", "holds"):
         for path in sorted((PACKAGE_DIR / sub).rglob("*.py")):

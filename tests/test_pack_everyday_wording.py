@@ -1,11 +1,20 @@
 # SPDX-License-Identifier: Apache-2.0
 """The everyday pack's text says what is detected and recorded, never what is
-prevented, and makes no claim that a reader can re-run or check a verdict.
+prevented; makes no claim that a reader can re-run or check a verdict; and
+carries none of the process vocabulary of the people who wrote it.
 
-Scanned: every text file in ``catalog/everyday/`` except the fixture ledger.
-The ledger holds sealed records whose registered field values (for example
+Scanned: every file in ``catalog/everyday/`` except the fixture ledger. The
+ledger holds sealed records whose registered field values (for example
 ``severity: "blocking"``, method ``agent_action_capsule.verify``) are spec
-tokens, not prose this pack wrote.
+tokens, not prose this pack wrote; the one sealed record quoted in
+``gold_labels.yaml`` carries the same ``severity: blocking`` line, which is
+the only line shape exempted.
+
+Every gate runs through ``_gate``, which first requires a planted violation
+to be matched -- a gate that matches nothing in the pack AND nothing in its
+control is broken, not clean. Matching is case-insensitive except for the
+two-letter role abbreviations, which are matched in capitals only because
+lower-case "pm" occurs in ordinary text ("3 pm").
 """
 from __future__ import annotations
 
@@ -17,54 +26,77 @@ import pytest
 from capsule_engine.packs.loader import load_pack_dir
 
 PACK_DIR = Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog" / "everyday"
-SCANNED = sorted(p for p in PACK_DIR.rglob("*") if p.is_file() and p.name != "mini_ledger.jsonl")
+ALL_FILES = sorted(p for p in PACK_DIR.rglob("*") if p.is_file())
+SCANNED = [p for p in ALL_FILES if p.name != "mini_ledger.jsonl"]
 
-FORBIDDEN = re.compile(
-    r"\b(prevent\w*|stop\w*|block\w*|catch\w*|scam\w*|protect\w*|prove\w*)\b"
-    r"|\b(re-?run|check|verify)\b[^.\n]{0,20}\byourself\b",
-    re.IGNORECASE,
-)
-# Process vocabulary that has no place in shipped pack files.
-PROCESS_WORDS = re.compile(
-    r"\b(tranche\w*|brief\w*|batch\w*|inbox|outbox|lane|lanes|held|Sherlock)\b"
-    r"|\b(this|the) item\b|\bu\d{1,4}\b|\bP[1-9]\b|\bPM-\w+",
-    re.IGNORECASE,
-)
-PROCESS_WORDS_CASED = re.compile(r"\b(EM|PM)\b")
+# Lines a gate never reads: the single interim-field declaration (the one
+# place a bracketed id may appear) and the sealed spec token quoted above.
+DECLARATION_LINE = re.compile(r"evidence-result schema \[recomputed-tier-code-identity\]")
+SEALED_TOKEN_LINE = re.compile(r"^\s*severity: blocking$")
+
+GATES = {
+    "claim_verbs": (
+        re.compile(r"\b(prevent\w*|stop\w*|block\w*|catch\w*|scam\w*|protect\w*|prove\w*)\b", re.IGNORECASE),
+        "This pack prevents fraud and blocks every scam.",
+    ),
+    "re_runnability": (
+        re.compile(r"\b(re-?run|check|verify)\b[^.\n]{0,20}\byourself\b", re.IGNORECASE),
+        "You can re-run this yourself, or verify it yourself.",
+    ),
+    "process_vocabulary": (
+        re.compile(
+            r"\b(tranche\w*|brief\w*|batch\w*|inbox|outbox|lanes?|held|sherlock)\b"
+            r"|\b(this|the) item\b|\bu\d{1,4}\b|\bP[1-9]\b|\bPM-\w+|\brc\d+\b",
+            re.IGNORECASE,
+        ),
+        "Tranche 1 of the brief, held for rc6 per u66 and P2.",
+    ),
+    "role_abbreviations": (re.compile(r"\b(EM|PM)\b"), "The EM asked the PM."),
+    "bracketed_ids": (re.compile(r"\[[a-z0-9]+(?:-[a-z0-9]+)+\]", re.IGNORECASE), "see [everyday-ask-decision-token]"),
+}
+
+
+def _hits(pattern: re.Pattern, text: str) -> list[str]:
+    return [
+        m.group(0)
+        for line in text.splitlines()
+        if not (DECLARATION_LINE.search(line) or SEALED_TOKEN_LINE.match(line))
+        for m in pattern.finditer(line)
+    ]
+
+
+def _gate(name: str, path: Path) -> list[str]:
+    pattern, control = GATES[name]
+    assert _hits(pattern, control), f"gate {name!r} does not match its own planted control -- the gate is broken"
+    return _hits(pattern, path.read_text())
+
+
+def test_the_scan_covers_every_pack_file_but_the_ledger():
+    assert len(SCANNED) == len(ALL_FILES) - 1
+    assert {p.name for p in SCANNED} >= {"pack.yaml", "AI-BOOTSTRAP.md", "decision_table.yaml", "gold_labels.yaml"}
+
+
+@pytest.mark.parametrize("name", sorted(GATES))
+@pytest.mark.parametrize("path", SCANNED, ids=lambda p: p.name)
+def test_gate(path, name):
+    assert _gate(name, path) == []
+
+
+def test_exempted_lines_are_exactly_the_declaration_and_the_quoted_sealed_token():
+    exempted = [
+        (p.name, line.strip())
+        for p in SCANNED
+        for line in p.read_text().splitlines()
+        if DECLARATION_LINE.search(line) or SEALED_TOKEN_LINE.match(line)
+    ]
+    assert sorted(name for name, _ in exempted) == ["gold_labels.yaml", "gold_labels.yaml"]
+
+
 PERMITTED_OPENING = re.compile(r"^(Records|Detects|Checks|Flags|Requires out-of-band consent|Produces)\b")
 
 
-def test_the_scan_covers_the_pack_text():
-    assert {p.name for p in SCANNED} >= {"pack.yaml", "AI-BOOTSTRAP.md", "decision_table.yaml"}
-
-
-@pytest.mark.parametrize("path", SCANNED, ids=lambda p: p.name)
-def test_no_forbidden_claim_wording(path):
-    hits = [(n, m.group(0)) for n, line in enumerate(path.read_text().splitlines(), 1) for m in FORBIDDEN.finditer(line)]
-    assert hits == []
-
-
-@pytest.mark.parametrize("path", SCANNED, ids=lambda p: p.name)
-def test_no_process_vocabulary(path):
-    text = path.read_text()
-    hits = [m.group(0) for m in PROCESS_WORDS.finditer(text)]
-    hits += [m.group(0) for m in PROCESS_WORDS_CASED.finditer(text)]
-    assert hits == []
-
-
-def test_process_pattern_matches_what_it_must():
-    for text in ("tranche 1", "the item", "u66", "P2 lands", "PM-Pack", "held sub-part"):
-        assert PROCESS_WORDS.search(text), text
-    assert PROCESS_WORDS_CASED.search("the EM said")
-    assert not PROCESS_WORDS.search("the first release of this pack")
-
-
-def test_forbidden_pattern_matches_what_it_must():
-    for text in ("this prevents fraud", "it blocks a scam", "Re-run this yourself", "verify it yourself"):
-        assert FORBIDDEN.search(text), text
-    assert not FORBIDDEN.search("Detects a payment over a watched rail and records the rail it read.")
-
-
 def test_every_statement_opens_with_a_permitted_verb():
-    for obligation in load_pack_dir(PACK_DIR).obligations:
-        assert PERMITTED_OPENING.match(obligation.statement), obligation.id
+    assert PERMITTED_OPENING.match("Prevents a payment.") is None  # control
+    obligations = load_pack_dir(PACK_DIR).obligations
+    assert len(obligations) == 6
+    assert [o.id for o in obligations if PERMITTED_OPENING.match(o.statement)] == [o.id for o in obligations]
