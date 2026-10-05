@@ -38,6 +38,8 @@ GENERATED_AT = "2026-10-04T23:00:00Z"
 TOOL = {"tool_name": "capsulectl", "tool_version": "v0.1.0-rc6"}
 JUDGE_PIN = "a" * 64
 EVIDENCE = "b" * 64
+# Stands in for the SHA-256 of the executions file reconcile read.
+EXECUTIONS = "e" * 64
 
 CANNOT_SEE = [
     "Only the execution records in the file it was given: a session, side conversation or sub-task whose records were not exported is not seen.",
@@ -83,7 +85,7 @@ RECONCILE: dict = {
     },
 }
 
-INVOKED = LayerSpec("invoked", "layer:invoked", "recomputed")
+INVOKED = LayerSpec("invoked", "layer:invoked", "recomputed", self_reported=True)
 EXTRACTED = LayerSpec("extracted", "layer:extracted", "judged", gate="invoked", judge_pin=JUDGE_PIN)
 OBEYED = LayerSpec("obeyed", "layer:obeyed", "recomputed", gate="invoked")
 # Two further layers with opaque ids: the adapter takes layer ids as data.
@@ -116,6 +118,7 @@ def _tally(**overrides: object) -> LayerTallyDoc:
         "contract_ref": CONTRACT_REF,
         "generated_at": GENERATED_AT,
         "not_applicable": NOT_APPLICABLE,
+        "executions_sha256": EXECUTIONS,
         **TOOL,
     }
     kwargs.update(overrides)
@@ -168,9 +171,89 @@ def test_invocation_layer_reads_reconcile_rows():
     # not_consequential is the exclusion; a failed attempt is UNKNOWN, never met.
     assert invoked["coverage"] == {"evaluated_population": 4, "excluded_not_applicable": 2, "unknown_count": 1}
     claims = {c["id"]: c for c in invoked["result"]["claims"]}
-    assert claims["invoked:a1"]["evidence"][1]["digest"] == "c" * 64
-    assert len(claims["invoked:a2"]["evidence"]) == 1, "a non-digest capsule_id is covered by the row digest only"
+    assert claims["invoked:a1"]["evidence"][2]["digest"] == "c" * 64
+    assert len(claims["invoked:a2"]["evidence"]) == 2, "a non-digest capsule_id is covered by the row digest only"
     assert all(c["grade"] == "self-attested" and c["tier"] == "recomputed" for c in claims.values())
+
+
+def test_invocation_claims_cite_the_executions_file_first():
+    doc = _tally()
+    assert doc["source"]["executions_sha256"] == EXECUTIONS
+    claims = _layer(doc, "invoked")["result"]["claims"]
+    assert all(c["evidence"][0]["digest"] == EXECUTIONS for c in claims)
+    with pytest.raises(ResultError):
+        _tally(executions_sha256="not-a-digest")
+    with pytest.raises(TypeError, match="executions_sha256"):  # required, no default
+        build_layer_tally(
+            RECONCILE, INVOKED, LAYERS, OBSERVATIONS, contract_ref=CONTRACT_REF, generated_at=GENERATED_AT, **TOOL
+        )
+
+
+@pytest.mark.parametrize(
+    "mutate",
+    [
+        pytest.param(lambda doc: doc["source"].__setitem__("executions_sha256", "f" * 64), id="source-swapped"),
+        pytest.param(lambda doc: doc["source"].pop("executions_sha256"), id="source-removed"),
+        pytest.param(
+            lambda doc: _layer(doc, "invoked")["result"]["claims"][0]["evidence"].pop(0), id="claim-stops-citing"
+        ),
+    ],
+)
+def test_tally_whose_invocation_claims_do_not_cite_the_executions_file_does_not_verify(mutate):
+    doc = _tally()
+    mutate(doc)
+    with pytest.raises(ResultError) as exc:
+        verify_layer_tally(doc)
+    assert exc.value.reason == INVALID_LAYER_TALLY
+
+
+def test_executions_digest_is_checked_when_no_claim_cites_it():
+    """With no consequential action there is no invocation claim to carry
+    the digest, so it is checked on its own, at build and at verify."""
+    empty = copy.deepcopy(RECONCILE)
+    empty.update(recorded=[], unrecorded=[], failed_attempts=[], consequential=0, records_read=2)
+    with pytest.raises(ResultError):
+        _tally(reconcile=empty, observations=[], not_applicable=[], executions_sha256="not-a-digest")
+    doc = _tally(reconcile=empty, observations=[], not_applicable=[])
+    assert _layer(doc, "invoked")["result"] is None
+    verify_layer_tally(doc)
+    doc["source"]["executions_sha256"] = "not-a-digest"
+    with pytest.raises(ResultError, match="executions_sha256") as exc:
+        verify_layer_tally(doc)
+    assert exc.value.reason == INVALID_LAYER_TALLY
+
+
+# A hold-style layer: its population is the agent's own sealed reports, so it
+# is a lower bound like invocation, tamper-evident but still self-report.
+HOLD = LayerSpec("hold", "layer:hold", "recomputed", gate="invoked", self_reported=True)
+HOLD_OBSERVATIONS = [*OBSERVATIONS, _obs("a1", "hold"), _obs("a2", "hold", "not_met")]
+
+
+def _tally_with_hold(**overrides: object) -> LayerTallyDoc:
+    return _tally(layers=[*LAYERS, HOLD], observations=HOLD_OBSERVATIONS, **overrides)
+
+
+@pytest.mark.parametrize("layer_id", ["invoked", "hold"])
+def test_self_reported_layer_is_never_graded_witnessed(layer_id):
+    doc = _tally_with_hold()
+    entry = _layer(doc, layer_id)
+    assert entry["self_reported"] is True
+    assert entry["result"]["claims"]
+    assert all(c["grade"] == "self-attested" for c in entry["result"]["claims"])
+    verify_layer_tally(doc)
+    # Mutant: one claim relabelled witnessed in the document. Still valid Result v0.
+    entry["result"]["claims"][0]["grade"] = "witnessed"
+    validate_against_schema(entry["result"])
+    with pytest.raises(ResultError, match="self-reported layer and graded 'witnessed'"):
+        verify_layer_tally(doc)
+
+
+def test_self_reported_layer_refuses_a_witnessed_observation():
+    witnessed = LayerObservation("a1", "hold", "witnessed", "SATISFIED", "met", (EVIDENCE,))
+    with pytest.raises(ResultError, match="must be self-attested"):
+        _tally(layers=[*LAYERS, HOLD], observations=[*OBSERVATIONS, witnessed])
+    with pytest.raises(ResultError, match="self-reported"):
+        _tally(invocation=LayerSpec("invoked", "layer:invoked", "recomputed"))
 
 
 def test_gate_unsettled_and_missing_observation_are_not_evaluable():

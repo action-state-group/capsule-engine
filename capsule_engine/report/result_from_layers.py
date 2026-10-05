@@ -32,9 +32,15 @@ action is ``not_evaluable`` here too. An action that reaches a layer with
 no observation is ``not_evaluable`` with sufficiency ``UNKNOWN``: no
 observed check is never a ``met``.
 
-Grades: invocation claims are ``self-attested`` -- reconcile reads the
-agent host's own records on the agent's own machine and carries no witness
-state. Observations carry the grade the caller read off the sealed record.
+Grades: a layer whose population is a party's own report is configured
+``self_reported``, and every claim on it is ``self-attested`` -- the count
+is a lower bound on what happened, however tamper-evident the record. The
+invocation layer is always self-reported: reconcile reads the agent host's
+own records on the agent's own machine, so it must be configured that way,
+and every invocation claim cites the digest of the executions file
+reconcile read (``executions_sha256``) as its first evidence. On other
+layers, observations carry the grade the caller read off the sealed record;
+on a self-reported layer, any grade but ``self-attested`` is refused.
 A ``judged`` layer must name its judge pin, which every claim of that layer
 carries as its first evidence digest; a ``recomputed`` layer must not.
 """
@@ -105,6 +111,8 @@ class ReconcileCounts(TypedDict):
 class ReconcileSource(ReconcileCounts):
     kind: str
     failed_attempts: int
+    # SHA-256 of the executions file the reconcile pass read.
+    executions_sha256: str
     # The reconcile report's own ``coverage`` block, carried verbatim:
     # ``cannot_see`` is checked non-empty, the rest is the pass's wording.
     coverage: Mapping[str, object]
@@ -123,6 +131,7 @@ class LayerEntry(TypedDict):
     tier: str
     gate: NotRequired[str]
     judge_pin: NotRequired[str]
+    self_reported: bool
     coverage: CoverageCounts
     # A Result v0 document, as ``EvidenceResult.to_dict`` returns it.
     result: dict | None
@@ -163,6 +172,7 @@ class LayerSpec:
     tier: str
     gate: str | None = None
     judge_pin: str | None = None
+    self_reported: bool = False
 
     def __post_init__(self) -> None:
         if not self.layer_id or not self.requirement_ref:
@@ -313,6 +323,7 @@ class LayerAggregate:
         out = LayerEntry(
             layer=self.spec.layer_id,
             tier=self.spec.tier,
+            self_reported=self.spec.self_reported,
             coverage=CoverageCounts(
                 evaluated_population=self.coverage.evaluated_population,
                 excluded_not_applicable=self.coverage.excluded_not_applicable,
@@ -332,6 +343,7 @@ class LayerTally:
     generated_at: str
     tool_name: str
     tool_version: str
+    executions_sha256: str
     reconcile: ReconcileReport
     layers: tuple[LayerAggregate, ...]
 
@@ -340,6 +352,7 @@ class LayerTally:
             kind="deal-reconcile",
             **self.reconcile.counts,
             failed_attempts=len(self.reconcile.failed_attempts),
+            executions_sha256=self.executions_sha256,
             coverage=dict(self.reconcile.coverage),
         )
         return LayerTallyDoc(
@@ -352,13 +365,16 @@ class LayerTally:
         )
 
 
-def _invocation_claims(report: ReconcileReport, spec: LayerSpec, contract_ref: str) -> dict[str, Claim]:
+def _invocation_claims(
+    report: ReconcileReport, spec: LayerSpec, contract_ref: str, executions_sha256: str
+) -> dict[str, Claim]:
     claims: dict[str, Claim] = {}
 
     def claim(row: ReconcileRow, sufficiency: str, verdict: str, presentation_status: str) -> Claim:
-        # The row digest covers the whole row, capsule_id included; the
-        # capsule_id is also cited on its own when it is itself a digest.
-        digests = [row.digest]
+        # The executions file first: it is what the count is a lower bound
+        # over. The row digest covers the whole row, capsule_id included;
+        # the capsule_id is also cited on its own when it is itself a digest.
+        digests = [executions_sha256, row.digest]
         if row.capsule_id is not None and _HEX64.match(row.capsule_id):
             digests.append(row.capsule_id)
         evidence = tuple(DigestRef(digest=d) for d in digests)
@@ -450,22 +466,27 @@ def build_layer_tally(
     generated_at: str,
     tool_name: str,
     tool_version: str,
+    executions_sha256: str,
     not_applicable: Collection[ActionLayer] = (),
 ) -> LayerTally:
     """Build one Result per layer: ``invocation`` first, read off the
     ``deal reconcile`` JSON ``reconcile``; then each of ``layers`` from
     ``observations``. ``not_applicable`` names (action, layer) pairs the
     caller saw the layer not apply to (for example, no disposition was
-    returned), each counted as excluded, never as a claim."""
+    returned), each counted as excluded, never as a claim.
+    ``executions_sha256`` is the SHA-256 of the executions file the
+    reconcile pass read; reconcile's JSON does not carry it."""
     _check_rfc3339("generated_at", generated_at)
     if not tool_name or not tool_version:
         raise _tally_error("tool_name and tool_version must be non-empty: the version under test is part of the artifact")
-    if invocation.gate is not None or invocation.tier != "recomputed":
-        raise _tally_error("the invocation layer is recomputed from the reconcile report and has no gate")
+    if invocation.gate is not None or invocation.tier != "recomputed" or not invocation.self_reported:
+        raise _tally_error("the invocation layer is recomputed from the reconcile report, self-reported, and has no gate")
+    DigestRef(digest=executions_sha256)
     report = ReconcileReport.from_json(reconcile)
     actions = report.action_ids
 
     known = {invocation.layer_id}
+    specs = {spec.layer_id: spec for spec in layers}
     for spec in layers:
         if spec.layer_id in known:
             raise _tally_error(f"layer {spec.layer_id!r} appears more than once")
@@ -483,6 +504,8 @@ def build_layer_tally(
             raise _tally_error(f"observation for {pair} names no configured layer or no consequential action")
         if pair in by_pair:
             raise _tally_error(f"two observations for {pair}")
+        if specs[obs.layer_id].self_reported and obs.grade != "self-attested":
+            raise _tally_error(f"{pair} is on a self-reported layer and must be self-attested, got {obs.grade!r}")
         by_pair[pair] = obs
     skipped = {ActionLayer(*p) for p in not_applicable}
     for pair in skipped:
@@ -493,7 +516,7 @@ def build_layer_tally(
 
     # Per action, the verdict each layer reached, or None when excluded.
     outcome: dict[str, dict[str, str | None]] = {a: {} for a in actions}
-    invocation_claims = _invocation_claims(report, invocation, contract_ref)
+    invocation_claims = _invocation_claims(report, invocation, contract_ref, executions_sha256)
     for action_id, claim in invocation_claims.items():
         outcome[action_id][invocation.layer_id] = claim.verdict
     aggregates = [
@@ -533,6 +556,7 @@ def build_layer_tally(
         generated_at=generated_at,
         tool_name=tool_name,
         tool_version=tool_version,
+        executions_sha256=executions_sha256,
         reconcile=report,
         layers=tuple(aggregates),
     )
@@ -566,6 +590,9 @@ def verify_layer_tally(doc: Mapping[str, object]) -> None:
     cannot_see = coverage.get("cannot_see") if isinstance(coverage, dict) else None
     if not isinstance(cannot_see, list) or not cannot_see:
         raise _tally_error("source.coverage.cannot_see must be carried, non-empty")
+    executions = source.get("executions_sha256") if isinstance(source, dict) else None
+    if not isinstance(executions, str) or not _HEX64.match(executions):
+        raise _tally_error("source.executions_sha256 must be a SHA-256 hex digest")
     layers = doc.get("layers")
     if not isinstance(layers, list) or not layers:
         raise _tally_error("layers must be a non-empty list")
@@ -601,7 +628,18 @@ def verify_layer_tally(doc: Mapping[str, object]) -> None:
             raise _tally_error(f"layer {layer_id!r} is judged and names no judge pin")
         if tier == "recomputed" and pin is not None:
             raise _tally_error(f"layer {layer_id!r} is recomputed and carries a judge pin")
+        self_reported = entry.get("self_reported")
+        if not isinstance(self_reported, bool):
+            raise _tally_error(f"layer {layer_id!r} must state self_reported")
+        # The invocation layer is the one with no gate: it is a lower bound
+        # over the executions file, which every one of its claims cites first.
+        if "gate" not in entry and (not self_reported or any(
+            not c["evidence"] or c["evidence"][0]["digest"] != executions for c in claims
+        )):
+            raise _tally_error(f"invocation layer {layer_id!r} must be self-reported and cite the executions file first")
         for claim in claims:
+            if self_reported and claim["grade"] != "self-attested":
+                raise _tally_error(f"claim {claim['id']!r} is on a self-reported layer and graded {claim['grade']!r}")
             if claim["tier"] != tier:
                 raise _tally_error(f"claim {claim['id']!r} tier {claim['tier']!r} differs from layer tier {tier!r}")
             if pin is not None and (not claim["evidence"] or claim["evidence"][0]["digest"] != pin):
