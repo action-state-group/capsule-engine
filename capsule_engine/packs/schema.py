@@ -219,7 +219,7 @@ EVIDENCE_PROFILE_VALUES = frozenset(
 # contract belongs to. The closed set is owned by the Internet-Draft
 # draft-mih-agent-evidence-layer-00, section 4.1 "Epistemic Type" (interim
 # registry: agent-action-capsule spec/REGISTRY.md section 17), lower-case as
-# it spells them; schemas/vendor/epistemic-types.json is the vendored copy.
+# it spells them; capsule_engine/schemas/vendor/epistemic-types.json is the vendored copy.
 EPISTEMIC_TYPE_VALUES = frozenset(
     {
         "observed_event",
@@ -522,7 +522,7 @@ class EvidenceContract:
         """The JCS-canonicalizable form of one Evidence Contract entry --
         the same dict shape ``PackDefinition.canonical_dict()`` cites for
         each of its ``outcomes``, extracted here so it has exactly one
-        author (schema validation, e.g. ``schemas/evidence-contract-v0.json``,
+        author (schema validation, e.g. ``capsule_engine/schemas/evidence-contract-v0.json``,
         cross-checks THIS method's output, not a second hand-rolled copy).
         Every optional field is omitted at its documented default, same
         convention as every other ``canonical_dict``/``to_dict`` in this

@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""Validator entry point for ``schemas/evidence-contract-v0.json``.
+"""Validator entry point for ``capsule_engine/schemas/evidence-contract-v0.json``.
 
 This module is deliberately independent of the pack loader (``loader.py``):
 it validates a *file on disk* against the Evidence Contract JSON Schema, the
@@ -17,12 +17,15 @@ from __future__ import annotations
 import json
 import sys
 from dataclasses import dataclass
+from importlib import resources
 from pathlib import Path
 from typing import Any
 
 import jsonschema
 
-SCHEMA_PATH = Path(__file__).resolve().parents[2] / "schemas" / "evidence-contract-v0.json"
+# Resolved inside the installed package, so it is present in a wheel install
+# and not only in a source checkout (scripts/clean_room_wheel.sh checks this).
+SCHEMA_PATH = resources.files("capsule_engine") / "schemas" / "evidence-contract-v0.json"
 
 __all__ = [
     "SCHEMA_PATH",
@@ -36,7 +39,7 @@ __all__ = [
 
 
 def load_schema() -> dict[str, Any]:
-    return json.loads(SCHEMA_PATH.read_text())
+    return json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
 
 
 def _validator_for(pointer: str) -> jsonschema.Draft202012Validator:

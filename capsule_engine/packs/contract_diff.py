@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""Versioning and diff rules for ``schemas/evidence-contract-v0.json``.
+"""Versioning and diff rules for ``capsule_engine/schemas/evidence-contract-v0.json``.
 
 Two things live here:
 
