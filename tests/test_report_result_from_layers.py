@@ -3,10 +3,11 @@
 ``deal reconcile`` report and per-action layer observations.
 
 ``RECONCILE`` below is a TEST FIXTURE written in the shape of the JSON that
-``capsulectl deal reconcile`` prints at tag v0.1.0-rc5 (internal/cli/
-deal_reconcile.go, ``reconcileDeals``). It is not the output of any run: the
-ids, times and digests are made up, and the ``cannot_see`` lines are copied
-from that version's constants so the shape is exact.
+``capsulectl deal reconcile`` prints at tag v0.1.0-rc6 (internal/cli/
+deal_reconcile.go, ``reconcileDeals``, unchanged since rc5). It is not the
+output of any run: the ids, times and digests are made up, and the
+``cannot_see`` lines are copied from that version's constants so the shape
+is exact.
 """
 from __future__ import annotations
 
@@ -34,7 +35,7 @@ from capsule_engine.report.result_from_layers import (
 
 CONTRACT_REF = "ec:example-layers:2026-10-04@1"
 GENERATED_AT = "2026-10-04T23:00:00Z"
-TOOL = {"tool_name": "capsulectl", "tool_version": "v0.1.0-rc5"}
+TOOL = {"tool_name": "capsulectl", "tool_version": "v0.1.0-rc6"}
 JUDGE_PIN = "a" * 64
 EVIDENCE = "b" * 64
 
@@ -140,7 +141,7 @@ def test_five_layers_five_results_each_valid_and_verified():
 def test_date_and_version_are_in_the_artifact():
     doc = _tally()
     assert doc["generated_at"] == GENERATED_AT
-    assert doc["tool"] == {"name": "capsulectl", "version": "v0.1.0-rc5"}
+    assert doc["tool"] == {"name": "capsulectl", "version": "v0.1.0-rc6"}
     assert all(e["result"]["generated_at"] == GENERATED_AT for e in doc["layers"])
     with pytest.raises(ResultError) as exc:
         _tally(tool_version="")
@@ -246,7 +247,7 @@ def test_zero_denominator_is_stated_never_a_pass():
     line = next(ln for ln in render_layer_tally(doc) if ln.startswith("extracted:"))
     assert line.startswith("extracted: 0 evaluated (denominator 0), no result · 3 excluded as not applicable")
     assert "met of" not in line and "pass" not in line.lower()
-    assert GENERATED_AT in line and "v0.1.0-rc5" in line
+    assert GENERATED_AT in line and "v0.1.0-rc6" in line
     # Mutant: a null result claiming a non-zero population is refused.
     extracted["coverage"]["evaluated_population"] = 3
     with pytest.raises(ResultError) as exc:
@@ -282,23 +283,48 @@ def test_cannot_see_is_carried_and_rendered():
     assert doc["source"]["coverage"]["cannot_see"] == CANNOT_SEE
     lines = render_layer_tally(doc)
     assert lines[lines.index("cannot see:") + 1 :] == [f"- {gap}" for gap in CANNOT_SEE]
-    # Mutant: drop it from the document.
-    doc["source"]["coverage"]["cannot_see"] = []
-    with pytest.raises(ResultError) as exc:
+
+
+@pytest.mark.parametrize(
+    "mutate",
+    [
+        pytest.param(lambda cov: cov.pop("cannot_see"), id="missing"),
+        pytest.param(lambda cov: cov.__setitem__("cannot_see", []), id="empty"),
+        pytest.param(lambda cov: cov.__setitem__("cannot_see", "one gap"), id="not-a-list"),
+        pytest.param(lambda cov: cov.__setitem__("cannot_see", [*CANNOT_SEE, 7]), id="non-string-item"),
+        pytest.param(lambda cov: cov.__setitem__("cannot_see", [*CANNOT_SEE, ""]), id="empty-string-item"),
+    ],
+)
+def test_reconcile_report_without_cannot_see_is_refused(mutate):
+    reconcile = copy.deepcopy(RECONCILE)
+    mutate(reconcile["coverage"])
+    with pytest.raises(ResultError, match="cannot_see") as exc:
+        _tally(reconcile=reconcile)
+    assert exc.value.reason == INVALID_LAYER_TALLY
+
+
+@pytest.mark.parametrize(
+    "mutate",
+    [
+        pytest.param(lambda doc: doc["source"]["coverage"].pop("cannot_see"), id="removed"),
+        pytest.param(lambda doc: doc["source"]["coverage"].__setitem__("cannot_see", []), id="emptied"),
+        pytest.param(lambda doc: doc["source"].pop("coverage"), id="coverage-removed"),
+    ],
+)
+def test_tally_without_cannot_see_does_not_verify(mutate):
+    doc = _tally()
+    verify_layer_tally(doc)
+    mutate(doc)
+    with pytest.raises(ResultError, match="cannot_see") as exc:
         verify_layer_tally(doc)
     assert exc.value.reason == INVALID_LAYER_TALLY
-    # A reconcile report without it is refused at input.
-    reconcile = copy.deepcopy(RECONCILE)
-    del reconcile["coverage"]["cannot_see"]
-    with pytest.raises(ResultError):
-        _tally(reconcile=reconcile)
 
 
 def test_render_states_each_layer_denominator():
     lines = render_layer_tally(_tally())
     assert lines[0] == (
         "invoked: 2 met of 4 evaluated · 1 not met · 1 not evaluable (1 unknown) · "
-        "2 excluded as not applicable · recomputed · 2026-10-04T23:00:00Z · capsulectl v0.1.0-rc5"
+        "2 excluded as not applicable · recomputed · 2026-10-04T23:00:00Z · capsulectl v0.1.0-rc6"
     )
 
 
