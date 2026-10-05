@@ -153,6 +153,8 @@ def _payload_extension(action: Action, checkpoint: dict, manifest_digest: str | 
         ext["rail"] = action.rail
     if action.counterparty_account_ref is not None:
         ext["counterparty_account_ref"] = action.counterparty_account_ref
+    if action.recurrence is not None:
+        ext["recurrence"] = action.recurrence
     if manifest_digest is not None:
         ext["manifest_digest"] = manifest_digest
     return ext

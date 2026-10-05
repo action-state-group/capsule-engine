@@ -44,11 +44,17 @@ obligations:
       the content.
     check: credential_pattern
     default_disposition: NEVER
+  - id: recurring-charge
+    statement: >-
+      Flags a payment that sets up a repeating charge, and records the
+      recurrence the payment declared.
+    check: recurring_charge
+    default_disposition: ASK
 
 action_semantics:
   - action_type: payment.make
     action_class: money.transfer
-    required_fields: [amount_minor, currency, target, rail, counterparty_account_ref]
+    required_fields: [amount_minor, currency, target, rail, counterparty_account_ref, recurrence]
     optional_fields: [equivalence_key, outgoing_content]
     field_aliases:
       target: payee_ref
@@ -68,6 +74,8 @@ constraints:
     digest: 0cfb1cb380b355abb88ea385334f3bb31f2e145269a2768022f85005665fc6fe
   - wicket_ref: credential_pattern/1.0.0
     digest: 3617fdcaa39c03cf70a3254490328ccee5eaac0faba7cd52d9e3dc3fc50336c0
+  - wicket_ref: recurring_charge/1.0.0
+    digest: ea4ae204e5dc33f3a28e5e15471f404f20d4f8fca193d355a099a4a7e08b082e
 
 folds:
   - fold_ref: spend.weekly/1.0.0
@@ -104,5 +112,7 @@ fixtures:
       outcome: allow
     - id: out-of-scope-action
       outcome: allow
+    - id: recurring-charge-set-up
+      outcome: deny
 
 bootstrap: AI-BOOTSTRAP.md

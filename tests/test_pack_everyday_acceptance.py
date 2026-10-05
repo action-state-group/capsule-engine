@@ -36,6 +36,7 @@ def _signer() -> LocalSigner:
 
 
 def _payment(name: str, minute: int, developer: str, **fields) -> Action:
+    fields.setdefault("recurrence", "one_time")
     return Action(
         verb="make_payment",
         operator=OPERATOR,
@@ -107,6 +108,9 @@ def _scenarios() -> list[tuple[str, Action, str]]:
         ("out-of-scope-action", Action(verb="check_balance", operator=OPERATOR, developer="household-assistant-g@v1",
          action_class="info.query", target="bank/account-summary",
          action_id="check_balance/everyday-fixture-out-of-scope", timestamp="2026-08-10T10:13:00Z"), ALLOW),
+        ("recurring-charge-set-up", _payment("recurring-charge", 14, "household-assistant-h@v1", amount_minor=1_299,
+         target="service/streaming", rail="card", counterparty_account_ref="acct-ref-streaming-1",
+         recurrence="monthly"), DENY),
     ]
 
 

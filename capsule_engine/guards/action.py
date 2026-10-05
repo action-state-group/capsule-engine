@@ -41,6 +41,8 @@ class Action:
     never a raw account number, because it is recorded on the capsule.
     ``outgoing_content`` is text the action sends out, read by
     ``credential_pattern``; it is never written to the capsule.
+    ``recurrence`` says whether a payment repeats (e.g. ``"one_time"``,
+    ``"monthly"``), read by ``recurring_charge``.
     """
 
     verb: str
@@ -60,6 +62,7 @@ class Action:
     rail: str | None = None
     counterparty_account_ref: str | None = None
     outgoing_content: str | None = None
+    recurrence: str | None = None
     extra: dict = field(default_factory=dict)
 
     def resolved_action_id(self) -> str:
@@ -108,4 +111,5 @@ class Action:
             cited_mandate_capsule_id=cited_mandate_capsule_id,
             rail=payload.get("rail"),
             counterparty_account_ref=payload.get("counterparty_account_ref"),
+            recurrence=payload.get("recurrence"),
         )

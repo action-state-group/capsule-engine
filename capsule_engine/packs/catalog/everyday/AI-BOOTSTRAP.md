@@ -7,7 +7,7 @@ whose payment and messaging code you want covered by the `everyday` pack.
 
 You are helping me wire `capsule-engine`'s `everyday` pack into this
 codebase. The pack records a decision for each payment and each outgoing
-message an assistant makes on a household's behalf, and runs five
+message an assistant makes on a household's behalf, and runs six
 deterministic checks over the recorded fields. It governs two action types:
 
 - `payment.make`, mapped to the `money.transfer` guard class;
@@ -24,6 +24,7 @@ invent others):
 | `rail` | `destination_rail` | the payment rail, e.g. `"card"`, `"bank_transfer"`, `"p2p"`, `"gift_card"`, `"crypto"` |
 | `counterparty_account_ref` | `counterparty_identity_change` | an opaque reference to the account the payee is paid into -- a digest or token, never a raw account number, because it is recorded |
 | `outgoing_content` | `credential_pattern` | the text the action sends; it is matched and then discarded, never recorded |
+| `recurrence` | `recurring_charge` | whether the payment repeats: `"one_time"`, or e.g. `"monthly"` for a subscription |
 | `equivalence_key` | `dedupe` | optional: your own idempotency key, if two payments to one payee are genuinely different payments (two monthly bills) |
 
 **The checks** (each one is a wicket cited by digest from the engine's own
@@ -39,6 +40,8 @@ catalog):
    the payee's account is compared with the one last recorded for that payee.
 5. `credential_pattern` (`credential_pattern/1.0.0`) -- outgoing content is
    matched against one-time-code, password and card-security-code patterns.
+6. `recurring_charge` (`recurring_charge/1.0.0`) -- a payment whose
+   declared recurrence is not one-time is flagged.
 
 **When a check does not settle.** A check that could not be evaluated
 records `n/a` with a small facts object `{constraint_id, in_scope,

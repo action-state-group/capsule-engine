@@ -18,6 +18,7 @@ from .credential_pattern import check_credential_pattern
 from .dedupe import check_dedupe
 from .destination_rail import check_destination_rail
 from .plan_containment import check_plan_containment
+from .recurring_charge import check_recurring_charge
 from .verify_before_dispatch import check_verify_before_dispatch
 
 CONFIGURED_CHECKS: dict[str, Callable[[Action, LedgerAPI, dict], CheckOutcome]] = {
@@ -30,6 +31,9 @@ CONFIGURED_CHECKS: dict[str, Callable[[Action, LedgerAPI, dict], CheckOutcome]] 
     "credential_pattern": lambda action, ledger, config: check_credential_pattern(
         action, patterns=config["patterns"]
     ),
+    "recurring_charge": lambda action, ledger, config: check_recurring_charge(
+        action, one_time_values=config["one_time_values"], action_classes=config["action_classes"]
+    ),
 }
 
 __all__ = [
@@ -41,5 +45,6 @@ __all__ = [
     "check_dedupe",
     "check_destination_rail",
     "check_plan_containment",
+    "check_recurring_charge",
     "check_verify_before_dispatch",
 ]

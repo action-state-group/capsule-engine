@@ -15,6 +15,7 @@ from capsule_engine.guards.checks import (
     check_counterparty_identity_change,
     check_credential_pattern,
     check_destination_rail,
+    check_recurring_charge,
 )
 from capsule_engine.guards.wickets import load_definition_file
 
@@ -22,6 +23,7 @@ CATALOG = Path(__file__).parent.parent / "capsule_engine" / "guards" / "wickets"
 RAIL = load_definition_file(CATALOG / "destination_rail.yaml")
 IDENTITY = load_definition_file(CATALOG / "counterparty_identity_change.yaml")
 CREDENTIAL = load_definition_file(CATALOG / "credential_pattern.yaml")
+RECURRING = load_definition_file(CATALOG / "recurring_charge.yaml")
 
 
 def _action(**overrides) -> Action:
@@ -183,6 +185,41 @@ def test_counterparty_identity_change_names_the_missing_field(store, overrides, 
     out = check_counterparty_identity_change(_action(**overrides), store, action_classes=["money.transfer"]).constraint
     assert out.result == "n/a"
     assert out.evidence == not_applicable_evidence("counterparty_identity_change", in_scope=True, missing_field=missing)
+
+
+# -- recurring_charge ----------------------------------------------------------
+
+
+def _recurring(action: Action):
+    return check_recurring_charge(
+        action, one_time_values=RECURRING.config["one_time_values"], action_classes=RECURRING.config["action_classes"]
+    ).constraint
+
+
+def test_recurring_charge_fails_on_a_repeating_charge_and_passes_one_time():
+    repeating = _recurring(_action(recurrence="monthly"))
+    assert repeating.result == "fail"
+    assert repeating.evidence == {"recurrence": "monthly", "one_time_values": ["one_time"]}
+    assert _recurring(_action(recurrence="one_time")).result == "pass"
+
+
+def test_recurring_charge_without_a_recurrence_names_the_missing_field():
+    out = _recurring(_action())
+    assert out.result == "n/a"
+    assert out.evidence == not_applicable_evidence("recurring_charge", in_scope=True, missing_field="recurrence")
+
+
+def test_recurring_charge_outside_its_action_classes_is_out_of_scope():
+    out = _recurring(_action(action_class="info.query", recurrence="monthly"))
+    assert out.result == "n/a"
+    assert out.evidence == not_applicable_evidence("recurring_charge", in_scope=False)
+
+
+def test_recurrence_is_recorded_on_the_capsule(store, caps_fold, signer):
+    engine = _engine(store, caps_fold, signer, RECURRING)
+    capsule = engine.check(_action(recurrence="monthly", action_id="pay/rc1"), dry_run=True).capsule
+    assert capsule["asg_payload"]["recurrence"] == "monthly"
+    assert _record_for(capsule, "recurring_charge")["result"] == "fail"
 
 
 # -- GuardEngine wiring ----------------------------------------------------------

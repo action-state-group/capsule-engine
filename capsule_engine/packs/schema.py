@@ -120,6 +120,7 @@ NORMALIZED_ACTION_FIELDS = frozenset(
         "rail",
         "counterparty_account_ref",
         "outgoing_content",
+        "recurrence",
     }
 )
 

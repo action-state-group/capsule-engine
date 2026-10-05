@@ -29,11 +29,12 @@ EXPECTED_DIGESTS = {
     "verify_before_dispatch/1.0.0": "a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c",
     "caps_holds/1.0.0": "86a07c5c2739502b1211dbb1c73df0d6950f91ba454ff151ff32cb6946fc21f6",
     "hold_reconcile/1.0.0": "cf6f76b1aeb1d705f90f89c97667c2db035e697211f7f7dc0f8455c54acaec74",
-    # The three configured checks the everyday pack cites (guards/checks/
+    # The configured checks the everyday pack cites (guards/checks/
     # __init__.py CONFIGURED_CHECKS).
     "destination_rail/1.0.0": "4d76251eba138b37e6be3e83390072315ebcea42cd8d790f7e9765ecf1f63429",
     "counterparty_identity_change/1.0.0": "0cfb1cb380b355abb88ea385334f3bb31f2e145269a2768022f85005665fc6fe",
     "credential_pattern/1.0.0": "3617fdcaa39c03cf70a3254490328ccee5eaac0faba7cd52d9e3dc3fc50336c0",
+    "recurring_charge/1.0.0": "ea4ae204e5dc33f3a28e5e15471f404f20d4f8fca193d355a099a4a7e08b082e",
 }
 
 
