@@ -15,8 +15,9 @@ FACT/RULE/JUDGED/CONFIRM/DOC as its own "Evidence-class -> schema mapping" comme
 (mode: FACT -> structural/value, RULE -> structural, JUDGED -> judged, CONFIRM ->
 structural + an external-confirmation evidence_instrument, DOC -> structural,
 presence-by-digest only, never graded "compliant"). This register adds exactly one
-class that pack didn't need: STATE, for a live system-of-record read (doc1
-"Evidence Fabric Architecture v2" Section 4's system_of_record_fact epistemic type,
+class that pack didn't need: STATE, for a live system-of-record read (the
+``system_of_record_fact`` epistemic type of draft-mih-agent-evidence-layer-00
+section 4.1, registered in agent-action-capsule spec/REGISTRY.md section 17;
 e.g. "payment state == settled") -- a claim that needs a record which doesn't
 exist in a capsule at seal time, same shape as FACT/DOC, but about EXTERNAL system
 state rather than the agent's own sealed action stream. ``compiler.
