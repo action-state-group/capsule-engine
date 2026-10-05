@@ -17,6 +17,7 @@ fixture nobody re-derives.
 """
 from __future__ import annotations
 
+import dataclasses
 import json
 from datetime import datetime, timezone
 from pathlib import Path
@@ -111,13 +112,28 @@ def test_not_met_fold_verdict_projects_to_satisfied_not_met_claim(three_checkpoi
     assert claim.verdict == "not_met"
 
 
-def test_insufficient_evidence_fold_verdict_projects_to_insufficient_not_evaluable_claim(three_checkpoint_segment):
+def test_not_evaluable_fold_verdict_projects_to_insufficient_not_evaluable_claim(three_checkpoint_segment):
     segment, _ = three_checkpoint_segment
     result = evaluate_retention_continuity(segment, as_of=_now(), window_days=183)
-    assert result.verdict == "insufficient_evidence"
+    assert result.verdict == "not_evaluable"
 
     claim = claim_from_retention_continuity(
         result, segment, claim_id="c3", contract_ref=CONTRACT_REF, requirement_ref="req-retention-6mo"
+    )
+    assert claim.sufficiency == "INSUFFICIENT"
+    assert claim.verdict == "not_evaluable"
+
+
+def test_legacy_insufficient_evidence_spelling_still_projects_to_not_evaluable(three_checkpoint_segment):
+    """A fold result carrying the retired spelling (written before the
+    rename) is read as its alias and projected under the one canonical
+    spelling, never refused and never passed through."""
+    segment, _ = three_checkpoint_segment
+    current = evaluate_retention_continuity(segment, as_of=_now(), window_days=183)
+    legacy = dataclasses.replace(current, verdict="insufficient_evidence")
+
+    claim = claim_from_retention_continuity(
+        legacy, segment, claim_id="c3", contract_ref=CONTRACT_REF, requirement_ref="req-retention-6mo"
     )
     assert claim.sufficiency == "INSUFFICIENT"
     assert claim.verdict == "not_evaluable"
