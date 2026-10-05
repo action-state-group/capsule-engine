@@ -39,6 +39,7 @@ MISSING_REFUSAL_REASON = "missing_refusal_reason"
 EFFECT_CLAIM_NOT_REFUSED = "effect_claim_not_refused"
 UNKNOWN_EFFECT_CLAIM = "unknown_effect_claim"
 INVALID_RE_DERIVABILITY_GRADE = "invalid_re_derivability_grade"
+INVALID_DEFAULT_DISPOSITION = "invalid_default_disposition"
 INVALID_SCOPE_CENSUS = "invalid_scope_census"
 
 # tier: whether an outcome

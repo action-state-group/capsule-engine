@@ -70,6 +70,7 @@ from .errors import (
     INVALID_CLAUSE,
     INVALID_CONSTRAINT,
     INVALID_COUNTERPARTY_BINDING,
+    INVALID_DEFAULT_DISPOSITION,
     INVALID_EPISTEMIC_TYPE,
     INVALID_EVIDENCE_INSTRUMENT,
     INVALID_EVIDENCE_PROFILE,
@@ -104,6 +105,7 @@ from .errors import (
     PackDefinitionError,
 )
 from .schema import (
+    DEFAULT_DISPOSITION_VALUES,
     EPISTEMIC_TYPE_VALUES,
     EVIDENCE_INSTRUMENT_KINDS,
     EVIDENCE_PROFILE_VALUES,
@@ -219,8 +221,21 @@ def _parse_obligations(
                 f"obligations[{obligation_id!r}].re_derivability_grade={re_derivability_grade!r} must be one of "
                 f"{sorted(RE_DERIVABILITY_GRADES)}, or omitted",
             )
+        default_disposition = entry.get("default_disposition")
+        if default_disposition is not None and default_disposition not in DEFAULT_DISPOSITION_VALUES:
+            raise PackDefinitionError(
+                INVALID_DEFAULT_DISPOSITION,
+                f"obligations[{obligation_id!r}].default_disposition={default_disposition!r} must be one of "
+                f"{sorted(DEFAULT_DISPOSITION_VALUES)}, or omitted",
+            )
         obligations.append(
-            Obligation(id=obligation_id, statement=statement, check=check, re_derivability_grade=re_derivability_grade)
+            Obligation(
+                id=obligation_id,
+                statement=statement,
+                check=check,
+                re_derivability_grade=re_derivability_grade,
+                default_disposition=default_disposition,
+            )
         )
     return tuple(obligations)
 
