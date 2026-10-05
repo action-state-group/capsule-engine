@@ -47,10 +47,10 @@ def test_gated_event_with_no_prior_disclosure_is_not_met():
     assert "no prior disclosure" in result.sessions[0].detail
 
 
-def test_gated_event_not_yet_reached_is_insufficient_evidence_not_a_grade():
+def test_gated_event_not_yet_reached_is_not_evaluable_not_a_grade():
     records = [_disclosure("s1", 0)]
     result = evaluate_ordering(records, session_key="session_id", before=_is_disclosure, after=_is_first_turn)
-    assert result.sessions[0].verdict == "insufficient_evidence"
+    assert result.sessions[0].verdict == "not_evaluable"
 
 
 def test_missing_session_key_is_skipped_not_an_error():

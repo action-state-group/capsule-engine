@@ -21,9 +21,18 @@ def test_all_registered_kinds_present_is_met():
     assert result.missing == frozenset()
 
 
-def test_empty_registered_kinds_is_not_applicable_not_a_vacuous_met():
+def test_empty_registered_kinds_is_a_population_exclusion_not_a_verdict():
+    """Nothing declared means the requirement is excluded from the evaluated
+    population: no verdict at all, and in particular never a vacuous met."""
     result = evaluate_record_type_coverage(_records(["anything"]), registered_kinds=frozenset())
-    assert result.verdict == "not_applicable"
+    assert result.applicable is False
+    assert result.verdict is None
+
+
+def test_declared_kinds_are_applicable_and_carry_a_verdict():
+    result = evaluate_record_type_coverage([], registered_kinds=REGISTERED)
+    assert result.applicable is True
+    assert result.verdict == "not_met"
 
 
 def test_no_records_with_registered_kinds_is_not_met():

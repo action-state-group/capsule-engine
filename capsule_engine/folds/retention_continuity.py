@@ -35,7 +35,7 @@ def _parse_timestamp(ts: str) -> datetime:
 
 @dataclass(frozen=True)
 class RetentionContinuityResult:
-    verdict: str  # "met" | "not_met" | "insufficient_evidence"
+    verdict: str  # "met" | "not_met" | "not_evaluable"
     continuity: str
     history_depth: int
     witnessed: str
@@ -58,7 +58,7 @@ def evaluate_retention_continuity(
     it, it does not select the range itself.
 
     ``not_met`` when the chain is broken anywhere in the segment.
-    ``insufficient_evidence`` when the chain is sound but has not yet
+    ``not_evaluable`` when the chain is sound but has not yet
     accumulated ``window_days`` of history (a young log is never graded a
     failure for its own youth). ``met`` otherwise, and additionally requires
     at least one witnessed checkpoint in the segment when
@@ -81,7 +81,7 @@ def evaluate_retention_continuity(
 
     if _parse_timestamp(earliest) > window_start:
         return RetentionContinuityResult(
-            verdict="insufficient_evidence",
+            verdict="not_evaluable",
             continuity=verify.continuity,
             history_depth=verify.history_depth,
             witnessed=verify.witnessed,

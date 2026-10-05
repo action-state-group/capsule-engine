@@ -23,7 +23,7 @@ discipline):
 * EU-27 — the FRIA artifact precedes the first-use capsule.
 
 A session where the gated (``after``) event has not happened yet is
-``insufficient_evidence`` — never graded a pass or a fail, because the
+``not_evaluable`` — never graded a pass or a fail, because the
 obligation has not been triggered. A session is ``not_met`` only once the
 gated event has occurred without (or after) the required prior disclosure.
 """
@@ -41,7 +41,7 @@ __all__ = ["SessionOrderingResult", "OrderingResult", "evaluate_ordering"]
 @dataclass(frozen=True)
 class SessionOrderingResult:
     session: Any
-    verdict: str  # "met" | "not_met" | "insufficient_evidence"
+    verdict: str  # "met" | "not_met" | "not_evaluable"
     detail: str
 
 
@@ -111,7 +111,7 @@ def evaluate_ordering(
             sessions.append(
                 SessionOrderingResult(
                     session=session,
-                    verdict="insufficient_evidence",
+                    verdict="not_evaluable",
                     detail="the gated event has not occurred yet in this session",
                 )
             )
