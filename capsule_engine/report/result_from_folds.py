@@ -35,6 +35,7 @@ __all__ = ["claim_from_retention_continuity", "is_excluded_not_applicable"]
 # otherwise. "insufficient_evidence" is the fold's retired spelling of
 # not_evaluable, still read as an alias for results written before the
 # rename and always projected under the one canonical spelling.
+# Accepted alias, never emitted: removing it breaks reading older results.
 _RETENTION_VERDICT_MAP = {
     "met": ("SATISFIED", "met", "SATISFIED"),
     "not_met": ("SATISFIED", "not_met", "SATISFIED"),
