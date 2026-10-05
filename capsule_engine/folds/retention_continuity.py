@@ -103,7 +103,7 @@ def evaluate_retention_continuity(
                 witnessed=verify.witnessed,
                 earliest_checkpoint_at=earliest,
                 window_days=window_days,
-                detail="witnessed grade requested but no checkpoint in the window carries a verifying witness receipt",
+                detail="grade 'witnessed' requested but no checkpoint in the window carries a verifying witness receipt",
             )
 
     return RetentionContinuityResult(

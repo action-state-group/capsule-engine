@@ -82,7 +82,7 @@ def test_require_witnessed_with_no_witnessing_ts_is_not_met(three_checkpoint_seg
     assert segment.links and all(link.checkpoint.witnesses for link in segment.links)
     result = evaluate_retention_continuity(segment, as_of=_now(), window_days=0, require_witnessed=True)
     assert result.verdict == "not_met"
-    assert "witnessed grade" in result.detail
+    assert "grade 'witnessed'" in result.detail
 
 
 def test_mutant_drop_middle_checkpoint_breaks_continuity(three_checkpoint_segment):

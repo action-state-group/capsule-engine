@@ -211,7 +211,7 @@ def evaluate_requirement_coverage(
                     f"{len(backfilled)} backfilled record(s) satisfy this requirement's matcher, "
                     "but a Committed-or-higher requirement needs log-witnessed time assurance; a "
                     "backfilled record's occurrence-time claim is capped at self_attested unless a "
-                    "references[] entry cites a corroborating witnessed timestamp by digest "
+                    "references[] entry cites a corroborating log-witnessed timestamp by digest "
                     "(citation_purpose=corroborates_source_time) -- none is present here "
                     "(draft-mih-scitt-agent-action-capsule-05 §provenancemode, 'Status cap')"
                 ),
@@ -225,7 +225,10 @@ def evaluate_requirement_coverage(
 
     return RequirementCoverageResult(
         status=STATUS_SATISFIED,
-        detail=f"{len(contemporaneous)} contemporaneous + {len(backfilled)} backfilled record(s) satisfy this requirement",
+        detail=(
+            f"{len(contemporaneous)} record(s) with provenance mode 'contemporaneous' + "
+            f"{len(backfilled)} with 'backfilled' satisfy this requirement"
+        ),
         considered_count=len(records),
         matched_count=len(candidates),
         duplicates_collapsed_count=collapsed,
