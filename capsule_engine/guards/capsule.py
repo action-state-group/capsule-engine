@@ -149,6 +149,10 @@ def _payload_extension(action: Action, checkpoint: dict, manifest_digest: str | 
         ext["target"] = action.target
     if action.action_class is not None:
         ext["action_class"] = action.action_class
+    if action.rail is not None:
+        ext["rail"] = action.rail
+    if action.counterparty_account_ref is not None:
+        ext["counterparty_account_ref"] = action.counterparty_account_ref
     if manifest_digest is not None:
         ext["manifest_digest"] = manifest_digest
     return ext

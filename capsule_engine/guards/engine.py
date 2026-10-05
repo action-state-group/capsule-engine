@@ -19,6 +19,7 @@ from ..folds.definition import FoldDefinition
 from .action import Action
 from .capsule import ALLOW, DENY, ESCALATE, ConstraintOutcome, build_decision_capsule, not_applicable_evidence
 from .checks import (
+    CONFIGURED_CHECKS,
     CheckOutcome,
     check_caps,
     check_dedupe,
@@ -28,6 +29,7 @@ from .checks import (
 from .classes import ActionClass, classify
 from .plan import PlanDefinition
 from .signing import Signer, SigningKeyUnavailable
+from .wickets.definition import WicketDefinition
 
 __all__ = ["GuardDecision", "GuardEngine"]
 
@@ -83,6 +85,7 @@ class GuardEngine:
         checkpoint_age_ms: Callable[[], int] = lambda: 0,
         manifest_digest: str | None = None,
         plan: PlanDefinition | None = None,
+        wickets: tuple[WicketDefinition, ...] = (),
     ) -> None:
         self._ledger = ledger
         self._caps_fold = caps_fold
@@ -100,6 +103,14 @@ class GuardEngine:
         # reports ``n/a`` for every action (same "absent config -> n/a"
         # shape ``caps`` already uses when no per-class cap is configured).
         self._plan = plan
+        # Wickets configuring a ``CONFIGURED_CHECKS`` check, run in this
+        # order after every reference check. Empty by default, so an engine
+        # with none configured produces byte-for-byte the decisions it
+        # always has (same reasoning as ``plan`` above).
+        unknown = [w.check for w in wickets if w.check not in CONFIGURED_CHECKS]
+        if unknown:
+            raise ValueError(f"wickets configure checks the engine cannot run per decision: {unknown}")
+        self._wickets = wickets
         # The active policy manifest's own digest (``capsule_ledger.policy.
         # resolve_manifest(...).manifest_digest``), pinned onto every
         # decision capsule this engine produces (``build_decision_capsule``'s
@@ -250,6 +261,9 @@ class GuardEngine:
             # predates this check) is byte-for-byte unchanged.
             plan_out = check_plan_containment(action, self._plan)
             constraints = (*constraints, plan_out.constraint)
+        for wicket in self._wickets:
+            out = CONFIGURED_CHECKS[wicket.check](action, self._ledger, wicket.config)
+            constraints = (*constraints, out.constraint)
         fold_envelopes = tuple(caps_out.fold_envelopes)
         outcome = _decide(constraints, ac)
 

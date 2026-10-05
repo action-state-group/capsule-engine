@@ -109,7 +109,18 @@ PACK_ID_RE = re.compile(r"^[a-z][a-z0-9_]*/[a-z][a-z0-9_]*(-[a-z0-9_]+)*/\d+\.\d
 # listed here -- they are not something a pack "requires", they are what an
 # action semantic entry itself declares.
 NORMALIZED_ACTION_FIELDS = frozenset(
-    {"amount_minor", "currency", "target", "cited_mandate_capsule_id", "equivalence_key", "model_id", "provider"}
+    {
+        "amount_minor",
+        "currency",
+        "target",
+        "cited_mandate_capsule_id",
+        "equivalence_key",
+        "model_id",
+        "provider",
+        "rail",
+        "counterparty_account_ref",
+        "outgoing_content",
+    }
 )
 
 HOLDS_INTEGRATION_VALUES = frozenset({"none", "stubbed", "built"})

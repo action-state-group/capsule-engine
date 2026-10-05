@@ -33,6 +33,14 @@ class Action:
     is the prior capsule this action claims authorization from, checked by
     ``verify_before_dispatch``. ``equivalence_key`` lets a caller override the
     dedupe check's default equivalence formula for this action.
+
+    ``rail`` names the payment rail or destination type (e.g. ``"card"``,
+    ``"p2p"``), read by ``destination_rail``. ``counterparty_account_ref`` is
+    an opaque reference to the account a counterparty is paid into, read by
+    ``counterparty_identity_change`` -- pass a stable reference or digest,
+    never a raw account number, because it is recorded on the capsule.
+    ``outgoing_content`` is text the action sends out, read by
+    ``credential_pattern``; it is never written to the capsule.
     """
 
     verb: str
@@ -49,6 +57,9 @@ class Action:
     equivalence_key: str | None = None
     model_id: str | None = None
     provider: str | None = None
+    rail: str | None = None
+    counterparty_account_ref: str | None = None
+    outgoing_content: str | None = None
     extra: dict = field(default_factory=dict)
 
     def resolved_action_id(self) -> str:
@@ -95,4 +106,6 @@ class Action:
             currency=payload.get("currency"),
             target=payload.get("target"),
             cited_mandate_capsule_id=cited_mandate_capsule_id,
+            rail=payload.get("rail"),
+            counterparty_account_ref=payload.get("counterparty_account_ref"),
         )
