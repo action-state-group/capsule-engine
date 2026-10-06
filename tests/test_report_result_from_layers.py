@@ -16,6 +16,7 @@ import copy
 import pytest
 
 from capsule_engine.report.errors import (
+    COVERAGE_CLAIM_MISMATCH,
     COVERAGE_NOT_COMPUTED,
     INVALID_LAYER_TALLY,
     INVALID_VERDICT,
@@ -348,17 +349,22 @@ def test_hand_set_evaluated_population_is_rejected(where):
         entry["coverage"]["evaluated_population"] += 1
     with pytest.raises(ResultError) as exc:
         verify_layer_tally(doc)
-    assert exc.value.reason == COVERAGE_NOT_COMPUTED
+    # A hand-set count inside the Result is caught by verify_result's own
+    # recount; one set only on the tally entry is caught by the tally's.
+    expected = COVERAGE_CLAIM_MISMATCH if where in ("aggregate", "both") else COVERAGE_NOT_COMPUTED
+    assert exc.value.reason == expected
 
 
-def test_verify_result_alone_does_not_recount_coverage():
-    """Why the tally verifier owns the recount: Result v0's own cross-element
-    checks cover ids and buckets, not the coverage counts."""
+def test_verify_result_alone_recounts_coverage():
+    """verify_result recounts evaluated_population from the claims, so a
+    Result whose coverage disagrees with its own claims fails on its own,
+    without the tally verifier."""
     doc = _tally()
     result = _layer(doc, "invoked")["result"]
     result["aggregate"]["coverage"]["evaluated_population"] += 1
-    verify_result(result)
-    validate_against_schema(result)
+    with pytest.raises(ResultError) as exc:
+        verify_result(result)
+    assert exc.value.reason == COVERAGE_CLAIM_MISMATCH
 
 
 def test_cannot_see_is_carried_and_rendered():

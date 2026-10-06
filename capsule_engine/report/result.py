@@ -38,6 +38,7 @@ import jsonschema
 
 from .errors import (
     BUCKET_CLAIM_MISMATCH,
+    COVERAGE_CLAIM_MISMATCH,
     DISCLOSURE_NOT_LEGAL_FOR_STATUS,
     DUPLICATE_CLAIM_ID,
     INVALID_DISCLOSED_STATUS,
@@ -451,7 +452,12 @@ def verify_result(doc: dict[str, Any]) -> None:
     """The cross-element checks spec/evidence-result-v0.md section 4 names
     as "normative, not schema-enforced in v0": claim ``id`` uniqueness, and
     every ``aggregate.buckets`` entry naming a claim that actually exists
-    with the matching verdict -- plus, when the document carries a
+    with the matching verdict. Then the two coverage counts a reader can
+    recompute from the claims: ``evaluated_population`` (the number of
+    claims) and ``unknown_count`` (claims whose sufficiency is UNKNOWN).
+    ``excluded_not_applicable`` is not checked -- excluded requirements
+    never become claims, so nothing here can recount it. A missing
+    ``coverage`` is the schema's to reject. Plus, when the document carries a
     ``coverage_report``, ``coverage.verify_coverage_report``'s checks
     against the same claims. Raises ``ResultError`` on the first
     violation. Callers wanting full conformance run this AND
@@ -478,6 +484,19 @@ def verify_result(doc: dict[str, Any]) -> None:
     for claim_id, claim in claims_by_id.items():
         if claim_id not in bucketed_ids:
             raise ResultError(BUCKET_CLAIM_MISMATCH, f"claim {claim_id!r} (verdict {claim.get('verdict')!r}) is in no bucket")
+
+    coverage = doc.get("aggregate", {}).get("coverage")
+    if coverage is not None:
+        recounted = (
+            ("evaluated_population", len(claims_by_id)),
+            ("unknown_count", sum(1 for claim in claims_by_id.values() if claim.get("sufficiency") == "UNKNOWN")),
+        )
+        for name, count in recounted:
+            if coverage.get(name) != count:
+                raise ResultError(
+                    COVERAGE_CLAIM_MISMATCH,
+                    f"coverage {name} {coverage.get(name)!r} disagrees with the {count} counted from claims",
+                )
 
     if "coverage_report" in doc:
         from .coverage import verify_coverage_report
