@@ -13,9 +13,9 @@ pack_id: asg/everyday/0.1.0
 obligations:
   - id: purchase-over-limit
     statement: >-
-      Checks each payment against the configured weekly spending limit for
-      the agent making it, and flags a payment that would take that week's
-      total over the limit.
+      Checks each payment, purchase or booking against the configured weekly
+      spending limit for the operator it is made for, and flags one that
+      would take that week's total over the limit.
     check: caps
     default_disposition: ASK
   - id: duplicate-commitment
@@ -63,9 +63,11 @@ action_semantics:
     required_fields: [target, outgoing_content]
 
 constraints:
-  - wicket_ref: caps/1.0.0
-    digest: 906a75a0b908d38fa7b05823ba11f229c3d593516119ad757b541cee7083f54b
-    scope: [developer]
+  # One weekly limit over every class that pays money out, totalled per
+  # operator (guards/wickets/catalog_defs/caps.v2.yaml).
+  - wicket_ref: caps/2.0.0
+    digest: b7ea63ec3d9fdb872d3b5db952e774f04ff8f4b945ca803e49181b91b2a25f80
+    scope: [operator]
   - wicket_ref: dedupe/1.0.0
     digest: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
   - wicket_ref: destination_rail/1.0.0
@@ -78,8 +80,8 @@ constraints:
     digest: ea4ae204e5dc33f3a28e5e15471f404f20d4f8fca193d355a099a4a7e08b082e
 
 folds:
-  - fold_ref: spend.weekly/1.0.0
-    digest: 3e7f6a3e8707de92b120bbc2aa0b5a78032df5d36e99f9955dd3ba948bba5e9c
+  - fold_ref: spend.weekly/2.0.0
+    digest: a27c581b44a9735b6fad42ec619ac8e22928da6719dec59259549247726f3f10
 
 holds_integration: none
 

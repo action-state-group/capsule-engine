@@ -21,10 +21,12 @@ from .capsule import ALLOW, DENY, ESCALATE, ConstraintOutcome, build_decision_ca
 from .checks import (
     CONFIGURED_CHECKS,
     CheckOutcome,
+    cap_for,
     check_caps,
     check_dedupe,
     check_plan_containment,
     check_verify_before_dispatch,
+    resolve_caps_minor,
 )
 from .classes import ActionClass, classify
 from .plan import PlanDefinition
@@ -90,7 +92,7 @@ class GuardEngine:
         self._ledger = ledger
         self._caps_fold = caps_fold
         self._signer_provider = signer_provider
-        self._caps_minor = caps_minor or {}
+        self._caps_minor = resolve_caps_minor(caps_minor or {})
         self._freshness_bound_ms = freshness_bound_ms
         self._fail_open_classes = fail_open_classes
         self._engine_available = engine_available
@@ -231,7 +233,7 @@ class GuardEngine:
         since_dedupe = _shift(action.resolved_timestamp(), days=_DEDUPE_WINDOW_DAYS)
         dedupe_out = check_dedupe(action, self._ledger, since=since_dedupe)
 
-        cap_minor = self._caps_minor.get(action.action_class)
+        cap_minor = cap_for(self._caps_minor, action.action_class)
         if cap_minor is not None:
             caps_out = check_caps(action, self._ledger, definition=self._caps_fold, cap_minor=cap_minor)
         else:

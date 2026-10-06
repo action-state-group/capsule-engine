@@ -26,6 +26,7 @@ WICKET_CATALOG_DIR = Path(__file__).parent.parent / "capsule_engine" / "guards" 
 EXPECTED_DIGESTS = {
     "dedupe/1.0.0": "18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb",
     "caps/1.0.0": "906a75a0b908d38fa7b05823ba11f229c3d593516119ad757b541cee7083f54b",
+    "caps/2.0.0": "b7ea63ec3d9fdb872d3b5db952e774f04ff8f4b945ca803e49181b91b2a25f80",
     "verify_before_dispatch/1.0.0": "a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c",
     "caps_holds/1.0.0": "86a07c5c2739502b1211dbb1c73df0d6950f91ba454ff151ff32cb6946fc21f6",
     "hold_reconcile/1.0.0": "cf6f76b1aeb1d705f90f89c97667c2db035e697211f7f7dc0f8455c54acaec74",

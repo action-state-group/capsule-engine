@@ -27,7 +27,7 @@ PACK_DIR = Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog"
 FIXTURE_PATH = PACK_DIR / "fixtures" / "mini_ledger.jsonl"
 
 OPERATOR = "household-fixture"
-CAP_MINOR = 10_000_000  # caps/1.0.0's money.transfer limit, cited by the pack
+CAP_MINOR = 10_000_000  # caps/2.0.0's pooled weekly limit, cited by the pack
 SIGNER_SECRET = b"everyday-acceptance-fixture-fixed-key"
 
 
@@ -35,11 +35,11 @@ def _signer() -> LocalSigner:
     return LocalSigner(key_id="everyday-fixture-key", secret=SIGNER_SECRET)
 
 
-def _payment(name: str, minute: int, developer: str, **fields) -> Action:
+def _payment(name: str, minute: int, developer: str, *, operator: str = OPERATOR, **fields) -> Action:
     fields.setdefault("recurrence", "one_time")
     return Action(
         verb="make_payment",
-        operator=OPERATOR,
+        operator=operator,
         developer=developer,
         action_class="money.transfer",
         currency="EUR",
@@ -87,14 +87,17 @@ def _scenarios() -> list[tuple[str, Action, str]]:
          target="contact/landlord", outgoing_content="The March rent is paid; the receipt is attached."), ALLOW),
         ("dedupe-original", _payment("dedupe-original", 7, **dup), ALLOW),
         ("dedupe-repeat", _payment("dedupe-repeat", 8, **dup), DENY),
+        # The cap totals per operator, so each caps scenario below pays for its
+        # own household and starts from that household's own total.
         # Boundary: spend == cap exactly; caps compares with <=, so this passes.
-        ("caps-boundary-at-cap", _payment("caps-boundary", 9, "household-assistant-e@v1", amount_minor=CAP_MINOR,
+        ("caps-boundary-at-cap", _payment("caps-boundary", 9, "household-assistant-e@v1", operator=f"{OPERATOR}-e",
+         amount_minor=CAP_MINOR,
          target="dealer/car", rail="card", counterparty_account_ref="acct-ref-dealer-1"), ALLOW),
-        ("caps-first-draw", _payment("caps-first-draw", 10, "household-assistant-f@v1", amount_minor=6_000_000,
+        ("caps-first-draw", _payment("caps-first-draw", 10, "household-assistant-f@v1", operator=f"{OPERATOR}-f", amount_minor=6_000_000,
          target="contractor/roof", rail="bank_transfer", counterparty_account_ref="acct-ref-roof-1"), ALLOW),
         # caps fails here alongside destination_rail, so the decision is a
         # deny; caps-over-limit-escalates below is the sole-failure case.
-        ("caps-over-limit-on-watched-rail", _payment("caps-over-limit", 11, "household-assistant-f@v1",
+        ("caps-over-limit-on-watched-rail", _payment("caps-over-limit", 11, "household-assistant-f@v1", operator=f"{OPERATOR}-f",
          amount_minor=5_000_000, target="contractor/roof-extra", rail="p2p",
          counterparty_account_ref="acct-ref-roof-2"), DENY),
         # Population (a): a cap IS configured for money.transfer and the
@@ -110,13 +113,13 @@ def _scenarios() -> list[tuple[str, Action, str]]:
         ("recurring-charge-set-up", _payment("recurring-charge", 14, "household-assistant-h@v1", amount_minor=1_299,
          target="service/streaming", rail="card", counterparty_account_ref="acct-ref-streaming-1",
          recurrence="monthly"), DENY),
-        ("caps-second-first-draw", _payment("caps-second-first-draw", 15, "household-assistant-i@v1",
+        ("caps-second-first-draw", _payment("caps-second-first-draw", 15, "household-assistant-i@v1", operator=f"{OPERATOR}-i",
          amount_minor=6_000_000, target="builder/extension", rail="card",
          counterparty_account_ref="acct-ref-builder-1"), ALLOW),
         # caps is the SOLE failing check and money.transfer has an approver
         # role, so the decision escalates: disposition.decision needs_input,
         # disposition.verdict_class hitl_dispatched.
-        ("caps-over-limit-escalates", _payment("caps-escalates", 16, "household-assistant-i@v1",
+        ("caps-over-limit-escalates", _payment("caps-escalates", 16, "household-assistant-i@v1", operator=f"{OPERATOR}-i",
          amount_minor=5_000_000, target="builder/extension-phase-2", rail="card",
          counterparty_account_ref="acct-ref-builder-2"), ESCALATE),
     ]
@@ -184,7 +187,7 @@ def test_records_are_pack_attributed_and_observe_mode(run):
 def test_cited_definitions_resolve_to_the_built_in_digests(run):
     installed, _, _, _, _ = run
     pinned = {w.wicket_id: w.digest for w in installed.manifest.wickets}
-    assert pinned["caps/1.0.0"] == "906a75a0b908d38fa7b05823ba11f229c3d593516119ad757b541cee7083f54b"
+    assert pinned["caps/2.0.0"] == "b7ea63ec3d9fdb872d3b5db952e774f04ff8f4b945ca803e49181b91b2a25f80"
     assert pinned["dedupe/1.0.0"] == "18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb"
 
 

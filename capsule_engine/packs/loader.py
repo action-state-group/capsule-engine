@@ -481,20 +481,23 @@ def _validate_caps_scope_against_folds(
         fold_id = wicket.config.get("fold_id")
         fold = folds_by_id.get(fold_id)
 
-        if "developer" in scope and fold is not None and fold.key != "developer":
-            raise PackDefinitionError(
-                SCOPE_MISMATCH,
-                f"constraints[{wicket.wicket_id!r}] declares scope including 'developer', but its fold "
-                f"{fold.fold_id!r} is keyed by {fold.key!r}, not 'developer' -- the declared scope and "
-                "the fold's actual aggregation key disagree.",
-            )
+        for dim in ("developer", "operator"):
+            if dim in scope and fold is not None and fold.key != dim:
+                raise PackDefinitionError(
+                    SCOPE_MISMATCH,
+                    f"constraints[{wicket.wicket_id!r}] declares scope including {dim!r}, but its fold "
+                    f"{fold.fold_id!r} is keyed by {fold.key!r}, not {dim!r} -- the declared scope and "
+                    "the fold's actual aggregation key disagree.",
+                )
 
-        multi_class = len(caps_minor) > 1
+        # One value across every class is one pooled limit over the pooled
+        # total, which is what a fold with no class partition enforces.
+        multi_class = len(set(caps_minor.values())) > 1
         if multi_class and "action_class" not in scope:
             raise PackDefinitionError(
                 SCOPE_MISMATCH,
-                f"constraints[{wicket.wicket_id!r}] configures caps_minor for {len(caps_minor)} action "
-                f"classes ({sorted(caps_minor)}) but its declared scope {list(scope)} does not include "
+                f"constraints[{wicket.wicket_id!r}] configures different caps_minor limits for {len(caps_minor)} "
+                f"action classes ({sorted(caps_minor)}) but its declared scope {list(scope)} does not include "
                 "'action_class' -- a cap declared per-class must say so, or the fold pooling amounts "
                 "across those classes is silently over-broad (capsule-emit PR #54's exact bug shape: "
                 "cap says per-class, aggregate says pooled).",
@@ -507,7 +510,7 @@ def _validate_caps_scope_against_folds(
                 raise PackDefinitionError(
                     SCOPE_MISMATCH,
                     f"constraints[{wicket.wicket_id!r}] declares scope including 'action_class' and "
-                    f"configures {len(caps_minor)} per-class caps, but its fold {fold.fold_id!r} pools "
+                    f"configures different limits for {len(caps_minor)} classes, but its fold {fold.fold_id!r} pools "
                     f"amounts across ALL action classes (key={fold.key!r}, no action_class filter) -- "
                     "the cap is declared per-class but the aggregate isn't. Add an action_class-scoped "
                     "key or filter to the fold, or this pack will admit combined spend across classes "
