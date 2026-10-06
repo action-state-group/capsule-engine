@@ -63,6 +63,7 @@ __all__ = [
     "MEASURABILITY_VALUES",
     "EVIDENCE_INSTRUMENT_KINDS",
     "TIER_VALUES",
+    "DEFAULT_DISPOSITION_VALUES",
     "MODE_VALUES",
     "PROFILE_ID_VALUES",
     "TOPOLOGY_INVARIANT_MODES",
@@ -108,7 +109,19 @@ PACK_ID_RE = re.compile(r"^[a-z][a-z0-9_]*/[a-z][a-z0-9_]*(-[a-z0-9_]+)*/\d+\.\d
 # listed here -- they are not something a pack "requires", they are what an
 # action semantic entry itself declares.
 NORMALIZED_ACTION_FIELDS = frozenset(
-    {"amount_minor", "currency", "target", "cited_mandate_capsule_id", "equivalence_key", "model_id", "provider"}
+    {
+        "amount_minor",
+        "currency",
+        "target",
+        "cited_mandate_capsule_id",
+        "equivalence_key",
+        "model_id",
+        "provider",
+        "rail",
+        "counterparty_account_ref",
+        "outgoing_content",
+        "recurrence",
+    }
 )
 
 HOLDS_INTEGRATION_VALUES = frozenset({"none", "stubbed", "built"})
@@ -155,6 +168,13 @@ EVIDENCE_INSTRUMENT_KINDS = frozenset({"structured_field", "tool_call_name"})
 # every pack written before this field existed keeps its current (gate-free)
 # behavior and digests identically.
 TIER_VALUES = frozenset({"must_have", "informational"})
+
+# What an obligation's check failing should mean to the person the action is
+# for, by default: the agent may do it (DO), stop and ask them (ASK), or never
+# do it (NEVER). Declared data only -- the guard engine does not read it. Optional
+# and additive like ``re_derivability_grade``: an obligation with no
+# ``default_disposition`` parses and digests identically to before.
+DEFAULT_DISPOSITION_VALUES = frozenset({"DO", "ASK", "NEVER"})
 
 # The seven ways a ledger gets judged (standard-outcome-pack design §3) --
 # every standard outcome is tagged with exactly one. "structural" (presence/
@@ -248,12 +268,16 @@ class Obligation:
     ``vocabulary.RE_DERIVABILITY_GRADES`` -- ``compiler.re_derivability.
     grade_for_check`` gives the seeded default for the checks this repo
     already ships.
+
+    ``default_disposition`` follows the same optional, additive convention:
+    when declared it must be one of ``DEFAULT_DISPOSITION_VALUES``.
     """
 
     id: str
     statement: str
     check: str
     re_derivability_grade: str | None = None
+    default_disposition: str | None = None
 
 
 @dataclass(frozen=True)
@@ -735,6 +759,7 @@ class PackDefinition:
                     "statement": o.statement,
                     "check": o.check,
                     **({"re_derivability_grade": o.re_derivability_grade} if o.re_derivability_grade else {}),
+                    **({"default_disposition": o.default_disposition} if o.default_disposition else {}),
                 }
                 for o in self.obligations
             ],

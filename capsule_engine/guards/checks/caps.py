@@ -16,7 +16,7 @@ from capsule_ledger.ledger.api import LedgerAPI, ScanQuery
 from ...folds.definition import FoldDefinition
 from ...folds.engine import evaluate_one
 from ..action import Action
-from ..capsule import ConstraintOutcome
+from ..capsule import ConstraintOutcome, not_applicable_evidence
 from .base import CheckOutcome
 
 __all__ = ["check_caps"]
@@ -36,7 +36,9 @@ def check_caps(
             constraint=ConstraintOutcome(
                 id="caps",
                 result="n/a",
-                reason="action carries no amount; cap check not applicable",
+                reason="a cap is configured for this action class but the action carries no amount_minor; "
+                "the cap could not be evaluated",
+                evidence=not_applicable_evidence("caps", in_scope=True, missing_field="amount_minor"),
                 check_type="policy",
                 method=definition.fold_id,
             )

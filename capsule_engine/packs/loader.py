@@ -50,14 +50,17 @@ from ..compiler.vocabulary import (
     RE_DERIVABILITY_GRADES,
     REFUSAL_REASON_CODES,
 )
+from ..folds.catalog import Catalog as FoldCatalog
 from ..folds.definition import FoldDefinition
 from ..folds.errors import FoldDefinitionError
 from ..folds.loader import load_definition_file as load_fold_definition_file
 from ..guards.classes import TAXONOMY
+from ..guards.wickets.catalog import Catalog as WicketCatalog
 from ..guards.wickets.definition import WicketDefinition
 from ..guards.wickets.definition import parse_definition as parse_wicket_definition
 from ..guards.wickets.errors import WicketDefinitionError
 from .errors import (
+    CATALOG_REF_DIGEST_MISMATCH,
     DUPLICATE_ACTION_TYPE,
     DUPLICATE_CONSTRAINT_WICKET_ID,
     DUPLICATE_OBLIGATION_ID,
@@ -70,6 +73,7 @@ from .errors import (
     INVALID_CLAUSE,
     INVALID_CONSTRAINT,
     INVALID_COUNTERPARTY_BINDING,
+    INVALID_DEFAULT_DISPOSITION,
     INVALID_EPISTEMIC_TYPE,
     INVALID_EVIDENCE_INSTRUMENT,
     INVALID_EVIDENCE_PROFILE,
@@ -98,12 +102,14 @@ from .errors import (
     SCOPE_MISMATCH,
     TOPOLOGY_INVARIANT_OVERRIDE,
     UNKNOWN_ACTION_CLASS,
+    UNKNOWN_CATALOG_REF,
     UNKNOWN_EFFECT_CLAIM,
     UNKNOWN_NORMALIZED_FIELD,
     UNKNOWN_OUTCOME_IN_PROFILE_OVERRIDE,
     PackDefinitionError,
 )
 from .schema import (
+    DEFAULT_DISPOSITION_VALUES,
     EPISTEMIC_TYPE_VALUES,
     EVIDENCE_INSTRUMENT_KINDS,
     EVIDENCE_PROFILE_VALUES,
@@ -152,6 +158,14 @@ RESERVED_CAPSULE_ACTION_TYPES = frozenset({"fyi", "decide"})
 # malformed value here would silently miscompare rather than raise -- these
 # are validated at load time for the same reason every other closed shape
 # in this module is.
+# The engine's own built-in catalogs. A pack may cite a definition from one
+# of these by id and digest (``wicket_ref``/``fold_ref`` + ``digest``)
+# instead of copying it: the loader resolves the id, refuses a digest that
+# does not match the catalog's current definition, and the pack's canonical
+# form is identical to what an inline copy of the same definition produces.
+CORE_WICKET_CATALOG_DIR = Path(__file__).resolve().parent.parent / "guards" / "wickets" / "catalog_defs"
+CORE_FOLD_CATALOG_DIR = Path(__file__).resolve().parent.parent / "folds" / "catalog_defs"
+
 _ISO_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 _SHA256_HEX_RE = re.compile(r"^[0-9a-f]{64}$")
 
@@ -219,8 +233,21 @@ def _parse_obligations(
                 f"obligations[{obligation_id!r}].re_derivability_grade={re_derivability_grade!r} must be one of "
                 f"{sorted(RE_DERIVABILITY_GRADES)}, or omitted",
             )
+        default_disposition = entry.get("default_disposition")
+        if default_disposition is not None and default_disposition not in DEFAULT_DISPOSITION_VALUES:
+            raise PackDefinitionError(
+                INVALID_DEFAULT_DISPOSITION,
+                f"obligations[{obligation_id!r}].default_disposition={default_disposition!r} must be one of "
+                f"{sorted(DEFAULT_DISPOSITION_VALUES)}, or omitted",
+            )
         obligations.append(
-            Obligation(id=obligation_id, statement=statement, check=check, re_derivability_grade=re_derivability_grade)
+            Obligation(
+                id=obligation_id,
+                statement=statement,
+                check=check,
+                re_derivability_grade=re_derivability_grade,
+                default_disposition=default_disposition,
+            )
         )
     return tuple(obligations)
 
@@ -364,6 +391,24 @@ def _parse_scope(raw: Any, *, wicket_id: str) -> tuple[str, ...]:
     return tuple(dims)
 
 
+# `entry` is one raw pack.yaml mapping, decoded here at the loader boundary.
+def _resolve_catalog_ref(entry: dict, *, ref_key: str, catalog, what: str):
+    ref = _require_nonempty_str(entry.get(ref_key), f"{what}.{ref_key}", "caps/1.0.0")
+    digest = _require_nonempty_str(entry.get("digest"), f"{what}.digest", "<64-char sha-256 hex>")
+    found = catalog.get(ref)
+    if found is None:
+        raise PackDefinitionError(
+            UNKNOWN_CATALOG_REF, f"{what}.{ref_key}={ref!r} is not in the built-in catalog {catalog.directory}"
+        )
+    if found.digest != digest:
+        raise PackDefinitionError(
+            CATALOG_REF_DIGEST_MISMATCH,
+            f"{what} cites {ref!r} at digest {digest}, but the built-in definition digests to {found.digest} -- "
+            "the cited definition has changed; re-pin the digest only after reviewing the change",
+        )
+    return found.definition
+
+
 def _parse_constraints(
     raw: Any, *, allow_empty: bool = False
 ) -> tuple[tuple[WicketDefinition, ...], dict[str, tuple[str, ...]]]:
@@ -400,10 +445,15 @@ def _parse_constraints(
         # core wicket parser below ignores unknown keys, so this is read
         # independently rather than smuggled through WicketDefinition.config.
         raw_scope = entry.get("scope") if isinstance(entry, dict) else None
-        try:
-            definition = parse_wicket_definition(entry)
-        except WicketDefinitionError as exc:
-            raise PackDefinitionError(INVALID_CONSTRAINT, f"constraints[{idx}]: {exc}") from exc
+        if isinstance(entry, dict) and "wicket_ref" in entry:
+            definition = _resolve_catalog_ref(
+                entry, ref_key="wicket_ref", catalog=WicketCatalog(CORE_WICKET_CATALOG_DIR), what=f"constraints[{idx}]"
+            )
+        else:
+            try:
+                definition = parse_wicket_definition(entry)
+            except WicketDefinitionError as exc:
+                raise PackDefinitionError(INVALID_CONSTRAINT, f"constraints[{idx}]: {exc}") from exc
         if definition.wicket_id in seen_ids:
             raise PackDefinitionError(
                 DUPLICATE_CONSTRAINT_WICKET_ID, f"wicket_id {definition.wicket_id!r} declared more than once"
@@ -483,6 +533,15 @@ def _parse_folds(raw: Any, *, pack_dir: Path, allow_empty: bool = False) -> tupl
     seen_ids: set[str] = set()
     for idx, entry in enumerate(raw):
         entry = _require_mapping(entry, f"folds[{idx}]")
+        if "fold_ref" in entry:
+            definition = _resolve_catalog_ref(
+                entry, ref_key="fold_ref", catalog=FoldCatalog(CORE_FOLD_CATALOG_DIR), what=f"folds[{idx}]"
+            )
+            if definition.fold_id in seen_ids:
+                raise PackDefinitionError(INVALID_FOLD_REF, f"fold_id {definition.fold_id!r} already declared")
+            seen_ids.add(definition.fold_id)
+            out.append(definition)
+            continue
         rel_path = _require_nonempty_str(entry.get("file"), f"folds[{idx}].file", "folds/spend_weekly.yaml")
         fold_path = pack_dir / rel_path
         if not fold_path.is_file():

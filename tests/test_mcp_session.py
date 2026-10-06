@@ -119,19 +119,11 @@ def test_scripted_session_answers_carry_verification_data():
     # -- "is that refusal record actually intact?"
     verified = _call("record_verify", {"capsule_id": over_cap["capsule_id"]})
     assert verified["ok"] is True
-    # `hitl_dispatched` (D1) is capsule-ledger's own policy vocabulary and isn't
-    # yet a seeded value in AAC's REGISTRY.md -- the reference verifier
-    # correctly flags that as informational (§12), not a rejection.
-    assert verified["findings"] == [
-        {
-            "code": "unknown_registry_value",
-            "detail": (
-                "disposition.decision='hitl_dispatched' is not a seeded "
-                "disposition.decision value; informational, not rejected (§12)"
-            ),
-            "severity": "info",
-        }
-    ]
+    # An escalation seals disposition.decision `needs_input`, a seeded value,
+    # so the reference verifier has nothing to flag -- not even the
+    # informational unknown_registry_value the legacy `hitl_dispatched`
+    # decision drew.
+    assert verified["findings"] == []
 
     # -- "has this exact transfer already happened?" (would-be repeat check)
     been_done = _call(

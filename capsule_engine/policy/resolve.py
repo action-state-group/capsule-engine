@@ -66,6 +66,10 @@ class ResolvedManifest:
         fold_id = self.wicket_config("caps").get("fold_id")
         return self.folds.get(fold_id) if fold_id else None
 
+    def configured_wickets(self, checks: frozenset[str]) -> tuple[WicketDefinition, ...]:
+        """Every resolved wicket configuring one of ``checks``, in manifest order."""
+        return tuple(w for w in self.wickets.values() if w.check in checks)
+
     def plan(self) -> PlanDefinition | None:
         """The compiled plan quoted directly in the resolved
         ``plan_containment`` wicket's own ``config`` (``guards/plan.py``'s
