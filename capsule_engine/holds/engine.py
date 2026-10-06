@@ -31,7 +31,14 @@ from ..guards.capsule import (
     build_decision_capsule,
     not_applicable_evidence,
 )
-from ..guards.checks import CheckOutcome, check_caps, check_dedupe, check_verify_before_dispatch
+from ..guards.checks import (
+    CheckOutcome,
+    cap_for,
+    check_caps,
+    check_dedupe,
+    check_verify_before_dispatch,
+    resolve_caps_minor,
+)
 from ..guards.classes import classify
 from ..guards.engine import _decide
 from ..guards.signing import Signer, SigningKeyUnavailable
@@ -127,7 +134,7 @@ class HoldEngine:
         self._hold_fold = hold_fold
         self._fold_digest = fold_digest
         self._signer_provider = signer_provider
-        self._cap_minor = cap_minor or {}
+        self._cap_minor = resolve_caps_minor(cap_minor or {})
         self._tolerance_minor = tolerance_minor or {}
         self._freshness_bound_ms = freshness_bound_ms
         self._engine_available = engine_available
@@ -209,7 +216,7 @@ class HoldEngine:
     def _evaluate_and_reserve_locked(self, action: Action, *, signer: Signer, age_ms: int) -> HoldDecision:
         ac = classify(action.action_class)
         dedupe_out = check_dedupe(action, self._ledger)
-        cap_minor = self._cap_minor.get(action.action_class)
+        cap_minor = cap_for(self._cap_minor, action.action_class)
         if cap_minor is not None:
             caps_out = check_caps(
                 action, self._ledger, definition=self._hold_fold, cap_minor=cap_minor,

@@ -30,8 +30,11 @@ invent others):
 **The checks** (each one is a wicket cited by digest from the engine's own
 catalog):
 
-1. `caps` (`caps/1.0.0`) -- the agent's rolling 7-day spend plus this amount
-   must be at or under the configured limit.
+1. `caps` (`caps/2.0.0`) -- the operator's rolling 7-day spend plus this
+   amount must be at or under the configured limit. One limit covers every
+   class that pays money out (transfers, purchases, subscriptions, bookings),
+   and the total is kept per `operator`, so a new agent version or a second
+   tool acting for the same operator draws on the same total.
 2. `dedupe` (`dedupe/1.0.0`) -- the same payment by the same agent to the
    same payee is flagged if it was already recorded in the window.
 3. `destination_rail` (`destination_rail/1.0.0`) -- a payment over a

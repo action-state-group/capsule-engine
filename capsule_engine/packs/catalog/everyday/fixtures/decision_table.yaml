@@ -106,7 +106,7 @@ rows:
     verdict: allow
   - scenario: caps-over-limit-on-watched-rail
     action_id: make_payment/everyday-fixture-caps-over-limit
-    note: "pooled with caps-first-draw (same developer, same window): 6,000,000 + 5,000,000 > 10,000,000"
+    note: "pooled with caps-first-draw (same operator, same window): 6,000,000 + 5,000,000 > 10,000,000"
     checks: {dedupe: pass, caps: fail, verify_before_dispatch: n/a, destination_rail: fail, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: pass}
     n_a:
       verify_before_dispatch: {population: c}

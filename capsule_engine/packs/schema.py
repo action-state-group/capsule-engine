@@ -34,7 +34,8 @@ wicket's ``caps_minor`` declares a limit PER ACTION CLASS, while the fold
 it cites aggregates however its own ``key``/``filter`` say to -- if a pack
 ever configures caps for more than one action class, the fold must
 genuinely partition by class or the same "declared per-class, enforced
-pooled" gap opens. ``loader.py``'s scope validator checks this at
+pooled" gap opens. The same value for every class is one pooled limit, and a
+pooled fold enforces exactly that. ``loader.py``'s scope validator checks this at
 pack-load time, not at incident time.
 """
 from __future__ import annotations

@@ -33,8 +33,10 @@ its ``Action.taxonomy_version`` was set (``guards/capsule.py``); nothing in
 this package sets it by default yet, so existing records keep their bytes. A
 record without one is read as ``unversioned_records_read_as``.
 
-Operator config (caps, tolerances, fail-open opt-ins) is still keyed by the
-raw ``action_class`` string a caller sends, not by the canonical name.
+Caps config resolves through this table (``checks.caps.resolve_caps_minor``),
+so a cap keyed by a legacy name and one keyed by its canonical name are one
+cap. Tolerances and fail-open opt-ins are still keyed by the raw
+``action_class`` string a caller sends.
 """
 from __future__ import annotations
 

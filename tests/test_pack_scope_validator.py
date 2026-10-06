@@ -257,3 +257,45 @@ def test_scope_participates_in_the_pack_digest(tmp_path):
         caps_minor={"money.transfer": 100},
     )
     assert load_pack_dir(narrow).definition_digest() != load_pack_dir(wide).definition_digest()
+
+
+def test_declared_operator_scope_disagreeing_with_fold_key_fails_closed(tmp_path):
+    pack = _pack(
+        tmp_path,
+        fold_yaml=DEVELOPER_KEYED_FOLD,
+        fold_id="test.spend.by_developer/1.0.0",
+        scope=["operator"],
+        caps_minor={"money.transfer": 100},
+    )
+    with pytest.raises(PackDefinitionError) as exc_info:
+        load_pack_dir(pack)
+    assert exc_info.value.reason == "scope_mismatch"
+    assert "'operator'" in str(exc_info.value)
+
+
+def test_one_limit_across_classes_is_a_pooled_cap_and_loads_without_action_class_scope(tmp_path):
+    """The same value for every class is one limit over the pooled total --
+    exactly what a fold with no class partition enforces."""
+    pack = _pack(
+        tmp_path,
+        fold_yaml=OPERATOR_KEYED_FOLD,
+        fold_id="test.spend.by_operator/1.0.0",
+        scope=["operator"],
+        caps_minor={"money.transfer": 100, "money.purchase": 100, "booking.create": 100},
+    )
+    loaded = load_pack_dir(pack)
+    assert loaded.constraint_scopes["test.caps/1.0.0"] == ("operator",)
+
+
+def test_different_limits_across_classes_on_a_pooled_fold_still_fail_closed(tmp_path):
+    pack = _pack(
+        tmp_path,
+        fold_yaml=OPERATOR_KEYED_FOLD,
+        fold_id="test.spend.by_operator/1.0.0",
+        scope=["operator"],
+        caps_minor={"money.transfer": 100, "booking.create": 50},
+    )
+    with pytest.raises(PackDefinitionError) as exc_info:
+        load_pack_dir(pack)
+    assert exc_info.value.reason == "scope_mismatch"
+    assert "different caps_minor limits" in str(exc_info.value)

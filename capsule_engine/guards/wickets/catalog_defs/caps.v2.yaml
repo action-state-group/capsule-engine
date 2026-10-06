@@ -1,0 +1,30 @@
+# Caps wicket, version 2: one weekly spend limit over every action class
+# that pays money out, totalled per operator (guards/checks/caps.py).
+#
+# The class set is every COMMIT row of guards/action_taxonomy.json except
+# money.refund and marketplace.sale, where the money arrives at the operator
+# rather than leaving. An action in the set that carries no amount_minor
+# seals caps as an in-scope n/a, so listing a class that usually has no
+# amount costs nothing.
+#
+# The cited fold sums every accepted amount for the operator whatever its
+# class, so this is ONE pooled limit and every entry carries the same value.
+# caps/1.0.0 (caps.yaml) stays as it was for the records and packs that cite it.
+#
+# `fold_digest` is the real, independently-computable `definition_digest()`
+# of folds/catalog_defs/spend.weekly.v2.yaml (folds/definition.py).
+wicket_id: caps/2.0.0
+check: caps
+config:
+  fold_id: spend.weekly/2.0.0
+  fold_digest: a27c581b44a9735b6fad42ec619ac8e22928da6719dec59259549247726f3f10
+  caps_minor:
+    money.purchase: 10000000
+    money.transfer: 10000000
+    money.subscription: 10000000
+    booking.create: 10000000
+    booking.modify: 10000000
+    booking.cancel: 10000000
+    agreement.accept: 10000000
+    marketplace.offer: 10000000
+    external_commitment.other: 10000000

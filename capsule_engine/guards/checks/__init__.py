@@ -12,7 +12,7 @@ from capsule_ledger.ledger.api import LedgerAPI
 
 from ..action import Action
 from .base import CheckOutcome
-from .caps import check_caps
+from .caps import cap_for, check_caps, resolve_caps_minor
 from .counterparty_identity_change import check_counterparty_identity_change
 from .credential_pattern import check_credential_pattern
 from .dedupe import check_dedupe
@@ -39,6 +39,7 @@ CONFIGURED_CHECKS: dict[str, Callable[[Action, LedgerAPI, dict], CheckOutcome]] 
 __all__ = [
     "CONFIGURED_CHECKS",
     "CheckOutcome",
+    "cap_for",
     "check_caps",
     "check_counterparty_identity_change",
     "check_credential_pattern",
@@ -47,4 +48,5 @@ __all__ = [
     "check_plan_containment",
     "check_recurring_charge",
     "check_verify_before_dispatch",
+    "resolve_caps_minor",
 ]

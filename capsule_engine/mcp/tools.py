@@ -28,6 +28,7 @@ from ..folds.engine import evaluate_one
 from ..folds.errors import FoldDefinitionError, FoldDeterminismError
 from ..folds.loader import load_definition_file
 from ..guards import Action, GuardEngine
+from ..guards.checks.caps import cap_for, resolve_caps_minor
 from ..guards.checks.dedupe import check_dedupe
 from ..guards.classes import TAXONOMY, UNCLASSIFIED_DEFAULT
 
@@ -193,7 +194,7 @@ def budget_remaining(
     ``cap_configured: false`` rather than a fabricated remaining amount --
     matching the caps check's own `n/a` result for an unconfigured class.
     """
-    cap_minor = caps_minor.get(action_class)
+    cap_minor = cap_for(resolve_caps_minor(caps_minor), action_class)
     if cap_minor is None:
         return {
             "agent": agent,
