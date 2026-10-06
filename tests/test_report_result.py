@@ -12,6 +12,7 @@ from capsule_engine.report.result import (
     Claim,
     DigestRef,
     DisclosureCarrier,
+    EvidenceResult,
     ProofRef,
     StoryCarrier,
     build_result,
@@ -290,3 +291,94 @@ def test_mutant_verify_result_catches_a_claim_in_no_bucket():
     with pytest.raises(ResultError) as exc:
         verify_result(doc)
     assert exc.value.reason == "bucket_claim_mismatch"
+
+
+# --- verify_result: coverage counts recomputed off claims -------------------
+#
+# evaluated_population is len(claims) and unknown_count is the number of
+# claims whose sufficiency is UNKNOWN, so a reader can recompute both from
+# the document itself. excluded_not_applicable is not checked: excluded
+# requirements never become claims, so the document holds nothing to
+# recount it from.
+
+
+def _unknown_claim(claim_id: str) -> Claim:
+    return _claim(
+        claim_id=claim_id,
+        sufficiency="UNKNOWN",
+        verdict="not_evaluable",
+        presentation=AnalysisCarrier(status="UNKNOWN", summary="not evaluated; cause not determined"),
+    )
+
+
+def _mixed_result() -> EvidenceResult:
+    claims = [
+        _claim(claim_id="claim-1", verdict="met"),
+        _unknown_claim("claim-2"),
+        _claim(claim_id="claim-3", sufficiency="GAP", verdict="not_evaluable"),
+        _claim(claim_id="claim-4", verdict="not_met"),
+        _unknown_claim("claim-5"),
+        _claim(claim_id="claim-6", sufficiency="INSUFFICIENT", verdict="not_evaluable"),
+    ]
+    return build_result(claims, generated_at="2026-10-04T00:00:00Z", excluded_not_applicable=2)
+
+
+def test_verify_result_accepts_coverage_that_agrees_with_claims():
+    doc = _mixed_result().to_dict()
+    assert doc["aggregate"]["coverage"]["evaluated_population"] == 6
+    assert doc["aggregate"]["coverage"]["unknown_count"] == 2
+    validate_against_schema(doc)
+    verify_result(doc)
+
+
+@pytest.mark.parametrize("stated", [0, 1, 3])
+def test_mutant_verify_result_catches_unknown_count_disagreeing_with_claims(stated):
+    doc = _mixed_result().to_dict()
+    doc["aggregate"]["coverage"]["unknown_count"] = stated
+    with pytest.raises(ResultError) as exc:
+        verify_result(doc)
+    assert exc.value.reason == "coverage_claim_mismatch"
+    assert f"unknown_count {stated}" in str(exc.value)
+
+
+def test_mutant_verify_result_catches_unknown_claims_remapped_under_a_stated_count():
+    doc = _mixed_result().to_dict()
+    for claim in doc["claims"]:
+        if claim["sufficiency"] == "UNKNOWN":
+            claim["sufficiency"] = "GAP"
+    with pytest.raises(ResultError) as exc:
+        verify_result(doc)
+    assert exc.value.reason == "coverage_claim_mismatch"
+
+
+@pytest.mark.parametrize("stated", [5, 7])
+def test_mutant_verify_result_catches_evaluated_population_disagreeing_with_claims(stated):
+    doc = _mixed_result().to_dict()
+    doc["aggregate"]["coverage"]["evaluated_population"] = stated
+    with pytest.raises(ResultError) as exc:
+        verify_result(doc)
+    assert exc.value.reason == "coverage_claim_mismatch"
+    assert f"evaluated_population {stated}" in str(exc.value)
+
+
+def test_verify_result_does_not_check_excluded_not_applicable():
+    doc = _mixed_result().to_dict()
+    doc["aggregate"]["coverage"]["excluded_not_applicable"] = 40
+    verify_result(doc)
+
+
+def test_verify_result_reports_a_bucket_mismatch_before_a_coverage_mismatch():
+    doc = _mixed_result().to_dict()
+    doc["aggregate"]["buckets"]["met"].append("claim-does-not-exist")
+    doc["aggregate"]["coverage"]["unknown_count"] = 0
+    with pytest.raises(ResultError) as exc:
+        verify_result(doc)
+    assert exc.value.reason == "bucket_claim_mismatch"
+
+
+def test_verify_result_leaves_a_missing_coverage_to_the_schema():
+    doc = _mixed_result().to_dict()
+    del doc["aggregate"]["coverage"]
+    verify_result(doc)
+    with pytest.raises(jsonschema.exceptions.ValidationError):
+        validate_against_schema(doc)

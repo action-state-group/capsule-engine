@@ -8,12 +8,13 @@ this module is the encoding. A drift between the two is a defect here, never
 a second legitimate spelling. At the time this module was written, that
 schema had landed on an ``agent-action-capsule`` branch (ruled, no longer
 DRAFT) but was not yet on its main branch -- not yet importable from the ``agent-action-capsule``
-dependency this repo already pins -- so ``schemas/vendor/evidence-result-v0.
-json`` carries a vendored copy (see ``schemas/vendor/README.md`` for its
+dependency this repo already pins -- so ``capsule_engine/schemas/vendor/
+evidence-result-v0.json`` carries a vendored copy (see
+``capsule_engine/schemas/vendor/README.md`` for its
 provenance and the drop-vendoring-once-shipped note).
 
 **Claims never self-declare.** Exactly like ``EvidenceContract`` upstream
-(``schemas/evidence-contract-v0.json``'s ``$comment``: "the evidence record
+(``capsule_engine/schemas/evidence-contract-v0.json``'s ``$comment``: "the evidence record
 never self-declares that it satisfies a requirement"), nothing in this module
 computes sufficiency or verdict from data it also emits as evidence -- both
 are supplied by the caller, who is expected to have derived them from real
@@ -30,13 +31,14 @@ from __future__ import annotations
 import json
 import re
 from dataclasses import dataclass, field
-from pathlib import Path
+from importlib import resources
 from typing import TYPE_CHECKING, Any
 
 import jsonschema
 
 from .errors import (
     BUCKET_CLAIM_MISMATCH,
+    COVERAGE_CLAIM_MISMATCH,
     DISCLOSURE_NOT_LEGAL_FOR_STATUS,
     DUPLICATE_CLAIM_ID,
     INVALID_DISCLOSED_STATUS,
@@ -95,11 +97,13 @@ DISCLOSED_STATUS_VALUES = EVIDENCE_STATUS_VALUES - {"WITHHELD", "NOT_COMMITTED"}
 
 _HEX_DIGEST_RE = re.compile(r"^[0-9a-f]{64}$")
 
-SCHEMA_PATH = Path(__file__).resolve().parents[2] / "schemas" / "vendor" / "evidence-result-v0.json"
+# Resolved inside the installed package, so it is present in a wheel install
+# and not only in a source checkout (scripts/clean_room_wheel.sh checks this).
+SCHEMA_PATH = resources.files("capsule_engine") / "schemas" / "vendor" / "evidence-result-v0.json"
 
 
 def load_schema() -> dict[str, Any]:
-    return json.loads(SCHEMA_PATH.read_text())
+    return json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
 
 
 def _check_hex_digest(digest: str) -> None:
@@ -448,7 +452,12 @@ def verify_result(doc: dict[str, Any]) -> None:
     """The cross-element checks spec/evidence-result-v0.md section 4 names
     as "normative, not schema-enforced in v0": claim ``id`` uniqueness, and
     every ``aggregate.buckets`` entry naming a claim that actually exists
-    with the matching verdict -- plus, when the document carries a
+    with the matching verdict. Then the two coverage counts a reader can
+    recompute from the claims: ``evaluated_population`` (the number of
+    claims) and ``unknown_count`` (claims whose sufficiency is UNKNOWN).
+    ``excluded_not_applicable`` is not checked -- excluded requirements
+    never become claims, so nothing here can recount it. A missing
+    ``coverage`` is the schema's to reject. Plus, when the document carries a
     ``coverage_report``, ``coverage.verify_coverage_report``'s checks
     against the same claims. Raises ``ResultError`` on the first
     violation. Callers wanting full conformance run this AND
@@ -475,6 +484,19 @@ def verify_result(doc: dict[str, Any]) -> None:
     for claim_id, claim in claims_by_id.items():
         if claim_id not in bucketed_ids:
             raise ResultError(BUCKET_CLAIM_MISMATCH, f"claim {claim_id!r} (verdict {claim.get('verdict')!r}) is in no bucket")
+
+    coverage = doc.get("aggregate", {}).get("coverage")
+    if coverage is not None:
+        recounted = (
+            ("evaluated_population", len(claims_by_id)),
+            ("unknown_count", sum(1 for claim in claims_by_id.values() if claim.get("sufficiency") == "UNKNOWN")),
+        )
+        for name, count in recounted:
+            if coverage.get(name) != count:
+                raise ResultError(
+                    COVERAGE_CLAIM_MISMATCH,
+                    f"coverage {name} {coverage.get(name)!r} disagrees with the {count} counted from claims",
+                )
 
     if "coverage_report" in doc:
         from .coverage import verify_coverage_report

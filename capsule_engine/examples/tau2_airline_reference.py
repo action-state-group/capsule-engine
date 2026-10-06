@@ -85,10 +85,12 @@ from pathlib import Path
 import capsule_emit
 from capsule_ledger.ledger import LedgerAPI, LedgerRecord, LedgerStore
 
+from capsule_engine.cli.format import format_coverage_footnote
+from capsule_engine.folds.engine import EvaluationTrace, evaluate_one
 from capsule_engine.folds.loader import load_definition_file
 from capsule_engine.guards import Action, GuardEngine, LocalSigner
 
-__all__ = ["DATASETS", "DatasetResult", "run_dataset", "main"]
+__all__ = ["DATASETS", "DatasetResult", "coverage_trace", "run_dataset", "main"]
 
 CATALOG_DIR = Path(__file__).resolve().parent.parent / "folds" / "catalog_defs"
 DATA_DIR = Path(__file__).resolve().parent / "data" / "tau2_airline"
@@ -209,6 +211,10 @@ class DatasetResult:
         return counts
 
 
+def _developer(dataset: str) -> str:
+    return f"tau2-airline-reference@{dataset}"
+
+
 def _seeded_secret(dataset: str) -> bytes:
     return hashlib.sha256(f"tau2-airline-reference/{dataset}".encode()).digest()
 
@@ -282,7 +288,7 @@ def run_dataset(dataset: str, path: Path, *, store_dir: str | os.PathLike | None
         caps_fold = load_definition_file(CATALOG_DIR / "spend.weekly.yaml")
         signer = LocalSigner(key_id=f"tau2-airline-reference-{dataset}", secret=_seeded_secret(dataset))
         engine = GuardEngine(ledger=ledger, caps_fold=caps_fold, signer_provider=lambda: signer)
-        developer = f"tau2-airline-reference@{dataset}"
+        developer = _developer(dataset)
         policy_check_ledger_path = Path(store_dir) / f"{dataset}.policy-check.ledger.jsonl"
 
         calls: list[ReplayedCall] = []
@@ -359,6 +365,18 @@ def run_dataset(dataset: str, path: Path, *, store_dir: str | os.PathLike | None
             shutil.rmtree(cleanup_dir, ignore_errors=True)
 
 
+def coverage_trace(result: DatasetResult) -> EvaluationTrace:
+    """The range every number in ``result``'s summary row was counted over:
+    the catalog ``actions.count_by_developer`` fold evaluated over the
+    dataset's own sealed records. Its result is the row's capsule count and
+    its ``coverage_statement()`` is the row's footnote. No capture boundary
+    is declared for this replay, so ``capture`` is left unset and the
+    statement says ``unknown`` rather than omitting it."""
+    definition = load_definition_file(CATALOG_DIR / "actions.count_by_developer.yaml")
+    records = [record.capsule for record in result.records]
+    return evaluate_one(definition, records, key_value=_developer(result.dataset))
+
+
 def _export_fixture(records: tuple[LedgerRecord, ...], path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", encoding="utf-8") as fh:
@@ -383,36 +401,54 @@ def _parse_args(argv: list[str] | None) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 
+def _footnoted(value: int, ref: int) -> str:
+    """A rendered number is never shown without its coverage footnote marker."""
+    return f"{value} [{ref}]"
+
+
 def main(argv: list[str] | None = None) -> int:
+    """Print the summary table. Every number carries a ``[k]`` marker naming
+    its dataset's coverage footnote (``coverage_trace``), printed under the
+    table, so no number is shown without the range it was counted over."""
     args = _parse_args(argv)
     if not args.dataset and not args.all:
         args.all = True
     targets = sorted(DATASETS) if args.all else [args.dataset]
 
-    print(f"{'dataset':<26} {'ALLOW':>6} {'DENY':>6} {'WITH-INSTRUMENTATION':>22}   sample refusal capsule")
-    for dataset in targets:
+    print(
+        f"{'dataset':<26} {'ALLOW':>9} {'DENY':>9} {'WITH-INSTRUMENTATION':>22} {'CAPSULES':>10}"
+        "   sample refusal capsule"
+    )
+    footnotes: list[str] = []
+    for ref, dataset in enumerate(targets, start=1):
         result = run_dataset(dataset, DATASETS[dataset])
+        trace = coverage_trace(result)
+        footnotes.append(f"[{ref}] {dataset}: {format_coverage_footnote(trace.coverage_statement())}")
         counts = result.counts()
         sample = next((c for c in result.calls if c.verdict == "DENY"), None)
-        sample_txt = f"{sample.capsule_id[:16]}… ({sample.tool_name}, task {sample.task_id})" if sample else "-"
+        sample_txt = f'{sample.capsule_id[:16]}… ({sample.tool_name}, task "{sample.task_id}")' if sample else "-"
         print(
-            f"{dataset:<26} {counts['ALLOW']:>6} {counts['DENY']:>6} "
-            f"{counts['MAPPABLE-WITH-INSTRUMENTATION']:>22}   {sample_txt}"
+            f"{dataset:<26} {_footnoted(counts['ALLOW'], ref):>9} {_footnoted(counts['DENY'], ref):>9} "
+            f"{_footnoted(counts['MAPPABLE-WITH-INSTRUMENTATION'], ref):>22} {_footnoted(trace.result, ref):>10}"
+            f"   {sample_txt}"
         )
         if args.out_dir:
             out_path = Path(args.out_dir) / f"{dataset}.jsonl"
             _export_fixture(result.records, out_path)
-            print(f"  -> {len(result.records)} capsule(s) written to {out_path}")
+            print(f"  -> {_footnoted(len(result.records), ref)} capsule(s) written to {out_path}")
             with_instr = next((c for c in result.calls if c.verdict == "MAPPABLE-WITH-INSTRUMENTATION"), None)
             if with_instr:
                 print(
                     f"  -> WITH-INSTRUMENTATION example: capsule {with_instr.capsule_id[:16]}… "
-                    f"({with_instr.tool_name}, task {with_instr.task_id}): {with_instr.reason}"
+                    f'({with_instr.tool_name}, task "{with_instr.task_id}"): {with_instr.reason}'
                 )
             if sample:
                 print(
                     f"  -> verify one row offline:  capsule verify {sample.capsule_id} --ledger {out_path}"
                 )
+    print()
+    for line in footnotes:
+        print(line)
     print(
         "\nCounts are never blended across datasets -- each row is one model's own replay against "
         "the same two policy predicates. See docs/reference/tau2-airline-reference.md."

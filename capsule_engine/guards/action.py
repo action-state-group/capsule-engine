@@ -7,6 +7,7 @@ produces a decision, which is what becomes a Capsule (``guards/capsule.py``).
 """
 from __future__ import annotations
 
+import re
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -18,6 +19,17 @@ def _new_action_id(verb: str) -> str:
 
 def _utc_now() -> str:
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+# All digits once spaces, hyphens and dots are removed, six or more of them
+# (card, account and routing numbers), or IBAN-shaped.
+_RAW_DIGITS = re.compile(r"^\d{6,}$")
+_IBAN = re.compile(r"^[A-Z]{2}\d{2}[A-Z0-9]{11,30}$", re.IGNORECASE)
+
+
+def _looks_like_raw_account_number(value: str) -> bool:
+    compact = re.sub(r"[\s.\-]", "", value)
+    return bool(_RAW_DIGITS.match(compact) or _IBAN.match(compact))
 
 
 @dataclass(frozen=True)
@@ -33,6 +45,19 @@ class Action:
     is the prior capsule this action claims authorization from, checked by
     ``verify_before_dispatch``. ``equivalence_key`` lets a caller override the
     dedupe check's default equivalence formula for this action.
+
+    ``rail`` names the payment rail or destination type (e.g. ``"card"``,
+    ``"p2p"``), read by ``destination_rail``. ``counterparty_account_ref`` is
+    an OPAQUE reference to the account a counterparty is paid into, read by
+    ``counterparty_identity_change`` and sealed on the capsule: a token or a
+    digest that is stable per account, never the account, card or IBAN number
+    itself. A value shaped like a raw number is refused at construction (see
+    ``_looks_like_raw_account_number``); that check catches the common shapes,
+    it cannot prove a value is opaque.
+    ``outgoing_content`` is text the action sends out, read by
+    ``credential_pattern``; it is never written to the capsule.
+    ``recurrence`` says whether a payment repeats (e.g. ``"one_time"``,
+    ``"monthly"``), read by ``recurring_charge``.
     ``taxonomy_version`` (normally ``classes.TAXONOMY_VERSION``) is sealed
     beside ``action_class`` when set, so a count over trigger classes can be
     recomputed against the table that was live; unset, the record keeps its
@@ -53,8 +78,21 @@ class Action:
     equivalence_key: str | None = None
     model_id: str | None = None
     provider: str | None = None
+    rail: str | None = None
+    counterparty_account_ref: str | None = None
+    outgoing_content: str | None = None
+    recurrence: str | None = None
     extra: dict = field(default_factory=dict)
     taxonomy_version: str | None = None
+
+    def __post_init__(self) -> None:
+        if self.counterparty_account_ref is not None and _looks_like_raw_account_number(
+            self.counterparty_account_ref
+        ):
+            raise ValueError(
+                "counterparty_account_ref looks like a raw account, card or IBAN number; it is sealed on the "
+                "capsule, so pass an opaque reference (a token or a digest) instead"
+            )
 
     def resolved_action_id(self) -> str:
         return self.action_id or _new_action_id(self.verb)
@@ -100,5 +138,8 @@ class Action:
             currency=payload.get("currency"),
             target=payload.get("target"),
             cited_mandate_capsule_id=cited_mandate_capsule_id,
+            rail=payload.get("rail"),
+            counterparty_account_ref=payload.get("counterparty_account_ref"),
+            recurrence=payload.get("recurrence"),
             taxonomy_version=payload.get("taxonomy_version"),
         )

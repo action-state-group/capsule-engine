@@ -1,0 +1,9 @@
+# destination_rail wicket: set membership of the action's payment rail
+# (guards/checks/destination_rail.py). The check fails when Action.rail is one
+# of `watched_rails`, for actions in `action_classes`. Both lists are policy
+# data, so a change to either moves this definition's digest.
+wicket_id: destination_rail/1.0.0
+check: destination_rail
+config:
+  action_classes: [money.transfer]
+  watched_rails: [crypto, gift_card, p2p]

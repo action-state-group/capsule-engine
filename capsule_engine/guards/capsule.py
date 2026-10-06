@@ -11,16 +11,19 @@ Per the -02 disposition spec (§ Disposition and the verdict reason-class):
 ``verdict_class`` is "legitimately absent for a clean executed verdict", so
 ``allow`` leaves it absent rather than claiming ``executed`` for something
 this capsule did not itself do. ``deny`` uses the registry-seeded ``blocked``
-token. ``escalate`` uses ``hitl_dispatched``: the guard is the one routing the action to a human who has not yet
-acted, which is what -02 §verdictclass defines ``hitl_dispatched`` as
-("routed to a human operator; awaiting resolution") -- ``deferred`` is a
-*human*-elected postponement, a different, later state. ``disposition.decision``
-also takes ``hitl_dispatched`` under the same decision; it sits outside the
-seeded ``accept``/``reject``/``needs_input``/``deferred`` set, but an
-unregistered ``decision`` value is informational to a verifier, never a
-rejection, per -02's conformance rules (see STATUS.md's Needs decision
-section for the still-open ``supersedes`` vs. requested-but-unregistered
-``resolves`` relation question -- unrelated to D1, not resolved here).
+token. ``escalate`` sets ``verdict_class`` to ``hitl_dispatched``: the guard
+is the one routing the action to a human who has not yet acted, which is
+what -02 §verdictclass defines ``hitl_dispatched`` as ("routed to a human
+operator; awaiting resolution") -- ``deferred`` is a *human*-elected
+postponement, a different, later state. ``disposition.decision`` is
+``needs_input``, a seeded decision value, so the pair matches the donated
+conformance vector ``vectors/capsule/pos-hitl-dispatched`` exactly.
+
+Superseded 2026-10-04: the 2026-08-05 decision (D1) that also wrote
+``hitl_dispatched`` into ``disposition.decision``: that put one token on
+both axes, and ``hitl_dispatched`` is not a seeded decision value. Records
+sealed under D1 are never rewritten; ``outcome_from_disposition`` reads
+their legacy pairing as ``escalate``.
 
 Money amounts have no field in the core -02 schema. ``asg_payload`` is a
 single namespaced, non-spec payload extension (never a repurposed spec-
@@ -41,6 +44,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from dataclasses import dataclass
+from typing import TypedDict
 
 from agent_action_capsule import (
     DEFAULT_FORMAT_VERSION,
@@ -62,20 +66,43 @@ __all__ = [
     "DENY",
     "ESCALATE",
     "ConstraintOutcome",
+    "NotApplicableEvidence",
     "build_decision_capsule",
+    "not_applicable_evidence",
+    "outcome_from_disposition",
 ]
 
 ALLOW = "allow"
 DENY = "deny"
 ESCALATE = "escalate"
 
-# Disposition mapping (see module docstring). `escalate` -> `hitl_dispatched`
-# for both `decision` and `verdict_class`, per D1 (2026-08-05).
+# Disposition mapping (see module docstring). `escalate` -> decision
+# `needs_input` with verdict_class `hitl_dispatched`, the donated vector's pair.
 _DISPOSITION_BY_OUTCOME = {
     ALLOW: {"decision": "accept", "verdict_class": None},
     DENY: {"decision": "reject", "verdict_class": "blocked"},
-    ESCALATE: {"decision": "hitl_dispatched", "verdict_class": "hitl_dispatched"},
+    ESCALATE: {"decision": "needs_input", "verdict_class": "hitl_dispatched"},
 }
+
+# Reader side: every decision value this engine has ever sealed. The legacy
+# `hitl_dispatched` decision was written before the change above and still
+# reads as an escalation.
+_OUTCOME_BY_DECISION = {"accept": ALLOW, "reject": DENY, "needs_input": ESCALATE}
+_LEGACY_ESCALATE_DECISION = "hitl_dispatched"
+
+
+# `disposition` is the raw JSON object of a sealed capsule, possibly one this
+# engine did not write; its keys are the capsule spec's and are read here.
+def outcome_from_disposition(disposition: dict) -> str:
+    """allow | deny | escalate for a sealed decision capsule's disposition,
+    including records sealed with the legacy escalate pairing (decision and
+    verdict_class both ``hitl_dispatched``)."""
+    decision = disposition.get("decision")
+    if decision in _OUTCOME_BY_DECISION:
+        return _OUTCOME_BY_DECISION[decision]
+    if decision == _LEGACY_ESCALATE_DECISION and disposition.get("verdict_class") == _LEGACY_ESCALATE_DECISION:
+        return ESCALATE
+    raise ValueError(f"no guard outcome for disposition.decision {decision!r}")
 
 
 @dataclass(frozen=True)
@@ -97,6 +124,40 @@ class ConstraintOutcome:
     blocking: bool | None = None
     check_type: str | None = "policy"
     method: str | None = None
+
+    def __post_init__(self) -> None:
+        # An n/a with no evidence seals with no evidence_digest, so every n/a
+        # cause would produce the same constraint record and a reader could
+        # not tell "this rule did not apply" from "this rule applied and
+        # could not be evaluated". Refuse to build one.
+        if self.result == "n/a" and self.evidence is None:
+            raise ValueError(
+                f"constraint {self.id!r}: result 'n/a' requires an evidence object "
+                "(see not_applicable_evidence)"
+            )
+
+
+class NotApplicableEvidence(TypedDict):
+    constraint_id: str
+    in_scope: bool
+    missing_field: str | None
+
+
+def not_applicable_evidence(
+    constraint_id: str, *, in_scope: bool, missing_field: str | None = None
+) -> NotApplicableEvidence:
+    """The evidence object every ``n/a`` constraint carries: facts only.
+
+    ``in_scope`` says whether the rule applied to this action at all (e.g. a
+    cap is configured for its action class). ``missing_field`` names the
+    normalized action field that was absent when an in-scope rule could not
+    be evaluated, and is ``None`` otherwise. The object is small, canonical
+    and holds no private data, so anyone can recompute the candidate digests
+    and tell the cases apart from ``evidence_digest`` alone.
+    """
+    if not in_scope and missing_field is not None:
+        raise ValueError("missing_field is only meaningful for an in-scope n/a")
+    return NotApplicableEvidence(constraint_id=constraint_id, in_scope=in_scope, missing_field=missing_field)
 
 
 def _to_constraint_record(outcome: ConstraintOutcome) -> ConstraintRecord:
@@ -122,6 +183,12 @@ def _payload_extension(action: Action, checkpoint: dict, manifest_digest: str | 
         ext["target"] = action.target
     if action.action_class is not None:
         ext["action_class"] = action.action_class
+    if action.rail is not None:
+        ext["rail"] = action.rail
+    if action.counterparty_account_ref is not None:
+        ext["counterparty_account_ref"] = action.counterparty_account_ref
+    if action.recurrence is not None:
+        ext["recurrence"] = action.recurrence
     if action.taxonomy_version is not None:
         # Written only when set, so existing records keep their bytes; read
         # back with ``classes.record_taxonomy_version``.

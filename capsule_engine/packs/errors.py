@@ -39,6 +39,7 @@ MISSING_REFUSAL_REASON = "missing_refusal_reason"
 EFFECT_CLAIM_NOT_REFUSED = "effect_claim_not_refused"
 UNKNOWN_EFFECT_CLAIM = "unknown_effect_claim"
 INVALID_RE_DERIVABILITY_GRADE = "invalid_re_derivability_grade"
+INVALID_DEFAULT_DISPOSITION = "invalid_default_disposition"
 INVALID_SCOPE_CENSUS = "invalid_scope_census"
 
 # tier: whether an outcome
@@ -93,6 +94,8 @@ MISSING_OBLIGATION_CLAUSE = "missing_obligation_clause"
 MISSING_CONSTRAINT_SCOPE = "missing_constraint_scope"
 INVALID_SCOPE_DIMENSION = "invalid_scope_dimension"
 SCOPE_MISMATCH = "scope_mismatch"
+UNKNOWN_CATALOG_REF = "unknown_catalog_ref"
+CATALOG_REF_DIGEST_MISMATCH = "catalog_ref_digest_mismatch"
 
 # Registry-pin verification (pins.py) -- a distinct failure family from
 # pack.yaml parsing: these are trust/integrity failures against a pins

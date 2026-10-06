@@ -33,7 +33,7 @@ dependencies = [
     # .registry and .vectors live only in capsule-ledger and must move into this
     # package (or cll) first.
     "capsule-ledger @ git+https://github.com/action-state-group/capsule-ledger.git@42fb45f69b067f623a4b9915ae8883dff22d5d27",
-    # schemas/evidence-contract-v0.json's validator entry point
+    # capsule_engine/schemas/evidence-contract-v0.json's validator entry point
     # (packs/contract_validate.py).
     "jsonschema>=4.18",
     # ``ledger-io`` extra: capsule_emit.ledger_io/period, the read/verify seam
@@ -97,6 +97,8 @@ capsule_engine = [
     "examples/data/tau2_airline/*.jsonl",
     "examples/data/tau2_airline/*.json",
     "registry/*.json",
+    "schemas/*.json",
+    "schemas/vendor/*.json",
 ]
 
 [tool.pytest.ini_options]

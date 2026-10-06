@@ -84,7 +84,7 @@ def test_over_tolerance_escalates_when_approver_role_configured_never_adjusts_ag
     assert over.reason_code == OVER_TOLERANCE
 
     # NEVER a *successful* reconcile for the over-tolerance attempt: the
-    # capsule's own disposition is the escalate outcome (hitl_dispatched),
+    # capsule's own disposition is the escalate outcome (needs_input),
     # never "accept" -- which is also exactly why the hold.active_exposure
     # fold's own filter (disposition.decision == accept) never picks this
     # record up, regardless of its action_id verb.

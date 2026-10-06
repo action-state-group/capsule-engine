@@ -35,3 +35,17 @@ jobs:
         run: ruff check .
       - name: pytest
         run: pytest -q
+
+  # Every job above tests the editable install, where the checkout is on disk
+  # whatever the wheel ships. This one builds the wheel, installs it into a
+  # fresh venv with its declared dependencies, and runs the schema-backed
+  # calls from outside the checkout.
+  clean-room-wheel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: build, install into a fresh venv, run the clean-room check
+        run: bash scripts/clean_room_wheel.sh
