@@ -70,5 +70,5 @@ def run_list(args: argparse.Namespace) -> int:
     print()
     print("action classes (absent or unrecognized -> unclassified, fail-closed):")
     for ac in (*TAXONOMY.values(), UNCLASSIFIED_DEFAULT):
-        print(f"  {ac.name:<20} consequential={str(ac.consequential):<6} fail_open_allowed={ac.fail_open_allowed}")
+        print(f"  {ac.name:<26} consequential={str(ac.consequential):<6} fail_open_allowed={ac.fail_open_allowed}")
     return 0

@@ -54,7 +54,7 @@ from ..folds.catalog import Catalog as FoldCatalog
 from ..folds.definition import FoldDefinition
 from ..folds.errors import FoldDefinitionError
 from ..folds.loader import load_definition_file as load_fold_definition_file
-from ..guards.classes import TAXONOMY
+from ..guards.classes import TAXONOMY, is_known_action_class, legacy_aliases
 from ..guards.wickets.catalog import Catalog as WicketCatalog
 from ..guards.wickets.definition import WicketDefinition
 from ..guards.wickets.definition import parse_definition as parse_wicket_definition
@@ -293,11 +293,12 @@ def _parse_action_semantics(raw: Any, *, allow_empty: bool = False) -> tuple[Act
         action_class = _require_nonempty_str(
             entry.get("action_class"), f"action_semantics[{action_type!r}].action_class", "money.transfer"
         )
-        if action_class not in TAXONOMY:
+        if not is_known_action_class(action_class):
             raise PackDefinitionError(
                 UNKNOWN_ACTION_CLASS,
                 f"action_semantics[{action_type!r}].action_class={action_class!r} is not in the guard's "
-                f"starter taxonomy (guards/classes.py): {sorted(TAXONOMY)}. A pack governs an EXISTING "
+                f"taxonomy (guards/action_taxonomy.json): {sorted(TAXONOMY)} (legacy names also accepted: "
+                f"{sorted(legacy_aliases())}). A pack governs an EXISTING "
                 "action class -- it does not invent new ones (that is a core-repo taxonomy change).",
             )
 

@@ -36,7 +36,7 @@ def _looks_like_raw_account_number(value: str) -> bool:
 class Action:
     """One candidate action, as presented to the guard for a decision.
 
-    ``action_class`` is looked up in the starter taxonomy (``classes.py``);
+    ``action_class`` is looked up in the taxonomy (``classes.py``);
     absent or unrecognized both resolve to the consequential/fail-closed
     default. ``amount_minor``/``currency`` are integer-minor-units money
     fields (never floats, per the fold engine's own determinism rule) read
@@ -58,6 +58,10 @@ class Action:
     ``credential_pattern``; it is never written to the capsule.
     ``recurrence`` says whether a payment repeats (e.g. ``"one_time"``,
     ``"monthly"``), read by ``recurring_charge``.
+    ``taxonomy_version`` (normally ``classes.TAXONOMY_VERSION``) is sealed
+    beside ``action_class`` when set, so a count over trigger classes can be
+    recomputed against the table that was live; unset, the record keeps its
+    prior bytes.
     """
 
     verb: str
@@ -79,6 +83,7 @@ class Action:
     outgoing_content: str | None = None
     recurrence: str | None = None
     extra: dict = field(default_factory=dict)
+    taxonomy_version: str | None = None
 
     def __post_init__(self) -> None:
         if self.counterparty_account_ref is not None and _looks_like_raw_account_number(
@@ -136,4 +141,5 @@ class Action:
             rail=payload.get("rail"),
             counterparty_account_ref=payload.get("counterparty_account_ref"),
             recurrence=payload.get("recurrence"),
+            taxonomy_version=payload.get("taxonomy_version"),
         )

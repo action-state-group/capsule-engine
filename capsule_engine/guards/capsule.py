@@ -189,6 +189,10 @@ def _payload_extension(action: Action, checkpoint: dict, manifest_digest: str | 
         ext["counterparty_account_ref"] = action.counterparty_account_ref
     if action.recurrence is not None:
         ext["recurrence"] = action.recurrence
+    if action.taxonomy_version is not None:
+        # Written only when set, so existing records keep their bytes; read
+        # back with ``classes.record_taxonomy_version``.
+        ext["taxonomy_version"] = action.taxonomy_version
     if manifest_digest is not None:
         ext["manifest_digest"] = manifest_digest
     return ext
