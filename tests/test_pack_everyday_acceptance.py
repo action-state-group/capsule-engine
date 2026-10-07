@@ -61,6 +61,20 @@ def _message(name: str, minute: int, developer: str, **fields) -> Action:
     )
 
 
+def _purchase(name: str, minute: int, developer: str, **fields) -> Action:
+    return Action(
+        verb="make_purchase",
+        operator=OPERATOR,
+        developer=developer,
+        action_class="money.purchase",
+        currency="EUR",
+        rail="card",
+        action_id=f"make_purchase/everyday-fixture-{name}",
+        timestamp=f"2026-08-10T10:{minute:02d}:00Z",
+        **fields,
+    )
+
+
 def _scenarios() -> list[tuple[str, Action, str]]:
     water = dict(target="utility/water-co", rail="bank_transfer", developer="household-assistant-a@v1")
     dup = dict(
@@ -124,6 +138,18 @@ def _scenarios() -> list[tuple[str, Action, str]]:
         ("caps-over-limit-escalates", _payment("caps-escalates", 16, "household-assistant-i@v1", operator=f"{OPERATOR}-i",
          amount_minor=3_000, target="builder/extension-phase-2", rail="card",
          counterparty_account_ref="acct-ref-builder-2"), ESCALATE),
+        # No accepted action with the garden centre yet: counterparty_seen_before
+        # fails, and money.purchase has no approver role, so the decision denies.
+        ("merchant-first-purchase", _purchase("merchant-first", 17, "household-assistant-j@v1", amount_minor=1_800,
+         target="shop/garden-centre"), DENY),
+        # dedupe-original is an accepted payment to the hardware store, so a
+        # purchase there is a repeat merchant and passes.
+        ("merchant-repeat-purchase", _purchase("merchant-repeat", 18, "household-assistant-j@v1", amount_minor=900,
+         target="shop/hardware-store"), ALLOW),
+        # booking.create matches the gate's booking_create selector, which fails.
+        ("booking-create", Action(verb="book_table", operator=OPERATOR, developer="household-assistant-k@v1",
+         action_class="booking.create", amount_minor=2_000, currency="EUR", target="venue/restaurant",
+         action_id="book_table/everyday-fixture-booking-create", timestamp="2026-08-10T10:19:00Z"), DENY),
     ]
 
 
@@ -182,7 +208,7 @@ def test_records_are_pack_attributed_and_observe_mode(run):
         assert capsule["asg_payload"]["manifest_digest"] == installed.resolved.manifest_digest, name
         assert capsule["asg_payload"]["checkpoint"]["dry_run"] is True, name
     assert activation["asg_payload"]["detail"]["packs"] == [
-        {"pack_id": "asg/everyday/0.1.0", "digest": installed.pack.definition_digest(), "mode": "observe"}
+        {"pack_id": "asg/everyday/0.2.0", "digest": installed.pack.definition_digest(), "mode": "observe"}
     ]
 
 

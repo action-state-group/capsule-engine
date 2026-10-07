@@ -81,28 +81,34 @@ def resolves_instrument(instrument: EvidenceInstrument, messages: Iterable[Mappi
 
 
 def verify_declared_not_measured(pack: PackDefinition, corpus: Iterable[Mapping[str, Any]]) -> None:
-    """For every outcome in ``pack`` declared ``measurability:
-    declared_not_measured``, prove its ``evidence_instrument`` resolves to
-    ZERO hits across ``corpus`` -- raising ``CorpusVerificationError`` the
-    moment one doesn't. Units are consumed once each (a generator corpus is
-    fine, it is only ever iterated over, never rewound) but every
-    declared-not-measured outcome is checked against every unit, so a
-    generator that can only be iterated once should be materialized by the
-    caller first if more than one outcome needs checking (the common case)."""
-    declared_not_measured = [o for o in pack.outcomes if o.measurability == "declared_not_measured"]
+    """For every outcome and every obligation in ``pack`` declared
+    ``measurability: declared_not_measured``, prove its
+    ``evidence_instrument`` resolves to ZERO hits across ``corpus`` --
+    raising ``CorpusVerificationError`` the moment one doesn't. Units are
+    consumed once each (a generator corpus is fine, it is only ever iterated
+    over, never rewound) but every declared-not-measured entry is checked
+    against every unit, so a generator that can only be iterated once should
+    be materialized by the caller first if more than one entry needs checking
+    (the common case)."""
+    declared_not_measured: list[tuple[str, str, EvidenceInstrument | None]] = [
+        ("outcome", o.id, o.evidence_instrument) for o in pack.outcomes if o.measurability == "declared_not_measured"
+    ] + [
+        ("obligation", o.id, o.evidence_instrument)
+        for o in pack.obligations
+        if o.measurability == "declared_not_measured"
+    ]
     if not declared_not_measured:
         return
     units = list(corpus)
     violations: list[str] = []
-    for outcome in declared_not_measured:
-        instrument = outcome.evidence_instrument
+    for label, entry_id, instrument in declared_not_measured:
         # loader.py requires this whenever measurability == declared_not_measured;
         # a PackDefinition built by hand (bypassing the loader) could still omit
         # it, so this is a real, not merely defensive, check.
         if instrument is None:
             raise CorpusVerificationError(
                 DECLARED_NOT_MEASURED_EVIDENCE_RESOLVED,
-                f"outcome {outcome.id!r} declares measurability=declared_not_measured but carries no "
+                f"{label} {entry_id!r} declares measurability=declared_not_measured but carries no "
                 "evidence_instrument -- nothing for this oracle to check, which is itself the unverifiable "
                 "state this module exists to close",
             )
@@ -110,7 +116,7 @@ def verify_declared_not_measured(pack: PackDefinition, corpus: Iterable[Mapping[
             messages = unit.get("messages") or ()
             if resolves_instrument(instrument, messages):
                 violations.append(
-                    f"outcome {outcome.id!r} declares measurability=declared_not_measured with "
+                    f"{label} {entry_id!r} declares measurability=declared_not_measured with "
                     f"evidence_instrument={instrument.to_dict()!r}, but that instrument DOES resolve on this "
                     "corpus -- this term is measurable here; either the declared measurability is wrong, or "
                     "a real verdict is being hidden behind a false 'inapplicable' claim"

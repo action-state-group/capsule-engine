@@ -217,6 +217,32 @@ def _parse_obligations(
             f"obligations[{obligation_id!r}].statement",
             "No payment may exceed the configured weekly cap without escalation.",
         )
+        measurability = entry.get("measurability", "measured")
+        if measurability not in MEASURABILITY_VALUES:
+            raise PackDefinitionError(
+                INVALID_MEASURABILITY,
+                f"obligations[{obligation_id!r}].measurability={measurability!r} must be one of "
+                f"{sorted(MEASURABILITY_VALUES)}, or omitted (defaults to 'measured')",
+            )
+        if measurability == "declared_not_measured":
+            obligations.append(
+                _declared_not_measured_obligation(
+                    obligation_id=obligation_id,
+                    statement=statement,
+                    check=entry.get("check"),
+                    instrument=entry.get("evidence_instrument"),
+                    grades=_obligation_grades(
+                        entry.get("re_derivability_grade"), entry.get("default_disposition"), obligation_id=obligation_id
+                    ),
+                )
+            )
+            continue
+        if "evidence_instrument" in entry:
+            raise PackDefinitionError(
+                INVALID_MEASURABILITY,
+                f"obligations[{obligation_id!r}] is measured by its check and also names an "
+                "evidence_instrument; an instrument belongs only to a declared_not_measured obligation",
+            )
         check = _require_nonempty_str(entry.get("check"), f"obligations[{obligation_id!r}].check", "caps")
         if check not in declared_checks:
             raise PackDefinitionError(
@@ -226,20 +252,9 @@ def _parse_obligations(
                 "to a constraint that actually enforces it; add a constraints[] entry with check: "
                 f"{check!r}, or fix the typo",
             )
-        re_derivability_grade = entry.get("re_derivability_grade")
-        if re_derivability_grade is not None and re_derivability_grade not in RE_DERIVABILITY_GRADES:
-            raise PackDefinitionError(
-                INVALID_RE_DERIVABILITY_GRADE,
-                f"obligations[{obligation_id!r}].re_derivability_grade={re_derivability_grade!r} must be one of "
-                f"{sorted(RE_DERIVABILITY_GRADES)}, or omitted",
-            )
-        default_disposition = entry.get("default_disposition")
-        if default_disposition is not None and default_disposition not in DEFAULT_DISPOSITION_VALUES:
-            raise PackDefinitionError(
-                INVALID_DEFAULT_DISPOSITION,
-                f"obligations[{obligation_id!r}].default_disposition={default_disposition!r} must be one of "
-                f"{sorted(DEFAULT_DISPOSITION_VALUES)}, or omitted",
-            )
+        re_derivability_grade, default_disposition = _obligation_grades(
+            entry.get("re_derivability_grade"), entry.get("default_disposition"), obligation_id=obligation_id
+        )
         obligations.append(
             Obligation(
                 id=obligation_id,
@@ -250,6 +265,61 @@ def _parse_obligations(
             )
         )
     return tuple(obligations)
+
+
+def _obligation_grades(
+    re_derivability_grade: object, default_disposition: object, *, obligation_id: str
+) -> tuple[str | None, str | None]:
+    """The optional ``re_derivability_grade`` and ``default_disposition``, each checked against its closed set."""
+    if re_derivability_grade is not None and re_derivability_grade not in RE_DERIVABILITY_GRADES:
+        raise PackDefinitionError(
+            INVALID_RE_DERIVABILITY_GRADE,
+            f"obligations[{obligation_id!r}].re_derivability_grade={re_derivability_grade!r} must be one of "
+            f"{sorted(RE_DERIVABILITY_GRADES)}, or omitted",
+        )
+    if default_disposition is not None and default_disposition not in DEFAULT_DISPOSITION_VALUES:
+        raise PackDefinitionError(
+            INVALID_DEFAULT_DISPOSITION,
+            f"obligations[{obligation_id!r}].default_disposition={default_disposition!r} must be one of "
+            f"{sorted(DEFAULT_DISPOSITION_VALUES)}, or omitted",
+        )
+    return re_derivability_grade, default_disposition
+
+
+def _declared_not_measured_obligation(
+    *,
+    obligation_id: str,
+    statement: str,
+    check: object,
+    instrument: object,
+    grades: tuple[str | None, str | None],
+) -> Obligation:
+    """An obligation no check measures: it cites none and names the evidence instrument its input would arrive in."""
+    what = f"obligations[{obligation_id!r}]"
+    if check is not None:
+        raise PackDefinitionError(
+            INVALID_MEASURABILITY,
+            f"{what} declares measurability=declared_not_measured and also cites check={check!r}; "
+            "a rule a check measures is measured -- drop one of the two",
+        )
+    if instrument is None:
+        raise PackDefinitionError(
+            MISSING_EVIDENCE_INSTRUMENT,
+            f"{what} declares measurability=declared_not_measured but no evidence_instrument -- name the "
+            "signal its missing input would arrive in, so corpus_verify.py can check the claim, e.g.:\n"
+            "evidence_instrument:\n"
+            "  kind: structured_field\n"
+            "  field: task_authority_ref",
+        )
+    re_derivability_grade, default_disposition = grades
+    return Obligation(
+        id=obligation_id,
+        statement=statement,
+        re_derivability_grade=re_derivability_grade,
+        default_disposition=default_disposition,
+        measurability="declared_not_measured",
+        evidence_instrument=_parse_evidence_instrument(instrument, what=what),
+    )
 
 
 def _parse_action_semantics(raw: Any, *, allow_empty: bool = False) -> tuple[ActionSemantic, ...]:
@@ -626,13 +696,14 @@ def _parse_window(raw: Any, *, what: str) -> WindowSpec | None:
     return WindowSpec(duration=duration, cure=cure, grace=grace)
 
 
-def _parse_evidence_instrument(raw: Any, *, outcome_id: str) -> EvidenceInstrument:
-    raw = _require_mapping(raw, f"outcomes[{outcome_id!r}].evidence_instrument")
+def _parse_evidence_instrument(raw: Any, *, what: str) -> EvidenceInstrument:
+    """``what`` names the entry, e.g. ``outcomes['x']`` or ``obligations['y']``."""
+    raw = _require_mapping(raw, f"{what}.evidence_instrument")
     kind = raw.get("kind")
     if kind not in EVIDENCE_INSTRUMENT_KINDS:
         raise PackDefinitionError(
             INVALID_EVIDENCE_INSTRUMENT,
-            f"outcomes[{outcome_id!r}].evidence_instrument.kind={kind!r} must be one of "
+            f"{what}.evidence_instrument.kind={kind!r} must be one of "
             f"{sorted(EVIDENCE_INSTRUMENT_KINDS)}",
         )
     if kind == "structured_field":
@@ -640,7 +711,7 @@ def _parse_evidence_instrument(raw: Any, *, outcome_id: str) -> EvidenceInstrume
         if not isinstance(field, str) or not field:
             raise PackDefinitionError(
                 INVALID_EVIDENCE_INSTRUMENT,
-                f"outcomes[{outcome_id!r}].evidence_instrument.field is required and must be a non-empty "
+                f"{what}.evidence_instrument.field is required and must be a non-empty "
                 "string for kind: structured_field, e.g. field: restriction_reason_cited",
             )
         return EvidenceInstrument(kind=kind, field=field)
@@ -648,7 +719,7 @@ def _parse_evidence_instrument(raw: Any, *, outcome_id: str) -> EvidenceInstrume
     if not isinstance(name, str) or not name:
         raise PackDefinitionError(
             INVALID_EVIDENCE_INSTRUMENT,
-            f"outcomes[{outcome_id!r}].evidence_instrument.name is required and must be a non-empty string "
+            f"{what}.evidence_instrument.name is required and must be a non-empty string "
             "for kind: tool_call_name, e.g. name: issue_refund",
         )
     return EvidenceInstrument(kind=kind, name=name)
@@ -836,7 +907,7 @@ def _parse_outcomes(raw: Any) -> tuple[EvidenceContract, ...]:
                 "  field: restriction_reason_cited",
             )
         evidence_instrument = (
-            _parse_evidence_instrument(evidence_instrument_raw, outcome_id=outcome_id)
+            _parse_evidence_instrument(evidence_instrument_raw, what=f"outcomes[{outcome_id!r}]")
             if evidence_instrument_raw is not None
             else None
         )

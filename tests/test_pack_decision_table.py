@@ -12,7 +12,8 @@ Parameterized over every catalog pack that ships
 ``fixtures/decision_table.yaml``, so a new pack's table cannot go unchecked.
 No-dead-rules covers the checks the pack's obligations declare; a reference
 check the engine always records but the pack does not declare (everyday's
-``verify_before_dispatch``) may stay ``n/a`` throughout.
+``verify_before_dispatch``) may stay ``n/a`` throughout. An obligation
+declared not measured cites no check, so it adds no column.
 
 A row may declare ``n_a``: for every constraint that recorded ``n/a``, its
 population (``a``: the rule applied and the named field was missing; ``c``:
@@ -104,7 +105,7 @@ def test_every_n_a_declares_its_population_and_matches_the_sealed_evidence_diges
 def test_no_dead_rules_every_declared_check_fires_both_ways(pack_dir):
     from capsule_engine.packs.loader import load_pack_dir
 
-    declared_checks = {o.check for o in load_pack_dir(pack_dir).obligations}
+    declared_checks = {o.check for o in load_pack_dir(pack_dir).obligations if o.check is not None}
     outcomes_by_check: dict[str, set[str]] = {}
     for row in _load_table(pack_dir):
         for check_id, result in row["checks"].items():
@@ -124,6 +125,6 @@ def test_every_declared_obligation_check_appears_in_the_table(pack_dir):
     from capsule_engine.packs.loader import load_pack_dir
 
     pack = load_pack_dir(pack_dir)
-    declared_checks = {o.check for o in pack.obligations}
+    declared_checks = {o.check for o in pack.obligations if o.check is not None}
     table_checks = {check_id for row in _load_table(pack_dir) for check_id in row["checks"]}
     assert declared_checks <= table_checks, f"declared but never in the decision table: {declared_checks - table_checks}"

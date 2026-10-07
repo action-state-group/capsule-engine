@@ -258,8 +258,9 @@ EPISTEMIC_TYPE_VALUES = frozenset(
 
 @dataclass(frozen=True)
 class Obligation:
-    """The human-readable contract this pack encodes, mapped 1:1 to a check
-    (every obligation maps 1:1 to the check that enforces it).
+    """The human-readable contract this pack encodes, mapped to the one check
+    that measures it, or declared not measured (below). Several obligations
+    may cite the same check.
 
     ``re_derivability_grade`` (design §2.3, compiler-and-setup-design
     2026-08-19) is optional and additive -- an undeclared grade is a
@@ -272,13 +273,23 @@ class Obligation:
 
     ``default_disposition`` follows the same optional, additive convention:
     when declared it must be one of ``DEFAULT_DISPOSITION_VALUES``.
+
+    ``measurability``/``evidence_instrument`` follow it too, with the same
+    meaning as on an ``EvidenceContract``: an obligation is ``measured`` by
+    its ``check`` unless it declares ``declared_not_measured``, in which case
+    it cites no check and names the ``evidence_instrument`` its missing input
+    would arrive in, for ``corpus_verify.verify_declared_not_measured`` to
+    test. Both are emitted only when declared, so an obligation without them
+    digests identically to before.
     """
 
     id: str
     statement: str
-    check: str
+    check: str | None = None
     re_derivability_grade: str | None = None
     default_disposition: str | None = None
+    measurability: str = "measured"
+    evidence_instrument: EvidenceInstrument | None = None
 
 
 @dataclass(frozen=True)
@@ -758,9 +769,15 @@ class PackDefinition:
                 {
                     "id": o.id,
                     "statement": o.statement,
-                    "check": o.check,
+                    **({"check": o.check} if o.check is not None else {}),
                     **({"re_derivability_grade": o.re_derivability_grade} if o.re_derivability_grade else {}),
                     **({"default_disposition": o.default_disposition} if o.default_disposition else {}),
+                    **({"measurability": o.measurability} if o.measurability != "measured" else {}),
+                    **(
+                        {"evidence_instrument": o.evidence_instrument.to_dict()}
+                        if o.evidence_instrument is not None
+                        else {}
+                    ),
                 }
                 for o in self.obligations
             ],
