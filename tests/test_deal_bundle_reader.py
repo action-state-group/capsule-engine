@@ -19,6 +19,7 @@ import json
 from pathlib import Path
 
 import pytest
+from agent_action_capsule import json_digest
 
 from capsule_engine.cli.main import main as cli_main
 from capsule_engine.policy import load_manifest_file, resolve_manifest
@@ -167,3 +168,40 @@ def test_cli_caps_from_manifest_needs_a_manifest(tmp_path, capsys):
     )
     assert rc == 1
     assert "needs a manifest" in capsys.readouterr().err
+
+
+def _bound_check(body: dict) -> tuple[dict, dict]:
+    """A deal check record with ``body``, and a capsule that seals it (its
+    ``agent_input_digest`` is the record's digest), so the reader reads it."""
+    record = {
+        "body": {"action": "pay", "action_class": "money.purchase", "taxonomy_version": "2", **body},
+        "x-deal-v0": {"record_type": "check", "deal_id": "deal-0000000000000000", "seq": 2},
+    }
+    capsule = {
+        "capsule_id": "0" * 64,
+        "action_id": "deal-0000000000000000/2",
+        "action_type": "fyi",
+        "operator": "household-a",
+        "developer": "capsulectl-deal",
+        "timestamp": "2026-10-07T12:00:00Z",
+        "model_attestation": {"compute_attestation": {"agent_input_digest": json_digest(record)}},
+    }
+    return capsule, record
+
+
+def test_the_cap_amount_is_spend_minor_never_amount_minor():
+    """Where a record's amount and its spend differ, the cap evaluates the
+    spend: amount_minor is never the cap's amount."""
+    capsule, record = _bound_check({"amount_minor": 55_880, "currency": "USD", "spend_minor": 100})
+    action = action_for_record(capsule, record)
+    assert action.action_class == "money.purchase"
+    assert action.amount_minor == 100
+
+
+def test_money_moving_in_is_never_the_caps_amount():
+    """A record that says the money moved in is never spend, whatever its
+    spend_minor says."""
+    capsule, record = _bound_check(
+        {"action": "cancel", "action_class": "money.refund", "amount_minor": 500, "spend_minor": 500, "direction": "in"}
+    )
+    assert action_for_record(capsule, record).amount_minor == 0
