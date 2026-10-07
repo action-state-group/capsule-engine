@@ -1,0 +1,76 @@
+# Net spend per operator over a rolling 7-day window: the sum of
+# asg_payload.amount_minor (integer minor units) over accepted actions, less
+# what a linked cancel or refund took back. Used by the caps/4.0.0 wicket.
+#
+# Two changes from spend.weekly/2.0.0, which stays as it was for the records
+# and ports that pin it:
+#
+# 1. A booking.cancel or money.refund no longer adds to spend. It takes its
+#    amount back out, up to what the charge has left, when its chain block
+#    cites that charge (chain.parent_capsule_id) with the registered
+#    `supersedes` relation and the charge is one this fold counted for the
+#    same operator in the same window. Any other cancel or refund is unlinked
+#    and neither adds nor subtracts. Subtracting an unlinked one would let a
+#    cancel that reverses nothing lower the total, which is a cap bypass.
+#    The caps evidence counts both kinds (folds/engine.py, ReversalSummary).
+#    A producer links a cancel by passing chain_parent=<the charge's
+#    capsule_id> and chain_relation="supersedes" to GuardEngine.check. Until
+#    a producer does, its cancels are unlinked and spend stays where it was.
+# 2. Dry runs do not count. GuardEngine records a dry-run allow as accepted,
+#    with asg_payload.checkpoint.dry_run = true, but the action never ran.
+#
+# A cancellation fee is money leaving, not a reversal: record it under the
+# class of the payment (money.purchase), not booking.cancel.
+#
+# The cancel's own recorded amount is what comes back off the total, once
+# the cancel is accepted. Nothing here confirms that the merchant refunded
+# it, and a cancel may cite a charge of any class.
+#
+# A negative amount never lowers the total: a negative charge counts as
+# zero, and a reversal with an amount of zero or less is unlinked.
+#
+# Records with no asg_payload.amount_minor are skipped, as in v2. A record
+# with no action_class or chain block is read as a charge with no citation.
+fold_id: spend.weekly/3.0.0
+reads:
+  - path: operator
+    erasure_class: commitment-ok
+  - path: timestamp
+    erasure_class: commitment-ok
+  - path: asg_payload.amount_minor
+    erasure_class: commitment-ok
+  - path: disposition.decision
+    erasure_class: commitment-ok
+  - path: asg_payload.checkpoint.dry_run
+    erasure_class: commitment-ok
+    default: false
+  - path: asg_payload.action_class
+    erasure_class: commitment-ok
+    default: null
+  - path: chain.parent_capsule_id
+    erasure_class: commitment-ok
+    default: null
+  - path: chain.relation
+    erasure_class: commitment-ok
+    default: null
+filter:
+  - field: disposition.decision
+    op: eq
+    value: accept
+  - field: asg_payload.checkpoint.dry_run
+    op: ne
+    value: true
+key: operator
+window:
+  mode: rolling
+  duration: 7d
+reduce:
+  reducer: sum
+  field: asg_payload.amount_minor
+reversal:
+  class_field: asg_payload.action_class
+  classes: [booking.cancel, money.refund]
+  parent_field: chain.parent_capsule_id
+  relation_field: chain.relation
+  relation: supersedes
+emit: weekly_spend_minor

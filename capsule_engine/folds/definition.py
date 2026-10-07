@@ -28,6 +28,7 @@ from .errors import (
     DUPLICATE_READ_PATH,
     FLOAT_IN_DEFINITION,
     INVALID_FOLD_ID,
+    INVALID_REVERSAL,
     MALFORMED_DEFINITION,
     MISSING_REDUCE_FIELD,
     UNBOUNDED_FILTER_OP,
@@ -61,6 +62,13 @@ BOUNDED_FILTER_OPS = frozenset({"eq", "ne", "in", "not_in", "prefix", "gt", "gte
 # output-only per spec §4 ("informational, never an input").
 WALL_CLOCK_TOKENS = frozenset({"now", "current_time", "wall_clock", "_now", "evaluated_at", "system_time"})
 
+# The chain relations a reversal may cite its charge under. ``supersedes`` is
+# the only terminal relation in the chain.relation registry (Agent Action
+# Capsule REGISTRY §6): it closes the parent's open state, which is what a
+# cancel or refund does to a charge. The non-terminal ones (``confirms``,
+# ``epoch_opens``, ``duplicates``) leave the parent standing.
+REVERSAL_RELATIONS = frozenset({"supersedes"})
+
 
 @dataclass(frozen=True)
 class ReadField:
@@ -92,6 +100,23 @@ class Reduce:
 
 
 @dataclass(frozen=True)
+class Reversal:
+    """Records whose ``class_field`` is in ``classes`` take back a prior
+    charge instead of adding to the sum (engine.py, ``_reverse``). One is
+    linked when its ``relation_field`` is ``relation``, its ``parent_field``
+    names a charge this fold already counted in the same group, and its
+    amount is positive; it then subtracts its amount, up to what that charge
+    has left. Any other is unlinked and contributes nothing. Every other
+    record is a charge, and a negative charge counts as zero."""
+
+    class_field: str
+    classes: tuple[str, ...]
+    parent_field: str
+    relation_field: str
+    relation: str
+
+
+@dataclass(frozen=True)
 class FoldDefinition:
     fold_id: str
     reads: tuple[ReadField, ...]
@@ -109,6 +134,9 @@ class FoldDefinition:
     # own ``definition_digest()`` (its authoring digest) does not include this
     # field, so existing digests/vectors are untouched.
     derivation_class: str = DEFAULT_DERIVATION_CLASS
+    # Optional, and absent from ``canonical_dict`` when unset, so a
+    # definition without one keeps its digest.
+    reversal: Reversal | None = None
 
     def read_paths(self) -> frozenset[str]:
         return frozenset(r.path for r in self.reads)
@@ -177,6 +205,14 @@ class FoldDefinition:
             if self.window.end is not None:
                 w["end"] = self.window.end
             out["window"] = w
+        if self.reversal is not None:
+            out["reversal"] = {
+                "class_field": self.reversal.class_field,
+                "classes": list(self.reversal.classes),
+                "parent_field": self.reversal.parent_field,
+                "relation_field": self.reversal.relation_field,
+                "relation": self.reversal.relation,
+            }
         return out
 
     def definition_digest(self) -> str:
@@ -346,6 +382,9 @@ def parse_definition(data: Any) -> FoldDefinition:
             f"derivation_class {derivation_class!r} must be one of {sorted(DERIVATION_CLASSES)}",
         )
 
+    raw_reversal = data.get("reversal")
+    reversal = None if raw_reversal is None else _parse_reversal(raw_reversal, declared, reducer)
+
     return FoldDefinition(
         fold_id=fold_id,
         reads=tuple(reads),
@@ -355,4 +394,28 @@ def parse_definition(data: Any) -> FoldDefinition:
         reduce=Reduce(reducer=reducer, field=reduce_field),
         emit=emit,
         derivation_class=derivation_class,
+        reversal=reversal,
     )
+
+
+def _parse_reversal(raw: Any, declared: set[str], reducer: str) -> Reversal:
+    if not isinstance(raw, dict):
+        raise FoldDefinitionError(INVALID_REVERSAL, "reversal must be a mapping")
+    if reducer != "sum":
+        raise FoldDefinitionError(INVALID_REVERSAL, f"a reversal takes back part of a sum; reducer {reducer!r} is not sum")
+    fields: dict[str, str] = {}
+    for name in ("class_field", "parent_field", "relation_field"):
+        path = raw.get(name)
+        if not isinstance(path, str) or path not in declared:
+            raise FoldDefinitionError(UNDECLARED_FIELD_READ, f"reversal.{name} {path!r} is undeclared in reads")
+        fields[name] = path
+    classes = raw.get("classes")
+    if not isinstance(classes, list) or not classes or not all(isinstance(c, str) and c for c in classes):
+        raise FoldDefinitionError(INVALID_REVERSAL, "reversal.classes must be a non-empty list of class names")
+    relation = raw.get("relation")
+    if relation not in REVERSAL_RELATIONS:
+        raise FoldDefinitionError(
+            INVALID_REVERSAL,
+            f"reversal.relation {relation!r} must be a registered terminal chain relation: {sorted(REVERSAL_RELATIONS)}",
+        )
+    return Reversal(classes=tuple(classes), relation=relation, **fields)

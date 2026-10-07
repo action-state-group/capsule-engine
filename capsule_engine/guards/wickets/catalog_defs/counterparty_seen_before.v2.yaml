@@ -1,0 +1,15 @@
+# counterparty_seen_before wicket, version 2: counterparty_seen_before/1.0.0
+# read against counterparty.seen_before/2.0.0, which leaves dry runs out of
+# the count. Under version 1 a dry run made a counterparty known, so the
+# first real payment to it passed as a repeat. Version 1
+# (counterparty_seen_before.yaml) stays as it was for the records that pin it.
+#
+# `fold_digest` is the real `definition_digest()` of
+# folds/catalog_defs/counterparty.seen_before.v2.yaml (folds/definition.py);
+# the check refuses to run when the catalog fold does not match it.
+wicket_id: counterparty_seen_before/2.0.0
+check: counterparty_seen_before
+config:
+  fold_id: counterparty.seen_before/2.0.0
+  fold_digest: 6a1a357e4a3b950b7397c2790fe46c03f7e645d04aad1a9bb41533df9b4a4033
+  action_classes: [money.purchase]

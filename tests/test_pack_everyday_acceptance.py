@@ -27,8 +27,11 @@ PACK_DIR = Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog"
 FIXTURE_PATH = PACK_DIR / "fixtures" / "mini_ledger.jsonl"
 
 OPERATOR = "household-fixture"
-PER_ACTION_MINOR = 2_500  # caps/3.0.0's per-action default, cited by the pack
+PER_ACTION_MINOR = 2_500  # caps/4.0.0's per-action default, cited by the pack
 SIGNER_SECRET = b"everyday-acceptance-fixture-fixed-key"
+# Scenarios recorded as real decisions rather than dry runs: only a real
+# accepted action makes a merchant known to counterparty_seen_before.
+REAL_RUN = frozenset({"merchant-history-real-payment"})
 
 
 def _signer() -> LocalSigner:
@@ -138,18 +141,22 @@ def _scenarios() -> list[tuple[str, Action, str]]:
         ("caps-over-limit-escalates", _payment("caps-escalates", 16, "household-assistant-i@v1", operator=f"{OPERATOR}-i",
          amount_minor=3_000, target="builder/extension-phase-2", rail="card",
          counterparty_account_ref="acct-ref-builder-2"), ESCALATE),
+        # A real (not dry-run) accepted payment to the bakery: the earlier
+        # action that makes the bakery a known merchant (see REAL_RUN).
+        ("merchant-history-real-payment", _payment("merchant-history", 17, "household-assistant-j@v1",
+         amount_minor=700, target="shop/bakery", rail="card", counterparty_account_ref="acct-ref-bakery-1"), ALLOW),
         # No accepted action with the garden centre yet: counterparty_seen_before
         # fails, and money.purchase has no approver role, so the decision denies.
-        ("merchant-first-purchase", _purchase("merchant-first", 17, "household-assistant-j@v1", amount_minor=1_800,
+        ("merchant-first-purchase", _purchase("merchant-first", 18, "household-assistant-j@v1", amount_minor=1_800,
          target="shop/garden-centre"), DENY),
-        # dedupe-original is an accepted payment to the hardware store, so a
-        # purchase there is a repeat merchant and passes.
-        ("merchant-repeat-purchase", _purchase("merchant-repeat", 18, "household-assistant-j@v1", amount_minor=900,
-         target="shop/hardware-store"), ALLOW),
+        # The bakery has a real accepted payment, so a purchase there is a
+        # repeat merchant and passes.
+        ("merchant-repeat-purchase", _purchase("merchant-repeat", 19, "household-assistant-j@v1", amount_minor=900,
+         target="shop/bakery"), ALLOW),
         # booking.create matches the gate's booking_create selector, which fails.
         ("booking-create", Action(verb="book_table", operator=OPERATOR, developer="household-assistant-k@v1",
          action_class="booking.create", amount_minor=2_000, currency="EUR", target="venue/restaurant",
-         action_id="book_table/everyday-fixture-booking-create", timestamp="2026-08-10T10:19:00Z"), DENY),
+         action_id="book_table/everyday-fixture-booking-create", timestamp="2026-08-10T10:20:00Z"), DENY),
     ]
 
 
@@ -168,7 +175,7 @@ def _run_scenarios(ledger, *, project_dir):
     )
     capsules: dict[str, dict] = {}
     for name, action, expected in _scenarios():
-        decision = engine.check(action, dry_run=True)
+        decision = engine.check(action, dry_run=name not in REAL_RUN)
         if decision.outcome != expected:
             raise AssertionError(f"scenario {name!r}: expected {expected!r}, got {decision.outcome!r} ({decision.reason})")
         capsules[name] = decision.capsule
@@ -206,7 +213,7 @@ def test_records_are_pack_attributed_and_observe_mode(run):
     installed, activation, capsules, _, _ = run
     for name, capsule in capsules.items():
         assert capsule["asg_payload"]["manifest_digest"] == installed.resolved.manifest_digest, name
-        assert capsule["asg_payload"]["checkpoint"]["dry_run"] is True, name
+        assert capsule["asg_payload"]["checkpoint"].get("dry_run") is (True if name not in REAL_RUN else None), name
     assert activation["asg_payload"]["detail"]["packs"] == [
         {"pack_id": "asg/everyday/0.3.0", "digest": installed.pack.definition_digest(), "mode": "observe"}
     ]
@@ -215,7 +222,7 @@ def test_records_are_pack_attributed_and_observe_mode(run):
 def test_cited_definitions_resolve_to_the_built_in_digests(run):
     installed, _, _, _, _ = run
     pinned = {w.wicket_id: w.digest for w in installed.manifest.wickets}
-    assert pinned["caps/3.0.0"] == "54870cd7059d18c5a88221185cb0a49fe1ea09c30825548e1e3134569c5cb66f"
+    assert pinned["caps/4.0.0"] == "2b07340e8fc858af76d8accf6afc3d6c9d05bb92d50abcfddd1fee8d9b51de35"
     assert pinned["dedupe/1.0.0"] == "18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb"
 
 

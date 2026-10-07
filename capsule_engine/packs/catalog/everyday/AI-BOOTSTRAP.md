@@ -35,13 +35,14 @@ invent others):
 **The checks** (each one is a wicket cited by digest from the engine's own
 catalog):
 
-1. `caps` (`caps/3.0.0`) -- this amount must be at or under the per-action
+1. `caps` (`caps/4.0.0`) -- this amount must be at or under the per-action
    limit (default 25.00), and the operator's rolling 7-day spend plus this
    amount must be at or under the window limit (default 100.00); the record
    names which limit tripped. The limits cover every
-   class that pays money out (transfers, purchases, subscriptions, bookings),
-   and the total is kept per `operator`, so a new agent version or a second
-   tool acting for the same operator draws on the same total.
+   class that pays money out (transfers, purchases, subscriptions, creating
+   or changing a booking); cancelling a booking is not capped. The total is
+   kept per `operator`, so a new agent version or a second tool acting for
+   the same operator draws on the same total, and it leaves out dry runs.
 2. `dedupe` (`dedupe/1.0.0`) -- the same payment by the same agent to the
    same payee is flagged if it was already recorded in the window.
 3. `destination_rail` (`destination_rail/1.0.0`) -- a payment over a
@@ -57,9 +58,10 @@ catalog):
    `info.query` alone); public posting, creating or cancelling a booking,
    deleting stored data, and disclosing personal data are flagged. It reads
    the declared class only, never what the action contains.
-8. `counterparty_seen_before` (`counterparty_seen_before/1.0.0`) -- a
+8. `counterparty_seen_before` (`counterparty_seen_before/2.0.0`) -- a
    purchase from a merchant the operator has no accepted earlier action with
-   is flagged; the record names the count and the key it was read under.
+   is flagged; a dry run does not count as an earlier action. The record
+   names the count and the key it was read under.
 
 **Rules declared not measured.** 11 of the 27 rules need an input no action
 records yet: the bounds the user confirmed for a task, refund and reversal
