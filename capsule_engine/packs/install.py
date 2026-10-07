@@ -132,6 +132,7 @@ def build_engine(
         ledger=ledger,
         caps_fold=installed.resolved.caps_fold(),
         caps_minor=installed.resolved.caps_minor(),
+        per_action_minor=installed.resolved.per_action_minor(),
         signer_provider=signer_provider,
         manifest_digest=installed.resolved.manifest_digest,
         wickets=installed.resolved.configured_wickets(frozenset(CONFIGURED_CHECKS)),

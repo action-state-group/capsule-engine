@@ -79,6 +79,7 @@ class GuardEngine:
         caps_fold: FoldDefinition,
         signer_provider: Callable[[], Signer | None],
         caps_minor: dict[str, int] | None = None,
+        per_action_minor: dict[str, int] | None = None,
         freshness_bound_ms: int = 5_000,
         fail_open_classes: frozenset[str] = frozenset(),
         engine_available: Callable[[], bool] = lambda: True,
@@ -93,6 +94,9 @@ class GuardEngine:
         self._caps_fold = caps_fold
         self._signer_provider = signer_provider
         self._caps_minor = resolve_caps_minor(caps_minor or {})
+        # Per-action limits, compared against the proposed amount alone; a
+        # class applies one only where it also has a window limit.
+        self._per_action_minor = resolve_caps_minor(per_action_minor or {})
         self._freshness_bound_ms = freshness_bound_ms
         self._fail_open_classes = fail_open_classes
         self._engine_available = engine_available
@@ -235,7 +239,13 @@ class GuardEngine:
 
         cap_minor = cap_for(self._caps_minor, action.action_class)
         if cap_minor is not None:
-            caps_out = check_caps(action, self._ledger, definition=self._caps_fold, cap_minor=cap_minor)
+            caps_out = check_caps(
+                action,
+                self._ledger,
+                definition=self._caps_fold,
+                cap_minor=cap_minor,
+                per_action_cap_minor=cap_for(self._per_action_minor, action.action_class),
+            )
         else:
             caps_out = CheckOutcome(
                 constraint=ConstraintOutcome(

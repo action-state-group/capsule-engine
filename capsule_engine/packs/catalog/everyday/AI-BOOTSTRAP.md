@@ -30,8 +30,10 @@ invent others):
 **The checks** (each one is a wicket cited by digest from the engine's own
 catalog):
 
-1. `caps` (`caps/2.0.0`) -- the operator's rolling 7-day spend plus this
-   amount must be at or under the configured limit. One limit covers every
+1. `caps` (`caps/3.0.0`) -- this amount must be at or under the per-action
+   limit (default 25.00), and the operator's rolling 7-day spend plus this
+   amount must be at or under the window limit (default 100.00); the record
+   names which limit tripped. The limits cover every
    class that pays money out (transfers, purchases, subscriptions, bookings),
    and the total is kept per `operator`, so a new agent version or a second
    tool acting for the same operator draws on the same total.

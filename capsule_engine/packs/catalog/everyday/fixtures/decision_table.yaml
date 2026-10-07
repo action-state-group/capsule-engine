@@ -89,7 +89,7 @@ rows:
     verdict: deny
   - scenario: caps-boundary-at-cap
     action_id: make_payment/everyday-fixture-caps-boundary
-    note: "boundary: spend == cap exactly (10,000,000); caps compares with <=, so this passes"
+    note: "boundary: amount == the per-action limit exactly (2,500); caps compares with <=, so this passes"
     checks: {dedupe: pass, caps: pass, verify_before_dispatch: n/a, destination_rail: pass, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: pass}
     n_a:
       verify_before_dispatch: {population: c}
@@ -106,7 +106,7 @@ rows:
     verdict: allow
   - scenario: caps-over-limit-on-watched-rail
     action_id: make_payment/everyday-fixture-caps-over-limit
-    note: "pooled with caps-first-draw (same operator, same window): 6,000,000 + 5,000,000 > 10,000,000"
+    note: "3,000 is over the per-action limit (2,500); the window total 2,000 + 3,000 stays under 10,000"
     checks: {dedupe: pass, caps: fail, verify_before_dispatch: n/a, destination_rail: fail, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: pass}
     n_a:
       verify_before_dispatch: {population: c}
@@ -153,7 +153,7 @@ rows:
     verdict: allow
   - scenario: caps-over-limit-escalates
     action_id: make_payment/everyday-fixture-caps-escalates
-    note: "pooled with caps-second-first-draw: 6,000,000 + 5,000,000 > 10,000,000, and caps is the only failing check"
+    note: "3,000 is over the per-action limit (2,500), and caps is the only failing check"
     checks: {dedupe: pass, caps: fail, verify_before_dispatch: n/a, destination_rail: pass, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: pass}
     n_a:
       verify_before_dispatch: {population: c}
