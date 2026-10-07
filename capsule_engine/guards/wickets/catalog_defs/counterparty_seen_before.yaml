@@ -1,0 +1,14 @@
+# counterparty_seen_before wicket: fail a first-time counterparty, pass a
+# repeat one (guards/checks/counterparty_seen_before.py), for actions in
+# `action_classes`. The count is the cited fold's result over the
+# operator's accepted actions addressed to the same target.
+#
+# `fold_digest` is the real `definition_digest()` of
+# folds/catalog_defs/counterparty.seen_before.yaml (folds/definition.py);
+# the check refuses to run when the catalog fold does not match it.
+wicket_id: counterparty_seen_before/1.0.0
+check: counterparty_seen_before
+config:
+  fold_id: counterparty.seen_before/1.0.0
+  fold_digest: c43b2011b4d49cf54a0306e9637ecfd3a945ff7febc13283507dd77513ae9b28
+  action_classes: [money.purchase]

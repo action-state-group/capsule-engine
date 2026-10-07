@@ -8,7 +8,7 @@
 #
 # Statements name what is detected and recorded -- the observable, never an intent.
 # default_disposition is declared data the guard engine does not read.
-pack_id: asg/everyday/0.1.0
+pack_id: asg/everyday/0.2.0
 
 obligations:
   - id: purchase-over-limit
@@ -64,9 +64,9 @@ action_semantics:
 
 constraints:
   # Two limits for every class that pays money out: per action, and per
-  # operator over a rolling 7 days (guards/wickets/catalog_defs/caps.v3.yaml).
-  - wicket_ref: caps/3.0.0
-    digest: 54870cd7059d18c5a88221185cb0a49fe1ea09c30825548e1e3134569c5cb66f
+  # operator over a rolling 7 days (guards/wickets/catalog_defs/caps.v4.yaml).
+  - wicket_ref: caps/4.0.0
+    digest: 2b07340e8fc858af76d8accf6afc3d6c9d05bb92d50abcfddd1fee8d9b51de35
     scope: [operator]
   - wicket_ref: dedupe/1.0.0
     digest: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -80,8 +80,8 @@ constraints:
     digest: ea4ae204e5dc33f3a28e5e15471f404f20d4f8fca193d355a099a4a7e08b082e
 
 folds:
-  - fold_ref: spend.weekly/2.0.0
-    digest: a27c581b44a9735b6fad42ec619ac8e22928da6719dec59259549247726f3f10
+  - fold_ref: spend.weekly/3.0.0
+    digest: 25907741320624a830c5854fc7f2d434bfa17528c8bfc17f4a8a4f84a39f1b18
 
 holds_integration: none
 

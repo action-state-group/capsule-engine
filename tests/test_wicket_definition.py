@@ -28,6 +28,7 @@ EXPECTED_DIGESTS = {
     "caps/1.0.0": "906a75a0b908d38fa7b05823ba11f229c3d593516119ad757b541cee7083f54b",
     "caps/2.0.0": "b7ea63ec3d9fdb872d3b5db952e774f04ff8f4b945ca803e49181b91b2a25f80",
     "caps/3.0.0": "54870cd7059d18c5a88221185cb0a49fe1ea09c30825548e1e3134569c5cb66f",
+    "caps/4.0.0": "2b07340e8fc858af76d8accf6afc3d6c9d05bb92d50abcfddd1fee8d9b51de35",
     "verify_before_dispatch/1.0.0": "a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c",
     "caps_holds/1.0.0": "86a07c5c2739502b1211dbb1c73df0d6950f91ba454ff151ff32cb6946fc21f6",
     "hold_reconcile/1.0.0": "cf6f76b1aeb1d705f90f89c97667c2db035e697211f7f7dc0f8455c54acaec74",
@@ -37,6 +38,11 @@ EXPECTED_DIGESTS = {
     "counterparty_identity_change/1.0.0": "0cfb1cb380b355abb88ea385334f3bb31f2e145269a2768022f85005665fc6fe",
     "credential_pattern/1.0.0": "3617fdcaa39c03cf70a3254490328ccee5eaac0faba7cd52d9e3dc3fc50336c0",
     "recurring_charge/1.0.0": "ea4ae204e5dc33f3a28e5e15471f404f20d4f8fca193d355a099a4a7e08b082e",
+    # Configured check no pack cites yet.
+    "counterparty_seen_before/1.0.0": "e3a89876d6547fd1af6dde151e0802388fb68f7b2f9660c39b95b44e397cb263",
+    "counterparty_seen_before/2.0.0": "c82a29eae8ef72736851d275ffa4d85e511a21d202822366d3b03bf3834c8cd0",
+    # Taxonomy-only selectors, no fold (guards/checks/action_class_gate.py).
+    "action_class_gate/1.0.0": "fcc352838832e13f5e87662f0194ec4a7065bc989bbe624b43ac5d9d1b638ae2",
 }
 
 

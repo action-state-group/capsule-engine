@@ -158,11 +158,17 @@ def test_a_legacy_keyed_per_action_limit_applies_to_the_canonical_class(store, s
     assert caps.evidence["tripped"][0]["limit"] == "per_action"
 
 
+def _everyday_caps_config() -> CapsConfig:
+    """The config of the caps wicket the everyday pack cites."""
+    (caps,) = [w for w in load_pack_dir(EVERYDAY_DIR).constraints if w.check == "caps"]
+    return WicketCatalog(WICKET_CATALOG_DIR).get(caps.wicket_id).definition.config
+
+
 def test_the_installed_everyday_pack_wires_the_per_action_limit(store, signer, tmp_path):
     from capsule_engine.packs import build_engine, install_pack
 
     installed = install_pack(load_pack_dir(EVERYDAY_DIR), project_dir=tmp_path / "project", mode="enforce")
-    assert installed.resolved.per_action_minor() == _caps_v3_config()["per_action_minor"]
+    assert installed.resolved.per_action_minor() == _everyday_caps_config()["per_action_minor"]
     engine = build_engine(installed, ledger=store, signer_provider=lambda: signer)
     caps = _caps(engine.check(_action(1, "money.purchase", 6_000)))
     assert caps.evidence["tripped"][0]["limit"] == "per_action"
@@ -172,4 +178,4 @@ def test_a_user_accepted_per_action_limit_replaces_the_default():
     pack = accept_thresholds(load_pack_dir(EVERYDAY_DIR), {}, accepted_per_action={"money.purchase": 5_000})
     (caps,) = [w for w in pack.constraints if w.check == "caps"]
     assert caps.config["per_action_minor"]["money.purchase"] == 5_000
-    assert caps.config["per_action_minor"]["booking.create"] == _caps_v3_config()["per_action_minor"]["booking.create"]
+    assert caps.config["per_action_minor"]["booking.create"] == _everyday_caps_config()["per_action_minor"]["booking.create"]

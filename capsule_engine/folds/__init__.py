@@ -23,7 +23,7 @@ from .counterparty_signals import (
     counterparty_trajectory_for_signal,
     signal_record,
 )
-from .definition import FilterClause, FoldDefinition, ReadField, Reduce, Window, parse_definition
+from .definition import FilterClause, FoldDefinition, ReadField, Reduce, Reversal, Window, parse_definition
 from .engine import EvaluationTrace, evaluate_all, evaluate_one
 from .errors import FoldDefinitionError, FoldDeterminismError
 from .loader import load_definition_file, load_definition_text
@@ -62,6 +62,7 @@ __all__ = [
     "FilterClause",
     "Window",
     "Reduce",
+    "Reversal",
     "parse_definition",
     "load_definition_text",
     "load_definition_file",

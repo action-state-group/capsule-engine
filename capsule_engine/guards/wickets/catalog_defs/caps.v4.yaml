@@ -1,0 +1,45 @@
+# Caps wicket, version 4: caps/3.0.0's two limits, read against the
+# spend.weekly/3.0.0 fold (guards/checks/caps.py).
+#
+# spend.weekly/3.0.0 takes a linked cancel or refund back out of the
+# operator's 7-day total and leaves dry runs out of it. spend.weekly/2.0.0,
+# which caps/3.0.0 cites, added a cancel to the total, so buying and
+# cancelling one booking counted it twice.
+#
+# The class set is caps/3.0.0's less booking.cancel. A cancel returns money
+# to the operator, like money.refund and marketplace.sale, which caps/3.0.0
+# already leaves out, and the v3 fold never adds a cancel to the total.
+# Capping it would fail a cancel above the per-action limit, blocking the
+# user from undoing a booking. A cancellation fee is a payment and belongs
+# under money.purchase. tests/test_spend_weekly_reversals.py fails if this
+# set and the fold's reversal classes overlap.
+#
+# Defaults are caps/3.0.0's consumer defaults: 25.00 per purchase and 100.00
+# per rolling 7 days, in minor units of a two-decimal currency.
+#
+# `fold_digest` is the real, independently-computable `definition_digest()`
+# of folds/catalog_defs/spend.weekly.v3.yaml (folds/definition.py).
+# caps/3.0.0 (caps.v3.yaml) stays as it was for the records and packs that pin it.
+wicket_id: caps/4.0.0
+check: caps
+config:
+  fold_id: spend.weekly/3.0.0
+  fold_digest: 25907741320624a830c5854fc7f2d434bfa17528c8bfc17f4a8a4f84a39f1b18
+  caps_minor:
+    money.purchase: 10000
+    money.transfer: 10000
+    money.subscription: 10000
+    booking.create: 10000
+    booking.modify: 10000
+    agreement.accept: 10000
+    marketplace.offer: 10000
+    external_commitment.other: 10000
+  per_action_minor:
+    money.purchase: 2500
+    money.transfer: 2500
+    money.subscription: 2500
+    booking.create: 2500
+    booking.modify: 2500
+    agreement.accept: 2500
+    marketplace.offer: 2500
+    external_commitment.other: 2500

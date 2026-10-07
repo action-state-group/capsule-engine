@@ -14,7 +14,7 @@ from typing import Any
 from .errors import FLOAT_IN_REDUCE_FIELD, NON_NUMERIC_REDUCE_FIELD, FoldDeterminismError
 
 
-def _check_integer(value: Any, field: str) -> int:
+def check_integer(value: Any, field: str) -> int:
     """Amounts are integer minor units (spec §2, §3 rule 2) — floats MUST-FAIL."""
     if isinstance(value, bool):
         raise FoldDeterminismError(
@@ -38,16 +38,16 @@ def _count_step(acc: int, value: Any, field: str) -> int:
 
 
 def _sum_step(acc: int, value: Any, field: str) -> int:
-    return acc + _check_integer(value, field)
+    return acc + check_integer(value, field)
 
 
 def _min_step(acc: int | None, value: Any, field: str) -> int:
-    v = _check_integer(value, field)
+    v = check_integer(value, field)
     return v if acc is None else min(acc, v)
 
 
 def _max_step(acc: int | None, value: Any, field: str) -> int:
-    v = _check_integer(value, field)
+    v = check_integer(value, field)
     return v if acc is None else max(acc, v)
 
 
