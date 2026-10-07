@@ -39,6 +39,8 @@ EXPECTED_DIGESTS = {
     "recurring_charge/1.0.0": "ea4ae204e5dc33f3a28e5e15471f404f20d4f8fca193d355a099a4a7e08b082e",
     # Configured check no pack cites yet.
     "counterparty_seen_before/1.0.0": "e3a89876d6547fd1af6dde151e0802388fb68f7b2f9660c39b95b44e397cb263",
+    # Taxonomy-only selectors, no fold (guards/checks/action_class_gate.py).
+    "action_class_gate/1.0.0": "fcc352838832e13f5e87662f0194ec4a7065bc989bbe624b43ac5d9d1b638ae2",
 }
 
 

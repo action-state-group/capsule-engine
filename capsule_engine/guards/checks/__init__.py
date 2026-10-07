@@ -11,6 +11,7 @@ from collections.abc import Callable
 from capsule_ledger.ledger.api import LedgerAPI
 
 from ..action import Action
+from .action_class_gate import check_action_class_gate
 from .base import CheckOutcome
 from .caps import cap_for, check_caps, resolve_caps_minor
 from .counterparty_identity_change import check_counterparty_identity_change
@@ -41,12 +42,14 @@ CONFIGURED_CHECKS: dict[str, Callable[[Action, LedgerAPI, dict], CheckOutcome]] 
     "recurring_charge": lambda action, ledger, config: check_recurring_charge(
         action, one_time_values=config["one_time_values"], action_classes=config["action_classes"]
     ),
+    "action_class_gate": lambda action, ledger, config: check_action_class_gate(action, selectors=config["selectors"]),
 }
 
 __all__ = [
     "CONFIGURED_CHECKS",
     "CheckOutcome",
     "cap_for",
+    "check_action_class_gate",
     "check_caps",
     "check_counterparty_identity_change",
     "check_counterparty_seen_before",
