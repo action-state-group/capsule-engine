@@ -52,6 +52,17 @@ def build_manifest_activation_capsule(
         detail["packs"] = [
             {"pack_id": p.pack_id, "digest": p.digest, "mode": p.mode} for p in resolved.manifest.packs
         ]
+    # Omitted when no profile is pinned, by the same rule. The values ride in
+    # the record, not just their digest: a profile is one user's own data
+    # that no catalog holds, so a digest alone would leave "what was in
+    # force" resolvable only while that user's file survives. With the
+    # values here, the record alone recomputes both the profile digest and
+    # (with the refs above) the manifest digest it cites.
+    if resolved.profile is not None:
+        detail["profile"] = {
+            "profile_digest": resolved.profile.profile_digest(),
+            "values": resolved.profile.canonical_dict(),
+        }
     return build_event_capsule(
         operator=operator,
         developer=developer,

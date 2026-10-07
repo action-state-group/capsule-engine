@@ -135,6 +135,10 @@ class Manifest:
     folds: tuple[FoldRef, ...] = ()
     wickets: tuple[WicketRef, ...] = ()
     packs: tuple[PackRef, ...] = ()
+    # The digest of the user's policy profile (``profile.py``), pinned like
+    # every fold and wicket: a changed limit is a changed manifest, while the
+    # wicket and pack it configures keep their digests.
+    profile_digest: str | None = None
 
     def canonical_dict(self) -> dict:
         """The JCS-canonicalizable form of this manifest -- drives manifest_digest().
@@ -154,6 +158,9 @@ class Manifest:
             out["packs"] = [
                 {"pack_id": p.pack_id, "engine": p.engine, "digest": p.digest, "mode": p.mode} for p in self.packs
             ]
+        # Omitted when no profile is pinned, by the same rule as ``packs``.
+        if self.profile_digest is not None:
+            out["profile_digest"] = self.profile_digest
         return out
 
     def manifest_digest(self) -> str:
@@ -269,4 +276,14 @@ def parse_manifest(data: Any) -> Manifest:
         digest = _check_digest(entry["digest"], f"packs[{pack_id!r}].digest")
         packs.append(PackRef(pack_id=pack_id, engine=engine, digest=digest, mode=mode))
 
-    return Manifest(manifest_id=manifest_id, folds=tuple(folds), wickets=tuple(wickets), packs=tuple(packs))
+    profile_digest = data.get("profile_digest")
+    if profile_digest is not None:
+        _check_digest(profile_digest, "profile_digest")
+
+    return Manifest(
+        manifest_id=manifest_id,
+        folds=tuple(folds),
+        wickets=tuple(wickets),
+        packs=tuple(packs),
+        profile_digest=profile_digest,
+    )
