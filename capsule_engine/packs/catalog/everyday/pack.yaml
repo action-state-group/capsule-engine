@@ -329,5 +329,7 @@ fixtures:
       outcome: allow
     - id: booking-create
       outcome: deny
+    - id: off-taxonomy-class
+      outcome: deny
 
 bootstrap: AI-BOOTSTRAP.md

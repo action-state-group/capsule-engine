@@ -157,6 +157,11 @@ def _scenarios() -> list[tuple[str, Action, str]]:
         ("booking-create", Action(verb="book_table", operator=OPERATOR, developer="household-assistant-k@v1",
          action_class="booking.create", amount_minor=2_000, currency="EUR", target="venue/restaurant",
          action_id="book_table/everyday-fixture-booking-create", timestamp="2026-08-10T10:20:00Z"), DENY),
+        # household.unlisted has no row in the action taxonomy: action_class_gate
+        # fails closed, as the only failing check, so the decision denies.
+        ("off-taxonomy-class", Action(verb="do_unlisted", operator=OPERATOR, developer="household-assistant-l@v1",
+         action_class="household.unlisted", target="service/unlisted",
+         action_id="do_unlisted/everyday-fixture-off-taxonomy", timestamp="2026-08-10T10:21:00Z"), DENY),
     ]
 
 
@@ -248,6 +253,17 @@ def test_the_sole_caps_failure_escalates_with_the_donated_disposition_pair(run):
     assert [c["id"] for c in escalated["constraints"] if c["result"] == "fail"] == ["caps"]
     assert escalated["disposition"]["decision"] == "needs_input"
     assert escalated["disposition"]["verdict_class"] == "hitl_dispatched"
+
+
+def test_an_off_taxonomy_class_fails_the_gate_closed_and_says_so(run):
+    from capsule_engine.guards.classes import TAXONOMY_VERSION
+
+    capsule = run[2]["off-taxonomy-class"]
+    assert [c["id"] for c in capsule["constraints"] if c["result"] == "fail"] == ["action_class_gate"]
+    assert _constraint(capsule, "action_class_gate")["evidence_digest"] == json_digest(
+        {"action_class": "household.unlisted", "in_taxonomy": False, "taxonomy_version": TAXONOMY_VERSION}
+    )
+    assert capsule["disposition"]["decision"] == "reject"
 
 
 def test_a_repeat_payment_chains_to_the_payment_it_repeats(run):

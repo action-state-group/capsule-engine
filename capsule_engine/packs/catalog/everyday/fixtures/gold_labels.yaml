@@ -390,6 +390,25 @@ rows:
     kind: source_tree_sha256
     value: b6b315d74e0247a22d5741f1e8339cb58357f76afa4b37b4d464a0d770894012
     assurance: self-attested
+- action_id: do_unlisted/everyday-fixture-off-taxonomy
+  capsule_id: 8de9dad6fca52223b48fd4a5b9fdd7bcb5ccbfa144c935f35ba0e27b6ebea9a2
+  evaluator_tier: recomputed
+  config_identity:
+    pack_id: asg/everyday/0.3.0
+    pack_digest: dc3a9842e1cf800806866cf5e1d4cd66f5e7a0872e42487376d5595d4494e266
+    wickets:
+      caps/4.0.0: 2b07340e8fc858af76d8accf6afc3d6c9d05bb92d50abcfddd1fee8d9b51de35
+      dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
+      destination_rail/1.0.0: 4d76251eba138b37e6be3e83390072315ebcea42cd8d790f7e9765ecf1f63429
+      counterparty_identity_change/1.0.0: 0cfb1cb380b355abb88ea385334f3bb31f2e145269a2768022f85005665fc6fe
+      credential_pattern/1.0.0: 3617fdcaa39c03cf70a3254490328ccee5eaac0faba7cd52d9e3dc3fc50336c0
+      recurring_charge/1.0.0: ea4ae204e5dc33f3a28e5e15471f404f20d4f8fca193d355a099a4a7e08b082e
+      action_class_gate/1.0.0: fcc352838832e13f5e87662f0194ec4a7065bc989bbe624b43ac5d9d1b638ae2
+      counterparty_seen_before/2.0.0: c82a29eae8ef72736851d275ffa4d85e511a21d202822366d3b03bf3834c8cd0
+  code_identity:
+    kind: source_tree_sha256
+    value: b6b315d74e0247a22d5741f1e8339cb58357f76afa4b37b4d464a0d770894012
+    assurance: self-attested
 - hand_authored: true
   action_id: dispatch_payout/payments-safety-fixture-caps-allow
   capsule_id: 1870189b2e23c0c86ea95f2b945ffff33ec430da295ff7348eefee60efff7ad9

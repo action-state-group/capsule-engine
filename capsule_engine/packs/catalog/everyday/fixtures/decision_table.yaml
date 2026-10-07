@@ -28,7 +28,9 @@
 # passes because merchant-history-real-payment is a real accepted payment to
 # the same merchant (a dry run does not count).
 # out-of-scope-action passes action_class_gate (a non-consequential class);
-# booking-create fails it.
+# booking-create fails it. off-taxonomy-class declares a class with no row in
+# the action taxonomy, so action_class_gate fails closed as the only failing
+# check and the decision denies.
 rows:
   - scenario: baseline-allow
     action_id: make_payment/everyday-fixture-baseline
@@ -236,6 +238,18 @@ rows:
     action_id: book_table/everyday-fixture-booking-create
     checks: {dedupe: pass, caps: pass, verify_before_dispatch: n/a, destination_rail: n/a, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: n/a, action_class_gate: fail, counterparty_seen_before: n/a}
     n_a:
+      verify_before_dispatch: {population: c}
+      destination_rail: {population: c}
+      counterparty_identity_change: {population: c}
+      credential_pattern: {population: c}
+      recurring_charge: {population: c}
+      counterparty_seen_before: {population: c}
+    verdict: deny
+  - scenario: off-taxonomy-class
+    action_id: do_unlisted/everyday-fixture-off-taxonomy
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, destination_rail: n/a, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: n/a, action_class_gate: fail, counterparty_seen_before: n/a}
+    n_a:
+      caps: {population: c}
       verify_before_dispatch: {population: c}
       destination_rail: {population: c}
       counterparty_identity_change: {population: c}
