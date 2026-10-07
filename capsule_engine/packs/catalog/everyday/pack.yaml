@@ -17,7 +17,7 @@
 # intent. A measured statement names exactly what its check reads, including
 # where that is narrower or wider than the rule. default_disposition is
 # declared data the guard engine does not read.
-pack_id: asg/everyday/0.2.0
+pack_id: asg/everyday/0.3.0
 
 obligations:
   # -- DO ------------------------------------------------------------------

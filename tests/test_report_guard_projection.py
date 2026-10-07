@@ -57,7 +57,7 @@ def _claim(capsule: dict, record: dict, n: int = 0):
         capsule,
         record,
         claim_id=f"{record['id']}-{n}",
-        contract_ref="asg/everyday@0.2.0",
+        contract_ref="asg/everyday@0.3.0",
         requirement_ref=record["id"],
         candidate_fields=FIELDS,
     )
