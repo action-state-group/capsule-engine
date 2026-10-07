@@ -412,17 +412,23 @@ class GuardEngine:
         )
 
 
+# Failures that ask an approver rather than refuse: an over-limit spend and
+# a first-time counterparty.
+_ESCALATABLE = frozenset({"caps", "counterparty_seen_before"})
+
+
 def _decide(constraints: tuple[ConstraintOutcome, ...], action_class: ActionClass) -> str:
     """allow/deny/escalate per D2 (2026-08-05): a clean run allows. A hold
-    escalates only when the *sole* failing constraint is `caps` and the
-    triggering class has an `approver_role` configured -- an integrity
-    failure (`verify_before_dispatch`, whether the cited mandate is missing
-    or fails re-verification), a dedupe hit, or a cap breach on a class with
+    escalates only when every failing constraint is in ``_ESCALATABLE``
+    (`caps`, `counterparty_seen_before`) and the triggering class has an
+    `approver_role` configured -- an integrity failure
+    (`verify_before_dispatch`, whether the cited mandate is missing or fails
+    re-verification), a dedupe hit, or an escalatable failure on a class with
     no approver configured all hard-deny, unconditionally."""
     fails = {c.id for c in constraints if c.result == "fail"}
     if not fails:
         return ALLOW
-    if fails == {"caps"} and action_class.approver_role is not None:
+    if fails <= _ESCALATABLE and action_class.approver_role is not None:
         return ESCALATE
     return DENY
 

@@ -14,6 +14,7 @@ from ..action import Action
 from .base import CheckOutcome
 from .caps import cap_for, check_caps, resolve_caps_minor
 from .counterparty_identity_change import check_counterparty_identity_change
+from .counterparty_seen_before import check_counterparty_seen_before, seen_before_fold
 from .credential_pattern import check_credential_pattern
 from .dedupe import check_dedupe
 from .destination_rail import check_destination_rail
@@ -27,6 +28,12 @@ CONFIGURED_CHECKS: dict[str, Callable[[Action, LedgerAPI, dict], CheckOutcome]] 
     ),
     "counterparty_identity_change": lambda action, ledger, config: check_counterparty_identity_change(
         action, ledger, action_classes=config["action_classes"]
+    ),
+    "counterparty_seen_before": lambda action, ledger, config: check_counterparty_seen_before(
+        action,
+        ledger,
+        definition=seen_before_fold(config["fold_id"], config["fold_digest"]),
+        action_classes=config["action_classes"],
     ),
     "credential_pattern": lambda action, ledger, config: check_credential_pattern(
         action, patterns=config["patterns"]
@@ -42,6 +49,7 @@ __all__ = [
     "cap_for",
     "check_caps",
     "check_counterparty_identity_change",
+    "check_counterparty_seen_before",
     "check_credential_pattern",
     "check_dedupe",
     "check_destination_rail",
@@ -49,4 +57,5 @@ __all__ = [
     "check_recurring_charge",
     "check_verify_before_dispatch",
     "resolve_caps_minor",
+    "seen_before_fold",
 ]
