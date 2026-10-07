@@ -18,7 +18,10 @@ Determinism (spec §3), enforced here, not just documented:
    field with no default is skipped (counted), never an error. Fields
    present on a record but not declared in ``reads`` are simply never looked
    at.
-5. Bounded per-record work — one pass, no recursion, no cross-record joins.
+5. Bounded per-record work — one pass, no recursion, and no cross-record
+   joins except one: a definition with a ``reversal`` clause looks up, per
+   reversal record, the charge its chain parent names among records this
+   same pass already counted. Nothing outside the declared range is read.
 """
 from __future__ import annotations
 
@@ -26,15 +29,15 @@ import hashlib
 import json
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
-from typing import Any
+from typing import Any, TypedDict
 
 from agent_action_capsule.canonical import FloatInDigestError, UnsafeIntegerError, json_digest
 
-from .definition import FoldDefinition
+from .definition import FoldDefinition, Reversal
 from .duration import parse_duration_seconds
 from .errors import AS_OF_REQUIRED_NOT_WALL_CLOCK, FoldDeterminismError
 from .paths import ABSENT, get_path
-from .reducers import REDUCERS
+from .reducers import REDUCERS, check_integer
 
 _GLOBAL_KEY = object()  # sentinel: the single accumulator for a key-less fold
 
@@ -126,6 +129,45 @@ def _resolve_reads(definition: FoldDefinition, record: dict) -> dict[str, Any] |
     return values
 
 
+class ReversalSummary(TypedDict):
+    """What a reversal clause did to one group's result. ``linked_count``
+    reversal records took back a positive amount from the charge they cite,
+    ``linked_minor`` in total. ``unlinked_count`` took back nothing: no
+    citation under the clause's relation, a cited record that is not a
+    counted charge in this group, or a charge already taken back in full."""
+
+    linked_count: int
+    linked_minor: int
+    unlinked_count: int
+
+
+@dataclass
+class _Charge:
+    group_key: Any
+    remaining: int
+
+
+def _empty_summary() -> ReversalSummary:
+    return ReversalSummary(linked_count=0, linked_minor=0, unlinked_count=0)
+
+
+def _reverse(reversal: Reversal, values: dict[str, Any], group_key: Any, amount: int, charges: dict[str, _Charge]) -> int:
+    """The amount a reversal record takes back: its own amount, capped at
+    what its cited charge has left, or 0 when it is unlinked -- it names no
+    counted charge in this group under ``reversal.relation``, or its amount
+    is not positive. Reduces the cited charge's remainder, so two reversals
+    never take back more than the charge."""
+    parent = values.get(reversal.parent_field)
+    if amount <= 0 or values.get(reversal.relation_field) != reversal.relation or not isinstance(parent, str):
+        return 0
+    charge = charges.get(parent)
+    if charge is None or charge.group_key != group_key:
+        return 0
+    taken = min(amount, charge.remaining)
+    charge.remaining -= taken
+    return taken
+
+
 @dataclass(frozen=True)
 class EvaluationTrace:
     """The strict result envelope (spec §4) plus v0 replay diagnostics, plus
@@ -149,6 +191,9 @@ class EvaluationTrace:
     input_set_digest: str
     capture: dict | None = None
     reconciled: dict | None = None
+    # Set only for a definition with a ``reversal`` clause, and kept out of
+    # ``to_envelope()`` for the same reason as ``citations()``.
+    reversals: ReversalSummary | None = None
 
     def to_envelope(self) -> dict:
         return {
@@ -203,9 +248,17 @@ class EvaluationTrace:
         }
 
 
-def _compute_groups(
-    definition: FoldDefinition, records: list[dict], as_of: str | None
-) -> tuple[dict[Any, Any], int, int, int, tuple[str, ...]]:
+@dataclass(frozen=True)
+class _Groups:
+    accumulators: dict[Any, Any]
+    skipped: int
+    considered: int
+    matched: int
+    matched_ids: tuple[str, ...]
+    reversals: dict[Any, ReversalSummary]
+
+
+def _compute_groups(definition: FoldDefinition, records: list[dict], as_of: str | None) -> _Groups:
     anchor: datetime | None = None
     if definition.window is not None and definition.window.mode == "rolling":
         if as_of is None:
@@ -222,6 +275,9 @@ def _compute_groups(
     considered = 0
     matched = 0
     matched_ids: list[str] = []
+    reversal = definition.reversal
+    charges: dict[str, _Charge] = {}
+    reversals: dict[Any, ReversalSummary] = {}
 
     for record in records:  # ledger order only (spec §3 rule 3) — never re-sorted
         considered += 1
@@ -236,13 +292,35 @@ def _compute_groups(
             continue
 
         matched += 1
-        matched_ids.append(_record_identity(record))
+        record_id = _record_identity(record)
+        matched_ids.append(record_id)
         group_key = _GLOBAL_KEY if definition.key is None else values[definition.key]
         acc = groups.get(group_key, reducer.initial())
+        field = definition.reduce.field or ""
         field_value = values.get(definition.reduce.field) if reducer.needs_field else None
-        groups[group_key] = reducer.step(acc, field_value, definition.reduce.field or "")
+        if reversal is None:
+            groups[group_key] = reducer.step(acc, field_value, field)
+            continue
 
-    return groups, skipped, considered, matched, tuple(matched_ids)
+        # A reversal clause implies the sum reducer (definition.py).
+        amount = check_integer(field_value, field)
+        summary = reversals.setdefault(group_key, _empty_summary())
+        if values.get(reversal.class_field) in reversal.classes:
+            taken = _reverse(reversal, values, group_key, amount, charges)
+            if taken:
+                summary["linked_count"] += 1
+                summary["linked_minor"] += taken
+            else:
+                summary["unlinked_count"] += 1
+            groups[group_key] = acc - taken
+        else:
+            # Only a cited reversal lowers the total: a negative charge
+            # counts as zero rather than buying room under the cap.
+            counted = max(amount, 0)
+            charges[record_id] = _Charge(group_key=group_key, remaining=counted)
+            groups[group_key] = acc + counted
+
+    return _Groups(groups, skipped, considered, matched, tuple(matched_ids), reversals)
 
 
 def evaluate_all(
@@ -266,7 +344,7 @@ def evaluate_all(
     them; a caller with no capture boundary or no external comparison set
     simply omits the argument and the statement renders that honestly
     (``capture: "unknown"`` / ``reconciled: none``)."""
-    groups, skipped, considered, matched, matched_capsule_ids = _compute_groups(definition, records, as_of)
+    computed = _compute_groups(definition, records, as_of)
     reducer = REDUCERS[definition.reduce.reducer]
 
     fold_digest = definition.definition_digest()
@@ -289,16 +367,17 @@ def evaluate_all(
             result=reducer.finalize(acc),
             evaluated_at=env_evaluated_at,
             staleness=env_staleness,
-            skipped_count=skipped,
-            considered_count=considered,
-            matched_count=matched,
+            skipped_count=computed.skipped,
+            considered_count=computed.considered,
+            matched_count=computed.matched,
             input_capsule_ids=input_capsule_ids,
-            matched_capsule_ids=matched_capsule_ids,
+            matched_capsule_ids=computed.matched_ids,
             input_set_digest=input_digest,
             capture=capture,
             reconciled=reconciled,
+            reversals=computed.reversals.get(group_key),
         )
-        for group_key, acc in groups.items()
+        for group_key, acc in computed.accumulators.items()
     }
 
 
@@ -353,4 +432,5 @@ def evaluate_one(
         input_set_digest=_input_set_digest(input_capsule_ids),
         capture=capture,
         reconciled=reconciled,
+        reversals=None if definition.reversal is None else _empty_summary(),
     )

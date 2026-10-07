@@ -19,16 +19,21 @@ and ``tripped``: one ``{limit, threshold_minor, observed_minor}`` entry per
 limit exceeded (``per_action`` against the amount, ``window`` against the
 projected total), empty on a pass. Without one the evidence keeps its
 single-limit shape, so records under a window-only config keep their bytes.
+
+Under a fold with a ``reversal`` clause (``spend.weekly/3.0.0``) the evidence
+adds ``reversals``: how many cancels or refunds took a linked charge back out
+of the total and by how much, and how many were unlinked and did nothing.
+Under a fold without one the evidence keeps the shape it had.
 """
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Literal, TypedDict
+from typing import Literal, NotRequired, TypedDict
 
 from capsule_ledger.ledger.api import LedgerAPI, ScanQuery
 
 from ...folds.definition import FoldDefinition
-from ...folds.engine import evaluate_one
+from ...folds.engine import ReversalSummary, evaluate_one
 from ..action import Action
 from ..capsule import ConstraintOutcome, not_applicable_evidence
 from ..classes import resolve
@@ -53,6 +58,8 @@ class CapsEvidence(TypedDict):
     amount_minor: int
     cap_minor: int
     projected_minor: int
+    # Only under a fold with a ``reversal`` clause.
+    reversals: NotRequired[ReversalSummary]
 
 
 class CapTripped(TypedDict):
@@ -154,6 +161,9 @@ def check_caps(
         cap_minor=cap_minor,
         projected_minor=projected,
     )
+
+    if trace.reversals is not None:
+        evidence["reversals"] = trace.reversals
 
     if per_action_cap_minor is not None:
         result, reason, tripped = _judge_two_limits(action.amount_minor, projected, cap_minor, per_action_cap_minor)
