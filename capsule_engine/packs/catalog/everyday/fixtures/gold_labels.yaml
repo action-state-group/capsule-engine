@@ -25,7 +25,7 @@ rows:
       recurring_charge/1.0.0: ea4ae204e5dc33f3a28e5e15471f404f20d4f8fca193d355a099a4a7e08b082e
   code_identity:
     kind: source_tree_sha256
-    value: d02d705ea09f88126a7ad2b229baaa100cb6fe906bf55ee13fe05ad052633554
+    value: 6536d4ddf15328f4ec61ccac331220b6eb51c24d558b9cd2847fd38c26fb213a
     assurance: self-attested
 - action_id: make_payment/everyday-fixture-same-account
   capsule_id: f63cd648ab36340b74ad5fecd5981f182418e508ee6d094c08da41ec4a37f8b5
@@ -42,7 +42,7 @@ rows:
       recurring_charge/1.0.0: ea4ae204e5dc33f3a28e5e15471f404f20d4f8fca193d355a099a4a7e08b082e
   code_identity:
     kind: source_tree_sha256
-    value: d02d705ea09f88126a7ad2b229baaa100cb6fe906bf55ee13fe05ad052633554
+    value: 6536d4ddf15328f4ec61ccac331220b6eb51c24d558b9cd2847fd38c26fb213a
     assurance: self-attested
 - action_id: make_payment/everyday-fixture-account-changed
   capsule_id: a73c037b6f2510b0eb2ac610426c34b3360815ab606eb79c802acbc6141d446d
@@ -59,7 +59,7 @@ rows:
       recurring_charge/1.0.0: ea4ae204e5dc33f3a28e5e15471f404f20d4f8fca193d355a099a4a7e08b082e
   code_identity:
     kind: source_tree_sha256
-    value: d02d705ea09f88126a7ad2b229baaa100cb6fe906bf55ee13fe05ad052633554
+    value: 6536d4ddf15328f4ec61ccac331220b6eb51c24d558b9cd2847fd38c26fb213a
     assurance: self-attested
 - action_id: make_payment/everyday-fixture-rail-watched
   capsule_id: 414d30dfa85669cd63f92511db80015489eae4d5fd99d2937bac35e3859847de
@@ -76,7 +76,7 @@ rows:
       recurring_charge/1.0.0: ea4ae204e5dc33f3a28e5e15471f404f20d4f8fca193d355a099a4a7e08b082e
   code_identity:
     kind: source_tree_sha256
-    value: d02d705ea09f88126a7ad2b229baaa100cb6fe906bf55ee13fe05ad052633554
+    value: 6536d4ddf15328f4ec61ccac331220b6eb51c24d558b9cd2847fd38c26fb213a
     assurance: self-attested
 - action_id: send_message/everyday-fixture-credential-in-content
   capsule_id: fc8f8345706a700a8284bbf79d08b5eb959768edfd2792f995af07633865cdb0
@@ -93,7 +93,7 @@ rows:
       recurring_charge/1.0.0: ea4ae204e5dc33f3a28e5e15471f404f20d4f8fca193d355a099a4a7e08b082e
   code_identity:
     kind: source_tree_sha256
-    value: d02d705ea09f88126a7ad2b229baaa100cb6fe906bf55ee13fe05ad052633554
+    value: 6536d4ddf15328f4ec61ccac331220b6eb51c24d558b9cd2847fd38c26fb213a
     assurance: self-attested
 - action_id: send_message/everyday-fixture-credential-absent
   capsule_id: 77b06a98346f142253f54064cfb52cb408aaf5339f2d7a6e2accef22b8673eda
@@ -110,7 +110,7 @@ rows:
       recurring_charge/1.0.0: ea4ae204e5dc33f3a28e5e15471f404f20d4f8fca193d355a099a4a7e08b082e
   code_identity:
     kind: source_tree_sha256
-    value: d02d705ea09f88126a7ad2b229baaa100cb6fe906bf55ee13fe05ad052633554
+    value: 6536d4ddf15328f4ec61ccac331220b6eb51c24d558b9cd2847fd38c26fb213a
     assurance: self-attested
 - action_id: make_payment/everyday-fixture-dedupe-original
   capsule_id: 2cd839f5916fe86592384313baa282da0ffa47120541e1572af3b65b778239d3
@@ -127,7 +127,7 @@ rows:
       recurring_charge/1.0.0: ea4ae204e5dc33f3a28e5e15471f404f20d4f8fca193d355a099a4a7e08b082e
   code_identity:
     kind: source_tree_sha256
-    value: d02d705ea09f88126a7ad2b229baaa100cb6fe906bf55ee13fe05ad052633554
+    value: 6536d4ddf15328f4ec61ccac331220b6eb51c24d558b9cd2847fd38c26fb213a
     assurance: self-attested
 - action_id: make_payment/everyday-fixture-dedupe-repeat
   capsule_id: 654e2728c2372d975d3452c1d345385ab7e97d64d24dd718b973fd2223c287ee
@@ -144,7 +144,7 @@ rows:
       recurring_charge/1.0.0: ea4ae204e5dc33f3a28e5e15471f404f20d4f8fca193d355a099a4a7e08b082e
   code_identity:
     kind: source_tree_sha256
-    value: d02d705ea09f88126a7ad2b229baaa100cb6fe906bf55ee13fe05ad052633554
+    value: 6536d4ddf15328f4ec61ccac331220b6eb51c24d558b9cd2847fd38c26fb213a
     assurance: self-attested
 - action_id: make_payment/everyday-fixture-caps-boundary
   capsule_id: 6cf7a292ca4be2cc6ad63af6739f8e685f491b805669f5ba9133930d6fd24983
@@ -161,7 +161,7 @@ rows:
       recurring_charge/1.0.0: ea4ae204e5dc33f3a28e5e15471f404f20d4f8fca193d355a099a4a7e08b082e
   code_identity:
     kind: source_tree_sha256
-    value: d02d705ea09f88126a7ad2b229baaa100cb6fe906bf55ee13fe05ad052633554
+    value: 6536d4ddf15328f4ec61ccac331220b6eb51c24d558b9cd2847fd38c26fb213a
     assurance: self-attested
 - action_id: make_payment/everyday-fixture-caps-first-draw
   capsule_id: 875f1263c36c5f4781a1b3928579f6b1a8d2817314ac258102b04ea7beaf1936
@@ -178,7 +178,7 @@ rows:
       recurring_charge/1.0.0: ea4ae204e5dc33f3a28e5e15471f404f20d4f8fca193d355a099a4a7e08b082e
   code_identity:
     kind: source_tree_sha256
-    value: d02d705ea09f88126a7ad2b229baaa100cb6fe906bf55ee13fe05ad052633554
+    value: 6536d4ddf15328f4ec61ccac331220b6eb51c24d558b9cd2847fd38c26fb213a
     assurance: self-attested
 - action_id: make_payment/everyday-fixture-caps-over-limit
   capsule_id: 564f4d3540e71ae9f0c6a3681e5d3ba76ecdde4f3c7b4302e162e31364eeaf4b
@@ -195,7 +195,7 @@ rows:
       recurring_charge/1.0.0: ea4ae204e5dc33f3a28e5e15471f404f20d4f8fca193d355a099a4a7e08b082e
   code_identity:
     kind: source_tree_sha256
-    value: d02d705ea09f88126a7ad2b229baaa100cb6fe906bf55ee13fe05ad052633554
+    value: 6536d4ddf15328f4ec61ccac331220b6eb51c24d558b9cd2847fd38c26fb213a
     assurance: self-attested
 - action_id: make_payment/everyday-fixture-caps-amount-missing
   capsule_id: 0efb88af67d344067c4075faf8d5a6323e44e6a1cb5c411d203ce54718ffe2f6
@@ -212,7 +212,7 @@ rows:
       recurring_charge/1.0.0: ea4ae204e5dc33f3a28e5e15471f404f20d4f8fca193d355a099a4a7e08b082e
   code_identity:
     kind: source_tree_sha256
-    value: d02d705ea09f88126a7ad2b229baaa100cb6fe906bf55ee13fe05ad052633554
+    value: 6536d4ddf15328f4ec61ccac331220b6eb51c24d558b9cd2847fd38c26fb213a
     assurance: self-attested
 - action_id: check_balance/everyday-fixture-out-of-scope
   capsule_id: 7aa5c7706af86788875e050257c0ae2ddae2d4acdfa8de956806fffc9c38cc99
@@ -229,7 +229,7 @@ rows:
       recurring_charge/1.0.0: ea4ae204e5dc33f3a28e5e15471f404f20d4f8fca193d355a099a4a7e08b082e
   code_identity:
     kind: source_tree_sha256
-    value: d02d705ea09f88126a7ad2b229baaa100cb6fe906bf55ee13fe05ad052633554
+    value: 6536d4ddf15328f4ec61ccac331220b6eb51c24d558b9cd2847fd38c26fb213a
     assurance: self-attested
 - action_id: make_payment/everyday-fixture-recurring-charge
   capsule_id: 67123f3cfd98b501d91696ca40348be0746c3f977aa75672318716a67906eb4d
@@ -246,7 +246,7 @@ rows:
       recurring_charge/1.0.0: ea4ae204e5dc33f3a28e5e15471f404f20d4f8fca193d355a099a4a7e08b082e
   code_identity:
     kind: source_tree_sha256
-    value: d02d705ea09f88126a7ad2b229baaa100cb6fe906bf55ee13fe05ad052633554
+    value: 6536d4ddf15328f4ec61ccac331220b6eb51c24d558b9cd2847fd38c26fb213a
     assurance: self-attested
 - action_id: make_payment/everyday-fixture-caps-second-first-draw
   capsule_id: f13a7fa6800af6df0e5d556fcb5961c09e243764d960aba6d3b140a199c717be
@@ -263,7 +263,7 @@ rows:
       recurring_charge/1.0.0: ea4ae204e5dc33f3a28e5e15471f404f20d4f8fca193d355a099a4a7e08b082e
   code_identity:
     kind: source_tree_sha256
-    value: d02d705ea09f88126a7ad2b229baaa100cb6fe906bf55ee13fe05ad052633554
+    value: 6536d4ddf15328f4ec61ccac331220b6eb51c24d558b9cd2847fd38c26fb213a
     assurance: self-attested
 - action_id: make_payment/everyday-fixture-caps-escalates
   capsule_id: a54a963d946a46667b5e6fabc6f980112d27f874a635c7b92fd8475a74a79760
@@ -280,7 +280,7 @@ rows:
       recurring_charge/1.0.0: ea4ae204e5dc33f3a28e5e15471f404f20d4f8fca193d355a099a4a7e08b082e
   code_identity:
     kind: source_tree_sha256
-    value: d02d705ea09f88126a7ad2b229baaa100cb6fe906bf55ee13fe05ad052633554
+    value: 6536d4ddf15328f4ec61ccac331220b6eb51c24d558b9cd2847fd38c26fb213a
     assurance: self-attested
 - hand_authored: true
   action_id: dispatch_payout/payments-safety-fixture-caps-allow
