@@ -37,6 +37,8 @@ EXPECTED_DIGESTS = {
     "counterparty_identity_change/1.0.0": "0cfb1cb380b355abb88ea385334f3bb31f2e145269a2768022f85005665fc6fe",
     "credential_pattern/1.0.0": "3617fdcaa39c03cf70a3254490328ccee5eaac0faba7cd52d9e3dc3fc50336c0",
     "recurring_charge/1.0.0": "ea4ae204e5dc33f3a28e5e15471f404f20d4f8fca193d355a099a4a7e08b082e",
+    # Taxonomy-only selectors, no fold (guards/checks/action_class_gate.py).
+    "action_class_gate/1.0.0": "fcc352838832e13f5e87662f0194ec4a7065bc989bbe624b43ac5d9d1b638ae2",
 }
 
 
