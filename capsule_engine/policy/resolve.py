@@ -59,6 +59,9 @@ class ResolvedManifest:
     def caps_minor(self) -> dict[str, int]:
         return dict(self.wicket_config("caps").get("caps_minor") or {})
 
+    def per_action_minor(self) -> dict[str, int]:
+        return dict(self.wicket_config("caps").get("per_action_minor") or {})
+
     def dedupe_window_days(self) -> int | None:
         return self.wicket_config("dedupe").get("window_days")
 
