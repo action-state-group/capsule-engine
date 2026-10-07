@@ -10,7 +10,15 @@ against a *prior decision in this same replay*, not against the source
 ledger's original capsules (which the guard never produced and has no
 decision-history relationship to).
 
-``_bridge_transfer_funds`` is the one non-default action mapping, and it
+``_bridge_deal_check`` builds the action of a capsulectl deal check from the
+check's own sealed record, disclosed beside its capsule in a capsulectl deal
+bundle: the record names the action's taxonomy class (``action_class``,
+``taxonomy_version``) and the amount a spend cap evaluates (``spend_minor``),
+and the capsule binds the record by digest
+(``model_attestation.compute_attestation.agent_input_digest``). A record
+that does not match that digest is never read.
+
+``_bridge_transfer_funds`` is the other non-default action mapping, and it
 mirrors the pattern already established by ``tests/test_guard_dry_run.py``
 and ``tests/test_guard_eur150k_bridge.py``: ``transfer_funds`` capsules in
 these fixtures carry their amount only as free text inside
@@ -28,13 +36,22 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from pathlib import Path
 
+from agent_action_capsule import json_digest
 from capsule_ledger.ledger import LedgerStore
 
 from ..folds.definition import FoldDefinition
 from ..folds.duration import parse_duration_seconds
 from ..guards import Action, GuardDecision, GuardEngine, LocalSigner
 
-__all__ = ["SourcedDecision", "ReplayResult", "load_records", "filter_since", "action_for_record", "replay"]
+__all__ = [
+    "SourcedDecision",
+    "ReplayResult",
+    "load_records",
+    "load_disclosed",
+    "filter_since",
+    "action_for_record",
+    "replay",
+]
 
 _TRANSFER_NOTE_RE = re.compile(r"amount_eur:\s*(\d+).*?target_iban:\s*([A-Z0-9]+)")
 
@@ -43,14 +60,19 @@ def load_records(paths: Sequence[str | Path]) -> list[dict]:
     """Load every record from one or more sources, in the given order.
 
     Each source is either a plain JSONL ledger file (read in file-internal
-    line order) or a ``LedgerStore`` directory (read via ``scan()``, its own
+    line order), a ``LedgerStore`` directory (read via ``scan()``, its own
     append order) -- the CLI's real-deployment path, since an operator's
-    actual local ledger is a store directory, not a loose JSONL file.
+    actual local ledger is a store directory, not a loose JSONL file -- or a
+    capsule bundle (one JSON object with ``records`` and ``disclosures``, as
+    ``capsulectl bundle --deal`` writes), read in its record order.
     """
     records: list[dict] = []
     for path in paths:
         p = Path(path)
-        if p.is_dir():
+        bundle = _bundle(p)
+        if bundle is not None:
+            records.extend(bundle["records"])
+        elif p.is_dir():
             store = LedgerStore(p)
             try:
                 for rec in store.scan():
@@ -64,6 +86,35 @@ def load_records(paths: Sequence[str | Path]) -> list[dict]:
                     if line:
                         records.append(json.loads(line))
     return records
+
+
+def _bundle(path: Path) -> dict | None:
+    """``path``'s capsule bundle, or ``None`` when it is not one."""
+    if path.is_dir():
+        return None
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except ValueError:
+        return None
+    if isinstance(value, dict) and isinstance(value.get("records"), list) and isinstance(value.get("disclosures"), dict):
+        return value
+    return None
+
+
+def load_disclosed(paths: Sequence[str | Path]) -> dict[str, dict]:
+    """The records a capsule bundle discloses beside its capsules, by
+    ``capsule_id``: each one's ``agent_input``. Sources that are not bundles
+    disclose nothing."""
+    disclosed: dict[str, dict] = {}
+    for path in paths:
+        bundle = _bundle(Path(path))
+        if bundle is None:
+            continue
+        for capsule_id, members in bundle["disclosures"].items():
+            agent_input = members.get("agent_input") if isinstance(members, dict) else None
+            if isinstance(agent_input, dict):
+                disclosed[capsule_id] = agent_input
+    return disclosed
 
 
 def _parse_ts(ts: str) -> datetime:
@@ -111,8 +162,61 @@ def _bridge_transfer_funds(record: dict) -> Action | None:
     )
 
 
-def action_for_record(record: dict) -> Action:
-    bridged = _bridge_transfer_funds(record)
+def _bound(record: dict, disclosed: dict) -> bool:
+    """Whether ``disclosed`` is the record ``record``'s capsule sealed."""
+    attestation = (record.get("model_attestation") or {}).get("compute_attestation") or {}
+    bound = attestation.get("agent_input_digest")
+    return isinstance(bound, str) and json_digest(disclosed) == bound
+
+
+def _checked_body(disclosed: dict) -> dict | None:
+    """The body of a deal check (an ``x-deal-v0`` check record, or a typed
+    ``proposed-action/v0``), or ``None`` for any other record."""
+    block = disclosed.get("x-deal-v0")
+    if isinstance(block, dict) and block.get("record_type") == "check":
+        body = disclosed.get("body")
+    elif disclosed.get("type") == "proposed-action/v0":
+        body = disclosed.get("body")
+    else:
+        return None
+    return body if isinstance(body, dict) else None
+
+
+def _bridge_deal_check(record: dict, disclosed: dict | None) -> Action | None:
+    """The proposed action a capsulectl deal check states, from its own
+    sealed record: the class it names, and the amount a spend cap evaluates,
+    which is ``spend_minor`` only: never ``amount_minor`` (on a cancel it is
+    a refund) or ``cancelled_amount_minor``, and ``0`` for a record that says
+    the money moved in. So a cancel is never spend.
+    Only a check is an action here: the step that acts on it is the same
+    payment, and counting both would count it twice."""
+    if disclosed is None or not _bound(record, disclosed):
+        return None
+    body = _checked_body(disclosed)
+    if body is None or not body.get("action_class") or not body.get("taxonomy_version"):
+        return None
+    spend = body.get("spend_minor")
+    if body.get("direction") == "in":
+        spend = 0  # money arriving is never spend, whatever spend_minor says
+    return Action(
+        verb=str(body.get("action") or "unknown"),
+        operator=record.get("operator", ""),
+        developer=record.get("developer", ""),
+        action_class=body["action_class"],
+        action_id=record.get("action_id") or None,
+        action_type=record.get("action_type", "decide"),
+        timestamp=record.get("timestamp"),
+        amount_minor=spend if isinstance(spend, int) and not isinstance(spend, bool) else None,
+        currency=body.get("currency"),
+        rail=body.get("rail"),
+        taxonomy_version=body["taxonomy_version"],
+    )
+
+
+def action_for_record(record: dict, disclosed: dict | None = None) -> Action:
+    """The action ``record`` states. ``disclosed`` is the record its capsule
+    sealed, when a bundle disclosed it (``load_disclosed``)."""
+    bridged = _bridge_deal_check(record, disclosed) or _bridge_transfer_funds(record)
     if bridged is not None:
         return bridged
     return Action.from_capsule(record)
@@ -143,6 +247,8 @@ def replay(
     caps_fold: FoldDefinition,
     caps_minor: dict[str, int] | None = None,
     manifest_digest: str | None = None,
+    per_action_minor: dict[str, int] | None = None,
+    disclosed: dict[str, dict] | None = None,
 ) -> ReplayResult:
     """Feed every record through a fresh ``GuardEngine`` in dry-run mode, in
     order. Never blocks (``dry_run=True``) -- see ``engine.py``'s own
@@ -162,10 +268,11 @@ def replay(
             caps_fold=caps_fold,
             signer_provider=lambda: signer,
             caps_minor=caps_minor or {},
+            per_action_minor=per_action_minor,
             manifest_digest=manifest_digest,
         )
         for record in records:
-            action = action_for_record(record)
+            action = action_for_record(record, (disclosed or {}).get(record.get("capsule_id", "")))
             decision = engine.check(action, dry_run=True)
             cited_capsule = None
             for constraint in decision.constraints:
