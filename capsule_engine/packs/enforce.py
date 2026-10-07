@@ -23,10 +23,13 @@ from .schema import PackDefinition
 __all__ = ["accept_thresholds", "enforce_pack"]
 
 
-def accept_thresholds(pack: PackDefinition, accepted: dict[str, int]) -> PackDefinition:
+def accept_thresholds(
+    pack: PackDefinition, accepted: dict[str, int], *, accepted_per_action: dict[str, int] | None = None
+) -> PackDefinition:
     """A new ``PackDefinition`` with the ``caps`` wicket's ``caps_minor``
-    merged with ``accepted`` (action_class -> accepted cap, minor units).
-    Every action class already configured keeps its existing cap unless
+    merged with ``accepted`` (action_class -> accepted cap, minor units),
+    and its ``per_action_minor`` merged with ``accepted_per_action`` the
+    same way. Every action class already configured keeps its existing cap unless
     ``accepted`` overrides it -- accepting one class's proposal never
     silently drops another's already-enforced limit."""
     new_constraints = []
@@ -39,6 +42,8 @@ def accept_thresholds(pack: PackDefinition, accepted: dict[str, int]) -> PackDef
         caps_minor = dict(config.get("caps_minor") or {})
         caps_minor.update(accepted)
         config["caps_minor"] = caps_minor
+        if accepted_per_action:
+            config["per_action_minor"] = {**(config.get("per_action_minor") or {}), **accepted_per_action}
         new_constraints.append(WicketDefinition(wicket_id=wicket.wicket_id, check=wicket.check, config=config))
         updated = True
     if not updated:

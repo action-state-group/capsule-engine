@@ -12,10 +12,18 @@ The running total is partitioned by the fold's own ``key`` (``developer`` or
 ``operator``), and the evidence names that key and the value the total was
 read under. ``caps_minor`` is keyed by action class; ``resolve_caps_minor``
 maps a legacy name to its canonical row so both spellings are one cap.
+
+A class may also carry a per-action limit, compared against the proposed
+action's own amount alone. With one, the evidence adds ``per_action_cap_minor``
+and ``tripped``: one ``{limit, threshold_minor, observed_minor}`` entry per
+limit exceeded (``per_action`` against the amount, ``window`` against the
+projected total), empty on a pass. Without one the evidence keeps its
+single-limit shape, so records under a window-only config keep their bytes.
 """
 from __future__ import annotations
 
 from collections.abc import Mapping
+from typing import Literal, TypedDict
 
 from capsule_ledger.ledger.api import LedgerAPI, ScanQuery
 
@@ -26,7 +34,40 @@ from ..capsule import ConstraintOutcome, not_applicable_evidence
 from ..classes import resolve
 from .base import CheckOutcome
 
-__all__ = ["cap_for", "check_caps", "resolve_caps_minor"]
+__all__ = ["CapTripped", "CapsEvidence", "FoldKey", "TwoLimitCapsEvidence", "cap_for", "check_caps", "resolve_caps_minor"]
+
+
+class FoldKey(TypedDict):
+    """The partition a running total was read under."""
+
+    path: str | None
+    value: str | None
+
+
+class CapsEvidence(TypedDict):
+    """The facts a pass/fail caps constraint seals."""
+
+    fold: str
+    fold_key: FoldKey
+    weekly_spend_minor: int
+    amount_minor: int
+    cap_minor: int
+    projected_minor: int
+
+
+class CapTripped(TypedDict):
+    """One limit an action exceeded, as sealed in the caps evidence."""
+
+    limit: Literal["per_action", "window"]
+    threshold_minor: int
+    observed_minor: int
+
+
+class TwoLimitCapsEvidence(CapsEvidence):
+    """``CapsEvidence`` under a config that also sets a per-action limit."""
+
+    per_action_cap_minor: int
+    tripped: list[CapTripped]
 
 
 def _canonical(action_class: str) -> str:
@@ -77,6 +118,7 @@ def check_caps(
     *,
     definition: FoldDefinition,
     cap_minor: int,
+    per_action_cap_minor: int | None = None,
     since: str | None = None,
     as_of: str | None = None,
 ) -> CheckOutcome:
@@ -104,14 +146,28 @@ def check_caps(
     weekly_spend = trace.result or 0
     projected = weekly_spend + action.amount_minor
     envelope = trace.to_envelope()
-    evidence = {
-        "fold": envelope["fold"],
-        "fold_key": {"path": definition.key, "value": key_value},
-        "weekly_spend_minor": weekly_spend,
-        "amount_minor": action.amount_minor,
-        "cap_minor": cap_minor,
-        "projected_minor": projected,
-    }
+    evidence = CapsEvidence(
+        fold=envelope["fold"],
+        fold_key=FoldKey(path=definition.key, value=key_value),
+        weekly_spend_minor=weekly_spend,
+        amount_minor=action.amount_minor,
+        cap_minor=cap_minor,
+        projected_minor=projected,
+    )
+
+    if per_action_cap_minor is not None:
+        result, reason, tripped = _judge_two_limits(action.amount_minor, projected, cap_minor, per_action_cap_minor)
+        return CheckOutcome(
+            constraint=ConstraintOutcome(
+                id="caps",
+                result=result,
+                reason=reason,
+                evidence=TwoLimitCapsEvidence(**evidence, per_action_cap_minor=per_action_cap_minor, tripped=tripped),
+                check_type="policy",
+                method=definition.fold_id,
+            ),
+            fold_envelopes=(envelope,),
+        )
 
     if projected <= cap_minor:
         return CheckOutcome(
@@ -136,3 +192,23 @@ def check_caps(
         ),
         fold_envelopes=(envelope,),
     )
+
+
+def _judge_two_limits(
+    amount: int, projected: int, cap_minor: int, per_action_cap_minor: int
+) -> tuple[str, str, list[CapTripped]]:
+    tripped: list[CapTripped] = []
+    if amount > per_action_cap_minor:
+        tripped.append(CapTripped(limit="per_action", threshold_minor=per_action_cap_minor, observed_minor=amount))
+    if projected > cap_minor:
+        tripped.append(CapTripped(limit="window", threshold_minor=cap_minor, observed_minor=projected))
+    if tripped:
+        reason = "; ".join(
+            f"{t['limit']} limit {t['threshold_minor']} exceeded by {t['observed_minor']} (minor units)" for t in tripped
+        )
+        return "fail", reason, tripped
+    reason = (
+        f"amount {amount} <= per-action limit {per_action_cap_minor}; "
+        f"projected {projected} <= window limit {cap_minor} (minor units)"
+    )
+    return "pass", reason, tripped

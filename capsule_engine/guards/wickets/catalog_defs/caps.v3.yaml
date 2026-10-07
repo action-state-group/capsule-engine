@@ -1,0 +1,49 @@
+# Caps wicket, version 3: two limits for every action class that pays money
+# out (guards/checks/caps.py).
+#
+# - per_action_minor: compared against the proposed action's own amount alone.
+# - caps_minor: the pooled rolling-window limit, compared against the
+#   operator's 7-day total plus this amount, exactly as in caps/2.0.0.
+#
+# The evidence names which limit tripped. Both values are defaults a user
+# replaces (packs/enforce.py accept_thresholds); they are not pack content.
+#
+# Defaults are the consumer defaults: 25.00 per purchase and 100.00 per
+# rolling 7 days, in minor units of a two-decimal currency (USD assumed).
+# The check compares integers and does not convert currency, so a
+# deployment in a currency with a different minor unit sets its own values.
+# tests/test_caps_shipped_defaults.py fails if a shipped default drifts more
+# than ten times above these.
+#
+# The class set is caps/2.0.0's: every COMMIT row of guards/action_taxonomy.json
+# except money.refund and marketplace.sale, where money arrives at the
+# operator rather than leaving. caps/2.0.0 (caps.v2.yaml) stays as it was for
+# the records and ports that pin it.
+#
+# `fold_digest` is the real, independently-computable `definition_digest()`
+# of folds/catalog_defs/spend.weekly.v2.yaml (folds/definition.py).
+wicket_id: caps/3.0.0
+check: caps
+config:
+  fold_id: spend.weekly/2.0.0
+  fold_digest: a27c581b44a9735b6fad42ec619ac8e22928da6719dec59259549247726f3f10
+  caps_minor:
+    money.purchase: 10000
+    money.transfer: 10000
+    money.subscription: 10000
+    booking.create: 10000
+    booking.modify: 10000
+    booking.cancel: 10000
+    agreement.accept: 10000
+    marketplace.offer: 10000
+    external_commitment.other: 10000
+  per_action_minor:
+    money.purchase: 2500
+    money.transfer: 2500
+    money.subscription: 2500
+    booking.create: 2500
+    booking.modify: 2500
+    booking.cancel: 2500
+    agreement.accept: 2500
+    marketplace.offer: 2500
+    external_commitment.other: 2500
