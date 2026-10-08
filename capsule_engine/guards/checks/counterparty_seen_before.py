@@ -24,7 +24,7 @@ from ..action import Action
 from ..capsule import ConstraintOutcome, not_applicable_evidence
 from .base import CheckOutcome
 
-__all__ = ["check_counterparty_seen_before", "seen_before_fold"]
+__all__ = ["check_counterparty_seen_before", "check_recipient_seen_before", "seen_before_fold"]
 
 _CHECK_ID = "counterparty_seen_before"
 _FOLD_CATALOG_DIR = Path(__file__).resolve().parent.parent.parent / "folds" / "catalog_defs"
@@ -42,13 +42,13 @@ def seen_before_fold(fold_id: str, fold_digest: str) -> FoldDefinition:
     return entry.definition
 
 
-def _n_a(reason: str, method: str, *, in_scope: bool, missing_field: str | None = None) -> CheckOutcome:
+def _n_a(check_id: str, reason: str, method: str, *, in_scope: bool, missing_field: str | None = None) -> CheckOutcome:
     return CheckOutcome(
         constraint=ConstraintOutcome(
-            id=_CHECK_ID,
+            id=check_id,
             result="n/a",
             reason=reason,
-            evidence=not_applicable_evidence(_CHECK_ID, in_scope=in_scope, missing_field=missing_field),
+            evidence=not_applicable_evidence(check_id, in_scope=in_scope, missing_field=missing_field),
             check_type="policy",
             method=method,
         )
@@ -58,11 +58,27 @@ def _n_a(reason: str, method: str, *, in_scope: bool, missing_field: str | None 
 def check_counterparty_seen_before(
     action: Action, ledger: LedgerAPI, *, definition: FoldDefinition, action_classes: list[str]
 ) -> CheckOutcome:
+    return _seen_before(_CHECK_ID, "counterparty", action, ledger, definition=definition, action_classes=action_classes)
+
+
+def check_recipient_seen_before(
+    action: Action, ledger: LedgerAPI, *, definition: FoldDefinition, action_classes: list[str]
+) -> CheckOutcome:
+    """The same count, for a message: has this operator gone ahead with an
+    action addressed to this recipient before?"""
+    return _seen_before("recipient_seen_before", "recipient", action, ledger, definition=definition,
+                        action_classes=action_classes)
+
+
+def _seen_before(
+    check_id: str, noun: str, action: Action, ledger: LedgerAPI, *, definition: FoldDefinition,
+    action_classes: list[str],
+) -> CheckOutcome:
     method = definition.fold_id
     if action.action_class not in action_classes:
-        return _n_a("the rule is not configured for this action class", method, in_scope=False)
+        return _n_a(check_id, "the rule is not configured for this action class", method, in_scope=False)
     if action.target is None:
-        return _n_a("the action names no target; the counterparty could not be identified",
+        return _n_a(check_id, f"the action names no target; the {noun} could not be identified",
                     method, in_scope=True, missing_field="target")
 
     # ``ScanQuery.counterparty`` is the ledger's filter on ``operator``.
@@ -80,9 +96,9 @@ def check_counterparty_seen_before(
     if seen_before:
         return CheckOutcome(
             constraint=ConstraintOutcome(
-                id=_CHECK_ID,
+                id=check_id,
                 result="pass",
-                reason=f"repeat counterparty: {prior_count} accepted prior action(s) for this operator",
+                reason=f"repeat {noun}: {prior_count} accepted prior action(s) for this operator",
                 evidence=evidence,
                 check_type="policy",
                 method=method,
@@ -91,9 +107,9 @@ def check_counterparty_seen_before(
         )
     return CheckOutcome(
         constraint=ConstraintOutcome(
-            id=_CHECK_ID,
+            id=check_id,
             result="fail",
-            reason="first-time counterparty: no accepted prior action for this operator",
+            reason=f"first-time {noun}: no accepted prior action for this operator",
             evidence=evidence,
             check_type="policy",
             method=method,

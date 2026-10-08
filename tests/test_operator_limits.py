@@ -49,7 +49,7 @@ OPERATOR = "household-limits-fixture"
 
 # The everyday pack and its caps wicket as released, before operator limits
 # existed: an operator limit must not move either.
-EVERYDAY_PACK_DIGEST = "a9f18caeceecbcd1e28bb21b052ab00b10347f8d668c80d2fe7385113996e061"
+EVERYDAY_PACK_DIGEST = "cf10d1af09bfca7dcec25e259702184306ccbaf1d7af5ebad8aa538202b22b55"
 CAPS_V5_WICKET_DIGEST = "2807e174dc7c817917621f90a53f3fa54992b76fe3ec28e8567f814b9e72a741"
 CAPS_V5_FILE_SHA256 = "3f7ef8850e11d4a893ccaa7f85e1c9b2dde358980c946104dbc970f6989ad206"
 
@@ -129,7 +129,7 @@ def _sealed_caps_evidence_digest(decision: GuardDecision) -> str:
     return caps["evidence_digest"]
 
 
-# everyday 0.3.0 asks before a first purchase from a merchant
+# everyday 0.3.1 asks before a first purchase from a merchant
 # (counterparty_seen_before), and every shop here is new to a fresh ledger, so
 # a purchase the limit allows is still refused by that check alone.
 NEW_MERCHANT = "counterparty_seen_before"

@@ -100,7 +100,7 @@ NOT_MEASURED_OPENING = re.compile(r"^Not measured yet\. ")
 def test_every_measured_statement_opens_with_a_permitted_verb():
     assert PERMITTED_OPENING.match("Prevents a payment.") is None  # control
     obligations = [o for o in load_pack_dir(PACK_DIR).obligations if o.measurability == "measured"]
-    assert len(obligations) == 16
+    assert len(obligations) == 24
     assert [o.id for o in obligations if PERMITTED_OPENING.match(o.statement)] == [o.id for o in obligations]
 
 
@@ -108,5 +108,5 @@ def test_every_declared_not_measured_statement_says_so_first_and_no_measured_one
     assert NOT_MEASURED_OPENING.match("Flags a payment.") is None  # control
     obligations = load_pack_dir(PACK_DIR).obligations
     declared = [o.id for o in obligations if o.measurability == "declared_not_measured"]
-    assert len(declared) == 11
+    assert len(declared) == 3
     assert [o.id for o in obligations if NOT_MEASURED_OPENING.match(o.statement)] == declared

@@ -1,0 +1,8 @@
+# task_authority wicket: the action is inside the task authority it cites
+# (guards/checks/task_authority.py). The cited record's body is read only
+# when its digest equals the action's task_authority_ref; it is a plan in
+# guards/plan.py's shape, and plan_containment decides.
+wicket_id: task_authority/1.0.0
+check: task_authority
+config:
+  action_classes: [money.purchase, money.transfer, money.subscription, booking.create, booking.modify, agreement.accept, marketplace.offer, external_commitment.other]

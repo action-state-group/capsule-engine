@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import TypedDict
 
 import pytest
 from agent_action_capsule import json_digest
@@ -21,17 +22,28 @@ from capsule_ledger.ledger import LedgerStore
 
 from capsule_engine.guards import Action, LocalSigner
 from capsule_engine.guards.capsule import ALLOW, DENY, ESCALATE
+from capsule_engine.guards.checks import fields_basis
+from capsule_engine.guards.wickets import load_definition_file
 from capsule_engine.packs import build_engine, install_pack, load_pack_dir, record_pack_activation
 
 PACK_DIR = Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog" / "everyday"
 FIXTURE_PATH = PACK_DIR / "fixtures" / "mini_ledger.jsonl"
+WICKETS = Path(__file__).parent.parent / "capsule_engine" / "guards" / "wickets" / "catalog_defs"
 
 OPERATOR = "household-fixture"
 PER_ACTION_MINOR = 2_500  # caps/5.0.0's per-action default, cited by the pack
 SIGNER_SECRET = b"everyday-acceptance-fixture-fixed-key"
 # Scenarios recorded as real decisions rather than dry runs: only a real
 # accepted action makes a merchant known to counterparty_seen_before.
-REAL_RUN = frozenset({"merchant-history-real-payment"})
+REAL_RUN = frozenset({"merchant-history-real-payment", "recipient-history-real-payment"})
+# The sealed task-authority record a payment cites by digest, supplied with
+# the decision: a plan in guards/plan.py's shape.
+TASK_AUTHORITY = {"outcome_id": "household.pay_the_plumber/1.0.0", "allowed_actions": ["make_payment"],
+                  "preconditions": [], "binding": {"subject": "service/plumber"}}
+TASK_AUTHORITY_REF = json_digest(TASK_AUTHORITY)
+TASK_BODIES = {"task-inside-authority": TASK_AUTHORITY, "task-outside-authority": TASK_AUTHORITY}
+MATERIAL_BASIS = fields_basis(load_definition_file(WICKETS / "material_fields_changed.yaml").config["counted_fields"])
+OFFER_BASIS = fields_basis(load_definition_file(WICKETS / "offer_fields_changed.yaml").config["counted_fields"])
 
 
 def _signer() -> LocalSigner:
@@ -78,6 +90,55 @@ def _purchase(name: str, minute: int, developer: str, **fields) -> Action:
     )
 
 
+def _disclosure(name: str, minute: int, target: str = "shop/bakery", **fields) -> Action:
+    return Action(
+        verb="share_address",
+        operator=OPERATOR,
+        developer="household-assistant-k@v1",
+        action_class="disclosure.personal",
+        target=target,
+        action_id=f"share_address/everyday-fixture-{name}",
+        timestamp=f"2026-08-10T10:{minute:02d}:00Z",
+        **fields,
+    )
+
+
+class DeclaredInputs(TypedDict):
+    amount_minor: int
+    target: str
+    rail: str
+    counterparty_account_ref: str
+    refundable: bool
+    material_fields_changed: int
+    material_fields_basis: str
+    offer_fields_changed: int
+    offer_fields_basis: str
+    channel: str
+    first_contact_channel: str
+    upfront_amount_minor: int
+
+
+def _declared(payee: str = "m", **overrides) -> DeclaredInputs:
+    """A payment's declared inputs, each inside its limit; ``overrides``
+    moves one past it."""
+    fields = DeclaredInputs(
+        amount_minor=2_000,
+        target=f"seller/bike-{payee}",
+        rail="card",
+        counterparty_account_ref=f"acct-ref-bike-{payee}",
+        refundable=True,
+        material_fields_changed=0,
+        material_fields_basis=MATERIAL_BASIS,
+        offer_fields_changed=0,
+        offer_fields_basis=OFFER_BASIS,
+        channel="marketplace",
+        first_contact_channel="marketplace",
+        upfront_amount_minor=500,
+    )
+    fields.update(overrides)
+    return fields
+
+
 def _scenarios() -> list[tuple[str, Action, str]]:
     water = dict(target="utility/water-co", rail="bank_transfer", developer="household-assistant-a@v1")
     dup = dict(
@@ -100,6 +161,10 @@ def _scenarios() -> list[tuple[str, Action, str]]:
          target="person/neighbour-1", rail="p2p", counterparty_account_ref="acct-ref-neighbour-1"), DENY),
         ("credential-in-content", _message("credential-in-content", 5, "household-assistant-c@v1",
          target="contact/support-desk", outgoing_content="Your verification code is 482913"), DENY),
+        # A real accepted payment to the landlord: the earlier action that makes
+        # the landlord a known recipient for the message below (see REAL_RUN).
+        ("recipient-history-real-payment", _payment("rent", 6, "household-assistant-c@v1", amount_minor=900,
+         target="contact/landlord", rail="bank_transfer", counterparty_account_ref="acct-ref-landlord-1"), ALLOW),
         ("credential-absent", _message("credential-absent", 6, "household-assistant-c@v1",
          target="contact/landlord", outgoing_content="The March rent is paid; the receipt is attached."), ALLOW),
         ("dedupe-original", _payment("dedupe-original", 7, **dup), ALLOW),
@@ -162,6 +227,36 @@ def _scenarios() -> list[tuple[str, Action, str]]:
         ("off-taxonomy-class", Action(verb="do_unlisted", operator=OPERATOR, developer="household-assistant-l@v1",
          action_class="household.unlisted", target="service/unlisted",
          action_id="do_unlisted/everyday-fixture-off-taxonomy", timestamp="2026-08-10T10:21:00Z"), DENY),
+        # The role of a disclosure's recipient. Every personal-data disclosure
+        # also fails action_class_gate, so both deny.
+        ("disclosure-to-fulfilling-merchant", _disclosure("fulfilling-merchant", 22, recipient_role="fulfilling_merchant"),
+         DENY),
+        ("disclosure-to-third-party", _disclosure("third-party", 23, recipient_role="third_party",
+                                                     target="person/neighbour-2"), DENY),
+        # Every declared input inside its limits: refundable, no pinned field
+        # changed, the first-contact channel, a deposit of exactly a quarter.
+        ("declared-terms-in-bounds", _payment("terms-in-bounds", 24, "household-assistant-m@v1",
+         operator=f"{OPERATOR}-m", **_declared()), ALLOW),
+        # Each of the following moves one declared input past its limit, on its
+        # own household and payee.
+        ("non-refundable-payment", _payment("non-refundable", 25, "household-assistant-m@v1",
+         operator=f"{OPERATOR}-n", **_declared("n", refundable=False)), DENY),
+        ("material-terms-changed", _payment("material-changed", 26, "household-assistant-m@v1",
+         operator=f"{OPERATOR}-o", **_declared("o", material_fields_changed=2)), DENY),
+        ("offer-differs-from-stated", _payment("offer-differs", 27, "household-assistant-m@v1",
+         operator=f"{OPERATOR}-p", **_declared("p", offer_fields_changed=1)), DENY),
+        ("channel-moved", _payment("channel-moved", 28, "household-assistant-m@v1",
+         operator=f"{OPERATOR}-q", **_declared("q", channel="whatsapp")), DENY),
+        ("deposit-over-a-quarter", _payment("deposit-over", 29, "household-assistant-m@v1",
+         operator=f"{OPERATOR}-r", **_declared("r", upfront_amount_minor=501)), DENY),
+        # A payment citing a task-authority record, supplied with the decision
+        # (TASK_BODIES): inside its plan, and to a payee its plan does not bind.
+        ("task-inside-authority", _payment("task-inside", 30, "household-assistant-s@v1", operator=f"{OPERATOR}-s",
+         amount_minor=2_000, target="service/plumber", rail="card", counterparty_account_ref="acct-ref-plumber-1",
+         task_authority_ref=TASK_AUTHORITY_REF), ALLOW),
+        ("task-outside-authority", _payment("task-outside", 31, "household-assistant-s@v1", operator=f"{OPERATOR}-t",
+         amount_minor=2_000, target="service/roofer", rail="card", counterparty_account_ref="acct-ref-roofer-1",
+         task_authority_ref=TASK_AUTHORITY_REF), DENY),
     ]
 
 
@@ -180,7 +275,7 @@ def _run_scenarios(ledger, *, project_dir):
     )
     capsules: dict[str, dict] = {}
     for name, action, expected in _scenarios():
-        decision = engine.check(action, dry_run=name not in REAL_RUN)
+        decision = engine.check(action, dry_run=name not in REAL_RUN, task_authority=TASK_BODIES.get(name))
         if decision.outcome != expected:
             raise AssertionError(f"scenario {name!r}: expected {expected!r}, got {decision.outcome!r} ({decision.reason})")
         capsules[name] = decision.capsule
@@ -220,7 +315,7 @@ def test_records_are_pack_attributed_and_observe_mode(run):
         assert capsule["asg_payload"]["manifest_digest"] == installed.resolved.manifest_digest, name
         assert capsule["asg_payload"]["checkpoint"].get("dry_run") is (True if name not in REAL_RUN else None), name
     assert activation["asg_payload"]["detail"]["packs"] == [
-        {"pack_id": "asg/everyday/0.3.0", "digest": installed.pack.definition_digest(), "mode": "observe"}
+        {"pack_id": "asg/everyday/0.3.1", "digest": installed.pack.definition_digest(), "mode": "observe"}
     ]
 
 

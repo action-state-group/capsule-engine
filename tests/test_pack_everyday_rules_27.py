@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""everyday pack 0.3.0 carries all 27 rules. Each one either cites a check
+"""everyday pack 0.3.1 carries all 27 rules. Each one either cites a check
 the pack declares (measured) or is declared not measured and names the
 evidence instrument the fixture corpus does not carry. None is left out.
 
@@ -12,8 +12,13 @@ from pathlib import Path
 
 import pytest
 
-from capsule_engine.packs.corpus_verify import CorpusVerificationError, verify_declared_not_measured
+from capsule_engine.packs.corpus_verify import (
+    CorpusVerificationError,
+    resolves_instrument,
+    verify_declared_not_measured,
+)
 from capsule_engine.packs.loader import load_pack_dir
+from capsule_engine.packs.schema import EvidenceInstrument
 
 CATALOG = Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog"
 PACK_DIR = CATALOG / "everyday"
@@ -22,34 +27,47 @@ PACK_DIR = CATALOG / "everyday"
 MEASURED = {
     "r01-research-and-prepare": "action_class_gate",
     "r02-ordinary-purchase": "counterparty_seen_before",
+    "r03-shipping-address-to-fulfilling-merchant": "recipient_role",
     "r04-prepare-without-committing": "action_class_gate",
     "r05-spending-limits": "caps",
     "r06-new-merchant": "counterparty_seen_before",
     "r07-subscription-or-free-trial": "recurring_charge",
+    "r08-non-refundable-or-hard-to-undo": "refundability",
+    "r09-material-terms-changed": "material_fields_changed",
+    "r10-materially-different-offer": "offer_fields_changed",
     "r11-home-address-to-an-individual": "action_class_gate",
     "r12-personal-contact-to-a-new-party": "action_class_gate",
+    "r13-message-to-a-new-recipient": "recipient_seen_before",
     "r15-public-posting": "action_class_gate",
     "r16-booking-with-a-commitment": "action_class_gate",
     "r17-cancellation": "action_class_gate",
     "r18-delete-persistent-data": "action_class_gate",
     "r19-counterparty-identity-changed": "counterparty_identity_change",
     "r20-payment-method-or-destination-changed": "destination_rail",
+    "r21-unexpected-channel-change": "channel_change",
+    "r22-unusual-counterparty-behaviour": "upfront_amount",
     "r23-secrets-and-authentication": "credential_pattern",
+    "r26-stay-within-task-bounds": "task_authority",
     "r27-no-commitment-beyond-task-bounds": "dedupe",
 }
 # Rule -> the structured field its missing input would arrive in.
 DECLARED_NOT_MEASURED = {
-    "r03-shipping-address-to-fulfilling-merchant": "recipient_role",
-    "r08-non-refundable-or-hard-to-undo": "reversibility_terms",
-    "r09-material-terms-changed": "material_field_diff",
-    "r10-materially-different-offer": "offer_terms_diff",
-    "r13-message-to-a-new-recipient": "recipient_history",
     "r14-message-that-commits-the-user": "commitment_classification",
-    "r21-unexpected-channel-change": "channel_change",
-    "r22-unusual-counterparty-behaviour": "upfront_amount_minor",
     "r24-outside-instructions-are-not-the-users": "instruction_source",
     "r25-no-bypassing-safeguards": "user_control_state",
-    "r26-stay-within-task-bounds": "task_authority_ref",
+}
+# Rule -> the action field (or fold key) its check reads, for each rule 0.3.1
+# moved from declared to measured. Each is one number, one member of a closed
+# set, or one opaque reference.
+FLIPPED_INPUTS = {
+    "r03-shipping-address-to-fulfilling-merchant": ("recipient_role",),
+    "r08-non-refundable-or-hard-to-undo": ("refundable",),
+    "r09-material-terms-changed": ("material_fields_changed", "material_fields_basis"),
+    "r10-materially-different-offer": ("offer_fields_changed", "offer_fields_basis"),
+    "r13-message-to-a-new-recipient": ("target",),
+    "r21-unexpected-channel-change": ("channel", "first_contact_channel"),
+    "r22-unusual-counterparty-behaviour": ("upfront_amount_minor",),
+    "r26-stay-within-task-bounds": ("task_authority_ref",),
 }
 DISPOSITION = {n: "DO" for n in (1, 2, 3, 4)} | {n: "NEVER" for n in (23, 24, 25)}
 
@@ -70,8 +88,8 @@ def _rule_number(obligation_id: str) -> int:
     return int(obligation_id[1:3])
 
 
-def test_the_pack_is_version_0_3_0_with_exactly_27_rules_numbered_1_to_27():
-    assert PACK.pack_id == "asg/everyday/0.3.0"
+def test_the_pack_is_version_0_3_1_with_exactly_27_rules_numbered_1_to_27():
+    assert PACK.pack_id == "asg/everyday/0.3.1"
     assert len(PACK.obligations) == 27
     assert sorted(_rule_number(o.id) for o in PACK.obligations) == list(range(1, 28))
 
@@ -95,7 +113,7 @@ def test_every_rule_is_either_measured_by_a_declared_check_or_declared_not_measu
 def test_the_measured_subset_is_named_and_counted():
     measured = sorted(o.id for o in PACK.obligations if o.measurability == "measured")
     assert measured == sorted(MEASURED)
-    assert len(measured) == 16
+    assert len(measured) == 24
 
 
 def test_every_rule_carries_its_disposition():
@@ -119,9 +137,29 @@ def test_no_declared_instrument_resolves_on_the_fixture_corpus():
 
 
 def test_the_oracle_refuses_a_declared_rule_whose_instrument_the_corpus_carries():
-    corpus = _fixture_corpus() + [{"messages": [{"task_authority_ref": "authority-ref-1"}]}]
-    with pytest.raises(CorpusVerificationError, match="r26-stay-within-task-bounds"):
+    corpus = _fixture_corpus() + [{"messages": [{"user_control_state": "paused"}]}]
+    with pytest.raises(CorpusVerificationError, match="r25-no-bypassing-safeguards"):
         verify_declared_not_measured(PACK, corpus)
+
+
+@pytest.mark.parametrize(("rule", "fields"), sorted(FLIPPED_INPUTS.items()))
+def test_every_flipped_rules_input_resolves_on_the_fixture_corpus(rule, fields):
+    corpus = _fixture_corpus()
+    for field in fields:
+        instrument = EvidenceInstrument(kind="structured_field", field=field)
+        assert any(resolves_instrument(instrument, unit["messages"]) for unit in corpus), (rule, field)
+
+
+def test_the_resolve_check_reds_on_a_field_the_corpus_does_not_carry():
+    instrument = EvidenceInstrument(kind="structured_field", field="user_control_state")
+    assert not any(resolves_instrument(instrument, unit["messages"]) for unit in _fixture_corpus())
+
+
+def test_every_flipped_rule_is_measured_by_its_check():
+    by_id = {o.id: o for o in PACK.obligations}
+    assert set(FLIPPED_INPUTS) <= set(MEASURED)
+    for rule in FLIPPED_INPUTS:
+        assert (by_id[rule].measurability, by_id[rule].check) == ("measured", MEASURED[rule]), rule
 
 
 @pytest.mark.parametrize(("name", "digest"), sorted(OTHER_PACK_DIGESTS.items()))

@@ -22,8 +22,11 @@ from .action import Action
 from .capsule import ALLOW, DENY, ESCALATE, ConstraintOutcome, build_decision_capsule, not_applicable_evidence
 from .checks import (
     CONFIGURED_CHECKS,
+    RUNNABLE_CHECKS,
+    TASK_AUTHORITY_CHECKS,
     CheckOutcome,
     LimitSources,
+    TaskAuthorityBody,
     cap_for,
     check_caps,
     check_dedupe,
@@ -137,7 +140,7 @@ class GuardEngine:
         # order after every reference check. Empty by default, so an engine
         # with none configured produces byte-for-byte the decisions it
         # always has (same reasoning as ``plan`` above).
-        unknown = [w.check for w in wickets if w.check not in CONFIGURED_CHECKS]
+        unknown = [w.check for w in wickets if w.check not in RUNNABLE_CHECKS]
         if unknown:
             raise ValueError(f"wickets configure checks the engine cannot run per decision: {unknown}")
         self._wickets = wickets
@@ -182,7 +185,12 @@ class GuardEngine:
         dry_run: bool = False,
         chain_parent: str | None = None,
         chain_relation: str | None = None,
+        task_authority: TaskAuthorityBody | None = None,
     ) -> GuardDecision:
+        """``task_authority`` is the body of the task-authority record
+        ``action.task_authority_ref`` names, read only by a
+        ``task_authority`` wicket and only when the reference binds it
+        (``guards/checks/task_authority.py``)."""
         ac = classify(action.action_class)
         consequential = ac.consequential
         may_fail_open = ac.fail_open_allowed and action.action_class in self._fail_open_classes
@@ -324,7 +332,10 @@ class GuardEngine:
             plan_out = check_plan_containment(action, self._plan)
             constraints = (*constraints, plan_out.constraint)
         for wicket in self._wickets:
-            out = CONFIGURED_CHECKS[wicket.check](action, self._ledger, wicket.config)
+            if wicket.check in TASK_AUTHORITY_CHECKS:
+                out = TASK_AUTHORITY_CHECKS[wicket.check](action, task_authority, wicket.config)
+            else:
+                out = CONFIGURED_CHECKS[wicket.check](action, self._ledger, wicket.config)
             constraints = (*constraints, out.constraint)
         fold_envelopes = tuple(caps_out.fold_envelopes)
         outcome = _decide(constraints, ac, self._escalatable)

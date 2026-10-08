@@ -17,7 +17,7 @@
 # intent. A measured statement names exactly what its check reads, including
 # where that is narrower or wider than the rule. default_disposition is
 # declared data the guard engine does not read.
-pack_id: asg/everyday/0.3.0
+pack_id: asg/everyday/0.3.1
 
 obligations:
   # -- DO ------------------------------------------------------------------
@@ -39,11 +39,12 @@ obligations:
     default_disposition: DO
   - id: r03-shipping-address-to-fulfilling-merchant
     statement: >-
-      Not measured yet. Allows sharing the shipping address with the merchant
-      fulfilling an authorized order. Needs the recipient's role in the
-      transaction, which no action records yet.
-    measurability: declared_not_measured
-    evidence_instrument: {kind: structured_field, field: recipient_role}
+      Checks the role of whoever receives a personal-data disclosure
+      (disclosure.personal), from the closed set fulfilling_merchant,
+      third_party or self, and records the role it read. It passes for the
+      fulfilling merchant or the user; it reads the role only, never who the
+      recipient is or what the disclosure contains.
+    check: recipient_role
     default_disposition: DO
   - id: r04-prepare-without-committing
     statement: >-
@@ -78,29 +79,27 @@ obligations:
     default_disposition: ASK
   - id: r08-non-refundable-or-hard-to-undo
     statement: >-
-      Not measured yet. Asks before an action that is non-refundable or hard
-      to reverse. Needs the refund and reversal terms, which no action records
-      yet.
-    measurability: declared_not_measured
-    evidence_instrument: {kind: structured_field, field: reversibility_terms}
+      Flags a payment, purchase or booking that declares it cannot be
+      refunded, and records that value and the rail. Whether it is hard to
+      reverse for another reason is not measured yet.
+    check: refundability
     default_disposition: ASK
   - id: r09-material-terms-changed
     statement: >-
-      Not measured yet. Asks when a material field, such as price, quantity,
-      date, merchant, recipient, fees or terms, differs from what the user
-      confirmed or approved. Needs a field-by-field difference against that
-      record, which no action records yet.
-    measurability: declared_not_measured
-    evidence_instrument: {kind: structured_field, field: material_field_diff}
+      Flags an action on which any field of a pinned list (item, quantity,
+      price, deposit, currency, date, place, conditions, rail, refundability,
+      payee) differs from what the user approved, and records the count. It
+      reads the count the action carries over that list, never the fields
+      themselves.
+    check: material_fields_changed
     default_disposition: ASK
   - id: r10-materially-different-offer
     statement: >-
-      Not measured yet. Asks before accepting an offer materially different
-      in price, scope or terms from what the user stated or approved. Needs
-      the offer's terms compared with that record, which no action records
-      yet.
-    measurability: declared_not_measured
-    evidence_instrument: {kind: structured_field, field: offer_terms_diff}
+      Flags accepting an offer on which any field of a pinned list (item,
+      quantity, price, deposit, conditions, refundability) differs from what
+      the user stated, and records the count. It reads the count the action
+      carries over that list, never the fields themselves.
+    check: offer_fields_changed
     default_disposition: ASK
   - id: r11-home-address-to-an-individual
     statement: >-
@@ -123,11 +122,10 @@ obligations:
     default_disposition: ASK
   - id: r13-message-to-a-new-recipient
     statement: >-
-      Not measured yet. Asks before sending a message to someone the user has
-      not communicated with before. Needs a recipient history for messages,
-      which this pack does not read yet.
-    measurability: declared_not_measured
-    evidence_instrument: {kind: structured_field, field: recipient_history}
+      Flags a message to a recipient the operator has no accepted earlier
+      action addressed to, and records the recipient reference, the count
+      and the key it was read under.
+    check: recipient_seen_before
     default_disposition: ASK
   # A judge can answer this one from outgoing_content, which message.send
   # already requires. It stays declared until a judge prompt template exists
@@ -180,28 +178,28 @@ obligations:
     default_disposition: ASK
   - id: r21-unexpected-channel-change
     statement: >-
-      Not measured yet. Asks when the other party moves the interaction to
-      another website, number, address or app without that being authorized.
-      Needs the channel change recorded, which no action records yet.
-    measurability: declared_not_measured
-    evidence_instrument: {kind: structured_field, field: channel_change}
+      Detects when the kind of channel a counterparty is using (email, sms,
+      web, an app and so on) differs from the one the relationship started
+      on, both stated on the same action, and records both. Whether the move
+      was authorized is not measured yet.
+    check: channel_change
     default_disposition: ASK
   - id: r22-unusual-counterparty-behaviour
     statement: >-
-      Not measured yet. Asks when the other party presses for urgency or
-      secrecy, skips normal verification, or asks for an unusual amount up
-      front (above 100.00, or above 25% of the total). Needs the up-front
-      amount and the observed interaction, which no action records yet.
-    measurability: declared_not_measured
-    evidence_instrument: {kind: structured_field, field: upfront_amount_minor}
+      Flags a payment whose stated deposit is above 100.00, or above 25% of
+      the total, and records the amounts and which limit it is above.
+      Pressure for urgency or secrecy, and skipped verification, are not
+      measured yet.
+    check: upfront_amount
     default_disposition: ASK
   - id: r26-stay-within-task-bounds
     statement: >-
-      Not measured yet. Asks before a consequential action outside the bounds
-      the user confirmed for the task. Needs a confirmed record of those
-      bounds, which no action records yet.
-    measurability: declared_not_measured
-    evidence_instrument: {kind: structured_field, field: task_authority_ref}
+      Checks that a consequential action is inside the allowed actions of
+      the task-authority record it cites by digest, reading that record only
+      when its digest matches, and records the plan digest and the
+      containment result. An action citing no record, or whose record is not
+      supplied, is recorded as not checked.
+    check: task_authority
     default_disposition: ASK
   - id: r27-no-commitment-beyond-task-bounds
     statement: >-
@@ -242,21 +240,23 @@ action_semantics:
   - action_type: payment.make
     action_class: money.transfer
     required_fields: [amount_minor, currency, target, rail, counterparty_account_ref, recurrence]
-    optional_fields: [equivalence_key, outgoing_content]
+    optional_fields: [equivalence_key, outgoing_content, refundable, material_fields_changed, material_fields_basis, offer_fields_changed, offer_fields_basis, channel, first_contact_channel, upfront_amount_minor, task_authority_ref]
     field_aliases:
       target: payee_ref
   - action_type: message.send
     action_class: comms.external
     required_fields: [target, outgoing_content]
+    optional_fields: [channel, first_contact_channel]
   - action_type: purchase.make
     action_class: money.purchase
     required_fields: [amount_minor, currency, target]
-    optional_fields: [rail, counterparty_account_ref, equivalence_key]
+    optional_fields: [rail, counterparty_account_ref, equivalence_key, refundable, material_fields_changed, material_fields_basis, offer_fields_changed, offer_fields_basis, channel, first_contact_channel, upfront_amount_minor, task_authority_ref]
     field_aliases:
       target: merchant_ref
   - action_type: booking.create
     action_class: booking.create
     required_fields: [amount_minor, currency, target]
+    optional_fields: [refundable, material_fields_changed, material_fields_basis, offer_fields_changed, offer_fields_basis, channel, first_contact_channel, upfront_amount_minor, task_authority_ref]
 
 constraints:
   # Two limits for every class that pays money out: per action, and per
@@ -283,6 +283,25 @@ constraints:
   # A purchase from a merchant the operator has no accepted action with.
   - wicket_ref: counterparty_seen_before/2.0.0
     digest: c82a29eae8ef72736851d275ffa4d85e511a21d202822366d3b03bf3834c8cd0
+  # Each reads one number, one member of a closed set, or one opaque
+  # reference from the action, never an object or text.
+  - wicket_ref: recipient_role/1.0.0
+    digest: 917ab5edea21867f318b8dfd54a6d7b458cbabcc5cebfac6ff0c4861e918d43b
+  - wicket_ref: refundability/1.0.0
+    digest: 410ad28fa2dd518502cbcbc00972d31ae4597722f17836ed2bf80e717f2f3294
+  - wicket_ref: material_fields_changed/1.0.0
+    digest: b7c98d710e48c8fc87d92abf2599b04b6ac9ac6f129eee6335edb742f1dbc02a
+  - wicket_ref: offer_fields_changed/1.0.0
+    digest: b1ca52ccdc821cbb57df844a10eb9e7d6242fff612fb5324c3c4f642d57f7ab1
+  # A message to a recipient the operator has not written to before.
+  - wicket_ref: recipient_seen_before/1.0.0
+    digest: df8803e9c4bdab9deff48e772fcd21ff813d00157068dd250a8a5c6b45cd6c44
+  - wicket_ref: channel_change/1.0.0
+    digest: fb580fc03afe1e641286c3ba62650d8e7150be91c6de0c6dac6a225a2eb6c793
+  - wicket_ref: upfront_amount/1.0.0
+    digest: 30996a832fa0cd94dc9a64f11e69d903f73a6e6415bff4005a665460a0798a6f
+  - wicket_ref: task_authority/1.0.0
+    digest: bdb53ad1d4f3f18dc3a8ed5752c4429725df1df692f1e3b3687517f40074c150
 
 folds:
   - fold_ref: spend.weekly/3.0.0
@@ -336,6 +355,28 @@ fixtures:
     - id: booking-create
       outcome: deny
     - id: off-taxonomy-class
+      outcome: deny
+    - id: recipient-history-real-payment
+      outcome: allow
+    - id: disclosure-to-fulfilling-merchant
+      outcome: deny
+    - id: disclosure-to-third-party
+      outcome: deny
+    - id: declared-terms-in-bounds
+      outcome: allow
+    - id: non-refundable-payment
+      outcome: deny
+    - id: material-terms-changed
+      outcome: deny
+    - id: offer-differs-from-stated
+      outcome: deny
+    - id: channel-moved
+      outcome: deny
+    - id: deposit-over-a-quarter
+      outcome: deny
+    - id: task-inside-authority
+      outcome: allow
+    - id: task-outside-authority
       outcome: deny
 
 bootstrap: AI-BOOTSTRAP.md
