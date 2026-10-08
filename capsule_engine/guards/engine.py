@@ -11,16 +11,19 @@ from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
+from typing import TYPE_CHECKING
 
 from capsule_ledger.ledger.api import LedgerAPI
 
 from ..events.capsule import build_event_capsule
 from ..folds.definition import FoldDefinition
+from ..policy.errors import PolicyManifestError
 from .action import Action
 from .capsule import ALLOW, DENY, ESCALATE, ConstraintOutcome, build_decision_capsule, not_applicable_evidence
 from .checks import (
     CONFIGURED_CHECKS,
     CheckOutcome,
+    LimitSources,
     cap_for,
     check_caps,
     check_dedupe,
@@ -33,6 +36,10 @@ from .classes import ActionClass, classify
 from .plan import PlanDefinition
 from .signing import Signer, SigningKeyUnavailable
 from .wickets.definition import WicketDefinition
+
+if TYPE_CHECKING:
+    # ``policy`` imports ``guards``; the engine only calls ``in_force``.
+    from ..policy.limits import CapsLimits
 
 __all__ = ["GuardDecision", "GuardEngine"]
 
@@ -91,7 +98,11 @@ class GuardEngine:
         manifest_digest: str | None = None,
         plan: PlanDefinition | None = None,
         wickets: tuple[WicketDefinition, ...] = (),
+        caps_limits: Callable[[Signer], CapsLimits] | None = None,
+        clock: Callable[[], str] | None = None,
     ) -> None:
+        if caps_limits is not None and (caps_minor or per_action_minor):
+            raise ValueError("give caps limits as caps_limits or as caps_minor/per_action_minor, not both")
         self._ledger = ledger
         self._caps_fold = caps_fold
         self._signer_provider = signer_provider
@@ -102,6 +113,13 @@ class GuardEngine:
         # The caps wicket's ``per_action_reads``: ``None`` reads the capture.
         require_per_action_reads(per_action_reads)
         self._per_action_reads = per_action_reads
+        # Limits read per decision from activated policy (``policy/limits.py``),
+        # given this engine's signer to verify the activation records with:
+        # the value in force at the action's timestamp and at ``clock()``, and
+        # where it came from. ``None``: the two tables above, with no
+        # provenance in the evidence.
+        self._caps_limits = caps_limits
+        self._clock = clock or _utc_now
         self._freshness_bound_ms = freshness_bound_ms
         self._fail_open_classes = fail_open_classes
         self._engine_available = engine_available
@@ -238,19 +256,35 @@ class GuardEngine:
         if not self._engine_available():
             reduced_assurance = True
 
+        # Limits from activated policy are re-read for every decision, so an
+        # activation appended after this engine was built applies at once. A
+        # history they cannot be read from fails closed, recorded.
+        try:
+            caps_limits = self._caps_limits(signer) if self._caps_limits is not None else None
+        except PolicyManifestError as exc:
+            return self._infra_deny(
+                action,
+                dry_run=dry_run,
+                signer=signer,
+                age_ms=age_ms,
+                constraint_id="policy_binding",
+                reason=f"the limits in force could not be read from the activation records ({exc.reason}): {exc}",
+            )
+
         # -- the three reference checks --------------------------------
         since_dedupe = _shift(action.resolved_timestamp(), days=_DEDUPE_WINDOW_DAYS)
         dedupe_out = check_dedupe(action, self._ledger, since=since_dedupe)
 
-        cap_minor = cap_for(self._caps_minor, action.action_class)
+        cap_minor, per_action_cap_minor, limit_sources = self._limits_for(action, caps_limits)
         if cap_minor is not None:
             caps_out = check_caps(
                 action,
                 self._ledger,
                 definition=self._caps_fold,
                 cap_minor=cap_minor,
-                per_action_cap_minor=cap_for(self._per_action_minor, action.action_class),
+                per_action_cap_minor=per_action_cap_minor,
                 per_action_reads=self._per_action_reads,
+                limit_sources=limit_sources,
             )
         else:
             caps_out = CheckOutcome(
@@ -358,6 +392,27 @@ class GuardEngine:
             capsule=capsule,
             reason=_summarize(constraints, outcome),
         )
+
+    def _limits_for(
+        self, action: Action, caps_limits: CapsLimits | None
+    ) -> tuple[int | None, int | None, LimitSources | None]:
+        """The window and per-action limits for ``action`` and, when read from
+        activated policy, their sources. A per-action limit applies only to a
+        class that also has a window limit."""
+        if caps_limits is None:
+            cap_minor = cap_for(self._caps_minor, action.action_class)
+            per_action = cap_for(self._per_action_minor, action.action_class) if cap_minor is not None else None
+            return cap_minor, per_action, None
+        at, now = action.resolved_timestamp(), self._clock()
+        window = caps_limits.in_force("caps_minor", action.action_class, at=at, now=now)
+        if window is None:
+            return None, None, None
+        sources = LimitSources(window=window.source)
+        per_action = caps_limits.in_force("per_action_minor", action.action_class, at=at, now=now)
+        if per_action is None:
+            return window.value_minor, None, sources
+        sources["per_action"] = per_action.source
+        return window.value_minor, per_action.value_minor, sources
 
     # -- degradation recovery --------------------------------------------
 

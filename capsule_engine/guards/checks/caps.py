@@ -30,6 +30,14 @@ capture, because the rolling total sums what was taken. The evidence adds
 ``per_action_basis``: the field read, whether it fell back to the capture, and
 the value compared.
 
+When the engine reads its limits from activated policy (``policy/limits.py``)
+the evidence adds ``limit_sources``: for each limit applied (``window``, and
+``per_action`` when set), whether its value is the operator's, from a policy
+profile (``operator_profile``, with that profile's digest), or the wicket's
+default (``definition_default``), plus any raise activated but still inside
+its cooling-off (``pending_raise``). An engine given bare limit tables has no
+provenance to report, and its evidence keeps the shape it had.
+
 Under a fold with a ``reversal`` clause (``spend.weekly/3.0.0``) the evidence
 adds ``reversals``: how many cancels or refunds took a linked charge back out
 of the total and by how much, and how many were unlinked and did nothing.
@@ -50,10 +58,15 @@ from ..classes import resolve
 from .base import CheckOutcome
 
 __all__ = [
+    "LIMIT_SOURCE_DEFAULT",
+    "LIMIT_SOURCE_PROFILE",
     "PER_ACTION_READS",
     "CapTripped",
     "CapsEvidence",
     "FoldKey",
+    "LimitSource",
+    "LimitSources",
+    "PendingRaise",
     "PerActionBasis",
     "TwoLimitCapsEvidence",
     "cap_for",
@@ -66,12 +79,41 @@ __all__ = [
 # per-action limit reads the capture, as caps/3.0.0 and caps/4.0.0 do.
 PER_ACTION_READS = frozenset({"spend_authorized_minor"})
 
+# Where a limit's value came from (``limit_sources``).
+LIMIT_SOURCE_PROFILE = "operator_profile"
+LIMIT_SOURCE_DEFAULT = "definition_default"
+
 
 class FoldKey(TypedDict):
     """The partition a running total was read under."""
 
     path: str | None
     value: str | None
+
+
+class PendingRaise(TypedDict):
+    """A higher value activated for a limit, not yet in force."""
+
+    value_minor: int
+    effective_at: str
+    limit_source: Literal["operator_profile", "definition_default"]
+    profile_digest: NotRequired[str]
+
+
+class LimitSource(TypedDict):
+    """Where one applied limit's value came from."""
+
+    limit_source: Literal["operator_profile", "definition_default"]
+    # Only for ``operator_profile``: the digest of the profile that set it.
+    profile_digest: NotRequired[str]
+    pending_raise: NotRequired[PendingRaise]
+
+
+class LimitSources(TypedDict):
+    """``LimitSource`` per applied limit."""
+
+    window: LimitSource
+    per_action: NotRequired[LimitSource]
 
 
 class CapsEvidence(TypedDict):
@@ -85,6 +127,8 @@ class CapsEvidence(TypedDict):
     projected_minor: int
     # Only under a fold with a ``reversal`` clause.
     reversals: NotRequired[ReversalSummary]
+    # Only when the engine reads its limits from activated policy.
+    limit_sources: NotRequired[LimitSources]
 
 
 class CapTripped(TypedDict):
@@ -181,8 +225,11 @@ def check_caps(
     per_action_reads: str | None = None,
     since: str | None = None,
     as_of: str | None = None,
+    limit_sources: LimitSources | None = None,
 ) -> CheckOutcome:
     require_per_action_reads(per_action_reads)
+    if limit_sources is not None and ("per_action" in limit_sources) != (per_action_cap_minor is not None):
+        raise ValueError("limit_sources must name a per_action source exactly when a per-action limit is applied")
     if action.amount_minor is None:
         return CheckOutcome(
             constraint=ConstraintOutcome(
@@ -218,6 +265,8 @@ def check_caps(
 
     if trace.reversals is not None:
         evidence["reversals"] = trace.reversals
+    if limit_sources is not None:
+        evidence["limit_sources"] = limit_sources
 
     if per_action_cap_minor is not None:
         basis = _per_action_basis(action, action.amount_minor) if per_action_reads is not None else None
