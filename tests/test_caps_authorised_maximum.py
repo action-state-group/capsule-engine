@@ -7,7 +7,8 @@ one was declared, the most the payment may take as ``spend_authorized_minor``.
 Under ``caps/4.0.0`` the per-action limit read the capture, so a payment that
 authorised a buffer above the limit passed while its capture stayed under it.
 Under ``caps/5.0.0`` the per-action limit reads the authorised maximum and
-falls back to the capture when none was declared; the window limit and the
+falls back to the capture when none was declared, or one below the capture
+was; the window limit and the
 rolling total read only captures. The evidence's ``per_action_basis`` names
 the field read and whether it fell back.
 """
@@ -21,6 +22,7 @@ from agent_action_capsule import json_digest
 
 from capsule_engine.folds.loader import load_definition_file
 from capsule_engine.guards import Action, GuardEngine
+from capsule_engine.guards.checks import check_caps
 from capsule_engine.guards.wickets.catalog import Catalog as WicketCatalog
 from capsule_engine.policy import load_manifest_file, resolve_manifest
 from capsule_engine.report.replay import action_for_record, replay
@@ -105,10 +107,24 @@ def test_a_pre_authorisation_buffer_over_the_per_action_limit_is_denied_though_t
 
 
 def test_under_caps_v4_the_same_buffer_passes_and_the_evidence_keeps_its_shape(store, signer):
-    """The evasion caps/5.0.0 closes, kept as caps/4.0.0's pinned behaviour."""
-    caps = _caps(_engine(store, signer, per_action_reads=None).check(_action(1, CAPTURE, AUTHORIZED)))
+    """The evasion caps/5.0.0 closes, kept as caps/4.0.0's pinned behaviour,
+    under caps/4.0.0's own config."""
+    v4 = _config("caps/4.0.0")
+    engine = GuardEngine(
+        ledger=store,
+        caps_fold=load_definition_file(FOLDS / "spend.weekly.v3.yaml"),
+        signer_provider=lambda: signer,
+        caps_minor=v4["caps_minor"],
+        per_action_minor={**v4["per_action_minor"], "money.purchase": PER_ACTION},
+        per_action_reads=v4.get("per_action_reads"),
+    )
+    caps = _caps(engine.check(_action(1, CAPTURE, AUTHORIZED)))
     assert caps.result == "pass"
-    assert "per_action_basis" not in caps.evidence
+    assert set(caps.evidence) == {
+        "fold", "fold_key", "weekly_spend_minor", "amount_minor", "cap_minor", "projected_minor",
+        "reversals", "per_action_cap_minor", "tripped",
+    }
+    assert caps.reason.startswith(f"amount {CAPTURE} <= per-action limit")
 
 
 def test_with_no_authorised_maximum_the_per_action_limit_reads_the_capture_and_says_it_fell_back(store, signer):
@@ -152,9 +168,26 @@ def test_the_window_limit_reads_the_capture(store, signer):
     assert caps.evidence["tripped"] == []
 
 
-def test_an_unknown_per_action_reads_value_is_refused(store, signer):
+def test_an_unknown_per_action_reads_value_is_refused_when_the_engine_is_built(store, signer):
     with pytest.raises(ValueError, match="per_action_reads"):
-        _engine(store, signer, per_action_reads="authorized_max_minor").check(_action(1, CAPTURE, AUTHORIZED))
+        _engine(store, signer, per_action_reads="authorized_max_minor")
+
+
+def test_an_unknown_per_action_reads_value_is_refused_by_the_check(store):
+    with pytest.raises(ValueError, match="per_action_reads"):
+        check_caps(
+            _action(1, CAPTURE, AUTHORIZED),
+            store,
+            definition=load_definition_file(FOLDS / "spend.weekly.v3.yaml"),
+            cap_minor=WINDOW,
+            per_action_cap_minor=PER_ACTION,
+            per_action_reads="authorized_max_minor",
+        )
+
+
+def test_the_reason_names_the_field_the_per_action_limit_read(store, signer):
+    caps = _caps(_engine(store, signer).check(_action(1, CAPTURE, PER_ACTION)))
+    assert caps.reason.startswith(f"spend_authorized_minor {PER_ACTION} <= per-action limit {PER_ACTION}")
 
 
 class DealCheckBody(TypedDict, total=False):
@@ -210,6 +243,14 @@ def test_a_deal_check_carries_its_authorised_maximum():
     )
     action = action_for_record(capsule, record)
     assert (action.amount_minor, action.spend_authorized_minor) == (CAPTURE, AUTHORIZED)
+
+
+@pytest.mark.parametrize("value", [True, "954"])
+def test_an_authorised_maximum_that_is_not_an_integer_is_not_carried(value):
+    capsule, record = _bound_check({"spend_minor": CAPTURE})
+    record["body"]["spend_authorized_minor"] = value
+    capsule["model_attestation"]["compute_attestation"]["agent_input_digest"] = json_digest(record)
+    assert action_for_record(capsule, record).spend_authorized_minor is None
 
 
 def test_money_moving_in_carries_no_authorised_maximum():

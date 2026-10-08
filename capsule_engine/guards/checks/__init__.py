@@ -13,7 +13,7 @@ from capsule_ledger.ledger.api import LedgerAPI
 from ..action import Action
 from .action_class_gate import check_action_class_gate
 from .base import CheckOutcome
-from .caps import cap_for, check_caps, resolve_caps_minor
+from .caps import cap_for, check_caps, require_per_action_reads, resolve_caps_minor
 from .counterparty_identity_change import check_counterparty_identity_change
 from .counterparty_seen_before import check_counterparty_seen_before, seen_before_fold
 from .credential_pattern import check_credential_pattern
@@ -59,6 +59,7 @@ __all__ = [
     "check_plan_containment",
     "check_recurring_charge",
     "check_verify_before_dispatch",
+    "require_per_action_reads",
     "resolve_caps_minor",
     "seen_before_fold",
 ]

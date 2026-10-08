@@ -58,6 +58,7 @@ __all__ = [
     "TwoLimitCapsEvidence",
     "cap_for",
     "check_caps",
+    "require_per_action_reads",
     "resolve_caps_minor",
 ]
 
@@ -153,6 +154,13 @@ def _fold_key(action: Action, key: str | None, since: str | None) -> tuple[str |
     raise ValueError(f"caps cannot partition by fold key {key!r}; it reads developer or operator")
 
 
+def require_per_action_reads(per_action_reads: str | None) -> None:
+    """Raise ``ValueError`` unless ``per_action_reads`` is absent or one of
+    ``PER_ACTION_READS``."""
+    if per_action_reads is not None and per_action_reads not in PER_ACTION_READS:
+        raise ValueError(f"caps per_action_reads {per_action_reads!r} is not one of {sorted(PER_ACTION_READS)}")
+
+
 def _per_action_basis(action: Action, amount_minor: int) -> PerActionBasis:
     """What the per-action limit compares under ``per_action_reads``. An
     authorised maximum below the capture is not a maximum, so the capture is
@@ -174,8 +182,7 @@ def check_caps(
     since: str | None = None,
     as_of: str | None = None,
 ) -> CheckOutcome:
-    if per_action_reads is not None and per_action_reads not in PER_ACTION_READS:
-        raise ValueError(f"caps per_action_reads {per_action_reads!r} is not one of {sorted(PER_ACTION_READS)}")
+    require_per_action_reads(per_action_reads)
     if action.amount_minor is None:
         return CheckOutcome(
             constraint=ConstraintOutcome(
@@ -215,7 +222,9 @@ def check_caps(
     if per_action_cap_minor is not None:
         basis = _per_action_basis(action, action.amount_minor) if per_action_reads is not None else None
         per_action_amount = basis["observed_minor"] if basis is not None else action.amount_minor
-        result, reason, tripped = _judge_two_limits(per_action_amount, projected, cap_minor, per_action_cap_minor)
+        result, reason, tripped = _judge_two_limits(
+            per_action_amount, projected, cap_minor, per_action_cap_minor, basis["field"] if basis is not None else "amount"
+        )
         two_limit = TwoLimitCapsEvidence(**evidence, per_action_cap_minor=per_action_cap_minor, tripped=tripped)
         if basis is not None:
             two_limit["per_action_basis"] = basis
@@ -257,7 +266,7 @@ def check_caps(
 
 
 def _judge_two_limits(
-    amount: int, projected: int, cap_minor: int, per_action_cap_minor: int
+    amount: int, projected: int, cap_minor: int, per_action_cap_minor: int, amount_label: str
 ) -> tuple[str, str, list[CapTripped]]:
     tripped: list[CapTripped] = []
     if amount > per_action_cap_minor:
@@ -270,7 +279,7 @@ def _judge_two_limits(
         )
         return "fail", reason, tripped
     reason = (
-        f"amount {amount} <= per-action limit {per_action_cap_minor}; "
+        f"{amount_label} {amount} <= per-action limit {per_action_cap_minor}; "
         f"projected {projected} <= window limit {cap_minor} (minor units)"
     )
     return "pass", reason, tripped

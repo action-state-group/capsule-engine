@@ -26,6 +26,7 @@ from .checks import (
     check_dedupe,
     check_plan_containment,
     check_verify_before_dispatch,
+    require_per_action_reads,
     resolve_caps_minor,
 )
 from .classes import ActionClass, classify
@@ -99,6 +100,7 @@ class GuardEngine:
         # class applies one only where it also has a window limit.
         self._per_action_minor = resolve_caps_minor(per_action_minor or {})
         # The caps wicket's ``per_action_reads``: ``None`` reads the capture.
+        require_per_action_reads(per_action_reads)
         self._per_action_reads = per_action_reads
         self._freshness_bound_ms = freshness_bound_ms
         self._fail_open_classes = fail_open_classes

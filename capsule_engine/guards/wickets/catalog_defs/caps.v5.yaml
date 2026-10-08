@@ -6,8 +6,9 @@
 # the payment may take as spend_authorized_minor. Under caps/4.0.0 the
 # per-action limit read the capture, so authorising a buffer above the
 # limit, with an expected capture under it, passed. Here the per-action
-# limit reads spend_authorized_minor, and the capture only when no
-# authorised maximum was declared. The window limit still reads the
+# limit reads spend_authorized_minor, and the capture when no authorised
+# maximum was declared or the one declared is below the capture (it is not
+# a maximum then). The window limit still reads the
 # capture: spend.weekly/3.0.0 sums what was taken, and adding
 # authorisations would count every pre-authorisation twice.
 #
