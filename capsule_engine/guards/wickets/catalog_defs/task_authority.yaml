@@ -1,7 +1,7 @@
 # task_authority wicket: the action is inside the task authority it cites
-# (guards/checks/task_authority.py). The cited record's body is read only
-# when its digest equals the action's task_authority_ref; it is a plan in
-# guards/plan.py's shape, and plan_containment decides.
+# (guards/checks/task_authority.py). The whole cited record is read only
+# when the engine's own digest of it equals the action's task_authority_ref;
+# the plan inside it is in guards/plan.py's shape, and plan_containment decides.
 wicket_id: task_authority/1.0.0
 check: task_authority
 config:

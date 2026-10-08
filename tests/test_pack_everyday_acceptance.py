@@ -22,7 +22,7 @@ from capsule_ledger.ledger import LedgerStore
 
 from capsule_engine.guards import Action, LocalSigner
 from capsule_engine.guards.capsule import ALLOW, DENY, ESCALATE
-from capsule_engine.guards.checks import fields_basis
+from capsule_engine.guards.checks import fields_basis, task_authority_record_digest
 from capsule_engine.guards.wickets import load_definition_file
 from capsule_engine.packs import build_engine, install_pack, load_pack_dir, record_pack_activation
 
@@ -36,12 +36,12 @@ SIGNER_SECRET = b"everyday-acceptance-fixture-fixed-key"
 # Scenarios recorded as real decisions rather than dry runs: only a real
 # accepted action makes a merchant known to counterparty_seen_before.
 REAL_RUN = frozenset({"merchant-history-real-payment", "recipient-history-real-payment"})
-# The sealed task-authority record a payment cites by digest, supplied with
-# the decision: a plan in guards/plan.py's shape.
-TASK_AUTHORITY = {"outcome_id": "household.pay_the_plumber/1.0.0", "allowed_actions": ["make_payment"],
-                  "preconditions": [], "binding": {"subject": "service/plumber"}}
-TASK_AUTHORITY_REF = json_digest(TASK_AUTHORITY)
-TASK_BODIES = {"task-inside-authority": TASK_AUTHORITY, "task-outside-authority": TASK_AUTHORITY}
+# The whole sealed task-authority record a payment cites by digest, supplied
+# with the decision; the plan inside it is in guards/plan.py's shape.
+TASK_AUTHORITY = {"body": {"outcome_id": "household.pay_the_plumber/1.0.0", "allowed_actions": ["make_payment"],
+                           "preconditions": [], "binding": {"subject": "service/plumber"}}}
+TASK_AUTHORITY_REF = task_authority_record_digest(TASK_AUTHORITY)
+TASK_RECORDS = {"task-inside-authority": TASK_AUTHORITY, "task-outside-authority": TASK_AUTHORITY}
 MATERIAL_BASIS = fields_basis(load_definition_file(WICKETS / "material_fields_changed.yaml").config["counted_fields"])
 OFFER_BASIS = fields_basis(load_definition_file(WICKETS / "offer_fields_changed.yaml").config["counted_fields"])
 
@@ -250,7 +250,7 @@ def _scenarios() -> list[tuple[str, Action, str]]:
         ("deposit-over-a-quarter", _payment("deposit-over", 29, "household-assistant-m@v1",
          operator=f"{OPERATOR}-r", **_declared("r", upfront_amount_minor=501)), DENY),
         # A payment citing a task-authority record, supplied with the decision
-        # (TASK_BODIES): inside its plan, and to a payee its plan does not bind.
+        # (TASK_RECORDS): inside its plan, and to a payee its plan does not bind.
         ("task-inside-authority", _payment("task-inside", 30, "household-assistant-s@v1", operator=f"{OPERATOR}-s",
          amount_minor=2_000, target="service/plumber", rail="card", counterparty_account_ref="acct-ref-plumber-1",
          task_authority_ref=TASK_AUTHORITY_REF), ALLOW),
@@ -275,7 +275,7 @@ def _run_scenarios(ledger, *, project_dir):
     )
     capsules: dict[str, dict] = {}
     for name, action, expected in _scenarios():
-        decision = engine.check(action, dry_run=name not in REAL_RUN, task_authority=TASK_BODIES.get(name))
+        decision = engine.check(action, dry_run=name not in REAL_RUN, task_authority_record=TASK_RECORDS.get(name))
         if decision.outcome != expected:
             raise AssertionError(f"scenario {name!r}: expected {expected!r}, got {decision.outcome!r} ({decision.reason})")
         capsules[name] = decision.capsule

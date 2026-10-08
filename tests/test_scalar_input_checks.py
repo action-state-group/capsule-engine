@@ -8,6 +8,7 @@ reads."""
 from __future__ import annotations
 
 import dataclasses
+import json
 from pathlib import Path
 
 import pytest
@@ -16,7 +17,9 @@ from agent_action_capsule import json_digest
 from capsule_engine.guards import Action, GuardEngine
 from capsule_engine.guards.capsule import NotApplicableEvidence, not_applicable_evidence
 from capsule_engine.guards.checks import (
+    PLAN_PATH,
     TaskAuthorityBody,
+    TaskAuthorityRecord,
     check_channel_change,
     check_material_fields_changed,
     check_offer_fields_changed,
@@ -25,6 +28,7 @@ from capsule_engine.guards.checks import (
     check_task_authority,
     check_upfront_amount,
     fields_basis,
+    task_authority_record_digest,
 )
 from capsule_engine.guards.wickets import load_definition_file
 
@@ -38,10 +42,15 @@ CHANNEL = load_definition_file(CATALOG / "channel_change.yaml")
 UPFRONT = load_definition_file(CATALOG / "upfront_amount.yaml")
 TASK = load_definition_file(CATALOG / "task_authority.yaml")
 
-# A sealed task-authority record's body: a plan in guards/plan.py's shape.
-AUTHORITY: TaskAuthorityBody = {"outcome_id": "household.pay_the_plumber/1.0.0", "allowed_actions": ["pay"], "preconditions": [],
-             "binding": {"subject": "service/plumber"}}
-AUTHORITY_REF = json_digest(AUTHORITY)
+# The plan inside a sealed task-authority record, in guards/plan.py's shape.
+PLAN: TaskAuthorityBody = {"outcome_id": "household.pay_the_plumber/1.0.0", "allowed_actions": ["pay"], "preconditions": [],
+                           "binding": {"subject": "service/plumber"}}
+# The whole record the reference names; the plan is one member of it.
+AUTHORITY: TaskAuthorityRecord = {"body": PLAN}
+AUTHORITY_REF = task_authority_record_digest(AUTHORITY)
+# A real sealed task-authority record from the producer, stored as its JCS
+# bytes, and the reference an action carries to it (the golden vector).
+GOLDEN = Path(__file__).parent / "fixtures" / "task-authority"
 
 # Each new Action field and the one scalar type it may hold.
 SCALAR_FIELDS = {
@@ -280,27 +289,67 @@ def test_task_authority_fails_an_action_outside_the_bound_record():
     assert out.evidence["containment"] == "fail"
 
 
-def test_a_body_the_reference_does_not_bind_is_never_read():
-    widened = {**AUTHORITY, "allowed_actions": ["pay", "refund"]}
+def test_the_reference_binds_the_whole_record_not_the_plan():
+    # Any member the record seals moves the digest, even one the check never reads.
+    sealed = {**AUTHORITY, "sealed_at": "2026-10-08T08:00:00Z"}
+    assert task_authority_record_digest(sealed) != AUTHORITY_REF
+    assert _task(sealed, task_authority_ref=task_authority_record_digest(sealed)).result == "pass"
+    out = _task(sealed, task_authority_ref=AUTHORITY_REF)
+    assert (out.result, out.evidence) == ("n/a", _missing("task_authority", "task_authority_record"))
+
+
+def test_the_plan_alone_is_a_ref_mismatch():
+    # The earlier shape: the plan supplied without its record, under the record's reference.
+    out = _task(PLAN, task_authority_ref=AUTHORITY_REF)
+    assert (out.result, out.evidence) == ("n/a", _missing("task_authority", "task_authority_record"))
+    assert out.reason.startswith("ref mismatch")
+
+
+def test_a_tampered_record_is_never_read():
+    widened = {"body": {**PLAN, "allowed_actions": ["pay", "refund"]}}
     out = _task(widened, task_authority_ref=AUTHORITY_REF, verb="refund")
-    assert (out.result, out.evidence) == ("n/a", _missing("task_authority", "task_authority"))
+    assert (out.result, out.evidence) == ("n/a", _missing("task_authority", "task_authority_record"))
+    assert out.reason.startswith("ref mismatch")
 
 
-def test_a_bound_record_that_is_not_a_plan_is_not_read():
-    body = {"allowed_classes": ["money.transfer"]}
-    out = _task(body, task_authority_ref=json_digest(body))
-    assert (out.result, out.evidence) == ("n/a", _missing("task_authority", "task_authority"))
+def test_a_bound_record_with_no_plan_member_is_not_read():
+    record = {"plan": PLAN}
+    out = _task(record, task_authority_ref=task_authority_record_digest(record))
+    assert (out.result, out.evidence) == ("n/a", _missing("task_authority", "task_authority_record"))
+    assert "no plan at body" in out.reason
 
 
-def test_a_body_with_no_digest_is_not_read():
-    body = {**AUTHORITY, "limit": 1.5}
-    out = _task(body, task_authority_ref=AUTHORITY_REF)
-    assert (out.result, out.evidence) == ("n/a", _missing("task_authority", "task_authority"))
+def test_a_bound_record_whose_plan_does_not_parse_is_not_read():
+    record = {"body": {"allowed_classes": ["money.transfer"]}}
+    out = _task(record, task_authority_ref=task_authority_record_digest(record))
+    assert (out.result, out.evidence) == ("n/a", _missing("task_authority", "task_authority_record"))
+    assert "does not parse" in out.reason
 
 
-def test_task_authority_with_no_body_supplied_names_it():
+def test_a_record_with_no_digest_is_not_read():
+    record = {"body": {**PLAN, "limit": 1.5}}
+    out = _task(record, task_authority_ref=AUTHORITY_REF)
+    assert (out.result, out.evidence) == ("n/a", _missing("task_authority", "task_authority_record"))
+
+
+def test_task_authority_with_no_record_supplied_names_it():
     out = _task(None, task_authority_ref=AUTHORITY_REF)
-    assert (out.result, out.evidence) == ("n/a", _missing("task_authority", "task_authority"))
+    assert (out.result, out.evidence) == ("n/a", _missing("task_authority", "task_authority_record"))
+
+
+def test_the_producer_golden_record_binds_its_reference_and_its_plan_decides():
+    raw = (GOLDEN / "task-authority-record.json").read_bytes()
+    record = json.loads(raw)
+    ref = json.loads((GOLDEN / "task_authority_ref.json").read_text())["digest"]
+    assert task_authority_record_digest(record) == ref
+    assert PLAN_PATH == ("body",) and record["body"]["allowed_actions"] == ["pay"]
+    inside = _task(record, task_authority_ref=ref)
+    assert (inside.result, inside.evidence["containment"]) == ("pass", "pass")
+    outside = _task(record, task_authority_ref=ref, verb="refund")
+    assert (outside.result, outside.evidence["containment"]) == ("fail", "fail")
+    body_alone = _task(record["body"], task_authority_ref=ref)
+    assert (body_alone.result, body_alone.evidence) == ("n/a", _missing("task_authority", "task_authority_record"))
+    assert body_alone.reason.startswith("ref mismatch")
 
 
 def test_task_authority_without_the_reference_names_it():
@@ -371,12 +420,12 @@ def test_recipient_seen_before_does_not_apply_to_a_payment(store, caps_fold, sig
     assert _constraint(decision, "recipient_seen_before").evidence == _out_of_scope("recipient_seen_before")
 
 
-def test_task_authority_reads_the_body_supplied_with_the_decision(store, caps_fold, signer):
+def test_task_authority_reads_the_record_supplied_with_the_decision(store, caps_fold, signer):
     engine = _engine(store, caps_fold, signer, TASK)
-    bound = engine.check(_action(task_authority_ref=AUTHORITY_REF), task_authority=AUTHORITY)
+    bound = engine.check(_action(task_authority_ref=AUTHORITY_REF), task_authority_record=AUTHORITY)
     assert _constraint(bound, "task_authority").result == "pass"
     unsupplied = engine.check(_action(task_authority_ref=AUTHORITY_REF, action_id="pay/2", equivalence_key="2"))
-    assert _constraint(unsupplied, "task_authority").evidence == _missing("task_authority", "task_authority")
+    assert _constraint(unsupplied, "task_authority").evidence == _missing("task_authority", "task_authority_record")
 
 def test_each_new_field_is_sealed_when_set_and_absent_when_not(store, caps_fold, signer):
     values = {

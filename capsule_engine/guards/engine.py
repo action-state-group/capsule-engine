@@ -26,7 +26,7 @@ from .checks import (
     TASK_AUTHORITY_CHECKS,
     CheckOutcome,
     LimitSources,
-    TaskAuthorityBody,
+    TaskAuthorityRecord,
     cap_for,
     check_caps,
     check_dedupe,
@@ -185,12 +185,12 @@ class GuardEngine:
         dry_run: bool = False,
         chain_parent: str | None = None,
         chain_relation: str | None = None,
-        task_authority: TaskAuthorityBody | None = None,
+        task_authority_record: TaskAuthorityRecord | None = None,
     ) -> GuardDecision:
-        """``task_authority`` is the body of the task-authority record
+        """``task_authority_record`` is the whole sealed task-authority record
         ``action.task_authority_ref`` names, read only by a
-        ``task_authority`` wicket and only when the reference binds it
-        (``guards/checks/task_authority.py``)."""
+        ``task_authority`` wicket and only when the engine's own digest of it
+        equals the reference (``guards/checks/task_authority.py``)."""
         ac = classify(action.action_class)
         consequential = ac.consequential
         may_fail_open = ac.fail_open_allowed and action.action_class in self._fail_open_classes
@@ -333,7 +333,7 @@ class GuardEngine:
             constraints = (*constraints, plan_out.constraint)
         for wicket in self._wickets:
             if wicket.check in TASK_AUTHORITY_CHECKS:
-                out = TASK_AUTHORITY_CHECKS[wicket.check](action, task_authority, wicket.config)
+                out = TASK_AUTHORITY_CHECKS[wicket.check](action, task_authority_record, wicket.config)
             else:
                 out = CONFIGURED_CHECKS[wicket.check](action, self._ledger, wicket.config)
             constraints = (*constraints, out.constraint)

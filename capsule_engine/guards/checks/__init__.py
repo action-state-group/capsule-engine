@@ -33,7 +33,13 @@ from .plan_containment import check_plan_containment
 from .recipient_role import check_recipient_role
 from .recurring_charge import check_recurring_charge
 from .refundability import check_refundability
-from .task_authority import TaskAuthorityBody, check_task_authority
+from .task_authority import (
+    PLAN_PATH,
+    TaskAuthorityBody,
+    TaskAuthorityRecord,
+    check_task_authority,
+    task_authority_record_digest,
+)
 from .upfront_amount import check_upfront_amount
 from .verify_before_dispatch import check_verify_before_dispatch
 
@@ -95,9 +101,9 @@ CONFIGURED_CHECKS: dict[str, Callable[[Action, LedgerAPI, dict], CheckOutcome]] 
     ),
 }
 
-TASK_AUTHORITY_CHECKS: dict[str, Callable[[Action, TaskAuthorityBody | None, dict], CheckOutcome]] = {
-    "task_authority": lambda action, task_authority, config: check_task_authority(
-        action, task_authority, action_classes=config["action_classes"]
+TASK_AUTHORITY_CHECKS: dict[str, Callable[[Action, TaskAuthorityRecord | None, dict], CheckOutcome]] = {
+    "task_authority": lambda action, record, config: check_task_authority(
+        action, record, action_classes=config["action_classes"]
     ),
 }
 
@@ -107,7 +113,9 @@ __all__ = [
     "CONFIGURED_CHECKS",
     "RUNNABLE_CHECKS",
     "TASK_AUTHORITY_CHECKS",
+    "PLAN_PATH",
     "TaskAuthorityBody",
+    "TaskAuthorityRecord",
     "CheckOutcome",
     "LimitSources",
     "cap_for",
@@ -128,6 +136,7 @@ __all__ = [
     "check_recurring_charge",
     "check_refundability",
     "check_task_authority",
+    "task_authority_record_digest",
     "check_upfront_amount",
     "check_verify_before_dispatch",
     "fields_basis",

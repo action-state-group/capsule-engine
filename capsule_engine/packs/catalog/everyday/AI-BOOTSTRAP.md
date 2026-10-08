@@ -38,7 +38,7 @@ invent others):
 | `offer_fields_changed`, `offer_fields_basis` | `offer_fields_changed` | the same, over the offer list, against what the user stated |
 | `channel`, `first_contact_channel` | `channel_change` | the kind of channel in use now and the one the relationship started on, e.g. `"marketplace"`, `"email"`, `"whatsapp"`; a kind, never an address |
 | `upfront_amount_minor` | `upfront_amount` | the stated deposit, an integer in the same minor units as `amount_minor` |
-| `task_authority_ref` | `task_authority` | the SHA-256 digest of the task-authority record the action cites; that record's body (a plan: `outcome_id`, `allowed_actions`, `preconditions`) is passed as `guard_engine.check(action, task_authority=body)` and read only when its digest matches |
+| `task_authority_ref` | `task_authority` | the SHA-256 digest of the whole sealed task-authority record the action cites; the whole record is passed as `guard_engine.check(action, task_authority_record=record)`, the engine recomputes its digest, and the plan inside it (`outcome_id`, `allowed_actions`, `preconditions`) is read only when that digest matches |
 
 Every one of these is a single number, a member of a small closed set, or
 an opaque reference. None is an object, a list, a difference or free text;
