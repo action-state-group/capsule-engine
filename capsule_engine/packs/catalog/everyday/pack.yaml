@@ -129,6 +129,9 @@ obligations:
     measurability: declared_not_measured
     evidence_instrument: {kind: structured_field, field: recipient_history}
     default_disposition: ASK
+  # A judge can answer this one from outgoing_content, which message.send
+  # already requires. It stays declared until a judge prompt template exists
+  # to pin as mode: judged with a judge_pin.
   - id: r14-message-that-commits-the-user
     statement: >-
       Not measured yet. Asks before sending a message that commits the user
