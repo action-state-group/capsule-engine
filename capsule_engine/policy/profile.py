@@ -25,6 +25,10 @@ Shape (``policy-profile/v0``)::
           caps:                          # the check the values configure
             per_action_minor: {money.purchase: 4000}
             caps_minor: {money.purchase: 20000}
+          counterparty_list:             # a list, not class values
+            mode: deny                   # required: deny | allow
+            entries: [shop/example]      # counterparty references
+            disposition: ask             # optional: deny | ask
 
 ``pack`` names a pack without its version so a profile can outlive a pack
 upgrade; carrying values across an upgrade is a later step, and today a
@@ -36,6 +40,12 @@ Which parameters a profile may set is a closed table (``CONFIGURABLE``), and
 a value may only replace a default the pack's wicket already declares: a
 profile never adds a class the pack does not limit. Anything else is refused
 (``resolve.py``), never ignored.
+
+``counterparty_list`` is the one check whose values are not per-class
+amounts: its ``entries`` replace the wicket's (empty) list whole. A profile
+that sets it must name ``mode``, so a list is never read as deny when the
+user meant allow. Entries are stored sorted, so the profile digest does not
+depend on the order the user typed them.
 """
 from __future__ import annotations
 
@@ -48,10 +58,13 @@ from typing import Any, TypedDict
 
 from agent_action_capsule.canonical import json_digest
 
+from ..guards.checks.counterparty_list import DISPOSITIONS, MODES
 from .errors import MALFORMED_PROFILE, PolicyManifestError
 
 __all__ = [
     "CONFIGURABLE",
+    "LIST_CHECK",
+    "LIST_KEYS",
     "PROFILE_FORMAT",
     "PackParameters",
     "PolicyProfile",
@@ -68,6 +81,12 @@ CONFIGURABLE: dict[str, frozenset[str]] = {
     "caps": frozenset({"caps_minor", "per_action_minor"}),
 }
 
+# The one check whose profile values are not per-class amounts, and the keys
+# a profile may set on it. Kept out of ``CONFIGURABLE``, whose every key is a
+# per-class limit to its readers.
+LIST_CHECK = "counterparty_list"
+LIST_KEYS = frozenset({"mode", "entries", "disposition"})
+
 # publisher/name: a pack_id (``publisher/name/semver``) without its version.
 PACK_NAME_RE = re.compile(r"^[a-z0-9][a-z0-9_.-]*/[a-z0-9][a-z0-9-]*$")
 
@@ -75,11 +94,14 @@ PACK_NAME_RE = re.compile(r"^[a-z0-9][a-z0-9_.-]*/[a-z0-9][a-z0-9-]*$")
 _MAX_SAFE_INT = 2**53 - 1
 
 ClassValues = dict[str, int]
+# A ``caps`` key carries ClassValues; a ``counterparty_list`` key carries its
+# mode or disposition (str) or its entries (list[str]).
+ParameterValue = ClassValues | str | list[str]
 
 
 class PackParametersDict(TypedDict):
     pack: str
-    parameters: dict[str, dict[str, ClassValues]]
+    parameters: dict[str, dict[str, ParameterValue]]
 
 
 class PolicyProfileDict(TypedDict):
@@ -92,7 +114,7 @@ class PackParameters:
     """The values one profile sets for one pack: check -> key -> class -> value."""
 
     pack: str
-    parameters: dict[str, dict[str, ClassValues]] = field(default_factory=dict)
+    parameters: dict[str, dict[str, ParameterValue]] = field(default_factory=dict)
 
     def canonical_dict(self) -> PackParametersDict:
         return {"pack": self.pack, "parameters": self.parameters}
@@ -147,6 +169,29 @@ def _parse_class_values(raw: Any, context: str) -> ClassValues:
     return out
 
 
+def _parse_list_parameters(raw: Any, context: str) -> dict[str, ParameterValue]:
+    keys = set(raw)
+    if not {"mode", "entries"} <= keys <= LIST_KEYS:
+        raise _refuse(
+            f"{context} must set 'mode' and 'entries' and may set 'disposition', got {sorted(keys, key=str)}"
+        )
+    if raw["mode"] not in MODES:
+        raise _refuse(f"{context}['mode'] must be one of {sorted(MODES)}, got {raw['mode']!r}")
+    entries = raw["entries"]
+    if not isinstance(entries, list) or not all(isinstance(e, str) and e for e in entries):
+        raise _refuse(f"{context}['entries'] must be a list of non-empty strings, got {entries!r}")
+    if len(set(entries)) != len(entries):
+        raise _refuse(f"{context}['entries'] lists a counterparty more than once")
+    out: dict[str, ParameterValue] = {"mode": raw["mode"], "entries": sorted(entries)}
+    if "disposition" in raw:
+        if raw["disposition"] not in DISPOSITIONS:
+            raise _refuse(
+                f"{context}['disposition'] must be one of {sorted(DISPOSITIONS)}, got {raw['disposition']!r}"
+            )
+        out["disposition"] = raw["disposition"]
+    return out
+
+
 def _parse_pack_entry(raw: Any) -> PackParameters:
     if not isinstance(raw, dict):
         raise _refuse(f"each packs entry must be a mapping: {raw!r}")
@@ -157,10 +202,13 @@ def _parse_pack_entry(raw: Any) -> PackParameters:
     raw_params = raw["parameters"]
     if not isinstance(raw_params, dict):
         raise _refuse(f"packs[{name!r}].parameters must be a mapping")
-    parameters: dict[str, dict[str, ClassValues]] = {}
+    parameters: dict[str, dict[str, ParameterValue]] = {}
     for check, keys in raw_params.items():
         if not isinstance(check, str) or not isinstance(keys, dict):
             raise _refuse(f"packs[{name!r}].parameters[{check!r}] must be a mapping of config key to values")
+        if check == LIST_CHECK:
+            parameters[check] = _parse_list_parameters(keys, f"packs[{name!r}].parameters[{check!r}]")
+            continue
         parameters[check] = {
             key: _parse_class_values(values, f"packs[{name!r}].parameters[{check!r}][{key!r}]")
             for key, values in keys.items()

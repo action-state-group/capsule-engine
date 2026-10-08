@@ -26,6 +26,7 @@ from .checks import (
     check_dedupe,
     check_plan_containment,
     check_verify_before_dispatch,
+    require_disposition,
     require_per_action_reads,
     resolve_caps_minor,
 )
@@ -122,6 +123,15 @@ class GuardEngine:
         if unknown:
             raise ValueError(f"wickets configure checks the engine cannot run per decision: {unknown}")
         self._wickets = wickets
+        # A counterparty_list wicket configured ``disposition: ask`` joins
+        # the failures that ask an approver; ``deny`` leaves it refusing.
+        escalatable = set(_ESCALATABLE)
+        for wicket in wickets:
+            if wicket.check == "counterparty_list":
+                require_disposition(wicket.config["disposition"])
+                if wicket.config["disposition"] == "ask":
+                    escalatable.add("counterparty_list")
+        self._escalatable = frozenset(escalatable)
         # The active policy manifest's own digest (``capsule_ledger.policy.
         # resolve_manifest(...).manifest_digest``), pinned onto every
         # decision capsule this engine produces (``build_decision_capsule``'s
@@ -283,7 +293,7 @@ class GuardEngine:
             out = CONFIGURED_CHECKS[wicket.check](action, self._ledger, wicket.config)
             constraints = (*constraints, out.constraint)
         fold_envelopes = tuple(caps_out.fold_envelopes)
-        outcome = _decide(constraints, ac)
+        outcome = _decide(constraints, ac, self._escalatable)
 
         resolved_parent, resolved_relation = chain_parent, chain_relation
         if resolved_parent is None:
@@ -433,10 +443,15 @@ class GuardEngine:
 _ESCALATABLE = frozenset({"caps", "counterparty_seen_before"})
 
 
-def _decide(constraints: tuple[ConstraintOutcome, ...], action_class: ActionClass) -> str:
+def _decide(
+    constraints: tuple[ConstraintOutcome, ...],
+    action_class: ActionClass,
+    escalatable: frozenset[str] = _ESCALATABLE,
+) -> str:
     """allow/deny/escalate per D2 (2026-08-05): a clean run allows. A hold
-    escalates only when every failing constraint is in ``_ESCALATABLE``
-    (`caps`, `counterparty_seen_before`) and the triggering class has an
+    escalates only when every failing constraint is in ``escalatable``
+    (``_ESCALATABLE`` -- `caps`, `counterparty_seen_before` -- plus a
+    `counterparty_list` configured to ask) and the triggering class has an
     `approver_role` configured -- an integrity failure
     (`verify_before_dispatch`, whether the cited mandate is missing or fails
     re-verification), a dedupe hit, or an escalatable failure on a class with
@@ -444,7 +459,7 @@ def _decide(constraints: tuple[ConstraintOutcome, ...], action_class: ActionClas
     fails = {c.id for c in constraints if c.result == "fail"}
     if not fails:
         return ALLOW
-    if fails <= _ESCALATABLE and action_class.approver_role is not None:
+    if fails <= escalatable and action_class.approver_role is not None:
         return ESCALATE
     return DENY
 

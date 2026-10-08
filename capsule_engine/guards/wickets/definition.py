@@ -44,10 +44,11 @@ WICKET_ID_RE = re.compile(r"^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)*/\d+\.\d+\.\d+$"
 # py``'s ``CHECKS`` catalog lists, plus ``hold_reconcile`` (``holds/engine.
 # py``'s tolerance check for planned-vs-executed reconciliation, capsule-emit
 # #53), plus ``plan_containment`` (``guards/checks/plan_containment.py`` --
-# forward-compiled-plan containment), plus the six configured checks a
+# forward-compiled-plan containment), plus the configured checks a
 # pack can add to a decision (``destination_rail``,
 # ``counterparty_identity_change``, ``counterparty_seen_before``,
-# ``credential_pattern``, ``recurring_charge``, ``action_class_gate`` --
+# ``credential_pattern``, ``recurring_charge``, ``action_class_gate``,
+# ``counterparty_list`` --
 # ``guards/checks/__init__.py``'s ``CONFIGURED_CHECKS``). Closed for
 # the same reason ``folds/definition.py``'s ``KNOWN_REDUCERS`` is: an
 # unregistered name is a typo or a not-yet-built check, never silently
@@ -65,6 +66,7 @@ KNOWN_CHECKS = frozenset(
         "credential_pattern",
         "recurring_charge",
         "action_class_gate",
+        "counterparty_list",
     }
 )
 

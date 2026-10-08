@@ -1,0 +1,17 @@
+# counterparty_list wicket: a deny list or an allow list of counterparty
+# references (guards/checks/counterparty_list.py). It ships an EMPTY deny
+# list, so citing it changes no decision until a user supplies one: the list,
+# its mode and its disposition are set in a policy profile
+# (policy/profile.py), never in this file, so the digest below is the same
+# for every user.
+#
+# mode: deny fails a listed counterparty; allow fails an unlisted one.
+# disposition: deny refuses on a fail; ask sends it to the action class's
+# approver, and refuses where the class names none.
+wicket_id: counterparty_list/1.0.0
+check: counterparty_list
+config:
+  action_classes: [money.purchase]
+  mode: deny
+  entries: []
+  disposition: deny
