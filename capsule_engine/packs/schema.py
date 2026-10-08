@@ -43,7 +43,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field, replace
 from pathlib import Path
-from typing import Any
+from typing import Any, TypedDict
 
 from agent_action_capsule.canonical import FloatInDigestError, UnsafeIntegerError, json_digest
 
@@ -70,6 +70,9 @@ __all__ = [
     "TOPOLOGY_INVARIANT_MODES",
     "EVIDENCE_PROFILE_VALUES",
     "EPISTEMIC_TYPE_VALUES",
+    "JUDGE_PIN_HOSTING_VALUES",
+    "JudgePin",
+    "JudgePinDict",
     "Obligation",
     "ActionSemantic",
     "ProposerStub",
@@ -256,6 +259,60 @@ EPISTEMIC_TYPE_VALUES = frozenset(
 
 
 
+# Where the model named by a judged obligation's ``judge_pin`` runs. A
+# "hosted" model is reached through someone else's endpoint: we hold neither
+# its weights nor any guarantee that the model behind the name stays the
+# same, so a verdict from it is ATTRIBUTABLE (it says which pinned judge
+# answered) and never re-derivable by a stranger. "self_hosted" names a model
+# whose weights the operator runs; whether those weights are published so a
+# stranger can re-run them is not recorded here.
+JUDGE_PIN_HOSTING_VALUES = frozenset({"hosted", "self_hosted"})
+
+
+class JudgePinDict(TypedDict):
+    """``JudgePin.to_dict()``: the pin as it enters the pack digest."""
+
+    model_id: str
+    prompt_template_hash: str
+    schema_hash: str
+    input_refs: list[str]
+    model_hosting: str
+
+
+@dataclass(frozen=True)
+class JudgePin:
+    """The pin a ``mode: judged`` obligation carries: which judge answers it.
+
+    ``model_id`` names the model; ``prompt_template_hash`` is the SHA-256 hex
+    of the prompt TEMPLATE (capsule-judge's ``prompt_digest`` over a
+    ``JudgePromptDefinition``), never of a prompt with an action's content
+    interpolated into it; ``schema_hash`` is the SHA-256 hex of the answer
+    schema the judge must return; ``input_refs`` names the normalized action
+    fields the template reads. The interpolated prompt carries the action's
+    content -- which can be identity or a secret -- so it never enters a
+    pack, and the loader refuses any prompt-text field outright.
+
+    ``model_hosting`` (one of ``JUDGE_PIN_HOSTING_VALUES``) is the honest
+    label on what the verdict is: a hosted model's verdict is attributable,
+    not re-derivable, so a judged obligation pinned to one cannot declare
+    ``re_derivability_grade: pure_replay``."""
+
+    model_id: str
+    prompt_template_hash: str
+    schema_hash: str
+    input_refs: tuple[str, ...]
+    model_hosting: str
+
+    def to_dict(self) -> JudgePinDict:
+        return {
+            "model_id": self.model_id,
+            "prompt_template_hash": self.prompt_template_hash,
+            "schema_hash": self.schema_hash,
+            "input_refs": list(self.input_refs),
+            "model_hosting": self.model_hosting,
+        }
+
+
 @dataclass(frozen=True)
 class Obligation:
     """The human-readable contract this pack encodes, mapped to the one check
@@ -281,6 +338,15 @@ class Obligation:
     would arrive in, for ``corpus_verify.verify_declared_not_measured`` to
     test. Both are emitted only when declared, so an obligation without them
     digests identically to before.
+
+    ``mode`` (one of ``MODE_VALUES``, default ``"structural"``) says how the
+    obligation is judged. A ``"judged"`` obligation is measured by the judge
+    its ``judge_pin`` names rather than by a check, so it cites no check and
+    must carry the pin; any other mode must not. A judged obligation may ASK
+    but never declare ``default_disposition: NEVER`` -- a judged verdict
+    cannot be re-derived by the person it stops. Both fields are emitted only
+    when declared, so an obligation without them digests identically to
+    before.
     """
 
     id: str
@@ -290,6 +356,8 @@ class Obligation:
     default_disposition: str | None = None
     measurability: str = "measured"
     evidence_instrument: EvidenceInstrument | None = None
+    mode: str = "structural"
+    judge_pin: JudgePin | None = None
 
 
 @dataclass(frozen=True)
@@ -778,6 +846,8 @@ class PackDefinition:
                         if o.evidence_instrument is not None
                         else {}
                     ),
+                    **({"mode": o.mode} if o.mode != "structural" else {}),
+                    **({"judge_pin": o.judge_pin.to_dict()} if o.judge_pin is not None else {}),
                 }
                 for o in self.obligations
             ],

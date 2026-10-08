@@ -80,6 +80,7 @@ from .errors import (
     INVALID_FIXTURES,
     INVALID_FOLD_REF,
     INVALID_HOLDS_INTEGRATION,
+    INVALID_JUDGE_PIN,
     INVALID_MEASURABILITY,
     INVALID_MODE,
     INVALID_OUTCOME,
@@ -90,15 +91,18 @@ from .errors import (
     INVALID_SCOPE_DIMENSION,
     INVALID_TIER,
     INVALID_VERDICT,
+    JUDGED_DISPOSITION_NEVER,
     MALFORMED_PACK,
     MISSING_CONSTRAINT_SCOPE,
     MISSING_EVIDENCE_INSTRUMENT,
     MISSING_EVIDENCE_RULE,
+    MISSING_JUDGE_PIN,
     MISSING_OBLIGATION_CLAUSE,
     MISSING_REFUSAL_REASON,
     MISSING_REQUIRED_FIELD,
     OBLIGATION_CHECK_NOT_DECLARED,
     PACK_NOT_FOUND,
+    PROMPT_TEXT_IN_PACK,
     SCOPE_MISMATCH,
     TOPOLOGY_INVARIANT_OVERRIDE,
     UNKNOWN_ACTION_CLASS,
@@ -114,6 +118,7 @@ from .schema import (
     EVIDENCE_INSTRUMENT_KINDS,
     EVIDENCE_PROFILE_VALUES,
     HOLDS_INTEGRATION_VALUES,
+    JUDGE_PIN_HOSTING_VALUES,
     KNOWN_SCOPE_DIMENSIONS,
     MEASURABILITY_VALUES,
     MODE_VALUES,
@@ -128,6 +133,7 @@ from .schema import (
     EvidenceContract,
     EvidenceInstrument,
     FixtureScenario,
+    JudgePin,
     Obligation,
     OutcomeOverride,
     PackDefinition,
@@ -168,6 +174,7 @@ CORE_FOLD_CATALOG_DIR = Path(__file__).resolve().parent.parent / "folds" / "cata
 
 _ISO_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 _SHA256_HEX_RE = re.compile(r"^[0-9a-f]{64}$")
+_JUDGE_PIN_KEYS = frozenset({"model_id", "prompt_template_hash", "schema_hash", "input_refs", "model_hosting"})
 
 
 def _require_mapping(data: Any, what: str) -> dict:
@@ -217,12 +224,29 @@ def _parse_obligations(
             f"obligations[{obligation_id!r}].statement",
             "No payment may exceed the configured weekly cap without escalation.",
         )
+        _refuse_prompt_text(entry, what=f"obligations[{obligation_id!r}]")
         measurability = entry.get("measurability", "measured")
         if measurability not in MEASURABILITY_VALUES:
             raise PackDefinitionError(
                 INVALID_MEASURABILITY,
                 f"obligations[{obligation_id!r}].measurability={measurability!r} must be one of "
                 f"{sorted(MEASURABILITY_VALUES)}, or omitted (defaults to 'measured')",
+            )
+        mode = entry.get("mode", "structural")
+        if mode not in MODE_VALUES:
+            raise PackDefinitionError(
+                INVALID_MODE,
+                f"obligations[{obligation_id!r}].mode={mode!r} must be one of {sorted(MODE_VALUES)}, or omitted "
+                "(defaults to 'structural')",
+            )
+        if mode == "judged":
+            obligations.append(_judged_obligation(entry, obligation_id=obligation_id, statement=statement))
+            continue
+        if "judge_pin" in entry:
+            raise PackDefinitionError(
+                INVALID_JUDGE_PIN,
+                f"obligations[{obligation_id!r}] carries a judge_pin but mode={mode!r}; a judge_pin belongs "
+                "only to a mode: judged obligation",
             )
         if measurability == "declared_not_measured":
             obligations.append(
@@ -234,6 +258,7 @@ def _parse_obligations(
                     grades=_obligation_grades(
                         entry.get("re_derivability_grade"), entry.get("default_disposition"), obligation_id=obligation_id
                     ),
+                    mode=mode,
                 )
             )
             continue
@@ -262,9 +287,129 @@ def _parse_obligations(
                 check=check,
                 re_derivability_grade=re_derivability_grade,
                 default_disposition=default_disposition,
+                mode=mode,
             )
         )
     return tuple(obligations)
+
+
+# Reads one obligation's raw YAML mapping: the loader's decoding boundary.
+def _refuse_prompt_text(entry: dict, *, what: str) -> None:
+    """Refuse any prompt-text key on an obligation or its judge_pin.
+
+    An interpolated prompt carries the action's content, which can be the
+    user's identity or a secret, and neither may enter a capsule in clear or
+    as a digest. A pack names the template by hash and the fields it reads;
+    the only prompt-named key it may carry is ``judge_pin.prompt_template_hash``."""
+    pin = entry.get("judge_pin")
+    keys = [(what, key) for key in entry]
+    if isinstance(pin, dict):
+        keys += [(f"{what}.judge_pin", key) for key in pin if key != "prompt_template_hash"]
+    for where, key in keys:
+        if isinstance(key, str) and "prompt" in key.lower():
+            raise PackDefinitionError(
+                PROMPT_TEXT_IN_PACK,
+                f"{where} carries {key!r}; prompt text never enters a pack. Name the template by "
+                "judge_pin.prompt_template_hash and the fields it reads by judge_pin.input_refs",
+            )
+
+
+# Reads one obligation's raw YAML mapping: the loader's decoding boundary.
+def _judged_obligation(entry: dict, *, obligation_id: str, statement: str) -> Obligation:
+    """A ``mode: judged`` obligation: measured by the judge its pin names, never by a check."""
+    what = f"obligations[{obligation_id!r}]"
+    if entry.get("measurability", "measured") != "measured" or "evidence_instrument" in entry:
+        raise PackDefinitionError(
+            INVALID_MEASURABILITY,
+            f"{what} is mode: judged, so the judge its judge_pin names measures it; it cannot also be "
+            "declared_not_measured or name an evidence_instrument",
+        )
+    if "check" in entry:
+        raise PackDefinitionError(
+            INVALID_JUDGE_PIN,
+            f"{what} is mode: judged and also cites check={entry['check']!r}; a judged obligation is "
+            "measured by its judge_pin, not by a check -- drop one of the two",
+        )
+    if "judge_pin" not in entry:
+        raise PackDefinitionError(
+            MISSING_JUDGE_PIN,
+            f"{what} is mode: judged but carries no judge_pin -- name the judge that answers it, e.g.:\n"
+            "judge_pin:\n"
+            "  model_id: <model>\n"
+            "  prompt_template_hash: <sha256 hex of the prompt template>\n"
+            "  schema_hash: <sha256 hex of the answer schema>\n"
+            "  input_refs: [outgoing_content]\n"
+            "  model_hosting: hosted",
+        )
+    pin = _parse_judge_pin(entry["judge_pin"], what=what)
+    re_derivability_grade, default_disposition = _obligation_grades(
+        entry.get("re_derivability_grade"), entry.get("default_disposition"), obligation_id=obligation_id
+    )
+    if default_disposition == "NEVER":
+        raise PackDefinitionError(
+            JUDGED_DISPOSITION_NEVER,
+            f"{what} is mode: judged with default_disposition: NEVER; a judged verdict cannot be "
+            "re-derived by the person it stops, so a judged obligation may ASK but never NEVER",
+        )
+    if pin.model_hosting == "hosted" and re_derivability_grade == "pure_replay":
+        raise PackDefinitionError(
+            INVALID_RE_DERIVABILITY_GRADE,
+            f"{what} is judged by a hosted model and declares re_derivability_grade: pure_replay; a "
+            "hosted model's verdict is attributable, not re-derivable",
+        )
+    return Obligation(
+        id=obligation_id,
+        statement=statement,
+        re_derivability_grade=re_derivability_grade,
+        default_disposition=default_disposition,
+        mode="judged",
+        judge_pin=pin,
+    )
+
+
+def _parse_judge_pin(raw: Any, *, what: str) -> JudgePin:
+    raw = _require_mapping(raw, f"{what}.judge_pin")
+    unknown = sorted(str(key) for key in raw if key not in _JUDGE_PIN_KEYS)
+    if unknown:
+        raise PackDefinitionError(
+            INVALID_JUDGE_PIN,
+            f"{what}.judge_pin carries unknown keys {unknown}; the pin is exactly {sorted(_JUDGE_PIN_KEYS)}",
+        )
+    model_id = raw.get("model_id")
+    if not isinstance(model_id, str) or not model_id:
+        raise PackDefinitionError(INVALID_JUDGE_PIN, f"{what}.judge_pin.model_id must be a non-empty string")
+    for key in ("prompt_template_hash", "schema_hash"):
+        value = raw.get(key)
+        if not isinstance(value, str) or not _SHA256_HEX_RE.match(value):
+            raise PackDefinitionError(
+                INVALID_JUDGE_PIN, f"{what}.judge_pin.{key} must be 64 lowercase hex characters (SHA-256)"
+            )
+    input_refs = raw.get("input_refs")
+    if not isinstance(input_refs, list) or not input_refs:
+        raise PackDefinitionError(
+            INVALID_JUDGE_PIN, f"{what}.judge_pin.input_refs must be a non-empty list of normalized action fields"
+        )
+    for ref in input_refs:
+        if not isinstance(ref, str) or ref not in NORMALIZED_ACTION_FIELDS:
+            raise PackDefinitionError(
+                INVALID_JUDGE_PIN,
+                f"{what}.judge_pin.input_refs entry {ref!r} must be one of {sorted(NORMALIZED_ACTION_FIELDS)}",
+            )
+    if len(set(input_refs)) != len(input_refs):
+        raise PackDefinitionError(INVALID_JUDGE_PIN, f"{what}.judge_pin.input_refs lists a field more than once")
+    model_hosting = raw.get("model_hosting")
+    if model_hosting not in JUDGE_PIN_HOSTING_VALUES:
+        raise PackDefinitionError(
+            INVALID_JUDGE_PIN,
+            f"{what}.judge_pin.model_hosting={model_hosting!r} must be one of {sorted(JUDGE_PIN_HOSTING_VALUES)}",
+        )
+    return JudgePin(
+        model_id=model_id,
+        prompt_template_hash=raw["prompt_template_hash"],
+        schema_hash=raw["schema_hash"],
+        input_refs=tuple(input_refs),
+        model_hosting=model_hosting,
+    )
 
 
 def _obligation_grades(
@@ -293,6 +438,7 @@ def _declared_not_measured_obligation(
     check: object,
     instrument: object,
     grades: tuple[str | None, str | None],
+    mode: str,
 ) -> Obligation:
     """An obligation no check measures: it cites none and names the evidence instrument its input would arrive in."""
     what = f"obligations[{obligation_id!r}]"
@@ -319,6 +465,7 @@ def _declared_not_measured_obligation(
         default_disposition=default_disposition,
         measurability="declared_not_measured",
         evidence_instrument=_parse_evidence_instrument(instrument, what=what),
+        mode=mode,
     )
 
 

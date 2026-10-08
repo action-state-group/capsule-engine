@@ -76,6 +76,12 @@ INVALID_MEASURABILITY = "invalid_measurability"
 MISSING_EVIDENCE_INSTRUMENT = "missing_evidence_instrument"
 INVALID_EVIDENCE_INSTRUMENT = "invalid_evidence_instrument"
 
+# judge_pin -- the pin a mode: judged obligation carries.
+MISSING_JUDGE_PIN = "missing_judge_pin"
+INVALID_JUDGE_PIN = "invalid_judge_pin"
+JUDGED_DISPOSITION_NEVER = "judged_disposition_never"
+PROMPT_TEXT_IN_PACK = "prompt_text_in_pack"
+
 # clause -- the structured legal anchor alongside clause_ref.
 INVALID_CLAUSE = "invalid_clause"
 
