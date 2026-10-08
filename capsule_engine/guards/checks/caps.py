@@ -20,6 +20,24 @@ limit exceeded (``per_action`` against the amount, ``window`` against the
 projected total), empty on a pass. Without one the evidence keeps its
 single-limit shape, so records under a window-only config keep their bytes.
 
+Under a config with ``per_action_reads: spend_authorized_minor``
+(``caps/5.0.0``) the per-action limit reads the action's authorised maximum,
+``spend_authorized_minor``: the most the payment may take, which can exceed
+the expected capture by a pre-authorisation buffer. It reads the capture,
+``spend_minor`` (the action's ``amount_minor``), when no authorised maximum was
+declared, or one below the capture was. The window limit always reads the
+capture, because the rolling total sums what was taken. The evidence adds
+``per_action_basis``: the field read, whether it fell back to the capture, and
+the value compared.
+
+When the engine reads its limits from activated policy (``policy/limits.py``)
+the evidence adds ``limit_sources``: for each limit applied (``window``, and
+``per_action`` when set), whether its value is the operator's, from a policy
+profile (``operator_profile``, with that profile's digest), or the wicket's
+default (``definition_default``), plus any raise activated but still inside
+its cooling-off (``pending_raise``). An engine given bare limit tables has no
+provenance to report, and its evidence keeps the shape it had.
+
 Under a fold with a ``reversal`` clause (``spend.weekly/3.0.0``) the evidence
 adds ``reversals``: how many cancels or refunds took a linked charge back out
 of the total and by how much, and how many were unlinked and did nothing.
@@ -39,7 +57,31 @@ from ..capsule import ConstraintOutcome, not_applicable_evidence
 from ..classes import resolve
 from .base import CheckOutcome
 
-__all__ = ["CapTripped", "CapsEvidence", "FoldKey", "TwoLimitCapsEvidence", "cap_for", "check_caps", "resolve_caps_minor"]
+__all__ = [
+    "LIMIT_SOURCE_DEFAULT",
+    "LIMIT_SOURCE_PROFILE",
+    "PER_ACTION_READS",
+    "CapTripped",
+    "CapsEvidence",
+    "FoldKey",
+    "LimitSource",
+    "LimitSources",
+    "PendingRaise",
+    "PerActionBasis",
+    "TwoLimitCapsEvidence",
+    "cap_for",
+    "check_caps",
+    "require_per_action_reads",
+    "resolve_caps_minor",
+]
+
+# The values a caps config's ``per_action_reads`` may take. Absent, the
+# per-action limit reads the capture, as caps/3.0.0 and caps/4.0.0 do.
+PER_ACTION_READS = frozenset({"spend_authorized_minor"})
+
+# Where a limit's value came from (``limit_sources``).
+LIMIT_SOURCE_PROFILE = "operator_profile"
+LIMIT_SOURCE_DEFAULT = "definition_default"
 
 
 class FoldKey(TypedDict):
@@ -47,6 +89,31 @@ class FoldKey(TypedDict):
 
     path: str | None
     value: str | None
+
+
+class PendingRaise(TypedDict):
+    """A higher value activated for a limit, not yet in force."""
+
+    value_minor: int
+    effective_at: str
+    limit_source: Literal["operator_profile", "definition_default"]
+    profile_digest: NotRequired[str]
+
+
+class LimitSource(TypedDict):
+    """Where one applied limit's value came from."""
+
+    limit_source: Literal["operator_profile", "definition_default"]
+    # Only for ``operator_profile``: the digest of the profile that set it.
+    profile_digest: NotRequired[str]
+    pending_raise: NotRequired[PendingRaise]
+
+
+class LimitSources(TypedDict):
+    """``LimitSource`` per applied limit."""
+
+    window: LimitSource
+    per_action: NotRequired[LimitSource]
 
 
 class CapsEvidence(TypedDict):
@@ -60,6 +127,8 @@ class CapsEvidence(TypedDict):
     projected_minor: int
     # Only under a fold with a ``reversal`` clause.
     reversals: NotRequired[ReversalSummary]
+    # Only when the engine reads its limits from activated policy.
+    limit_sources: NotRequired[LimitSources]
 
 
 class CapTripped(TypedDict):
@@ -70,11 +139,21 @@ class CapTripped(TypedDict):
     observed_minor: int
 
 
+class PerActionBasis(TypedDict):
+    """The amount a per-action limit read, under ``per_action_reads``."""
+
+    field: Literal["spend_authorized_minor", "spend_minor"]
+    fell_back: bool
+    observed_minor: int
+
+
 class TwoLimitCapsEvidence(CapsEvidence):
     """``CapsEvidence`` under a config that also sets a per-action limit."""
 
     per_action_cap_minor: int
     tripped: list[CapTripped]
+    # Only under a config with ``per_action_reads``.
+    per_action_basis: NotRequired[PerActionBasis]
 
 
 def _canonical(action_class: str) -> str:
@@ -119,6 +198,23 @@ def _fold_key(action: Action, key: str | None, since: str | None) -> tuple[str |
     raise ValueError(f"caps cannot partition by fold key {key!r}; it reads developer or operator")
 
 
+def require_per_action_reads(per_action_reads: str | None) -> None:
+    """Raise ``ValueError`` unless ``per_action_reads`` is absent or one of
+    ``PER_ACTION_READS``."""
+    if per_action_reads is not None and per_action_reads not in PER_ACTION_READS:
+        raise ValueError(f"caps per_action_reads {per_action_reads!r} is not one of {sorted(PER_ACTION_READS)}")
+
+
+def _per_action_basis(action: Action, amount_minor: int) -> PerActionBasis:
+    """What the per-action limit compares under ``per_action_reads``. An
+    authorised maximum below the capture is not a maximum, so the capture is
+    read instead."""
+    authorized = action.spend_authorized_minor
+    if authorized is None or authorized < amount_minor:
+        return PerActionBasis(field="spend_minor", fell_back=True, observed_minor=amount_minor)
+    return PerActionBasis(field="spend_authorized_minor", fell_back=False, observed_minor=authorized)
+
+
 def check_caps(
     action: Action,
     ledger: LedgerAPI,
@@ -126,9 +222,14 @@ def check_caps(
     definition: FoldDefinition,
     cap_minor: int,
     per_action_cap_minor: int | None = None,
+    per_action_reads: str | None = None,
     since: str | None = None,
     as_of: str | None = None,
+    limit_sources: LimitSources | None = None,
 ) -> CheckOutcome:
+    require_per_action_reads(per_action_reads)
+    if limit_sources is not None and ("per_action" in limit_sources) != (per_action_cap_minor is not None):
+        raise ValueError("limit_sources must name a per_action source exactly when a per-action limit is applied")
     if action.amount_minor is None:
         return CheckOutcome(
             constraint=ConstraintOutcome(
@@ -164,15 +265,24 @@ def check_caps(
 
     if trace.reversals is not None:
         evidence["reversals"] = trace.reversals
+    if limit_sources is not None:
+        evidence["limit_sources"] = limit_sources
 
     if per_action_cap_minor is not None:
-        result, reason, tripped = _judge_two_limits(action.amount_minor, projected, cap_minor, per_action_cap_minor)
+        basis = _per_action_basis(action, action.amount_minor) if per_action_reads is not None else None
+        per_action_amount = basis["observed_minor"] if basis is not None else action.amount_minor
+        result, reason, tripped = _judge_two_limits(
+            per_action_amount, projected, cap_minor, per_action_cap_minor, basis["field"] if basis is not None else "amount"
+        )
+        two_limit = TwoLimitCapsEvidence(**evidence, per_action_cap_minor=per_action_cap_minor, tripped=tripped)
+        if basis is not None:
+            two_limit["per_action_basis"] = basis
         return CheckOutcome(
             constraint=ConstraintOutcome(
                 id="caps",
                 result=result,
                 reason=reason,
-                evidence=TwoLimitCapsEvidence(**evidence, per_action_cap_minor=per_action_cap_minor, tripped=tripped),
+                evidence=two_limit,
                 check_type="policy",
                 method=definition.fold_id,
             ),
@@ -205,7 +315,7 @@ def check_caps(
 
 
 def _judge_two_limits(
-    amount: int, projected: int, cap_minor: int, per_action_cap_minor: int
+    amount: int, projected: int, cap_minor: int, per_action_cap_minor: int, amount_label: str
 ) -> tuple[str, str, list[CapTripped]]:
     tripped: list[CapTripped] = []
     if amount > per_action_cap_minor:
@@ -218,7 +328,7 @@ def _judge_two_limits(
         )
         return "fail", reason, tripped
     reason = (
-        f"amount {amount} <= per-action limit {per_action_cap_minor}; "
+        f"{amount_label} {amount} <= per-action limit {per_action_cap_minor}; "
         f"projected {projected} <= window limit {cap_minor} (minor units)"
     )
     return "pass", reason, tripped

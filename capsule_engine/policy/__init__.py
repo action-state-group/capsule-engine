@@ -11,6 +11,7 @@ from .activation import (
 from .errors import PolicyManifestError
 from .loader import load_manifest_file, load_manifest_text
 from .manifest import FoldRef, Manifest, PackRef, WicketRef, parse_manifest
+from .profile import PROFILE_FORMAT, PackParameters, PolicyProfile, load_profile_file, parse_profile
 from .resolve import ResolvedManifest, resolve_manifest
 
 __all__ = [
@@ -22,6 +23,11 @@ __all__ = [
     "load_manifest_text",
     "load_manifest_file",
     "PolicyManifestError",
+    "PROFILE_FORMAT",
+    "PolicyProfile",
+    "PackParameters",
+    "parse_profile",
+    "load_profile_file",
     "ResolvedManifest",
     "resolve_manifest",
     "build_manifest_activation_capsule",

@@ -21,6 +21,22 @@ FOLD_DIGEST_DRIFT = "fold_digest_drift"
 WICKET_DIGEST_DRIFT = "wicket_digest_drift"
 UNKNOWN_ENGINE = "unknown_engine"
 
+# Policy profile (``profile.py``): parse-time shape, then resolve-time
+# cross-checks against the manifest's pin and the resolved wickets.
+MALFORMED_PROFILE = "malformed_profile"
+PROFILE_MISSING = "profile_missing"
+PROFILE_UNPINNED = "profile_unpinned"
+PROFILE_DIGEST_DRIFT = "profile_digest_drift"
+PROFILE_UNKNOWN_PACK = "profile_unknown_pack"
+PROFILE_UNKNOWN_PARAMETER = "profile_unknown_parameter"
+# ``limits.py``: the activation history a profile's limits are read from.
+# The installed manifest is not the one the latest activation binds:
+PROFILE_UNBOUND = "profile_unbound"
+# An activation record fails verification under the engine's signer:
+ACTIVATION_UNVERIFIED = "activation_unverified"
+# An activation is timestamped before the one appended ahead of it:
+ACTIVATION_OUT_OF_ORDER = "activation_out_of_order"
+
 
 class PolicyManifestError(ValueError):
     """A policy manifest fails to parse, validate, or resolve. Carries a named reason."""

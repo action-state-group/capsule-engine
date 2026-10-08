@@ -22,7 +22,8 @@ invent others):
 
 | Normalized field | Read by | What it is |
 |---|---|---|
-| `amount_minor` | `caps` | the amount in minor currency units (cents), always an integer |
+| `amount_minor` | `caps` | the amount in minor currency units (cents), always an integer: the amount the payment is expected to take |
+| `spend_authorized_minor` | `caps` | optional: the most the payment may take, in minor units, when that is more than `amount_minor` (a card pre-authorisation or a buffer); leave it unset when there is none |
 | `currency` | -- | ISO 4217 code, e.g. `"EUR"` |
 | `action_class` | `action_class_gate` | the guard class the action is declared in; the gate reads nothing else |
 | `target` (pack-facing name: **payee_ref**, or **merchant_ref** on a purchase) | `dedupe`, `counterparty_identity_change`, `counterparty_seen_before` | a stable reference for who is paid, bought from or messaged |
@@ -35,10 +36,14 @@ invent others):
 **The checks** (each one is a wicket cited by digest from the engine's own
 catalog):
 
-1. `caps` (`caps/4.0.0`) -- this amount must be at or under the per-action
-   limit (default 25.00), and the operator's rolling 7-day spend plus this
-   amount must be at or under the window limit (default 100.00); the record
-   names which limit tripped. The limits cover every
+1. `caps` (`caps/5.0.0`) -- the most this payment may take must be at or
+   under the per-action limit (default 25.00), and the operator's rolling
+   7-day spend plus this amount must be at or under the window limit
+   (default 100.00); the record names which limit tripped. The per-action
+   limit reads `spend_authorized_minor` when it is set and not below
+   `amount_minor`, and `amount_minor` otherwise; the record names which one
+   it read and whether it fell back. The rolling total adds only
+   `amount_minor`, so a pre-authorisation is never counted twice. The limits cover every
    class that pays money out (transfers, purchases, subscriptions, creating
    or changing a booking); cancelling a booking is not capped. The total is
    kept per `operator`, so a new agent version or a second tool acting for

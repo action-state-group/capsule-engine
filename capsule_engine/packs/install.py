@@ -20,6 +20,7 @@ caller (the CLI, an integration, a test) is expected to read and honor.
 """
 from __future__ import annotations
 
+import json
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
@@ -31,7 +32,9 @@ from ..guards.checks import CONFIGURED_CHECKS
 from ..guards.engine import GuardEngine
 from ..guards.signing import Signer
 from ..policy.activation import build_manifest_activation_capsule, find_latest_activation
+from ..policy.limits import read_caps_limits
 from ..policy.manifest import FoldRef, Manifest, PackRef, WicketRef
+from ..policy.profile import PolicyProfile
 from ..policy.resolve import ResolvedManifest, resolve_manifest
 from .schema import PackDefinition
 
@@ -63,6 +66,8 @@ class InstalledPack:
     manifest_path: Path
     fold_catalog_dir: Path
     wicket_catalog_dir: Path
+    profile: PolicyProfile | None = None
+    profile_path: Path | None = None
 
 
 def _write_definition_yaml(path: Path, canonical: dict) -> None:
@@ -70,17 +75,27 @@ def _write_definition_yaml(path: Path, canonical: dict) -> None:
     path.write_text(yaml.safe_dump(canonical, sort_keys=False))
 
 
-def install_pack(pack: PackDefinition, *, project_dir: str | Path, mode: str = "observe") -> InstalledPack:
+def install_pack(
+    pack: PackDefinition, *, project_dir: str | Path, mode: str = "observe", profile: PolicyProfile | None = None
+) -> InstalledPack:
     """Materialize ``pack`` into ``<project_dir>/.capsule/`` and return the
     resolved manifest + catalog locations a ``GuardEngine`` can be built
     from. Idempotent: re-running with the same pack/mode overwrites the same
     files with byte-identical content (every definition here is written from
-    its own ``canonical_dict()``, not appended to)."""
+    its own ``canonical_dict()``, not appended to).
+
+    ``profile`` carries the user's own values for the pack's parameters
+    (``policy/profile.py``). It is written to ``.capsule/policy/profile.json``
+    and pinned by digest in the manifest; the catalogs are written exactly as
+    they are without it, so two installs that differ only in profile have
+    byte-identical catalogs. A profile that sets anything the pack does not
+    define is refused before the install returns."""
     project_dir = Path(project_dir)
     catalog_root = project_dir / CATALOG_DIRNAME
     fold_catalog_dir = catalog_root / "catalog" / "folds"
     wicket_catalog_dir = catalog_root / "catalog" / "wickets"
     manifest_path = catalog_root / "policy" / "manifest.yaml"
+    profile_path = catalog_root / "policy" / "profile.json"
 
     fold_refs: list[FoldRef] = []
     for fold in pack.folds:
@@ -101,11 +116,21 @@ def install_pack(pack: PackDefinition, *, project_dir: str | Path, mode: str = "
         folds=tuple(fold_refs),
         wickets=tuple(wicket_refs),
         packs=(pack_ref,),
+        profile_digest=profile.profile_digest() if profile is not None else None,
     )
+    # Resolve before writing the manifest, so a refused profile leaves no
+    # manifest on disk that pins it.
+    resolved = resolve_manifest(
+        manifest, fold_catalog_dir=fold_catalog_dir, wicket_catalog_dir=wicket_catalog_dir, profile=profile
+    )
+
     manifest_path.parent.mkdir(parents=True, exist_ok=True)
     manifest_path.write_text(yaml.safe_dump(manifest.canonical_dict(), sort_keys=False))
-
-    resolved = resolve_manifest(manifest, fold_catalog_dir=fold_catalog_dir, wicket_catalog_dir=wicket_catalog_dir)
+    if profile is not None:
+        profile_path.write_text(json.dumps(profile.canonical_dict(), indent=2, sort_keys=True) + "\n")
+    else:
+        # A profile left by an earlier install is no longer pinned.
+        profile_path.unlink(missing_ok=True)
 
     return InstalledPack(
         pack=pack,
@@ -115,24 +140,37 @@ def install_pack(pack: PackDefinition, *, project_dir: str | Path, mode: str = "
         manifest_path=manifest_path,
         fold_catalog_dir=fold_catalog_dir,
         wicket_catalog_dir=wicket_catalog_dir,
+        profile=profile,
+        profile_path=profile_path if profile is not None else None,
     )
 
 
 def build_engine(
-    installed: InstalledPack, *, ledger: LedgerAPI, signer_provider: Callable[[], Signer | None]
+    installed: InstalledPack,
+    *,
+    ledger: LedgerAPI,
+    signer_provider: Callable[[], Signer | None],
+    clock: Callable[[], str] | None = None,
 ) -> GuardEngine:
     """A ``GuardEngine`` wired from the installed pack's resolved manifest --
     the caps fold/limits and manifest_digest all come from what
     ``install_pack`` actually materialized and resolved, never re-declared
-    here. Note this does NOT set ``dry_run`` -- that is a per-``check()``-call
+    here. The caps limits are read from ``ledger``'s activation records on
+    every decision (``policy/limits.py``): a profile's value applies only once
+    a signed activation binds it, a raise waits out the cooling-off, and each
+    decision's caps evidence names the source of every limit it applied. A
+    decision under an install whose profile no activation binds is denied
+    (``policy_binding``). ``clock`` (default: the wall clock) is the engine's
+    "now" for the cooling-off. Note this does NOT set ``dry_run`` -- that is a per-``check()``-call
     argument (``guards/engine.py``); a caller in ``mode="observe"`` must pass
     ``dry_run=True`` to every ``check()`` call itself (see this module's own
     docstring)."""
     return GuardEngine(
         ledger=ledger,
         caps_fold=installed.resolved.caps_fold(),
-        caps_minor=installed.resolved.caps_minor(),
-        per_action_minor=installed.resolved.per_action_minor(),
+        caps_limits=lambda signer: read_caps_limits(installed.resolved, ledger, signer),
+        clock=clock,
+        per_action_reads=installed.resolved.per_action_reads(),
         signer_provider=signer_provider,
         manifest_digest=installed.resolved.manifest_digest,
         wickets=installed.resolved.configured_wickets(frozenset(CONFIGURED_CHECKS)),
@@ -152,7 +190,9 @@ def record_pack_activation(
     """Append a signed ``policy_manifest_activated`` event capsule
     (``policy/activation.py``) recording that this pack, at this digest, in
     this mode, is now in force -- the "provable what was in force" half of
-    the starter-packs plan's manifest-fragment requirement. Chains to the
+    the starter-packs plan's manifest-fragment requirement. When the install
+    pins a policy profile, the record also carries that profile's digest and
+    values. Chains to the
     ledger's own previous activation, if any, so pack installs and any other
     manifest changes share one walkable epoch history."""
     previous = find_latest_activation(ledger)

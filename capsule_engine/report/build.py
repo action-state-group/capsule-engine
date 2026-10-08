@@ -15,7 +15,7 @@ from datetime import datetime, timezone
 
 from ..folds.definition import FoldDefinition
 from .model import DryRunReport, GuardSection, ModelNote, ReportRow
-from .replay import ReplayResult, filter_since, load_records, replay
+from .replay import ReplayResult, filter_since, load_disclosed, load_records, replay
 
 __all__ = ["build_dry_run_report", "build_dry_run_report_with_proposal", "GUARD_ORDER", "GUARD_DESCRIPTIONS"]
 
@@ -111,11 +111,19 @@ def build_dry_run_report(
     model_note: str | None = None,
     model_id: str | None = None,
     manifest_digest: str | None = None,
+    per_action_minor: dict[str, int] | None = None,
+    per_action_reads: str | None = None,
 ) -> DryRunReport:
     all_records = load_records(ledger_paths)
     replayed_records = filter_since(all_records, since)
     result: ReplayResult = replay(
-        replayed_records, caps_fold=caps_fold, caps_minor=caps_minor, manifest_digest=manifest_digest
+        replayed_records,
+        caps_fold=caps_fold,
+        caps_minor=caps_minor,
+        manifest_digest=manifest_digest,
+        per_action_minor=per_action_minor,
+        per_action_reads=per_action_reads,
+        disclosed=load_disclosed(ledger_paths),
     )
 
     sections: dict[str, list[ReportRow]] = {guard_id: [] for guard_id in GUARD_ORDER}
@@ -171,6 +179,8 @@ def build_dry_run_report_with_proposal(
     model_note: str | None = None,
     model_id: str | None = None,
     manifest_digest: str | None = None,
+    per_action_minor: dict[str, int] | None = None,
+    per_action_reads: str | None = None,
 ) -> DryRunReport:
     """Extends ``build_dry_run_report``'s report with one additional
     section: actions that were ``allow`` under the currently-configured
@@ -193,12 +203,31 @@ def build_dry_run_report_with_proposal(
         model_note=model_note,
         model_id=model_id,
         manifest_digest=manifest_digest,
+        per_action_minor=per_action_minor,
+        per_action_reads=per_action_reads,
     )
 
     all_records = load_records(ledger_paths)
     replayed_records = filter_since(all_records, since)
-    current = replay(replayed_records, caps_fold=caps_fold, caps_minor=caps_minor, manifest_digest=manifest_digest)
-    proposed = replay(replayed_records, caps_fold=caps_fold, caps_minor=proposed_caps_minor, manifest_digest=manifest_digest)
+    disclosed = load_disclosed(ledger_paths)
+    current = replay(
+        replayed_records,
+        caps_fold=caps_fold,
+        caps_minor=caps_minor,
+        manifest_digest=manifest_digest,
+        per_action_minor=per_action_minor,
+        per_action_reads=per_action_reads,
+        disclosed=disclosed,
+    )
+    proposed = replay(
+        replayed_records,
+        caps_fold=caps_fold,
+        caps_minor=proposed_caps_minor,
+        manifest_digest=manifest_digest,
+        per_action_minor=per_action_minor,
+        per_action_reads=per_action_reads,
+        disclosed=disclosed,
+    )
 
     newly_held_rows: list[ReportRow] = []
     for cur, prop in zip(current.decisions, proposed.decisions, strict=True):

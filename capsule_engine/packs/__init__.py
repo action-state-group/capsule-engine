@@ -9,7 +9,7 @@ See the module docstrings in ``schema.py`` (the parsed pack shape),
 pieces. ``catalog/`` holds the packs this repo ships (``payments-safety``
 today).
 """
-from .enforce import accept_thresholds, enforce_pack
+from .enforce import accept_thresholds, enforce_pack, profile_for_accepted
 from .errors import PackDefinitionError, RegistryPinError
 from .install import InstalledPack, build_engine, install_pack, record_pack_activation
 from .loader import load_pack_dir
@@ -38,4 +38,5 @@ __all__ = [
     "load_proposals_file",
     "accept_thresholds",
     "enforce_pack",
+    "profile_for_accepted",
 ]

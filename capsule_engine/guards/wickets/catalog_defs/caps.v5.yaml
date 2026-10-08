@@ -1,0 +1,43 @@
+# Caps wicket, version 5: caps/4.0.0's two limits and fold, with the
+# per-action limit reading the authorised maximum (guards/checks/caps.py).
+#
+# A payment by card or with a pre-authorisation may take more than its
+# expected charge: a record seals the capture as spend_minor and the most
+# the payment may take as spend_authorized_minor. Under caps/4.0.0 the
+# per-action limit read the capture, so authorising a buffer above the
+# limit, with an expected capture under it, passed. Here the per-action
+# limit reads spend_authorized_minor, and the capture when no authorised
+# maximum was declared or the one declared is below the capture (it is not
+# a maximum then). The window limit still reads the
+# capture: spend.weekly/3.0.0 sums what was taken, and adding
+# authorisations would count every pre-authorisation twice.
+#
+# The evidence's per_action_basis names the field the per-action limit read
+# and whether it fell back to the capture.
+#
+# Class set, limits and fold are caps/4.0.0's; only per_action_reads is new.
+# caps/4.0.0 (caps.v4.yaml) stays as it was for the records and packs that pin it.
+wicket_id: caps/5.0.0
+check: caps
+config:
+  per_action_reads: spend_authorized_minor
+  fold_id: spend.weekly/3.0.0
+  fold_digest: 25907741320624a830c5854fc7f2d434bfa17528c8bfc17f4a8a4f84a39f1b18
+  caps_minor:
+    money.purchase: 10000
+    money.transfer: 10000
+    money.subscription: 10000
+    booking.create: 10000
+    booking.modify: 10000
+    agreement.accept: 10000
+    marketplace.offer: 10000
+    external_commitment.other: 10000
+  per_action_minor:
+    money.purchase: 2500
+    money.transfer: 2500
+    money.subscription: 2500
+    booking.create: 2500
+    booking.modify: 2500
+    agreement.accept: 2500
+    marketplace.offer: 2500
+    external_commitment.other: 2500
