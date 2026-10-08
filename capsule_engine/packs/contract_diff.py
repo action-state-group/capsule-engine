@@ -70,6 +70,34 @@ name gets no rule, so any change to it is breaking.
   abstract outcome shape), ``clause.source_url`` (native shape) --
   ``editorial``: neither is read when sufficiency is decided.
 * everything else, at the root or in a requirement -- ``changed`` (breaking).
+
+The same rules, aimed at a RuleSet. ``diff_rulesets`` diffs what is in force
+-- the installed packs (by pin and mode) and the user's policy profile
+(``policy/profile.py``) -- so the screen that shows an upgrade or a changed
+limit is a rendering of this output (``render_diff``), never a second
+computation. A RuleSet is ``{"packs": [{pack_id, digest, mode}], "profile":
+<policy-profile/v0>}``, the shape an activation record carries
+(``ruleset_from_activation``); packs are keyed by ``publisher/name``.
+
+* pack added -- ``tightened``: its rules now run. Removed -- ``loosened``.
+* pack version label and digest -- the contract pin rule: the same version
+  naming a different digest is ``version_reused`` (always breaking, and the
+  diff reports itself ``refused``); a new version label alone is
+  ``version_changed``; a new digest under a new label is ``changed``,
+  because which way each rule inside moved needs the pack definitions, which
+  this diff does not read.
+* pack ``mode`` -- observe to enforce is ``tightened``, the reverse
+  ``loosened``.
+* profile ``caps_minor`` and ``per_action_minor``, per action class -- a lower
+  limit is ``tightened``, a higher one ``loosened``. A class set on one side
+  only is ``changed``: the other side uses the pack default, which a profile
+  does not carry. A value that is not an integer is ``changed``.
+* everything else in a RuleSet -- ``changed`` (breaking), by the same rule.
+
+Each change also carries a ``direction`` (``Change.direction``): its kind when
+that is ``tightened`` or ``loosened``, ``neutral`` for a change that moves no
+rule (a version label, a reorder, an editorial field), and ``changed`` for
+everything else, whose direction cannot be determined.
 """
 from __future__ import annotations
 
@@ -79,12 +107,13 @@ import re
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, TypedDict
 
 import jsonschema
 from agent_action_capsule.canonical import json_digest
 
 from capsule_engine.packs.contract_validate import validate_evidence_contract
+from capsule_engine.policy.profile import CONFIGURABLE, PROFILE_FORMAT, PolicyProfileDict, pack_name
 
 __all__ = [
     "BREAKING",
@@ -96,7 +125,12 @@ __all__ = [
     "contract_pin",
     "contract_ref",
     "diff_contracts",
+    "diff_rulesets",
+    "PackPin",
+    "RuleSet",
     "main",
+    "render_diff",
+    "ruleset_from_activation",
 ]
 
 BREAKING = "breaking"
@@ -114,6 +148,17 @@ _SEVERITY = {
     "loosened": NON_BREAKING,
     "changed": BREAKING,
     "editorial": NON_BREAKING,
+    "pack_id_changed": BREAKING,
+}
+
+# Which way a change moves what is enforced. Kinds not listed are "changed":
+# their direction cannot be determined.
+_DIRECTION = {
+    "tightened": "tightened",
+    "loosened": "loosened",
+    "version_changed": "neutral",
+    "requirements_reordered": "neutral",
+    "editorial": "neutral",
 }
 
 ASSURANCE_LADDER = ("self-attested", "witnessed", "countersigned")
@@ -127,6 +172,13 @@ class ContractDiffError(ValueError):
     """The inputs cannot be diffed (e.g. two requirements share an id)."""
 
 
+class ChangeResult(TypedDict):
+    path: str
+    direction: str
+    compatibility: str
+    reason: str
+
+
 @dataclass(frozen=True)
 class Change:
     path: str
@@ -136,6 +188,10 @@ class Change:
     @property
     def severity(self) -> str:
         return _SEVERITY[self.kind]
+
+    @property
+    def direction(self) -> str:
+        return _DIRECTION.get(self.kind, "changed")
 
     def to_dict(self) -> dict[str, str]:
         return {"path": self.path, "kind": self.kind, "severity": self.severity, "reason": self.reason}
@@ -150,6 +206,19 @@ class ContractDiff:
     @property
     def breaking(self) -> bool:
         return any(c.severity == BREAKING for c in self.changes)
+
+    @property
+    def refused(self) -> bool:
+        """A version label names two different contents: no upgrade or
+        activation may proceed on this pair."""
+        return any(c.kind == "version_reused" for c in self.changes)
+
+    def results(self) -> list[ChangeResult]:
+        """One result per change: what moved, which way, and whether it breaks."""
+        return [
+            {"path": c.path, "direction": c.direction, "compatibility": c.severity, "reason": c.reason}
+            for c in self.changes
+        ]
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -455,6 +524,15 @@ def _compare_requirement(rid: str, a: dict[str, Any], b: dict[str, Any]) -> list
     return out
 
 
+def _version_changes(path: str, version_a: str, version_b: str, digest_a: Any, digest_b: Any, *, what: str) -> list[Change]:
+    """The pin rule: a version label names exactly one digest."""
+    if version_a == version_b:
+        if digest_a != digest_b:
+            return [Change(path, "version_reused", f"one version label now names two different {what}")]
+        return []
+    return [Change(path, "version_changed", f"version {version_a} -> {version_b}")]
+
+
 def _by_id(doc: dict[str, Any], side: str) -> dict[str, dict[str, Any]]:
     out: dict[str, dict[str, Any]] = {}
     for req in doc["requirements"]:
@@ -477,10 +555,9 @@ def diff_contracts(a: dict[str, Any], b: dict[str, Any]) -> ContractDiff:
 
     if a["id"] != b["id"]:
         changes.append(Change("id", "contract_id_changed", "claims name their contract by id; claims against A do not name B"))
-    elif a["version"] == b["version"] and pin_a["contract_digest"] != pin_b["contract_digest"]:
-        changes.append(Change("version", "version_reused", "one version label now names two different contracts"))
-    if a["version"] != b["version"]:
-        changes.append(Change("version", "version_changed", f"version {a['version']} -> {b['version']}"))
+    else:
+        changes += _version_changes("version", a["version"], b["version"], pin_a["contract_digest"],
+                                    pin_b["contract_digest"], what="contracts")
 
     for key in sorted((set(a) | set(b)) - {"id", "version", "requirements"}):
         changes += _compare(key, key, a.get(key, _MISSING), b.get(key, _MISSING), {})
@@ -507,6 +584,189 @@ def diff_contracts(a: dict[str, Any], b: dict[str, Any]) -> ContractDiff:
 
     changes.sort(key=lambda c: (c.path, c.kind))
     return ContractDiff(a=pin_a, b=pin_b, changes=changes)
+
+
+# -- RuleSets ----------------------------------------------------------------
+
+_PACK_MODE_RANK = {"observe": 0, "enforce": 1}
+
+_LIMIT_NAMES = {"caps_minor": "rolling-window limit", "per_action_minor": "per-action limit"}
+
+
+def _compare_limits(path: str, a: Any, b: Any, *, what: str) -> list[Change]:
+    """Per action class: a lower limit is tighter. A class set on one side
+    only is ``changed``: the other side falls back to a default this diff
+    does not see."""
+    a = {} if a is _MISSING else a
+    b = {} if b is _MISSING else b
+    if _not_a(dict, a, b):
+        return [Change(path, "changed", f"{what}: not a mapping; direction cannot be determined")]
+    out: list[Change] = []
+    for cls in sorted(set(a) | set(b)):
+        va, vb = a.get(cls, _MISSING), b.get(cls, _MISSING)
+        if va == vb and type(va) is type(vb):
+            continue
+        p = f"{path}/{cls}"
+        if va is _MISSING or vb is _MISSING:
+            out.append(Change(p, "changed", f"{what} for {cls}: set on one side only; the other uses the pack default"))
+        elif type(va) is not int or type(vb) is not int:
+            out.append(Change(p, "changed", f"{what} for {cls}: not an integer; direction cannot be determined"))
+        else:
+            out.append(Change(p, "tightened" if vb < va else "loosened", f"{what} for {cls}: {va} -> {vb}"))
+    return out
+
+
+# Field rules for one profile pack entry, keyed by the path relative to it.
+_PROFILE_RULES: dict[str, Any] = {
+    f"parameters/{check}/{key}": (lambda p, a, b, _w=_LIMIT_NAMES[key]: _compare_limits(p, a, b, what=_w))
+    for check, keys in CONFIGURABLE.items()
+    for key in keys
+}
+
+
+def _profile_entries(profile: dict[str, Any]) -> dict[str, Any]:
+    packs = profile.get("packs")
+    if not isinstance(packs, list) or not all(isinstance(e, dict) and isinstance(e.get("pack"), str) for e in packs):
+        raise ContractDiffError("profile: packs must be a list of entries that each name a pack")
+    return {e["pack"]: e for e in packs}
+
+
+def _with_ranked_keys(params: dict[str, Any], other: dict[str, Any]) -> dict[str, Any]:
+    """``params`` with every ranked check/key the other side sets filled in as
+    empty, so a limit set on one side is compared per class, not reported
+    once as a whole missing mapping."""
+    out = {k: dict(v) if isinstance(v, dict) else v for k, v in params.items()}
+    for check, keys in CONFIGURABLE.items():
+        if isinstance(other.get(check), dict):
+            for key in keys:
+                if key in other[check] and isinstance(out.setdefault(check, {}), dict):
+                    out[check].setdefault(key, {})
+    return out
+
+
+def _as_profile(value: Any) -> dict[str, Any]:
+    """No profile is an empty one: every limit is the pack default."""
+    if value is _MISSING:
+        return {"format": PROFILE_FORMAT, "packs": []}
+    if not isinstance(value, dict):
+        raise ContractDiffError("profile must be a mapping")
+    return value
+
+
+def _diff_profiles(a: Any, b: Any) -> list[Change]:
+    a, b = _as_profile(a), _as_profile(b)
+    out: list[Change] = []
+    for key in sorted((set(a) | set(b)) - {"packs"}):
+        out += _compare(f"profile/{key}", key, a.get(key, _MISSING), b.get(key, _MISSING), {})
+    ea, eb = _profile_entries(a), _profile_entries(b)
+    for name in sorted(set(ea) | set(eb)):
+        entry_a, entry_b = ea.get(name, {}), eb.get(name, {})
+        base = f"profile/packs[{name}]"
+        for key in sorted((set(entry_a) | set(entry_b)) - {"pack", "parameters"}):
+            out += _compare(f"{base}/{key}", key, entry_a.get(key, _MISSING), entry_b.get(key, _MISSING), {})
+        pa, pb = entry_a.get("parameters", {}), entry_b.get("parameters", {})
+        if isinstance(pa, dict) and isinstance(pb, dict):
+            pa, pb = _with_ranked_keys(pa, pb), _with_ranked_keys(pb, pa)
+        out += _compare(f"{base}/parameters", "parameters", pa, pb, _PROFILE_RULES)
+    return out
+
+
+def _packs_by_name(ruleset: dict[str, Any], side: str) -> dict[str, dict[str, Any]]:
+    out: dict[str, dict[str, Any]] = {}
+    for entry in ruleset.get("packs") or []:
+        pack_id = entry.get("pack_id") if isinstance(entry, dict) else None
+        if not isinstance(pack_id, str) or pack_id.count("/") != 2:
+            raise ContractDiffError(f"RuleSet {side}: each packs entry needs a pack_id '<publisher>/<name>/<version>'")
+        name = pack_name(pack_id)
+        if name in out:
+            raise ContractDiffError(f"RuleSet {side} installs pack {name} twice")
+        out[name] = entry
+    return out
+
+
+def _diff_pack(name: str, a: dict[str, Any], b: dict[str, Any]) -> list[Change]:
+    base = f"packs[{name}]"
+    version_a, version_b = a["pack_id"].rsplit("/", 1)[1], b["pack_id"].rsplit("/", 1)[1]
+    digest_a, digest_b = a.get("digest", _MISSING), b.get("digest", _MISSING)
+    out = _version_changes(f"{base}/version", version_a, version_b, digest_a, digest_b, what="pack contents")
+    if version_a != version_b and digest_a != digest_b:
+        out.append(Change(f"{base}/digest", "changed",
+                          "pack content changed; which way each rule moved needs the pack definitions"))
+    mode_a, mode_b = a.get("mode", _MISSING), b.get("mode", _MISSING)
+    if mode_a != mode_b:
+        ra, rb = _PACK_MODE_RANK.get(mode_a), _PACK_MODE_RANK.get(mode_b)
+        if ra is None or rb is None:
+            out.append(Change(f"{base}/mode", "changed", "mode not recognised; direction cannot be determined"))
+        else:
+            out.append(Change(f"{base}/mode", "tightened" if rb > ra else "loosened", f"mode {mode_a} -> {mode_b}"))
+    for key in sorted((set(a) | set(b)) - {"pack_id", "digest", "mode"}):
+        out += _compare(f"{base}/{key}", key, a.get(key, _MISSING), b.get(key, _MISSING), {})
+    return out
+
+
+class PackPin(TypedDict):
+    pack_id: str
+    digest: str
+    mode: str
+
+
+class _RuleSetPacks(TypedDict):
+    packs: list[PackPin]
+
+
+class RuleSet(_RuleSetPacks, total=False):
+    profile: PolicyProfileDict
+
+
+def ruleset_from_activation(detail: dict[str, Any]) -> RuleSet:
+    """The RuleSet a ``policy_manifest_activated`` record put in force: its
+    packs and, when one is pinned, its profile values."""
+    out: RuleSet = {
+        "packs": [{"pack_id": p["pack_id"], "digest": p["digest"], "mode": p["mode"]} for p in detail.get("packs") or []]
+    }
+    if "profile" in detail:
+        out["profile"] = detail["profile"]["values"]
+    return out
+
+
+def diff_rulesets(a: dict[str, Any], b: dict[str, Any]) -> ContractDiff:
+    """Classify every difference from RuleSet ``a`` to RuleSet ``b``; see the
+    module docstring for the rules. The inputs are plain JSON, not ``RuleSet``:
+    a field ``RuleSet`` does not declare must reach the diff so it can be
+    reported as breaking."""
+    packs_a, packs_b = _packs_by_name(a, "A"), _packs_by_name(b, "B")
+    changes: list[Change] = []
+    for name in sorted(set(packs_a) | set(packs_b)):
+        if name not in packs_b:
+            changes.append(Change(f"packs[{name}]", "loosened", "pack removed: its rules no longer run"))
+        elif name not in packs_a:
+            changes.append(Change(f"packs[{name}]", "tightened", "pack added: its rules now run"))
+        else:
+            changes += _diff_pack(name, packs_a[name], packs_b[name])
+    changes += _diff_profiles(a.get("profile", _MISSING), b.get("profile", _MISSING))
+    for key in sorted((set(a) | set(b)) - {"packs", "profile"}):
+        changes += _compare(key, key, a.get(key, _MISSING), b.get(key, _MISSING), {})
+    changes.sort(key=lambda c: (c.path, c.kind))
+    return ContractDiff(a={"ruleset_digest": json_digest(a)}, b={"ruleset_digest": json_digest(b)}, changes=changes)
+
+
+def _pin_label(pin: dict[str, Any]) -> str:
+    if "ruleset_digest" in pin:
+        return str(pin["ruleset_digest"])
+    return f"{pin['contract_ref']} sha256:{pin['contract_digest']['digest']}"
+
+
+def render_diff(diff: ContractDiff) -> str:
+    """The text of a diff, formatted from the diff object alone: every line
+    is a field the differ already set. Nothing here compares anything."""
+    lines = [f"before: {_pin_label(diff.a)}", f"after:  {_pin_label(diff.b)}"]
+    if not diff.changes:
+        lines.append("identical")
+    for r in diff.results():
+        lines.append(f"  {r['direction']:<10} {r['compatibility']:<13} {r['path']}: {r['reason']}")
+    if diff.refused:
+        lines.append("REFUSED: a version label names different content (version_reused)")
+    return "\n".join(lines)
 
 
 # -- CLI ---------------------------------------------------------------------
