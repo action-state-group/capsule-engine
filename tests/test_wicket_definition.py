@@ -29,7 +29,7 @@ EXPECTED_DIGESTS = {
     "caps/2.0.0": "b7ea63ec3d9fdb872d3b5db952e774f04ff8f4b945ca803e49181b91b2a25f80",
     "caps/3.0.0": "54870cd7059d18c5a88221185cb0a49fe1ea09c30825548e1e3134569c5cb66f",
     "caps/4.0.0": "2b07340e8fc858af76d8accf6afc3d6c9d05bb92d50abcfddd1fee8d9b51de35",
-    # caps/4.0.0 with the per-action limit reading the authorised maximum; no pack cites it yet.
+    # caps/4.0.0 with the per-action limit reading the authorised maximum; the everyday pack cites it.
     "caps/5.0.0": "2807e174dc7c817917621f90a53f3fa54992b76fe3ec28e8567f814b9e72a741",
     "verify_before_dispatch/1.0.0": "a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c",
     "caps_holds/1.0.0": "86a07c5c2739502b1211dbb1c73df0d6950f91ba454ff151ff32cb6946fc21f6",

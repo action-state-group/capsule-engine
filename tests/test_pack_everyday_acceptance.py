@@ -27,7 +27,7 @@ PACK_DIR = Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog"
 FIXTURE_PATH = PACK_DIR / "fixtures" / "mini_ledger.jsonl"
 
 OPERATOR = "household-fixture"
-PER_ACTION_MINOR = 2_500  # caps/4.0.0's per-action default, cited by the pack
+PER_ACTION_MINOR = 2_500  # caps/5.0.0's per-action default, cited by the pack
 SIGNER_SECRET = b"everyday-acceptance-fixture-fixed-key"
 
 
@@ -182,14 +182,14 @@ def test_records_are_pack_attributed_and_observe_mode(run):
         assert capsule["asg_payload"]["manifest_digest"] == installed.resolved.manifest_digest, name
         assert capsule["asg_payload"]["checkpoint"]["dry_run"] is True, name
     assert activation["asg_payload"]["detail"]["packs"] == [
-        {"pack_id": "asg/everyday/0.2.0", "digest": installed.pack.definition_digest(), "mode": "observe"}
+        {"pack_id": "asg/everyday/0.2.1", "digest": installed.pack.definition_digest(), "mode": "observe"}
     ]
 
 
 def test_cited_definitions_resolve_to_the_built_in_digests(run):
     installed, _, _, _, _ = run
     pinned = {w.wicket_id: w.digest for w in installed.manifest.wickets}
-    assert pinned["caps/4.0.0"] == "2b07340e8fc858af76d8accf6afc3d6c9d05bb92d50abcfddd1fee8d9b51de35"
+    assert pinned["caps/5.0.0"] == "2807e174dc7c817917621f90a53f3fa54992b76fe3ec28e8567f814b9e72a741"
     assert pinned["dedupe/1.0.0"] == "18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb"
 
 
