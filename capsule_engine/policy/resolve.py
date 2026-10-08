@@ -12,7 +12,7 @@ fail-closed, never a best-effort partial load.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 
 from ..folds.catalog import Catalog as FoldCatalog
@@ -34,7 +34,7 @@ from .errors import (
     PolicyManifestError,
 )
 from .manifest import Manifest
-from .profile import CONFIGURABLE, PolicyProfile, pack_name
+from .profile import CONFIGURABLE, LIST_CHECK, LIST_KEYS, PolicyProfile, pack_name
 
 __all__ = ["SUPPORTED_FOLD_ENGINES", "SUPPORTED_WICKET_ENGINES", "ResolvedManifest", "resolve_manifest"]
 
@@ -93,8 +93,19 @@ class ResolvedManifest:
         return self.folds.get(fold_id) if fold_id else None
 
     def configured_wickets(self, checks: frozenset[str]) -> tuple[WicketDefinition, ...]:
-        """Every resolved wicket configuring one of ``checks``, in manifest order."""
-        return tuple(w for w in self.wickets.values() if w.check in checks)
+        """Every resolved wicket configuring one of ``checks``, in manifest
+        order. A ``counterparty_list`` wicket comes back with the profile's
+        list values laid over its config: that is what the check runs with,
+        while the manifest still pins the wicket's own digest."""
+        return tuple(self._with_profile_list(w) for w in self.wickets.values() if w.check in checks)
+
+    def _with_profile_list(self, wicket: WicketDefinition) -> WicketDefinition:
+        if wicket.check != LIST_CHECK or self.profile is None:
+            return wicket
+        config = dict(wicket.config)
+        for entry in self.profile.packs:
+            config.update(entry.parameters.get(LIST_CHECK, {}))
+        return replace(wicket, config=config)
 
     def plan(self) -> PlanDefinition | None:
         """The compiled plan quoted directly in the resolved
@@ -107,7 +118,8 @@ class ResolvedManifest:
 
 def _check_profile(manifest: Manifest, profile: PolicyProfile | None, wickets: dict[str, WicketDefinition]) -> None:
     """Fail closed unless ``profile`` is exactly the one the manifest pins and
-    every value in it replaces a default an installed pack's wicket declares."""
+    every value in it replaces a default an installed pack's wicket declares.
+    A ``counterparty_list`` list replaces the wicket's list whole."""
     if manifest.profile_digest is None:
         if profile is not None:
             raise PolicyManifestError(
@@ -132,11 +144,14 @@ def _check_profile(manifest: Manifest, profile: PolicyProfile | None, wickets: d
             )
         for check, keys in entry.parameters.items():
             wicket = next((w for w in wickets.values() if w.check == check), None)
+            settable = LIST_KEYS if check == LIST_CHECK else CONFIGURABLE.get(check, frozenset())
             for key, values in keys.items():
-                if wicket is None or key not in CONFIGURABLE.get(check, frozenset()):
+                if wicket is None or key not in settable:
                     raise PolicyManifestError(
                         PROFILE_UNKNOWN_PARAMETER, f"profile sets {check}.{key}, which no installed wicket lets a user set"
                     )
+                if check == LIST_CHECK:
+                    continue
                 defaults = wicket.config.get(key) or {}
                 undeclared = sorted(set(values) - set(defaults))
                 if undeclared:

@@ -60,6 +60,11 @@ class Action:
     it cannot prove a value is opaque.
     ``outgoing_content`` is text the action sends out, read by
     ``credential_pattern``; it is never written to the capsule.
+    ``counterparty_ids`` are the counterparty's keyed fingerprints by kind
+    (e.g. ``{"payee": <hex>}``) as a producer sealed them, and
+    ``counterparty_fp_alg`` the algorithm that made them, read by
+    ``counterparty_list``; neither is written to the capsule, and the clear
+    value they fingerprint never reaches the guard.
     ``recurrence`` says whether a payment repeats (e.g. ``"one_time"``,
     ``"monthly"``), read by ``recurring_charge``.
     ``taxonomy_version`` (normally ``classes.TAXONOMY_VERSION``) is sealed
@@ -89,6 +94,8 @@ class Action:
     extra: dict = field(default_factory=dict)
     taxonomy_version: str | None = None
     spend_authorized_minor: int | None = None
+    counterparty_ids: dict[str, str] | None = None
+    counterparty_fp_alg: str | None = None
 
     def __post_init__(self) -> None:
         if self.counterparty_account_ref is not None and _looks_like_raw_account_number(
