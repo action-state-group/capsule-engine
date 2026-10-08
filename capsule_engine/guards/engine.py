@@ -80,6 +80,7 @@ class GuardEngine:
         signer_provider: Callable[[], Signer | None],
         caps_minor: dict[str, int] | None = None,
         per_action_minor: dict[str, int] | None = None,
+        per_action_reads: str | None = None,
         freshness_bound_ms: int = 5_000,
         fail_open_classes: frozenset[str] = frozenset(),
         engine_available: Callable[[], bool] = lambda: True,
@@ -97,6 +98,8 @@ class GuardEngine:
         # Per-action limits, compared against the proposed amount alone; a
         # class applies one only where it also has a window limit.
         self._per_action_minor = resolve_caps_minor(per_action_minor or {})
+        # The caps wicket's ``per_action_reads``: ``None`` reads the capture.
+        self._per_action_reads = per_action_reads
         self._freshness_bound_ms = freshness_bound_ms
         self._fail_open_classes = fail_open_classes
         self._engine_available = engine_available
@@ -245,6 +248,7 @@ class GuardEngine:
                 definition=self._caps_fold,
                 cap_minor=cap_minor,
                 per_action_cap_minor=cap_for(self._per_action_minor, action.action_class),
+                per_action_reads=self._per_action_reads,
             )
         else:
             caps_out = CheckOutcome(
