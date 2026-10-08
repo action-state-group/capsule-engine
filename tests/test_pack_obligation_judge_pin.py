@@ -6,7 +6,9 @@ A ``mode: judged`` obligation is measured by a pinned judge -- model, prompt
 template hash, answer-schema hash, the action fields it reads, and where the
 model runs -- never by a check. The pin is required on a judged obligation
 and refused on any other. A judged obligation may ASK but never NEVER, and a
-pin to a hosted model cannot claim ``pure_replay``. No prompt text, literal
+pin to a hosted model cannot claim ``pure_replay``. An optional ``model_digest``
+(SHA-256 of the loaded model file's bytes) is never empty, null or all zeros,
+never sits on a hosted pin, and is required for ``pure_replay``. No prompt text, literal
 or interpolated, may appear on an obligation or its pin.
 """
 from __future__ import annotations
@@ -34,6 +36,7 @@ CATALOG = Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog"
 
 TEMPLATE_HASH = "a" * 64
 SCHEMA_HASH = "b" * 64
+MODEL_DIGEST = "9f2c" * 16
 
 
 # Builds raw pack YAML, malformed entries included: the test's encoding boundary.
@@ -165,9 +168,47 @@ def test_a_hosted_judge_cannot_claim_pure_replay(tmp_path):
     assert _refused(tmp_path, _judged(re_derivability_grade="pure_replay")) == INVALID_RE_DERIVABILITY_GRADE
 
 
-def test_a_self_hosted_judge_may_declare_pure_replay(tmp_path):
-    entry = _judged(re_derivability_grade="pure_replay", judge_pin=_pin(model_hosting="self_hosted"))
+def test_a_self_hosted_judge_with_a_model_digest_may_declare_pure_replay(tmp_path):
+    pin = _pin(model_hosting="self_hosted", model_digest=MODEL_DIGEST)
+    entry = _judged(re_derivability_grade="pure_replay", judge_pin=pin)
     assert load_pack_dir(_pack_with(tmp_path, entry)).obligations[-1].re_derivability_grade == "pure_replay"
+
+
+def test_pure_replay_without_a_model_digest_is_refused(tmp_path):
+    entry = _judged(re_derivability_grade="pure_replay", judge_pin=_pin(model_hosting="self_hosted"))
+    assert _refused(tmp_path, entry) == INVALID_RE_DERIVABILITY_GRADE
+
+
+def test_a_model_digest_parses_and_enters_the_digest_only_when_declared(tmp_path):
+    without = load_pack_dir(_pack_with(tmp_path / "a", _judged(judge_pin=_pin(model_hosting="self_hosted"))))
+    pin = _pin(model_hosting="self_hosted", model_digest=MODEL_DIGEST)
+    with_digest = load_pack_dir(_pack_with(tmp_path / "b", _judged(judge_pin=pin)))
+    assert without.obligations[-1].judge_pin.model_digest is None
+    assert "model_digest" not in without.canonical_dict()["obligations"][-1]["judge_pin"]
+    assert with_digest.obligations[-1].judge_pin.model_digest == MODEL_DIGEST
+    assert with_digest.canonical_dict()["obligations"][-1]["judge_pin"]["model_digest"] == MODEL_DIGEST
+    assert with_digest.definition_digest() != without.definition_digest()
+
+
+@pytest.mark.parametrize(
+    ("value", "why"),
+    [
+        ("", "empty"),
+        (None, "null"),
+        ("0" * 64, "all-zero placeholder"),
+        ("C" * 64, "uppercase"),
+        ("c" * 63, "short"),
+        (0, "not a string"),
+    ],
+)
+def test_an_absent_model_digest_is_omitted_never_a_placeholder(tmp_path, value, why):
+    pin = _pin(model_hosting="self_hosted", model_digest=value)
+    assert _refused(tmp_path, _judged(judge_pin=pin)) == INVALID_JUDGE_PIN, why
+
+
+def test_a_hosted_pin_may_not_carry_a_model_digest(tmp_path):
+    pin = _pin(model_hosting="hosted", model_digest=MODEL_DIGEST)
+    assert _refused(tmp_path, _judged(judge_pin=pin)) == INVALID_JUDGE_PIN
 
 
 @pytest.mark.parametrize("value", ["fold_magic", "JUDGED", ""])

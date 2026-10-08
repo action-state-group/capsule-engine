@@ -188,7 +188,10 @@ CORE_FOLD_CATALOG_DIR = Path(__file__).resolve().parent.parent / "folds" / "cata
 
 _ISO_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 _SHA256_HEX_RE = re.compile(r"^[0-9a-f]{64}$")
-_JUDGE_PIN_KEYS = frozenset({"model_id", "prompt_template_hash", "schema_hash", "input_refs", "model_hosting"})
+_JUDGE_PIN_KEYS = frozenset(
+    {"model_id", "prompt_template_hash", "schema_hash", "input_refs", "model_hosting", "model_digest"}
+)
+_ALL_ZERO_SHA256 = "0" * 64
 
 
 def _require_mapping(data: Any, what: str) -> dict:
@@ -417,6 +420,13 @@ def _judged_obligation(entry: dict, *, obligation_id: str, statement: str) -> Ob
             f"{what} is judged by a hosted model and declares re_derivability_grade: pure_replay; a "
             "hosted model's verdict is attributable, not re-derivable",
         )
+    if re_derivability_grade == "pure_replay" and pin.model_digest is None:
+        raise PackDefinitionError(
+            INVALID_RE_DERIVABILITY_GRADE,
+            f"{what} declares re_derivability_grade: pure_replay but its judge_pin carries no model_digest; "
+            "a model named only by model_id (or a reference) is attributable at best -- re-deriving a "
+            "verdict needs the digest of the bytes the judge loads",
+        )
     return Obligation(
         id=obligation_id,
         statement=statement,
@@ -463,12 +473,33 @@ def _parse_judge_pin(raw: Any, *, what: str) -> JudgePin:
             INVALID_JUDGE_PIN,
             f"{what}.judge_pin.model_hosting={model_hosting!r} must be one of {sorted(JUDGE_PIN_HOSTING_VALUES)}",
         )
+    model_digest = raw.get("model_digest")
+    if "model_digest" in raw:
+        if not isinstance(model_digest, str) or not _SHA256_HEX_RE.match(model_digest):
+            raise PackDefinitionError(
+                INVALID_JUDGE_PIN,
+                f"{what}.judge_pin.model_digest must be 64 lowercase hex characters (SHA-256 of the loaded "
+                "model file's bytes); when there is no digest, omit the key -- never an empty or null value",
+            )
+        if model_digest == _ALL_ZERO_SHA256:
+            raise PackDefinitionError(
+                INVALID_JUDGE_PIN,
+                f"{what}.judge_pin.model_digest is all zeros, a placeholder rather than a digest; omit the key "
+                "when there is no digest",
+            )
+        if model_hosting == "hosted":
+            raise PackDefinitionError(
+                INVALID_JUDGE_PIN,
+                f"{what}.judge_pin carries model_digest with model_hosting: hosted; nobody outside a hosted "
+                "endpoint holds the loaded bytes, so a hosted pin names the model by model_id only",
+            )
     return JudgePin(
         model_id=model_id,
         prompt_template_hash=raw["prompt_template_hash"],
         schema_hash=raw["schema_hash"],
         input_refs=tuple(input_refs),
         model_hosting=model_hosting,
+        model_digest=model_digest,
     )
 
 
