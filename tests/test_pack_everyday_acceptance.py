@@ -29,6 +29,9 @@ FIXTURE_PATH = PACK_DIR / "fixtures" / "mini_ledger.jsonl"
 OPERATOR = "household-fixture"
 PER_ACTION_MINOR = 2_500  # caps/5.0.0's per-action default, cited by the pack
 SIGNER_SECRET = b"everyday-acceptance-fixture-fixed-key"
+# Scenarios recorded as real decisions rather than dry runs: only a real
+# accepted action makes a merchant known to counterparty_seen_before.
+REAL_RUN = frozenset({"merchant-history-real-payment"})
 
 
 def _signer() -> LocalSigner:
@@ -56,6 +59,20 @@ def _message(name: str, minute: int, developer: str, **fields) -> Action:
         developer=developer,
         action_class="comms.external",
         action_id=f"send_message/everyday-fixture-{name}",
+        timestamp=f"2026-08-10T10:{minute:02d}:00Z",
+        **fields,
+    )
+
+
+def _purchase(name: str, minute: int, developer: str, **fields) -> Action:
+    return Action(
+        verb="make_purchase",
+        operator=OPERATOR,
+        developer=developer,
+        action_class="money.purchase",
+        currency="EUR",
+        rail="card",
+        action_id=f"make_purchase/everyday-fixture-{name}",
         timestamp=f"2026-08-10T10:{minute:02d}:00Z",
         **fields,
     )
@@ -124,6 +141,27 @@ def _scenarios() -> list[tuple[str, Action, str]]:
         ("caps-over-limit-escalates", _payment("caps-escalates", 16, "household-assistant-i@v1", operator=f"{OPERATOR}-i",
          amount_minor=3_000, target="builder/extension-phase-2", rail="card",
          counterparty_account_ref="acct-ref-builder-2"), ESCALATE),
+        # A real (not dry-run) accepted payment to the bakery: the earlier
+        # action that makes the bakery a known merchant (see REAL_RUN).
+        ("merchant-history-real-payment", _payment("merchant-history", 17, "household-assistant-j@v1",
+         amount_minor=700, target="shop/bakery", rail="card", counterparty_account_ref="acct-ref-bakery-1"), ALLOW),
+        # No accepted action with the garden centre yet: counterparty_seen_before
+        # fails, and money.purchase has no approver role, so the decision denies.
+        ("merchant-first-purchase", _purchase("merchant-first", 18, "household-assistant-j@v1", amount_minor=1_800,
+         target="shop/garden-centre"), DENY),
+        # The bakery has a real accepted payment, so a purchase there is a
+        # repeat merchant and passes.
+        ("merchant-repeat-purchase", _purchase("merchant-repeat", 19, "household-assistant-j@v1", amount_minor=900,
+         target="shop/bakery"), ALLOW),
+        # booking.create matches the gate's booking_create selector, which fails.
+        ("booking-create", Action(verb="book_table", operator=OPERATOR, developer="household-assistant-k@v1",
+         action_class="booking.create", amount_minor=2_000, currency="EUR", target="venue/restaurant",
+         action_id="book_table/everyday-fixture-booking-create", timestamp="2026-08-10T10:20:00Z"), DENY),
+        # household.unlisted has no row in the action taxonomy: action_class_gate
+        # fails closed, as the only failing check, so the decision denies.
+        ("off-taxonomy-class", Action(verb="do_unlisted", operator=OPERATOR, developer="household-assistant-l@v1",
+         action_class="household.unlisted", target="service/unlisted",
+         action_id="do_unlisted/everyday-fixture-off-taxonomy", timestamp="2026-08-10T10:21:00Z"), DENY),
     ]
 
 
@@ -142,7 +180,7 @@ def _run_scenarios(ledger, *, project_dir):
     )
     capsules: dict[str, dict] = {}
     for name, action, expected in _scenarios():
-        decision = engine.check(action, dry_run=True)
+        decision = engine.check(action, dry_run=name not in REAL_RUN)
         if decision.outcome != expected:
             raise AssertionError(f"scenario {name!r}: expected {expected!r}, got {decision.outcome!r} ({decision.reason})")
         capsules[name] = decision.capsule
@@ -180,9 +218,9 @@ def test_records_are_pack_attributed_and_observe_mode(run):
     installed, activation, capsules, _, _ = run
     for name, capsule in capsules.items():
         assert capsule["asg_payload"]["manifest_digest"] == installed.resolved.manifest_digest, name
-        assert capsule["asg_payload"]["checkpoint"]["dry_run"] is True, name
+        assert capsule["asg_payload"]["checkpoint"].get("dry_run") is (True if name not in REAL_RUN else None), name
     assert activation["asg_payload"]["detail"]["packs"] == [
-        {"pack_id": "asg/everyday/0.2.1", "digest": installed.pack.definition_digest(), "mode": "observe"}
+        {"pack_id": "asg/everyday/0.3.0", "digest": installed.pack.definition_digest(), "mode": "observe"}
     ]
 
 
@@ -215,6 +253,17 @@ def test_the_sole_caps_failure_escalates_with_the_donated_disposition_pair(run):
     assert [c["id"] for c in escalated["constraints"] if c["result"] == "fail"] == ["caps"]
     assert escalated["disposition"]["decision"] == "needs_input"
     assert escalated["disposition"]["verdict_class"] == "hitl_dispatched"
+
+
+def test_an_off_taxonomy_class_fails_the_gate_closed_and_says_so(run):
+    from capsule_engine.guards.classes import TAXONOMY_VERSION
+
+    capsule = run[2]["off-taxonomy-class"]
+    assert [c["id"] for c in capsule["constraints"] if c["result"] == "fail"] == ["action_class_gate"]
+    assert _constraint(capsule, "action_class_gate")["evidence_digest"] == json_digest(
+        {"action_class": "household.unlisted", "in_taxonomy": False, "taxonomy_version": TAXONOMY_VERSION}
+    )
+    assert capsule["disposition"]["decision"] == "reject"
 
 
 def test_a_repeat_payment_chains_to_the_payment_it_repeats(run):

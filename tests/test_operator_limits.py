@@ -24,7 +24,7 @@ from capsule_ledger.ledger import LedgerStore
 
 from capsule_engine.events import build_event_capsule
 from capsule_engine.guards import Action, GuardDecision, GuardEngine, LocalSigner
-from capsule_engine.guards.capsule import ALLOW, DENY
+from capsule_engine.guards.capsule import DENY
 from capsule_engine.guards.checks import check_caps
 from capsule_engine.guards.checks.caps import LimitSource
 from capsule_engine.packs import build_engine, install_pack, load_pack_dir, record_pack_activation
@@ -49,7 +49,7 @@ OPERATOR = "household-limits-fixture"
 
 # The everyday pack and its caps wicket as released, before operator limits
 # existed: an operator limit must not move either.
-EVERYDAY_PACK_DIGEST = "9eb23761f94561fc7ee6bd440e76e78a018b4a331a26f6b24826e2f40d238453"
+EVERYDAY_PACK_DIGEST = "a9f18caeceecbcd1e28bb21b052ab00b10347f8d668c80d2fe7385113996e061"
 CAPS_V5_WICKET_DIGEST = "2807e174dc7c817917621f90a53f3fa54992b76fe3ec28e8567f814b9e72a741"
 CAPS_V5_FILE_SHA256 = "3f7ef8850e11d4a893ccaa7f85e1c9b2dde358980c946104dbc970f6989ad206"
 
@@ -129,6 +129,16 @@ def _sealed_caps_evidence_digest(decision: GuardDecision) -> str:
     return caps["evidence_digest"]
 
 
+# everyday 0.3.0 asks before a first purchase from a merchant
+# (counterparty_seen_before), and every shop here is new to a fresh ledger, so
+# a purchase the limit allows is still refused by that check alone.
+NEW_MERCHANT = "counterparty_seen_before"
+
+
+def _failed(decision: GuardDecision) -> list[str]:
+    return [c.id for c in decision.constraints if c.result == "fail"]
+
+
 def _per_action(caps) -> LimitSource:
     return caps.evidence["limit_sources"]["per_action"]
 
@@ -192,7 +202,7 @@ def test_with_no_profile_the_pack_default_applies_and_the_evidence_says_so(house
     }
 
     allowed, caps = household.check("six-dollars", 600, "2026-10-08T09:02:00Z")
-    assert allowed.outcome == ALLOW
+    assert _failed(allowed) == [NEW_MERCHANT]
     assert caps.evidence["per_action_cap_minor"] == PACK_PER_ACTION_DEFAULT
     assert caps.evidence["cap_minor"] == PACK_WINDOW_DEFAULT
     assert _per_action(caps) == {"limit_source": "definition_default"}
@@ -236,7 +246,7 @@ def test_a_raise_inside_the_cooling_off_keeps_the_earlier_limit_and_says_why(hou
     assert _per_action(caps) == {"limit_source": "operator_profile", "profile_digest": five.profile_digest()}
 
     allowed, caps = household.check("after-cooling-off", 3_000, "2026-10-08T22:00:00Z")
-    assert allowed.outcome == ALLOW
+    assert _failed(allowed) == [NEW_MERCHANT]
     assert caps.evidence["per_action_cap_minor"] == 4_000
     assert _per_action(caps) == {"limit_source": "operator_profile", "profile_digest": forty.profile_digest()}
 
@@ -363,7 +373,7 @@ def test_an_engine_built_before_a_new_activation_fails_closed_until_rebuilt(hous
     household.activate(None, "2026-10-08T09:00:00Z")
     engine = household.engine("2026-10-08T10:01:00Z")
     before = engine.check(_purchase("before-lowering", 2_000, "2026-10-08T09:59:00Z"), dry_run=False)
-    assert before.outcome == ALLOW
+    assert _failed(before) == [NEW_MERCHANT]
     household.activate(_profile(500), "2026-10-08T10:00:00Z")
     # The engine built before the lowering pins the old manifest: it denies
     # rather than run the old limit.

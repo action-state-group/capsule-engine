@@ -436,7 +436,9 @@ def test_a_profile_deny_list_refuses_a_listed_purchase_and_leaves_the_pack_uncha
 
 def test_a_profile_deny_list_passes_an_unlisted_purchase_and_says_it_consulted_the_list(tmp_path):
     _, decision = _decide(tmp_path, _profile(mode="deny", entries=[_t(BLOCKED)]), _action(target=OTHER, amount_minor=100))
-    assert decision.outcome == ALLOW
+    # The list lets it through; everyday 0.3.0's first-purchase check still
+    # refuses a merchant the fresh ledger has not seen.
+    assert _failed(decision) == ["counterparty_seen_before"]
     out = _list_constraint(decision)
     assert out.result == "pass"
     assert out.evidence["list_digest"] == json_digest([_t(BLOCKED)])
@@ -446,7 +448,7 @@ def test_a_profile_deny_list_passes_an_unlisted_purchase_and_says_it_consulted_t
 def test_a_profile_allow_list_refuses_an_unlisted_purchase(tmp_path):
     _, decision = _decide(tmp_path, _profile(mode="allow", entries=[_t(ALLOWED)]), _action(target=OTHER, amount_minor=100))
     assert decision.outcome == DENY
-    assert _failed(decision) == ["counterparty_list"]
+    assert _failed(decision) == ["counterparty_seen_before", "counterparty_list"]
     assert _list_constraint(decision).evidence["mode"] == "allow"
 
 

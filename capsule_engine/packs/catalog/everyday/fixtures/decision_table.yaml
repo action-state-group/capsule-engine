@@ -5,7 +5,9 @@
 #
 # "no-dead-rules": every check an obligation declares (caps, dedupe,
 # destination_rail, counterparty_identity_change, credential_pattern,
-# recurring_charge) has at least one 'pass' row and at least one 'fail' row.
+# recurring_charge, action_class_gate, counterparty_seen_before) has at least
+# one 'pass' row and at least one 'fail' row. A rule declared not measured
+# cites no check and has no column here.
 #
 # n_a: every constraint that recorded n/a declares its population, and the
 # test checks the declaration against that constraint record's
@@ -20,113 +22,146 @@
 # it escalates, sealed as disposition.decision needs_input with
 # disposition.verdict_class hitl_dispatched. caps-over-limit-on-watched-rail
 # fires caps 'fail' alongside destination_rail, so it denies.
+#
+# merchant-first-purchase fails counterparty_seen_before and denies: money.purchase
+# has no approver role, so the failure cannot escalate. merchant-repeat-purchase
+# passes because merchant-history-real-payment is a real accepted payment to
+# the same merchant (a dry run does not count).
+# out-of-scope-action passes action_class_gate (a non-consequential class);
+# booking-create fails it. off-taxonomy-class declares a class with no row in
+# the action taxonomy, so action_class_gate fails closed as the only failing
+# check and the decision denies.
 rows:
   - scenario: baseline-allow
     action_id: make_payment/everyday-fixture-baseline
-    checks: {dedupe: pass, caps: pass, verify_before_dispatch: n/a, destination_rail: pass, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: pass}
+    checks: {dedupe: pass, caps: pass, verify_before_dispatch: n/a, destination_rail: pass, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: pass, action_class_gate: n/a, counterparty_seen_before: n/a}
     n_a:
       verify_before_dispatch: {population: c}
       counterparty_identity_change: {population: c}
       credential_pattern: {population: c}
+      action_class_gate: {population: c}
+      counterparty_seen_before: {population: c}
     verdict: allow
   - scenario: counterparty-same-account
     action_id: make_payment/everyday-fixture-same-account
-    checks: {dedupe: pass, caps: pass, verify_before_dispatch: n/a, destination_rail: pass, counterparty_identity_change: pass, credential_pattern: n/a, recurring_charge: pass}
+    checks: {dedupe: pass, caps: pass, verify_before_dispatch: n/a, destination_rail: pass, counterparty_identity_change: pass, credential_pattern: n/a, recurring_charge: pass, action_class_gate: n/a, counterparty_seen_before: n/a}
     n_a:
       verify_before_dispatch: {population: c}
       credential_pattern: {population: c}
+      action_class_gate: {population: c}
+      counterparty_seen_before: {population: c}
     verdict: allow
   - scenario: counterparty-account-changed
     action_id: make_payment/everyday-fixture-account-changed
-    checks: {dedupe: pass, caps: pass, verify_before_dispatch: n/a, destination_rail: pass, counterparty_identity_change: fail, credential_pattern: n/a, recurring_charge: pass}
+    checks: {dedupe: pass, caps: pass, verify_before_dispatch: n/a, destination_rail: pass, counterparty_identity_change: fail, credential_pattern: n/a, recurring_charge: pass, action_class_gate: n/a, counterparty_seen_before: n/a}
     n_a:
       verify_before_dispatch: {population: c}
       credential_pattern: {population: c}
+      action_class_gate: {population: c}
+      counterparty_seen_before: {population: c}
     verdict: deny
   - scenario: rail-watched
     action_id: make_payment/everyday-fixture-rail-watched
-    checks: {dedupe: pass, caps: pass, verify_before_dispatch: n/a, destination_rail: fail, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: pass}
+    checks: {dedupe: pass, caps: pass, verify_before_dispatch: n/a, destination_rail: fail, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: pass, action_class_gate: n/a, counterparty_seen_before: n/a}
     n_a:
       verify_before_dispatch: {population: c}
       counterparty_identity_change: {population: c}
       credential_pattern: {population: c}
+      action_class_gate: {population: c}
+      counterparty_seen_before: {population: c}
     verdict: deny
   - scenario: credential-in-content
     action_id: send_message/everyday-fixture-credential-in-content
-    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, destination_rail: n/a, counterparty_identity_change: n/a, credential_pattern: fail, recurring_charge: n/a}
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, destination_rail: n/a, counterparty_identity_change: n/a, credential_pattern: fail, recurring_charge: n/a, action_class_gate: n/a, counterparty_seen_before: n/a}
     n_a:
       caps: {population: c}
       verify_before_dispatch: {population: c}
       destination_rail: {population: c}
       counterparty_identity_change: {population: c}
       recurring_charge: {population: c}
+      action_class_gate: {population: c}
+      counterparty_seen_before: {population: c}
     verdict: deny
   - scenario: credential-absent
     action_id: send_message/everyday-fixture-credential-absent
-    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, destination_rail: n/a, counterparty_identity_change: n/a, credential_pattern: pass, recurring_charge: n/a}
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, destination_rail: n/a, counterparty_identity_change: n/a, credential_pattern: pass, recurring_charge: n/a, action_class_gate: n/a, counterparty_seen_before: n/a}
     n_a:
       caps: {population: c}
       verify_before_dispatch: {population: c}
       destination_rail: {population: c}
       counterparty_identity_change: {population: c}
       recurring_charge: {population: c}
+      action_class_gate: {population: c}
+      counterparty_seen_before: {population: c}
     verdict: allow
   - scenario: dedupe-original
     action_id: make_payment/everyday-fixture-dedupe-original
-    checks: {dedupe: pass, caps: pass, verify_before_dispatch: n/a, destination_rail: pass, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: pass}
+    checks: {dedupe: pass, caps: pass, verify_before_dispatch: n/a, destination_rail: pass, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: pass, action_class_gate: n/a, counterparty_seen_before: n/a}
     n_a:
       verify_before_dispatch: {population: c}
       counterparty_identity_change: {population: c}
       credential_pattern: {population: c}
+      action_class_gate: {population: c}
+      counterparty_seen_before: {population: c}
     verdict: allow
   - scenario: dedupe-repeat
     action_id: make_payment/everyday-fixture-dedupe-repeat
     note: "identical logical payment to dedupe-original, resubmitted"
-    checks: {dedupe: fail, caps: pass, verify_before_dispatch: n/a, destination_rail: pass, counterparty_identity_change: pass, credential_pattern: n/a, recurring_charge: pass}
+    checks: {dedupe: fail, caps: pass, verify_before_dispatch: n/a, destination_rail: pass, counterparty_identity_change: pass, credential_pattern: n/a, recurring_charge: pass, action_class_gate: n/a, counterparty_seen_before: n/a}
     n_a:
       verify_before_dispatch: {population: c}
       credential_pattern: {population: c}
+      action_class_gate: {population: c}
+      counterparty_seen_before: {population: c}
     verdict: deny
   - scenario: caps-boundary-at-cap
     action_id: make_payment/everyday-fixture-caps-boundary
     note: "boundary: amount == the per-action limit exactly (2,500); caps compares with <=, so this passes"
-    checks: {dedupe: pass, caps: pass, verify_before_dispatch: n/a, destination_rail: pass, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: pass}
+    checks: {dedupe: pass, caps: pass, verify_before_dispatch: n/a, destination_rail: pass, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: pass, action_class_gate: n/a, counterparty_seen_before: n/a}
     n_a:
       verify_before_dispatch: {population: c}
       counterparty_identity_change: {population: c}
       credential_pattern: {population: c}
+      action_class_gate: {population: c}
+      counterparty_seen_before: {population: c}
     verdict: allow
   - scenario: caps-first-draw
     action_id: make_payment/everyday-fixture-caps-first-draw
-    checks: {dedupe: pass, caps: pass, verify_before_dispatch: n/a, destination_rail: pass, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: pass}
+    checks: {dedupe: pass, caps: pass, verify_before_dispatch: n/a, destination_rail: pass, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: pass, action_class_gate: n/a, counterparty_seen_before: n/a}
     n_a:
       verify_before_dispatch: {population: c}
       counterparty_identity_change: {population: c}
       credential_pattern: {population: c}
+      action_class_gate: {population: c}
+      counterparty_seen_before: {population: c}
     verdict: allow
   - scenario: caps-over-limit-on-watched-rail
     action_id: make_payment/everyday-fixture-caps-over-limit
     note: "3,000 is over the per-action limit (2,500); the window total 2,000 + 3,000 stays under 10,000"
-    checks: {dedupe: pass, caps: fail, verify_before_dispatch: n/a, destination_rail: fail, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: pass}
+    checks: {dedupe: pass, caps: fail, verify_before_dispatch: n/a, destination_rail: fail, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: pass, action_class_gate: n/a, counterparty_seen_before: n/a}
     n_a:
       verify_before_dispatch: {population: c}
       counterparty_identity_change: {population: c}
       credential_pattern: {population: c}
+      action_class_gate: {population: c}
+      counterparty_seen_before: {population: c}
     verdict: deny
   - scenario: caps-in-scope-amount-missing
     action_id: make_payment/everyday-fixture-caps-amount-missing
     note: "population a: a cap is configured for money.transfer and the action carries no amount_minor; the engine allows it and the record names the missing field"
-    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, destination_rail: pass, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: pass}
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, destination_rail: pass, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: pass, action_class_gate: n/a, counterparty_seen_before: n/a}
     n_a:
       caps: {population: a, missing_field: amount_minor}
       verify_before_dispatch: {population: c}
       counterparty_identity_change: {population: c}
       credential_pattern: {population: c}
+      action_class_gate: {population: c}
+      counterparty_seen_before: {population: c}
     verdict: allow
   - scenario: out-of-scope-action
     action_id: check_balance/everyday-fixture-out-of-scope
     note: "population c: no cap is configured for info.query and no configured check applies"
-    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, destination_rail: n/a, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: n/a}
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, destination_rail: n/a, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: n/a, action_class_gate: pass, counterparty_seen_before: n/a}
     n_a:
       caps: {population: c}
       verify_before_dispatch: {population: c}
@@ -134,29 +169,91 @@ rows:
       counterparty_identity_change: {population: c}
       credential_pattern: {population: c}
       recurring_charge: {population: c}
+      counterparty_seen_before: {population: c}
     verdict: allow
   - scenario: recurring-charge-set-up
     action_id: make_payment/everyday-fixture-recurring-charge
-    checks: {dedupe: pass, caps: pass, verify_before_dispatch: n/a, destination_rail: pass, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: fail}
+    checks: {dedupe: pass, caps: pass, verify_before_dispatch: n/a, destination_rail: pass, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: fail, action_class_gate: n/a, counterparty_seen_before: n/a}
     n_a:
       verify_before_dispatch: {population: c}
       counterparty_identity_change: {population: c}
       credential_pattern: {population: c}
+      action_class_gate: {population: c}
+      counterparty_seen_before: {population: c}
     verdict: deny
   - scenario: caps-second-first-draw
     action_id: make_payment/everyday-fixture-caps-second-first-draw
-    checks: {dedupe: pass, caps: pass, verify_before_dispatch: n/a, destination_rail: pass, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: pass}
+    checks: {dedupe: pass, caps: pass, verify_before_dispatch: n/a, destination_rail: pass, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: pass, action_class_gate: n/a, counterparty_seen_before: n/a}
     n_a:
       verify_before_dispatch: {population: c}
       counterparty_identity_change: {population: c}
       credential_pattern: {population: c}
+      action_class_gate: {population: c}
+      counterparty_seen_before: {population: c}
     verdict: allow
   - scenario: caps-over-limit-escalates
     action_id: make_payment/everyday-fixture-caps-escalates
     note: "3,000 is over the per-action limit (2,500), and caps is the only failing check"
-    checks: {dedupe: pass, caps: fail, verify_before_dispatch: n/a, destination_rail: pass, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: pass}
+    checks: {dedupe: pass, caps: fail, verify_before_dispatch: n/a, destination_rail: pass, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: pass, action_class_gate: n/a, counterparty_seen_before: n/a}
     n_a:
       verify_before_dispatch: {population: c}
       counterparty_identity_change: {population: c}
       credential_pattern: {population: c}
+      action_class_gate: {population: c}
+      counterparty_seen_before: {population: c}
     verdict: escalate
+  - scenario: merchant-history-real-payment
+    action_id: make_payment/everyday-fixture-merchant-history
+    checks: {dedupe: pass, caps: pass, verify_before_dispatch: n/a, destination_rail: pass, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: pass, action_class_gate: n/a, counterparty_seen_before: n/a}
+    n_a:
+      verify_before_dispatch: {population: c}
+      counterparty_identity_change: {population: c}
+      credential_pattern: {population: c}
+      action_class_gate: {population: c}
+      counterparty_seen_before: {population: c}
+    verdict: allow
+  - scenario: merchant-first-purchase
+    action_id: make_purchase/everyday-fixture-merchant-first
+    checks: {dedupe: pass, caps: pass, verify_before_dispatch: n/a, destination_rail: n/a, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: n/a, action_class_gate: n/a, counterparty_seen_before: fail}
+    n_a:
+      verify_before_dispatch: {population: c}
+      destination_rail: {population: c}
+      counterparty_identity_change: {population: c}
+      credential_pattern: {population: c}
+      recurring_charge: {population: c}
+      action_class_gate: {population: c}
+    verdict: deny
+  - scenario: merchant-repeat-purchase
+    action_id: make_purchase/everyday-fixture-merchant-repeat
+    checks: {dedupe: pass, caps: pass, verify_before_dispatch: n/a, destination_rail: n/a, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: n/a, action_class_gate: n/a, counterparty_seen_before: pass}
+    n_a:
+      verify_before_dispatch: {population: c}
+      destination_rail: {population: c}
+      counterparty_identity_change: {population: c}
+      credential_pattern: {population: c}
+      recurring_charge: {population: c}
+      action_class_gate: {population: c}
+    verdict: allow
+  - scenario: booking-create
+    action_id: book_table/everyday-fixture-booking-create
+    checks: {dedupe: pass, caps: pass, verify_before_dispatch: n/a, destination_rail: n/a, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: n/a, action_class_gate: fail, counterparty_seen_before: n/a}
+    n_a:
+      verify_before_dispatch: {population: c}
+      destination_rail: {population: c}
+      counterparty_identity_change: {population: c}
+      credential_pattern: {population: c}
+      recurring_charge: {population: c}
+      counterparty_seen_before: {population: c}
+    verdict: deny
+  - scenario: off-taxonomy-class
+    action_id: do_unlisted/everyday-fixture-off-taxonomy
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, destination_rail: n/a, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: n/a, action_class_gate: fail, counterparty_seen_before: n/a}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      destination_rail: {population: c}
+      counterparty_identity_change: {population: c}
+      credential_pattern: {population: c}
+      recurring_charge: {population: c}
+      counterparty_seen_before: {population: c}
+    verdict: deny

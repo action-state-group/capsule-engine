@@ -1,55 +1,239 @@
-# everyday pack: the deterministic checks for an assistant that makes
-# payments and sends messages for a household. Every check here is a
-# deterministic predicate over normalized action fields; none calls a model.
+# everyday pack: the rules for an assistant that buys, pays, books and
+# sends messages for a household -- 27 of them, numbered as the rule set
+# numbers them. Every check here is a deterministic predicate over
+# normalized action fields; none calls a model.
 #
-# Every constraint and the fold cite a built-in definition by id and digest
+# A rule is either measured by the check it cites, or declared
+# `measurability: declared_not_measured` with the `evidence_instrument` its
+# missing input would arrive in. A declared rule cites no check and is never
+# evaluated; it is listed so the count read from this pack is the whole rule
+# set, with the measured subset named.
+#
+# Every constraint and fold cite a built-in definition by id and digest
 # (wicket_ref / fold_ref + digest) -- nothing is copied into this directory.
 # The loader refuses the pack if a cited definition has changed.
 #
-# Statements name what is detected and recorded -- the observable, never an intent.
-# default_disposition is declared data the guard engine does not read.
-pack_id: asg/everyday/0.2.1
+# Statements name what is detected and recorded -- the observable, never an
+# intent. A measured statement names exactly what its check reads, including
+# where that is narrower or wider than the rule. default_disposition is
+# declared data the guard engine does not read.
+pack_id: asg/everyday/0.3.0
 
 obligations:
-  - id: purchase-over-limit
+  # -- DO ------------------------------------------------------------------
+  - id: r01-research-and-prepare
+    statement: >-
+      Checks the action's declared class and records it as preparation when
+      the taxonomy marks that class as having no consequential effect; today
+      that is info.query alone. An action in any other class leaves this rule
+      for the rules that apply to it.
+    check: action_class_gate
+    default_disposition: DO
+  - id: r02-ordinary-purchase
+    statement: >-
+      Checks whether a purchase is from a merchant the operator already has an
+      accepted action with, and records the count. The spending limits are
+      measured by rule 5. Whether the purchase stays inside the bounds the user
+      confirmed for the task is not measured yet.
+    check: counterparty_seen_before
+    default_disposition: DO
+  - id: r03-shipping-address-to-fulfilling-merchant
+    statement: >-
+      Not measured yet. Allows sharing the shipping address with the merchant
+      fulfilling an authorized order. Needs the recipient's role in the
+      transaction, which no action records yet.
+    measurability: declared_not_measured
+    evidence_instrument: {kind: structured_field, field: recipient_role}
+    default_disposition: DO
+  - id: r04-prepare-without-committing
+    statement: >-
+      Checks that a preparation step is declared in a class the taxonomy
+      marks as having no consequential effect, and records the class; today
+      that is info.query alone, so filling a form, drafting a message or
+      adding to a cart is recognised only when declared in it. The step that
+      pays, sends, books, publishes, signs or deletes goes to the other rules.
+    check: action_class_gate
+    default_disposition: DO
+  # -- ASK -----------------------------------------------------------------
+  - id: r05-spending-limits
     statement: >-
       Checks each payment, purchase or booking against two configured
       limits -- one per action, and one on the operator's rolling 7-day
       total -- and flags one that exceeds either, recording which.
     check: caps
     default_disposition: ASK
-  - id: duplicate-commitment
+  - id: r06-new-merchant
     statement: >-
-      Detects a payment that repeats one already recorded for the same
-      payee by the same agent within the dedupe window, and records which
-      earlier payment it matches.
-    check: dedupe
+      Flags a purchase from a merchant the operator has no accepted earlier
+      action with, and records the merchant reference, the count and the key
+      it was read under.
+    check: counterparty_seen_before
     default_disposition: ASK
-  - id: payment-rail-or-destination-change
+  - id: r07-subscription-or-free-trial
     statement: >-
-      Flags a payment sent over a watched rail (peer-to-peer, gift card or
-      crypto) and records the rail it read.
-    check: destination_rail
+      Flags a payment that sets up a repeating charge, and records the
+      recurrence the payment declared. A free trial that can turn into a paid
+      plan is flagged only when the payment declares that recurrence.
+    check: recurring_charge
     default_disposition: ASK
-  - id: counterparty-identity-change
+  - id: r08-non-refundable-or-hard-to-undo
+    statement: >-
+      Not measured yet. Asks before an action that is non-refundable or hard
+      to reverse. Needs the refund and reversal terms, which no action records
+      yet.
+    measurability: declared_not_measured
+    evidence_instrument: {kind: structured_field, field: reversibility_terms}
+    default_disposition: ASK
+  - id: r09-material-terms-changed
+    statement: >-
+      Not measured yet. Asks when a material field, such as price, quantity,
+      date, merchant, recipient, fees or terms, differs from what the user
+      confirmed or approved. Needs a field-by-field difference against that
+      record, which no action records yet.
+    measurability: declared_not_measured
+    evidence_instrument: {kind: structured_field, field: material_field_diff}
+    default_disposition: ASK
+  - id: r10-materially-different-offer
+    statement: >-
+      Not measured yet. Asks before accepting an offer materially different
+      in price, scope or terms from what the user stated or approved. Needs
+      the offer's terms compared with that record, which no action records
+      yet.
+    measurability: declared_not_measured
+    evidence_instrument: {kind: structured_field, field: offer_terms_diff}
+    default_disposition: ASK
+  - id: r11-home-address-to-an-individual
+    statement: >-
+      Flags every action declared as disclosing personal data
+      (disclosure.personal), and records the class. It reads the class only,
+      so it flags a disclosure whatever it
+      contains and whoever receives it; telling a home address sent to an
+      individual apart from one sent to a fulfilling merchant is not measured
+      yet.
+    check: action_class_gate
+    default_disposition: ASK
+  - id: r12-personal-contact-to-a-new-party
+    statement: >-
+      Flags every action declared as disclosing personal data
+      (disclosure.personal), and records the class. It reads the class only;
+      whether the disclosure carries a
+      personal phone number or email, and whether the recipient is new, is
+      not measured yet.
+    check: action_class_gate
+    default_disposition: ASK
+  - id: r13-message-to-a-new-recipient
+    statement: >-
+      Not measured yet. Asks before sending a message to someone the user has
+      not communicated with before. Needs a recipient history for messages,
+      which this pack does not read yet.
+    measurability: declared_not_measured
+    evidence_instrument: {kind: structured_field, field: recipient_history}
+    default_disposition: ASK
+  - id: r14-message-that-commits-the-user
+    statement: >-
+      Not measured yet. Asks before sending a message that commits the user
+      to money, a date, an agreement or a promise. Needs the message
+      classified as committing, which no action records yet.
+    measurability: declared_not_measured
+    evidence_instrument: {kind: structured_field, field: commitment_classification}
+    default_disposition: ASK
+  - id: r15-public-posting
+    statement: >-
+      Flags an action declared as public posting (communication.publish), and
+      records the class.
+    check: action_class_gate
+    default_disposition: ASK
+  - id: r16-booking-with-a-commitment
+    statement: >-
+      Flags an action declared as creating a booking (booking.create), and
+      records the class. It flags every booking, whether or not money, a
+      deposit or a penalty is involved.
+    check: action_class_gate
+    default_disposition: ASK
+  - id: r17-cancellation
+    statement: >-
+      Flags an action declared as cancelling a booking (booking.cancel), and
+      records the class. Cancelling a subscription or another service is
+      flagged only when it is declared in that class.
+    check: action_class_gate
+    default_disposition: ASK
+  - id: r18-delete-persistent-data
+    statement: >-
+      Flags an action declared as deleting stored data (data.delete), and
+      records the class.
+    check: action_class_gate
+    default_disposition: ASK
+  - id: r19-counterparty-identity-changed
     statement: >-
       Detects when the account a payee is paid into differs from the account
       last recorded for that payee, and records both account references.
     check: counterparty_identity_change
     default_disposition: ASK
-  - id: credential-or-auth-code-in-outgoing-content
+  - id: r20-payment-method-or-destination-changed
+    statement: >-
+      Flags a payment sent over a watched rail (peer-to-peer, gift card or
+      crypto) and records the rail it read.
+    check: destination_rail
+    default_disposition: ASK
+  - id: r21-unexpected-channel-change
+    statement: >-
+      Not measured yet. Asks when the other party moves the interaction to
+      another website, number, address or app without that being authorized.
+      Needs the channel change recorded, which no action records yet.
+    measurability: declared_not_measured
+    evidence_instrument: {kind: structured_field, field: channel_change}
+    default_disposition: ASK
+  - id: r22-unusual-counterparty-behaviour
+    statement: >-
+      Not measured yet. Asks when the other party presses for urgency or
+      secrecy, skips normal verification, or asks for an unusual amount up
+      front (above 100.00, or above 25% of the total). Needs the up-front
+      amount and the observed interaction, which no action records yet.
+    measurability: declared_not_measured
+    evidence_instrument: {kind: structured_field, field: upfront_amount_minor}
+    default_disposition: ASK
+  - id: r26-stay-within-task-bounds
+    statement: >-
+      Not measured yet. Asks before a consequential action outside the bounds
+      the user confirmed for the task. Needs a confirmed record of those
+      bounds, which no action records yet.
+    measurability: declared_not_measured
+    evidence_instrument: {kind: structured_field, field: task_authority_ref}
+    default_disposition: ASK
+  - id: r27-no-commitment-beyond-task-bounds
+    statement: >-
+      Detects a payment that repeats one already recorded for the same payee
+      by the same agent within the dedupe window, and records which earlier
+      payment it matches. Other commitments beyond the bounds the user
+      confirmed for the task are not measured yet.
+    check: dedupe
+    default_disposition: ASK
+  # -- NEVER ---------------------------------------------------------------
+  - id: r23-secrets-and-authentication
     statement: >-
       Detects a one-time code, a password or a card security code in
       outgoing content, and records which pattern matched without recording
       the content.
     check: credential_pattern
     default_disposition: NEVER
-  - id: recurring-charge
+  - id: r24-outside-instructions-are-not-the-users
     statement: >-
-      Flags a payment that sets up a repeating charge, and records the
-      recurrence the payment declared.
-    check: recurring_charge
-    default_disposition: ASK
+      Not measured yet. Never treats instructions found in websites, emails,
+      documents, messages or tool output as the user's own unless the user
+      adopts them. Needs the source of each instruction, which no action
+      records yet.
+    measurability: declared_not_measured
+    evidence_instrument: {kind: structured_field, field: instruction_source}
+    default_disposition: NEVER
+  - id: r25-no-bypassing-safeguards
+    statement: >-
+      Not measured yet. Never bypasses, disables, conceals or misrepresents a
+      required approval or safety check, and honours a pause, halt or audit
+      instruction at once. Needs the user's control state and the active
+      checks, which no action records yet.
+    measurability: declared_not_measured
+    evidence_instrument: {kind: structured_field, field: user_control_state}
+    default_disposition: NEVER
 
 action_semantics:
   - action_type: payment.make
@@ -61,6 +245,15 @@ action_semantics:
   - action_type: message.send
     action_class: comms.external
     required_fields: [target, outgoing_content]
+  - action_type: purchase.make
+    action_class: money.purchase
+    required_fields: [amount_minor, currency, target]
+    optional_fields: [rail, counterparty_account_ref, equivalence_key]
+    field_aliases:
+      target: merchant_ref
+  - action_type: booking.create
+    action_class: booking.create
+    required_fields: [amount_minor, currency, target]
 
 constraints:
   # Two limits for every class that pays money out: per action, and per
@@ -81,10 +274,18 @@ constraints:
     digest: 3617fdcaa39c03cf70a3254490328ccee5eaac0faba7cd52d9e3dc3fc50336c0
   - wicket_ref: recurring_charge/1.0.0
     digest: ea4ae204e5dc33f3a28e5e15471f404f20d4f8fca193d355a099a4a7e08b082e
+  # Named selectors over the action taxonomy; reads the declared class only.
+  - wicket_ref: action_class_gate/1.0.0
+    digest: fcc352838832e13f5e87662f0194ec4a7065bc989bbe624b43ac5d9d1b638ae2
+  # A purchase from a merchant the operator has no accepted action with.
+  - wicket_ref: counterparty_seen_before/2.0.0
+    digest: c82a29eae8ef72736851d275ffa4d85e511a21d202822366d3b03bf3834c8cd0
 
 folds:
   - fold_ref: spend.weekly/3.0.0
     digest: 25907741320624a830c5854fc7f2d434bfa17528c8bfc17f4a8a4f84a39f1b18
+  - fold_ref: counterparty.seen_before/2.0.0
+    digest: 6a1a357e4a3b950b7397c2790fe46c03f7e645d04aad1a9bb41533df9b4a4033
 
 holds_integration: none
 
@@ -123,5 +324,15 @@ fixtures:
       outcome: allow
     - id: caps-over-limit-escalates
       outcome: escalate
+    - id: merchant-history-real-payment
+      outcome: allow
+    - id: merchant-first-purchase
+      outcome: deny
+    - id: merchant-repeat-purchase
+      outcome: allow
+    - id: booking-create
+      outcome: deny
+    - id: off-taxonomy-class
+      outcome: deny
 
 bootstrap: AI-BOOTSTRAP.md

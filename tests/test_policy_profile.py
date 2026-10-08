@@ -14,7 +14,6 @@ from agent_action_capsule.canonical import json_digest
 from capsule_ledger.ledger import LedgerStore
 
 from capsule_engine.guards import Action, LocalSigner
-from capsule_engine.guards.capsule import ALLOW, DENY
 from capsule_engine.packs import (
     accept_thresholds,
     build_engine,
@@ -122,7 +121,9 @@ def test_two_households_share_the_wicket_and_pack_and_differ_only_in_profile(tmp
     assert a.manifest.profile_digest != b.manifest.profile_digest
 
     # The same 30.00 purchase trips the per-action limit at 25.00 and passes
-    # at 40.00. (A caps breach on a class with no approver denies.)
+    # at 40.00. (A caps breach on a class with no approver denies.) Each
+    # household's merchant is new to its ledger, so everyday 0.3.0's
+    # first-purchase check fails in both.
     outcomes = {}
     for name, installed in (("a", a), ("b", b)):
         ledger = LedgerStore(tmp_path / f"ledger-{name}")
@@ -135,10 +136,13 @@ def test_two_households_share_the_wicket_and_pack_and_differ_only_in_profile(tmp
                               clock=lambda: "2026-10-06T10:00:00Z")
         decision = engine.check(_purchase(name, 3_000), dry_run=False)
         (caps,) = [c for c in decision.constraints if c.id == "caps"]
-        outcomes[name] = (decision.outcome, caps.result)
+        outcomes[name] = (caps.result, [c.id for c in decision.constraints if c.result == "fail"])
         assert decision.capsule["asg_payload"]["manifest_digest"] == installed.resolved.manifest_digest
         ledger.close()
-    assert outcomes == {"a": (DENY, "fail"), "b": (ALLOW, "pass")}
+    assert outcomes == {
+        "a": ("fail", ["caps", "counterparty_seen_before"]),
+        "b": ("pass", ["counterparty_seen_before"]),
+    }
 
 
 def test_what_was_in_force_is_recomputable_from_the_activation_alone(tmp_path):

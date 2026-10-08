@@ -6,12 +6,16 @@ whose payment and messaging code you want covered by the `everyday` pack.
 ---
 
 You are helping me wire `capsule-engine`'s `everyday` pack into this
-codebase. The pack records a decision for each payment and each outgoing
-message an assistant makes on a household's behalf, and runs six
-deterministic checks over the recorded fields. It governs two action types:
+codebase. The pack records a decision for each payment, purchase, booking
+and outgoing message an assistant makes on a household's behalf, and runs
+eight deterministic checks over the recorded fields. It carries 27 rules:
+16 are measured by those checks, and 11 are declared not measured (see
+below). It governs four action types:
 
 - `payment.make`, mapped to the `money.transfer` guard class;
-- `message.send`, mapped to the `comms.external` guard class.
+- `message.send`, mapped to the `comms.external` guard class;
+- `purchase.make`, mapped to the `money.purchase` guard class;
+- `booking.create`, mapped to the `booking.create` guard class.
 
 **What each check reads** (the ONLY fields this pack's checks read; do not
 invent others):
@@ -21,7 +25,8 @@ invent others):
 | `amount_minor` | `caps` | the amount in minor currency units (cents), always an integer: the amount the payment is expected to take |
 | `spend_authorized_minor` | `caps` | optional: the most the payment may take, in minor units, when that is more than `amount_minor` (a card pre-authorisation or a buffer); leave it unset when there is none |
 | `currency` | -- | ISO 4217 code, e.g. `"EUR"` |
-| `target` (pack-facing name: **payee_ref**) | `dedupe`, `counterparty_identity_change` | a stable reference for who is paid or messaged |
+| `action_class` | `action_class_gate` | the guard class the action is declared in; the gate reads nothing else |
+| `target` (pack-facing name: **payee_ref**, or **merchant_ref** on a purchase) | `dedupe`, `counterparty_identity_change`, `counterparty_seen_before` | a stable reference for who is paid, bought from or messaged |
 | `rail` | `destination_rail` | the payment rail, e.g. `"card"`, `"bank_transfer"`, `"p2p"`, `"gift_card"`, `"crypto"` |
 | `counterparty_account_ref` | `counterparty_identity_change` | an opaque reference to the account the payee is paid into -- a token or digest that is stable per account, never the account, card or IBAN number, because it is recorded on the capsule. A value shaped like a raw number is refused |
 | `outgoing_content` | `credential_pattern` | the text the action sends; it is matched and then discarded, never recorded |
@@ -53,6 +58,25 @@ catalog):
    matched against one-time-code, password and card-security-code patterns.
 6. `recurring_charge` (`recurring_charge/1.0.0`) -- a payment whose
    declared recurrence is not one-time is flagged.
+7. `action_class_gate` (`action_class_gate/1.0.0`) -- named selectors over
+   the action taxonomy: a class with no consequential effect passes (today,
+   `info.query` alone); public posting, creating or cancelling a booking,
+   deleting stored data, and disclosing personal data are flagged. It reads
+   the declared class only, never what the action contains.
+8. `counterparty_seen_before` (`counterparty_seen_before/2.0.0`) -- a
+   purchase from a merchant the operator has no accepted earlier action with
+   is flagged; a dry run does not count as an earlier action. The record
+   names the count and the key it was read under.
+
+**Rules declared not measured.** 11 of the 27 rules need an input no action
+records yet: the bounds the user confirmed for a task, refund and reversal
+terms, a field-by-field difference against an approved action, the
+recipient's role or history, a message classified as committing, a channel
+change, an up-front amount, where an instruction came from, and the user's
+control state. Each one is in `pack.yaml` with `measurability:
+declared_not_measured` and the `evidence_instrument` field its input would
+arrive in. It cites no check and is never evaluated: a decision record
+carries nothing for it. Do not invent those fields to make a rule apply.
 
 **When a check does not settle.** A check that could not be evaluated
 records `n/a` with a small facts object `{constraint_id, in_scope,
@@ -85,9 +109,10 @@ stranger cannot confirm it from the receipt.
 
 **What I need from you:**
 
-1. Scan this codebase for every call that moves money or sends a message
-   to someone outside the household (payment SDK calls, bank or wallet
-   transfers, email/SMS/chat sends). Look at what is actually here.
+1. Scan this codebase for every call that moves money, buys, books or sends
+   a message to someone outside the household (payment SDK calls, bank or
+   wallet transfers, checkouts, reservations, email/SMS/chat sends). Look at
+   what is actually here.
 2. For each one, draft the `capsule_engine.guards.Action` that represents
    it, using only the fields above plus `verb`, `operator`, `developer` and
    `action_class`. Leave `action_type` at its default (`"decide"`); the pack's
