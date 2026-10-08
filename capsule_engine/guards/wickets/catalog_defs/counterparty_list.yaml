@@ -6,6 +6,9 @@
 # for every user.
 #
 # mode: deny fails a listed counterparty; allow fails an unlisted one.
+# entries: each names its kind -- {kind: target, value} for a clear declared
+# reference, or {kind: domain|payee, fp_alg, value} for a sealed keyed
+# fingerprint; the two forms never compare.
 # disposition: deny refuses on a fail; ask sends it to the action class's
 # approver, and refuses where the class names none.
 wicket_id: counterparty_list/1.0.0

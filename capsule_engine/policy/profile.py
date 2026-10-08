@@ -27,7 +27,9 @@ Shape (``policy-profile/v0``)::
             caps_minor: {money.purchase: 20000}
           counterparty_list:             # a list, not class values
             mode: deny                   # required: deny | allow
-            entries: [shop/example]      # counterparty references
+            entries:                     # each names its kind and form
+              - {kind: payee, fp_alg: hmac-sha256-deal-key, value: <hex>}
+              - {kind: target, value: shop/example}
             disposition: ask             # optional: deny | ask
 
 ``pack`` names a pack without its version so a profile can outlive a pack
@@ -44,8 +46,10 @@ profile never adds a class the pack does not limit. Anything else is refused
 ``counterparty_list`` is the one check whose values are not per-class
 amounts: its ``entries`` replace the wicket's (empty) list whole. A profile
 that sets it must name ``mode``, so a list is never read as deny when the
-user meant allow. Entries are stored sorted, so the profile digest does not
-depend on the order the user typed them.
+user meant allow. Each entry names its ``kind`` (``target``, or a
+fingerprint kind with its ``fp_alg``; see ``guards/checks/
+counterparty_list.py``). Entries are stored in a canonical order, so the
+profile digest does not depend on the order the user typed them.
 """
 from __future__ import annotations
 
@@ -58,7 +62,14 @@ from typing import Any, TypedDict
 
 from agent_action_capsule.canonical import json_digest
 
-from ..guards.checks.counterparty_list import DISPOSITIONS, MODES
+from ..guards.checks.counterparty_list import (
+    CLEAR_KINDS,
+    DISPOSITIONS,
+    FINGERPRINT_KINDS,
+    MODES,
+    ListEntry,
+    sorted_entries,
+)
 from .errors import MALFORMED_PROFILE, PolicyManifestError
 
 __all__ = [
@@ -95,8 +106,8 @@ _MAX_SAFE_INT = 2**53 - 1
 
 ClassValues = dict[str, int]
 # A ``caps`` key carries ClassValues; a ``counterparty_list`` key carries its
-# mode or disposition (str) or its entries (list[str]).
-ParameterValue = ClassValues | str | list[str]
+# mode or disposition (str) or its entries (list[ListEntry]).
+ParameterValue = ClassValues | str | list[ListEntry]
 
 
 class PackParametersDict(TypedDict):
@@ -169,6 +180,31 @@ def _parse_class_values(raw: Any, context: str) -> ClassValues:
     return out
 
 
+def _nonempty_str(value: object) -> bool:
+    return isinstance(value, str) and bool(value)
+
+
+def _parse_list_entry(raw: Any, context: str) -> ListEntry:
+    """``{kind: target, value}`` or ``{kind: <fingerprint kind>, fp_alg,
+    value}``. A bare string names no kind, and a name is never a kind."""
+    kind = raw.get("kind") if isinstance(raw, dict) else None
+    if kind in CLEAR_KINDS:
+        _keys_exactly(raw.keys(), {"kind", "value"}, f"{context} entry of kind {kind!r}")
+    elif kind in FINGERPRINT_KINDS:
+        _keys_exactly(raw.keys(), {"kind", "fp_alg", "value"}, f"{context} entry of kind {kind!r}")
+        if not _nonempty_str(raw["fp_alg"]):
+            raise _refuse(f"{context} entry has an fp_alg that is not a non-empty string: {raw['fp_alg']!r}")
+    else:
+        kinds = sorted(CLEAR_KINDS | FINGERPRINT_KINDS)
+        raise _refuse(f"{context} entries must be mappings whose kind is one of {kinds}, got {raw!r}")
+    if not _nonempty_str(raw["value"]):
+        raise _refuse(f"{context} entry has a value that is not a non-empty string: {raw['value']!r}")
+    entry: ListEntry = {"kind": kind, "value": raw["value"]}
+    if kind in FINGERPRINT_KINDS:
+        entry["fp_alg"] = raw["fp_alg"]
+    return entry
+
+
 def _parse_list_parameters(raw: Any, context: str) -> dict[str, ParameterValue]:
     keys = set(raw)
     if not {"mode", "entries"} <= keys <= LIST_KEYS:
@@ -177,12 +213,12 @@ def _parse_list_parameters(raw: Any, context: str) -> dict[str, ParameterValue]:
         )
     if raw["mode"] not in MODES:
         raise _refuse(f"{context}['mode'] must be one of {sorted(MODES)}, got {raw['mode']!r}")
-    entries = raw["entries"]
-    if not isinstance(entries, list) or not all(isinstance(e, str) and e for e in entries):
-        raise _refuse(f"{context}['entries'] must be a list of non-empty strings, got {entries!r}")
-    if len(set(entries)) != len(entries):
+    if not isinstance(raw["entries"], list):
+        raise _refuse(f"{context}['entries'] must be a list, got {raw['entries']!r}")
+    entries = [_parse_list_entry(e, f"{context}['entries']") for e in raw["entries"]]
+    if len({json_digest(e) for e in entries}) != len(entries):
         raise _refuse(f"{context}['entries'] lists a counterparty more than once")
-    out: dict[str, ParameterValue] = {"mode": raw["mode"], "entries": sorted(entries)}
+    out: dict[str, ParameterValue] = {"mode": raw["mode"], "entries": sorted_entries(entries)}
     if "disposition" in raw:
         if raw["disposition"] not in DISPOSITIONS:
             raise _refuse(

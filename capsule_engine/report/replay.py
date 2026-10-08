@@ -15,7 +15,9 @@ check's own sealed record, disclosed beside its capsule in a capsulectl deal
 bundle: the record names the action's taxonomy class (``action_class``,
 ``taxonomy_version``) and the amount a spend cap evaluates (``spend_minor``),
 and the capsule binds the record by digest
-(``model_attestation.compute_attestation.agent_input_digest``). A record
+(``model_attestation.compute_attestation.agent_input_digest``). The
+counterparty's keyed fingerprints the record seals beside its body
+(``x-deal-v0.counterparty``) are carried as they are, never a clear value. A record
 that does not match that digest is never read.
 
 ``_bridge_transfer_funds`` is the other non-default action mapping, and it
@@ -42,6 +44,7 @@ from capsule_ledger.ledger import LedgerStore
 from ..folds.definition import FoldDefinition
 from ..folds.duration import parse_duration_seconds
 from ..guards import Action, GuardDecision, GuardEngine, LocalSigner
+from ..guards.wickets.definition import WicketDefinition
 
 __all__ = [
     "SourcedDecision",
@@ -186,6 +189,18 @@ def _minor(value: object) -> int | None:
     return value if isinstance(value, int) and not isinstance(value, bool) else None
 
 
+def _sealed_counterparty(block: object) -> tuple[dict[str, str] | None, str | None]:
+    """The fingerprints (kind -> hex) in a sealed ``x-deal-v0.counterparty``
+    block and their ``fp_alg``, or ``(None, None)`` when it holds none usable."""
+    if not isinstance(block, dict):
+        return None, None
+    ids, fp_alg = block.get("ids"), block.get("fp_alg")
+    if not isinstance(ids, dict) or not isinstance(fp_alg, str) or not fp_alg:
+        return None, None
+    usable = {k: v for k, v in ids.items() if isinstance(k, str) and isinstance(v, str) and v}
+    return (usable, fp_alg) if usable else (None, None)
+
+
 def _bridge_deal_check(record: dict, disclosed: dict | None) -> Action | None:
     """The proposed action a capsulectl deal check states, from its own
     sealed record: the class it names, and the amount a spend cap evaluates,
@@ -206,6 +221,7 @@ def _bridge_deal_check(record: dict, disclosed: dict | None) -> Action | None:
     if body.get("direction") == "in":
         spend = 0  # money arriving is never spend, whatever spend_minor says
         authorized = None
+    counterparty_ids, fp_alg = _sealed_counterparty((disclosed.get("x-deal-v0") or {}).get("counterparty"))
     return Action(
         verb=str(body.get("action") or "unknown"),
         operator=record.get("operator", ""),
@@ -219,6 +235,8 @@ def _bridge_deal_check(record: dict, disclosed: dict | None) -> Action | None:
         currency=body.get("currency"),
         rail=body.get("rail"),
         taxonomy_version=body["taxonomy_version"],
+        counterparty_ids=counterparty_ids,
+        counterparty_fp_alg=fp_alg,
     )
 
 
@@ -259,13 +277,16 @@ def replay(
     per_action_minor: dict[str, int] | None = None,
     per_action_reads: str | None = None,
     disclosed: dict[str, dict] | None = None,
+    wickets: tuple[WicketDefinition, ...] = (),
 ) -> ReplayResult:
     """Feed every record through a fresh ``GuardEngine`` in dry-run mode, in
     order. Never blocks (``dry_run=True``) -- see ``engine.py``'s own
     guarantee that a dry-run decision still produces and appends a real,
     signed capsule. ``record_range`` on the result is this replayed set's own
     1-based position range (i.e. positions within the ``--since``-filtered
-    window actually replayed, not the source ledger's absolute positions)."""
+    window actually replayed, not the source ledger's absolute positions).
+    ``wickets`` are configured checks run on every decision, as
+    ``GuardEngine(wickets=...)`` runs them; none by default."""
     if not records:
         return ReplayResult(decisions=(), record_range=(0, -1))
 
@@ -281,6 +302,7 @@ def replay(
             per_action_minor=per_action_minor,
             per_action_reads=per_action_reads,
             manifest_digest=manifest_digest,
+            wickets=wickets,
         )
         for record in records:
             action = action_for_record(record, (disclosed or {}).get(record.get("capsule_id", "")))
