@@ -9,6 +9,6 @@ own docstring for why.
 """
 from __future__ import annotations
 
-from .capsule import build_event_capsule
+from .capsule import build_event_capsule, event_signature_valid
 
-__all__ = ["build_event_capsule"]
+__all__ = ["build_event_capsule", "event_signature_valid"]

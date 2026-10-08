@@ -16,7 +16,9 @@ through the back door.
 """
 from __future__ import annotations
 
+import hmac
 import uuid
+from collections.abc import Mapping
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 
@@ -40,7 +42,7 @@ if TYPE_CHECKING:
     # what closes the cycle if this import is eager.
     from ..guards.signing import Signer
 
-__all__ = ["build_event_capsule"]
+__all__ = ["build_event_capsule", "event_signature_valid"]
 
 
 def _resolved_action_id(action_id: str | None, verb: str) -> str:
@@ -112,3 +114,20 @@ def build_event_capsule(
         if k not in sealed:
             sealed[k] = v
     return sealed
+
+
+def event_signature_valid(capsule: Mapping, signer: Signer) -> bool:
+    """Whether ``capsule`` is a record ``build_event_capsule`` sealed with
+    ``signer``'s key: its ``capsule_id`` recomputes, and its ``asg_signature``
+    names ``signer``'s key and algorithm and matches ``signer``'s signature
+    over the pre-signature body. For a symmetric signer (``LocalSigner``) this
+    means "signed by a holder of this node's secret"."""
+    signature = capsule.get("asg_signature")
+    if not isinstance(signature, Mapping) or not isinstance(signature.get("sig"), str):
+        return False
+    if signature.get("key_id") != signer.key_id or signature.get("alg") != signer.algorithm:
+        return False
+    if compute_capsule_id(dict(capsule)) != capsule.get("capsule_id"):
+        return False
+    presig = {k: v for k, v in capsule.items() if k not in ("capsule_id", "asg_signature")}
+    return hmac.compare_digest(signer.sign(json_digest(presig)), signature["sig"])

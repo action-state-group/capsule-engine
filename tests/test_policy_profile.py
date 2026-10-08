@@ -126,7 +126,13 @@ def test_two_households_share_the_wicket_and_pack_and_differ_only_in_profile(tmp
     outcomes = {}
     for name, installed in (("a", a), ("b", b)):
         ledger = LedgerStore(tmp_path / f"ledger-{name}")
-        engine = build_engine(installed, ledger=ledger, signer_provider=lambda: SIGNER)
+        # A profile's values apply once an activation binds them. 40.00 is a
+        # raise over the pack's 25.00, so it is activated more than the 12-hour
+        # cooling-off before the purchase.
+        record_pack_activation(installed, ledger=ledger, operator=f"household-{name}", developer="ops",
+                               signer=SIGNER, timestamp="2026-10-05T09:00:00Z")
+        engine = build_engine(installed, ledger=ledger, signer_provider=lambda: SIGNER,
+                              clock=lambda: "2026-10-06T10:00:00Z")
         decision = engine.check(_purchase(name, 3_000), dry_run=False)
         (caps,) = [c for c in decision.constraints if c.id == "caps"]
         outcomes[name] = (decision.outcome, caps.result)

@@ -23,7 +23,7 @@ from capsule_engine.guards.capsule import ALLOW, DENY, ESCALATE, not_applicable_
 from capsule_engine.guards.checks import check_counterparty_list
 from capsule_engine.guards.checks.counterparty_list import ListEntry
 from capsule_engine.guards.wickets import load_definition_file
-from capsule_engine.packs import build_engine, install_pack, load_pack_dir
+from capsule_engine.packs import build_engine, install_pack, load_pack_dir, record_pack_activation
 from capsule_engine.policy import PROFILE_FORMAT, PolicyManifestError, parse_profile
 from capsule_engine.policy.errors import MALFORMED_PROFILE, PROFILE_UNKNOWN_PARAMETER
 from capsule_engine.report.replay import action_for_record, load_disclosed, load_records, replay
@@ -399,10 +399,17 @@ def _profile(**params):
     )
 
 
-def _decide(tmp_path, profile, action):
+def _decide(tmp_path, profile, action, *, activate=True):
+    """Install with ``profile`` and decide ``action``. A profile applies only
+    once a signed activation binds it (``policy/limits.py``), so the install
+    is activated an hour before the action unless ``activate`` is false."""
     installed = install_pack(_pack_with_list(), project_dir=tmp_path / "project", mode="enforce", profile=profile)
     ledger = LedgerStore(tmp_path / "ledger")
-    decision = build_engine(installed, ledger=ledger, signer_provider=lambda: SIGNER).check(action)
+    if activate:
+        record_pack_activation(installed, ledger=ledger, operator="household-list-fixture", developer="ops",
+                               signer=SIGNER, timestamp="2026-10-08T09:00:00Z")
+    engine = build_engine(installed, ledger=ledger, signer_provider=lambda: SIGNER, clock=lambda: action.timestamp)
+    decision = engine.check(action)
     ledger.close()
     return installed, decision
 
@@ -411,10 +418,15 @@ def _list_constraint(decision):
     return next(c for c in decision.constraints if c.id == "counterparty_list")
 
 
+def _failed(decision) -> list[str]:
+    return [c.id for c in decision.constraints if c.result == "fail"]
+
+
 def test_a_profile_deny_list_refuses_a_listed_purchase_and_leaves_the_pack_unchanged(tmp_path):
     profile = _profile(mode="deny", entries=[_fp("payee", PAYEE)])
     installed, decision = _decide(tmp_path, profile, _sealed({"payee": PAYEE}))
     assert decision.outcome == DENY
+    assert _failed(decision) == ["counterparty_list"]
     assert _list_constraint(decision).evidence["matched_entry"] == _fp("payee", PAYEE)
     without = install_pack(_pack_with_list(), project_dir=tmp_path / "bare", mode="enforce")
     assert installed.manifest.wickets == without.manifest.wickets
@@ -424,6 +436,7 @@ def test_a_profile_deny_list_refuses_a_listed_purchase_and_leaves_the_pack_uncha
 
 def test_a_profile_deny_list_passes_an_unlisted_purchase_and_says_it_consulted_the_list(tmp_path):
     _, decision = _decide(tmp_path, _profile(mode="deny", entries=[_t(BLOCKED)]), _action(target=OTHER, amount_minor=100))
+    assert decision.outcome == ALLOW
     out = _list_constraint(decision)
     assert out.result == "pass"
     assert out.evidence["list_digest"] == json_digest([_t(BLOCKED)])
@@ -433,12 +446,24 @@ def test_a_profile_deny_list_passes_an_unlisted_purchase_and_says_it_consulted_t
 def test_a_profile_allow_list_refuses_an_unlisted_purchase(tmp_path):
     _, decision = _decide(tmp_path, _profile(mode="allow", entries=[_t(ALLOWED)]), _action(target=OTHER, amount_minor=100))
     assert decision.outcome == DENY
+    assert _failed(decision) == ["counterparty_list"]
     assert _list_constraint(decision).evidence["mode"] == "allow"
 
 
 def test_a_profile_purchase_with_no_reference_is_not_evaluable(tmp_path):
     _, decision = _decide(tmp_path, _profile(mode="deny", entries=[_t(BLOCKED)]), _action(target=None, amount_minor=100))
     assert _list_constraint(decision).evidence == _missing("target")
+    assert "policy_binding" not in [c.id for c in decision.constraints]
+
+
+def test_a_list_profile_no_activation_binds_is_denied_by_policy_binding_not_the_list(tmp_path):
+    # The same deny-list profile and an unlisted purchase that it would pass:
+    # unbound, the decision is denied before any rule runs.
+    _, decision = _decide(tmp_path, _profile(mode="deny", entries=[_t(BLOCKED)]), _action(target=OTHER, amount_minor=100),
+                          activate=False)
+    assert decision.outcome == DENY
+    assert [(c.id, c.result) for c in decision.constraints] == [("policy_binding", "fail")]
+    assert "(profile_unbound)" in decision.constraints[0].reason
 
 
 def test_the_profile_entries_are_order_independent():

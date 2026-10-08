@@ -32,6 +32,7 @@ from ..guards.checks import CONFIGURED_CHECKS
 from ..guards.engine import GuardEngine
 from ..guards.signing import Signer
 from ..policy.activation import build_manifest_activation_capsule, find_latest_activation
+from ..policy.limits import read_caps_limits
 from ..policy.manifest import FoldRef, Manifest, PackRef, WicketRef
 from ..policy.profile import PolicyProfile
 from ..policy.resolve import ResolvedManifest, resolve_manifest
@@ -145,20 +146,30 @@ def install_pack(
 
 
 def build_engine(
-    installed: InstalledPack, *, ledger: LedgerAPI, signer_provider: Callable[[], Signer | None]
+    installed: InstalledPack,
+    *,
+    ledger: LedgerAPI,
+    signer_provider: Callable[[], Signer | None],
+    clock: Callable[[], str] | None = None,
 ) -> GuardEngine:
     """A ``GuardEngine`` wired from the installed pack's resolved manifest --
     the caps fold/limits and manifest_digest all come from what
     ``install_pack`` actually materialized and resolved, never re-declared
-    here. Note this does NOT set ``dry_run`` -- that is a per-``check()``-call
+    here. The caps limits are read from ``ledger``'s activation records on
+    every decision (``policy/limits.py``): a profile's value applies only once
+    a signed activation binds it, a raise waits out the cooling-off, and each
+    decision's caps evidence names the source of every limit it applied. A
+    decision under an install whose profile no activation binds is denied
+    (``policy_binding``). ``clock`` (default: the wall clock) is the engine's
+    "now" for the cooling-off. Note this does NOT set ``dry_run`` -- that is a per-``check()``-call
     argument (``guards/engine.py``); a caller in ``mode="observe"`` must pass
     ``dry_run=True`` to every ``check()`` call itself (see this module's own
     docstring)."""
     return GuardEngine(
         ledger=ledger,
         caps_fold=installed.resolved.caps_fold(),
-        caps_minor=installed.resolved.caps_minor(),
-        per_action_minor=installed.resolved.per_action_minor(),
+        caps_limits=lambda signer: read_caps_limits(installed.resolved, ledger, signer),
+        clock=clock,
         per_action_reads=installed.resolved.per_action_reads(),
         signer_provider=signer_provider,
         manifest_digest=installed.resolved.manifest_digest,
