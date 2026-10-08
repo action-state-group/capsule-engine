@@ -44,6 +44,27 @@ def _wicket_dir(args: argparse.Namespace) -> Path:
     return Path(env) if env else DEFAULT_WICKET_DIR
 
 
+def _resolve_manifest(args: argparse.Namespace, *, strict: bool):
+    """The policy manifest that governs this replay (``--manifest``, default
+    the built-in one), resolved against the fold catalog (``_catalog_dir``)
+    and the wicket catalog (``--wicket-dir``). ``strict``: one that does not
+    resolve is an error (``None``, after saying why) rather than a warning."""
+    from ..policy import PolicyManifestError, load_manifest_file, resolve_manifest
+
+    manifest_path = Path(args.manifest) if getattr(args, "manifest", None) else DEFAULT_MANIFEST_PATH
+    try:
+        manifest = load_manifest_file(manifest_path)
+        return resolve_manifest(manifest, fold_catalog_dir=_catalog_dir(args), wicket_catalog_dir=_wicket_dir(args))
+    except PolicyManifestError as exc:
+        if strict:
+            print(f"capsule guard dry-run: policy manifest {manifest_path} did not resolve ({exc.reason}): {exc}",
+                  file=sys.stderr)
+        else:
+            print(f"warning: policy manifest {manifest_path} did not resolve ({exc.reason}: {exc}); "
+                  "proceeding without a manifest citation", file=sys.stderr)
+        return None
+
+
 def _resolve_manifest_digest(args: argparse.Namespace) -> str | None:
     """Resolve the policy manifest that governs this replay (``--manifest``,
     default the built-in one) against the same fold catalog this command is
@@ -55,20 +76,8 @@ def _resolve_manifest_digest(args: argparse.Namespace) -> str | None:
     a resolvable manifest citation. ``--no-manifest`` skips this entirely."""
     if getattr(args, "no_manifest", False):
         return None
-
-    from ..policy import PolicyManifestError, load_manifest_file, resolve_manifest
-
-    manifest_path = Path(args.manifest) if getattr(args, "manifest", None) else DEFAULT_MANIFEST_PATH
-    try:
-        manifest = load_manifest_file(manifest_path)
-        resolved = resolve_manifest(
-            manifest, fold_catalog_dir=_catalog_dir(args), wicket_catalog_dir=_wicket_dir(args)
-        )
-    except PolicyManifestError as exc:
-        print(f"warning: policy manifest {manifest_path} did not resolve ({exc.reason}: {exc}); "
-              "proceeding without a manifest citation", file=sys.stderr)
-        return None
-    return resolved.manifest_digest
+    resolved = _resolve_manifest(args, strict=False)
+    return resolved.manifest_digest if resolved is not None else None
 
 
 def _parse_cap_args(items: list[str]) -> dict[str, int] | None:
@@ -109,7 +118,28 @@ def _cmd_guard_dry_run(args: argparse.Namespace) -> int:
     since = None if args.since in (None, "all") else args.since
     fold_path = Path(args.fold_file) if args.fold_file else _catalog_dir(args) / "spend.weekly.yaml"
     caps_fold = load_definition_file(fold_path)
-    manifest_digest = _resolve_manifest_digest(args)
+    per_action_minor = None
+    per_action_reads = None
+    if getattr(args, "caps_from_manifest", False):
+        # The resolved manifest's own caps wicket: its window and per-action
+        # limits, and the fold it names. A --cap still sets a window limit.
+        if getattr(args, "no_manifest", False):
+            print("--caps-from-manifest needs a manifest: drop --no-manifest", file=sys.stderr)
+            return 1
+        resolved = _resolve_manifest(args, strict=True)
+        if resolved is None:
+            return 1
+        if not resolved.caps_minor():
+            print("capsule guard dry-run: --caps-from-manifest: the manifest configures no caps limits", file=sys.stderr)
+            return 1
+        caps_minor = {**resolved.caps_minor(), **caps_minor}
+        per_action_minor = resolved.per_action_minor() or None
+        per_action_reads = resolved.per_action_reads()
+        if not args.fold_file and resolved.caps_fold() is not None:
+            caps_fold = resolved.caps_fold()
+        manifest_digest = resolved.manifest_digest
+    else:
+        manifest_digest = _resolve_manifest_digest(args)
 
     proposed_caps_minor = None
     proposal_rationale = None
@@ -136,6 +166,8 @@ def _cmd_guard_dry_run(args: argparse.Namespace) -> int:
                 model_note=args.model_note,
                 model_id=args.model_id,
                 manifest_digest=manifest_digest,
+                per_action_minor=per_action_minor,
+                per_action_reads=per_action_reads,
             )
         return build_dry_run_report(
             args.ledger,
@@ -146,6 +178,8 @@ def _cmd_guard_dry_run(args: argparse.Namespace) -> int:
             model_note=args.model_note,
             model_id=args.model_id,
             manifest_digest=manifest_digest,
+            per_action_minor=per_action_minor,
+            per_action_reads=per_action_reads,
         )
 
     report = _build()
@@ -287,6 +321,11 @@ def add_parser(sub: argparse._SubParsersAction) -> argparse.ArgumentParser:
     p_dry_run.add_argument(
         "--wicket-dir", dest="wicket_dir",
         help="wicket catalog directory the manifest's wicket refs resolve against (default: built-in catalog, or $CAPSULE_WICKET_DIR)",
+    )
+    p_dry_run.add_argument(
+        "--caps-from-manifest", dest="caps_from_manifest", action="store_true",
+        help="apply the resolved manifest's caps wicket to the replay: its window and per-action limits "
+        "(e.g. caps/3.0.0) and the fold it names; --cap still sets a window limit (default: off, only --cap limits apply)",
     )
     p_dry_run.add_argument(
         "--no-manifest", dest="no_manifest", action="store_true",
