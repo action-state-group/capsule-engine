@@ -4,7 +4,8 @@ cites, cross-checking every pinned digest.
 
 A manifest that fails to resolve (a cited fold_id/wicket_id no longer
 exists, its current catalog digest no longer matches what the manifest
-pinned, or it names an evaluation ``engine`` this build doesn't recognize)
+pinned, it names an evaluation ``engine`` this build doesn't recognize, or
+the policy profile supplied is not the one it pins)
 is not "real, loadable" -- every caller in this task (``manifest show``,
 ``manifest activate``, ``guard dry-run``) treats a resolve failure as
 fail-closed, never a best-effort partial load.
@@ -21,6 +22,11 @@ from ..guards.wickets.catalog import Catalog as WicketCatalog
 from ..guards.wickets.definition import WicketDefinition
 from .errors import (
     FOLD_DIGEST_DRIFT,
+    PROFILE_DIGEST_DRIFT,
+    PROFILE_MISSING,
+    PROFILE_UNKNOWN_PACK,
+    PROFILE_UNKNOWN_PARAMETER,
+    PROFILE_UNPINNED,
     UNKNOWN_ENGINE,
     UNKNOWN_FOLD_ID,
     UNKNOWN_WICKET_ID,
@@ -28,6 +34,7 @@ from .errors import (
     PolicyManifestError,
 )
 from .manifest import Manifest
+from .profile import CONFIGURABLE, PolicyProfile, pack_name
 
 __all__ = ["SUPPORTED_FOLD_ENGINES", "SUPPORTED_WICKET_ENGINES", "ResolvedManifest", "resolve_manifest"]
 
@@ -47,20 +54,33 @@ class ResolvedManifest:
     manifest_digest: str
     folds: dict[str, FoldDefinition]
     wickets: dict[str, WicketDefinition]
+    # The profile the manifest pins, verified against its digest and against
+    # the wickets above. ``None`` when the manifest pins none.
+    profile: PolicyProfile | None = None
 
     def wicket_config(self, check: str) -> dict:
         """The declarative ``config`` of the (first) resolved wicket
-        configuring the given check, or ``{}`` if none is active."""
+        configuring the given check, or ``{}`` if none is active. These are
+        the pack's defaults; ``effective_values`` overlays the profile."""
         for wicket in self.wickets.values():
             if wicket.check == check:
                 return wicket.config
         return {}
 
+    def effective_values(self, check: str, key: str) -> dict[str, int]:
+        """The wicket's default ``config[key]`` with every value the profile
+        sets for that check laid over it -- what the check actually enforces."""
+        out = dict(self.wicket_config(check).get(key) or {})
+        if self.profile is not None:
+            for entry in self.profile.packs:
+                out.update(entry.parameters.get(check, {}).get(key, {}))
+        return out
+
     def caps_minor(self) -> dict[str, int]:
-        return dict(self.wicket_config("caps").get("caps_minor") or {})
+        return self.effective_values("caps", "caps_minor")
 
     def per_action_minor(self) -> dict[str, int]:
-        return dict(self.wicket_config("caps").get("per_action_minor") or {})
+        return self.effective_values("caps", "per_action_minor")
 
     def per_action_reads(self) -> str | None:
         return self.wicket_config("caps").get("per_action_reads")
@@ -85,8 +105,54 @@ class ResolvedManifest:
         return parse_plan_definition(config) if config else None
 
 
+def _check_profile(manifest: Manifest, profile: PolicyProfile | None, wickets: dict[str, WicketDefinition]) -> None:
+    """Fail closed unless ``profile`` is exactly the one the manifest pins and
+    every value in it replaces a default an installed pack's wicket declares."""
+    if manifest.profile_digest is None:
+        if profile is not None:
+            raise PolicyManifestError(
+                PROFILE_UNPINNED, "a profile was supplied but the manifest pins none, so nothing records it"
+            )
+        return
+    if profile is None:
+        raise PolicyManifestError(
+            PROFILE_MISSING, f"manifest pins profile {manifest.profile_digest}, but no profile was supplied"
+        )
+    if profile.profile_digest() != manifest.profile_digest:
+        raise PolicyManifestError(
+            PROFILE_DIGEST_DRIFT,
+            f"manifest pins profile {manifest.profile_digest}, but the supplied profile digests to "
+            f"{profile.profile_digest()}",
+        )
+    installed = {pack_name(p.pack_id) for p in manifest.packs}
+    for entry in profile.packs:
+        if entry.pack not in installed:
+            raise PolicyManifestError(
+                PROFILE_UNKNOWN_PACK, f"profile sets values for pack {entry.pack!r}, which the manifest does not install"
+            )
+        for check, keys in entry.parameters.items():
+            wicket = next((w for w in wickets.values() if w.check == check), None)
+            for key, values in keys.items():
+                if wicket is None or key not in CONFIGURABLE.get(check, frozenset()):
+                    raise PolicyManifestError(
+                        PROFILE_UNKNOWN_PARAMETER, f"profile sets {check}.{key}, which no installed wicket lets a user set"
+                    )
+                defaults = wicket.config.get(key) or {}
+                undeclared = sorted(set(values) - set(defaults))
+                if undeclared:
+                    raise PolicyManifestError(
+                        PROFILE_UNKNOWN_PARAMETER,
+                        f"profile sets {check}.{key} for {undeclared}, which wicket {wicket.wicket_id!r} declares "
+                        "no default for; a profile replaces a default, it never adds a limit",
+                    )
+
+
 def resolve_manifest(
-    manifest: Manifest, *, fold_catalog_dir: str | Path, wicket_catalog_dir: str | Path
+    manifest: Manifest,
+    *,
+    fold_catalog_dir: str | Path,
+    wicket_catalog_dir: str | Path,
+    profile: PolicyProfile | None = None,
 ) -> ResolvedManifest:
     fold_catalog = FoldCatalog(fold_catalog_dir)
     wicket_catalog = WicketCatalog(wicket_catalog_dir)
@@ -136,6 +202,8 @@ def resolve_manifest(
             )
         wickets[ref.wicket_id] = entry.definition
 
+    _check_profile(manifest, profile, wickets)
+
     return ResolvedManifest(
-        manifest=manifest, manifest_digest=manifest.manifest_digest(), folds=folds, wickets=wickets
+        manifest=manifest, manifest_digest=manifest.manifest_digest(), folds=folds, wickets=wickets, profile=profile
     )

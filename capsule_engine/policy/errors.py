@@ -21,6 +21,15 @@ FOLD_DIGEST_DRIFT = "fold_digest_drift"
 WICKET_DIGEST_DRIFT = "wicket_digest_drift"
 UNKNOWN_ENGINE = "unknown_engine"
 
+# Policy profile (``profile.py``): parse-time shape, then resolve-time
+# cross-checks against the manifest's pin and the resolved wickets.
+MALFORMED_PROFILE = "malformed_profile"
+PROFILE_MISSING = "profile_missing"
+PROFILE_UNPINNED = "profile_unpinned"
+PROFILE_DIGEST_DRIFT = "profile_digest_drift"
+PROFILE_UNKNOWN_PACK = "profile_unknown_pack"
+PROFILE_UNKNOWN_PARAMETER = "profile_unknown_parameter"
+
 
 class PolicyManifestError(ValueError):
     """A policy manifest fails to parse, validate, or resolve. Carries a named reason."""
