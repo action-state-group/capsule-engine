@@ -28,7 +28,7 @@ from pathlib import Path
 import yaml
 from capsule_ledger.ledger.api import LedgerAPI
 
-from ..guards.checks import CONFIGURED_CHECKS
+from ..guards.checks import RUNNABLE_CHECKS
 from ..guards.engine import GuardEngine
 from ..guards.signing import Signer
 from ..policy.activation import build_manifest_activation_capsule, find_latest_activation
@@ -173,7 +173,7 @@ def build_engine(
         per_action_reads=installed.resolved.per_action_reads(),
         signer_provider=signer_provider,
         manifest_digest=installed.resolved.manifest_digest,
-        wickets=installed.resolved.configured_wickets(frozenset(CONFIGURED_CHECKS)),
+        wickets=installed.resolved.configured_wickets(RUNNABLE_CHECKS),
     )
 
 

@@ -47,6 +47,16 @@ EXPECTED_DIGESTS = {
     "action_class_gate/1.0.0": "fcc352838832e13f5e87662f0194ec4a7065bc989bbe624b43ac5d9d1b638ae2",
     # An empty deny list; the user's list rides in a policy profile. No pack cites it yet.
     "counterparty_list/1.0.0": "d95162931a6c1f88c763f2fd221d63b238888c1bdd7c6d594123ee5671e18f65",
+    # The everyday pack 0.3.1 checks that each read one number, one member of
+    # a closed set, or one opaque reference.
+    "recipient_role/1.0.0": "917ab5edea21867f318b8dfd54a6d7b458cbabcc5cebfac6ff0c4861e918d43b",
+    "refundability/1.0.0": "410ad28fa2dd518502cbcbc00972d31ae4597722f17836ed2bf80e717f2f3294",
+    "material_fields_changed/1.0.0": "b7c98d710e48c8fc87d92abf2599b04b6ac9ac6f129eee6335edb742f1dbc02a",
+    "offer_fields_changed/1.0.0": "b1ca52ccdc821cbb57df844a10eb9e7d6242fff612fb5324c3c4f642d57f7ab1",
+    "recipient_seen_before/1.0.0": "df8803e9c4bdab9deff48e772fcd21ff813d00157068dd250a8a5c6b45cd6c44",
+    "channel_change/1.0.0": "fb580fc03afe1e641286c3ba62650d8e7150be91c6de0c6dac6a225a2eb6c793",
+    "upfront_amount/1.0.0": "30996a832fa0cd94dc9a64f11e69d903f73a6e6415bff4005a665460a0798a6f",
+    "task_authority/1.0.0": "bdb53ad1d4f3f18dc3a8ed5752c4429725df1df692f1e3b3687517f40074c150",
 }
 
 

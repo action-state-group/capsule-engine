@@ -201,6 +201,35 @@ def _sealed_counterparty(block: object) -> tuple[dict[str, str] | None, str | No
     return (usable, fp_alg) if usable else (None, None)
 
 
+_HEX64 = re.compile(r"^[0-9a-f]{64}$")
+
+
+def _text(value: object) -> str | None:
+    return value if isinstance(value, str) and value else None
+
+
+def _flag(value: object) -> bool | None:
+    return value if isinstance(value, bool) else None
+
+
+def _payee_target(counterparty_ids: dict[str, str] | None, fp_alg: str | None) -> str | None:
+    """The payee's sealed fingerprint as an opaque target,
+    ``payee-fp:<fp_alg>:<hex>``. Prefixed so it never compares equal to a
+    clear reference or to a fingerprint made by another algorithm; ``None``
+    when the record seals no payee fingerprint."""
+    payee = (counterparty_ids or {}).get("payee")
+    return f"payee-fp:{fp_alg}:{payee}" if payee and fp_alg else None
+
+
+def _typed_ref_digest(value: object) -> str | None:
+    """The digest of a typed record reference ``{type, digest_alg, digest}``
+    when it is a SHA-256 one, or ``None``."""
+    if not isinstance(value, dict) or not _text(value.get("type")) or value.get("digest_alg") != "SHA-256":
+        return None
+    digest = value.get("digest")
+    return digest if isinstance(digest, str) and _HEX64.match(digest) else None
+
+
 def _bridge_deal_check(record: dict, disclosed: dict | None) -> Action | None:
     """The proposed action a capsulectl deal check states, from its own
     sealed record: the class it names, and the amount a spend cap evaluates,
@@ -210,7 +239,13 @@ def _bridge_deal_check(record: dict, disclosed: dict | None) -> Action | None:
     the authorised maximum sealed beside it, is carried for a per-action cap
     and dropped when the money moved in.
     Only a check is an action here: the step that acts on it is the same
-    payment, and counting both would count it twice."""
+    payment, and counting both would count it twice.
+    The rail and ``refundable`` come from the body's ``recourse`` block, where
+    the producer writes them (a top-level ``rail`` is read when there is no
+    recourse rail). The target is the payee's sealed fingerprint
+    (``_payee_target``). The remaining body fields are carried only in the
+    shape the action takes: a string, a boolean, an integer, or the SHA-256
+    digest of a typed reference, and dropped otherwise."""
     if disclosed is None or not _bound(record, disclosed):
         return None
     body = _checked_body(disclosed)
@@ -222,6 +257,7 @@ def _bridge_deal_check(record: dict, disclosed: dict | None) -> Action | None:
         spend = 0  # money arriving is never spend, whatever spend_minor says
         authorized = None
     counterparty_ids, fp_alg = _sealed_counterparty((disclosed.get("x-deal-v0") or {}).get("counterparty"))
+    recourse = body.get("recourse") if isinstance(body.get("recourse"), dict) else {}
     return Action(
         verb=str(body.get("action") or "unknown"),
         operator=record.get("operator", ""),
@@ -233,10 +269,21 @@ def _bridge_deal_check(record: dict, disclosed: dict | None) -> Action | None:
         amount_minor=_minor(spend),
         spend_authorized_minor=_minor(authorized),
         currency=body.get("currency"),
-        rail=body.get("rail"),
+        rail=_text(recourse.get("rail")) or _text(body.get("rail")),
+        target=_payee_target(counterparty_ids, fp_alg),
         taxonomy_version=body["taxonomy_version"],
         counterparty_ids=counterparty_ids,
         counterparty_fp_alg=fp_alg,
+        refundable=_flag(recourse.get("refundable")),
+        recipient_role=_text(body.get("recipient_role")),
+        channel=_text(body.get("channel")),
+        first_contact_channel=_text(body.get("first_contact_channel")),
+        upfront_amount_minor=_minor(body.get("upfront_amount_minor")),
+        material_fields_changed=_minor(body.get("material_fields_changed")),
+        material_fields_basis=_text(body.get("material_fields_basis")),
+        offer_fields_changed=_minor(body.get("offer_fields_changed")),
+        offer_fields_basis=_text(body.get("offer_fields_basis")),
+        task_authority_ref=_typed_ref_digest(body.get("task_authority_ref")),
     )
 
 

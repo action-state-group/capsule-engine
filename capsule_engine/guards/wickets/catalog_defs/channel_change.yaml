@@ -1,0 +1,10 @@
+# channel_change wicket: compare Action.channel, the channel kind in use at
+# this action, with Action.first_contact_channel, the one the relationship
+# started on, both off the same record (guards/checks/channel_change.py).
+# `seeded_channels` is the producer's seeded channel set; a value outside it
+# is compared the same way and recorded as not seeded.
+wicket_id: channel_change/1.0.0
+check: channel_change
+config:
+  action_classes: [money.purchase, money.transfer, money.subscription, booking.create, booking.modify, agreement.accept, marketplace.offer, external_commitment.other, communication.send, comms.external]
+  seeded_channels: [marketplace, web, sms, phone_call, email, app_chat, whatsapp, telegram, signal, in_person, other]

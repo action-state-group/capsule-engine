@@ -1,0 +1,16 @@
+# recipient_seen_before wicket: counterparty_seen_before's check and fold,
+# counterparty.seen_before/2.0.0, applied to messages
+# (guards/checks/counterparty_seen_before.py). The fold counts the
+# operator's accepted, not-dry-run actions keyed by asg_payload.target, the
+# recipient of a message. Zero fails: nothing accepted has been addressed to
+# this recipient before.
+#
+# `fold_digest` is the real `definition_digest()` of
+# folds/catalog_defs/counterparty.seen_before.v2.yaml; the check refuses to
+# run when the catalog fold does not match it.
+wicket_id: recipient_seen_before/1.0.0
+check: recipient_seen_before
+config:
+  fold_id: counterparty.seen_before/2.0.0
+  fold_digest: 6a1a357e4a3b950b7397c2790fe46c03f7e645d04aad1a9bb41533df9b4a4033
+  action_classes: [communication.send, comms.external]

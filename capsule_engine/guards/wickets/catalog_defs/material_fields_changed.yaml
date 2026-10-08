@@ -1,0 +1,14 @@
+# material_fields_changed wicket: a count, from the producer, of the fields
+# in `counted_fields` that differ from what the user approved
+# (guards/checks/field_change_count.py). The producer also sends the digest
+# of the list it counted over, and the count is read only when that digest is
+# this list's. The list is policy data, so a change to it moves this
+# definition's digest. A key counts as changed when it is on one side only,
+# or on both with unequal values; terms.conditions counts as one key. Fails
+# when the count is above `max_changed`.
+wicket_id: material_fields_changed/1.0.0
+check: material_fields_changed
+config:
+  action_classes: [money.purchase, money.transfer, money.subscription, booking.create, booking.modify, agreement.accept, marketplace.offer, external_commitment.other]
+  counted_fields: [terms.item, terms.quantity, terms.price_minor, terms.deposit_minor, terms.currency, terms.when, terms.place, terms.conditions, recourse.rail, recourse.refundable, who.payee]
+  max_changed: 0

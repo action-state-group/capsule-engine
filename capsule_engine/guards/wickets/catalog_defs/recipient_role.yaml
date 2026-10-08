@@ -1,0 +1,11 @@
+# recipient_role wicket: membership of the role of whoever receives a
+# disclosure (guards/checks/recipient_role.py). `roles` is the closed set a
+# role must come from; one outside it fails closed. The check passes when the
+# role is in `allowed_roles`. Both lists are policy data, so a change to
+# either moves this definition's digest.
+wicket_id: recipient_role/1.0.0
+check: recipient_role
+config:
+  action_classes: [disclosure.personal]
+  roles: [fulfilling_merchant, third_party, self]
+  allowed_roles: [fulfilling_merchant, self]

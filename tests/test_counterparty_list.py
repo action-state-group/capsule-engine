@@ -344,7 +344,8 @@ def test_the_deal_bridge_carries_the_checks_sealed_counterparty_ids():
     sealed = record["x-deal-v0"]["counterparty"]
     assert action.counterparty_ids == sealed["ids"]
     assert action.counterparty_fp_alg == sealed["fp_alg"]
-    assert action.target is None
+    # The target is the payee fingerprint, prefixed so it never equals a clear reference.
+    assert action.target == f"payee-fp:{sealed['fp_alg']}:{sealed['ids']['payee']}"
 
 
 def test_a_real_pay_check_whose_payee_is_on_a_deny_list_is_denied_on_replay():

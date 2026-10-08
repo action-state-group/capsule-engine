@@ -67,6 +67,23 @@ class Action:
     value they fingerprint never reaches the guard.
     ``recurrence`` says whether a payment repeats (e.g. ``"one_time"``,
     ``"monthly"``), read by ``recurring_charge``.
+    The fields below are each one number, one member of a closed set, or one
+    opaque reference, never an object, a diff or text, and each is sealed on
+    the capsule when set. ``recipient_role`` is the role of whoever receives a
+    disclosure (``fulfilling_merchant``, ``third_party``, ``self``), read by
+    ``recipient_role``. ``refundable`` is whether the payment can be refunded,
+    read by ``refundability``. ``material_fields_changed`` and
+    ``offer_fields_changed`` count how many fields on a list pinned in the
+    wicket config differ from what the user approved or stated, and
+    ``material_fields_basis``/``offer_fields_basis`` are the digest of the
+    list the producer counted over, read by the checks of the same names.
+    ``channel`` is the kind of channel the counterparty is using now and
+    ``first_contact_channel`` the one the relationship started on (``email``,
+    ``sms``, ...), never an address, read by ``channel_change``.
+    ``upfront_amount_minor`` is the stated deposit, in the same minor units
+    as ``amount_minor``, read by ``upfront_amount``. ``task_authority_ref`` is
+    the SHA-256 digest of the sealed task-authority record the action cites,
+    read by ``task_authority``.
     ``taxonomy_version`` (normally ``classes.TAXONOMY_VERSION``) is sealed
     beside ``action_class`` when set, so a count over trigger classes can be
     recomputed against the table that was live; unset, the record keeps its
@@ -96,6 +113,16 @@ class Action:
     spend_authorized_minor: int | None = None
     counterparty_ids: dict[str, str] | None = None
     counterparty_fp_alg: str | None = None
+    recipient_role: str | None = None
+    refundable: bool | None = None
+    material_fields_changed: int | None = None
+    material_fields_basis: str | None = None
+    offer_fields_changed: int | None = None
+    offer_fields_basis: str | None = None
+    channel: str | None = None
+    first_contact_channel: str | None = None
+    upfront_amount_minor: int | None = None
+    task_authority_ref: str | None = None
 
     def __post_init__(self) -> None:
         if self.counterparty_account_ref is not None and _looks_like_raw_account_number(

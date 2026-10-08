@@ -189,6 +189,23 @@ def _payload_extension(action: Action, checkpoint: dict, manifest_digest: str | 
         ext["counterparty_account_ref"] = action.counterparty_account_ref
     if action.recurrence is not None:
         ext["recurrence"] = action.recurrence
+    # Optional scalars sealed under their own name when set, so a record
+    # without them keeps its prior bytes.
+    scalars = (
+        ("recipient_role", action.recipient_role),
+        ("refundable", action.refundable),
+        ("material_fields_changed", action.material_fields_changed),
+        ("material_fields_basis", action.material_fields_basis),
+        ("offer_fields_changed", action.offer_fields_changed),
+        ("offer_fields_basis", action.offer_fields_basis),
+        ("channel", action.channel),
+        ("first_contact_channel", action.first_contact_channel),
+        ("upfront_amount_minor", action.upfront_amount_minor),
+        ("task_authority_ref", action.task_authority_ref),
+    )
+    for name, value in scalars:
+        if value is not None:
+            ext[name] = value
     if action.taxonomy_version is not None:
         # Written only when set, so existing records keep their bytes; read
         # back with ``classes.record_taxonomy_version``.

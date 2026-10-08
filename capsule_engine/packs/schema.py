@@ -125,6 +125,16 @@ NORMALIZED_ACTION_FIELDS = frozenset(
         "counterparty_account_ref",
         "outgoing_content",
         "recurrence",
+        "recipient_role",
+        "refundable",
+        "material_fields_changed",
+        "material_fields_basis",
+        "offer_fields_changed",
+        "offer_fields_basis",
+        "channel",
+        "first_contact_channel",
+        "upfront_amount_minor",
+        "task_authority_ref",
     }
 )
 

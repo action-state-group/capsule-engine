@@ -1,0 +1,7 @@
+# refundability wicket: fails a payment that declares it cannot be refunded
+# (guards/checks/refundability.py), for actions in `action_classes`: the
+# classes that commit money or a booking, the same list caps/5.0.0 limits.
+wicket_id: refundability/1.0.0
+check: refundability
+config:
+  action_classes: [money.purchase, money.transfer, money.subscription, booking.create, booking.modify, agreement.accept, marketplace.offer, external_commitment.other]

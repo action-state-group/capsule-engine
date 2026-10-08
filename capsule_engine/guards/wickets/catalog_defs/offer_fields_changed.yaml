@@ -1,0 +1,10 @@
+# offer_fields_changed wicket: a count, from the producer, of the fields in
+# `counted_fields` on which the offer being accepted differs from what the
+# user stated (guards/checks/field_change_count.py). Read the same way as
+# material_fields_changed/1.0.0, over its own list.
+wicket_id: offer_fields_changed/1.0.0
+check: offer_fields_changed
+config:
+  action_classes: [money.purchase, money.transfer, money.subscription, booking.create, booking.modify, agreement.accept, marketplace.offer, external_commitment.other]
+  counted_fields: [terms.item, terms.quantity, terms.price_minor, terms.deposit_minor, terms.conditions, recourse.refundable]
+  max_changed: 0

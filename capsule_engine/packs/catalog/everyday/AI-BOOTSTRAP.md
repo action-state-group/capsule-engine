@@ -8,8 +8,8 @@ whose payment and messaging code you want covered by the `everyday` pack.
 You are helping me wire `capsule-engine`'s `everyday` pack into this
 codebase. The pack records a decision for each payment, purchase, booking
 and outgoing message an assistant makes on a household's behalf, and runs
-eight deterministic checks over the recorded fields. It carries 27 rules:
-16 are measured by those checks, and 11 are declared not measured (see
+sixteen deterministic checks over the recorded fields. It carries 27 rules:
+24 are measured by those checks, and 3 are declared not measured (see
 below). It governs four action types:
 
 - `payment.make`, mapped to the `money.transfer` guard class;
@@ -32,6 +32,17 @@ invent others):
 | `outgoing_content` | `credential_pattern` | the text the action sends; it is matched and then discarded, never recorded |
 | `recurrence` | `recurring_charge` | whether the payment repeats: `"one_time"`, or e.g. `"monthly"` for a subscription |
 | `equivalence_key` | `dedupe` | optional: your own idempotency key, if two payments to one payee are genuinely different payments (two monthly bills) |
+| `recipient_role` | `recipient_role` | on a personal-data disclosure: the receiver's role, exactly one of `"fulfilling_merchant"`, `"third_party"`, `"self"`; a role, never a name |
+| `refundable` | `refundability` | `true` or `false`: whether the payment can be refunded |
+| `material_fields_changed`, `material_fields_basis` | `material_fields_changed` | an integer count of the fields on the check's pinned list that differ from what the user approved, and the SHA-256 (over JCS bytes) of that list; the count is read only when the digest matches |
+| `offer_fields_changed`, `offer_fields_basis` | `offer_fields_changed` | the same, over the offer list, against what the user stated |
+| `channel`, `first_contact_channel` | `channel_change` | the kind of channel in use now and the one the relationship started on, e.g. `"marketplace"`, `"email"`, `"whatsapp"`; a kind, never an address |
+| `upfront_amount_minor` | `upfront_amount` | the stated deposit, an integer in the same minor units as `amount_minor` |
+| `task_authority_ref` | `task_authority` | the SHA-256 digest of the whole sealed task-authority record the action cites; the whole record is passed as `guard_engine.check(action, task_authority_record=record)`, the engine recomputes its digest, and the plan inside it (`outcome_id`, `allowed_actions`, `preconditions`) is read only when that digest matches |
+
+Every one of these is a single number, a member of a small closed set, or
+an opaque reference. None is an object, a list, a difference or free text;
+leave a field unset when you do not have it, never `0` or `""`.
 
 **The checks** (each one is a wicket cited by digest from the engine's own
 catalog):
@@ -67,13 +78,31 @@ catalog):
    purchase from a merchant the operator has no accepted earlier action with
    is flagged; a dry run does not count as an earlier action. The record
    names the count and the key it was read under.
+9. `recipient_role` (`recipient_role/1.0.0`) -- a personal-data disclosure
+   passes for the fulfilling merchant or the user and is flagged for a third
+   party; a role outside the set is flagged.
+10. `refundability` (`refundability/1.0.0`) -- a payment declared not
+    refundable is flagged.
+11. `material_fields_changed` (`material_fields_changed/1.0.0`) -- any
+    change on the pinned material list (item, quantity, price, deposit,
+    currency, date, place, conditions, rail, refundability, payee) is
+    flagged.
+12. `offer_fields_changed` (`offer_fields_changed/1.0.0`) -- any change on
+    the pinned offer list (item, quantity, price, deposit, conditions,
+    refundability) is flagged.
+13. `recipient_seen_before` (`recipient_seen_before/1.0.0`) -- a message to
+    a recipient the operator has no accepted earlier action addressed to is
+    flagged, read with the same fold as `counterparty_seen_before`.
+14. `channel_change` (`channel_change/1.0.0`) -- `channel` differing from
+    `first_contact_channel` on the same action is flagged.
+15. `upfront_amount` (`upfront_amount/1.0.0`) -- a deposit above 100.00, or
+    above 25% of `amount_minor`, is flagged.
+16. `task_authority` (`task_authority/1.0.0`) -- an action outside the
+    allowed actions of the task-authority record it cites is flagged.
 
-**Rules declared not measured.** 11 of the 27 rules need an input no action
-records yet: the bounds the user confirmed for a task, refund and reversal
-terms, a field-by-field difference against an approved action, the
-recipient's role or history, a message classified as committing, a channel
-change, an up-front amount, where an instruction came from, and the user's
-control state. Each one is in `pack.yaml` with `measurability:
+**Rules declared not measured.** 3 of the 27 rules need an input no action
+records yet: a message classified as committing, where an instruction came
+from, and the user's control state. Each one is in `pack.yaml` with `measurability:
 declared_not_measured` and the `evidence_instrument` field its input would
 arrive in. It cites no check and is never evaluated: a decision record
 carries nothing for it. Do not invent those fields to make a rule apply.

@@ -1,0 +1,11 @@
+# upfront_amount wicket: the deposit a payment states, read as
+# Action.upfront_amount_minor
+# (guards/checks/upfront_amount.py). Fails above `upfront_max_minor`, or
+# above `upfront_max_bps` basis points of the total. Default limits:
+# 100.00 and 25%, in the action's own minor units.
+wicket_id: upfront_amount/1.0.0
+check: upfront_amount
+config:
+  action_classes: [money.purchase, money.transfer, money.subscription, booking.create, booking.modify, agreement.accept, marketplace.offer, external_commitment.other]
+  upfront_max_minor: 10000
+  upfront_max_bps: 2500

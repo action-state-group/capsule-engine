@@ -48,8 +48,10 @@ WICKET_ID_RE = re.compile(r"^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)*/\d+\.\d+\.\d+$"
 # pack can add to a decision (``destination_rail``,
 # ``counterparty_identity_change``, ``counterparty_seen_before``,
 # ``credential_pattern``, ``recurring_charge``, ``action_class_gate``,
-# ``counterparty_list`` --
-# ``guards/checks/__init__.py``'s ``CONFIGURED_CHECKS``). Closed for
+# ``counterparty_list``, ``recipient_role``, ``refundability``,
+# ``material_fields_changed``, ``offer_fields_changed``,
+# ``recipient_seen_before``, ``channel_change``, ``upfront_amount``,
+# ``task_authority`` -- ``guards/checks/__init__.py``'s ``RUNNABLE_CHECKS``). Closed for
 # the same reason ``folds/definition.py``'s ``KNOWN_REDUCERS`` is: an
 # unregistered name is a typo or a not-yet-built check, never silently
 # accepted as data.
@@ -67,6 +69,14 @@ KNOWN_CHECKS = frozenset(
         "recurring_charge",
         "action_class_gate",
         "counterparty_list",
+        "recipient_role",
+        "refundability",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "channel_change",
+        "upfront_amount",
+        "task_authority",
     }
 )
 
