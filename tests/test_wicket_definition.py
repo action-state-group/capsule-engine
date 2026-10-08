@@ -45,6 +45,8 @@ EXPECTED_DIGESTS = {
     "counterparty_seen_before/2.0.0": "c82a29eae8ef72736851d275ffa4d85e511a21d202822366d3b03bf3834c8cd0",
     # Taxonomy-only selectors, no fold (guards/checks/action_class_gate.py).
     "action_class_gate/1.0.0": "fcc352838832e13f5e87662f0194ec4a7065bc989bbe624b43ac5d9d1b638ae2",
+    # An empty deny list; the user's list rides in a policy profile. No pack cites it yet.
+    "counterparty_list/1.0.0": "d95162931a6c1f88c763f2fd221d63b238888c1bdd7c6d594123ee5671e18f65",
 }
 
 

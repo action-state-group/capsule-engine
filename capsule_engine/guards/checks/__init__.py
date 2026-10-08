@@ -15,6 +15,7 @@ from .action_class_gate import check_action_class_gate
 from .base import CheckOutcome
 from .caps import LimitSources, cap_for, check_caps, require_per_action_reads, resolve_caps_minor
 from .counterparty_identity_change import check_counterparty_identity_change
+from .counterparty_list import check_counterparty_list, require_disposition
 from .counterparty_seen_before import check_counterparty_seen_before, seen_before_fold
 from .credential_pattern import check_credential_pattern
 from .dedupe import check_dedupe
@@ -43,6 +44,9 @@ CONFIGURED_CHECKS: dict[str, Callable[[Action, LedgerAPI, dict], CheckOutcome]] 
         action, one_time_values=config["one_time_values"], action_classes=config["action_classes"]
     ),
     "action_class_gate": lambda action, ledger, config: check_action_class_gate(action, selectors=config["selectors"]),
+    "counterparty_list": lambda action, ledger, config: check_counterparty_list(
+        action, mode=config["mode"], entries=config["entries"], action_classes=config["action_classes"]
+    ),
 }
 
 __all__ = [
@@ -53,6 +57,7 @@ __all__ = [
     "check_action_class_gate",
     "check_caps",
     "check_counterparty_identity_change",
+    "check_counterparty_list",
     "check_counterparty_seen_before",
     "check_credential_pattern",
     "check_dedupe",
@@ -60,6 +65,7 @@ __all__ = [
     "check_plan_containment",
     "check_recurring_charge",
     "check_verify_before_dispatch",
+    "require_disposition",
     "require_per_action_reads",
     "resolve_caps_minor",
     "seen_before_fold",
