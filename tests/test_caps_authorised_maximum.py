@@ -278,3 +278,58 @@ def test_a_manifest_pinning_caps_v5_denies_the_buffered_deal_check_on_replay():
     assert caps.result == "fail"
     assert caps.evidence["per_action_basis"]["field"] == "spend_authorized_minor"
     assert caps.evidence["tripped"][0]["observed_minor"] == 2_600
+
+
+EVERYDAY_DIR = PACKAGE_DIR / "packs" / "catalog" / "everyday"
+
+# A pay check as the deal profile seals it: the expected capture, and the
+# most the payment may take when the check states an authorised maximum.
+BUFFERED_PAY = DealCheckBody(
+    amount_minor=CAPTURE, authorized_max_minor=AUTHORIZED, spend_minor=CAPTURE, spend_authorized_minor=AUTHORIZED
+)
+UNBUFFERED_PAY = DealCheckBody(amount_minor=CAPTURE, spend_minor=CAPTURE)
+
+
+def _everyday_engine(store, signer, tmp_path):
+    """The everyday pack installed with a user-accepted per-action limit of
+    ``PER_ACTION`` on purchases, built into an engine."""
+    from capsule_engine.packs import accept_thresholds, build_engine, install_pack, load_pack_dir
+
+    pack = accept_thresholds(load_pack_dir(EVERYDAY_DIR), {}, accepted_per_action={"money.purchase": PER_ACTION})
+    installed = install_pack(pack, project_dir=tmp_path / "project", mode="enforce")
+    return build_engine(installed, ledger=store, signer_provider=lambda: signer)
+
+
+def test_the_everyday_pack_cites_caps_v5():
+    from capsule_engine.packs import load_pack_dir
+
+    pack = load_pack_dir(EVERYDAY_DIR)
+    assert pack.pack_id == "asg/everyday/0.2.1"
+    (caps,) = [w for w in pack.constraints if w.check == "caps"]
+    assert caps.wicket_id == "caps/5.0.0"
+    assert caps.config["per_action_reads"] == "spend_authorized_minor"
+
+
+def test_the_installed_everyday_pack_denies_a_pay_check_whose_authorised_maximum_is_over_the_limit(
+    store, signer, tmp_path
+):
+    action = action_for_record(*_bound_check(BUFFERED_PAY))
+    decision = _everyday_engine(store, signer, tmp_path).check(action)
+    caps = _caps(decision)
+    assert decision.outcome == "deny"
+    assert caps.result == "fail"
+    assert caps.evidence["per_action_basis"] == {
+        "field": "spend_authorized_minor",
+        "fell_back": False,
+        "observed_minor": AUTHORIZED,
+    }
+    assert caps.evidence["tripped"] == [{"limit": "per_action", "threshold_minor": PER_ACTION, "observed_minor": AUTHORIZED}]
+
+
+def test_the_installed_everyday_pack_reads_the_capture_when_no_authorised_maximum_was_declared(
+    store, signer, tmp_path
+):
+    action = action_for_record(*_bound_check(UNBUFFERED_PAY))
+    caps = _caps(_everyday_engine(store, signer, tmp_path).check(action))
+    assert caps.result == "pass"
+    assert caps.evidence["per_action_basis"] == {"field": "spend_minor", "fell_back": True, "observed_minor": CAPTURE}
