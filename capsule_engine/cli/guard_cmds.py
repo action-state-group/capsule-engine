@@ -119,6 +119,7 @@ def _cmd_guard_dry_run(args: argparse.Namespace) -> int:
     fold_path = Path(args.fold_file) if args.fold_file else _catalog_dir(args) / "spend.weekly.yaml"
     caps_fold = load_definition_file(fold_path)
     per_action_minor = None
+    per_action_reads = None
     if getattr(args, "caps_from_manifest", False):
         # The resolved manifest's own caps wicket: its window and per-action
         # limits, and the fold it names. A --cap still sets a window limit.
@@ -133,6 +134,7 @@ def _cmd_guard_dry_run(args: argparse.Namespace) -> int:
             return 1
         caps_minor = {**resolved.caps_minor(), **caps_minor}
         per_action_minor = resolved.per_action_minor() or None
+        per_action_reads = resolved.per_action_reads()
         if not args.fold_file and resolved.caps_fold() is not None:
             caps_fold = resolved.caps_fold()
         manifest_digest = resolved.manifest_digest
@@ -165,6 +167,7 @@ def _cmd_guard_dry_run(args: argparse.Namespace) -> int:
                 model_id=args.model_id,
                 manifest_digest=manifest_digest,
                 per_action_minor=per_action_minor,
+                per_action_reads=per_action_reads,
             )
         return build_dry_run_report(
             args.ledger,
@@ -176,6 +179,7 @@ def _cmd_guard_dry_run(args: argparse.Namespace) -> int:
             model_id=args.model_id,
             manifest_digest=manifest_digest,
             per_action_minor=per_action_minor,
+            per_action_reads=per_action_reads,
         )
 
     report = _build()

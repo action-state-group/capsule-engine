@@ -112,6 +112,7 @@ def build_dry_run_report(
     model_id: str | None = None,
     manifest_digest: str | None = None,
     per_action_minor: dict[str, int] | None = None,
+    per_action_reads: str | None = None,
 ) -> DryRunReport:
     all_records = load_records(ledger_paths)
     replayed_records = filter_since(all_records, since)
@@ -121,6 +122,7 @@ def build_dry_run_report(
         caps_minor=caps_minor,
         manifest_digest=manifest_digest,
         per_action_minor=per_action_minor,
+        per_action_reads=per_action_reads,
         disclosed=load_disclosed(ledger_paths),
     )
 
@@ -178,6 +180,7 @@ def build_dry_run_report_with_proposal(
     model_id: str | None = None,
     manifest_digest: str | None = None,
     per_action_minor: dict[str, int] | None = None,
+    per_action_reads: str | None = None,
 ) -> DryRunReport:
     """Extends ``build_dry_run_report``'s report with one additional
     section: actions that were ``allow`` under the currently-configured
@@ -201,6 +204,7 @@ def build_dry_run_report_with_proposal(
         model_id=model_id,
         manifest_digest=manifest_digest,
         per_action_minor=per_action_minor,
+        per_action_reads=per_action_reads,
     )
 
     all_records = load_records(ledger_paths)
@@ -212,6 +216,7 @@ def build_dry_run_report_with_proposal(
         caps_minor=caps_minor,
         manifest_digest=manifest_digest,
         per_action_minor=per_action_minor,
+        per_action_reads=per_action_reads,
         disclosed=disclosed,
     )
     proposed = replay(
@@ -220,6 +225,7 @@ def build_dry_run_report_with_proposal(
         caps_minor=proposed_caps_minor,
         manifest_digest=manifest_digest,
         per_action_minor=per_action_minor,
+        per_action_reads=per_action_reads,
         disclosed=disclosed,
     )
 

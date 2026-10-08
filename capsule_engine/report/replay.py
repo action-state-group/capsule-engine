@@ -182,12 +182,18 @@ def _checked_body(disclosed: dict) -> dict | None:
     return body if isinstance(body, dict) else None
 
 
+def _minor(value: object) -> int | None:
+    return value if isinstance(value, int) and not isinstance(value, bool) else None
+
+
 def _bridge_deal_check(record: dict, disclosed: dict | None) -> Action | None:
     """The proposed action a capsulectl deal check states, from its own
     sealed record: the class it names, and the amount a spend cap evaluates,
     which is ``spend_minor`` only: never ``amount_minor`` (on a cancel it is
     a refund) or ``cancelled_amount_minor``, and ``0`` for a record that says
-    the money moved in. So a cancel is never spend.
+    the money moved in. So a cancel is never spend. ``spend_authorized_minor``,
+    the authorised maximum sealed beside it, is carried for a per-action cap
+    and dropped when the money moved in.
     Only a check is an action here: the step that acts on it is the same
     payment, and counting both would count it twice."""
     if disclosed is None or not _bound(record, disclosed):
@@ -196,8 +202,10 @@ def _bridge_deal_check(record: dict, disclosed: dict | None) -> Action | None:
     if body is None or not body.get("action_class") or not body.get("taxonomy_version"):
         return None
     spend = body.get("spend_minor")
+    authorized = body.get("spend_authorized_minor")
     if body.get("direction") == "in":
         spend = 0  # money arriving is never spend, whatever spend_minor says
+        authorized = None
     return Action(
         verb=str(body.get("action") or "unknown"),
         operator=record.get("operator", ""),
@@ -206,7 +214,8 @@ def _bridge_deal_check(record: dict, disclosed: dict | None) -> Action | None:
         action_id=record.get("action_id") or None,
         action_type=record.get("action_type", "decide"),
         timestamp=record.get("timestamp"),
-        amount_minor=spend if isinstance(spend, int) and not isinstance(spend, bool) else None,
+        amount_minor=_minor(spend),
+        spend_authorized_minor=_minor(authorized),
         currency=body.get("currency"),
         rail=body.get("rail"),
         taxonomy_version=body["taxonomy_version"],
@@ -248,6 +257,7 @@ def replay(
     caps_minor: dict[str, int] | None = None,
     manifest_digest: str | None = None,
     per_action_minor: dict[str, int] | None = None,
+    per_action_reads: str | None = None,
     disclosed: dict[str, dict] | None = None,
 ) -> ReplayResult:
     """Feed every record through a fresh ``GuardEngine`` in dry-run mode, in
@@ -269,6 +279,7 @@ def replay(
             signer_provider=lambda: signer,
             caps_minor=caps_minor or {},
             per_action_minor=per_action_minor,
+            per_action_reads=per_action_reads,
             manifest_digest=manifest_digest,
         )
         for record in records:
