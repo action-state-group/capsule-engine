@@ -40,7 +40,11 @@ class Action:
     absent or unrecognized both resolve to the consequential/fail-closed
     default. ``amount_minor``/``currency`` are integer-minor-units money
     fields (never floats, per the fold engine's own determinism rule) read
-    by the ``caps`` check. ``target`` is an optional dedupe discriminator
+    by the ``caps`` check; ``amount_minor`` is the expected capture.
+    ``spend_authorized_minor`` is the most the payment may take when that was
+    declared (a card hold, a pre-authorisation with a buffer), read by a caps
+    per-action limit configured with ``per_action_reads``; it is never sealed
+    on the capsule's payload, so the rolling total never sums it. ``target`` is an optional dedupe discriminator
     (e.g. a counterparty or recipient reference). ``cited_mandate_capsule_id``
     is the prior capsule this action claims authorization from, checked by
     ``verify_before_dispatch``. ``equivalence_key`` lets a caller override the
@@ -84,6 +88,7 @@ class Action:
     recurrence: str | None = None
     extra: dict = field(default_factory=dict)
     taxonomy_version: str | None = None
+    spend_authorized_minor: int | None = None
 
     def __post_init__(self) -> None:
         if self.counterparty_account_ref is not None and _looks_like_raw_account_number(
