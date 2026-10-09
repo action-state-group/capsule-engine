@@ -1,0 +1,14 @@
+# single_commitment wicket, configured for a seller (guards/checks/
+# single_commitment.py). One sale, several buyer threads: once an acceptance
+# is sealed for a task_authority_ref and an item_ref, a commitment for the
+# same pair fails unless it cites that acceptance and is addressed to the
+# counterparty that accepted. A failure refuses; it never asks.
+#
+# `acceptance_classes` are the classes whose accepted, non-dry-run record
+# seals the acceptance. `commit_classes` are the commitments the rule
+# applies to; anything else (a message, a disclosure) is n/a.
+wicket_id: seller.single_commitment/1.0.0
+check: single_commitment
+config:
+  acceptance_classes: [agreement.accept]
+  commit_classes: [agreement.accept, marketplace.offer, marketplace.sale, external_commitment.other]

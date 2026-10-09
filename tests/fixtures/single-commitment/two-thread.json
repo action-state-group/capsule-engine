@@ -1,0 +1,279 @@
+{
+  "wicket_id": "seller.single_commitment/1.0.0",
+  "note": "Steps run in order through one engine and one ledger with only this wicket configured. cites_step is replaced by that step's capsule id as cited_mandate_capsule_id; acceptance_step names the step whose capsule id the evidence must carry.",
+  "vectors": [
+    {
+      "name": "a-accepts-then-b-commits",
+      "steps": [
+        {
+          "id": "a-accept",
+          "action": {
+            "verb": "accept",
+            "action_id": "accept/a",
+            "operator": "household",
+            "developer": "assistant@v1",
+            "action_class": "agreement.accept",
+            "target": "buyer/ref-a",
+            "timestamp": "2026-10-08T08:00:00Z",
+            "task_authority_ref": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "item_ref": "item/ref-1",
+            "amount_minor": 175000,
+            "currency": "USD"
+          },
+          "expect": {
+            "single_commitment": "pass",
+            "outcome": "allow"
+          }
+        },
+        {
+          "id": "b-offer",
+          "action": {
+            "verb": "offer",
+            "action_id": "offer/b",
+            "operator": "household",
+            "developer": "assistant@v1",
+            "action_class": "marketplace.offer",
+            "target": "buyer/ref-b",
+            "timestamp": "2026-10-08T09:00:00Z",
+            "task_authority_ref": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "item_ref": "item/ref-1",
+            "amount_minor": 175000,
+            "currency": "USD"
+          },
+          "expect": {
+            "single_commitment": "fail",
+            "outcome": "deny",
+            "acceptance_step": "a-accept"
+          }
+        }
+      ]
+    },
+    {
+      "name": "b-commits-before-a-accepts",
+      "steps": [
+        {
+          "id": "b-offer",
+          "action": {
+            "verb": "offer",
+            "action_id": "offer/b",
+            "operator": "household",
+            "developer": "assistant@v1",
+            "action_class": "marketplace.offer",
+            "target": "buyer/ref-b",
+            "timestamp": "2026-10-08T07:00:00Z",
+            "task_authority_ref": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "item_ref": "item/ref-1",
+            "amount_minor": 175000,
+            "currency": "USD"
+          },
+          "expect": {
+            "single_commitment": "pass",
+            "outcome": "allow"
+          }
+        },
+        {
+          "id": "a-accept",
+          "action": {
+            "verb": "accept",
+            "action_id": "accept/a",
+            "operator": "household",
+            "developer": "assistant@v1",
+            "action_class": "agreement.accept",
+            "target": "buyer/ref-a",
+            "timestamp": "2026-10-08T08:00:00Z",
+            "task_authority_ref": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "item_ref": "item/ref-1",
+            "amount_minor": 175000,
+            "currency": "USD"
+          },
+          "expect": {
+            "single_commitment": "pass",
+            "outcome": "allow"
+          }
+        }
+      ]
+    },
+    {
+      "name": "b-non-commit-after-a-accepts",
+      "steps": [
+        {
+          "id": "a-accept",
+          "action": {
+            "verb": "accept",
+            "action_id": "accept/a",
+            "operator": "household",
+            "developer": "assistant@v1",
+            "action_class": "agreement.accept",
+            "target": "buyer/ref-a",
+            "timestamp": "2026-10-08T08:00:00Z",
+            "task_authority_ref": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "item_ref": "item/ref-1",
+            "amount_minor": 175000,
+            "currency": "USD"
+          },
+          "expect": {
+            "single_commitment": "pass",
+            "outcome": "allow"
+          }
+        },
+        {
+          "id": "b-message",
+          "action": {
+            "verb": "send",
+            "action_id": "send/b",
+            "operator": "household",
+            "developer": "assistant@v1",
+            "action_class": "communication.send",
+            "target": "buyer/ref-b",
+            "timestamp": "2026-10-08T09:00:00Z",
+            "task_authority_ref": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "item_ref": "item/ref-1"
+          },
+          "expect": {
+            "single_commitment": "n/a",
+            "outcome": "allow"
+          }
+        }
+      ]
+    },
+    {
+      "name": "b-cites-a-acceptance",
+      "steps": [
+        {
+          "id": "a-accept",
+          "action": {
+            "verb": "accept",
+            "action_id": "accept/a",
+            "operator": "household",
+            "developer": "assistant@v1",
+            "action_class": "agreement.accept",
+            "target": "buyer/ref-a",
+            "timestamp": "2026-10-08T08:00:00Z",
+            "task_authority_ref": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "item_ref": "item/ref-1",
+            "amount_minor": 175000,
+            "currency": "USD"
+          },
+          "expect": {
+            "single_commitment": "pass",
+            "outcome": "allow"
+          }
+        },
+        {
+          "id": "b-offer",
+          "action": {
+            "verb": "offer",
+            "action_id": "offer/b",
+            "operator": "household",
+            "developer": "assistant@v1",
+            "action_class": "marketplace.offer",
+            "target": "buyer/ref-b",
+            "timestamp": "2026-10-08T09:00:00Z",
+            "task_authority_ref": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "item_ref": "item/ref-1",
+            "amount_minor": 175000,
+            "currency": "USD",
+            "cites_step": "a-accept"
+          },
+          "expect": {
+            "single_commitment": "fail",
+            "outcome": "deny",
+            "acceptance_step": "a-accept"
+          }
+        }
+      ]
+    },
+    {
+      "name": "a-follows-its-own-acceptance",
+      "steps": [
+        {
+          "id": "a-accept",
+          "action": {
+            "verb": "accept",
+            "action_id": "accept/a",
+            "operator": "household",
+            "developer": "assistant@v1",
+            "action_class": "agreement.accept",
+            "target": "buyer/ref-a",
+            "timestamp": "2026-10-08T08:00:00Z",
+            "task_authority_ref": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "item_ref": "item/ref-1",
+            "amount_minor": 175000,
+            "currency": "USD"
+          },
+          "expect": {
+            "single_commitment": "pass",
+            "outcome": "allow"
+          }
+        },
+        {
+          "id": "a-sale",
+          "action": {
+            "verb": "sale",
+            "action_id": "sale/a",
+            "operator": "household",
+            "developer": "assistant@v1",
+            "action_class": "marketplace.sale",
+            "target": "buyer/ref-a",
+            "timestamp": "2026-10-08T09:00:00Z",
+            "task_authority_ref": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "item_ref": "item/ref-1",
+            "amount_minor": 175000,
+            "currency": "USD",
+            "cites_step": "a-accept"
+          },
+          "expect": {
+            "single_commitment": "pass",
+            "outcome": "allow",
+            "acceptance_step": "a-accept"
+          }
+        }
+      ]
+    },
+    {
+      "name": "commit-without-item-ref",
+      "steps": [
+        {
+          "id": "a-accept",
+          "action": {
+            "verb": "accept",
+            "action_id": "accept/a",
+            "operator": "household",
+            "developer": "assistant@v1",
+            "action_class": "agreement.accept",
+            "target": "buyer/ref-a",
+            "timestamp": "2026-10-08T08:00:00Z",
+            "task_authority_ref": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "item_ref": "item/ref-1",
+            "amount_minor": 175000,
+            "currency": "USD"
+          },
+          "expect": {
+            "single_commitment": "pass",
+            "outcome": "allow"
+          }
+        },
+        {
+          "id": "b-offer",
+          "action": {
+            "verb": "offer",
+            "action_id": "offer/b",
+            "operator": "household",
+            "developer": "assistant@v1",
+            "action_class": "marketplace.offer",
+            "target": "buyer/ref-b",
+            "timestamp": "2026-10-08T09:00:00Z",
+            "task_authority_ref": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "amount_minor": 175000,
+            "currency": "USD"
+          },
+          "expect": {
+            "single_commitment": "n/a",
+            "outcome": "allow",
+            "missing_field": "item_ref"
+          }
+        }
+      ]
+    }
+  ]
+}
