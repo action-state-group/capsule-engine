@@ -556,8 +556,10 @@ def _changes_details(block: dict) -> bool:
 
 
 def _accepted_offer_at(records: list[dict], disclosed: dict[str, dict]) -> dict[str, str]:
-    """The proposal each bound typed commit rests on, as the sealed
-    ``timestamp`` of that offer's capsule, by the commit's record digest:
+    """The proposal each bound typed commit rests on, as the ``at`` that
+    offer's record seals, by the commit's record digest (the value capsulectl
+    sends live as ``record.proposal_at``; its capsule's ``timestamp`` is the
+    same instant, from one clock read, but is not read here):
     ``offer_expiry`` reads it as ``Action.proposal_at``. It is the deal's
     latest offer, when a bound acceptance (an ``action-approval/v0`` of
     authority ``counterparty_acceptance``) names that offer's record by
@@ -579,7 +581,7 @@ def _accepted_offer_at(records: list[dict], disclosed: dict[str, dict]) -> dict[
         body = shown.get("body") if isinstance(shown.get("body"), dict) else {}
         block = shown.get("x-deal-v0")
         if shown.get("type") == _PROPOSED_TYPE and body.get("action") == _OFFER:
-            latest[deal] = (json_digest(shown), _text(record.get("timestamp")))
+            latest[deal] = (json_digest(shown), _text(shown.get("at")))
             accepted.pop(deal, None)
         elif shown.get("type") == _PROPOSED_TYPE and body.get("action") == _COMMIT:
             at = accepted.get(deal)
