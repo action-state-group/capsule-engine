@@ -654,7 +654,7 @@ class ReplayResult:
 def replay(
     records: list[dict],
     *,
-    caps_fold: FoldDefinition,
+    caps_fold: FoldDefinition | None,
     caps_minor: dict[str, int] | None = None,
     manifest_digest: str | None = None,
     per_action_minor: dict[str, int] | None = None,

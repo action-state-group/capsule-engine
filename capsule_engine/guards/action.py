@@ -48,7 +48,8 @@ class Action:
     (e.g. a counterparty or recipient reference). ``cited_mandate_capsule_id``
     is the prior capsule this action claims authorization from, checked by
     ``verify_before_dispatch``. ``equivalence_key`` lets a caller override the
-    dedupe check's default equivalence formula for this action.
+    dedupe check's default equivalence formula for this action; it is not
+    sealed, so it never matches an earlier record carrying the same key.
 
     ``rail`` names the payment rail or destination type (e.g. ``"card"``,
     ``"p2p"``), read by ``destination_rail``. ``counterparty_account_ref`` is

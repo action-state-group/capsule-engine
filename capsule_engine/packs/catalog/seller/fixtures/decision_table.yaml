@@ -11,8 +11,8 @@
 # price_floor, promise_requires_approval, required_disclosure, offer_expiry,
 # destination_rail, task_authority, dedupe, promise_never,
 # single_commitment, verify_before_dispatch, release_on_acceptance) has at
-# least one 'pass' row and at least one 'fail' row. caps is cited only so the
-# engine runs; it is n/a (population c) on every row.
+# least one 'pass' row and at least one 'fail' row. The pack cites no caps
+# definition; the engine records caps n/a (population c) on every row.
 #
 # n_a: every constraint that recorded n/a declares its population, and the
 # test checks the declaration against that constraint record's

@@ -104,7 +104,7 @@ def _value_held_label(rows: list[ReportRow]) -> str:
 def build_dry_run_report(
     ledger_paths: list[str],
     *,
-    caps_fold: FoldDefinition,
+    caps_fold: FoldDefinition | None,
     since: str | None = "7d",
     caps_minor: dict[str, int] | None = None,
     operator: str | None = None,
@@ -171,7 +171,7 @@ def build_dry_run_report(
 def build_dry_run_report_with_proposal(
     ledger_paths: list[str],
     *,
-    caps_fold: FoldDefinition,
+    caps_fold: FoldDefinition | None,
     proposed_caps_minor: dict[str, int],
     since: str | None = "7d",
     caps_minor: dict[str, int] | None = None,

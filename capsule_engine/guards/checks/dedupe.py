@@ -8,7 +8,10 @@ default formula uses only fields present on any capsule, ours or a foreign
 one already sitting in the ledger (operator, developer, action_type, and
 the ``verb`` prefix of ``action_id``), so a dedupe hit fires against
 capsules this guard never produced. A caller may override it per-action via
-``Action.equivalence_key``.
+``Action.equivalence_key``. The override keys the action side only: the key
+is not sealed on the decision, so an earlier record is always keyed by the
+formula. A caller's key makes two acts distinct, and never matches an earlier
+record that carried the same key (``tests/test_dedupe_equivalence_key.py``).
 
 An act stated against a pinned action taxonomy (``taxonomy_version`` set,
 as the deal-check bridge in ``report/replay.py`` sets it from a deal check's

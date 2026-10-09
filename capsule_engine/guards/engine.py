@@ -168,7 +168,7 @@ class GuardEngine:
         self,
         *,
         ledger: LedgerAPI,
-        caps_fold: FoldDefinition,
+        caps_fold: FoldDefinition | None,
         signer_provider: Callable[[], Signer | None],
         caps_minor: dict[str, int] | None = None,
         per_action_minor: dict[str, int] | None = None,
@@ -190,7 +190,12 @@ class GuardEngine:
     ) -> None:
         if caps_limits is not None and (caps_minor or per_action_minor):
             raise ValueError("give caps limits as caps_limits or as caps_minor/per_action_minor, not both")
+        if caps_fold is None and (caps_minor or per_action_minor):
+            raise ValueError("caps limits were given but no caps fold definition to read spend with")
         self._ledger = ledger
+        # ``None`` when the pack cites no ``caps`` definition: a pack may omit
+        # it. ``caps`` is then recorded ``n/a``, out of scope, on every
+        # decision, and no limit is read for it.
         self._caps_fold = caps_fold
         self._signer_provider = signer_provider
         self._caps_minor = resolve_caps_minor(caps_minor or {})
@@ -424,32 +429,14 @@ class GuardEngine:
                 return constraint
             return _taxonomy_held(constraint, mismatch, mismatch_reason)
 
-        cap_minor, per_action_cap_minor, limit_sources = self._limits_for(action, caps_limits)
-        if cap_minor is not None:
-            caps_out = check_caps(
-                action,
-                self._ledger,
-                definition=self._caps_fold,
-                cap_minor=cap_minor,
-                per_action_cap_minor=per_action_cap_minor,
-                per_action_reads=self._per_action_reads,
-                limit_sources=limit_sources,
-            )
-        else:
-            caps_out = CheckOutcome(
-                constraint=ConstraintOutcome(
-                    id="caps",
-                    result="n/a",
-                    reason="no cap configured for this action class",
-                    evidence=not_applicable_evidence("caps", in_scope=False),
-                    check_type="policy",
-                    method=self._caps_fold.fold_id,
-                )
-            )
+        caps_out = self._check_caps(action, caps_limits)
 
         vbd_out = check_verify_before_dispatch(action, self._ledger)
 
-        constraints = (dedupe_out.constraint, held(caps_out.constraint), vbd_out.constraint)
+        # With no caps definition, caps reads nothing keyed on the class, so a
+        # taxonomy mismatch does not hold it: it stays out of scope.
+        caps_constraint = held(caps_out.constraint) if self._caps_fold is not None else caps_out.constraint
+        constraints = (dedupe_out.constraint, caps_constraint, vbd_out.constraint)
         if self._plan is not None:
             # Pure function of (action, plan) -- no ledger read (module
             # docstring, guards/checks/plan_containment.py). Only added to
@@ -615,6 +602,24 @@ class GuardEngine:
                 return False
         return bool(failed)
 
+    def _check_caps(self, action: Action, caps_limits: CapsLimits | None) -> CheckOutcome:
+        """``caps`` for ``action``: ``n/a``, out of scope, when the pack cites
+        no caps definition or no limit is configured for the action's class."""
+        if self._caps_fold is None:
+            return _caps_out_of_scope("no caps definition is configured", method=None)
+        cap_minor, per_action_cap_minor, limit_sources = self._limits_for(action, caps_limits)
+        if cap_minor is None:
+            return _caps_out_of_scope("no cap configured for this action class", method=self._caps_fold.fold_id)
+        return check_caps(
+            action,
+            self._ledger,
+            definition=self._caps_fold,
+            cap_minor=cap_minor,
+            per_action_cap_minor=per_action_cap_minor,
+            per_action_reads=self._per_action_reads,
+            limit_sources=limit_sources,
+        )
+
     def _limits_for(
         self, action: Action, caps_limits: CapsLimits | None
     ) -> tuple[int | None, int | None, LimitSources | None]:
@@ -703,6 +708,19 @@ class GuardEngine:
             capsule=capsule,
             reason=reason,
         )
+
+
+def _caps_out_of_scope(reason: str, *, method: str | None) -> CheckOutcome:
+    return CheckOutcome(
+        constraint=ConstraintOutcome(
+            id="caps",
+            result="n/a",
+            reason=reason,
+            evidence=not_applicable_evidence("caps", in_scope=False),
+            check_type="policy",
+            method=method,
+        )
+    )
 
 
 # Failures that ask an approver rather than refuse: an over-limit spend and
