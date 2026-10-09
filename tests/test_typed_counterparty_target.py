@@ -9,8 +9,10 @@ reads each from where its record kind seals it, so the payee-keyed checks
 (``counterparty_seen_before``, ``dedupe``, ``single_commitment``) key a typed
 check on its payee: the per-deal fingerprint, or the profile-scoped one when
 the checker input or a companion supplies it. A typed check sealing no
-counterparty has no target, and ``counterparty_seen_before`` is ``n/a``
-naming ``target``, the field it could not read.
+counterparty has no target. Under everyday 0.3.5
+``counterparty_seen_before/4.0.0`` fails it as a first-time payee ("no payee
+named", tests/test_counterparty_seen_before_no_payee.py); under 0.3.4
+version 3 recorded it ``n/a`` naming ``target``, the field it could not read.
 """
 from __future__ import annotations
 
@@ -291,11 +293,11 @@ def test_replay_counterparty_seen_before_keys_a_typed_check_on_its_payee():
     assert out.evidence["fold_key"]["value"] == f"payee-fp:{CHAIN_ALG}:{PAYEE}"
 
 
-def test_replay_a_typed_check_sealing_no_counterparty_is_n_a_naming_target():
+def test_replay_a_typed_check_sealing_no_counterparty_fails_naming_target():
     (decision,) = _replay(_typed(None))
     out = _constraint(decision, "counterparty_seen_before")
-    assert out.result == "n/a"
-    assert (out.evidence["in_scope"], out.evidence["missing_field"]) == (True, "target")
+    assert out.result == "fail"
+    assert (out.evidence["seen_before"], out.evidence["missing_field"]) == (False, "target")
 
 
 def test_replay_a_repeated_identical_typed_payment_is_refused():

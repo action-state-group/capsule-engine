@@ -10,6 +10,14 @@ first-time counterparty); one or more passes it (a repeat). The evidence
 says which, with the count and the key it was read under, and names any
 input the action's target was built without (``Action.ignored_inputs``).
 Applies only to the configured ``action_classes``.
+
+An action in those classes that names no target is not applicable, naming
+``target``, unless the wicket configures ``missing_target: unseen``
+(counterparty_seen_before/4.0.0). Then it, and an action whose target is
+empty or only whitespace, fails as a first-time
+counterparty with the reason "no payee named": version 4 is configured for
+money.purchase, and a purchase that names nobody cannot be shown to go to a
+payee seen before.
 """
 from __future__ import annotations
 
@@ -28,6 +36,9 @@ from .base import CheckOutcome
 __all__ = ["check_counterparty_seen_before", "check_recipient_seen_before", "seen_before_fold"]
 
 _CHECK_ID = "counterparty_seen_before"
+# What an in-scope action naming no target records: ``n/a`` naming the field
+# (versions 1 to 3), or a failure as an unseen counterparty (version 4).
+MISSING_TARGET_MODES = frozenset({"n/a", "unseen"})
 _FOLD_CATALOG_DIR = Path(__file__).resolve().parent.parent.parent / "folds" / "catalog_defs"
 
 
@@ -56,10 +67,34 @@ def _n_a(check_id: str, reason: str, method: str, *, in_scope: bool, missing_fie
     )
 
 
+def _no_payee(check_id: str, noun: str, action: Action, method: str) -> CheckOutcome:
+    """An in-scope action naming no target, read as an unseen counterparty.
+    No fold runs: there is no key to count under. ``counterparty_ids`` are
+    not read here (``counterparty_list`` reads them), so an action carrying
+    only fingerprints fails the same way."""
+    evidence = {"missing_field": "target", "operator": action.operator, "seen_before": False}
+    if action.ignored_inputs:
+        evidence["ignored_inputs"] = list(action.ignored_inputs)
+    return CheckOutcome(
+        constraint=ConstraintOutcome(
+            id=check_id,
+            result="fail",
+            reason=f"no payee named: the action names no target, so the {noun} is read as first-time",
+            evidence=evidence,
+            check_type="policy",
+            method=method,
+        )
+    )
+
+
 def check_counterparty_seen_before(
-    action: Action, ledger: LedgerAPI, *, definition: FoldDefinition, action_classes: list[str]
+    action: Action, ledger: LedgerAPI, *, definition: FoldDefinition, action_classes: list[str],
+    missing_target: str = "n/a",
 ) -> CheckOutcome:
-    return _seen_before(_CHECK_ID, "counterparty", action, ledger, definition=definition, action_classes=action_classes)
+    if missing_target not in MISSING_TARGET_MODES:
+        raise ValueError(f"missing_target {missing_target!r} is not one of {sorted(MISSING_TARGET_MODES)}")
+    return _seen_before(_CHECK_ID, "counterparty", action, ledger, definition=definition, action_classes=action_classes,
+                        missing_target=missing_target)
 
 
 def check_recipient_seen_before(
@@ -73,11 +108,15 @@ def check_recipient_seen_before(
 
 def _seen_before(
     check_id: str, noun: str, action: Action, ledger: LedgerAPI, *, definition: FoldDefinition,
-    action_classes: list[str],
+    action_classes: list[str], missing_target: str = "n/a",
 ) -> CheckOutcome:
     method = definition.fold_id
     if action.action_class not in action_classes:
         return _n_a(check_id, "the rule is not configured for this action class", method, in_scope=False)
+    # Under "unseen" a blank target names nobody either: counted under "" it
+    # would let one blank-target act make every later one a repeat.
+    if missing_target == "unseen" and (action.target is None or not action.target.strip()):
+        return _no_payee(check_id, noun, action, method)
     if action.target is None:
         return _n_a(check_id, f"the action names no target; the {noun} could not be identified",
                     method, in_scope=True, missing_field="target")

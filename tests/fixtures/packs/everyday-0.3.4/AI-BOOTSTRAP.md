@@ -83,13 +83,11 @@ catalog):
    declares ASK; it is refused when any of them declares NEVER, or when the
    class names no approver.
    `packs.obligation_results` reads one decision's result per rule.
-8. `counterparty_seen_before` (`counterparty_seen_before/4.0.0`) -- a
+8. `counterparty_seen_before` (`counterparty_seen_before/3.0.0`) -- a
    purchase from a merchant the operator has no accepted earlier action with
    is flagged; an earlier act that asked, was approved and was executed
    counts as one, and a dry run does not. The record
-   names the count and the key it was read under. A purchase with no
-   `target`, or an empty one, is flagged as a first-time merchant, with the
-   reason "no payee named".
+   names the count and the key it was read under.
 9. `recipient_role` (`recipient_role/1.0.0`) -- a personal-data disclosure
    passes for the fulfilling merchant or the user and is flagged for a third
    party; a role outside the set is flagged.

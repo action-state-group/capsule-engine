@@ -42,7 +42,10 @@
 # merchant-first-purchase fails counterparty_seen_before alone and escalates the
 # same way: money.purchase names an approver role. merchant-repeat-purchase
 # passes because merchant-history-real-payment is a real accepted payment to
-# the same merchant (a dry run does not count).
+# the same merchant (a dry run does not count). merchant-purchase-no-payee
+# names no merchant: counterparty_seen_before/4.0.0 fails it as a first-time
+# merchant ("no payee named") rather than recording n/a, so it escalates
+# like merchant-first-purchase.
 # out-of-scope-action passes action_class_gate (a non-consequential class);
 # booking-create fails it on r16 alone, which declares ASK, and escalates:
 # booking.create names an approver role. off-taxonomy-class declares a class with no row in
@@ -665,5 +668,24 @@ rows:
       counterparty_seen_before: {population: c}
       recipient_role: {population: c}
       recipient_seen_before: {population: c}
+      task_authority: {population: a, missing_field: task_authority_ref}
+    verdict: escalate
+  - scenario: merchant-purchase-no-payee
+    action_id: make_purchase/everyday-fixture-merchant-no-payee
+    checks: {dedupe: pass, caps: pass, verify_before_dispatch: n/a, destination_rail: n/a, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: n/a, action_class_gate: n/a, counterparty_seen_before: fail, recipient_role: n/a, refundability: n/a, material_fields_changed: n/a, offer_fields_changed: n/a, recipient_seen_before: n/a, channel_change: n/a, upfront_amount: n/a, task_authority: n/a}
+    n_a:
+      verify_before_dispatch: {population: c}
+      destination_rail: {population: c}
+      counterparty_identity_change: {population: c}
+      credential_pattern: {population: c}
+      recurring_charge: {population: c}
+      action_class_gate: {population: c}
+      recipient_role: {population: c}
+      refundability: {population: a, missing_field: refundable}
+      material_fields_changed: {population: a, missing_field: material_fields_changed}
+      offer_fields_changed: {population: a, missing_field: offer_fields_changed}
+      recipient_seen_before: {population: c}
+      channel_change: {population: a, missing_field: channel}
+      upfront_amount: {population: a, missing_field: upfront_amount_minor}
       task_authority: {population: a, missing_field: task_authority_ref}
     verdict: escalate

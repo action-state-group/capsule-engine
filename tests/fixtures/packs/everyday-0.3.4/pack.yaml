@@ -27,7 +27,7 @@
 # whose selector matched its class and is not applicable to the others. An
 # action whose class has no taxonomy row fails all eight: the gate fails
 # closed and none of them can be ruled out.
-pack_id: asg/everyday/0.3.5
+pack_id: asg/everyday/0.3.4
 
 obligations:
   # -- DO ------------------------------------------------------------------
@@ -44,8 +44,7 @@ obligations:
     statement: >-
       Checks whether a purchase is from a merchant the operator already has an
       accepted action with, or an act that was approved and then executed,
-      and records the count. A purchase that names no merchant does not
-      pass. The spending limits are
+      and records the count. The spending limits are
       measured by rule 5. Whether the purchase stays inside the bounds the user
       confirmed for the task is not measured yet.
     check: counterparty_seen_before
@@ -82,8 +81,7 @@ obligations:
       Flags a purchase from a merchant the operator has no accepted earlier
       action with, and no earlier act that was approved and then executed,
       and records the merchant reference, the count and the key it was read
-      under. A purchase that names no merchant is flagged as a first-time
-      merchant, with the reason no payee named.
+      under.
     check: counterparty_seen_before
     default_disposition: ASK
   - id: r07-subscription-or-free-trial
@@ -303,10 +301,9 @@ constraints:
   - wicket_ref: action_class_gate/1.0.0
     digest: fcc352838832e13f5e87662f0194ec4a7065bc989bbe624b43ac5d9d1b638ae2
   # A purchase from a merchant the operator has no accepted or carried-out
-  # act with. 3.0.0 counts an act that asked, was approved and was executed;
-  # 4.0.0 also flags a purchase that names no merchant (no payee named).
-  - wicket_ref: counterparty_seen_before/4.0.0
-    digest: c7c20d9e57cb0a75184b9c6c4d037c9bea813a7b1105c581defd4481acf964b0
+  # act with. 3.0.0 counts an act that asked, was approved and was executed.
+  - wicket_ref: counterparty_seen_before/3.0.0
+    digest: 9cfab71d142ca7af8912218f4c4ea194f60fb02784d8536233cb7e18eddc24a8
   # Each reads one number, one member of a closed set, or one opaque
   # reference from the action, never an object or text. The 1.1.0
   # definitions are 1.0.0's with marketplace.sale added to their classes.
@@ -408,8 +405,6 @@ fixtures:
     - id: sale-material-terms-changed
       outcome: escalate
     - id: sale-deposit-over-a-quarter
-      outcome: escalate
-    - id: merchant-purchase-no-payee
       outcome: escalate
 
 # The action taxonomy this pack was authored against. The taxonomy decides

@@ -47,6 +47,7 @@ EXPECTED_DIGESTS = {
     "counterparty_seen_before/1.0.0": "e3a89876d6547fd1af6dde151e0802388fb68f7b2f9660c39b95b44e397cb263",
     "counterparty_seen_before/2.0.0": "c82a29eae8ef72736851d275ffa4d85e511a21d202822366d3b03bf3834c8cd0",
     "counterparty_seen_before/3.0.0": "9cfab71d142ca7af8912218f4c4ea194f60fb02784d8536233cb7e18eddc24a8",
+    "counterparty_seen_before/4.0.0": "c7c20d9e57cb0a75184b9c6c4d037c9bea813a7b1105c581defd4481acf964b0",
     # Taxonomy-only selectors, no fold (guards/checks/action_class_gate.py).
     "action_class_gate/1.0.0": "fcc352838832e13f5e87662f0194ec4a7065bc989bbe624b43ac5d9d1b638ae2",
     # An empty deny list; the user's list rides in a policy profile. No pack cites it yet.
@@ -102,7 +103,7 @@ RETIRED_DIGESTS = {
 WITHOUT_SEMANTICS = frozenset(EXPECTED_DIGESTS) - {
     "offer_expiry/1.0.1", "price_floor/2.0.1", "channel_change/1.1.0", "material_fields_changed/1.1.0",
     "offer_fields_changed/1.1.0", "refundability/1.1.0", "task_authority/1.1.0", "upfront_amount/1.1.0",
-    "counterparty_seen_before/3.0.0", "seller.release_on_acceptance/1.0.0",
+    "counterparty_seen_before/3.0.0", "counterparty_seen_before/4.0.0", "seller.release_on_acceptance/1.0.0",
 }
 
 

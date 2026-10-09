@@ -15,8 +15,8 @@ out like money.refund. caps/5.0.0 has the same class set as caps/4.0.0.
 
 0.3.2 is kept byte for byte under ``tests/fixtures/packs/everyday-0.3.2``, and
 it still has to load at its digest from this engine's definitions. 0.3.3 is
-kept the same way since 0.3.4 replaced it in the catalog; 0.3.4 measures a
-sale exactly as 0.3.3 does.
+kept the same way since 0.3.4 replaced it in the catalog, and 0.3.4 since
+0.3.5 did; both measure a sale exactly as 0.3.3 does.
 """
 from __future__ import annotations
 
@@ -157,7 +157,7 @@ def test_the_frozen_0_3_3_loads_at_its_recorded_digest():
     assert pack.definition_digest() == PACK_0_3_3_DIGEST
 
 
-def test_0_3_4_cites_the_same_sale_definitions_as_0_3_3():
+def test_the_catalog_pack_cites_the_same_sale_definitions_as_0_3_3():
     frozen = {c.wicket_id: c.definition_digest() for c in load_pack_dir(FROZEN_0_3_3_DIR).constraints}
     cited = {c.wicket_id: c.definition_digest() for c in PACK.constraints}
     for check in SALE_CHECKS:
