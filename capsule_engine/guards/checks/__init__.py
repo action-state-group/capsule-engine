@@ -45,6 +45,7 @@ from .recipient_role import check_recipient_role
 from .recurring_charge import check_recurring_charge
 from .refundability import check_refundability
 from .required_disclosure import check_required_disclosure
+from .single_commitment import check_single_commitment
 from .task_authority import (
     PLAN_PATH,
     TaskAuthorityBody,
@@ -133,6 +134,9 @@ CONFIGURED_CHECKS: dict[str, Callable[[Action, LedgerAPI, dict], CheckOutcome]] 
         never=config["never"],
         action_classes=config["action_classes"],
     ),
+    "single_commitment": lambda action, ledger, config: check_single_commitment(
+        action, ledger, acceptance_classes=config["acceptance_classes"], commit_classes=config["commit_classes"]
+    ),
 }
 
 TASK_AUTHORITY_CHECKS: dict[str, Callable[[Action, TaskAuthorityRecord | None, dict], CheckOutcome]] = {
@@ -199,6 +203,7 @@ __all__ = [
     "check_recurring_charge",
     "check_refundability",
     "check_required_disclosure",
+    "check_single_commitment",
     "check_task_authority",
     "task_authority_record_digest",
     "check_upfront_amount",

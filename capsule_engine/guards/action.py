@@ -97,6 +97,9 @@ class Action:
     the decision (``promise_never`` records it and ignores it).
     ``proposal_at`` is the RFC 3339 UTC timestamp of the proposal the action
     acts on, read by ``offer_expiry``.
+    ``item_ref`` is an opaque reference to the item a sale is about, stable
+    across every buyer thread of that sale, compared for equality and never
+    opened, read by ``single_commitment``.
     ``taxonomy_version`` (normally ``classes.TAXONOMY_VERSION``) is sealed
     beside ``action_class`` when set, so a count over trigger classes can be
     recomputed against the table that was live; unset, the record keeps its
@@ -139,6 +142,7 @@ class Action:
     representation_class: str | None = None
     authorized_by: str | None = None
     proposal_at: str | None = None
+    item_ref: str | None = None
 
     def __post_init__(self) -> None:
         if self.counterparty_account_ref is not None and _looks_like_raw_account_number(

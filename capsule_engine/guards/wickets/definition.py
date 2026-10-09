@@ -53,7 +53,7 @@ WICKET_ID_RE = re.compile(r"^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)*/\d+\.\d+\.\d+$"
 # ``recipient_seen_before``, ``channel_change``, ``upfront_amount``,
 # ``task_authority``, and the seller-side ``price_floor``,
 # ``required_disclosure``, ``promise_requires_approval``, ``promise_never``,
-# ``offer_expiry`` --
+# ``offer_expiry``, ``single_commitment`` --
 # ``guards/checks/__init__.py``'s ``RUNNABLE_CHECKS``). Closed for
 # the same reason ``folds/definition.py``'s ``KNOWN_REDUCERS`` is: an
 # unregistered name is a typo or a not-yet-built check, never silently
@@ -85,6 +85,7 @@ KNOWN_CHECKS = frozenset(
         "promise_requires_approval",
         "promise_never",
         "offer_expiry",
+        "single_commitment",
     }
 )
 
