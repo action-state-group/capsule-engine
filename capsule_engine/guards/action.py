@@ -91,8 +91,8 @@ class Action:
     ``promise_class`` and counted by ``required_disclosure``; a message that
     makes several statements is several actions, one class each. The
     statement itself never reaches the guard. ``authorized_by`` is the
-    SHA-256 digest of the sealed approval record the action cites, read by
-    ``promise_class``. ``proposal_at`` is the RFC 3339 UTC timestamp of the
+    SHA-256 digest of the whole sealed approval record the action cites,
+    read by ``promise_class`` against the record supplied with the decision. ``proposal_at`` is the RFC 3339 UTC timestamp of the
     proposal the action acts on, read by ``offer_expiry``.
     ``taxonomy_version`` (normally ``classes.TAXONOMY_VERSION``) is sealed
     beside ``action_class`` when set, so a count over trigger classes can be

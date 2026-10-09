@@ -18,9 +18,12 @@ from capsule_engine.folds.loader import load_definition_file as load_fold
 from capsule_engine.guards import Action, GuardEngine
 from capsule_engine.guards.capsule import not_applicable_evidence
 from capsule_engine.guards.checks import (
+    AUTHORIZATION_CHECKS,
     CONFIGURED_CHECKS,
     TASK_AUTHORITY_CHECKS,
+    AuthorizationRecord,
     TaskAuthorityRecord,
+    authorization_record_digest,
     check_destination_rail,
     task_authority_record_digest,
 )
@@ -48,8 +51,18 @@ REPRESENTATION_CLASSES = [
 ]
 
 BUYER = "buyer/ref-7"
-# A sealed approval record's digest, as an action cites it.
-APPROVAL_REF = "5" * 64
+
+
+def _approval(cls: str) -> tuple[AuthorizationRecord, str]:
+    """A sealed approval for one class of statement, and the digest an
+    action cites it by."""
+    record: AuthorizationRecord = {"type": "approval/v0", "body": {"representation_class": cls}}
+    return record, authorization_record_digest(record)
+
+
+WARRANTY_APPROVAL, APPROVAL_REF = _approval("warranty")
+# Digest-shaped, but the digest of no record anyone supplies.
+FAKE_REF = "5" * 64
 
 # A seller's task authority for one used bicycle: ask 1,900.00, accept down
 # to 1,700.00. Synthetic: the producer does not seal min_total_minor yet,
@@ -85,9 +98,11 @@ def _engine(store, signer, *wickets: WicketDefinition) -> GuardEngine:
     return GuardEngine(ledger=store, caps_fold=SPEND, signer_provider=lambda: signer, wickets=wickets)
 
 
-def _run(definition: WicketDefinition, action: Action, *, ledger=None, record=None):
+def _run(definition: WicketDefinition, action: Action, *, ledger=None, record=None, approval=None):
     if definition.check in TASK_AUTHORITY_CHECKS:
         return TASK_AUTHORITY_CHECKS[definition.check](action, record, definition.config).constraint
+    if definition.check in AUTHORIZATION_CHECKS:
+        return AUTHORIZATION_CHECKS[definition.check](action, approval, definition.config).constraint
     return CONFIGURED_CHECKS[definition.check](action, ledger, definition.config).constraint
 
 
@@ -286,27 +301,90 @@ def test_promise_class_never_without_approval(cls):
     out = _promise(representation_class=cls)
     assert out.result == "fail"
     assert out.evidence == {"representation_class": cls, "recognised": True, "requires_approval": True,
-                            "authorized_by": None}
-    approved = _promise(representation_class=cls, authorized_by=APPROVAL_REF)
+                            "authorized_by": None, "approval_bound": False}
+    record, ref = _approval(cls)
+    approved = _run(PROMISE, _action(action_class="communication.send", representation_class=cls, authorized_by=ref),
+                    approval=record)
     assert approved.result == "pass"
-    assert approved.evidence["authorized_by"] == APPROVAL_REF
+    assert approved.evidence["authorized_by"] == ref
+    assert approved.evidence["approval_bound"] is True
 
 
 def test_promise_class_passes_an_ordinary_representation():
     out = _promise(representation_class="condition")
     assert out.result == "pass"
     assert out.evidence["requires_approval"] is False
+    assert out.evidence["approval_bound"] is False
 
 
-@pytest.mark.parametrize("ref", ["yes", "5" * 63, "G" * 64, "5" * 65])
-def test_promise_class_needs_a_digest_shaped_approval(ref):
-    out = _promise(representation_class="warranty", authorized_by=ref)
+def _warranty(ref, approval):
+    return _run(PROMISE, _action(action_class="communication.send", representation_class="warranty",
+                                 authorized_by=ref), approval=approval)
+
+
+def test_promise_class_a_fabricated_ref_fails():
+    out = _warranty(FAKE_REF, None)
+    assert out.result == "fail"
+    assert out.evidence["authorized_by"] == FAKE_REF
+    assert out.evidence["approval_bound"] is False
+    assert "no approval record" in out.reason
+
+
+def test_promise_class_a_record_without_a_ref_fails():
+    out = _warranty(None, WARRANTY_APPROVAL)
     assert out.result == "fail"
     assert out.evidence["authorized_by"] is None
+    assert "cites no approval" in out.reason
+
+
+def test_promise_class_a_record_the_ref_does_not_bind_fails():
+    out = _warranty(FAKE_REF, WARRANTY_APPROVAL)
+    assert out.result == "fail"
+    assert out.evidence["approval_bound"] is False
+    assert "ref mismatch" in out.reason
+
+
+def test_promise_class_a_bound_approval_for_another_class_fails():
+    record, ref = _approval("authenticity")
+    out = _warranty(ref, record)
+    assert out.result == "fail"
+    assert out.evidence["approval_bound"] is False
+    assert "authenticity" in out.reason
+
+
+@pytest.mark.parametrize(
+    "record",
+    [{"type": "approval/v0"}, {"body": "warranty"}, {"body": {}}, {"body": {"representation_class": ["warranty"]}}],
+    ids=["no-body", "body-not-object", "no-class", "class-not-scalar"],
+)
+def test_promise_class_a_bound_approval_naming_no_class_fails(record):
+    out = _warranty(authorization_record_digest(record), record)
+    assert out.result == "fail"
+    assert out.evidence["approval_bound"] is False
+
+
+def test_promise_class_an_approval_with_no_digest_fails():
+    record = {"body": {"representation_class": "warranty", "weight": 0.5}}
+    out = _warranty(FAKE_REF, record)
+    assert out.result == "fail"
+    assert "no digest" in out.reason
+
+
+def test_promise_class_bound_approval_passes_through_the_engine(store, signer):
+    engine = _engine(store, signer, PROMISE)
+    action = _action(verb="tell", action_class="communication.send", amount_minor=None,
+                     representation_class="warranty", authorized_by=APPROVAL_REF)
+    assert engine.check(dataclasses.replace(action, action_id="tell/bound"),
+                        authorization_record=WARRANTY_APPROVAL).outcome == "allow"
+    assert engine.check(dataclasses.replace(action, action_id="tell/unbound")).outcome == "deny"
+    fake = dataclasses.replace(action, action_id="tell/fake", authorized_by=FAKE_REF)
+    assert engine.check(fake, authorization_record=WARRANTY_APPROVAL).outcome == "deny"
 
 
 def test_promise_class_unrecognised_class_fails_closed():
-    out = _promise(representation_class="guarantee", authorized_by=APPROVAL_REF)
+    record, ref = _approval("guarantee")
+    out = _run(PROMISE, _action(action_class="communication.send", representation_class="guarantee",
+                                authorized_by=ref), approval=record)
     assert out.result == "fail"
     assert out.evidence["recognised"] is False
 

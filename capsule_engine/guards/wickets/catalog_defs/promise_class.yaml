@@ -1,9 +1,9 @@
 # promise_class wicket: classes of statement the agent may not make without
 # an approval (guards/checks/promise_class.py). An action whose
-# Action.representation_class is in `never_without_approval` fails unless it
-# carries Action.authorized_by, the SHA-256 digest of the sealed approval
-# record. The check reads that the reference is present and digest-shaped;
-# it does not open the approval or check what it covers.
+# Action.representation_class is in `never_without_approval` fails unless
+# Action.authorized_by is the SHA-256 digest of the sealed approval record
+# supplied with the decision, the engine's own digest of that record equals
+# it, and the record's body.representation_class is the action's class.
 #
 # `representation_classes` is the closed set; a class outside it fails
 # closed.
