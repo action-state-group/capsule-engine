@@ -48,7 +48,7 @@ if TYPE_CHECKING:
     # ``policy`` imports ``guards``; the engine only calls ``in_force``.
     from ..policy.limits import CapsLimits
 
-__all__ = ["GuardDecision", "GuardEngine"]
+__all__ = ["ASK_RULE_EXCLUDED_CHECKS", "GuardDecision", "GuardEngine"]
 
 _DEDUPE_WINDOW_DAYS = 30
 
@@ -108,6 +108,7 @@ class GuardEngine:
         caps_limits: Callable[[Signer], CapsLimits] | None = None,
         clock: Callable[[], str] | None = None,
         ask_gate_selectors: frozenset[str] = frozenset(),
+        ask_wickets: frozenset[str] = frozenset(),
     ) -> None:
         if caps_limits is not None and (caps_minor or per_action_minor):
             raise ValueError("give caps limits as caps_limits or as caps_minor/per_action_minor, not both")
@@ -156,6 +157,21 @@ class GuardEngine:
                 require_disposition(wicket.config["disposition"])
                 if wicket.config["disposition"] == "ask":
                     escalatable.add("counterparty_list")
+        # The configured checks whose obligations all declare
+        # ``default_disposition: ASK`` (``packs/install.py`` derives them from
+        # the installed pack): a failure of one asks an approver. An integrity
+        # check never asks, and the two checks that carry their own ask rule
+        # (the gate's selectors, the list's ``disposition``) are refused here.
+        refused = ask_wickets & ASK_RULE_EXCLUDED_CHECKS
+        if refused:
+            raise ValueError(
+                f"these checks cannot be made to ask an approver by a declared disposition: {sorted(refused)}"
+            )
+        unconfigured = ask_wickets - {w.check for w in wickets}
+        if unconfigured:
+            raise ValueError(f"ask_wickets names checks no configured wicket runs: {sorted(unconfigured)}")
+        self._ask_wickets = ask_wickets
+        escalatable |= ask_wickets
         self._escalatable = frozenset(escalatable)
         # The action_class_gate selectors whose obligations all declare
         # ``default_disposition: ASK`` (``packs/install.py`` derives them
@@ -173,6 +189,12 @@ class GuardEngine:
         self._open: dict[str, _OpenDegradation] = {}
 
     # -- introspection (tests / recovery bookkeeping) -----------------------
+
+    @property
+    def ask_wickets(self) -> frozenset[str]:
+        """The configured checks whose failure asks an approver because every
+        obligation bound to them declares ASK; fixed when the engine is built."""
+        return self._ask_wickets
 
     def open_degradations(self) -> dict[str, str]:
         return {kind: deg.cause for kind, deg in self._open.items()}
@@ -544,9 +566,16 @@ class GuardEngine:
 
 
 # Failures that ask an approver rather than refuse: an over-limit spend and
-# a first-time counterparty.
+# a first-time counterparty. These two ask whatever a pack declares for them.
 _ESCALATABLE = frozenset({"caps", "counterparty_seen_before"})
 _GATE = "action_class_gate"
+# Integrity checks: a failure is refused whatever a pack declares (a dedupe hit
+# on the same act in another deal asks through ``CheckOutcome.asks_approver``).
+_INTEGRITY_CHECKS = frozenset({"dedupe", "verify_before_dispatch", "single_commitment", "promise_never"})
+# Checks whose own config decides whether a failure asks.
+_OWN_ASK_RULE = frozenset({_GATE, "counterparty_list"})
+# The checks a declared ASK disposition never makes ask (``ask_wickets``).
+ASK_RULE_EXCLUDED_CHECKS = _INTEGRITY_CHECKS | _OWN_ASK_RULE
 
 
 def _decide(
@@ -559,11 +588,13 @@ def _decide(
     (``_ESCALATABLE`` -- `caps`, `counterparty_seen_before` -- plus a
     `counterparty_list` configured to ask, plus an `action_class_gate`
     failure whose failing selectors' obligations all declare ASK, plus a
+    configured check whose obligations all declare ASK, plus a
     `dedupe` hit on the same act in another deal) and the
     triggering class has an
     `approver_role` configured -- an integrity failure
     (`verify_before_dispatch`, whether the cited mandate is missing or fails
-    re-verification), a dedupe hit in the same deal, or an escalatable failure on a class with
+    re-verification; `single_commitment`; `promise_never`), a dedupe hit in
+    the same deal, or an escalatable failure on a class with
     no approver configured all hard-deny, unconditionally."""
     fails = {c.id for c in constraints if c.result == "fail"}
     if not fails:

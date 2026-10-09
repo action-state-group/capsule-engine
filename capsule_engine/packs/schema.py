@@ -190,7 +190,10 @@ TIER_VALUES = frozenset({"must_have", "informational"})
 
 # What an obligation's check failing should mean to the person the action is
 # for, by default: the agent may do it (DO), stop and ask them (ASK), or never
-# do it (NEVER). Declared data only -- the guard engine does not read it. Optional
+# do it (NEVER). An engine built from an installed pack reads it: a failing check
+# or gate selector whose obligations all declare ASK asks an approver
+# (``packs/install.py`` ``ask_wickets``/``ask_gate_selectors``); caps and
+# counterparty_seen_before ask whatever is declared. Optional
 # and additive like ``re_derivability_grade``: an obligation with no
 # ``default_disposition`` parses and digests identically to before.
 DEFAULT_DISPOSITION_VALUES = frozenset({"DO", "ASK", "NEVER"})
