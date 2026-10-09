@@ -21,6 +21,13 @@ Applies only to the configured ``commit_classes``. A commitment missing
 ``task_authority_ref`` or ``item_ref`` cannot be placed in a sale, so it is
 ``n/a`` naming the field, never a pass. A failure is an integrity failure:
 the check is not escalatable, so the engine refuses rather than asks.
+
+The outcome carries no reference value. A checker result is sealed into a
+record that can reach a buyer's copy, so the reason and evidence never hold
+``item_ref``, ``task_authority_ref``, a counterparty or the acceptance's
+capsule id: any of them would link one buyer's thread to another's. The
+evidence says only whether the sale has an acceptance; the seller's own
+ledger keeps the acceptance record itself.
 """
 from __future__ import annotations
 
@@ -35,21 +42,21 @@ from .base import CheckOutcome
 __all__ = ["check_single_commitment"]
 
 _CHECK_ID = "single_commitment"
-_METHOD = "first_sealed_acceptance_v0"
+_METHOD = "first_sealed_acceptance_v1"
 
 
 class CommitmentEvidence(TypedDict):
-    task_authority_ref: str
-    item_ref: str
-    acceptance_capsule_id: str | None
-    acceptance_counterparty: str | None
-    counterparty: str | None
-    cites_acceptance: bool
+    constraint_id: str
+    sale_has_acceptance: bool
 
 
 class _Acceptance(TypedDict):
     capsule_id: str
     counterparty: str | None
+
+
+def _evidence(sale_has_acceptance: bool) -> CommitmentEvidence:
+    return CommitmentEvidence(constraint_id=_CHECK_ID, sale_has_acceptance=sale_has_acceptance)
 
 
 def _outcome(result: str, reason: str, evidence: CommitmentEvidence | NotApplicableEvidence) -> CheckOutcome:
@@ -94,21 +101,10 @@ def check_single_commitment(
 
     acceptance = _first_acceptance(action, ledger, acceptance_classes, action.task_authority_ref, action.item_ref)
     if acceptance is None:
-        return _outcome("pass", "no acceptance is sealed for this sale and item", CommitmentEvidence(
-            task_authority_ref=action.task_authority_ref, item_ref=action.item_ref, acceptance_capsule_id=None,
-            acceptance_counterparty=None, counterparty=action.target, cites_acceptance=False,
-        ))
+        return _outcome("pass", "no acceptance is sealed for this sale", _evidence(False))
     cites = action.cited_mandate_capsule_id == acceptance["capsule_id"]
     same_counterparty = action.target is not None and action.target == acceptance["counterparty"]
-    evidence = CommitmentEvidence(
-        task_authority_ref=action.task_authority_ref,
-        item_ref=action.item_ref,
-        acceptance_capsule_id=acceptance["capsule_id"],
-        acceptance_counterparty=acceptance["counterparty"],
-        counterparty=action.target,
-        cites_acceptance=cites,
-    )
     if cites and same_counterparty:
-        return _outcome("pass", "the commitment follows the acceptance, to the counterparty that accepted", evidence)
-    return _outcome("fail", "an acceptance is already sealed for this sale and item; a commitment must cite it "
-                            "and be addressed to the counterparty that accepted", evidence)
+        return _outcome("pass", "the commitment follows the acceptance, to the counterparty that accepted",
+                        _evidence(True))
+    return _outcome("fail", "this sale already has an accepted commitment", _evidence(True))

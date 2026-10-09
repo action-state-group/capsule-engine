@@ -1,6 +1,6 @@
 {
   "wicket_id": "seller.single_commitment/1.0.0",
-  "note": "Steps run in order through one engine and one ledger with only this wicket configured. cites_step is replaced by that step's capsule id as cited_mandate_capsule_id; acceptance_step names the step whose capsule id the evidence must carry.",
+  "note": "Steps run in order through one engine and one ledger with only this wicket configured. cites_step is replaced by that step's capsule id as cited_mandate_capsule_id. sale_has_acceptance is the only thing a pass or fail outcome's evidence states besides the constraint id: it never names the acceptance, the item or a counterparty.",
   "vectors": [
     {
       "name": "a-accepts-then-b-commits",
@@ -22,7 +22,8 @@
           },
           "expect": {
             "single_commitment": "pass",
-            "outcome": "allow"
+            "outcome": "allow",
+            "sale_has_acceptance": false
           }
         },
         {
@@ -43,7 +44,7 @@
           "expect": {
             "single_commitment": "fail",
             "outcome": "deny",
-            "acceptance_step": "a-accept"
+            "sale_has_acceptance": true
           }
         }
       ]
@@ -68,7 +69,8 @@
           },
           "expect": {
             "single_commitment": "pass",
-            "outcome": "allow"
+            "outcome": "allow",
+            "sale_has_acceptance": false
           }
         },
         {
@@ -88,7 +90,8 @@
           },
           "expect": {
             "single_commitment": "pass",
-            "outcome": "allow"
+            "outcome": "allow",
+            "sale_has_acceptance": false
           }
         }
       ]
@@ -113,7 +116,8 @@
           },
           "expect": {
             "single_commitment": "pass",
-            "outcome": "allow"
+            "outcome": "allow",
+            "sale_has_acceptance": false
           }
         },
         {
@@ -156,7 +160,8 @@
           },
           "expect": {
             "single_commitment": "pass",
-            "outcome": "allow"
+            "outcome": "allow",
+            "sale_has_acceptance": false
           }
         },
         {
@@ -178,7 +183,7 @@
           "expect": {
             "single_commitment": "fail",
             "outcome": "deny",
-            "acceptance_step": "a-accept"
+            "sale_has_acceptance": true
           }
         }
       ]
@@ -203,7 +208,8 @@
           },
           "expect": {
             "single_commitment": "pass",
-            "outcome": "allow"
+            "outcome": "allow",
+            "sale_has_acceptance": false
           }
         },
         {
@@ -225,7 +231,7 @@
           "expect": {
             "single_commitment": "pass",
             "outcome": "allow",
-            "acceptance_step": "a-accept"
+            "sale_has_acceptance": true
           }
         }
       ]
@@ -250,7 +256,8 @@
           },
           "expect": {
             "single_commitment": "pass",
-            "outcome": "allow"
+            "outcome": "allow",
+            "sale_has_acceptance": false
           }
         },
         {
