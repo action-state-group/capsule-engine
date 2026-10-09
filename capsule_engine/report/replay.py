@@ -491,6 +491,15 @@ def _only_ref(shown: dict, rel: str) -> str | None:
     return _typed_ref_digest(found[0])
 
 
+# The sealed approvers whose approval carries an act out: the user, or the
+# user's standing intent. Any other (``agent_card``: a click on a card the
+# agent composed) certifies no one's consent, so the act stays unseen. This is
+# the rule capsulectl's deal disposition applies live (capsule-cli
+# internal/cli/deal.go, dealDisposition), so replay never counts as seen a
+# counterparty the live path would not.
+_CONSENTING_APPROVERS = frozenset({"user", "standing_intent"})
+
+
 @dataclass(frozen=True)
 class _CarriedOut:
     """An executed action step's chain back to its check, as digests."""
@@ -503,10 +512,12 @@ class _CarriedOut:
 def _carried_out(action_digest: str, deal: dict[str, dict]) -> _CarriedOut | None:
     """The chain by which the bound action step ``action_digest`` carried out
     a check, read from sealed records only: its one ``authorized_by`` ref
-    names an approval whose body seals ``proceed: true``, and that approval's
-    one ``approves`` ref names the check, or the verdict whose one ``checks``
-    ref names it. Every record in the chain is in the action's deal. ``None``
-    when any link is missing, unbound, declined or of another kind."""
+    names an approval whose body seals ``proceed: true`` and an approver in
+    ``_CONSENTING_APPROVERS``, and that approval's one ``approves`` ref names
+    the check, or the verdict whose one ``checks`` ref names it. Every record
+    in the chain is in the action's deal. ``None`` when any link is missing,
+    unbound, declined, approved by no one who consents for the user, or of
+    another kind."""
     action = deal.get(action_digest)
     if action is None or _record_type(action) != "action":
         return None
@@ -517,6 +528,8 @@ def _carried_out(action_digest: str, deal: dict[str, dict]) -> _CarriedOut | Non
         return None
     body = approval.get("body")
     if approval["x-deal-v0"].get("deal_id") != deal_id or not isinstance(body, dict) or body.get("proceed") is not True:
+        return None
+    if _text(body.get("approver")) not in _CONSENTING_APPROVERS:
         return None
     check_digest = _only_ref(approval, "approves")
     approved = deal.get(check_digest) if check_digest is not None else None
@@ -631,8 +644,8 @@ def replay(
     (``load_withheld``); like every record that states no act, each gets no
     decision.
     When a deal's sealed records show that an act whose check this replay
-    decided (allowed, or asked) was approved to proceed and then executed
-    (``_carried_out``), the replay writes that act to its own view as
+    decided (allowed, or asked) was approved to proceed, by the user or under
+    the user's standing intent, and then executed (``_carried_out``), the replay writes that act to its own view as
     carried out (``_carried_out_record``), once, when it reaches the action
     step, so a later check counts it as an earlier act with that
     counterparty. A refused check is never counted.

@@ -31,6 +31,7 @@ from functools import cache
 from pathlib import Path
 from typing import TypedDict
 
+import pytest
 from agent_action_capsule import json_digest
 
 import capsule_engine
@@ -141,11 +142,12 @@ def _record_type(capsule_id: str) -> str | None:
     return None
 
 
-def decisions_document() -> DecisionsDocument:
+def decisions_document(result: ReplayResult | None = None) -> DecisionsDocument:
     """The replay's decision for every record of the two own copies that
-    gets one (each check), in replay order."""
+    gets one (each check), in replay order: of ``result``, by default the
+    replay of the fixture as sealed."""
     decisions: list[Decision] = []
-    for sourced in _replayed().decisions:
+    for sourced in (result or _replayed()).decisions:
         rules = {r.obligation_id: r.result for r in obligation_results(PACK, sourced.decision.constraints)}
         decisions.append({
             "capsule_id": sourced.record["capsule_id"],
@@ -343,6 +345,10 @@ def _with_body(**fields: object) -> Change:
     return lambda record: {**record, "body": {**record["body"], **fields}}
 
 
+def _without_body(field: str) -> Change:
+    return lambda record: {**record, "body": {k: v for k, v in record["body"].items() if k != field}}
+
+
 def _unseen(result: ReplayResult) -> bool:
     seen = _seen_on_deal_2(result)
     return (seen.result, seen.evidence["prior_count"]) == ("fail", 0)
@@ -359,6 +365,28 @@ def test_an_approval_that_declines_leaves_the_merchant_unseen():
     """Deal 1's approval sealed as declined, its action step still there and
     pointing at it: the chain is whole but says no."""
     assert _unseen(_deals_changed({"approval": _with_body(choice="decline", proceed=False)}))
+
+
+def test_deal_1s_approval_was_sealed_under_the_users_standing_intent():
+    (approval_id,) = _of_type(OWN[0], "approval")
+    assert load_disclosed(OWN)[approval_id]["body"]["approver"] == "standing_intent"
+
+
+def test_an_approval_the_user_gave_counts_the_act_as_seen():
+    seen = _seen_on_deal_2(_deals_changed({"approval": _with_body(approver="user")}))
+    assert (seen.result, seen.evidence["prior_count"]) == ("pass", 1)
+
+
+@pytest.mark.parametrize("approver", ["agent_card", "", None, "User", ["user"], {"user": True}])
+def test_an_approval_no_user_gave_leaves_the_merchant_unseen(approver):
+    """An approval on the agent's own card certifies no one's consent, so the
+    act it approves stays unseen, as live counts it; so does any approver the
+    producer does not seal for the user or the user's standing intent."""
+    assert _unseen(_deals_changed({"approval": _with_body(approver=approver)}))
+
+
+def test_an_approval_naming_no_approver_leaves_the_merchant_unseen():
+    assert _unseen(_deals_changed({"approval": _without_body("approver")}))
 
 
 def test_an_approved_act_never_executed_leaves_the_merchant_unseen():
