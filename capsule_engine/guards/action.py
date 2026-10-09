@@ -70,7 +70,9 @@ class Action:
     The fields below are each one number, one member of a closed set, or one
     opaque reference, never an object, a diff or text, and each is sealed on
     the capsule when set. ``recipient_role`` is the role of whoever receives a
-    disclosure (``fulfilling_merchant``, ``third_party``, ``self``), read by
+    disclosure, one member of the role set the wicket pins
+    (``fulfilling_merchant``, ``third_party``, ``self``; a seller's set has
+    ``buyer`` in place of ``fulfilling_merchant``), read by
     ``recipient_role``. ``refundable`` is whether the payment can be refunded,
     read by ``refundability``. ``material_fields_changed`` and
     ``offer_fields_changed`` count how many fields on a list pinned in the
@@ -84,6 +86,14 @@ class Action:
     as ``amount_minor``, read by ``upfront_amount``. ``task_authority_ref`` is
     the SHA-256 digest of the sealed task-authority record the action cites,
     read by ``task_authority``.
+    ``representation_class`` is the one class of statement the action makes
+    to a counterparty (``price``, ``condition``, ``warranty``, ...), read by
+    ``promise_class`` and counted by ``required_disclosure``; a message that
+    makes several statements is several actions, one class each. The
+    statement itself never reaches the guard. ``authorized_by`` is the
+    SHA-256 digest of the sealed approval record the action cites, read by
+    ``promise_class``. ``proposal_at`` is the RFC 3339 UTC timestamp of the
+    proposal the action acts on, read by ``offer_expiry``.
     ``taxonomy_version`` (normally ``classes.TAXONOMY_VERSION``) is sealed
     beside ``action_class`` when set, so a count over trigger classes can be
     recomputed against the table that was live; unset, the record keeps its
@@ -123,6 +133,9 @@ class Action:
     first_contact_channel: str | None = None
     upfront_amount_minor: int | None = None
     task_authority_ref: str | None = None
+    representation_class: str | None = None
+    authorized_by: str | None = None
+    proposal_at: str | None = None
 
     def __post_init__(self) -> None:
         if self.counterparty_account_ref is not None and _looks_like_raw_account_number(

@@ -1,0 +1,11 @@
+# offer_expiry wicket: how old the proposal an action acts on may be
+# (guards/checks/offer_expiry.py). The age is the action's own timestamp
+# minus Action.proposal_at, both RFC 3339 UTC timestamps sealed on the
+# record, in whole seconds. Older than `max_age_seconds` is not a failure:
+# the check records n/a with expired true, and the proposal is to be asked
+# again. Default limit: 24 hours.
+wicket_id: offer_expiry/1.0.0
+check: offer_expiry
+config:
+  action_classes: [marketplace.offer, marketplace.sale, agreement.accept]
+  max_age_seconds: 86400

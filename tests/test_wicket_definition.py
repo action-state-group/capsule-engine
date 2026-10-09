@@ -57,6 +57,14 @@ EXPECTED_DIGESTS = {
     "channel_change/1.0.0": "fb580fc03afe1e641286c3ba62650d8e7150be91c6de0c6dac6a225a2eb6c793",
     "upfront_amount/1.0.0": "30996a832fa0cd94dc9a64f11e69d903f73a6e6415bff4005a665460a0798a6f",
     "task_authority/1.0.0": "bdb53ad1d4f3f18dc3a8ed5752c4429725df1df692f1e3b3687517f40074c150",
+    # The seller-side checks, and the seller configurations of two existing
+    # ones. No pack cites them yet.
+    "price_floor/1.0.0": "a7eb755a71cf9dabaf04fbd740fc9ceaad5f0ba883795adad6fd9038796dffa9",
+    "required_disclosure/1.0.0": "c8f216415be1fac673d1efc6df2e7a9666b5d5c8e639fbb3d8379a24bb8f5ebf",
+    "promise_class/1.0.0": "d79a99ed1bff4d89ebf38faaa490f5c91ffd2fbe06f03a6d99f81e800d6187c9",
+    "offer_expiry/1.0.0": "7b1072fc6997b07e7f08941a723e60d53fd3a54dbccfda6fa7391124ec2702ee",
+    "seller.recipient_role/1.0.0": "001d4d4198921ffec5f492f88286765a075eece1418d15b68576d4fceec7826b",
+    "seller.destination_rail/1.0.0": "fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800",
 }
 
 

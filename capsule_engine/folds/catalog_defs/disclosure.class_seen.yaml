@@ -1,0 +1,29 @@
+# Count of accepted prior representations per representation class, leaving
+# dry runs out. Used by the required_disclosure/1.0.0 wicket: zero for a
+# required class means that class was never stated before the action.
+#
+# The caller selects one operator's records addressed to one counterparty
+# (asg_payload.target) before evaluating (guards/checks/
+# required_disclosure.py), so the count is per class, to that counterparty.
+# Records without asg_payload.representation_class are skipped. Only
+# accepted actions count: a statement the guard refused was never made.
+fold_id: disclosure.class_seen/1.0.0
+reads:
+  - path: asg_payload.representation_class
+    erasure_class: commitment-ok
+  - path: disposition.decision
+    erasure_class: commitment-ok
+  - path: asg_payload.checkpoint.dry_run
+    erasure_class: commitment-ok
+    default: false
+filter:
+  - field: disposition.decision
+    op: eq
+    value: accept
+  - field: asg_payload.checkpoint.dry_run
+    op: ne
+    value: true
+key: asg_payload.representation_class
+reduce:
+  reducer: count
+emit: prior_count

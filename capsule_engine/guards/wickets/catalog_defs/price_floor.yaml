@@ -1,0 +1,13 @@
+# price_floor wicket: the lowest total the task authority accepts
+# (guards/checks/price_floor.py). The floor is min_total_minor in the body
+# of the sealed task-authority record the action cites, read only when the
+# engine's own digest of the record equals the action's task_authority_ref,
+# as task_authority/1.0.0 binds it; the action cannot carry its own floor.
+# Fails when Action.amount_minor is below the floor, in the action's own
+# minor units. The mirror of caps, which compares upward only.
+#
+# Declared disposition: ask.
+wicket_id: price_floor/1.0.0
+check: price_floor
+config:
+  action_classes: [marketplace.offer, marketplace.sale, agreement.accept]

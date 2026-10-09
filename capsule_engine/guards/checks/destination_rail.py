@@ -2,11 +2,15 @@
 """destination_rail check: set membership of the action's payment rail.
 
 Fails when ``Action.rail`` is one of the configured ``watched_rails`` (for
-example a peer-to-peer or gift-card rail). Applies only to the configured
+example a peer-to-peer or gift-card rail), or, when ``allowed_rails`` is
+configured, is not one of those. A definition without ``allowed_rails``
+records the evidence it always has. Applies only to the configured
 ``action_classes``. It records the rail it read and
 the set it compared against; it does not judge why the rail was chosen.
 """
 from __future__ import annotations
+
+from typing import NotRequired, TypedDict
 
 from ..action import Action
 from ..capsule import ConstraintOutcome, not_applicable_evidence
@@ -18,7 +22,15 @@ _CHECK_ID = "destination_rail"
 _METHOD = "set_membership_v0"
 
 
-def check_destination_rail(action: Action, *, watched_rails: list[str], action_classes: list[str]) -> CheckOutcome:
+class RailEvidence(TypedDict):
+    rail: str
+    watched_rails: list[str]
+    allowed_rails: NotRequired[list[str]]
+
+
+def check_destination_rail(
+    action: Action, *, watched_rails: list[str], action_classes: list[str], allowed_rails: list[str] | None = None
+) -> CheckOutcome:
     if action.action_class not in action_classes:
         return CheckOutcome(
             constraint=ConstraintOutcome(
@@ -42,7 +54,21 @@ def check_destination_rail(action: Action, *, watched_rails: list[str], action_c
             )
         )
     watched = sorted(watched_rails)
-    evidence = {"rail": action.rail, "watched_rails": watched}
+    evidence = RailEvidence(rail=action.rail, watched_rails=watched)
+    if allowed_rails is not None:
+        allowed = sorted(allowed_rails)
+        evidence["allowed_rails"] = allowed
+        if action.rail not in allowed:
+            return CheckOutcome(
+                constraint=ConstraintOutcome(
+                    id=_CHECK_ID,
+                    result="fail",
+                    reason=f"rail {action.rail!r} is not one of the allowed rails {allowed}",
+                    evidence=evidence,
+                    check_type="policy",
+                    method=_METHOD,
+                )
+            )
     if action.rail in watched:
         return CheckOutcome(
             constraint=ConstraintOutcome(

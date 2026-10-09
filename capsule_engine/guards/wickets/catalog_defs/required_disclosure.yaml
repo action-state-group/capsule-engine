@@ -1,0 +1,23 @@
+# required_disclosure wicket: classes of statement that must have been made
+# to the counterparty before the action (guards/checks/
+# required_disclosure.py). For each class in `required_classes`, the
+# disclosure.class_seen/1.0.0 fold counts this operator's accepted prior
+# actions addressed to Action.target that carried that
+# representation_class; a zero fails the check. It checks that a statement
+# of the class was recorded, never what it said or whether it was true.
+#
+# `representation_classes` is the closed set a class must come from;
+# `required_classes` outside it is refused when the check runs.
+# `fold_digest` is the real definition_digest() of
+# folds/catalog_defs/disclosure.class_seen.yaml; the check refuses to run
+# when the catalog fold does not match it.
+#
+# Declared disposition: ask.
+wicket_id: required_disclosure/1.0.0
+check: required_disclosure
+config:
+  action_classes: [marketplace.offer, marketplace.sale, agreement.accept]
+  representation_classes: [price, condition, features, authenticity, availability, delivery_date, service_scope, warranty, refund_terms, payment_methods, pickup, deadline, address, other]
+  required_classes: [condition]
+  fold_id: disclosure.class_seen/1.0.0
+  fold_digest: 5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564

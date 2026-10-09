@@ -1,0 +1,505 @@
+# SPDX-License-Identifier: Apache-2.0
+"""The seller-side wickets: price_floor, required_disclosure, promise_class
+and offer_expiry, plus the seller configurations of recipient_role and
+destination_rail. Each reads one number, one member of a closed set, one
+opaque reference or one timestamp from an action, never a list, an object
+or text. None of them judges whether a statement is true: they check that a
+statement was recorded, or that a bound holds."""
+from __future__ import annotations
+
+import copy
+import dataclasses
+from pathlib import Path
+
+import pytest
+import yaml
+
+from capsule_engine.folds.loader import load_definition_file as load_fold
+from capsule_engine.guards import Action, GuardEngine
+from capsule_engine.guards.capsule import not_applicable_evidence
+from capsule_engine.guards.checks import (
+    CONFIGURED_CHECKS,
+    TASK_AUTHORITY_CHECKS,
+    TaskAuthorityRecord,
+    check_destination_rail,
+    task_authority_record_digest,
+)
+from capsule_engine.guards.wickets import Catalog, WicketDefinition, load_definition_file
+from capsule_engine.packs.loader import load_pack_dir
+from capsule_engine.report.result_from_folds import project_guard_constraint
+
+ROOT = Path(__file__).parent.parent / "capsule_engine"
+CATALOG = ROOT / "guards" / "wickets" / "catalog_defs"
+FOLDS = ROOT / "folds" / "catalog_defs"
+
+FLOOR = load_definition_file(CATALOG / "price_floor.yaml")
+DISCLOSURE = load_definition_file(CATALOG / "required_disclosure.yaml")
+PROMISE = load_definition_file(CATALOG / "promise_class.yaml")
+EXPIRY = load_definition_file(CATALOG / "offer_expiry.yaml")
+SELLER_ROLE = load_definition_file(CATALOG / "recipient_role.seller.yaml")
+SELLER_RAIL = load_definition_file(CATALOG / "destination_rail.seller.yaml")
+SPEND = load_fold(FOLDS / "spend.weekly.v3.yaml")
+SELLER_DEFINITIONS = (FLOOR, DISCLOSURE, PROMISE, EXPIRY, SELLER_ROLE, SELLER_RAIL)
+
+# The closed set of representation classes, in this order.
+REPRESENTATION_CLASSES = [
+    "price", "condition", "features", "authenticity", "availability", "delivery_date", "service_scope",
+    "warranty", "refund_terms", "payment_methods", "pickup", "deadline", "address", "other",
+]
+
+BUYER = "buyer/ref-7"
+# A sealed approval record's digest, as an action cites it.
+APPROVAL_REF = "5" * 64
+
+# A seller's task authority for one used bicycle: ask 1,900.00, accept down
+# to 1,700.00. Synthetic: the producer does not seal min_total_minor yet,
+# so this is not a producer golden vector.
+BICYCLE: TaskAuthorityRecord = {
+    "type": "task-authority/v0",
+    "body": {"outcome_id": "household.sell_the_bicycle/1.0.0", "allowed_actions": ["offer", "sell"],
+             "preconditions": [], "min_total_minor": 170_000},
+}
+BICYCLE_REF = task_authority_record_digest(BICYCLE)
+
+
+def _action(**overrides) -> Action:
+    fields = dict(
+        verb="offer",
+        operator="household",
+        developer="assistant@v1",
+        action_class="marketplace.offer",
+        amount_minor=175_000,
+        currency="USD",
+        target=BUYER,
+        timestamp="2026-10-08T09:00:00Z",
+    )
+    fields.update(overrides)
+    return Action(**fields)
+
+
+def _missing(constraint_id: str, field: str):
+    return not_applicable_evidence(constraint_id, in_scope=True, missing_field=field)
+
+
+def _engine(store, signer, *wickets: WicketDefinition) -> GuardEngine:
+    return GuardEngine(ledger=store, caps_fold=SPEND, signer_provider=lambda: signer, wickets=wickets)
+
+
+def _run(definition: WicketDefinition, action: Action, *, ledger=None, record=None):
+    if definition.check in TASK_AUTHORITY_CHECKS:
+        return TASK_AUTHORITY_CHECKS[definition.check](action, record, definition.config).constraint
+    return CONFIGURED_CHECKS[definition.check](action, ledger, definition.config).constraint
+
+
+# -- the input shape ------------------------------------------------------------
+
+
+def test_every_new_action_field_is_one_optional_scalar():
+    hints = {f.name: f.type for f in dataclasses.fields(Action)}
+    for name in ("representation_class", "authorized_by", "proposal_at"):
+        assert hints[name] == "str | None", name
+        assert Action.__dataclass_fields__[name].default is None, name
+
+
+def test_new_fields_are_sealed_only_when_set(store, signer):
+    engine = _engine(store, signer)
+    bare = engine.check(_action(action_id="offer/bare")).capsule["asg_payload"]
+    for name in ("representation_class", "authorized_by", "proposal_at"):
+        assert name not in bare
+    sealed = engine.check(
+        _action(action_id="offer/sealed", representation_class="warranty", authorized_by=APPROVAL_REF,
+                proposal_at="2026-10-08T08:00:00Z")
+    ).capsule["asg_payload"]
+    assert sealed["representation_class"] == "warranty"
+    assert sealed["authorized_by"] == APPROVAL_REF
+    assert sealed["proposal_at"] == "2026-10-08T08:00:00Z"
+
+
+def test_the_representation_class_set_is_pinned_verbatim():
+    assert DISCLOSURE.config["representation_classes"] == REPRESENTATION_CLASSES
+    assert PROMISE.config["representation_classes"] == REPRESENTATION_CLASSES
+
+
+def test_the_seller_configs_reuse_the_existing_checks_and_leave_v1_alone():
+    assert SELLER_ROLE.check == "recipient_role"
+    assert SELLER_ROLE.config["roles"] == ["buyer", "third_party", "self"]
+    assert SELLER_RAIL.check == "destination_rail"
+    v1_role = load_definition_file(CATALOG / "recipient_role.yaml")
+    assert v1_role.config["roles"] == ["fulfilling_merchant", "third_party", "self"]
+    v1_rail = load_definition_file(CATALOG / "destination_rail.yaml")
+    assert "allowed_rails" not in v1_rail.config
+
+
+def test_the_loader_reproduces_every_seller_digest():
+    catalog = Catalog(CATALOG)
+    for definition in SELLER_DEFINITIONS:
+        entry = catalog.get(definition.wicket_id)
+        assert entry is not None, definition.wicket_id
+        assert entry.digest == definition.definition_digest()
+        assert catalog.get(entry.digest).definition == definition
+
+
+# -- price_floor ----------------------------------------------------------------
+
+
+def _floor(record=BICYCLE, **overrides):
+    return _run(FLOOR, _action(task_authority_ref=BICYCLE_REF, **overrides), record=record)
+
+
+def test_price_floor_on_the_bicycle():
+    above = _floor(amount_minor=175_000)
+    assert above.result == "pass"
+    assert above.evidence == {"task_authority_ref": BICYCLE_REF, "amount_minor": 175_000,
+                              "min_total_minor": 170_000, "below_floor": False}
+    below = _floor(amount_minor=168_000)
+    assert below.result == "fail"
+    assert below.evidence["below_floor"] is True
+
+
+def test_price_floor_passes_at_the_floor_itself():
+    assert _floor(amount_minor=170_000).result == "pass"
+    assert _floor(amount_minor=169_999).result == "fail"
+
+
+def test_price_floor_reads_only_the_record_the_reference_binds():
+    lowered = copy.deepcopy(BICYCLE)
+    lowered["body"]["min_total_minor"] = 100_000
+    out = _floor(record=lowered, amount_minor=168_000)
+    assert out.result == "n/a"
+    assert out.evidence == _missing("price_floor", "task_authority_record")
+    assert "ref mismatch" in out.reason
+
+
+def test_price_floor_without_inputs_is_n_a_naming_the_input():
+    assert _run(FLOOR, _action(), record=BICYCLE).evidence == _missing("price_floor", "task_authority_ref")
+    assert _floor(record=None).evidence == _missing("price_floor", "task_authority_record")
+    assert _floor(amount_minor=None).evidence == _missing("price_floor", "amount_minor")
+    no_floor: TaskAuthorityRecord = {"body": {k: v for k, v in BICYCLE["body"].items() if k != "min_total_minor"}}
+    out = _run(FLOOR, _action(task_authority_ref=task_authority_record_digest(no_floor)), record=no_floor)
+    assert out.evidence == _missing("price_floor", "min_total_minor")
+
+
+@pytest.mark.parametrize("bad", [True, "170000", -1, 1700.5])
+def test_price_floor_refuses_a_floor_that_is_not_a_minor_unit_count(bad):
+    record: TaskAuthorityRecord = {"body": {**BICYCLE["body"], "min_total_minor": bad}}
+    try:
+        ref = task_authority_record_digest(record)
+    except ValueError:
+        ref = "0" * 64  # a float has no digest; the record then cannot be bound at all
+    out = _run(FLOOR, _action(task_authority_ref=ref), record=record)
+    assert out.result == "n/a"
+    assert out.evidence["missing_field"] in ("min_total_minor", "task_authority_record")
+
+
+def test_price_floor_out_of_scope_class():
+    out = _run(FLOOR, _action(action_class="money.purchase", task_authority_ref=BICYCLE_REF), record=BICYCLE)
+    assert out.evidence == not_applicable_evidence("price_floor", in_scope=False)
+
+
+# -- required_disclosure --------------------------------------------------------
+
+
+def _disclose(engine: GuardEngine, n: int, *, cls="condition", target=BUYER, dry_run=False):
+    out = engine.check(
+        _action(verb="tell", action_class="communication.send", amount_minor=None, action_id=f"tell/{n}",
+                target=target, representation_class=cls, equivalence_key=f"tell-{n}"),
+        dry_run=dry_run,
+    )
+    assert out.capsule["disposition"]["decision"] == "accept"
+
+
+def _act(store, signer, definition=DISCLOSURE):
+    engine = _engine(store, signer, definition)
+    (out,) = [c for c in engine.check(_action(action_id="offer/act")).constraints if c.id == "required_disclosure"]
+    return out
+
+
+def _plain(store, signer) -> GuardEngine:
+    return _engine(store, signer)
+
+
+def test_required_disclosure_missing_fails(store, signer):
+    out = _act(store, signer)
+    assert out.result == "fail"
+    assert out.evidence["missing_classes"] == ["condition"]
+    assert out.evidence["prior_counts"] == {"condition": 0}
+
+
+def test_required_disclosure_present_passes(store, signer):
+    _disclose(_plain(store, signer), 1)
+    out = _act(store, signer)
+    assert out.result == "pass"
+    assert out.evidence["missing_classes"] == []
+    assert out.evidence["prior_counts"] == {"condition": 1}
+    assert out.evidence["scope"] == {"operator": "household", "target": BUYER}
+    assert out.method == "disclosure.class_seen/1.0.0"
+
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {"cls": "price"},  # a different class
+        {"target": "buyer/ref-8"},  # the same class told to someone else
+        {"dry_run": True},  # never sent
+    ],
+)
+def test_required_disclosure_counts_only_this_class_to_this_counterparty(store, signer, kwargs):
+    _disclose(_plain(store, signer), 1, **kwargs)
+    assert _act(store, signer).result == "fail"
+
+
+def test_required_disclosure_does_not_count_a_refused_disclosure(store, signer):
+    refusing = _engine(store, signer, PROMISE)
+    out = refusing.check(_action(verb="tell", action_class="communication.send", amount_minor=None,
+                                 action_id="tell/refused", representation_class="warranty"))
+    assert out.capsule["disposition"]["decision"] == "reject"
+    warranty_required = dataclasses.replace(DISCLOSURE, config={**DISCLOSURE.config, "required_classes": ["warranty"]})
+    assert _act(store, signer, warranty_required).result == "fail"
+
+
+def test_required_disclosure_without_a_target_is_n_a(store, signer):
+    out = _run(DISCLOSURE, _action(target=None), ledger=store)
+    assert out.evidence == _missing("required_disclosure", "target")
+
+
+def test_required_disclosure_refuses_a_class_outside_the_set():
+    bad = {**DISCLOSURE.config, "required_classes": ["condition", "mood"]}
+    with pytest.raises(ValueError, match="mood"):
+        CONFIGURED_CHECKS["required_disclosure"](_action(), None, bad)
+
+
+def test_required_disclosure_fold_is_the_pinned_catalog_fold():
+    fold = load_fold(FOLDS / "disclosure.class_seen.yaml")
+    assert DISCLOSURE.config["fold_id"] == fold.fold_id
+    assert DISCLOSURE.config["fold_digest"] == fold.definition_digest()
+
+
+# -- promise_class --------------------------------------------------------------
+
+
+def _promise(**overrides):
+    return _run(PROMISE, _action(action_class="communication.send", **overrides))
+
+
+@pytest.mark.parametrize("cls", ["authenticity", "warranty", "delivery_date"])
+def test_promise_class_never_without_approval(cls):
+    out = _promise(representation_class=cls)
+    assert out.result == "fail"
+    assert out.evidence == {"representation_class": cls, "recognised": True, "requires_approval": True,
+                            "authorized_by": None}
+    approved = _promise(representation_class=cls, authorized_by=APPROVAL_REF)
+    assert approved.result == "pass"
+    assert approved.evidence["authorized_by"] == APPROVAL_REF
+
+
+def test_promise_class_passes_an_ordinary_representation():
+    out = _promise(representation_class="condition")
+    assert out.result == "pass"
+    assert out.evidence["requires_approval"] is False
+
+
+@pytest.mark.parametrize("ref", ["yes", "5" * 63, "G" * 64, "5" * 65])
+def test_promise_class_needs_a_digest_shaped_approval(ref):
+    out = _promise(representation_class="warranty", authorized_by=ref)
+    assert out.result == "fail"
+    assert out.evidence["authorized_by"] is None
+
+
+def test_promise_class_unrecognised_class_fails_closed():
+    out = _promise(representation_class="guarantee", authorized_by=APPROVAL_REF)
+    assert out.result == "fail"
+    assert out.evidence["recognised"] is False
+
+
+def test_promise_class_without_a_class_is_n_a():
+    assert _promise().evidence == _missing("promise_class", "representation_class")
+
+
+# -- offer_expiry ---------------------------------------------------------------
+
+
+def _expiry(**overrides):
+    return _run(EXPIRY, _action(**overrides))
+
+
+def test_offer_expiry_within_the_limit_passes():
+    out = _expiry(proposal_at="2026-10-07T09:00:00Z")  # exactly max_age_seconds old
+    assert out.result == "pass"
+    assert out.evidence == {"proposal_at": "2026-10-07T09:00:00Z", "decided_at": "2026-10-08T09:00:00Z",
+                            "age_seconds": 86_400, "max_age_seconds": 86_400}
+
+
+def test_offer_expiry_past_the_limit_is_not_evaluable_never_fail():
+    out = _expiry(proposal_at="2026-10-07T08:59:59Z")
+    assert out.result == "n/a"
+    assert "re-ask" in out.reason and "86401s" in out.reason
+    # The facts object a report reads as not evaluable (report/result_from_folds.py).
+    assert out.evidence == _missing("offer_expiry", "proposal_at")
+
+
+def test_an_expired_proposal_projects_as_not_evaluable(store, signer):
+    engine = _engine(store, signer, EXPIRY)
+    capsule = engine.check(_action(action_id="offer/stale", proposal_at="2026-10-01T09:00:00Z")).capsule
+    (record,) = [c for c in capsule["constraints"] if c["id"] == "offer_expiry"]
+    projected = project_guard_constraint(record, candidate_fields=frozenset({"proposal_at"}))
+    assert projected.verdict == "not_evaluable"
+    assert projected.recording_defect is False
+
+
+def test_offer_expiry_reads_fractional_seconds_down():
+    out = _expiry(proposal_at="2026-10-07T09:00:00.5Z", timestamp="2026-10-08T09:00:00.4Z")
+    assert out.evidence["age_seconds"] == 86_399
+
+
+def test_offer_expiry_without_inputs_is_n_a_naming_the_input():
+    assert _expiry().evidence == _missing("offer_expiry", "proposal_at")
+    assert _expiry(proposal_at="2026-10-07T09:00:00Z", timestamp=None).evidence == _missing("offer_expiry", "timestamp")
+
+
+@pytest.mark.parametrize("bad", ["yesterday", "2026-10-07", "2026-10-07T09:00:00", "2026-13-07T09:00:00Z", "2026-10-09T09:00:00Z"])
+def test_offer_expiry_unreadable_or_future_proposal_is_n_a(bad):
+    out = _expiry(proposal_at=bad)
+    assert out.result == "n/a"
+    assert out.evidence == _missing("offer_expiry", "proposal_at")
+
+
+# -- seller recipient_role and destination_rail ---------------------------------
+
+
+def test_seller_recipient_role():
+    def role(r):
+        return _run(SELLER_ROLE, _action(action_class="disclosure.personal", recipient_role=r))
+
+    assert role("buyer").result == "pass"
+    assert role("self").result == "pass"
+    assert role("third_party").result == "fail"
+    assert role("fulfilling_merchant").evidence["recognised"] is False
+
+
+def test_seller_destination_rail_is_an_allow_list():
+    def rail(r):
+        return _run(SELLER_RAIL, _action(action_class="marketplace.sale", rail=r))
+
+    assert rail("card").result == "pass"
+    assert rail("p2p").result == "pass"
+    out = rail("check")
+    assert out.result == "fail"
+    assert out.evidence == {"rail": "check", "watched_rails": [], "allowed_rails": ["card", "p2p"]}
+
+
+def test_destination_rail_v1_evidence_is_unchanged():
+    out = check_destination_rail(_action(action_class="money.transfer", rail="card"),
+                                 watched_rails=["p2p"], action_classes=["money.transfer"]).constraint
+    assert out.evidence == {"rail": "card", "watched_rails": ["p2p"]}
+
+
+# -- one mutant per config field ------------------------------------------------
+
+# For every config field of every new definition: the vector, the field's
+# mutated value, and the result before and after. A field whose mutation
+# does not move the result is a field the check does not read.
+MUTANTS = [
+    (FLOOR, "action_classes", dict(amount_minor=168_000, task_authority_ref=BICYCLE_REF), ["money.purchase"],
+     "fail", "n/a"),
+    (PROMISE, "action_classes", dict(action_class="communication.send", representation_class="warranty"),
+     ["marketplace.sale"], "fail", "n/a"),
+    (PROMISE, "never_without_approval", dict(action_class="communication.send", representation_class="warranty"),
+     ["authenticity"], "fail", "pass"),
+    (PROMISE, "representation_classes", dict(action_class="communication.send", representation_class="condition"),
+     [c for c in REPRESENTATION_CLASSES if c != "condition"], "pass", "fail"),
+    (EXPIRY, "action_classes", dict(proposal_at="2026-10-07T09:00:00Z"), ["agreement.accept"], "pass", "n/a"),
+    (EXPIRY, "max_age_seconds", dict(proposal_at="2026-10-07T09:00:00Z"), 86_399, "pass", "n/a"),
+    (SELLER_ROLE, "action_classes", dict(action_class="disclosure.personal", recipient_role="third_party"),
+     ["communication.send"], "fail", "n/a"),
+    (SELLER_ROLE, "roles", dict(action_class="disclosure.personal", recipient_role="buyer"), ["self"],
+     "pass", "fail"),
+    (SELLER_ROLE, "allowed_roles", dict(action_class="disclosure.personal", recipient_role="buyer"), ["self"],
+     "pass", "fail"),
+    (SELLER_RAIL, "action_classes", dict(action_class="marketplace.sale", rail="check"), ["money.transfer"],
+     "fail", "n/a"),
+    (SELLER_RAIL, "allowed_rails", dict(action_class="marketplace.sale", rail="check"), ["check"], "fail", "pass"),
+]
+
+
+@pytest.mark.parametrize("definition,field,vector,mutated,before,after", MUTANTS,
+                         ids=[f"{m[0].wicket_id}:{m[1]}" for m in MUTANTS])
+def test_each_config_field_moves_the_result(definition, field, vector, mutated, before, after):
+    action = _action(**vector)
+    assert _run(definition, action, record=BICYCLE).result == before
+    mutant = dataclasses.replace(definition, config={**definition.config, field: mutated})
+    assert _run(mutant, action, record=BICYCLE).result == after
+
+
+@pytest.mark.parametrize(
+    "field,mutated",
+    [("action_classes", ["money.purchase"]), ("required_classes", ["price"]),
+     ("representation_classes", REPRESENTATION_CLASSES[:1] + REPRESENTATION_CLASSES[2:]),
+     ("fold_digest", "0" * 64), ("fold_id", "counterparty.seen_before/2.0.0")],
+)
+def test_each_required_disclosure_config_field_is_read(store, signer, field, mutated):
+    _disclose(_plain(store, signer), 1)
+    assert _act(store, signer).result == "pass"
+    mutant = dataclasses.replace(DISCLOSURE, config={**DISCLOSURE.config, field: mutated})
+    if field in ("representation_classes", "fold_digest", "fold_id"):
+        with pytest.raises(ValueError):
+            _act(store, signer, mutant)
+        return
+    assert _act(store, signer, mutant).result == ("n/a" if field == "action_classes" else "fail")
+
+
+def test_every_config_field_has_a_mutant():
+    covered = {(m[0].wicket_id, m[1]) for m in MUTANTS}
+    covered |= {(DISCLOSURE.wicket_id, f) for f in
+                ("action_classes", "required_classes", "representation_classes", "fold_digest", "fold_id")}
+    declared = {(d.wicket_id, f) for d in SELLER_DEFINITIONS for f in d.config}
+    assert declared == covered
+
+
+# -- the engine, and the gap it still has ---------------------------------------
+
+
+def test_engine_decides_the_bicycle(store, signer):
+    engine = _engine(store, signer, FLOOR)
+    ok = engine.check(_action(action_id="offer/1750", task_authority_ref=BICYCLE_REF), task_authority_record=BICYCLE)
+    assert ok.outcome == "allow"
+    low = engine.check(_action(action_id="offer/1680", amount_minor=168_000, task_authority_ref=BICYCLE_REF),
+                       task_authority_record=BICYCLE)
+    # The definition's disposition is ASK, but the engine does not read a
+    # declared disposition: a failing rule outside its escalatable set
+    # refuses. Pinned here so the change that makes ASK pause shows up.
+    assert low.outcome == "deny"
+    assert {c.id: c.result for c in low.constraints}["price_floor"] == "fail"
+
+
+def test_engine_lets_an_expired_proposal_through(store, signer):
+    """offer_expiry records n/a, and the engine does not block on n/a: the
+    re-ask is the caller's to act on. Pinned for the same reason."""
+    engine = _engine(store, signer, EXPIRY)
+    out = engine.check(_action(action_id="offer/stale", proposal_at="2026-10-01T09:00:00Z"))
+    assert {c.id: c.result for c in out.constraints}["offer_expiry"] == "n/a"
+    assert out.outcome == "allow"
+
+
+# -- a pack citing them ---------------------------------------------------------
+
+
+def test_a_seller_pack_citing_every_seller_definition_validates(tmp_path):
+    catalog = Catalog(CATALOG)
+    pack = {
+        "pack_id": "test_pub/seller-everyday/0.1.0",
+        "obligations": [{"id": f"o{i}", "statement": d.wicket_id, "check": d.check}
+                        for i, d in enumerate(SELLER_DEFINITIONS)],
+        "action_semantics": [{
+            "action_type": "offer.make",
+            "action_class": "marketplace.offer",
+            "required_fields": ["amount_minor", "task_authority_ref", "target"],
+            "optional_fields": ["representation_class", "authorized_by", "proposal_at", "recipient_role", "rail"],
+        }],
+        "constraints": [{"wicket_ref": d.wicket_id, "digest": catalog.get(d.wicket_id).digest}
+                        for d in SELLER_DEFINITIONS],
+        "folds": [{"file": "seen.yaml"}],
+    }
+    (tmp_path / "pack.yaml").write_text(yaml.dump(pack))
+    (tmp_path / "seen.yaml").write_text((FOLDS / "disclosure.class_seen.yaml").read_text())
+    loaded = load_pack_dir(tmp_path)
+    assert {c.wicket_id for c in loaded.constraints} == {d.wicket_id for d in SELLER_DEFINITIONS}
