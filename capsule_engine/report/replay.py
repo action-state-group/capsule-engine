@@ -436,16 +436,32 @@ def _gets_no_decision(record: dict, disclosed: dict | None, withheld: frozenset[
     return _states_no_act(record, disclosed)
 
 
+# The typed records (capsule-cli internal/cli/action_records.go) that state no
+# act: the task authority, an evaluation, an approval (the user's, or a
+# counterparty's acceptance), the action taken, which carries out the act its
+# proposed action already stated, its outcome and a report. Only a
+# ``proposed-action/v0`` is a check. A type not named here still gets a
+# decision.
+_TYPED_NO_ACT = frozenset({
+    "task-authority/v0", "action-evaluation/v0", "action-approval/v0", "action-record/v0", "action-outcome/v0",
+    "action-report/v0",
+})
+
+
 def _states_no_act(record: dict, disclosed: dict | None) -> bool:
     """Whether ``record`` is a deal record other than a check, read from the
     ``x-deal-v0.record_type`` its capsule sealed: a baseline, verdict,
     approval or intent states no act, and the action step carries out the
-    act its check already stated. Never read from ``action_id`` or
-    ``action_type``, and never from a record the capsule does not bind."""
+    act its check already stated. A typed record, which has no ``x-deal-v0``
+    block, is read from its sealed ``type`` (``_TYPED_NO_ACT``). Never read
+    from ``action_id`` or ``action_type``, and never from a record the
+    capsule does not bind."""
     if disclosed is None or not _bound(record, disclosed):
         return False
     block = disclosed.get("x-deal-v0")
-    record_type = block.get("record_type") if isinstance(block, dict) else None
+    if not isinstance(block, dict):
+        return disclosed.get("type") in _TYPED_NO_ACT
+    record_type = block.get("record_type")
     return isinstance(record_type, str) and record_type != "check"
 
 
@@ -519,6 +535,62 @@ def _deal_records(records: list[dict], disclosed: dict[str, dict]) -> dict[str, 
         shown = disclosed.get(record.get("capsule_id", ""))
         if shown is not None and isinstance(shown.get("x-deal-v0"), dict) and _bound(record, shown):
             found[json_digest(shown)] = shown
+    return found
+
+
+# How a typed deal states a seller's offer, the buyer's acceptance of it and
+# the seller's commit (capsule-cli action_records.go).
+_PROPOSED_TYPE = "proposed-action/v0"
+_APPROVAL_TYPE = "action-approval/v0"
+_ACCEPTANCE_AUTHORITY = "counterparty_acceptance"
+_OFFER, _COMMIT = "offer", "commit"
+
+
+def _changes_details(block: dict) -> bool:
+    """Whether the ``x-deal-v0`` record ``block`` changes the deal's details,
+    so an earlier acceptance no longer stands: a change, or a message or
+    evidence that names the counterparty (capsule-cli deal_rules.go,
+    changesDetails)."""
+    record_type = block.get("record_type")
+    return record_type == "change" or (record_type in ("message", "evidence") and "counterparty" in block)
+
+
+def _accepted_offer_at(records: list[dict], disclosed: dict[str, dict]) -> dict[str, str]:
+    """The proposal each bound typed commit rests on, as the sealed
+    ``timestamp`` of that offer's capsule, by the commit's record digest:
+    ``offer_expiry`` reads it as ``Action.proposal_at``. It is the deal's
+    latest offer, when a bound acceptance (an ``action-approval/v0`` of
+    authority ``counterparty_acceptance``) names that offer's record by
+    ``proposed_action_ref`` and nothing after it changed the details
+    (``_changes_details``), as capsule-cli's offerAccepted reads it. A later
+    offer supersedes an earlier one and its acceptance. Every record is read
+    within the deal it names (``_deal_id``), in ledger order. A commit with
+    no such offer is left out, so its proposal's age stays unestablished."""
+    latest: dict[str, tuple[str, str | None]] = {}
+    accepted: dict[str, str | None] = {}
+    found: dict[str, str] = {}
+    for record in records:
+        shown = disclosed.get(record.get("capsule_id", ""))
+        if shown is None or not _bound(record, shown):
+            continue
+        deal = _deal_id(shown).value
+        if deal is None:
+            continue
+        body = shown.get("body") if isinstance(shown.get("body"), dict) else {}
+        block = shown.get("x-deal-v0")
+        if shown.get("type") == _PROPOSED_TYPE and body.get("action") == _OFFER:
+            latest[deal] = (json_digest(shown), _text(record.get("timestamp")))
+            accepted.pop(deal, None)
+        elif shown.get("type") == _PROPOSED_TYPE and body.get("action") == _COMMIT:
+            at = accepted.get(deal)
+            if at is not None:
+                found[json_digest(shown)] = at
+        elif shown.get("type") == _APPROVAL_TYPE and body.get("authority") == _ACCEPTANCE_AUTHORITY:
+            offer = latest.get(deal)
+            if offer is not None and _typed_ref_digest(body.get("proposed_action_ref")) == offer[0]:
+                accepted[deal] = offer[1]
+        elif isinstance(block, dict) and _changes_details(block):
+            accepted.pop(deal, None)
     return found
 
 
@@ -697,6 +769,9 @@ def replay(
     carried out (``_carried_out_record``), once, when it reaches the action
     step, so a later check counts it as an earlier act with that
     counterparty. A refused check is never counted.
+    A seller's typed commit is decided with ``proposal_at`` the sealed time
+    of the accepted offer it rests on (``_accepted_offer_at``), so
+    ``offer_expiry`` reads that offer's age.
     Each record is evaluated under the action taxonomy it was sealed with,
     where the engine carries that version, so history at a carried version is
     never refused for its version. A record naming one it does not carry
@@ -727,6 +802,7 @@ def replay(
         )
         profiles = _companion_profiles(records, disclosed or {})
         deal = _deal_records(records, disclosed or {})
+        offered_at = _accepted_offer_at(records, disclosed or {})
         decided_checks: dict[str, SourcedDecision] = {}
         for record in records:
             shown = (disclosed or {}).get(record.get("capsule_id", ""))
@@ -740,6 +816,8 @@ def replay(
                 continue
             profile = profiles.get(digest) if profiles and digest is not None else None
             action = action_for_record(record, shown, counterparty_profile=profile)
+            if digest in offered_at:
+                action = replace(action, proposal_at=offered_at[digest])
             decision = engine.check(action, dry_run=True)
             cited_capsule = None
             for constraint in decision.constraints:
