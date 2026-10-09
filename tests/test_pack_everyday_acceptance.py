@@ -220,9 +220,11 @@ def _scenarios() -> list[tuple[str, Action, str]]:
         ("merchant-repeat-purchase", _purchase("merchant-repeat", 19, "household-assistant-j@v1", amount_minor=900,
          target="shop/bakery"), ALLOW),
         # booking.create matches the gate's booking_create selector, which fails.
+        # r16, the one rule bound to it, declares ASK and booking.create names
+        # an approver role, so the decision escalates.
         ("booking-create", Action(verb="book_table", operator=OPERATOR, developer="household-assistant-k@v1",
          action_class="booking.create", amount_minor=2_000, currency="EUR", target="venue/restaurant",
-         action_id="book_table/everyday-fixture-booking-create", timestamp="2026-08-10T10:20:00Z"), DENY),
+         action_id="book_table/everyday-fixture-booking-create", timestamp="2026-08-10T10:20:00Z"), ESCALATE),
         # household.unlisted has no row in the action taxonomy: action_class_gate
         # fails closed, as the only failing check, so the decision denies.
         ("off-taxonomy-class", Action(verb="do_unlisted", operator=OPERATOR, developer="household-assistant-l@v1",

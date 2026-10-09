@@ -17,7 +17,7 @@ import pytest
 from capsule_ledger.ledger import LedgerStore
 
 from capsule_engine.guards import Action, LocalSigner
-from capsule_engine.guards.capsule import ALLOW, DENY
+from capsule_engine.guards.capsule import ALLOW, ESCALATE
 from capsule_engine.packs import (
     PackDefinitionError,
     build_engine,
@@ -122,7 +122,8 @@ def test_a_gate_rule_takes_a_result_only_when_its_selector_matched(decisions, ac
 def test_a_booking_fails_only_the_booking_rule_and_says_why_the_others_do_not_apply(decisions):
     decision = decisions["booking.create"]
     results = _by_rule(PACK, decision)
-    assert decision.outcome == DENY
+    # r16 declares ASK and booking.create names an approver, so it asks.
+    assert decision.outcome == ESCALATE
     assert [rule for rule, (result, _) in results.items() if result == "fail"] == ["r16-booking-with-a-commitment"]
     for rule in set(GATE_RULES) - {"r16-booking-with-a-commitment"}:
         result, reason = results[rule]

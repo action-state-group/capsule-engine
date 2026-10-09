@@ -78,7 +78,10 @@ catalog):
    (`selector:` in `pack.yaml`): a rule fails or passes only when its
    selector matched the action's class, and does not apply otherwise, so a
    booking fails the booking rule and no other. A class with no row in the
-   taxonomy fails all eight, because the gate fails closed.
+   taxonomy fails all eight, because the gate fails closed. A flagged class
+   asks the approver its taxonomy row names when every rule it failed
+   declares ASK; it is refused when any of them declares NEVER, or when the
+   class names no approver.
    `packs.obligation_results` reads one decision's result per rule.
 8. `counterparty_seen_before` (`counterparty_seen_before/2.0.0`) -- a
    purchase from a merchant the operator has no accepted earlier action with

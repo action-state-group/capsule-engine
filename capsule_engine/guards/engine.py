@@ -8,7 +8,7 @@ below cites the table row it implements.
 """
 from __future__ import annotations
 
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from typing import TYPE_CHECKING
@@ -38,6 +38,7 @@ from .checks import (
     require_per_action_reads,
     resolve_caps_minor,
 )
+from .checks.action_class_gate import Selector
 from .classes import ActionClass, classify
 from .plan import PlanDefinition
 from .signing import Signer, SigningKeyUnavailable
@@ -106,6 +107,7 @@ class GuardEngine:
         wickets: tuple[WicketDefinition, ...] = (),
         caps_limits: Callable[[Signer], CapsLimits] | None = None,
         clock: Callable[[], str] | None = None,
+        ask_gate_selectors: frozenset[str] = frozenset(),
     ) -> None:
         if caps_limits is not None and (caps_minor or per_action_minor):
             raise ValueError("give caps limits as caps_limits or as caps_minor/per_action_minor, not both")
@@ -155,6 +157,12 @@ class GuardEngine:
                 if wicket.config["disposition"] == "ask":
                     escalatable.add("counterparty_list")
         self._escalatable = frozenset(escalatable)
+        # The action_class_gate selectors whose obligations all declare
+        # ``default_disposition: ASK`` (``packs/install.py`` derives them
+        # from the installed pack). An action_class_gate failure asks an
+        # approver only when every selector that failed it is one of these.
+        # Empty by default: with no pack, the gate refuses as it always has.
+        self.ask_gate_selectors = ask_gate_selectors
         # The active policy manifest's own digest (``capsule_ledger.policy.
         # resolve_manifest(...).manifest_digest``), pinned onto every
         # decision capsule this engine produces (``build_decision_capsule``'s
@@ -339,6 +347,7 @@ class GuardEngine:
             # predates this check) is byte-for-byte unchanged.
             plan_out = check_plan_containment(action, self._plan)
             constraints = (*constraints, plan_out.constraint)
+        gate_runs: list[tuple[WicketDefinition, ConstraintOutcome]] = []
         for wicket in self._wickets:
             if wicket.check in TASK_AUTHORITY_CHECKS:
                 out = TASK_AUTHORITY_CHECKS[wicket.check](action, task_authority_record, wicket.config)
@@ -349,8 +358,13 @@ class GuardEngine:
             else:
                 out = CONFIGURED_CHECKS[wicket.check](action, self._ledger, wicket.config)
             constraints = (*constraints, out.constraint)
+            if wicket.check == _GATE:
+                gate_runs.append((wicket, out.constraint))
         fold_envelopes = tuple(caps_out.fold_envelopes)
-        outcome = _decide(constraints, ac, self._escalatable)
+        escalatable = self._escalatable
+        if self._gate_failures_ask(gate_runs):
+            escalatable = escalatable | {_GATE}
+        outcome = _decide(constraints, ac, escalatable)
 
         resolved_parent, resolved_relation = chain_parent, chain_relation
         if resolved_parent is None:
@@ -423,8 +437,19 @@ class GuardEngine:
             fold_envelopes=fold_envelopes,
             checkpoint=checkpoint,
             capsule=capsule,
-            reason=_summarize(constraints, outcome),
+            reason=_summarize(constraints, outcome, ac, escalatable),
         )
+
+    def _gate_failures_ask(self, gate_runs: list[tuple[WicketDefinition, ConstraintOutcome]]) -> bool:
+        """Whether some action_class_gate outcome failed and every failed one
+        failed only on selectors declared ASK. A failure naming no selector
+        (a class the taxonomy cannot resolve fails closed) never asks."""
+        failed = [(w, c) for w, c in gate_runs if c.result == "fail"]
+        for wicket, outcome in failed:
+            failing = _failing_selectors(wicket.config["selectors"], outcome)
+            if not failing or not failing <= self.ask_gate_selectors:
+                return False
+        return bool(failed)
 
     def _limits_for(
         self, action: Action, caps_limits: CapsLimits | None
@@ -519,6 +544,7 @@ class GuardEngine:
 # Failures that ask an approver rather than refuse: an over-limit spend and
 # a first-time counterparty.
 _ESCALATABLE = frozenset({"caps", "counterparty_seen_before"})
+_GATE = "action_class_gate"
 
 
 def _decide(
@@ -529,7 +555,9 @@ def _decide(
     """allow/deny/escalate per D2 (2026-08-05): a clean run allows. A hold
     escalates only when every failing constraint is in ``escalatable``
     (``_ESCALATABLE`` -- `caps`, `counterparty_seen_before` -- plus a
-    `counterparty_list` configured to ask) and the triggering class has an
+    `counterparty_list` configured to ask, plus an `action_class_gate`
+    failure whose failing selectors' obligations all declare ASK) and the
+    triggering class has an
     `approver_role` configured -- an integrity failure
     (`verify_before_dispatch`, whether the cited mandate is missing or fails
     re-verification), a dedupe hit, or an escalatable failure on a class with
@@ -542,6 +570,25 @@ def _decide(
     return DENY
 
 
-def _summarize(constraints: tuple[ConstraintOutcome, ...], outcome: str) -> str:
+def _failing_selectors(selectors: Mapping[str, Selector], outcome: ConstraintOutcome) -> frozenset[str]:
+    """The selectors a failed action_class_gate outcome failed on: those its
+    evidence lists as matched whose ``on_match`` is ``fail``."""
+    matched = (outcome.evidence or {}).get("matched_selectors", ())
+    return frozenset(sid for sid in matched if selectors[sid]["on_match"] == "fail")
+
+
+def _summarize(
+    constraints: tuple[ConstraintOutcome, ...],
+    outcome: str,
+    action_class: ActionClass,
+    escalatable: frozenset[str],
+) -> str:
     parts = [f"{c.id}={c.result}" for c in constraints]
-    return f"{outcome}: " + ", ".join(parts)
+    summary = f"{outcome}: " + ", ".join(parts)
+    fails = {c.id for c in constraints if c.result == "fail"}
+    if outcome == DENY and fails <= escalatable and action_class.approver_role is None:
+        summary += (
+            f"; every failure may ask an approver, but action class {action_class.name!r} "
+            "names no approver_role, so it is refused"
+        )
+    return summary

@@ -31,7 +31,8 @@
 # passes because merchant-history-real-payment is a real accepted payment to
 # the same merchant (a dry run does not count).
 # out-of-scope-action passes action_class_gate (a non-consequential class);
-# booking-create fails it. off-taxonomy-class declares a class with no row in
+# booking-create fails it on r16 alone, which declares ASK, and escalates:
+# booking.create names an approver role. off-taxonomy-class declares a class with no row in
 # the action taxonomy, so action_class_gate fails closed as the only failing
 # check and the decision denies.
 #
@@ -429,7 +430,7 @@ rows:
       channel_change: {population: a, missing_field: channel}
       upfront_amount: {population: a, missing_field: upfront_amount_minor}
       task_authority: {population: a, missing_field: task_authority_ref}
-    verdict: deny
+    verdict: escalate
   - scenario: off-taxonomy-class
     action_id: do_unlisted/everyday-fixture-off-taxonomy
     checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, destination_rail: n/a, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: n/a, action_class_gate: fail, counterparty_seen_before: n/a, recipient_role: n/a, refundability: n/a, material_fields_changed: n/a, offer_fields_changed: n/a, recipient_seen_before: n/a, channel_change: n/a, upfront_amount: n/a, task_authority: n/a}
