@@ -5,7 +5,8 @@ refusing (D2, ``guards/engine.py`` ``_decide``).
 
 Before taxonomy version 3, money.purchase had no approver role: r06's
 first-contact failure denied every first purchase at a new merchant, though
-r06 declares ASK. Integrity failures (dedupe, verify_before_dispatch) still
+r06 declares ASK. Taxonomy 4 names the same approver on four more classes,
+the ones the pack's other ASK gate rules flag. Integrity failures (dedupe, verify_before_dispatch) still
 deny, alone or beside a failure that could ask.
 
 Purchases run through a pack-installed engine, each on a fresh ledger.
@@ -25,6 +26,9 @@ from capsule_engine.packs import build_engine, install_pack, load_pack_dir
 PACK_DIR = Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog" / "everyday"
 PER_ACTION_MINOR = 2_500  # caps/5.0.0's per-action default, cited by the pack
 ACCOUNT_HOLDER_CLASSES = ("money.purchase", "money.subscription", "booking.create", "booking.modify")
+# Taxonomy 4: the classes the everyday pack's remaining ASK gate rules flag
+# (r11 r12 r15 r17 r18; tests/test_gate_rules_declared_ask.py).
+GATED_ACCOUNT_HOLDER_CLASSES = ("booking.cancel", "data.delete", "communication.publish", "disclosure.personal")
 OPERATOR = "household-account-holder"
 SIGNER = LocalSigner(key_id="everyday-account-holder-key", secret=b"everyday-account-holder-fixed-key")
 # A real accepted payment to the bakery makes it a known merchant.
@@ -76,10 +80,13 @@ def _failing(decision) -> list[str]:
     return [c.id for c in decision.constraints if c.result == "fail"]
 
 
-def test_exactly_the_four_consumer_commit_classes_name_the_account_holder():
-    assert TAXONOMY_VERSION == "3"
+def test_exactly_the_consumer_commit_and_gated_classes_name_the_account_holder():
+    assert TAXONOMY_VERSION == "4"
     named = {name: ac.approver_role for name, ac in TAXONOMY.items() if ac.approver_role is not None}
-    assert named == {**dict.fromkeys(ACCOUNT_HOLDER_CLASSES, "account_holder"), "money.transfer": "treasury-approver"}
+    assert named == {
+        **dict.fromkeys(ACCOUNT_HOLDER_CLASSES + GATED_ACCOUNT_HOLDER_CLASSES, "account_holder"),
+        "money.transfer": "treasury-approver",
+    }
 
 
 def test_a_first_purchase_at_an_unseen_merchant_under_the_caps_asks(engine):
