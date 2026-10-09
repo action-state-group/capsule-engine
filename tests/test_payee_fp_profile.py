@@ -86,9 +86,14 @@ def _bundle(*steps: tuple[dict, str]) -> tuple[list[dict], dict[str, dict]]:
     return capsules, {c["capsule_id"]: record for c, (record, _) in zip(capsules, steps, strict=True)}
 
 
-def _replay(*steps: tuple[dict, str]):
+def _result(*steps: tuple[dict, str]):
     records, disclosed = _bundle(*steps)
-    return replay(records, caps_fold=load_fold(SPEND_WEEKLY), disclosed=disclosed).decisions
+    return replay(records, caps_fold=load_fold(SPEND_WEEKLY), disclosed=disclosed)
+
+
+def _replay(*steps: tuple[dict, str]):
+    """The decisions: one per check, none for a companion."""
+    return _result(*steps).decisions
 
 
 def _two_deals(with_companions: bool = True):
@@ -141,7 +146,7 @@ def test_replay_keys_each_check_on_its_companions_profile_fingerprint():
 
 
 def test_with_the_profile_fingerprint_the_cross_deal_repeat_asks_the_approver():
-    _, _, second, _ = _two_deals()
+    _, second = _two_deals()
     out = _constraint(second.decision, "dedupe")
     assert (out.result, second.decision.outcome) == ("fail", ESCALATE)
     assert out.evidence["repeat"] == "other_deal"
@@ -157,22 +162,20 @@ def test_without_it_each_deal_keeps_its_own_fingerprint_and_nothing_repeats():
     assert second.decision.outcome == ALLOW
 
 
-def test_the_companion_is_not_an_act_and_no_rule_fires_on_it():
-    decisions = _two_deals()
-    companions = [decisions[1], decisions[3]]
-    for sourced in companions:
-        assert sourced.action.states_act is False
-        assert sourced.action.target is None
-        assert _constraint(sourced.decision, "dedupe").result == "n/a"
-        assert all(c.result in ("n/a", "pass") for c in sourced.decision.constraints)
-        assert sourced.decision.outcome == ALLOW
+def test_the_companion_is_not_an_act_and_gets_no_decision():
+    (check_1, companion_1, _), (check_2, companion_2, _) = _deal(0), _deal(1)
+    result = _result((check_1, DAY_1), (companion_1, DAY_1), (check_2, DAY_2), (companion_2, DAY_2))
+    assert [s.record["capsule_id"] for s in result.decisions] == [f"{1:064x}", f"{3:064x}"]
+    assert [r["capsule_id"] for r in result.undecided] == [f"{2:064x}", f"{4:064x}"]
+    for record, companion in zip(result.undecided, (companion_1, companion_2), strict=True):
+        assert action_for_record(record, companion).states_act is False
 
 
 def test_a_companion_naming_another_record_keys_nothing():
     check, companion, _ = _deal(0)
     stray = json.loads(json.dumps(companion))
     stray["x-deal-v0"]["refs"][0]["digest"] = "0" * 64
-    first, _ = _replay((check, DAY_1), (stray, DAY_1))
+    (first,) = _replay((check, DAY_1), (stray, DAY_1))
     assert first.action.target.startswith("payee-fp:hmac-sha256-deal-key:")
     assert first.action.ignored_inputs == ()
 
@@ -181,7 +184,7 @@ def test_a_companion_under_another_rel_keys_nothing():
     check, companion, _ = _deal(0)
     other = json.loads(json.dumps(companion))
     other["x-deal-v0"]["refs"][0]["rel"] = "checks"
-    first, _ = _replay((check, DAY_1), (other, DAY_1))
+    (first,) = _replay((check, DAY_1), (other, DAY_1))
     assert first.action.target.startswith("payee-fp:hmac-sha256-deal-key:")
 
 
@@ -189,7 +192,7 @@ def test_a_companion_ref_of_another_type_keys_nothing():
     check, companion, _ = _deal(0)
     other = json.loads(json.dumps(companion))
     other["x-deal-v0"]["refs"][0]["type"] = "task-authority"
-    first, _ = _replay((check, DAY_1), (other, DAY_1))
+    (first,) = _replay((check, DAY_1), (other, DAY_1))
     assert first.action.target.startswith("payee-fp:hmac-sha256-deal-key:")
 
 
@@ -197,14 +200,14 @@ def test_a_companion_with_more_than_one_ref_keys_nothing():
     check, companion, _ = _deal(0)
     other = json.loads(json.dumps(companion))
     other["x-deal-v0"]["refs"].append(dict(other["x-deal-v0"]["refs"][0], rel="checks"))
-    first, _ = _replay((check, DAY_1), (other, DAY_1))
+    (first,) = _replay((check, DAY_1), (other, DAY_1))
     assert first.action.target.startswith("payee-fp:hmac-sha256-deal-key:")
 
 
 def test_two_companions_about_one_check_are_ignored():
     check, companion, _ = _deal(0)
     rival = _with_profile(companion, {"fp_alg": PROFILE_ALG, "ids": {"payee": "b" * 64}})
-    first, _, _ = _replay((check, DAY_1), (companion, DAY_1), (rival, DAY_1))
+    (first,) = _replay((check, DAY_1), (companion, DAY_1), (rival, DAY_1))
     assert first.action.target.startswith("payee-fp:hmac-sha256-deal-key:")
     assert first.action.ignored_inputs == IGNORED
 
@@ -216,7 +219,7 @@ def test_two_companions_about_one_check_are_ignored():
 def test_live_input_and_replay_companion_give_the_same_target_bytes(n):
     check, companion, expected = _deal(n)
     live = action_for_check_input(_entry(check, 1, DAY_1, counterparty_profile=_profile_block(n)))
-    replayed, _ = _replay((check, DAY_1), (companion, DAY_1))
+    (replayed,) = _replay((check, DAY_1), (companion, DAY_1))
     assert live.target == replayed.action.target == expected
     assert live.target.encode() == expected.encode()
 
@@ -286,7 +289,7 @@ def test_a_bad_live_value_is_ignored_and_noted(name):
 @pytest.mark.parametrize("name", sorted(BAD_BLOCKS))
 def test_a_bad_companion_value_is_ignored_and_noted(name):
     check, companion, _ = _deal(0)
-    first, _ = _replay((check, DAY_1), (_with_profile(companion, BAD_BLOCKS[name]), DAY_1))
+    (first,) = _replay((check, DAY_1), (_with_profile(companion, BAD_BLOCKS[name]), DAY_1))
     assert first.action.target.startswith("payee-fp:hmac-sha256-deal-key:")
     assert first.action.ignored_inputs == IGNORED
 
@@ -295,7 +298,7 @@ def test_a_companion_carrying_no_block_is_ignored_and_noted():
     check, companion, _ = _deal(0)
     empty = json.loads(json.dumps(companion))
     del empty["x-deal-v0"]["counterparty_profile"]
-    first, _ = _replay((check, DAY_1), (empty, DAY_1))
+    (first,) = _replay((check, DAY_1), (empty, DAY_1))
     assert first.action.target.startswith("payee-fp:hmac-sha256-deal-key:")
     assert first.action.ignored_inputs == IGNORED
 
@@ -335,7 +338,7 @@ def test_a_decision_made_before_the_profile_fingerprint_never_matches_one_made_a
     companions; deal 2 on the profile target. Sealed decisions are never
     rewritten, so cross-deal matching starts at deal 2."""
     (check_1, _, _), (check_2, companion_2, _) = _deal(0), _deal(1)
-    first, second, _ = _replay((check_1, DAY_1), (check_2, DAY_2), (companion_2, DAY_2))
+    first, second = _replay((check_1, DAY_1), (check_2, DAY_2), (companion_2, DAY_2))
     assert first.action.target.startswith("payee-fp:hmac-sha256-deal-key:")
     assert second.action.target.startswith(LOCAL_ONLY_TARGET_PREFIX)
     assert _constraint(second.decision, "dedupe").result == "pass"

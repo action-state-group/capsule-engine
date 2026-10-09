@@ -14,7 +14,9 @@ caps/4.0.0 names it only in a comment, as money coming in, which caps leaves
 out like money.refund. caps/5.0.0 has the same class set as caps/4.0.0.
 
 0.3.2 is kept byte for byte under ``tests/fixtures/packs/everyday-0.3.2``, and
-it still has to load at its digest from this engine's definitions.
+it still has to load at its digest from this engine's definitions. 0.3.3 is
+kept the same way since 0.3.4 replaced it in the catalog; 0.3.4 measures a
+sale exactly as 0.3.3 does.
 """
 from __future__ import annotations
 
@@ -40,6 +42,7 @@ from capsule_engine.packs.schema import PackDefinition
 REPO = Path(__file__).parent.parent
 PACK_DIR = REPO / "capsule_engine" / "packs" / "catalog" / "everyday"
 PACK = load_pack_dir(PACK_DIR)
+FROZEN_0_3_3_DIR = REPO / "tests" / "fixtures" / "packs" / "everyday-0.3.3"
 PACK_0_3_3_DIGEST = "d153219b9b5f7ad8eb4805eb718aab81a5dfa29a6a1d977301559fc167268752"
 FROZEN_0_3_2_DIR = REPO / "tests" / "fixtures" / "packs" / "everyday-0.3.2"
 PACK_0_3_2_DIGEST = "6f333fa8b7a7e137abe6c61e5a32097ed06d493479a018807cbf4d2e4f5da7b2"
@@ -148,17 +151,25 @@ def test_the_pack_cites_version_1_1_0_and_neither_version_is_retired(check):
 # -- everyday 0.3.3 -------------------------------------------------------------
 
 
-def test_the_catalog_pack_is_everyday_0_3_3_at_its_recorded_digest():
-    assert PACK.pack_id == "asg/everyday/0.3.3"
-    assert PACK.definition_digest() == PACK_0_3_3_DIGEST
+def test_the_frozen_0_3_3_loads_at_its_recorded_digest():
+    pack = load_pack_dir(FROZEN_0_3_3_DIR)
+    assert pack.pack_id == "asg/everyday/0.3.3"
+    assert pack.definition_digest() == PACK_0_3_3_DIGEST
 
 
-def test_0_3_3_pins_the_taxonomy_this_engine_ships():
+def test_0_3_4_cites_the_same_sale_definitions_as_0_3_3():
+    frozen = {c.wicket_id: c.definition_digest() for c in load_pack_dir(FROZEN_0_3_3_DIR).constraints}
+    cited = {c.wicket_id: c.definition_digest() for c in PACK.constraints}
+    for check in SALE_CHECKS:
+        assert cited[f"{check}/1.1.0"] == frozen[f"{check}/1.1.0"]
+
+
+def test_the_catalog_pins_the_taxonomy_this_engine_ships():
     assert PACK.taxonomy is not None
     assert (PACK.taxonomy.taxonomy_version, PACK.taxonomy.digest) == (TAXONOMY_VERSION, TAXONOMY_DIGEST)
 
 
-def test_0_3_3_does_not_load_under_another_taxonomy(tmp_path):
+def test_the_catalog_pack_does_not_load_under_another_taxonomy(tmp_path):
     copy = tmp_path / "everyday"
     shutil.copytree(PACK_DIR, copy)
     text = (copy / "pack.yaml").read_text()

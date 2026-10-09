@@ -15,7 +15,7 @@ from datetime import datetime, timezone
 
 from ..folds.definition import FoldDefinition
 from .model import DryRunReport, GuardSection, ModelNote, ReportRow
-from .replay import ReplayResult, filter_since, load_disclosed, load_records, replay
+from .replay import ReplayResult, filter_since, load_disclosed, load_records, load_withheld, replay
 
 __all__ = ["build_dry_run_report", "build_dry_run_report_with_proposal", "GUARD_ORDER", "GUARD_DESCRIPTIONS"]
 
@@ -124,6 +124,7 @@ def build_dry_run_report(
         per_action_minor=per_action_minor,
         per_action_reads=per_action_reads,
         disclosed=load_disclosed(ledger_paths),
+        withheld=load_withheld(ledger_paths),
     )
 
     sections: dict[str, list[ReportRow]] = {guard_id: [] for guard_id in GUARD_ORDER}
@@ -210,6 +211,7 @@ def build_dry_run_report_with_proposal(
     all_records = load_records(ledger_paths)
     replayed_records = filter_since(all_records, since)
     disclosed = load_disclosed(ledger_paths)
+    withheld = load_withheld(ledger_paths)
     current = replay(
         replayed_records,
         caps_fold=caps_fold,
@@ -218,6 +220,7 @@ def build_dry_run_report_with_proposal(
         per_action_minor=per_action_minor,
         per_action_reads=per_action_reads,
         disclosed=disclosed,
+        withheld=withheld,
     )
     proposed = replay(
         replayed_records,
@@ -227,6 +230,7 @@ def build_dry_run_report_with_proposal(
         per_action_minor=per_action_minor,
         per_action_reads=per_action_reads,
         disclosed=disclosed,
+        withheld=withheld,
     )
 
     newly_held_rows: list[ReportRow] = []

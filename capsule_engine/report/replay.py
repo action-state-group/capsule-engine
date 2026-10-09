@@ -54,13 +54,14 @@ from collections.abc import Sequence
 from dataclasses import dataclass, replace
 from datetime import datetime, timedelta
 from pathlib import Path
+from typing import TypedDict
 
 from agent_action_capsule import json_digest
 from capsule_ledger.ledger import LedgerStore
 
 from ..folds.definition import FoldDefinition
 from ..folds.duration import parse_duration_seconds
-from ..guards import Action, GuardDecision, GuardEngine, LocalSigner
+from ..guards import ALLOW, ESCALATE, Action, GuardDecision, GuardEngine, LocalSigner
 from ..guards.wickets.definition import WicketDefinition
 from ..packs.install import engine_ask_sets
 from ..packs.schema import PackDefinition
@@ -70,6 +71,7 @@ __all__ = [
     "ReplayResult",
     "load_records",
     "load_disclosed",
+    "load_withheld",
     "filter_since",
     "action_for_record",
     "action_for_check_input",
@@ -138,6 +140,18 @@ def load_disclosed(paths: Sequence[str | Path]) -> dict[str, dict]:
             if isinstance(agent_input, dict):
                 disclosed[capsule_id] = agent_input
     return disclosed
+
+
+def load_withheld(paths: Sequence[str | Path]) -> frozenset[str]:
+    """The ``capsule_id`` of every record a capsule bundle among ``paths``
+    carries without disclosing its ``agent_input``, and no other source
+    discloses. Plain ledgers and store directories withhold nothing."""
+    carried: set[str] = set()
+    for path in paths:
+        bundle = _bundle(Path(path))
+        if bundle is not None:
+            carried.update(r["capsule_id"] for r in bundle["records"] if isinstance(r.get("capsule_id"), str))
+    return frozenset(carried - load_disclosed(paths).keys())
 
 
 def _parse_ts(ts: str) -> datetime:
@@ -361,6 +375,24 @@ def _bridge_deal_check(record: dict, disclosed: dict | None, counterparty_profil
     )
 
 
+# A capsulectl deal report's sealed ``type``: what the user asked and what was
+# done, for one audience. It states no act.
+_REPORT_TYPE = "deal_report"
+
+
+def _gets_no_decision(record: dict, disclosed: dict | None, withheld: frozenset[str]) -> bool:
+    """Whether the replay skips ``record`` before the engine sees it: a bound
+    deal record other than a check (``_states_no_act``), a bound deal report,
+    or a record its bundle carries but withholds (``load_withheld``), so
+    nothing it states can be read. No rule fires on any of them, the gate
+    included. They stay in the ledger and its completeness proof."""
+    if disclosed is None:
+        return record.get("capsule_id") in withheld
+    if _bound(record, disclosed) and disclosed.get("type") == _REPORT_TYPE:
+        return True
+    return _states_no_act(record, disclosed)
+
+
 def _states_no_act(record: dict, disclosed: dict | None) -> bool:
     """Whether ``record`` is a deal record other than a check, read from the
     ``x-deal-v0.record_type`` its capsule sealed: a baseline, verdict,
@@ -434,6 +466,119 @@ def _companion_profiles(records: list[dict], disclosed: dict[str, dict]) -> dict
     return {digest: blocks[0] if len(blocks) == 1 else blocks for digest, blocks in found.items()}
 
 
+def _deal_records(records: list[dict], disclosed: dict[str, dict]) -> dict[str, dict]:
+    """Each bound ``x-deal-v0`` record among ``records``, by its digest."""
+    found: dict[str, dict] = {}
+    for record in records:
+        shown = disclosed.get(record.get("capsule_id", ""))
+        if shown is not None and isinstance(shown.get("x-deal-v0"), dict) and _bound(record, shown):
+            found[json_digest(shown)] = shown
+    return found
+
+
+def _record_type(shown: dict) -> str | None:
+    record_type = shown["x-deal-v0"].get("record_type")
+    return record_type if isinstance(record_type, str) else None
+
+
+def _only_ref(shown: dict, rel: str) -> str | None:
+    """The digest of the record ``shown``'s one ``rel`` ref names, when it has
+    exactly one and it is a SHA-256 ``deal-record`` ref; else ``None``."""
+    refs = shown["x-deal-v0"].get("refs")
+    found = [r for r in refs if isinstance(r, dict) and r.get("rel") == rel] if isinstance(refs, list) else []
+    if len(found) != 1 or found[0].get("type") != "deal-record":
+        return None
+    return _typed_ref_digest(found[0])
+
+
+@dataclass(frozen=True)
+class _CarriedOut:
+    """An executed action step's chain back to its check, as digests."""
+
+    check: str
+    approval: str
+    action: str
+
+
+def _carried_out(action_digest: str, deal: dict[str, dict]) -> _CarriedOut | None:
+    """The chain by which the bound action step ``action_digest`` carried out
+    a check, read from sealed records only: its one ``authorized_by`` ref
+    names an approval whose body seals ``proceed: true``, and that approval's
+    one ``approves`` ref names the check, or the verdict whose one ``checks``
+    ref names it. Every record in the chain is in the action's deal. ``None``
+    when any link is missing, unbound, declined or of another kind."""
+    action = deal.get(action_digest)
+    if action is None or _record_type(action) != "action":
+        return None
+    deal_id = action["x-deal-v0"].get("deal_id")
+    approval_digest = _only_ref(action, "authorized_by")
+    approval = deal.get(approval_digest) if approval_digest is not None else None
+    if approval_digest is None or approval is None or _record_type(approval) != "approval":
+        return None
+    body = approval.get("body")
+    if approval["x-deal-v0"].get("deal_id") != deal_id or not isinstance(body, dict) or body.get("proceed") is not True:
+        return None
+    check_digest = _only_ref(approval, "approves")
+    approved = deal.get(check_digest) if check_digest is not None else None
+    if approved is not None and _record_type(approved) == "verdict":
+        check_digest = _only_ref(approved, "checks")
+        approved = deal.get(check_digest) if check_digest is not None else None
+    if check_digest is None or approved is None or _record_type(approved) != "check":
+        return None
+    if approved["x-deal-v0"].get("deal_id") != deal_id:
+        return None
+    return _CarriedOut(check=check_digest, approval=approval_digest, action=action_digest)
+
+
+# The ``disposition.decision`` of the record a replay writes to its own view
+# for an act carried out (counterparty.seen_before/3.0.0 counts it). No guard
+# decision carries it, so no fold that reads accepted decisions counts it.
+_CARRIED_OUT = "carried_out"
+
+
+class _CarriedOutCitation(TypedDict):
+    decision: str
+    check: str
+    approval: str
+    action: str
+
+
+class _CarriedOutPayload(TypedDict):
+    target: str | None
+    carried_out: _CarriedOutCitation
+
+
+class _Disposition(TypedDict):
+    decision: str
+
+
+class _CarriedOutBody(TypedDict):
+    operator: str
+    timestamp: str | None
+    disposition: _Disposition
+    asg_payload: _CarriedOutPayload
+
+
+class _CarriedOutRecord(_CarriedOutBody):
+    capsule_id: str
+
+
+def _carried_out_record(sourced: SourcedDecision, chain: _CarriedOut, at: str | None) -> _CarriedOutRecord:
+    """The record of ``sourced``'s act as carried out, citing its decision and
+    the sealed chain by digest; its ``capsule_id`` is the digest of the rest.
+    It is written to the replay's own view only."""
+    citation = _CarriedOutCitation(
+        decision=sourced.decision.capsule["capsule_id"], check=chain.check, approval=chain.approval, action=chain.action
+    )
+    body = _CarriedOutBody(
+        operator=sourced.action.operator,
+        timestamp=at,
+        disposition=_Disposition(decision=_CARRIED_OUT),
+        asg_payload=_CarriedOutPayload(target=sourced.action.target, carried_out=citation),
+    )
+    return _CarriedOutRecord(**body, capsule_id=json_digest(body))
+
+
 @dataclass(frozen=True)
 class SourcedDecision:
     """One replayed record, its resulting ``Action``, its real
@@ -449,8 +594,13 @@ class SourcedDecision:
 
 @dataclass(frozen=True)
 class ReplayResult:
+    """``decisions`` are the records that state an act, in order;
+    ``undecided`` the records the replay gave no decision
+    (``_gets_no_decision``). ``record_range`` spans both."""
+
     decisions: tuple[SourcedDecision, ...]
     record_range: tuple[int, int]
+    undecided: tuple[dict, ...] = ()
 
 
 def replay(
@@ -462,6 +612,7 @@ def replay(
     per_action_minor: dict[str, int] | None = None,
     per_action_reads: str | None = None,
     disclosed: dict[str, dict] | None = None,
+    withheld: frozenset[str] = frozenset(),
     wickets: tuple[WicketDefinition, ...] = (),
     pack: PackDefinition | None = None,
 ) -> ReplayResult:
@@ -475,7 +626,16 @@ def replay(
     ``GuardEngine(wickets=...)`` runs them; none by default. ``pack`` is the
     pack those wickets were installed from: given, the engine asks an approver
     on the same failures ``packs.build_engine`` does (``engine_ask_sets``);
-    without it every gate or wicket failure refuses."""
+    without it every gate or wicket failure refuses.
+    ``withheld`` are the records a bundle carries without disclosing
+    (``load_withheld``); like every record that states no act, each gets no
+    decision.
+    When a deal's sealed records show that an act whose check this replay
+    decided (allowed, or asked) was approved to proceed and then executed
+    (``_carried_out``), the replay writes that act to its own view as
+    carried out (``_carried_out_record``), once, when it reaches the action
+    step, so a later check counts it as an earlier act with that
+    counterparty. A refused check is never counted."""
     if not records:
         return ReplayResult(decisions=(), record_range=(0, -1))
 
@@ -483,6 +643,7 @@ def replay(
 
     gate_selectors, ask_checks = engine_ask_sets(pack, wickets) if pack is not None else (frozenset(), frozenset())
     sourced: list[SourcedDecision] = []
+    undecided: list[dict] = []
     with tempfile.TemporaryDirectory() as tmp, LedgerStore(tmp) as store:
         engine = GuardEngine(
             ledger=store,
@@ -497,9 +658,19 @@ def replay(
             ask_wickets=ask_checks,
         )
         profiles = _companion_profiles(records, disclosed or {})
+        deal = _deal_records(records, disclosed or {})
+        decided_checks: dict[str, SourcedDecision] = {}
         for record in records:
             shown = (disclosed or {}).get(record.get("capsule_id", ""))
-            profile = profiles.get(json_digest(shown)) if profiles and shown is not None else None
+            digest = json_digest(shown) if shown is not None else None
+            if _gets_no_decision(record, shown, withheld):
+                undecided.append(record)
+                chain = _carried_out(digest, deal) if digest is not None else None
+                checked = decided_checks.pop(chain.check, None) if chain is not None else None
+                if chain is not None and checked is not None and checked.decision.outcome in (ALLOW, ESCALATE):
+                    store.append(dict(_carried_out_record(checked, chain, _text(record.get("timestamp")))), consequential=False)
+                continue
+            profile = profiles.get(digest) if profiles and digest is not None else None
             action = action_for_record(record, shown, counterparty_profile=profile)
             decision = engine.check(action, dry_run=True)
             cited_capsule = None
@@ -513,5 +684,7 @@ def replay(
                         cited_capsule = found.capsule
                         break
             sourced.append(SourcedDecision(record=record, action=action, decision=decision, cited_capsule=cited_capsule))
+            if digest in deal and decision.capsule is not None:
+                decided_checks[digest] = sourced[-1]
 
-    return ReplayResult(decisions=tuple(sourced), record_range=(1, len(records)))
+    return ReplayResult(decisions=tuple(sourced), record_range=(1, len(records)), undecided=tuple(undecided))

@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
-"""``dedupe`` is not applicable to a deal record that states no act.
+"""A deal record that states no act gets no decision, and ``dedupe`` is not
+applicable to it.
 
 A capsulectl deal seals every step as its own record: a baseline, a check, a
 verdict, an approval, an intent, the action that carries a check out. Only a
@@ -7,8 +8,10 @@ check states an act to the guard; the action step is the same payment its
 check already stated. Whether a record is a check is read from its sealed
 ``x-deal-v0.record_type``, on a record bound to its capsule by digest, never
 from the capsule's ``action_id`` prefix or ``action_type``. Every other deal
-record's ``dedupe`` is ``n/a`` (out of scope), so it is never refused as a
-duplicate of the deal's other records, and a repeated act is still refused.
+record states no act (``Action.states_act`` false, so its ``dedupe`` is ``n/a``),
+and a replay gives it no decision at all: no rule, the gate included, fires on
+it, so it is never refused as a duplicate of the deal's other records. A
+repeated act is still refused.
 """
 from __future__ import annotations
 
@@ -17,9 +20,11 @@ from pathlib import Path
 
 import pytest
 from agent_action_capsule import json_digest
+from capsule_ledger.ledger import LedgerStore
 
 from capsule_engine.folds.loader import load_definition_file as load_fold
 from capsule_engine.guards.capsule import DENY, not_applicable_evidence
+from capsule_engine.guards.checks.dedupe import check_dedupe
 from capsule_engine.report.replay import action_for_record, load_disclosed, load_records, replay
 
 PACKAGE_DIR = Path(__file__).parent.parent / "capsule_engine"
@@ -28,8 +33,12 @@ BUNDLES = Path(__file__).parent / "fixtures" / "deal-bundles"
 FIXTURES = ("deal-purchase-then-partial-cancel", "deal-purchase-then-refund")
 
 
+def _result(records: list[dict], disclosed: dict[str, dict]):
+    return replay(records, caps_fold=load_fold(SPEND_WEEKLY), disclosed=disclosed)
+
+
 def _replayed(records: list[dict], disclosed: dict[str, dict]):
-    return replay(records, caps_fold=load_fold(SPEND_WEEKLY), disclosed=disclosed).decisions
+    return _result(records, disclosed).decisions
 
 
 def _bundle(name: str) -> tuple[list[dict], dict[str, dict]]:
@@ -46,14 +55,28 @@ def _dedupe(decision):
 
 
 @pytest.mark.parametrize("name", FIXTURES)
-def test_no_deal_record_but_a_check_gets_a_dedupe_finding(name):
+def test_no_deal_record_but_a_check_gets_a_decision(name):
     records, disclosed = _bundle(name)
-    non_checks = [s for s in _replayed(records, disclosed) if _record_type(disclosed, s.record) != "check"]
-    assert {_record_type(disclosed, s.record) for s in non_checks} == {"baseline", "verdict", "approval", "action", "intent"}
-    for sourced in non_checks:
-        dedupe = _dedupe(sourced.decision)
-        assert (dedupe.result, dedupe.evidence) == ("n/a", not_applicable_evidence("dedupe", in_scope=False))
-        assert sourced.decision.outcome != DENY
+    result = _result(records, disclosed)
+    assert {_record_type(disclosed, s.record) for s in result.decisions} == {"check"}
+    assert {_record_type(disclosed, r) for r in result.undecided} == {"baseline", "verdict", "approval", "action", "intent"}
+    assert len(result.decisions) + len(result.undecided) == len(records)
+
+
+@pytest.mark.parametrize("name", FIXTURES)
+def test_a_record_that_states_no_act_would_read_dedupe_not_applicable(name, tmp_path):
+    """Live, nothing sends the engine a non-act record; were one sent, its
+    ``dedupe`` is ``n/a`` and never a refusal."""
+    records, disclosed = _bundle(name)
+    for record in records:
+        if _record_type(disclosed, record) == "check":
+            continue
+        action = action_for_record(record, disclosed[record["capsule_id"]])
+        assert action.states_act is False
+        with LedgerStore(tmp_path / record["capsule_id"]) as ledger:
+            outcome = check_dedupe(action, ledger)
+        assert (outcome.constraint.result, outcome.constraint.evidence) == (
+            "n/a", not_applicable_evidence("dedupe", in_scope=False))
 
 
 @pytest.mark.parametrize("name", FIXTURES)
