@@ -404,3 +404,22 @@ def test_nothing_the_opening_holds_enters_any_record(store, signer):
             assert secret not in text, secret
         for floor in floors:
             assert floor.search(text) is None, floor.pattern
+
+
+# -- a sale's price is the amount its record states, not its spend --------------
+
+
+def test_the_stated_amount_is_compared_when_set_and_the_spend_otherwise():
+    """A seller's commit states its price (``amount_minor`` in the record) while
+    its spend is ``0``: the deal bridge carries the price as
+    ``stated_amount_minor``, and that is what the floor is compared with."""
+
+    def check(spend: int, stated: int | None):
+        action = _action(spend, stated_amount_minor=stated)
+        return check_price_floor(action, AUTHORITY, OPENING, action_classes=CLASSES).constraint
+
+    assert check(0, FLOOR_MINOR).result == "pass"
+    assert (check(0, FLOOR_MINOR - 1).result, check(0, FLOOR_MINOR - 1).evidence["amount_minor"]) == (
+        "fail", FLOOR_MINOR - 1)
+    assert check(FLOOR_MINOR - 1, None).result == "fail"
+    assert check(FLOOR_MINOR, None).result == "pass"

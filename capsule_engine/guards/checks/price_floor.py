@@ -15,8 +15,10 @@ read only once the engine's own digest of it equals
 and the floor only once the opening opens the commitment that record seals
 (``bounds_commitment``).
 
-Fails when ``Action.amount_minor`` is below the opened floor; the floor
-itself passes. Both are compared in the action's own minor units, as ``caps``
+Fails when the action's total is below the opened floor; the floor itself
+passes. The total is ``Action.stated_amount_minor`` when it is set (the
+amount a deal record states, which on a sale is the price while its spend is
+``0``), else ``Action.amount_minor``. Both are compared in the action's own minor units, as ``caps``
 compares; the document names no currency. An opening that does not open the
 sealed commitment also fails, naming ``bounds_commitment``: it is a wrong or
 altered record, so the rule does not step aside; so does a sealed
@@ -171,7 +173,7 @@ def check_price_floor(
     if action.action_class not in action_classes:
         return _outcome("n/a", "the rule is not configured for this action class",
                         not_applicable_evidence(_CHECK_ID, in_scope=False))
-    amount = action.amount_minor
+    amount = action.stated_amount_minor if action.stated_amount_minor is not None else action.amount_minor
     if amount is None:
         return _missing("the action carries no amount_minor; it could not be compared with the floor", "amount_minor")
     try:

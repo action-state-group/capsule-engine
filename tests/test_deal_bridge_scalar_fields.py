@@ -163,3 +163,13 @@ def test_the_target_is_the_prefixed_payee_fingerprint_and_absent_without_one():
     assert action.target == "payee-fp:hmac-sha256-deal-key:" + "cd" * 32
     assert _bridged({}, counterparty={"ids": {"phone": "cd" * 32}, "fp_alg": "hmac-sha256-deal-key"}).target is None
     assert _bridged({}).target is None
+
+
+def test_a_sale_carries_its_stated_price_apart_from_its_spend_of_zero():
+    """A seller's commit states its price (``amount_minor``) with a spend of
+    ``0``: the spend stays the action's ``amount_minor``, so caps never counts a
+    sale, and the price is carried as ``stated_amount_minor`` for price_floor."""
+    sale = _bridged({"spend_minor": 0, "amount_minor": 190_000})
+    assert (sale.amount_minor, sale.stated_amount_minor) == (0, 190_000)
+    assert _bridged({"spend_minor": 2_000}).stated_amount_minor is None
+    assert _bridged({"spend_minor": 0, "amount_minor": "190000"}).stated_amount_minor is None

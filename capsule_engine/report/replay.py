@@ -327,7 +327,10 @@ def _bridge_deal_check(record: dict, disclosed: dict | None, counterparty_profil
     sealed record: the class it names, and the amount a spend cap evaluates,
     which is ``spend_minor`` only: never ``amount_minor`` (on a cancel it is
     a refund) or ``cancelled_amount_minor``, and ``0`` for a record that says
-    the money moved in. So a cancel is never spend. ``spend_authorized_minor``,
+    the money moved in. So a cancel is never spend. The amount the body
+    states (``amount_minor``) is carried apart, as ``stated_amount_minor``, for
+    ``price_floor``: on a sale it is the price, while the spend is ``0``.
+    ``spend_authorized_minor``,
     the authorised maximum sealed beside it, is carried for a per-action cap
     and dropped when the money moved in. When it moved in, the amount
     returned (``_returned_minor``) and the SHA-256 digest of the reversed
@@ -381,6 +384,7 @@ def _bridge_deal_check(record: dict, disclosed: dict | None, counterparty_profil
         timestamp=record.get("timestamp"),
         amount_minor=_minor(spend),
         spend_authorized_minor=_minor(authorized),
+        stated_amount_minor=_minor(body.get("amount_minor")),
         currency=body.get("currency"),
         rail=_text(recourse.get("rail")) or _text(body.get("rail")),
         target=target,
