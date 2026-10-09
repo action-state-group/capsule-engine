@@ -228,12 +228,14 @@ def test_price_floor_never_reads_a_floor_in_clear_on_the_record():
     assert (out.result, out.evidence) == ("n/a", _missing("price_floor", "bounds_commitment"))
 
 
-@pytest.mark.parametrize("bad", ["0" * 63, "A" * 64, 7, None])
-def test_price_floor_reads_no_commitment_that_is_not_a_digest(bad):
+@pytest.mark.parametrize("bad", ["0" * 63, "A" * 64, "0" * 64 + "\n", 7, None])
+def test_price_floor_fails_a_sealed_commitment_that_is_not_a_digest(bad):
+    """A record that seals a bounds_commitment out of shape is a wrong
+    record, not one without a floor: the rule fails, it does not step aside."""
     record: TaskAuthorityRecord = {"body": {**BICYCLE["body"], "bounds_commitment": bad}}
-    out = _run(FLOOR, _action(task_authority_ref=task_authority_record_digest(record)), record=record,
-               opening=BICYCLE_OPENING)
-    assert (out.result, out.evidence) == ("n/a", _missing("price_floor", "bounds_commitment"))
+    ref = task_authority_record_digest(record)
+    out = _run(FLOOR, _action(task_authority_ref=ref), record=record, opening=BICYCLE_OPENING)
+    assert (out.result, out.evidence) == ("fail", {"task_authority_ref": ref, "malformed_field": "bounds_commitment"})
 
 
 def test_price_floor_out_of_scope_class():

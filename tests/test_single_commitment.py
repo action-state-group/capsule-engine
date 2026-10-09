@@ -390,8 +390,8 @@ def test_without_the_input_item_ref_the_second_thread_is_n_a(store, signer):
     assert out.reason == "the action names no item; the sale could not be identified"
 
 
-@pytest.mark.parametrize("bad", ["3F" * 32, "3f" * 31, "item/ref-1", 7, ["3f" * 32]],
-                         ids=["upper case", "short", "not hex", "number", "list"])
+@pytest.mark.parametrize("bad", ["3F" * 32, "3f" * 31, "3f" * 32 + "\n", "item/ref-1", 7, ["3f" * 32]],
+                         ids=["upper case", "short", "trailing newline", "not hex", "number", "list"])
 def test_an_input_item_ref_out_of_shape_is_ignored_and_named(store, signer, bad):
     action = action_for_check_input(_thread_entry("b", "offer", "marketplace.offer", 2), item_ref=bad)
     assert action.item_ref is None

@@ -19,7 +19,8 @@ semantics: >-
   document, its nonce and that commitment are the checker input's
   commercial_bounds_opening. An amount_minor at or above the opened floor
   passes; below it fails. An opening that does not open the sealed
-  commitment fails naming bounds_commitment. It is not applicable, naming
+  commitment fails naming bounds_commitment, and so does a sealed
+  bounds_commitment that is not 64 lowercase hex. It is not applicable, naming
   the field, when the action carries no amount_minor or task_authority_ref,
   when the record is missing or is not the one the reference names, when the
   record seals no bounds_commitment, or when no opening is supplied. A floor

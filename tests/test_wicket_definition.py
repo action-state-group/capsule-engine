@@ -73,7 +73,7 @@ EXPECTED_DIGESTS = {
     "seller.single_commitment/1.0.0": "91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e",
     # Replaces price_floor/1.0.0, retired at its digest (RETIRED_DIGESTS below):
     # the floor is now opened from a commitment, never read in clear.
-    "price_floor/2.0.0": "b171a3f18b2ec7062ee80bf61a5e468109020294ff60d4c154256ab0b7cb6002",
+    "price_floor/2.0.0": "52fd588ea62ce467ad5ee59cef4347a4a0fbb0836d20ebfe783923805230bc9b",
 }
 
 # Retired (id, digest) pairs, pinned independently of guards/wickets/retired.py

@@ -194,10 +194,12 @@ def test_an_opened_document_without_a_floor_in_shape_fails(document):
     assert (out.result, out.evidence) == ("fail", _mismatch(record))
 
 
-def test_a_float_floor_has_no_commitment_and_fails():
+@pytest.mark.parametrize("value", [170_000.5, 2**53, "\ud800"], ids=["float", "unsafe integer", "lone surrogate"])
+def test_a_document_with_no_jcs_digest_fails_and_does_not_raise(value):
     opening = copy.deepcopy(OPENING)
-    opening["document"]["min_total_minor"] = 170_000.5
-    assert (_check(FLOOR_MINOR + 5_000, opening).result) == "fail"
+    opening["document"]["min_total_minor"] = value
+    out = _check(FLOOR_MINOR + 5_000, opening)
+    assert (out.result, out.evidence) == ("fail", _mismatch())
 
 
 # -- a floor in clear on the record is never read -------------------------------

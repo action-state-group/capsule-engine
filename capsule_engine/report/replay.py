@@ -33,8 +33,8 @@ rewritten, so it never matches one keyed per profile.
 
 On a check of a sale's thread, the envelope's top-level ``item_ref`` (256
 random bits, lowercase hex, equal across the sale's threads) becomes
-``Action.item_ref`` for ``single_commitment``. No record carries it, so it is
-read only live, never in a replay. A value in any other shape is ignored and
+``Action.item_ref`` for ``single_commitment``. No deal record carries it, so
+it is read only live, never from a deal record in a replay. A value in any other shape is ignored and
 named in ``Action.ignored_inputs``.
 
 ``_bridge_transfer_funds`` is the other non-default action mapping, and it
@@ -403,7 +403,7 @@ def action_for_check_input(entry: dict, *, item_ref: object = None) -> Action:
     )
     if item_ref is None:
         return action
-    if isinstance(item_ref, str) and _HEX64.match(item_ref):
+    if isinstance(item_ref, str) and _HEX64.fullmatch(item_ref):
         return replace(action, item_ref=item_ref)
     return replace(action, ignored_inputs=(*action.ignored_inputs, _ITEM_INPUT))
 
