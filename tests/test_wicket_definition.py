@@ -78,6 +78,8 @@ EXPECTED_DIGESTS = {
     "seller.destination_rail/1.0.0": "fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800",
     # One accepted commitment per sale and item, across buyer threads. No pack cites it yet.
     "seller.single_commitment/1.0.0": "91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e",
+    # An address reaches only the buyer whose sealed acceptance of the sale it cites.
+    "seller.release_on_acceptance/1.0.0": "68d104278760690abda27ea143e15169994f7b1d56370992823ff1046b2a07eb",
     # Replaces price_floor/2.0.0 and 1.0.0, retired at their digests
     # (RETIRED_DIGESTS below): the floor is opened from a commitment, never
     # read in clear, and a record committing to none puts the action out of scope.
@@ -100,7 +102,7 @@ RETIRED_DIGESTS = {
 WITHOUT_SEMANTICS = frozenset(EXPECTED_DIGESTS) - {
     "offer_expiry/1.0.1", "price_floor/2.0.1", "channel_change/1.1.0", "material_fields_changed/1.1.0",
     "offer_fields_changed/1.1.0", "refundability/1.1.0", "task_authority/1.1.0", "upfront_amount/1.1.0",
-    "counterparty_seen_before/3.0.0",
+    "counterparty_seen_before/3.0.0", "seller.release_on_acceptance/1.0.0",
 }
 
 

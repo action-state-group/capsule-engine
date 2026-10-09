@@ -4,11 +4,13 @@
 # exact action_id each row names. Rows are in ledger order: one sale, two
 # buyer threads (a, b), and a third buyer (c) never told the item's
 # condition; the steps before acceptance-in-a run with no acceptance sealed.
+# Buyer b also accepts a second item (acceptance-in-b-of-item-2), so a
+# sealed acceptance of another sale by another buyer exists to be cited.
 #
 # "no-dead-rules": every check an obligation declares (recipient_role,
-# action_class_gate, price_floor, promise_requires_approval,
-# required_disclosure, offer_expiry, destination_rail, task_authority,
-# dedupe, promise_never, single_commitment, verify_before_dispatch) has at
+# price_floor, promise_requires_approval, required_disclosure, offer_expiry,
+# destination_rail, task_authority, dedupe, promise_never,
+# single_commitment, verify_before_dispatch, release_on_acceptance) has at
 # least one 'pass' row and at least one 'fail' row. caps is cited only so the
 # engine runs; it is n/a (population c) on every row.
 #
@@ -24,23 +26,23 @@
 # A failing check escalates when every rule bound to it declares ASK and the
 # class names an approver role: offer-below-floor-in-b (s03),
 # offer-before-required-statement (s05), offer-on-a-stale-proposal (s06),
-# offer-outside-the-task (s08), statement-warranty-unapproved (s04),
-# sale-to-a-on-a-rail-not-allowed (s07), and both address rows to buyer a
-# (s02, the personal_disclosure selector) each fail one such check alone.
+# offer-outside-the-task (s08), statement-warranty-unapproved (s04) and
+# sale-to-a-on-a-rail-not-allowed (s07) each fail one such check alone.
 # statement-authenticity (promise_never), pickup-told-to-a-again (dedupe in
-# one deal), second-commitment-in-b (single_commitment) and
-# address-citing-an-unknown-mandate (verify_before_dispatch) are integrity
-# failures and deny; address-to-a-third-party fails recipient_role, whose
-# rule declares DO, and denies.
+# one deal), second-commitment-in-b (single_commitment) and every address
+# row but address-to-a-after-acceptance (release_on_acceptance, s13; the
+# unknown mandate also fails verify_before_dispatch; the row with no action
+# class fails it closed) are integrity failures and deny, the approved one
+# included. address-to-a-third-party also fails
+# recipient_role, whose rule declares DO.
 
 rows:
   - scenario: condition-told-to-a
     action_id: tell/seller-fixture-condition-a
-    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, action_class_gate: n/a, recipient_role: n/a, price_floor: n/a, promise_requires_approval: pass, promise_never: pass, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a}
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: n/a, price_floor: n/a, promise_requires_approval: pass, promise_never: pass, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: n/a}
     n_a:
       caps: {population: c}
       verify_before_dispatch: {population: c}
-      action_class_gate: {population: c}
       recipient_role: {population: c}
       price_floor: {population: c}
       required_disclosure: {population: c}
@@ -48,14 +50,14 @@ rows:
       single_commitment: {population: c}
       destination_rail: {population: c}
       task_authority: {population: c}
+      release_on_acceptance: {population: c}
     verdict: allow
   - scenario: condition-told-to-b
     action_id: tell/seller-fixture-condition-b
-    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, action_class_gate: n/a, recipient_role: n/a, price_floor: n/a, promise_requires_approval: pass, promise_never: pass, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a}
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: n/a, price_floor: n/a, promise_requires_approval: pass, promise_never: pass, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: n/a}
     n_a:
       caps: {population: c}
       verify_before_dispatch: {population: c}
-      action_class_gate: {population: c}
       recipient_role: {population: c}
       price_floor: {population: c}
       required_disclosure: {population: c}
@@ -63,74 +65,74 @@ rows:
       single_commitment: {population: c}
       destination_rail: {population: c}
       task_authority: {population: c}
+      release_on_acceptance: {population: c}
     verdict: allow
   - scenario: counter-above-floor-in-a
     action_id: offer/seller-fixture-counter-a
-    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, action_class_gate: n/a, recipient_role: n/a, price_floor: pass, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: pass, offer_expiry: pass, single_commitment: pass, destination_rail: n/a, task_authority: pass}
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: n/a, price_floor: pass, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: pass, offer_expiry: pass, single_commitment: pass, destination_rail: n/a, task_authority: pass, release_on_acceptance: n/a}
     n_a:
       caps: {population: c}
       verify_before_dispatch: {population: c}
-      action_class_gate: {population: c}
       recipient_role: {population: c}
       promise_requires_approval: {population: a, missing_field: representation_class}
       promise_never: {population: a, missing_field: representation_class}
       destination_rail: {population: c}
+      release_on_acceptance: {population: c}
     verdict: allow
   - scenario: offer-below-floor-in-b
     action_id: offer/seller-fixture-below-floor-b
-    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, action_class_gate: n/a, recipient_role: n/a, price_floor: fail, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: pass, offer_expiry: pass, single_commitment: pass, destination_rail: n/a, task_authority: pass}
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: n/a, price_floor: fail, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: pass, offer_expiry: pass, single_commitment: pass, destination_rail: n/a, task_authority: pass, release_on_acceptance: n/a}
     n_a:
       caps: {population: c}
       verify_before_dispatch: {population: c}
-      action_class_gate: {population: c}
       recipient_role: {population: c}
       promise_requires_approval: {population: a, missing_field: representation_class}
       promise_never: {population: a, missing_field: representation_class}
       destination_rail: {population: c}
+      release_on_acceptance: {population: c}
     verdict: escalate
   - scenario: offer-before-required-statement
     action_id: offer/seller-fixture-no-condition-c
-    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, action_class_gate: n/a, recipient_role: n/a, price_floor: pass, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: fail, offer_expiry: pass, single_commitment: pass, destination_rail: n/a, task_authority: pass}
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: n/a, price_floor: pass, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: fail, offer_expiry: pass, single_commitment: pass, destination_rail: n/a, task_authority: pass, release_on_acceptance: n/a}
     n_a:
       caps: {population: c}
       verify_before_dispatch: {population: c}
-      action_class_gate: {population: c}
       recipient_role: {population: c}
       promise_requires_approval: {population: a, missing_field: representation_class}
       promise_never: {population: a, missing_field: representation_class}
       destination_rail: {population: c}
+      release_on_acceptance: {population: c}
     verdict: escalate
   - scenario: offer-on-a-stale-proposal
     action_id: offer/seller-fixture-stale-a
-    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, action_class_gate: n/a, recipient_role: n/a, price_floor: pass, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: pass, offer_expiry: fail, single_commitment: pass, destination_rail: n/a, task_authority: pass}
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: n/a, price_floor: pass, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: pass, offer_expiry: fail, single_commitment: pass, destination_rail: n/a, task_authority: pass, release_on_acceptance: n/a}
     n_a:
       caps: {population: c}
       verify_before_dispatch: {population: c}
-      action_class_gate: {population: c}
       recipient_role: {population: c}
       promise_requires_approval: {population: a, missing_field: representation_class}
       promise_never: {population: a, missing_field: representation_class}
       destination_rail: {population: c}
+      release_on_acceptance: {population: c}
     verdict: escalate
   - scenario: offer-outside-the-task
     action_id: offer_bundle/seller-fixture-bundle-a
-    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, action_class_gate: n/a, recipient_role: n/a, price_floor: pass, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: pass, offer_expiry: pass, single_commitment: pass, destination_rail: n/a, task_authority: fail}
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: n/a, price_floor: pass, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: pass, offer_expiry: pass, single_commitment: pass, destination_rail: n/a, task_authority: fail, release_on_acceptance: n/a}
     n_a:
       caps: {population: c}
       verify_before_dispatch: {population: c}
-      action_class_gate: {population: c}
       recipient_role: {population: c}
       promise_requires_approval: {population: a, missing_field: representation_class}
       promise_never: {population: a, missing_field: representation_class}
       destination_rail: {population: c}
+      release_on_acceptance: {population: c}
     verdict: escalate
   - scenario: statement-warranty-unapproved
     action_id: tell/seller-fixture-warranty-unapproved
-    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, action_class_gate: n/a, recipient_role: n/a, price_floor: n/a, promise_requires_approval: fail, promise_never: pass, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a}
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: n/a, price_floor: n/a, promise_requires_approval: fail, promise_never: pass, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: n/a}
     n_a:
       caps: {population: c}
       verify_before_dispatch: {population: c}
-      action_class_gate: {population: c}
       recipient_role: {population: c}
       price_floor: {population: c}
       required_disclosure: {population: c}
@@ -138,14 +140,14 @@ rows:
       single_commitment: {population: c}
       destination_rail: {population: c}
       task_authority: {population: c}
+      release_on_acceptance: {population: c}
     verdict: escalate
   - scenario: statement-warranty-approved
     action_id: tell/seller-fixture-warranty-approved
-    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, action_class_gate: n/a, recipient_role: n/a, price_floor: n/a, promise_requires_approval: pass, promise_never: pass, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a}
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: n/a, price_floor: n/a, promise_requires_approval: pass, promise_never: pass, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: n/a}
     n_a:
       caps: {population: c}
       verify_before_dispatch: {population: c}
-      action_class_gate: {population: c}
       recipient_role: {population: c}
       price_floor: {population: c}
       required_disclosure: {population: c}
@@ -153,14 +155,14 @@ rows:
       single_commitment: {population: c}
       destination_rail: {population: c}
       task_authority: {population: c}
+      release_on_acceptance: {population: c}
     verdict: allow
   - scenario: statement-authenticity
     action_id: tell/seller-fixture-authenticity
-    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, action_class_gate: n/a, recipient_role: n/a, price_floor: n/a, promise_requires_approval: pass, promise_never: fail, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a}
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: n/a, price_floor: n/a, promise_requires_approval: pass, promise_never: fail, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: n/a}
     n_a:
       caps: {population: c}
       verify_before_dispatch: {population: c}
-      action_class_gate: {population: c}
       recipient_role: {population: c}
       price_floor: {population: c}
       required_disclosure: {population: c}
@@ -168,14 +170,14 @@ rows:
       single_commitment: {population: c}
       destination_rail: {population: c}
       task_authority: {population: c}
+      release_on_acceptance: {population: c}
     verdict: deny
   - scenario: pickup-told-to-a
     action_id: tell/seller-fixture-pickup-a
-    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, action_class_gate: n/a, recipient_role: n/a, price_floor: n/a, promise_requires_approval: pass, promise_never: pass, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a}
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: n/a, price_floor: n/a, promise_requires_approval: pass, promise_never: pass, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: n/a}
     n_a:
       caps: {population: c}
       verify_before_dispatch: {population: c}
-      action_class_gate: {population: c}
       recipient_role: {population: c}
       price_floor: {population: c}
       required_disclosure: {population: c}
@@ -183,15 +185,29 @@ rows:
       single_commitment: {population: c}
       destination_rail: {population: c}
       task_authority: {population: c}
+      release_on_acceptance: {population: c}
     verdict: allow
   - scenario: pickup-told-to-a-again
     action_id: tell/seller-fixture-pickup-a-again
-    checks: {dedupe: fail, caps: n/a, verify_before_dispatch: n/a, action_class_gate: n/a, recipient_role: n/a, price_floor: n/a, promise_requires_approval: pass, promise_never: pass, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a}
+    checks: {dedupe: fail, caps: n/a, verify_before_dispatch: n/a, recipient_role: n/a, price_floor: n/a, promise_requires_approval: pass, promise_never: pass, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: n/a}
     n_a:
       caps: {population: c}
       verify_before_dispatch: {population: c}
-      action_class_gate: {population: c}
       recipient_role: {population: c}
+      price_floor: {population: c}
+      required_disclosure: {population: c}
+      offer_expiry: {population: c}
+      single_commitment: {population: c}
+      destination_rail: {population: c}
+      task_authority: {population: c}
+      release_on_acceptance: {population: c}
+    verdict: deny
+  - scenario: address-to-a-before-acceptance
+    action_id: share_address/seller-fixture-a-before
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: pass, price_floor: n/a, promise_requires_approval: pass, promise_never: pass, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: fail}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
       price_floor: {population: c}
       required_disclosure: {population: c}
       offer_expiry: {population: c}
@@ -199,9 +215,9 @@ rows:
       destination_rail: {population: c}
       task_authority: {population: c}
     verdict: deny
-  - scenario: address-to-a-before-acceptance
-    action_id: share_address/seller-fixture-a-before
-    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, action_class_gate: fail, recipient_role: pass, price_floor: n/a, promise_requires_approval: pass, promise_never: pass, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a}
+  - scenario: address-to-a-before-acceptance-approved
+    action_id: share_address/seller-fixture-a-before-approved
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: pass, price_floor: n/a, promise_requires_approval: pass, promise_never: pass, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: fail}
     n_a:
       caps: {population: c}
       verify_before_dispatch: {population: c}
@@ -211,10 +227,10 @@ rows:
       single_commitment: {population: c}
       destination_rail: {population: c}
       task_authority: {population: c}
-    verdict: escalate
+    verdict: deny
   - scenario: address-citing-an-unknown-mandate
     action_id: share_address/seller-fixture-a-unknown-mandate
-    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: fail, action_class_gate: fail, recipient_role: pass, price_floor: n/a, promise_requires_approval: pass, promise_never: pass, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a}
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: fail, recipient_role: pass, price_floor: n/a, promise_requires_approval: pass, promise_never: pass, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: fail}
     n_a:
       caps: {population: c}
       price_floor: {population: c}
@@ -226,7 +242,7 @@ rows:
     verdict: deny
   - scenario: listing-views-read
     action_id: read_listing_views/seller-fixture-1
-    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, action_class_gate: pass, recipient_role: n/a, price_floor: n/a, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a}
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: n/a, price_floor: n/a, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: n/a}
     n_a:
       caps: {population: c}
       verify_before_dispatch: {population: c}
@@ -239,34 +255,47 @@ rows:
       single_commitment: {population: c}
       destination_rail: {population: c}
       task_authority: {population: c}
+      release_on_acceptance: {population: c}
     verdict: allow
   - scenario: acceptance-in-a
     action_id: accept/seller-fixture-accept-a
-    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, action_class_gate: n/a, recipient_role: n/a, price_floor: pass, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: pass, offer_expiry: pass, single_commitment: pass, destination_rail: n/a, task_authority: pass}
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: n/a, price_floor: pass, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: pass, offer_expiry: pass, single_commitment: pass, destination_rail: n/a, task_authority: pass, release_on_acceptance: n/a}
     n_a:
       caps: {population: c}
       verify_before_dispatch: {population: c}
-      action_class_gate: {population: c}
       recipient_role: {population: c}
       promise_requires_approval: {population: a, missing_field: representation_class}
       promise_never: {population: a, missing_field: representation_class}
       destination_rail: {population: c}
+      release_on_acceptance: {population: c}
     verdict: allow
   - scenario: second-commitment-in-b
     action_id: offer/seller-fixture-after-accept-b
-    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, action_class_gate: n/a, recipient_role: n/a, price_floor: pass, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: pass, offer_expiry: pass, single_commitment: fail, destination_rail: n/a, task_authority: pass}
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: n/a, price_floor: pass, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: pass, offer_expiry: pass, single_commitment: fail, destination_rail: n/a, task_authority: pass, release_on_acceptance: n/a}
     n_a:
       caps: {population: c}
       verify_before_dispatch: {population: c}
-      action_class_gate: {population: c}
       recipient_role: {population: c}
       promise_requires_approval: {population: a, missing_field: representation_class}
       promise_never: {population: a, missing_field: representation_class}
       destination_rail: {population: c}
+      release_on_acceptance: {population: c}
     verdict: deny
+  - scenario: acceptance-in-b-of-item-2
+    action_id: accept/seller-fixture-accept-b-item-2
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: n/a, price_floor: pass, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: pass, offer_expiry: pass, single_commitment: pass, destination_rail: n/a, task_authority: pass, release_on_acceptance: n/a}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      recipient_role: {population: c}
+      promise_requires_approval: {population: a, missing_field: representation_class}
+      promise_never: {population: a, missing_field: representation_class}
+      destination_rail: {population: c}
+      release_on_acceptance: {population: c}
+    verdict: allow
   - scenario: address-to-a-after-acceptance
     action_id: share_address/seller-fixture-a-after
-    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: pass, action_class_gate: fail, recipient_role: pass, price_floor: n/a, promise_requires_approval: pass, promise_never: pass, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a}
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: pass, recipient_role: pass, price_floor: n/a, promise_requires_approval: pass, promise_never: pass, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: pass}
     n_a:
       caps: {population: c}
       price_floor: {population: c}
@@ -275,10 +304,49 @@ rows:
       single_commitment: {population: c}
       destination_rail: {population: c}
       task_authority: {population: c}
-    verdict: escalate
+    verdict: allow
+  - scenario: address-to-c-after-acceptance
+    action_id: share_address/seller-fixture-c-after
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: pass, recipient_role: pass, price_floor: n/a, promise_requires_approval: pass, promise_never: pass, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: fail}
+    n_a:
+      caps: {population: c}
+      price_floor: {population: c}
+      required_disclosure: {population: c}
+      offer_expiry: {population: c}
+      single_commitment: {population: c}
+      destination_rail: {population: c}
+      task_authority: {population: c}
+    verdict: deny
+  - scenario: address-to-a-citing-b-acceptance
+    action_id: share_address/seller-fixture-a-cites-b
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: pass, recipient_role: pass, price_floor: n/a, promise_requires_approval: pass, promise_never: pass, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: fail}
+    n_a:
+      caps: {population: c}
+      price_floor: {population: c}
+      required_disclosure: {population: c}
+      offer_expiry: {population: c}
+      single_commitment: {population: c}
+      destination_rail: {population: c}
+      task_authority: {population: c}
+    verdict: deny
+  - scenario: address-with-no-action-class
+    action_id: share_address/seller-fixture-c-no-class
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: pass, recipient_role: n/a, price_floor: n/a, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: fail}
+    n_a:
+      caps: {population: c}
+      recipient_role: {population: c}
+      price_floor: {population: c}
+      promise_requires_approval: {population: c}
+      promise_never: {population: c}
+      required_disclosure: {population: c}
+      offer_expiry: {population: c}
+      single_commitment: {population: c}
+      destination_rail: {population: c}
+      task_authority: {population: c}
+    verdict: deny
   - scenario: address-to-a-third-party
     action_id: share_address/seller-fixture-third-party
-    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: pass, action_class_gate: fail, recipient_role: fail, price_floor: n/a, promise_requires_approval: pass, promise_never: pass, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a}
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: pass, recipient_role: fail, price_floor: n/a, promise_requires_approval: pass, promise_never: pass, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: fail}
     n_a:
       caps: {population: c}
       price_floor: {population: c}
@@ -290,21 +358,22 @@ rows:
     verdict: deny
   - scenario: sale-to-a-on-an-allowed-rail
     action_id: sell/seller-fixture-sale-a
-    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: pass, action_class_gate: n/a, recipient_role: n/a, price_floor: pass, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: pass, offer_expiry: pass, single_commitment: pass, destination_rail: pass, task_authority: pass}
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: pass, recipient_role: n/a, price_floor: pass, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: pass, offer_expiry: pass, single_commitment: pass, destination_rail: pass, task_authority: pass, release_on_acceptance: n/a}
     n_a:
       caps: {population: c}
-      action_class_gate: {population: c}
       recipient_role: {population: c}
       promise_requires_approval: {population: a, missing_field: representation_class}
       promise_never: {population: a, missing_field: representation_class}
+      release_on_acceptance: {population: c}
     verdict: allow
   - scenario: sale-to-a-on-a-rail-not-allowed
     action_id: sell/seller-fixture-sale-a-cheque
-    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: pass, action_class_gate: n/a, recipient_role: n/a, price_floor: pass, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: pass, offer_expiry: pass, single_commitment: pass, destination_rail: fail, task_authority: pass}
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: pass, recipient_role: n/a, price_floor: pass, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: pass, offer_expiry: pass, single_commitment: pass, destination_rail: fail, task_authority: pass, release_on_acceptance: n/a}
     n_a:
       caps: {population: c}
-      action_class_gate: {population: c}
       recipient_role: {population: c}
       promise_requires_approval: {population: a, missing_field: representation_class}
       promise_never: {population: a, missing_field: representation_class}
+      release_on_acceptance: {population: c}
     verdict: escalate
+

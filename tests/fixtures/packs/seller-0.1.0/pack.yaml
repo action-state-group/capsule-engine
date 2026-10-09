@@ -17,19 +17,12 @@
 # gate selector) whose rules all declare ASK asks an approver when the
 # action's class names one; any other failure refuses, and an integrity
 # check (dedupe in one deal, a cited mandate, one commitment per sale, a
-# statement never made, an address before acceptance) refuses whatever its
-# rule declares.
+# statement never made) refuses whatever its rule declares.
 #
-# 0.1.1 releases the address on acceptance (seller.release_on_acceptance)
-# where 0.1.0 asked on every personal-data disclosure through
-# action_class_gate's personal_disclosure selector. The gate is no longer
-# cited: it reads only the action class, so it would ask on the address
-# after acceptance too. The gate also refused an action whose class has no
-# taxonomy row; release_on_acceptance now refuses that itself. A
-# personal-data disclosure of another class is measured by recipient_role
-# and the statement-class rules (s04, s10), which refuse a class outside
-# their closed set.
-pack_id: asg/seller/0.1.1
+# One rule shares action_class_gate; it names the selector it is measured
+# by (selector:). An action whose class has no taxonomy row fails the gate
+# closed and is refused.
+pack_id: asg/seller/0.1.0
 
 obligations:
   # -- DO ------------------------------------------------------------------
@@ -43,6 +36,16 @@ obligations:
     check: recipient_role
     default_disposition: DO
   # -- ASK -----------------------------------------------------------------
+  - id: s02-personal-disclosure
+    statement: >-
+      Flags every action declared as disclosing personal data
+      (disclosure.personal), and records the class. It reads the class only,
+      so it flags a disclosure whatever it contains and whoever receives it;
+      whether the sale has been accepted when the disclosure is made is not
+      measured by this rule.
+    check: action_class_gate
+    selector: personal_disclosure
+    default_disposition: ASK
   - id: s03-price-below-the-floor
     statement: >-
       Checks the amount of an offer, an acceptance or a sale against the
@@ -122,18 +125,6 @@ obligations:
       ledger or does not re-verify, and records the result.
     check: verify_before_dispatch
     default_disposition: NEVER
-  - id: s13-address-only-to-the-buyer-who-accepted
-    statement: >-
-      Detects a disclosure of the user's address (disclosure.personal of
-      class address) that does not cite the sale's sealed acceptance, or
-      whose recipient is not the buyer that accepted, and records the class,
-      whether the disclosure was bound to the acceptance and the name of a
-      missing field -- never the address, the item, the task authority or a
-      counterparty. An action whose class is missing or unknown, and a
-      disclosure that declares no class, are detected too. No approval
-      clears it.
-    check: release_on_acceptance
-    default_disposition: NEVER
 
 action_semantics:
   - action_type: offer.make
@@ -154,8 +145,8 @@ action_semantics:
     optional_fields: [task_authority_ref, authorized_by, equivalence_key]
   - action_type: personal_data.share
     action_class: disclosure.personal
-    required_fields: [target, recipient_role, representation_class]
-    optional_fields: [task_authority_ref, item_ref, authorized_by, cited_mandate_capsule_id, equivalence_key]
+    required_fields: [target, recipient_role]
+    optional_fields: [representation_class, task_authority_ref, authorized_by, cited_mandate_capsule_id, equivalence_key]
 
 constraints:
   # Cited because the guard engine needs a spending-limit definition to
@@ -170,6 +161,9 @@ constraints:
     digest: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
   - wicket_ref: verify_before_dispatch/1.0.0
     digest: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
+  # Named selectors over the action taxonomy; reads the declared class only.
+  - wicket_ref: action_class_gate/1.0.0
+    digest: fcc352838832e13f5e87662f0194ec4a7065bc989bbe624b43ac5d9d1b638ae2
   # The counterparty is the buyer: roles buyer | third_party | self.
   - wicket_ref: seller.recipient_role/1.0.0
     digest: 001d4d4198921ffec5f492f88286765a075eece1418d15b68576d4fceec7826b
@@ -191,9 +185,6 @@ constraints:
     digest: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
   - wicket_ref: task_authority/1.1.0
     digest: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-  # The address reaches only the buyer whose acceptance it cites.
-  - wicket_ref: seller.release_on_acceptance/1.0.0
-    digest: 68d104278760690abda27ea143e15169994f7b1d56370992823ff1046b2a07eb
 
 folds:
   - fold_ref: spend.weekly/1.0.0
@@ -232,9 +223,7 @@ fixtures:
     - id: pickup-told-to-a-again
       outcome: deny
     - id: address-to-a-before-acceptance
-      outcome: deny
-    - id: address-to-a-before-acceptance-approved
-      outcome: deny
+      outcome: escalate
     - id: address-citing-an-unknown-mandate
       outcome: deny
     - id: listing-views-read
@@ -243,16 +232,8 @@ fixtures:
       outcome: allow
     - id: second-commitment-in-b
       outcome: deny
-    - id: acceptance-in-b-of-item-2
-      outcome: allow
     - id: address-to-a-after-acceptance
-      outcome: allow
-    - id: address-to-c-after-acceptance
-      outcome: deny
-    - id: address-to-a-citing-b-acceptance
-      outcome: deny
-    - id: address-with-no-action-class
-      outcome: deny
+      outcome: escalate
     - id: address-to-a-third-party
       outcome: deny
     - id: sale-to-a-on-an-allowed-rail

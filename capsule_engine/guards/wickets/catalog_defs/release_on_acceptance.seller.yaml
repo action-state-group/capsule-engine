@@ -1,0 +1,35 @@
+# release_on_acceptance wicket, configured for a seller (guards/checks/
+# release_on_acceptance.py). Some personal data reaches a buyer only once
+# that buyer's acceptance of the sale is sealed. The rule itself is the
+# `semantics` field below: it is inside the digested body, so rewording it
+# moves the digest. A failure refuses; it never asks, and an approval does
+# not clear it.
+#
+# `release_classes` are the classes of personal data held back until
+# acceptance. `acceptance_classes` are the classes whose accepted,
+# non-dry-run record seals the acceptance (the same reading as
+# seller.single_commitment). `action_classes` are the disclosures the rule
+# applies to.
+wicket_id: seller.release_on_acceptance/1.0.0
+check: release_on_acceptance
+semantics: >-
+  A disclosure in action_classes whose representation_class is in
+  release_classes passes only when it names its task_authority_ref, item_ref
+  and target, cites by cited_mandate_capsule_id the sale's acceptance, and
+  that acceptance re-verifies and was sealed for the same target. The sale's
+  acceptance is the first record in ledger order, among the operator's,
+  whose action_class is in acceptance_classes, whose decision was accept,
+  which was not a dry run, and which carries the same task_authority_ref and
+  item_ref. Any other disclosure in release_classes fails: no citation,
+  another sale's or another recipient's acceptance, a record that is not the
+  sale's acceptance, or a missing reference. An action whose action_class is
+  missing or has no row in the action taxonomy fails, and so does a
+  disclosure in action_classes with no representation_class: neither can be
+  shown to be out of scope. Any other representation_class or known action
+  class is not applicable. A failure is refused and no approval
+  clears it. The reason and evidence carry no disclosed value, reference,
+  counterparty or capsule id.
+config:
+  release_classes: [address]
+  acceptance_classes: [agreement.accept]
+  action_classes: [disclosure.personal]
