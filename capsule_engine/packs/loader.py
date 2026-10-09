@@ -55,7 +55,13 @@ from ..folds.catalog import Catalog as FoldCatalog
 from ..folds.definition import FoldDefinition
 from ..folds.errors import FoldDefinitionError
 from ..folds.loader import load_definition_file as load_fold_definition_file
-from ..guards.classes import TAXONOMY, is_known_action_class, legacy_aliases
+from ..guards.classes import (
+    TAXONOMY,
+    TAXONOMY_DIGEST,
+    TAXONOMY_VERSION,
+    is_known_action_class,
+    legacy_aliases,
+)
 from ..guards.wickets.catalog import Catalog as WicketCatalog
 from ..guards.wickets.definition import WicketDefinition
 from ..guards.wickets.definition import parse_definition as parse_wicket_definition
@@ -109,6 +115,7 @@ from .errors import (
     PROMPT_TEXT_IN_PACK,
     RETIRED_CATALOG_REF,
     SCOPE_MISMATCH,
+    TAXONOMY_PIN_MISMATCH,
     TOPOLOGY_INVARIANT_OVERRIDE,
     UNKNOWN_ACTION_CLASS,
     UNKNOWN_CATALOG_REF,
@@ -146,6 +153,7 @@ from .schema import (
     PackFixtures,
     ProposerStub,
     ScopeCensus,
+    TaxonomyPin,
     TopologyProfile,
     WindowSpec,
 )
@@ -1224,6 +1232,23 @@ def _parse_scope_census(raw: Any) -> ScopeCensus | None:
     return ScopeCensus(document_digest=document_digest, n=n, m=m, review_by=review_by)
 
 
+def _parse_taxonomy_pin(raw: Any) -> TaxonomyPin | None:
+    """The optional ``taxonomy`` pin, refused unless it names the taxonomy this
+    engine ships, by version and by digest."""
+    if raw is None:
+        return None
+    raw = _require_mapping(raw, "taxonomy")
+    version = _require_nonempty_str(raw.get("taxonomy_version"), "taxonomy.taxonomy_version", TAXONOMY_VERSION)
+    digest = _require_nonempty_str(raw.get("digest"), "taxonomy.digest", "<sha256 over the taxonomy's JCS bytes>")
+    if (version, digest) != (TAXONOMY_VERSION, TAXONOMY_DIGEST):
+        raise PackDefinitionError(
+            TAXONOMY_PIN_MISMATCH,
+            f"taxonomy pins version {version!r} digest {digest!r}; this engine ships version "
+            f"{TAXONOMY_VERSION!r} digest {TAXONOMY_DIGEST!r}",
+        )
+    return TaxonomyPin(taxonomy_version=version, digest=digest)
+
+
 def _parse_counterparty_binding(raw: Any, *, profile_id: str) -> CounterpartyBinding:
     raw = _require_mapping(raw, f"profiles[{profile_id!r}].counterparty_binding")
     direct = _require_nonempty_str(
@@ -1370,6 +1395,7 @@ def load_pack_dir(pack_dir: str | Path) -> PackDefinition:
     fixtures = _parse_fixtures(data.get("fixtures"))
     scope_census = _parse_scope_census(data.get("scope_census"))
     profiles = _parse_profiles(data.get("profiles"), outcomes=outcomes)
+    taxonomy = _parse_taxonomy_pin(data.get("taxonomy"))
 
     holds_integration = data.get("holds_integration", "none")
     if holds_integration not in HOLDS_INTEGRATION_VALUES:
@@ -1401,4 +1427,5 @@ def load_pack_dir(pack_dir: str | Path) -> PackDefinition:
         outcomes=outcomes,
         scope_census=scope_census,
         profiles=profiles,
+        taxonomy=taxonomy,
     )
