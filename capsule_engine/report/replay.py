@@ -67,6 +67,7 @@ from ..packs.install import engine_ask_sets
 from ..packs.schema import PackDefinition
 
 __all__ = [
+    "MONEY_IN",
     "SourcedDecision",
     "ReplayResult",
     "load_records",
@@ -284,6 +285,14 @@ def _typed_ref_digest(value: object) -> str | None:
     return digest if isinstance(digest, str) and _HEX64.fullmatch(digest) else None
 
 
+# The ``direction`` a deal check states when the money moves to the user: a
+# refund, or a partial cancel. Such an act is never spend: the bridge carries
+# its spend as ``0`` whatever ``spend_minor`` says, so it adds nothing to the
+# rolling total and cannot raise it past a cap. So an act stated in this
+# direction is never a reason the spend window cannot be computed, decided or not.
+MONEY_IN = "in"
+
+
 # The body fields that state the amount a money-in record returns, first
 # present wins: the producer's explicit ``returned_minor``, then a refund's
 # ``amount_minor``, then a partial cancel's ``cancelled_amount_minor``.
@@ -359,8 +368,8 @@ def _bridge_deal_check(record: dict, disclosed: dict | None, counterparty_profil
     spend = body.get("spend_minor")
     authorized = body.get("spend_authorized_minor")
     returned = reverses = None
-    if body.get("direction") == "in":
-        spend = 0  # money arriving is never spend, whatever spend_minor says
+    if body.get("direction") == MONEY_IN:
+        spend = 0
         authorized = None
         returned, reverses = _returned_minor(body), _typed_ref_digest(body.get("reverses_ref"))
     block = disclosed.get("x-deal-v0") or {}
