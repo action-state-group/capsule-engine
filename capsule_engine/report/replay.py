@@ -245,7 +245,9 @@ def _bridge_deal_check(record: dict, disclosed: dict | None) -> Action | None:
     recourse rail). The target is the payee's sealed fingerprint
     (``_payee_target``). The remaining body fields are carried only in the
     shape the action takes: a string, a boolean, an integer, or the SHA-256
-    digest of a typed reference, and dropped otherwise."""
+    digest of a typed reference, and dropped otherwise.
+    ``taxonomy_version`` makes it an act stated against a pinned taxonomy, so
+    ``dedupe`` keys it on the act, never on this record's type or id."""
     if disclosed is None or not _bound(record, disclosed):
         return None
     body = _checked_body(disclosed)
