@@ -287,9 +287,7 @@ EPISTEMIC_TYPE_VALUES = frozenset(
 JUDGE_PIN_HOSTING_VALUES = frozenset({"hosted", "self_hosted"})
 
 
-class JudgePinDict(TypedDict):
-    """``JudgePin.to_dict()``: the pin as it enters the pack digest."""
-
+class _JudgePinRequiredDict(TypedDict):
     model_id: str
     prompt_template_hash: str
     schema_hash: str
@@ -297,38 +295,65 @@ class JudgePinDict(TypedDict):
     model_hosting: str
 
 
+class JudgePinDict(_JudgePinRequiredDict, total=False):
+    """``JudgePin.to_dict()``: the pin as it enters the pack digest.
+    ``model_digest`` is present only when declared."""
+
+    model_digest: str
+
+
 @dataclass(frozen=True)
 class JudgePin:
     """The pin a ``mode: judged`` obligation carries: which judge answers it.
 
-    ``model_id`` names the model; ``prompt_template_hash`` is the SHA-256 hex
-    of the prompt TEMPLATE (capsule-judge's ``prompt_digest`` over a
-    ``JudgePromptDefinition``), never of a prompt with an action's content
-    interpolated into it; ``schema_hash`` is the SHA-256 hex of the answer
-    schema the judge must return; ``input_refs`` names the normalized action
-    fields the template reads. The interpolated prompt carries the action's
+    ``model_id`` names the model. ``prompt_template_hash`` is the JSON-DIGEST
+    (lowercase-hex SHA-256 of the RFC 8785 JCS bytes) of the judge's
+    instruction template object as published, before anything is
+    interpolated into it. It equals a judgment record's
+    ``instruction_template_digest`` (Agent Action Capsule judgment extension,
+    ``x-judgment-v1``), never that record's ``prompt_digest``, which is a
+    SHA-256 of a published file's raw bytes. ``schema_hash`` is the SHA-256
+    hex of the answer schema the judge must return. ``input_refs`` names the
+    normalized action fields the template reads. The interpolated prompt carries the action's
     content -- which can be identity or a secret -- so it never enters a
     pack, and the loader refuses any prompt-text field outright.
 
     ``model_hosting`` (one of ``JUDGE_PIN_HOSTING_VALUES``) is the honest
     label on what the verdict is: a hosted model's verdict is attributable,
     not re-derivable, so a judged obligation pinned to one cannot declare
-    ``re_derivability_grade: pure_replay``."""
+    ``re_derivability_grade: pure_replay``.
+
+    ``model_digest`` (optional) is the third rung of model identity: the
+    lowercase-hex SHA-256 over the raw bytes of the model file the judge
+    loads. ``model_id`` is a name and proves nothing about bytes; a reference
+    (repository, revision, file) proves which artifact was named; only a
+    digest of the loaded bytes says which bytes ran. It is still
+    self-reported: it makes a verdict re-derivable in principle, not proven
+    (that is a stronger rung -- a trusted execution environment with a load
+    hook, or a referee). It never accompanies ``model_hosting: hosted``,
+    because nobody outside a hosted endpoint holds the loaded bytes, and
+    ``pure_replay`` requires it. Absent is absent: the field is omitted,
+    never written as an empty, zero or placeholder value, and it enters the
+    pack digest only when declared, so a pin without it digests as before."""
 
     model_id: str
     prompt_template_hash: str
     schema_hash: str
     input_refs: tuple[str, ...]
     model_hosting: str
+    model_digest: str | None = None
 
     def to_dict(self) -> JudgePinDict:
-        return {
+        out: JudgePinDict = {
             "model_id": self.model_id,
             "prompt_template_hash": self.prompt_template_hash,
             "schema_hash": self.schema_hash,
             "input_refs": list(self.input_refs),
             "model_hosting": self.model_hosting,
         }
+        if self.model_digest is not None:
+            out["model_digest"] = self.model_digest
+        return out
 
 
 @dataclass(frozen=True)
