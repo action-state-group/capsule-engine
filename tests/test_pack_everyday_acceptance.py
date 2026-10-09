@@ -42,8 +42,8 @@ TASK_AUTHORITY = {"body": {"outcome_id": "household.pay_the_plumber/1.0.0", "all
                            "preconditions": [], "binding": {"subject": "service/plumber"}}}
 TASK_AUTHORITY_REF = task_authority_record_digest(TASK_AUTHORITY)
 TASK_RECORDS = {"task-inside-authority": TASK_AUTHORITY, "task-outside-authority": TASK_AUTHORITY}
-MATERIAL_BASIS = fields_basis(load_definition_file(WICKETS / "material_fields_changed.yaml").config["counted_fields"])
-OFFER_BASIS = fields_basis(load_definition_file(WICKETS / "offer_fields_changed.yaml").config["counted_fields"])
+MATERIAL_BASIS = fields_basis(load_definition_file(WICKETS / "material_fields_changed.v1.1.yaml").config["counted_fields"])
+OFFER_BASIS = fields_basis(load_definition_file(WICKETS / "offer_fields_changed.v1.1.yaml").config["counted_fields"])
 
 
 def _signer() -> LocalSigner:
@@ -98,6 +98,19 @@ def _disclosure(name: str, minute: int, target: str = "shop/bakery", **fields) -
         action_class="disclosure.personal",
         target=target,
         action_id=f"share_address/everyday-fixture-{name}",
+        timestamp=f"2026-08-10T10:{minute:02d}:00Z",
+        **fields,
+    )
+
+
+def _sale(name: str, minute: int, operator: str, **fields) -> Action:
+    return Action(
+        verb="sell_item",
+        operator=operator,
+        developer="household-assistant-u@v1",
+        action_class="marketplace.sale",
+        currency="EUR",
+        action_id=f"sell_item/everyday-fixture-{name}",
         timestamp=f"2026-08-10T10:{minute:02d}:00Z",
         **fields,
     )
@@ -264,6 +277,15 @@ def _scenarios() -> list[tuple[str, Action, str]]:
         ("task-outside-authority", _payment("task-outside", 31, "household-assistant-s@v1", operator=f"{OPERATOR}-t",
          amount_minor=2_000, target="service/roofer", rail="card", counterparty_account_ref="acct-ref-roofer-1",
          task_authority_ref=TASK_AUTHORITY_REF), ESCALATE),
+        # The user's agent selling a bike to a buyer, with the same declared
+        # inputs. marketplace.sale names an approver role, so a sale past one
+        # limit escalates; caps leaves a sale out, as money coming in.
+        ("sale-terms-in-bounds", _sale("sale-in-bounds", 32, f"{OPERATOR}-u",
+         **_declared("u", target="buyer/bike-u")), ALLOW),
+        ("sale-material-terms-changed", _sale("sale-material-changed", 33, f"{OPERATOR}-v",
+         **_declared("v", target="buyer/bike-v", material_fields_changed=1)), ESCALATE),
+        ("sale-deposit-over-a-quarter", _sale("sale-deposit-over", 34, f"{OPERATOR}-w",
+         **_declared("w", target="buyer/bike-w", upfront_amount_minor=501)), ESCALATE),
     ]
 
 
@@ -322,7 +344,7 @@ def test_records_are_pack_attributed_and_observe_mode(run):
         assert capsule["asg_payload"]["manifest_digest"] == installed.resolved.manifest_digest, name
         assert capsule["asg_payload"]["checkpoint"].get("dry_run") is (True if name not in REAL_RUN else None), name
     assert activation["asg_payload"]["detail"]["packs"] == [
-        {"pack_id": "asg/everyday/0.3.2", "digest": installed.pack.definition_digest(), "mode": "observe"}
+        {"pack_id": "asg/everyday/0.3.3", "digest": installed.pack.definition_digest(), "mode": "observe"}
     ]
 
 

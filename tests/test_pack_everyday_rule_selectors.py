@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
-"""everyday 0.3.2: the eight rules measured by action_class_gate each name
-their own gate selector, so one action fails only the rule whose selector
-matched its class, and the others do not apply to it.
+"""everyday 0.3.2 and later: the eight rules measured by action_class_gate
+each name their own gate selector, so one action fails only the rule whose
+selector matched its class, and the others do not apply to it.
 
 In 0.3.1 every one of the eight took the gate's single result, so a booking
 failed all eight. Each action below is evaluated by a pack-installed engine,
@@ -28,7 +28,7 @@ from capsule_engine.packs import (
 
 PACK_DIR = Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog" / "everyday"
 PACK = load_pack_dir(PACK_DIR)
-PACK_DIGEST = "6f333fa8b7a7e137abe6c61e5a32097ed06d493479a018807cbf4d2e4f5da7b2"
+PACK_DIGEST = "d153219b9b5f7ad8eb4805eb718aab81a5dfa29a6a1d977301559fc167268752"
 
 SELECTOR = {
     "r01-research-and-prepare": "non_consequential",
@@ -107,7 +107,7 @@ def _gate_table(pack, decisions) -> dict[str, dict[str, str]]:
 
 
 def test_each_gate_rule_names_its_selector_and_the_digest_is_recorded():
-    assert PACK.pack_id == "asg/everyday/0.3.2"
+    assert PACK.pack_id == "asg/everyday/0.3.3"
     assert {o.id: o.selector for o in PACK.obligations if o.check == "action_class_gate"} == SELECTOR
     assert all(o.selector is None for o in PACK.obligations if o.check != "action_class_gate")
     assert PACK.definition_digest() == PACK_DIGEST

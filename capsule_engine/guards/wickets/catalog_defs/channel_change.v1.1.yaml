@@ -1,0 +1,18 @@
+# channel_change wicket, version 1.1: channel_change/1.0.0's config with
+# marketplace.sale added to action_classes (guards/checks/channel_change.py).
+# The rule itself is the `semantics` field below: it is inside the digested
+# body, so rewording it moves the digest. channel_change/1.0.0
+# (channel_change.yaml) stays as it was for the packs that pin it.
+wicket_id: channel_change/1.1.0
+check: channel_change
+semantics: >-
+  For an action in action_classes, Action.channel (the channel kind in use at
+  this action) is compared with Action.first_contact_channel (the kind the
+  relationship started on), both read off the same action. Equal passes;
+  different fails. A value outside seeded_channels is compared the same way
+  and recorded as not seeded. It is not applicable, naming the field, when
+  the action carries no channel or no first_contact_channel. marketplace.sale
+  is in scope. Any other action class is out of scope.
+config:
+  action_classes: [money.purchase, money.transfer, money.subscription, booking.create, booking.modify, agreement.accept, marketplace.offer, external_commitment.other, communication.send, comms.external, marketplace.sale]
+  seeded_channels: [marketplace, web, sms, phone_call, email, app_chat, whatsapp, telegram, signal, in_person, other]
