@@ -34,6 +34,11 @@
 # such check alone and escalate. dedupe-repeat (a dedupe hit in one deal) and
 # credential-in-content (r23 declares NEVER) still deny.
 #
+# The three sale-* rows are the user's agent selling (marketplace.sale), with
+# the declared inputs of the payment rows. caps reads them out of scope: a
+# sale is money coming in. marketplace.sale names an approver role, so a sale
+# failing one ASK-declared check alone (r09, r22) escalates.
+#
 # merchant-first-purchase fails counterparty_seen_before alone and escalates the
 # same way: money.purchase names an approver role. merchant-repeat-purchase
 # passes because merchant-history-real-payment is a real accepted payment to
@@ -613,4 +618,52 @@ rows:
       recipient_seen_before: {population: c}
       channel_change: {population: a, missing_field: channel}
       upfront_amount: {population: a, missing_field: upfront_amount_minor}
+    verdict: escalate
+  - scenario: sale-terms-in-bounds
+    action_id: sell_item/everyday-fixture-sale-in-bounds
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, destination_rail: n/a, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: n/a, action_class_gate: n/a, counterparty_seen_before: n/a, recipient_role: n/a, refundability: pass, material_fields_changed: pass, offer_fields_changed: pass, recipient_seen_before: n/a, channel_change: pass, upfront_amount: pass, task_authority: n/a}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      destination_rail: {population: c}
+      counterparty_identity_change: {population: c}
+      credential_pattern: {population: c}
+      recurring_charge: {population: c}
+      action_class_gate: {population: c}
+      counterparty_seen_before: {population: c}
+      recipient_role: {population: c}
+      recipient_seen_before: {population: c}
+      task_authority: {population: a, missing_field: task_authority_ref}
+    verdict: allow
+  - scenario: sale-material-terms-changed
+    action_id: sell_item/everyday-fixture-sale-material-changed
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, destination_rail: n/a, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: n/a, action_class_gate: n/a, counterparty_seen_before: n/a, recipient_role: n/a, refundability: pass, material_fields_changed: fail, offer_fields_changed: pass, recipient_seen_before: n/a, channel_change: pass, upfront_amount: pass, task_authority: n/a}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      destination_rail: {population: c}
+      counterparty_identity_change: {population: c}
+      credential_pattern: {population: c}
+      recurring_charge: {population: c}
+      action_class_gate: {population: c}
+      counterparty_seen_before: {population: c}
+      recipient_role: {population: c}
+      recipient_seen_before: {population: c}
+      task_authority: {population: a, missing_field: task_authority_ref}
+    verdict: escalate
+  - scenario: sale-deposit-over-a-quarter
+    action_id: sell_item/everyday-fixture-sale-deposit-over
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, destination_rail: n/a, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: n/a, action_class_gate: n/a, counterparty_seen_before: n/a, recipient_role: n/a, refundability: pass, material_fields_changed: pass, offer_fields_changed: pass, recipient_seen_before: n/a, channel_change: pass, upfront_amount: fail, task_authority: n/a}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      destination_rail: {population: c}
+      counterparty_identity_change: {population: c}
+      credential_pattern: {population: c}
+      recurring_charge: {population: c}
+      action_class_gate: {population: c}
+      counterparty_seen_before: {population: c}
+      recipient_role: {population: c}
+      recipient_seen_before: {population: c}
+      task_authority: {population: a, missing_field: task_authority_ref}
     verdict: escalate

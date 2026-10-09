@@ -1,0 +1,19 @@
+# upfront_amount wicket, version 1.1: upfront_amount/1.0.0's config with
+# marketplace.sale added to action_classes (guards/checks/upfront_amount.py).
+# The rule itself is the `semantics` field below: it is inside the digested
+# body, so rewording it moves the digest. upfront_amount/1.0.0
+# (upfront_amount.yaml) stays as it was for the packs that pin it.
+wicket_id: upfront_amount/1.1.0
+check: upfront_amount
+semantics: >-
+  For an action in action_classes, Action.upfront_amount_minor (the part of
+  the total stated as due before delivery) fails when it is above
+  upfront_max_minor, or when upfront_amount_minor * 10000 is above
+  Action.amount_minor * upfront_max_bps; otherwise it passes. Without an
+  amount_minor only upfront_max_minor is compared. It is not applicable,
+  naming the field, when the action carries no upfront_amount_minor.
+  marketplace.sale is in scope. Any other action class is out of scope.
+config:
+  action_classes: [money.purchase, money.transfer, money.subscription, booking.create, booking.modify, agreement.accept, marketplace.offer, external_commitment.other, marketplace.sale]
+  upfront_max_minor: 10000
+  upfront_max_bps: 2500

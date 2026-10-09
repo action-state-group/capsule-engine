@@ -27,7 +27,7 @@
 # whose selector matched its class and is not applicable to the others. An
 # action whose class has no taxonomy row fails all eight: the gate fails
 # closed and none of them can be ruled out.
-pack_id: asg/everyday/0.3.3
+pack_id: asg/everyday/0.3.2
 
 obligations:
   # -- DO ------------------------------------------------------------------
@@ -91,7 +91,7 @@ obligations:
     default_disposition: ASK
   - id: r08-non-refundable-or-hard-to-undo
     statement: >-
-      Flags a payment, purchase, booking or sale that declares it cannot be
+      Flags a payment, purchase or booking that declares it cannot be
       refunded, and records that value and the rail. Whether it is hard to
       reverse for another reason is not measured yet.
     check: refundability
@@ -204,8 +204,8 @@ obligations:
     default_disposition: ASK
   - id: r22-unusual-counterparty-behaviour
     statement: >-
-      Flags a payment or sale whose stated deposit is above 100.00, or above
-      25% of the total, and records the amounts and which limit it is above.
+      Flags a payment whose stated deposit is above 100.00, or above 25% of
+      the total, and records the amounts and which limit it is above.
       Pressure for urgency or secrecy, and skipped verification, are not
       measured yet.
     check: upfront_amount
@@ -302,25 +302,24 @@ constraints:
   - wicket_ref: counterparty_seen_before/2.0.0
     digest: c82a29eae8ef72736851d275ffa4d85e511a21d202822366d3b03bf3834c8cd0
   # Each reads one number, one member of a closed set, or one opaque
-  # reference from the action, never an object or text. The 1.1.0
-  # definitions are 1.0.0's with marketplace.sale added to their classes.
+  # reference from the action, never an object or text.
   - wicket_ref: recipient_role/1.0.0
     digest: 917ab5edea21867f318b8dfd54a6d7b458cbabcc5cebfac6ff0c4861e918d43b
-  - wicket_ref: refundability/1.1.0
-    digest: 1a471c09254a3db872c34a5e59d9e05e6da47cb396695a6cb6bf2bc055f4d811
-  - wicket_ref: material_fields_changed/1.1.0
-    digest: e8cd02743203d17cd0de9d548f85ec5b6b6135e80aba63136ae507ac84660042
-  - wicket_ref: offer_fields_changed/1.1.0
-    digest: f62c034140827beaa4b8ee13da8b56e4583994a973bc789d4a11812f9727a953
+  - wicket_ref: refundability/1.0.0
+    digest: 410ad28fa2dd518502cbcbc00972d31ae4597722f17836ed2bf80e717f2f3294
+  - wicket_ref: material_fields_changed/1.0.0
+    digest: b7c98d710e48c8fc87d92abf2599b04b6ac9ac6f129eee6335edb742f1dbc02a
+  - wicket_ref: offer_fields_changed/1.0.0
+    digest: b1ca52ccdc821cbb57df844a10eb9e7d6242fff612fb5324c3c4f642d57f7ab1
   # A message to a recipient the operator has not written to before.
   - wicket_ref: recipient_seen_before/1.0.0
     digest: df8803e9c4bdab9deff48e772fcd21ff813d00157068dd250a8a5c6b45cd6c44
-  - wicket_ref: channel_change/1.1.0
-    digest: f84770c7571a0932629667c4df38f447777f8dc5dfcdfdf29b37514c1eee1ad1
-  - wicket_ref: upfront_amount/1.1.0
-    digest: 2311833db12bf9465dcb5ecdd9f7aca079dbf638a19ed6dd18d607aad1811c10
-  - wicket_ref: task_authority/1.1.0
-    digest: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
+  - wicket_ref: channel_change/1.0.0
+    digest: fb580fc03afe1e641286c3ba62650d8e7150be91c6de0c6dac6a225a2eb6c793
+  - wicket_ref: upfront_amount/1.0.0
+    digest: 30996a832fa0cd94dc9a64f11e69d903f73a6e6415bff4005a665460a0798a6f
+  - wicket_ref: task_authority/1.0.0
+    digest: bdb53ad1d4f3f18dc3a8ed5752c4429725df1df692f1e3b3687517f40074c150
 
 folds:
   - fold_ref: spend.weekly/3.0.0
@@ -397,19 +396,5 @@ fixtures:
       outcome: allow
     - id: task-outside-authority
       outcome: escalate
-    - id: sale-terms-in-bounds
-      outcome: allow
-    - id: sale-material-terms-changed
-      outcome: escalate
-    - id: sale-deposit-over-a-quarter
-      outcome: escalate
-
-# The action taxonomy this pack was authored against. The taxonomy decides
-# whether a gated class asks or refuses on a failure (its approver_role), so
-# the pin puts it under this pack's digest, and the pack does not load under
-# any other taxonomy.
-taxonomy:
-  taxonomy_version: "6"
-  digest: "fc12eb90bc2b3c85bb49c4d3d7be8f384c6e0b8e189bc3b68a753a4f1af5cd94"
 
 bootstrap: AI-BOOTSTRAP.md

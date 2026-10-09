@@ -12,7 +12,9 @@ the taxonomy moves its digest when the taxonomy moves, and does not load
 under any other one.
 
 The pin is optional and everyday 0.3.2 does not carry it: adding it would move
-the digest the plugin vendors. The next everyday version is the one to adopt it.
+the digest the plugin vendors. everyday 0.3.3 carries it
+(test_pack_everyday_sale_coverage.py); the pin is exercised here on 0.3.2's
+released bytes, kept under tests/fixtures/packs.
 """
 from __future__ import annotations
 
@@ -31,7 +33,7 @@ from capsule_engine.packs.errors import TAXONOMY_PIN_MISMATCH, PackDefinitionErr
 from capsule_engine.packs.schema import TaxonomyPin
 
 REPO = Path(__file__).parent.parent
-EVERYDAY = REPO / "capsule_engine" / "packs" / "catalog" / "everyday"
+EVERYDAY = REPO / "tests" / "fixtures" / "packs" / "everyday-0.3.2"
 EVERYDAY_0_3_2_DIGEST = "6f333fa8b7a7e137abe6c61e5a32097ed06d493479a018807cbf4d2e4f5da7b2"
 
 

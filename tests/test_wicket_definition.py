@@ -60,6 +60,12 @@ EXPECTED_DIGESTS = {
     "channel_change/1.0.0": "fb580fc03afe1e641286c3ba62650d8e7150be91c6de0c6dac6a225a2eb6c793",
     "upfront_amount/1.0.0": "30996a832fa0cd94dc9a64f11e69d903f73a6e6415bff4005a665460a0798a6f",
     "task_authority/1.0.0": "bdb53ad1d4f3f18dc3a8ed5752c4429725df1df692f1e3b3687517f40074c150",
+    "channel_change/1.1.0": "f84770c7571a0932629667c4df38f447777f8dc5dfcdfdf29b37514c1eee1ad1",
+    "material_fields_changed/1.1.0": "e8cd02743203d17cd0de9d548f85ec5b6b6135e80aba63136ae507ac84660042",
+    "offer_fields_changed/1.1.0": "f62c034140827beaa4b8ee13da8b56e4583994a973bc789d4a11812f9727a953",
+    "refundability/1.1.0": "1a471c09254a3db872c34a5e59d9e05e6da47cb396695a6cb6bf2bc055f4d811",
+    "task_authority/1.1.0": "5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab",
+    "upfront_amount/1.1.0": "2311833db12bf9465dcb5ecdd9f7aca079dbf638a19ed6dd18d607aad1811c10",
     # The seller-side checks, and the seller configurations of two existing
     # ones. No pack cites them yet.
     "required_disclosure/1.0.0": "c8f216415be1fac673d1efc6df2e7a9666b5d5c8e639fbb3d8379a24bb8f5ebf",
@@ -90,7 +96,10 @@ RETIRED_DIGESTS = {
 # Catalog definitions that predate the `semantics` field. Their digests are
 # pinned above and are not rewritten to add it. Every definition added from
 # now on states its rule in `semantics`; this set only ever shrinks.
-WITHOUT_SEMANTICS = frozenset(EXPECTED_DIGESTS) - {"offer_expiry/1.0.1", "price_floor/2.0.1"}
+WITHOUT_SEMANTICS = frozenset(EXPECTED_DIGESTS) - {
+    "offer_expiry/1.0.1", "price_floor/2.0.1", "channel_change/1.1.0", "material_fields_changed/1.1.0",
+    "offer_fields_changed/1.1.0", "refundability/1.1.0", "task_authority/1.1.0", "upfront_amount/1.1.0",
+}
 
 
 @pytest.mark.parametrize("wicket_id,expected_digest", EXPECTED_DIGESTS.items())

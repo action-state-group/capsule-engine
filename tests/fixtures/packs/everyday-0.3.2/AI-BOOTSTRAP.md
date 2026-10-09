@@ -90,28 +90,24 @@ catalog):
 9. `recipient_role` (`recipient_role/1.0.0`) -- a personal-data disclosure
    passes for the fulfilling merchant or the user and is flagged for a third
    party; a role outside the set is flagged.
-10. `refundability` (`refundability/1.1.0`) -- a payment or sale declared
-    not refundable is flagged.
-11. `material_fields_changed` (`material_fields_changed/1.1.0`) -- any
+10. `refundability` (`refundability/1.0.0`) -- a payment declared not
+    refundable is flagged.
+11. `material_fields_changed` (`material_fields_changed/1.0.0`) -- any
     change on the pinned material list (item, quantity, price, deposit,
     currency, date, place, conditions, rail, refundability, payee) is
     flagged.
-12. `offer_fields_changed` (`offer_fields_changed/1.1.0`) -- any change on
+12. `offer_fields_changed` (`offer_fields_changed/1.0.0`) -- any change on
     the pinned offer list (item, quantity, price, deposit, conditions,
     refundability) is flagged.
 13. `recipient_seen_before` (`recipient_seen_before/1.0.0`) -- a message to
     a recipient the operator has no accepted earlier action addressed to is
     flagged, read with the same fold as `counterparty_seen_before`.
-14. `channel_change` (`channel_change/1.1.0`) -- `channel` differing from
+14. `channel_change` (`channel_change/1.0.0`) -- `channel` differing from
     `first_contact_channel` on the same action is flagged.
-15. `upfront_amount` (`upfront_amount/1.1.0`) -- a deposit above 100.00, or
+15. `upfront_amount` (`upfront_amount/1.0.0`) -- a deposit above 100.00, or
     above 25% of `amount_minor`, is flagged.
-16. `task_authority` (`task_authority/1.1.0`) -- an action outside the
+16. `task_authority` (`task_authority/1.0.0`) -- an action outside the
     allowed actions of the task-authority record it cites is flagged.
-
-Checks 10, 11, 12, 14, 15 and 16 also read an action declared in the
-`marketplace.sale` class, the user's agent selling something. `caps` does
-not: a sale is money coming in.
 
 **Rules declared not measured.** 3 of the 27 rules need an input no action
 records yet: a message classified as committing, where an instruction came

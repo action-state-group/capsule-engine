@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""everyday pack 0.3.2 carries all 27 rules. Each one either cites a check
+"""everyday pack 0.3.3 carries all 27 rules. Each one either cites a check
 the pack declares (measured) or is declared not measured and names the
 evidence instrument the fixture corpus does not carry. None is left out.
 
@@ -88,8 +88,8 @@ def _rule_number(obligation_id: str) -> int:
     return int(obligation_id[1:3])
 
 
-def test_the_pack_is_version_0_3_2_with_exactly_27_rules_numbered_1_to_27():
-    assert PACK.pack_id == "asg/everyday/0.3.2"
+def test_the_pack_is_version_0_3_3_with_exactly_27_rules_numbered_1_to_27():
+    assert PACK.pack_id == "asg/everyday/0.3.3"
     assert len(PACK.obligations) == 27
     assert sorted(_rule_number(o.id) for o in PACK.obligations) == list(range(1, 28))
 

@@ -1,0 +1,15 @@
+# refundability wicket, version 1.1: refundability/1.0.0's config with
+# marketplace.sale added to action_classes (guards/checks/refundability.py).
+# The rule itself is the `semantics` field below: it is inside the digested
+# body, so rewording it moves the digest. refundability/1.0.0
+# (refundability.yaml) stays as it was for the packs that pin it.
+wicket_id: refundability/1.1.0
+check: refundability
+semantics: >-
+  For an action in action_classes, Action.refundable is read: true passes,
+  false fails, and the rail is recorded beside it. It is not applicable,
+  naming the field, when the action carries no refundable. The refund terms
+  themselves are never read. marketplace.sale is in scope. Any other action
+  class is out of scope.
+config:
+  action_classes: [money.purchase, money.transfer, money.subscription, booking.create, booking.modify, agreement.accept, marketplace.offer, external_commitment.other, marketplace.sale]
