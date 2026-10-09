@@ -2,7 +2,9 @@
 """seller.single_commitment/1.0.0: one sale, several buyer threads, one
 acceptance. Once an acceptance is sealed for a task authority and an item,
 a commitment for the same task authority and item fails unless it cites
-that acceptance AND is addressed to the same counterparty.
+that acceptance AND is addressed to the same counterparty. The outcome never
+names the acceptance, the item or a counterparty: a checker result can reach
+a buyer's copy, and any of them would link two buyers' threads.
 
 The two-thread reference vector (tests/fixtures/single-commitment/
 two-thread.json) is replayed through a real engine; its steps name each
@@ -16,6 +18,7 @@ from typing import TypedDict
 
 import pytest
 import yaml
+from agent_action_capsule import json_digest
 
 from capsule_engine.folds.loader import load_definition_file as load_fold
 from capsule_engine.guards import Action, GuardEngine
@@ -25,6 +28,7 @@ from capsule_engine.guards.classes import resolve
 from capsule_engine.guards.engine import GuardDecision
 from capsule_engine.guards.wickets import Catalog, WicketDefinition, load_definition_file
 from capsule_engine.packs.loader import load_pack_dir
+from capsule_engine.report.replay import action_for_record
 
 ROOT = Path(__file__).parent.parent / "capsule_engine"
 CATALOG = ROOT / "guards" / "wickets" / "catalog_defs"
@@ -63,6 +67,10 @@ def _engine(store, signer, definition: WicketDefinition = SINGLE) -> GuardEngine
 def _constraint(decision):
     (out,) = [c for c in decision.constraints if c.id == "single_commitment"]
     return out
+
+
+def _says_only(sale_has_acceptance: bool) -> dict[str, str | bool]:
+    return {"constraint_id": "single_commitment", "sale_has_acceptance": sale_has_acceptance}
 
 
 def _accept_in_a(engine, **overrides) -> str:
@@ -121,7 +129,7 @@ def test_a_seller_pack_citing_it_validates(tmp_path):
 class Step(TypedDict):
     id: str
     action: dict[str, str | int]
-    expect: dict[str, str]
+    expect: dict[str, str | bool]
 
 
 @dataclasses.dataclass
@@ -153,8 +161,8 @@ def test_reference_vector(store, signer, vector):
         expect = step["expect"]
         assert out.result == expect["single_commitment"], step["id"]
         assert decision.outcome == expect["outcome"], step["id"]
-        if "acceptance_step" in expect:
-            assert out.evidence["acceptance_capsule_id"] == replay.ids[expect["acceptance_step"]], step["id"]
+        if "sale_has_acceptance" in expect:
+            assert out.evidence == _says_only(expect["sale_has_acceptance"]), step["id"]
         if "missing_field" in expect:
             assert out.evidence == not_applicable_evidence(
                 "single_commitment", in_scope=True, missing_field=expect["missing_field"])
@@ -171,21 +179,47 @@ def test_the_vector_covers_the_acceptance_cases():
 # -- the check, directly --------------------------------------------------------
 
 
-def test_a_commitment_in_b_after_a_accepts_is_denied_naming_the_acceptance(store, signer):
+def test_a_commitment_in_b_after_a_accepts_is_denied_saying_only_the_sale_has_an_acceptance(store, signer):
     engine = _engine(store, signer)
-    accepted = _accept_in_a(engine)
+    _accept_in_a(engine)
     decision = engine.check(_action(action_id="offer/b"))
     out = _constraint(decision)
     assert out.result == "fail"
     assert decision.outcome == "deny"
-    assert out.evidence == {
-        "task_authority_ref": SALE,
-        "item_ref": ITEM,
-        "acceptance_capsule_id": accepted,
-        "acceptance_counterparty": BUYER_A,
-        "counterparty": BUYER_B,
-        "cites_acceptance": False,
-    }
+    assert out.reason == "this sale already has an accepted commitment"
+    assert out.evidence == _says_only(True)
+
+
+def test_a_denial_carries_no_reference_another_buyer_could_link(store, signer):
+    """Everything the outcome carries, serialised, holds none of the sale's
+    references: not the item, not the task authority, not either buyer's
+    counterparty, not the acceptance's capsule id. The constraint record
+    sealed on the decision capsule carries only the evidence digest."""
+    engine = _engine(store, signer)
+    sale, item = "5a1e" * 16, "item/9f3c-private-item"
+    buyer_a, buyer_b = "fp-buyer-a-7d41e0", "fp-buyer-b-c28b55"
+    accepted = _accept_in_a(engine, task_authority_ref=sale, item_ref=item, target=buyer_a)
+    for overrides in (dict(target=buyer_b), dict(target=buyer_b, cited_mandate_capsule_id=accepted),
+                      dict(target=None, cited_mandate_capsule_id=accepted)):
+        decision = engine.check(_action(action_id="offer/b", task_authority_ref=sale, item_ref=item, **overrides))
+        out = _constraint(decision)
+        assert out.result == "fail"
+        (record,) = [c for c in decision.capsule["constraints"] if c["id"] == "single_commitment"]
+        serialised = json.dumps([dataclasses.asdict(out), record])
+        for value in (sale, item, buyer_a, buyer_b, accepted):
+            assert value not in serialised, value
+
+
+def test_the_bridge_never_reads_item_ref_from_a_check_body():
+    """item_ref is to come from the checker's local input, never from the
+    sealed check body, which can be in a buyer's copy."""
+    body = {"action": "offer", "action_class": "marketplace.offer", "taxonomy_version": 4, "item_ref": ITEM}
+    sealed = {"x-deal-v0": {"record_type": "check"}, "body": body}
+    record = {"operator": "household", "developer": "assistant@v1",
+              "model_attestation": {"compute_attestation": {"agent_input_digest": json_digest(sealed)}}}
+    action = action_for_record(record, sealed)
+    assert action.action_class == "marketplace.offer"
+    assert action.item_ref is None
 
 
 def test_b_citing_a_acceptance_still_fails(store, signer):
@@ -197,8 +231,7 @@ def test_b_citing_a_acceptance_still_fails(store, signer):
     out = _constraint(decision)
     assert out.result == "fail"
     assert decision.outcome == "deny"
-    assert out.evidence["cites_acceptance"] is True
-    assert out.evidence["counterparty"] == BUYER_B
+    assert out.evidence == _says_only(True)
 
 
 def test_a_follows_its_own_acceptance(store, signer):
@@ -208,7 +241,7 @@ def test_a_follows_its_own_acceptance(store, signer):
         _action(action_id="sale/a", action_class="marketplace.sale", target=BUYER_A, cited_mandate_capsule_id=accepted)
     ))
     assert out.result == "pass"
-    assert out.evidence["acceptance_capsule_id"] == accepted
+    assert out.evidence == _says_only(True)
 
 
 def test_a_without_citing_its_acceptance_fails(store, signer):
@@ -225,13 +258,13 @@ def test_a_commitment_naming_no_counterparty_is_never_exempt(store, signer):
     out = _constraint(engine.check(_action(action_id="sale/no-target", action_class="marketplace.sale", target=None,
                                            cited_mandate_capsule_id=accepted)))
     assert out.result == "fail"
-    assert out.evidence["counterparty"] is None
+    assert out.evidence == _says_only(True)
 
 
 def test_b_before_any_acceptance_passes(store, signer):
     out = _constraint(_engine(store, signer).check(_action(action_id="offer/b-early")))
     assert out.result == "pass"
-    assert out.evidence["acceptance_capsule_id"] is None
+    assert out.evidence == _says_only(False)
 
 
 def test_a_non_commit_message_in_b_after_acceptance_is_not_touched(store, signer):
