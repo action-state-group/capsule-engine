@@ -119,9 +119,10 @@ class Action:
     by ``dedupe``, which does not apply to it; it is never sealed.
     ``ignored_inputs`` names each input the action was built without because
     it was not in its agreed shape (``report/replay.py``: a
-    ``counterparty_profile`` block); the ``counterparty_seen_before`` evidence
-    lists them. Names only, never the value; it is never sealed in
-    ``asg_payload``.
+    ``counterparty_profile`` block, an ``item_ref``); the
+    ``counterparty_seen_before`` evidence lists them, and ``single_commitment``
+    names an ignored ``item_ref`` in its reason. Names only, never the value;
+    it is never sealed in ``asg_payload``.
     """
 
     verb: str

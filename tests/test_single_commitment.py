@@ -28,7 +28,7 @@ from capsule_engine.guards.classes import resolve
 from capsule_engine.guards.engine import GuardDecision
 from capsule_engine.guards.wickets import Catalog, WicketDefinition, load_definition_file
 from capsule_engine.packs.loader import load_pack_dir
-from capsule_engine.report.replay import action_for_record
+from capsule_engine.report.replay import action_for_check_input, action_for_record
 
 ROOT = Path(__file__).parent.parent / "capsule_engine"
 CATALOG = ROOT / "guards" / "wickets" / "catalog_defs"
@@ -347,3 +347,57 @@ def test_config_field_mutants(store, signer, field, mutated, expect_real, expect
 
 def test_every_config_field_has_a_mutant():
     assert set(SINGLE.config) == {"commit_classes", "acceptance_classes"}
+
+
+# -- live: item_ref from the checker input ------------------------------------------
+
+# A sale's item reference as capsulectl sends it: 256 random bits, lowercase hex.
+INPUT_ITEM = "3f" * 32
+
+
+# Raw decoded JSON on purpose: the entry ``action_for_check_input`` decodes.
+def _thread_entry(thread: str, verb: str, action_class: str, seq: int) -> dict[str, object]:
+    """One external-check-input/v0 record entry for a check in ``thread``:
+    the capsule and the deal check record it binds. The record names the sale
+    by its task authority and never the item."""
+    body = {"action": verb, "action_class": action_class, "taxonomy_version": 4, "spend_minor": 175_000,
+            "currency": "USD", "task_authority_ref": {"type": "task-authority", "digest_alg": "SHA-256",
+                                                      "digest": SALE}}
+    sealed = {"x-deal-v0": {"record_type": "check", "deal_id": f"deal-{thread}"}, "body": body}
+    return {"capsule_id": f"{seq:064x}", "action_id": f"deal-{thread}/{seq}", "action_type": "fyi",
+            "operator": "household", "developer": "assistant@v1", "timestamp": f"2026-10-08T0{seq}:00:00Z",
+            "model_attestation": {"compute_attestation": {"agent_input_digest": json_digest(sealed)}},
+            "agent_input": sealed}
+
+
+def test_the_input_item_ref_holds_a_second_thread_to_the_first_acceptance(store, signer):
+    engine = _engine(store, signer)
+    accept = action_for_check_input(_thread_entry("a", "accept", "agreement.accept", 1), item_ref=INPUT_ITEM)
+    assert accept.item_ref == INPUT_ITEM
+    assert engine.check(accept).outcome == "allow"
+    offer = action_for_check_input(_thread_entry("b", "offer", "marketplace.offer", 2), item_ref=INPUT_ITEM)
+    decision = engine.check(offer)
+    assert (_constraint(decision).result, decision.outcome) == ("fail", "deny")
+    assert _constraint(decision).evidence == _says_only(True)
+
+
+def test_without_the_input_item_ref_the_second_thread_is_n_a(store, signer):
+    engine = _engine(store, signer)
+    engine.check(action_for_check_input(_thread_entry("a", "accept", "agreement.accept", 1), item_ref=INPUT_ITEM))
+    out = _constraint(engine.check(action_for_check_input(_thread_entry("b", "offer", "marketplace.offer", 2))))
+    assert (out.result, out.evidence) == (
+        "n/a", not_applicable_evidence("single_commitment", in_scope=True, missing_field="item_ref"))
+    assert out.reason == "the action names no item; the sale could not be identified"
+
+
+@pytest.mark.parametrize("bad", ["3F" * 32, "3f" * 31, "3f" * 32 + "\n", "item/ref-1", 7, ["3f" * 32]],
+                         ids=["upper case", "short", "trailing newline", "not hex", "number", "list"])
+def test_an_input_item_ref_out_of_shape_is_ignored_and_named(store, signer, bad):
+    action = action_for_check_input(_thread_entry("b", "offer", "marketplace.offer", 2), item_ref=bad)
+    assert action.item_ref is None
+    assert action.ignored_inputs == ("item_ref",)
+    out = _constraint(_engine(store, signer).check(action))
+    assert (out.result, out.evidence) == (
+        "n/a", not_applicable_evidence("single_commitment", in_scope=True, missing_field="item_ref"))
+    assert out.reason == "the item_ref input was not in its agreed shape; the sale could not be identified"
+    assert str(bad) not in out.reason

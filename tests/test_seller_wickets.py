@@ -19,9 +19,11 @@ from capsule_engine.guards import Action, GuardEngine
 from capsule_engine.guards.capsule import not_applicable_evidence
 from capsule_engine.guards.checks import (
     AUTHORIZATION_CHECKS,
+    COMMERCIAL_BOUNDS_CHECKS,
     CONFIGURED_CHECKS,
     TASK_AUTHORITY_CHECKS,
     AuthorizationRecord,
+    CommercialBoundsOpening,
     TaskAuthorityRecord,
     authorization_record_digest,
     check_destination_rail,
@@ -37,6 +39,7 @@ CATALOG = ROOT / "guards" / "wickets" / "catalog_defs"
 FOLDS = ROOT / "folds" / "catalog_defs"
 RETIRED = Path(__file__).parent / "fixtures" / "retired_wickets"
 RETIRED_EXPIRY_DIGEST = "7b1072fc6997b07e7f08941a723e60d53fd3a54dbccfda6fa7391124ec2702ee"
+RETIRED_FLOOR_DIGEST = "a7eb755a71cf9dabaf04fbd740fc9ceaad5f0ba883795adad6fd9038796dffa9"
 
 FLOOR = load_definition_file(CATALOG / "price_floor.yaml")
 DISCLOSURE = load_definition_file(CATALOG / "required_disclosure.yaml")
@@ -69,12 +72,18 @@ WARRANTY_APPROVAL, APPROVAL_REF = _approval("warranty")
 FAKE_REF = "5" * 64
 
 # A seller's task authority for one used bicycle: ask 1,900.00, accept down
-# to 1,700.00. Synthetic: the producer does not seal min_total_minor yet,
-# so this is not a producer golden vector.
+# to 1,700.00. The floor is private: the record seals only its commitment,
+# and the opening comes beside the action. Both are capsulectl's first
+# commercial-bounds golden vector (tests/fixtures/commercial-bounds/).
+BICYCLE_OPENING: CommercialBoundsOpening = {
+    "document": {"type": "commercial-bounds/v0", "min_total_minor": 170_000},
+    "nonce": "43a3c8a2914ecd228f722ed9f47dc4b4005cc1e257bc64777c0635a41ba7ea67",
+    "bounds_commitment": "13563d6685d99e1bd4b5508a85a6ca679331cb3ff60e8516177ccafcfd5b4998",
+}
 BICYCLE: TaskAuthorityRecord = {
     "type": "task-authority/v0",
     "body": {"outcome_id": "household.sell_the_bicycle/1.0.0", "allowed_actions": ["offer", "sell"],
-             "preconditions": [], "min_total_minor": 170_000},
+             "preconditions": [], "bounds_commitment": BICYCLE_OPENING["bounds_commitment"]},
 }
 BICYCLE_REF = task_authority_record_digest(BICYCLE)
 # The same task, with a warranty statement already inside its authority.
@@ -108,7 +117,9 @@ def _engine(store, signer, *wickets: WicketDefinition) -> GuardEngine:
     return GuardEngine(ledger=store, caps_fold=SPEND, signer_provider=lambda: signer, wickets=wickets)
 
 
-def _run(definition: WicketDefinition, action: Action, *, ledger=None, record=None, approval=None):
+def _run(definition: WicketDefinition, action: Action, *, ledger=None, record=None, approval=None, opening=None):
+    if definition.check in COMMERCIAL_BOUNDS_CHECKS:
+        return COMMERCIAL_BOUNDS_CHECKS[definition.check](action, record, opening, definition.config).constraint
     if definition.check in TASK_AUTHORITY_CHECKS:
         return TASK_AUTHORITY_CHECKS[definition.check](action, record, definition.config).constraint
     if definition.check in AUTHORIZATION_CHECKS:
@@ -168,15 +179,15 @@ def test_the_loader_reproduces_every_seller_digest():
 # -- price_floor ----------------------------------------------------------------
 
 
-def _floor(record=BICYCLE, **overrides):
-    return _run(FLOOR, _action(task_authority_ref=BICYCLE_REF, **overrides), record=record)
+def _floor(record=BICYCLE, opening=BICYCLE_OPENING, **overrides):
+    return _run(FLOOR, _action(task_authority_ref=BICYCLE_REF, **overrides), record=record, opening=opening)
 
 
 def test_price_floor_on_the_bicycle():
     above = _floor(amount_minor=175_000)
     assert above.result == "pass"
-    assert above.evidence == {"task_authority_ref": BICYCLE_REF, "amount_minor": 175_000,
-                              "min_total_minor": 170_000, "below_floor": False}
+    assert above.evidence == {"task_authority_ref": BICYCLE_REF, "bounds_commitment": BICYCLE_OPENING["bounds_commitment"],
+                              "amount_minor": 175_000, "below_floor": False}
     below = _floor(amount_minor=168_000)
     assert below.result == "fail"
     assert below.evidence["below_floor"] is True
@@ -189,7 +200,7 @@ def test_price_floor_passes_at_the_floor_itself():
 
 def test_price_floor_reads_only_the_record_the_reference_binds():
     lowered = copy.deepcopy(BICYCLE)
-    lowered["body"]["min_total_minor"] = 100_000
+    lowered["body"]["bounds_commitment"] = "0" * 64
     out = _floor(record=lowered, amount_minor=168_000)
     assert out.result == "n/a"
     assert out.evidence == _missing("price_floor", "task_authority_record")
@@ -197,28 +208,39 @@ def test_price_floor_reads_only_the_record_the_reference_binds():
 
 
 def test_price_floor_without_inputs_is_n_a_naming_the_input():
-    assert _run(FLOOR, _action(), record=BICYCLE).evidence == _missing("price_floor", "task_authority_ref")
+    assert _run(FLOOR, _action(), record=BICYCLE, opening=BICYCLE_OPENING).evidence == _missing(
+        "price_floor", "task_authority_ref")
     assert _floor(record=None).evidence == _missing("price_floor", "task_authority_record")
     assert _floor(amount_minor=None).evidence == _missing("price_floor", "amount_minor")
-    no_floor: TaskAuthorityRecord = {"body": {k: v for k, v in BICYCLE["body"].items() if k != "min_total_minor"}}
-    out = _run(FLOOR, _action(task_authority_ref=task_authority_record_digest(no_floor)), record=no_floor)
-    assert out.evidence == _missing("price_floor", "min_total_minor")
+    assert _floor(opening=None).evidence == _missing("price_floor", "commercial_bounds_opening")
+    no_floor: TaskAuthorityRecord = {"body": {k: v for k, v in BICYCLE["body"].items() if k != "bounds_commitment"}}
+    out = _run(FLOOR, _action(task_authority_ref=task_authority_record_digest(no_floor)), record=no_floor,
+               opening=BICYCLE_OPENING)
+    assert out.evidence == _missing("price_floor", "bounds_commitment")
 
 
-@pytest.mark.parametrize("bad", [True, "170000", -1, 1700.5])
-def test_price_floor_refuses_a_floor_that_is_not_a_minor_unit_count(bad):
-    record: TaskAuthorityRecord = {"body": {**BICYCLE["body"], "min_total_minor": bad}}
-    try:
-        ref = task_authority_record_digest(record)
-    except ValueError:
-        ref = "0" * 64  # a float has no digest; the record then cannot be bound at all
-    out = _run(FLOOR, _action(task_authority_ref=ref), record=record)
-    assert out.result == "n/a"
-    assert out.evidence["missing_field"] in ("min_total_minor", "task_authority_record")
+def test_price_floor_never_reads_a_floor_in_clear_on_the_record():
+    """price_floor/1.0.0 read min_total_minor from the record body; 2.0.0
+    never does, so a record carrying one and no commitment is n/a."""
+    clear: TaskAuthorityRecord = {"body": {**{k: v for k, v in BICYCLE["body"].items() if k != "bounds_commitment"},
+                                           "min_total_minor": 170_000}}
+    out = _run(FLOOR, _action(task_authority_ref=task_authority_record_digest(clear), amount_minor=1), record=clear)
+    assert (out.result, out.evidence) == ("n/a", _missing("price_floor", "bounds_commitment"))
+
+
+@pytest.mark.parametrize("bad", ["0" * 63, "A" * 64, "0" * 64 + "\n", 7, None])
+def test_price_floor_fails_a_sealed_commitment_that_is_not_a_digest(bad):
+    """A record that seals a bounds_commitment out of shape is a wrong
+    record, not one without a floor: the rule fails, it does not step aside."""
+    record: TaskAuthorityRecord = {"body": {**BICYCLE["body"], "bounds_commitment": bad}}
+    ref = task_authority_record_digest(record)
+    out = _run(FLOOR, _action(task_authority_ref=ref), record=record, opening=BICYCLE_OPENING)
+    assert (out.result, out.evidence) == ("fail", {"task_authority_ref": ref, "malformed_field": "bounds_commitment"})
 
 
 def test_price_floor_out_of_scope_class():
-    out = _run(FLOOR, _action(action_class="money.purchase", task_authority_ref=BICYCLE_REF), record=BICYCLE)
+    out = _run(FLOOR, _action(action_class="money.purchase", task_authority_ref=BICYCLE_REF), record=BICYCLE,
+               opening=BICYCLE_OPENING)
     assert out.evidence == not_applicable_evidence("price_floor", in_scope=False)
 
 
@@ -631,9 +653,9 @@ MUTANTS = [
                          ids=[f"{m[0].wicket_id}:{m[1]}" for m in MUTANTS])
 def test_each_config_field_moves_the_result(definition, field, vector, mutated, before, after):
     action = _action(**vector)
-    assert _run(definition, action, record=BICYCLE).result == before
+    assert _run(definition, action, record=BICYCLE, opening=BICYCLE_OPENING).result == before
     mutant = dataclasses.replace(definition, config={**definition.config, field: mutated})
-    assert _run(mutant, action, record=BICYCLE).result == after
+    assert _run(mutant, action, record=BICYCLE, opening=BICYCLE_OPENING).result == after
 
 
 @pytest.mark.parametrize(
@@ -666,10 +688,11 @@ def test_every_config_field_has_a_mutant():
 
 def test_engine_decides_the_bicycle(store, signer):
     engine = _engine(store, signer, FLOOR)
-    ok = engine.check(_action(action_id="offer/1750", task_authority_ref=BICYCLE_REF), task_authority_record=BICYCLE)
+    ok = engine.check(_action(action_id="offer/1750", task_authority_ref=BICYCLE_REF), task_authority_record=BICYCLE,
+                      commercial_bounds_opening=BICYCLE_OPENING)
     assert ok.outcome == "allow"
     low = engine.check(_action(action_id="offer/1680", amount_minor=168_000, task_authority_ref=BICYCLE_REF),
-                       task_authority_record=BICYCLE)
+                       task_authority_record=BICYCLE, commercial_bounds_opening=BICYCLE_OPENING)
     # The definition's disposition is ASK, but the engine does not read a
     # declared disposition: a failing rule outside its escalatable set
     # refuses. Pinned here so the change that makes ASK pause shows up.
@@ -728,6 +751,20 @@ def test_a_seller_pack_citing_the_retired_offer_expiry_is_refused(tmp_path):
         load_pack_dir(tmp_path)
     assert exc_info.value.reason == "retired_catalog_ref"
     assert "offer_expiry/1.0.1" in str(exc_info.value)
+
+
+def test_a_seller_pack_citing_the_retired_price_floor_is_refused(tmp_path):
+    """price_floor/1.0.0 read the floor in clear from the task authority, so a
+    pack pinned to it is refused and told what replaced it."""
+    catalog = Catalog(CATALOG)
+    constraints = [{"wicket_ref": d.wicket_id, "digest": catalog.get(d.wicket_id).digest}
+                   for d in SELLER_DEFINITIONS if d is not FLOOR]
+    constraints.append({"wicket_ref": "price_floor/1.0.0", "digest": RETIRED_FLOOR_DIGEST})
+    _write_seller_pack(tmp_path, constraints)
+    with pytest.raises(PackDefinitionError) as exc_info:
+        load_pack_dir(tmp_path)
+    assert exc_info.value.reason == "retired_catalog_ref"
+    assert "price_floor/2.0.0" in str(exc_info.value)
 
 
 def test_a_seller_pack_inlining_the_retired_offer_expiry_is_refused(tmp_path):

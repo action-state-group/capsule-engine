@@ -62,7 +62,6 @@ EXPECTED_DIGESTS = {
     "task_authority/1.0.0": "bdb53ad1d4f3f18dc3a8ed5752c4429725df1df692f1e3b3687517f40074c150",
     # The seller-side checks, and the seller configurations of two existing
     # ones. No pack cites them yet.
-    "price_floor/1.0.0": "a7eb755a71cf9dabaf04fbd740fc9ceaad5f0ba883795adad6fd9038796dffa9",
     "required_disclosure/1.0.0": "c8f216415be1fac673d1efc6df2e7a9666b5d5c8e639fbb3d8379a24bb8f5ebf",
     "promise_requires_approval/1.0.0": "b29e29e0a31ef764b282fa5754992b49b5ffc4f3fc261fb821987ae6c2e1c9b2",
     "promise_never/1.0.0": "836ae58f704a9c8ab8027fee344ca47ddb3de76a7a1973a650f42a3595e649f4",
@@ -72,6 +71,9 @@ EXPECTED_DIGESTS = {
     "seller.destination_rail/1.0.0": "fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800",
     # One accepted commitment per sale and item, across buyer threads. No pack cites it yet.
     "seller.single_commitment/1.0.0": "91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e",
+    # Replaces price_floor/1.0.0, retired at its digest (RETIRED_DIGESTS below):
+    # the floor is now opened from a commitment, never read in clear.
+    "price_floor/2.0.0": "52fd588ea62ce467ad5ee59cef4347a4a0fbb0836d20ebfe783923805230bc9b",
 }
 
 # Retired (id, digest) pairs, pinned independently of guards/wickets/retired.py
@@ -80,12 +82,13 @@ EXPECTED_DIGESTS = {
 RETIRED_FIXTURES = Path(__file__).parent / "fixtures" / "retired_wickets"
 RETIRED_DIGESTS = {
     "offer_expiry/1.0.0": "7b1072fc6997b07e7f08941a723e60d53fd3a54dbccfda6fa7391124ec2702ee",
+    "price_floor/1.0.0": "a7eb755a71cf9dabaf04fbd740fc9ceaad5f0ba883795adad6fd9038796dffa9",
 }
 
 # Catalog definitions that predate the `semantics` field. Their digests are
 # pinned above and are not rewritten to add it. Every definition added from
 # now on states its rule in `semantics`; this set only ever shrinks.
-WITHOUT_SEMANTICS = frozenset(EXPECTED_DIGESTS) - {"offer_expiry/1.0.1"}
+WITHOUT_SEMANTICS = frozenset(EXPECTED_DIGESTS) - {"offer_expiry/1.0.1", "price_floor/2.0.0"}
 
 
 @pytest.mark.parametrize("wicket_id,expected_digest", EXPECTED_DIGESTS.items())
