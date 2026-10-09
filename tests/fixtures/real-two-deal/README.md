@@ -7,18 +7,18 @@ capsulectl wrote. `capsulectl verify --bundle` reports each one `VALID`. Each ch
 
 ## Producer
 
-- capsule-cli commit `d1615229de65a17e250594ea4e1f456671c12eba`: the head of capsule-cli pull
-  request #169 ("deal: seal taxonomy version 6 on new records"), not yet merged. The released
-  `v0.1.0-rc13` still seals taxonomy `5`.
-- Built from `git archive d1615229de65a17e250594ea4e1f456671c12eba` with `CGO_ENABLED=0 go build
-  -trimpath -o capsulectl ./cmd/capsulectl`. The `-ldflags -X` set `internal/cli.cliVersion` to
-  `v0.1.0-rc13-4-gd161522` (`git describe --tags` of that commit) and `internal/cli.cliCommit` to the
+- capsule-cli commit `831afeeb9fd76b7196486a9af38ca455b1230791`: capsule-cli `main` after pull
+  request #169 ("deal: seal taxonomy version 6 on new records") merged, the last rc14 content
+  change. It also carries #168, #170 and #171.
+- Built from `git archive 831afeeb9fd76b7196486a9af38ca455b1230791` with `CGO_ENABLED=0 go build
+  -trimpath -ldflags "-s -w -buildid= -X …"`. The `-X` flags set `internal/cli.cliVersion` to
+  `v0.1.0-rc13-6-g831afee` (`git describe --tags` of that commit) and `internal/cli.cliCommit` to the
   commit above, as `scripts/release-build.sh` does.
 - `capsulectl --version` prints
-  `capsulectl v0.1.0-rc13-4-gd161522 (commit d1615229de65a17e250594ea4e1f456671c12eba)`.
-- Once #169 merges, rebuild from the merged commit and run `build.sh` again. A re-run makes other
-  keys, ids and timestamps, so the bundles, the digests pinned in the test and
-  `expected_decisions.json` are replaced together.
+  `capsulectl v0.1.0-rc13-6-g831afee (commit 831afeeb9fd76b7196486a9af38ca455b1230791)`.
+- A re-run makes other keys, ids and timestamps, so the bundles, the digests pinned in the test and
+  `expected_decisions.json` are replaced together. Rebuilt from d1615229 (the #169 head) on
+  2026-10-09; the decisions did not change.
 
 ## Commands
 
