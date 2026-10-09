@@ -21,15 +21,16 @@ from pathlib import Path
 import pytest
 from capsule_ledger.ledger import LedgerStore
 
-from capsule_engine.guards import Action, GuardEngine, LocalSigner
+from capsule_engine.guards import Action, GuardDecision, GuardEngine, LocalSigner
 from capsule_engine.guards.capsule import DENY, ESCALATE
-from capsule_engine.guards.checks import fields_basis, task_authority_record_digest
+from capsule_engine.guards.checks import RUNNABLE_CHECKS, fields_basis, task_authority_record_digest
 from capsule_engine.guards.engine import ASK_RULE_EXCLUDED_CHECKS
 from capsule_engine.guards.wickets import load_definition_file
 from capsule_engine.packs import build_engine, install_pack, load_pack_dir
 from capsule_engine.packs.install import ask_wickets
 from capsule_engine.packs.obligation_results import obligation_results
 from capsule_engine.packs.schema import Obligation, PackDefinition
+from capsule_engine.report.replay import replay
 
 PACK_DIR = Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog" / "everyday"
 PACK = load_pack_dir(PACK_DIR)
@@ -324,3 +325,65 @@ def test_the_engine_refuses_an_ask_set_naming_a_check_no_wicket_runs(tmp_path):
                         ask_wickets=frozenset({"refundability"}))
     finally:
         store.close()
+
+
+def _replay_under_pack(tmp_path, live: GuardDecision, *, with_pack: bool):
+    installed = install_pack(PACK, project_dir=tmp_path / "replay-project", mode="observe")
+    resolved = installed.resolved
+    return replay(
+        [live.capsule],
+        caps_fold=resolved.caps_fold(),
+        caps_minor=resolved.caps_minor(),
+        per_action_minor=resolved.per_action_minor(),
+        per_action_reads=resolved.per_action_reads(),
+        manifest_digest=resolved.manifest_digest,
+        wickets=resolved.configured_wickets(RUNNABLE_CHECKS),
+        pack=installed.pack if with_pack else None,
+    )
+
+
+def test_replaying_the_non_refundable_booking_under_its_pack_asks_as_the_live_engine_did(engine_for, tmp_path):
+    live = engine_for(PACK).check(_non_refundable_booking(18), dry_run=True)
+    assert live.outcome == ESCALATE
+    (replayed,) = _replay_under_pack(tmp_path, live, with_pack=True).decisions
+    assert replayed.decision.outcome == live.outcome
+    assert _failing_checks(replayed.decision) == _failing_checks(live)
+    assert _failing_rules(replayed.decision) == [
+        "r05-spending-limits", "r08-non-refundable-or-hard-to-undo", "r16-booking-with-a-commitment",
+    ]
+    assert replayed.decision.capsule["disposition"]["decision"] == "needs_input"
+
+
+def test_replaying_the_same_booking_without_its_pack_refuses(engine_for, tmp_path):
+    live = engine_for(PACK).check(_non_refundable_booking(19), dry_run=True)
+    (replayed,) = _replay_under_pack(tmp_path, live, with_pack=False).decisions
+    assert _failing_checks(replayed.decision) == _failing_checks(live)
+    assert replayed.decision.outcome == DENY
+
+
+SEALED_SCALARS = {
+    "recipient_role": "fulfilling_merchant", "refundable": False, "material_fields_changed": 1,
+    "material_fields_basis": MATERIAL_BASIS, "offer_fields_changed": 1, "offer_fields_basis": OFFER_BASIS,
+    "channel": "whatsapp", "first_contact_channel": "marketplace", "upfront_amount_minor": 900,
+    "task_authority_ref": TASK_AUTHORITY_REF, "representation_class": "price", "authorized_by": "a" * 64,
+    "proposal_at": "2026-08-10T13:00:00Z", "item_ref": "item/ref-1", "returned_minor": 100,
+    "reverses_ref": "b" * 64, "deal_id": "deal-1",
+}
+
+
+def test_every_sealed_scalar_reads_back_from_the_capsule(engine_for):
+    # A replay reads its Action back from the record; a scalar sealed but not
+    # read back would be n/a on replay where it failed live.
+    action = replace(_payment(20), **SEALED_SCALARS)
+    capsule = engine_for(PACK).check(action, dry_run=True).capsule
+    back = Action.from_capsule(capsule)
+    assert {
+        "recipient_role": back.recipient_role, "refundable": back.refundable,
+        "material_fields_changed": back.material_fields_changed, "material_fields_basis": back.material_fields_basis,
+        "offer_fields_changed": back.offer_fields_changed, "offer_fields_basis": back.offer_fields_basis,
+        "channel": back.channel, "first_contact_channel": back.first_contact_channel,
+        "upfront_amount_minor": back.upfront_amount_minor, "task_authority_ref": back.task_authority_ref,
+        "representation_class": back.representation_class, "authorized_by": back.authorized_by,
+        "proposal_at": back.proposal_at, "item_ref": back.item_ref, "returned_minor": back.returned_minor,
+        "reverses_ref": back.reverses_ref, "deal_id": back.deal_id,
+    } == SEALED_SCALARS

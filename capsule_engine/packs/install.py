@@ -31,6 +31,7 @@ from capsule_ledger.ledger.api import LedgerAPI
 from ..guards.checks import RUNNABLE_CHECKS
 from ..guards.engine import ASK_RULE_EXCLUDED_CHECKS, GuardEngine
 from ..guards.signing import Signer
+from ..guards.wickets.definition import WicketDefinition
 from ..policy.activation import build_manifest_activation_capsule, find_latest_activation
 from ..policy.limits import read_caps_limits
 from ..policy.manifest import FoldRef, Manifest, PackRef, WicketRef
@@ -42,6 +43,7 @@ __all__ = [
     "InstalledPack",
     "ask_gate_selectors",
     "ask_wickets",
+    "engine_ask_sets",
     "install_pack",
     "manifest_id_for_pack",
     "build_engine",
@@ -175,8 +177,10 @@ def build_engine(
     docstring). An action_class_gate failure asks an approver only on the
     selectors whose obligations all declare ``default_disposition: ASK``
     (``ask_gate_selectors``); any other configured check asks on the same
-    condition (``ask_wickets``)."""
+    condition (``ask_wickets``). ``engine_ask_sets`` derives both, for this
+    engine and for a replay of the same pack."""
     wickets = installed.resolved.configured_wickets(RUNNABLE_CHECKS)
+    gate_selectors, checks = engine_ask_sets(installed.pack, wickets)
     return GuardEngine(
         ledger=ledger,
         caps_fold=installed.resolved.caps_fold(),
@@ -186,9 +190,20 @@ def build_engine(
         signer_provider=signer_provider,
         manifest_digest=installed.resolved.manifest_digest,
         wickets=wickets,
-        ask_gate_selectors=ask_gate_selectors(installed.pack),
-        ask_wickets=ask_wickets(installed.pack) & {w.check for w in wickets},
+        ask_gate_selectors=gate_selectors,
+        ask_wickets=checks,
     )
+
+
+def engine_ask_sets(
+    pack: PackDefinition, wickets: tuple[WicketDefinition, ...]
+) -> tuple[frozenset[str], frozenset[str]]:
+    """The ``(ask_gate_selectors, ask_wickets)`` a ``GuardEngine`` running
+    ``wickets`` under ``pack`` is built with: the gate selectors and the
+    configured checks among ``wickets`` whose obligations all declare ASK.
+    ``build_engine`` and ``report.replay`` both build their engine from this,
+    so a replay of a pack-governed ledger decides as the live engine did."""
+    return ask_gate_selectors(pack), ask_wickets(pack) & {w.check for w in wickets}
 
 
 def ask_gate_selectors(pack: PackDefinition) -> frozenset[str]:
