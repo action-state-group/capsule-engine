@@ -334,12 +334,12 @@ def _obligation_selector(
             f"{what} cites check {check!r}, which has selectors {sorted(selectors)}; name the one this "
             f"obligation is measured by, e.g. selector: {sorted(selectors)[0]!r}",
         )
-    if raw not in selectors:
+    if not isinstance(raw, str) or raw not in selectors:
         raise PackDefinitionError(
             UNKNOWN_OBLIGATION_SELECTOR,
             f"{what}.selector={raw!r} is not a selector of check {check!r} (selectors: {sorted(selectors)})",
         )
-    return str(raw)
+    return raw
 
 
 # Reads one obligation's raw YAML mapping: the loader's decoding boundary.

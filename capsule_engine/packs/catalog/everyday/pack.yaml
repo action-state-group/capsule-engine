@@ -20,7 +20,9 @@
 #
 # Eight rules share action_class_gate. Each names the one gate selector it
 # is measured by (selector:), so an action fails or passes only the rules
-# whose selector matched its class and is not applicable to the others.
+# whose selector matched its class and is not applicable to the others. An
+# action whose class has no taxonomy row fails all eight: the gate fails
+# closed and none of them can be ruled out.
 pack_id: asg/everyday/0.3.2
 
 obligations:

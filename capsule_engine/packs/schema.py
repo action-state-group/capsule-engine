@@ -362,7 +362,9 @@ class Obligation:
     (today only ``action_class_gate`` has them). Several obligations can
     share one check, each measured by its own selector: the obligation fails
     or passes only when its selector matched, and is not applicable when it
-    did not (``obligation_results.obligation_results``). ``loader.py``
+    did not (``obligation_results.obligation_results``); when the check
+    fails closed on a class it cannot resolve, every such obligation fails
+    with it. ``loader.py``
     requires one on every obligation citing a check that has selectors, and
     refuses one the check does not name. Emitted only when declared.
     """

@@ -189,10 +189,14 @@ def _pack_with(tmp_path: Path, old: str, new: str) -> Path:
         ("    evidence_instrument: {kind: structured_field, field: user_control_state}\n",
          "    evidence_instrument: {kind: structured_field, field: user_control_state}\n    selector: public_posting\n",
          "invalid_obligation_selector"),
+        ("    selector: public_posting\n", "    selector: public_posting\n    mode: judged\n",
+         "invalid_obligation_selector"),
+        ("    selector: public_posting\n", "    selector: [public_posting]\n", "unknown_obligation_selector"),
     ],
-    ids=["unknown", "missing", "on-a-check-without-selectors", "on-a-rule-with-no-check"],
+    ids=["unknown", "missing", "on-a-check-without-selectors", "on-a-rule-with-no-check", "on-a-judged-rule",
+         "not-a-string"],
 )
-def test_the_loader_refuses_a_selector_the_gate_does_not_bind(tmp_path, old, new, reason):
+def test_the_loader_refuses_a_missing_misplaced_or_unknown_selector(tmp_path, old, new, reason):
     with pytest.raises(PackDefinitionError) as exc:
         load_pack_dir(_pack_with(tmp_path, old, new))
     assert exc.value.reason == reason
