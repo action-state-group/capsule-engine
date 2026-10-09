@@ -22,8 +22,8 @@ ROOT = Path(__file__).parent.parent / "capsule_engine"
 SEEN = load_wicket(ROOT / "guards" / "wickets" / "catalog_defs" / "counterparty_seen_before.yaml")
 FOLD = load_fold(ROOT / "folds" / "catalog_defs" / "counterparty.seen_before.yaml")
 RAIL = load_wicket(ROOT / "guards" / "wickets" / "catalog_defs" / "destination_rail.yaml")
-# agreement.accept names no approver role.
-CLASSES = ["money.purchase", "money.transfer", "agreement.accept"]
+# external_commitment.other names no approver role.
+CLASSES = ["money.purchase", "money.transfer", "external_commitment.other"]
 SEEN_BOTH = replace(SEEN, config={**SEEN.config, "action_classes": CLASSES})
 
 
@@ -99,7 +99,7 @@ def test_a_wrong_fold_digest_is_refused():
 
 @pytest.mark.parametrize(
     ("action_class", "outcome"),
-    [("money.transfer", "escalate"), ("money.purchase", "escalate"), ("agreement.accept", "deny")],
+    [("money.transfer", "escalate"), ("money.purchase", "escalate"), ("external_commitment.other", "deny")],
 )
 def test_a_first_time_counterparty_fails_and_asks_where_the_class_has_an_approver(store, caps_fold, signer,
                                                                                  action_class, outcome):

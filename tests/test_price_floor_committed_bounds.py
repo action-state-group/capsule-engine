@@ -45,6 +45,8 @@ SPEND = load_fold(ROOT / "folds" / "catalog_defs" / "spend.weekly.v3.yaml")
 VECTORS = Path(__file__).parent / "fixtures" / "commercial-bounds" / "vectors.json"
 VECTORS_SHA256 = "4b85fb3ea7bd7735c93e2f1dd8605e6c8cc40a279100698ecda989366fe7c4e2"
 CLASSES = FLOOR.config["action_classes"]
+SINGLE_COMMITMENT = load_definition_file(ROOT / "guards" / "wickets" / "catalog_defs" / "single_commitment.seller.yaml")
+PROMISE_NEVER = load_definition_file(ROOT / "guards" / "wickets" / "catalog_defs" / "promise_never.yaml")
 
 
 class GoldenVector(TypedDict):
@@ -325,13 +327,62 @@ def test_on_a_class_with_an_approver_below_the_floor_and_a_bad_opening_ask(store
     assert _results(_decide(store, signer, asking, "money.purchase")) == expected
 
 
-def test_on_the_seller_classes_a_held_offer_is_refused_until_they_have_an_approver(store, signer):
-    """marketplace.offer, marketplace.sale and agreement.accept have no
-    approver_role in the taxonomy, so a declared-ASK failure on them refuses
-    (``engine._decide``). Pinned so the taxonomy change that lets them ask
-    shows up here."""
-    expected = {name: (result, DENY if held else ALLOW) for name, (_, _, result, held) in CASES.items()}
-    assert _results(_decide(store, signer)) == expected
+@pytest.mark.parametrize("action_class", CLASSES)
+def test_on_each_seller_class_a_held_offer_asks_the_account_holder(store, signer, action_class):
+    """Taxonomy 6 names the account holder as approver on marketplace.offer,
+    marketplace.sale and agreement.accept, so a declared-ASK price_floor
+    failure on them asks the seller rather than refusing."""
+    expected = {name: (result, ESCALATE if held else ALLOW) for name, (_, _, result, held) in CASES.items()}
+    assert _results(_decide(store, signer, action_class=action_class)) == expected
+
+
+def _seller_engine(store, signer) -> GuardEngine:
+    return GuardEngine(ledger=store, caps_fold=SPEND, signer_provider=lambda: signer,
+                       wickets=(FLOOR, SINGLE_COMMITMENT, PROMISE_NEVER), ask_wickets=frozenset({"price_floor"}))
+
+
+def _below_floor(engine: GuardEngine, **overrides) -> GuardDecision:
+    action = _action(168_000, action_id="offer/below", target="buyer/below", item_ref="item/bicycle", **overrides)
+    return engine.check(action, task_authority_record=AUTHORITY, commercial_bounds_opening=OPENING)
+
+
+def _failing(decision: GuardDecision) -> list[str]:
+    return sorted(c.id for c in decision.constraints if c.result == "fail")
+
+
+def test_an_offer_below_the_floor_asks_citing_price_floor_only(store, signer):
+    decision = _below_floor(_seller_engine(store, signer))
+    assert decision.outcome == ESCALATE
+    assert _failing(decision) == ["price_floor"]
+    assert decision.capsule["disposition"]["decision"] == "needs_input"
+    assert decision.capsule["disposition"]["verdict_class"] == "hitl_dispatched"
+
+
+def test_an_offer_below_the_floor_after_an_acceptance_in_the_sale_refuses(store, signer):
+    """single_commitment is an integrity check: beside it the floor's ask refuses."""
+    engine = _seller_engine(store, signer)
+    accepted = engine.check(
+        _action(175_000, verb="accept", action_id="accept/a", action_class="agreement.accept", target="buyer/a",
+                item_ref="item/bicycle"),
+        task_authority_record=AUTHORITY, commercial_bounds_opening=OPENING)
+    assert accepted.outcome == ALLOW
+    decision = _below_floor(engine)
+    assert decision.outcome == DENY
+    assert _failing(decision) == ["price_floor", "single_commitment"]
+
+
+def test_an_offer_below_the_floor_making_a_never_representation_refuses(store, signer):
+    decision = _below_floor(_seller_engine(store, signer), representation_class="authenticity")
+    assert decision.outcome == DENY
+    assert _failing(decision) == ["price_floor", "promise_never"]
+
+
+def test_a_repeated_offer_below_the_floor_in_the_same_deal_refuses_on_dedupe(store, signer):
+    engine = _seller_engine(store, signer)
+    assert _below_floor(engine).outcome == ESCALATE
+    decision = _below_floor(engine)
+    assert decision.outcome == DENY
+    assert _failing(decision) == ["dedupe", "price_floor"]
 
 
 def test_nothing_the_opening_holds_enters_any_record(store, signer):

@@ -262,8 +262,8 @@ def test_disposition_ask_pauses_a_listed_counterparty_for_the_approver(store, ca
 
 def test_disposition_ask_on_a_class_with_no_approver_still_refuses(store, caps_fold):
     """The engine's existing rule: there is nobody to ask, so it denies."""
-    engine = _engine(store, caps_fold, entries=[_t(BLOCKED)], disposition="ask", action_classes=["agreement.accept"])
-    assert engine.check(_action(action_class="agreement.accept", target=BLOCKED)).outcome == DENY
+    engine = _engine(store, caps_fold, entries=[_t(BLOCKED)], disposition="ask", action_classes=["external_commitment.other"])
+    assert engine.check(_action(action_class="external_commitment.other", target=BLOCKED)).outcome == DENY
 
 
 def test_disposition_ask_allows_an_unlisted_counterparty(store, caps_fold):
