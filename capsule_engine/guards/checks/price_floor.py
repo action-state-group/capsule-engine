@@ -22,9 +22,9 @@ sealed commitment also fails, naming ``bounds_commitment``: it is a wrong or
 altered record, so the rule does not step aside; so does a sealed
 ``bounds_commitment`` that is not 64 lowercase hex. A missing opening is
 ``n/a`` naming ``commercial_bounds_opening``: a counterparty or a stranger
-rightly has none. A task authority that commits to no floor is ``n/a``
-naming ``bounds_commitment``. Applies only to the configured
-``action_classes``.
+rightly has none. A task authority that commits to no floor puts none in
+force, so the action is out of scope (``n/a``, ``in_scope`` false), as is an
+action outside the configured ``action_classes``.
 
 The floor, the nonce and the document are never stated: the reason and
 evidence hold only the commitment the record already seals, the action's
@@ -181,8 +181,8 @@ def check_price_floor(
     try:
         sealed = _commitment_in(bound)
     except _NoCommitment:
-        return _missing(f"the task-authority record commits to no floor at {'.'.join(COMMITMENT_PATH)}",
-                        _COMMITMENT)
+        return _outcome("n/a", f"the task-authority record commits to no floor at {'.'.join(COMMITMENT_PATH)}",
+                        not_applicable_evidence(_CHECK_ID, in_scope=False))
     if sealed is None:
         return _outcome(
             "fail",

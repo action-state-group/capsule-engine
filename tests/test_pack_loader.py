@@ -269,8 +269,9 @@ def test_clause_malformed_effective_from_is_rejected(tmp_path):
     assert exc_info.value.reason == "invalid_clause"
 
 
-def test_clause_malformed_text_snapshot_digest_is_rejected(tmp_path):
-    _write_pack(tmp_path, overrides={"outcomes": [_outcome_entry(clause=_clause_entry(text_snapshot_digest="not-hex"))]})
+@pytest.mark.parametrize("digest", ["not-hex", "a" * 64 + "\n"], ids=["not hex", "trailing newline"])
+def test_clause_malformed_text_snapshot_digest_is_rejected(tmp_path, digest):
+    _write_pack(tmp_path, overrides={"outcomes": [_outcome_entry(clause=_clause_entry(text_snapshot_digest=digest))]})
     with pytest.raises(PackDefinitionError) as exc_info:
         load_pack_dir(tmp_path)
     assert exc_info.value.reason == "invalid_clause"

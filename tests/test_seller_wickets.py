@@ -213,19 +213,25 @@ def test_price_floor_without_inputs_is_n_a_naming_the_input():
     assert _floor(record=None).evidence == _missing("price_floor", "task_authority_record")
     assert _floor(amount_minor=None).evidence == _missing("price_floor", "amount_minor")
     assert _floor(opening=None).evidence == _missing("price_floor", "commercial_bounds_opening")
+
+
+def test_price_floor_with_no_floor_committed_is_out_of_scope():
+    """A task authority that seals no bounds_commitment puts no floor in
+    force: out of scope, never in scope and not evaluable."""
     no_floor: TaskAuthorityRecord = {"body": {k: v for k, v in BICYCLE["body"].items() if k != "bounds_commitment"}}
     out = _run(FLOOR, _action(task_authority_ref=task_authority_record_digest(no_floor)), record=no_floor,
                opening=BICYCLE_OPENING)
-    assert out.evidence == _missing("price_floor", "bounds_commitment")
+    assert (out.result, out.evidence) == ("n/a", not_applicable_evidence("price_floor", in_scope=False))
 
 
 def test_price_floor_never_reads_a_floor_in_clear_on_the_record():
     """price_floor/1.0.0 read min_total_minor from the record body; 2.0.0
-    never does, so a record carrying one and no commitment is n/a."""
+    and later never do, so a record carrying one and no commitment has no
+    floor in force and is out of scope."""
     clear: TaskAuthorityRecord = {"body": {**{k: v for k, v in BICYCLE["body"].items() if k != "bounds_commitment"},
                                            "min_total_minor": 170_000}}
     out = _run(FLOOR, _action(task_authority_ref=task_authority_record_digest(clear), amount_minor=1), record=clear)
-    assert (out.result, out.evidence) == ("n/a", _missing("price_floor", "bounds_commitment"))
+    assert (out.result, out.evidence) == ("n/a", not_applicable_evidence("price_floor", in_scope=False))
 
 
 @pytest.mark.parametrize("bad", ["0" * 63, "A" * 64, "0" * 64 + "\n", 7, None])
@@ -764,7 +770,7 @@ def test_a_seller_pack_citing_the_retired_price_floor_is_refused(tmp_path):
     with pytest.raises(PackDefinitionError) as exc_info:
         load_pack_dir(tmp_path)
     assert exc_info.value.reason == "retired_catalog_ref"
-    assert "price_floor/2.0.0" in str(exc_info.value)
+    assert "price_floor/2.0.1" in str(exc_info.value)
 
 
 def test_a_seller_pack_inlining_the_retired_offer_expiry_is_refused(tmp_path):

@@ -107,7 +107,7 @@ def load_schema() -> dict[str, Any]:
 
 
 def _check_hex_digest(digest: str) -> None:
-    if not _HEX_DIGEST_RE.match(digest):
+    if not _HEX_DIGEST_RE.fullmatch(digest):
         raise ResultError(INVALID_HEX_DIGEST, f"{digest!r} is not 64 lowercase hex characters")
 
 

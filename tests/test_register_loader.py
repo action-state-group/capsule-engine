@@ -169,6 +169,14 @@ def test_malformed_clause_rejected():
     assert exc.value.reason == "missing_required_field"
 
 
+@pytest.mark.parametrize("digest", ["not-hex", "a" * 64 + "\n"], ids=["not hex", "trailing newline"])
+def test_malformed_text_snapshot_digest_rejected(digest):
+    clause = {"instrument": "Policy P-1", "article": "§4", "text_snapshot_digest": digest}
+    with pytest.raises(RegisterDefinitionError) as exc:
+        load_register_dict(_register(rows=[_row(clause=clause)]))
+    assert exc.value.reason == "invalid_clause"
+
+
 def test_invalid_effective_date_rejected():
     with pytest.raises(RegisterDefinitionError) as exc:
         load_register_dict(_register(rows=[_row(effective_from="not-a-date")]))

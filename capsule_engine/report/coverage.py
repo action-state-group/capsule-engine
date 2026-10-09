@@ -434,7 +434,7 @@ def _record_digest(record: Mapping[str, Any]) -> str:
     """The record's ``capsule_id`` when it is a 64-hex digest, else a
     content digest over the record -- always a valid ``DigestRef``."""
     capsule_id = record.get("capsule_id")
-    if isinstance(capsule_id, str) and _HEX64.match(capsule_id):
+    if isinstance(capsule_id, str) and _HEX64.fullmatch(capsule_id):
         return capsule_id
     try:
         return json_digest(dict(record))

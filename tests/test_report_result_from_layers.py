@@ -208,17 +208,18 @@ def test_tally_whose_invocation_claims_do_not_cite_the_executions_file_does_not_
     assert exc.value.reason == INVALID_LAYER_TALLY
 
 
-def test_executions_digest_is_checked_when_no_claim_cites_it():
+@pytest.mark.parametrize("bad", ["not-a-digest", EXECUTIONS + "\n"], ids=["not hex", "trailing newline"])
+def test_executions_digest_is_checked_when_no_claim_cites_it(bad):
     """With no consequential action there is no invocation claim to carry
     the digest, so it is checked on its own, at build and at verify."""
     empty = copy.deepcopy(RECONCILE)
     empty.update(recorded=[], unrecorded=[], failed_attempts=[], consequential=0, records_read=2)
     with pytest.raises(ResultError):
-        _tally(reconcile=empty, observations=[], not_applicable=[], executions_sha256="not-a-digest")
+        _tally(reconcile=empty, observations=[], not_applicable=[], executions_sha256=bad)
     doc = _tally(reconcile=empty, observations=[], not_applicable=[])
     assert _layer(doc, "invoked")["result"] is None
     verify_layer_tally(doc)
-    doc["source"]["executions_sha256"] = "not-a-digest"
+    doc["source"]["executions_sha256"] = bad
     with pytest.raises(ResultError, match="executions_sha256") as exc:
         verify_layer_tally(doc)
     assert exc.value.reason == INVALID_LAYER_TALLY
