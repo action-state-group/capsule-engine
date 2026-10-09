@@ -28,12 +28,15 @@ from capsule_engine.guards.checks import (
     task_authority_record_digest,
 )
 from capsule_engine.guards.wickets import Catalog, WicketDefinition, load_definition_file
+from capsule_engine.packs.errors import PackDefinitionError
 from capsule_engine.packs.loader import load_pack_dir
 from capsule_engine.report.result_from_folds import project_guard_constraint
 
 ROOT = Path(__file__).parent.parent / "capsule_engine"
 CATALOG = ROOT / "guards" / "wickets" / "catalog_defs"
 FOLDS = ROOT / "folds" / "catalog_defs"
+RETIRED = Path(__file__).parent / "fixtures" / "retired_wickets"
+RETIRED_EXPIRY_DIGEST = "7b1072fc6997b07e7f08941a723e60d53fd3a54dbccfda6fa7391124ec2702ee"
 
 FLOOR = load_definition_file(CATALOG / "price_floor.yaml")
 DISCLOSURE = load_definition_file(CATALOG / "required_disclosure.yaml")
@@ -686,8 +689,7 @@ def test_engine_refuses_an_expired_proposal(store, signer):
 # -- a pack citing them ---------------------------------------------------------
 
 
-def test_a_seller_pack_citing_every_seller_definition_validates(tmp_path):
-    catalog = Catalog(CATALOG)
+def _write_seller_pack(tmp_path, constraints) -> None:
     pack = {
         "pack_id": "test_pub/seller-everyday/0.1.0",
         "obligations": [{"id": f"o{i}", "statement": d.wicket_id, "check": d.check}
@@ -698,11 +700,40 @@ def test_a_seller_pack_citing_every_seller_definition_validates(tmp_path):
             "required_fields": ["amount_minor", "task_authority_ref", "target"],
             "optional_fields": ["representation_class", "authorized_by", "proposal_at", "recipient_role", "rail"],
         }],
-        "constraints": [{"wicket_ref": d.wicket_id, "digest": catalog.get(d.wicket_id).digest}
-                        for d in SELLER_DEFINITIONS],
+        "constraints": constraints,
         "folds": [{"file": "seen.yaml"}],
     }
     (tmp_path / "pack.yaml").write_text(yaml.dump(pack))
     (tmp_path / "seen.yaml").write_text((FOLDS / "disclosure.class_seen.yaml").read_text())
+
+
+def test_a_seller_pack_citing_every_seller_definition_validates(tmp_path):
+    catalog = Catalog(CATALOG)
+    _write_seller_pack(tmp_path, [{"wicket_ref": d.wicket_id, "digest": catalog.get(d.wicket_id).digest}
+                                  for d in SELLER_DEFINITIONS])
     loaded = load_pack_dir(tmp_path)
     assert {c.wicket_id for c in loaded.constraints} == {d.wicket_id for d in SELLER_DEFINITIONS}
+    assert EXPIRY.wicket_id == "offer_expiry/1.0.1"
+
+
+def test_a_seller_pack_citing_the_retired_offer_expiry_is_refused(tmp_path):
+    """offer_expiry/1.0.0 changed meaning under its digest, so a pack pinned
+    to it is refused and told what replaced it, not reported as unknown."""
+    catalog = Catalog(CATALOG)
+    constraints = [{"wicket_ref": d.wicket_id, "digest": catalog.get(d.wicket_id).digest}
+                   for d in SELLER_DEFINITIONS if d is not EXPIRY]
+    constraints.append({"wicket_ref": "offer_expiry/1.0.0", "digest": RETIRED_EXPIRY_DIGEST})
+    _write_seller_pack(tmp_path, constraints)
+    with pytest.raises(PackDefinitionError) as exc_info:
+        load_pack_dir(tmp_path)
+    assert exc_info.value.reason == "retired_catalog_ref"
+    assert "offer_expiry/1.0.1" in str(exc_info.value)
+
+
+def test_a_seller_pack_inlining_the_retired_offer_expiry_is_refused(tmp_path):
+    inline = yaml.safe_load((RETIRED / "offer_expiry.1.0.0.yaml").read_text())
+    _write_seller_pack(tmp_path, [inline])
+    with pytest.raises(PackDefinitionError) as exc_info:
+        load_pack_dir(tmp_path)
+    assert exc_info.value.reason == "invalid_constraint"
+    assert "retired_definition" in str(exc_info.value)
