@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""A real two-deal bundle from capsulectl v0.1.0-rc13, replayed under everyday 0.3.3.
+"""A real two-deal bundle from capsulectl, replayed under everyday 0.3.4.
 
 ``fixtures/real-two-deal/`` holds what capsulectl wrote, byte for byte: two
 deals on one throwaway profile, each a purchase of the same item from the same
@@ -10,20 +10,14 @@ synthetic merchant, checked and paid for the same amount (``build.sh`` and
 by its ``counterparty_profile`` companion.
 
 The engine replays the two own copies, deal 1 then deal 2, under the installed
-pack. ``expected_decisions.json`` is that replay's decision for every record,
-in sorted canonical JSON, compared byte for byte here and handed to the Go
-plugin's differential. Regenerate it with
+pack. Only a check states an act, so only the two checks get a decision: the
+companions, the deal's other records and the reports get none, and no rule
+fires on them. Deal 1's check asks (a first-time merchant), and its sealed
+approval and executed action carry it out, so deal 2's check reads the
+merchant as seen. ``expected_decisions.json`` is that replay's decision for
+every check, in sorted canonical JSON, compared byte for byte here and handed
+to the Go plugin's differential. Regenerate it with
 ``python -m tests.test_real_two_deal_bundle``.
-
-Two of the expected results do not hold, and each is pinned with a strict
-xfail rather than written into the expectation:
-
-- r06 FAILS on deal 2's check. The merchant reads as new because a replay has
-  no accepted earlier act: deal 1's check escalates, and no sealed approval or
-  action is replayed as its acceptance.
-- The companion records are DENIED, not read as not applicable. Under the
-  pack, ``action_class_gate`` fails closed on a record with no action class,
-  as it does on every record that states no act.
 """
 from __future__ import annotations
 
@@ -32,11 +26,11 @@ import json
 import re
 import sys
 import tempfile
+from collections.abc import Callable
 from functools import cache
 from pathlib import Path
 from typing import TypedDict
 
-import pytest
 from agent_action_capsule import json_digest
 
 import capsule_engine
@@ -45,22 +39,26 @@ from capsule_engine.guards.capsule import DENY, ESCALATE, LOCAL_ONLY_TARGET_PREF
 from capsule_engine.guards.checks import RUNNABLE_CHECKS
 from capsule_engine.packs import install_pack, load_pack_dir
 from capsule_engine.packs.obligation_results import obligation_results
-from capsule_engine.report.replay import ReplayResult, load_disclosed, load_records, replay
+from capsule_engine.packs.schema import PackDefinition
+from capsule_engine.report.replay import ReplayResult, load_disclosed, load_records, load_withheld, replay
 
 FIXTURE = Path(__file__).parent / "fixtures" / "real-two-deal"
 OWN = (FIXTURE / "deal-1.bundle.json", FIXTURE / "deal-2.bundle.json")
 SHARES = (FIXTURE / "deal-1.counterparty.bundle.json", FIXTURE / "deal-2.counterparty.bundle.json")
 EXPECTED = FIXTURE / "expected_decisions.json"
 FIXTURE_SHA256 = {
-    "deal-1.bundle.json": "8eaed7e3e6e762d2528c17ee6cf2b1186f6f301c3340f8e91fff1bd0f85f38a3",
-    "deal-1.counterparty.bundle.json": "b9576f2cfb1a2d61469ad5f94daa1057788bfb4dae76efff041eb7cd24e200f0",
-    "deal-2.bundle.json": "fe97fde684e8d38a07f51157b8f73fcf609c511c8f29dd50aa6e5025d3797e2b",
-    "deal-2.counterparty.bundle.json": "181079ccc08f27eb2cd39af48f5913050d34bfb9b961d7cf7e577eb23d997685",
+    "deal-1.bundle.json": "74109be0d4c2450da340f4f1dfc272d51f64eb17ccb861c8ebf88ed50ceb18c1",
+    "deal-1.counterparty.bundle.json": "dc5cdc47284797fe81d04b6a55efbc3faed67931bb206585284b7fd302bdfd5a",
+    "deal-2.bundle.json": "a152f148bd110a7373ee420293bc96783a390dd460cf75b496130d0e83cce1ba",
+    "deal-2.counterparty.bundle.json": "fde7f888f3246548509451d035f96facff7b016cddc66a397e6c204ef82cb3ac",
 }
 PACK = load_pack_dir(Path(capsule_engine.__file__).parent / "packs" / "catalog" / "everyday")
-PACK_ID = "asg/everyday/0.3.3"
-PACK_DIGEST = "d153219b9b5f7ad8eb4805eb718aab81a5dfa29a6a1d977301559fc167268752"
-PRODUCER = {"commit": "7eb05ac1c277f4a7dad1ece8b1a1aec2df7eac11", "name": "capsulectl", "version": "v0.1.0-rc13"}
+FROZEN_0_3_3 = Path(__file__).parent / "fixtures" / "packs" / "everyday-0.3.3"
+PACK_ID = "asg/everyday/0.3.4"
+PACK_DIGEST = "cd98aaec5acf8cea86f91fc21dd7df6b36a67c7b55340489b66e6ce88b85117b"
+PRODUCER = {"commit": "d1615229de65a17e250594ea4e1f456671c12eba", "name": "capsulectl", "version": "v0.1.0-rc13-4-gd161522"}
+TAXONOMY = "6"
+R02 = "r02-ordinary-purchase"
 R06 = "r06-new-merchant"
 R27 = "r27-no-commitment-beyond-task-bounds"
 # What the inputs name in clear. A sealed record carries the merchant only as
@@ -113,17 +111,23 @@ def _of_type(path: Path, record_type: str) -> dict[str, dict]:
 
 @cache
 def _replayed() -> ReplayResult:
+    return _replay(tuple(load_records(OWN)), load_disclosed(OWN), load_withheld(OWN))
+
+
+def _replay(records: tuple[dict, ...], disclosed: dict[str, dict], withheld: frozenset[str],
+            pack: PackDefinition = PACK) -> ReplayResult:
     with tempfile.TemporaryDirectory() as tmp:
-        installed = install_pack(PACK, project_dir=Path(tmp) / "replay-project", mode="observe")
+        installed = install_pack(pack, project_dir=Path(tmp) / "replay-project", mode="observe")
         resolved = installed.resolved
         return replay(
-            load_records(OWN),
+            list(records),
             caps_fold=resolved.caps_fold(),
             caps_minor=resolved.caps_minor(),
             per_action_minor=resolved.per_action_minor(),
             per_action_reads=resolved.per_action_reads(),
             manifest_digest=resolved.manifest_digest,
-            disclosed=load_disclosed(OWN),
+            disclosed=disclosed,
+            withheld=withheld,
             wickets=resolved.configured_wickets(RUNNABLE_CHECKS),
             pack=installed.pack,
         )
@@ -138,7 +142,8 @@ def _record_type(capsule_id: str) -> str | None:
 
 
 def decisions_document() -> DecisionsDocument:
-    """The replay's decision for every record of the two own copies, in replay order."""
+    """The replay's decision for every record of the two own copies that
+    gets one (each check), in replay order."""
     decisions: list[Decision] = []
     for sourced in _replayed().decisions:
         rules = {r.obligation_id: r.result for r in obligation_results(PACK, sourced.decision.constraints)}
@@ -186,13 +191,19 @@ def test_the_fixture_is_the_bytes_capsulectl_wrote():
         assert hashlib.sha256((FIXTURE / name).read_bytes()).hexdigest() == digest, name
 
 
-def test_every_deal_record_was_sealed_by_capsulectl_rc13():
+def test_every_deal_record_was_sealed_by_the_pinned_capsulectl():
     for path in OWN:
         for block in _disclosed_records(path).values():
             assert block["producer"] == PRODUCER
 
 
-def test_the_pack_is_everyday_0_3_3_at_its_digest():
+def test_every_check_seals_taxonomy_6():
+    for path in OWN:
+        for capsule_id in _of_type(path, "check"):
+            assert _json(path)["disclosures"][capsule_id]["agent_input"]["body"]["taxonomy_version"] == TAXONOMY
+
+
+def test_the_pack_is_everyday_0_3_4_at_its_digest():
     assert PACK.pack_id == PACK_ID
     assert PACK.definition_digest() == PACK_DIGEST
 
@@ -242,39 +253,168 @@ def test_deal_1s_check_repeats_nothing():
     assert _decision(check)["rules"][R27] == "pass"
 
 
-@pytest.mark.xfail(strict=True, reason="r06 FAILS on deal 2: the replay has no accepted earlier act; "
-                   "deal 1's check escalates and no sealed approval or action is replayed as its acceptance")
-def test_r06_recognises_the_merchant_on_deal_2():
+def test_deal_1s_check_asks_about_a_first_time_merchant():
+    (check,) = _checks(1)
+    decision = _decision(check)
+    assert decision["outcome"] == ESCALATE
+    assert (decision["rules"][R02], decision["rules"][R06]) == ("fail", "fail")
+
+
+def test_r02_and_r06_recognise_the_merchant_on_deal_2():
     (check,) = _checks(2)
-    assert _decision(check)["rules"][R06] == "pass"
+    rules = _decision(check)["rules"]
+    assert (rules[R02], rules[R06]) == ("pass", "pass")
 
 
-def test_r06_reads_the_profile_fingerprint_and_finds_no_accepted_act():
+def _seen_on_deal_2(result: ReplayResult):
+    (check,) = _checks(2)
+    (sourced,) = [s for s in result.decisions if s.record["capsule_id"] == check]
+    (seen,) = [c for c in sourced.decision.constraints if c.id == "counterparty_seen_before"]
+    return seen
+
+
+def test_r06_counts_deal_1s_carried_out_act_under_the_profile_fingerprint():
     (payee,) = _profile_payees()
+    seen = _seen_on_deal_2(_replayed())
+    assert seen.evidence["fold_key"]["value"] == LOCAL_ONLY_TARGET_PREFIX + payee
+    assert (seen.result, seen.evidence["prior_count"]) == ("pass", 1)
+
+
+def test_under_0_3_3_deal_2_still_reads_a_first_time_merchant():
+    """counterparty_seen_before/2.0.0, which 0.3.3 cites, counts no carried-out
+    act: the fix is the new version, and the old one keeps its meaning."""
+    result = _replay(tuple(load_records(OWN)), load_disclosed(OWN), load_withheld(OWN), load_pack_dir(FROZEN_0_3_3))
+    seen = _seen_on_deal_2(result)
+    assert (seen.result, seen.evidence["prior_count"]) == ("fail", 0)
+
+
+def test_the_carried_out_act_is_never_counted_as_spend():
+    """The record the replay writes for deal 1's act is counted by
+    counterparty.seen_before/3.0.0 only: deal 2's caps reads no spend."""
     (check,) = _checks(2)
     (sourced,) = [s for s in _replayed().decisions if s.record["capsule_id"] == check]
-    (seen,) = [c for c in sourced.decision.constraints if c.id == "counterparty_seen_before"]
-    assert seen.evidence["fold_key"]["value"] == LOCAL_ONLY_TARGET_PREFIX + payee
-    assert seen.evidence["prior_count"] == 0
+    (caps,) = [c for c in sourced.decision.constraints if c.id == "caps"]
+    assert caps.evidence["weekly_spend_minor"] == 0
 
 
-@pytest.mark.xfail(strict=True, reason="the companion is DENIED: action_class_gate fails closed on a record "
-                   "with no action class under the pack")
-def test_the_companions_read_not_applicable():
+# -- the same deals, changed: an act that was not carried out is not seen -------------
+
+
+Change = Callable[[dict], dict | None]
+
+
+def _deal_1_changed(changes: dict[str, Change]) -> ReplayResult:
+    """The replay with deal 1's records of each ``record_type`` in ``changes``
+    passed through its function: a changed record, or ``None`` to drop it.
+    Every later deal-1 record that names a changed one by digest (``prev``,
+    ``refs``) is re-pointed and re-sealed, so the chain stays whole. A
+    re-sealed capsule binds its new record by digest; its signature no longer
+    verifies, and the replay reads only the binding."""
+    disclosed = dict(load_disclosed(OWN))
+    moved: dict[str, str] = {}
+    records = []
+    for capsule in load_records(OWN):
+        capsule_id = capsule["capsule_id"]
+        sealed = disclosed.get(capsule_id)
+        if sealed is None or "x-deal-v0" not in sealed or capsule_id not in _disclosed_records(OWN[0]):
+            records.append(capsule)
+            continue
+        text = json.dumps(sealed)
+        for old, new in moved.items():
+            text = text.replace(old, new)
+        changed = json.loads(text)
+        change = changes.get(changed["x-deal-v0"]["record_type"])
+        if change is not None:
+            changed = change(changed)
+        if changed is None:
+            disclosed.pop(capsule_id)
+            continue
+        if changed != sealed:
+            moved[json_digest(sealed)] = json_digest(changed)
+            attestation = {"compute_attestation": {"agent_input_digest": json_digest(changed)}}
+            capsule = {**capsule, "model_attestation": attestation}
+            disclosed[capsule_id] = changed
+        records.append(capsule)
+    return _replay(tuple(records), disclosed, load_withheld(OWN))
+
+
+def _with_body(**fields: object) -> Change:
+    return lambda record: {**record, "body": {**record["body"], **fields}}
+
+
+def _unseen(result: ReplayResult) -> bool:
+    seen = _seen_on_deal_2(result)
+    return (seen.result, seen.evidence["prior_count"]) == ("fail", 0)
+
+
+def test_the_unchanged_chain_rewritten_is_still_seen():
+    """The rewrite itself keeps the chain: changing nothing, deal 2 still
+    reads the merchant as seen."""
+    seen = _seen_on_deal_2(_deal_1_changed({}))
+    assert (seen.result, seen.evidence["prior_count"]) == ("pass", 1)
+
+
+def test_an_approval_that_declines_leaves_the_merchant_unseen():
+    """Deal 1's approval sealed as declined, its action step still there and
+    pointing at it: the chain is whole but says no."""
+    assert _unseen(_deal_1_changed({"approval": _with_body(choice="decline", proceed=False)}))
+
+
+def test_an_approved_act_never_executed_leaves_the_merchant_unseen():
+    assert _unseen(_deal_1_changed({"action": lambda record: None}))
+
+
+def test_a_purchase_the_guard_refused_leaves_the_merchant_unseen():
+    """Deal 1's check names a class with no taxonomy row: the gate fails
+    closed and the check is refused. Its approval and action step stay,
+    re-pointed at it, and still count for nothing."""
+    result = _deal_1_changed({"check": _with_body(action_class="money.unlisted")})
+    (check,) = [s for s in result.decisions if s.record["capsule_id"] in _checks(1)]
+    assert check.decision.outcome == DENY
+    assert check.action.target == _seen_on_deal_2(result).evidence["fold_key"]["value"]
+    assert _unseen(result)
+
+
+def test_an_action_step_its_capsule_did_not_seal_carries_nothing_out():
+    (action_id,) = _of_type(OWN[0], "action")
+    records = load_records(OWN)
+    disclosed = dict(load_disclosed(OWN))
+    disclosed[action_id] = {**disclosed[action_id], "note": "not what the capsule sealed"}
+    assert _unseen(_replay(tuple(records), disclosed, load_withheld(OWN)))
+
+
+# -- records that state no act --------------------------------------------------------
+
+
+def test_only_the_checks_get_a_decision():
+    decided = [d["capsule_id"] for d in decisions_document()["decisions"]]
+    assert decided == [*_checks(1), *_checks(2)]
+
+
+def test_every_other_record_is_replayed_without_a_decision():
+    """The companions, baselines, verdicts, approvals, action steps and both
+    reports of each deal: no rule fires on them, the gate included."""
+    undecided = {r["capsule_id"] for r in _replayed().undecided}
+    every = {r["capsule_id"] for p in OWN for r in _json(p)["records"]}
+    assert undecided == every - {*_checks(1), *_checks(2)}
+    kinds = {_record_type(c) or _json_type(c) for c in undecided}
+    assert kinds == {"baseline", "counterparty_profile", "verdict", "approval", "action", "deal_report", None}
+
+
+def _json_type(capsule_id: str) -> str | None:
+    """A disclosed non-deal record's sealed ``type``; ``None`` when no own
+    copy discloses it (each deal's counterparty report)."""
     for path in OWN:
-        for capsule_id in _of_type(path, "counterparty_profile"):
-            decision = _decision(capsule_id)
-            assert decision["outcome"] != DENY
-            assert set(decision["rules"].values()) <= {"pass", "n/a"}
+        record = _json(path)["disclosures"].get(capsule_id, {}).get("agent_input")
+        if record is not None:
+            return record.get("type")
+    return None
 
 
-def test_the_companions_state_no_act():
-    for path in OWN:
-        for capsule_id in _of_type(path, "counterparty_profile"):
-            decision = _decision(capsule_id)
-            assert decision["target"] is None
-            assert decision["action_class"] is None
-            assert decision["failing_checks"] == ["action_class_gate"]
+def test_the_withheld_records_are_the_counterparty_reports():
+    for own, share in zip(OWN, SHARES, strict=True):
+        (withheld,) = load_withheld([own])
+        assert _json(share)["disclosures"][withheld]["agent_input"]["type"] == "deal_report"
 
 
 # -- the counterparty shares -----------------------------------------------------------

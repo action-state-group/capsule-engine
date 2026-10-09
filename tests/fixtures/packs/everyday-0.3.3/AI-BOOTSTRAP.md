@@ -83,10 +83,9 @@ catalog):
    declares ASK; it is refused when any of them declares NEVER, or when the
    class names no approver.
    `packs.obligation_results` reads one decision's result per rule.
-8. `counterparty_seen_before` (`counterparty_seen_before/3.0.0`) -- a
+8. `counterparty_seen_before` (`counterparty_seen_before/2.0.0`) -- a
    purchase from a merchant the operator has no accepted earlier action with
-   is flagged; an earlier act that asked, was approved and was executed
-   counts as one, and a dry run does not. The record
+   is flagged; a dry run does not count as an earlier action. The record
    names the count and the key it was read under.
 9. `recipient_role` (`recipient_role/1.0.0`) -- a personal-data disclosure
    passes for the fulfilling merchant or the user and is flagged for a third
@@ -102,7 +101,7 @@ catalog):
     refundability) is flagged.
 13. `recipient_seen_before` (`recipient_seen_before/1.0.0`) -- a message to
     a recipient the operator has no accepted earlier action addressed to is
-    flagged, counted as `counterparty_seen_before/2.0.0` counts.
+    flagged, read with the same fold as `counterparty_seen_before`.
 14. `channel_change` (`channel_change/1.1.0`) -- `channel` differing from
     `first_contact_channel` on the same action is flagged.
 15. `upfront_amount` (`upfront_amount/1.1.0`) -- a deposit above 100.00, or

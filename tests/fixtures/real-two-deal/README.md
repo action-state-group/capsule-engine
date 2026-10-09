@@ -1,17 +1,24 @@
-# A real two-deal bundle (capsulectl v0.1.0-rc13)
+# A real two-deal bundle (capsulectl, taxonomy 6)
 
 Two deals on one throwaway deal profile. Each is a purchase of the same item from the same
 synthetic merchant, checked and paid for the same amount. Every byte of the four bundles is what
-capsulectl wrote. `capsulectl verify --bundle` reports each one `VALID`.
+capsulectl wrote. `capsulectl verify --bundle` reports each one `VALID`. Each check seals
+`taxonomy_version` `6`.
 
 ## Producer
 
-- capsule-cli tag `v0.1.0-rc13`, commit `7eb05ac1c277f4a7dad1ece8b1a1aec2df7eac11`.
-- Built from `git archive v0.1.0-rc13` with `CGO_ENABLED=0 go build -trimpath -o capsulectl
-  ./cmd/capsulectl`. The `-ldflags -X` set `internal/cli.cliVersion` to `v0.1.0-rc13` and
-  `internal/cli.cliCommit` to the commit above, as `scripts/release-build.sh` does.
-
-- `capsulectl --version` prints `capsulectl v0.1.0-rc13 (commit 7eb05ac1c277f4a7dad1ece8b1a1aec2df7eac11)`.
+- capsule-cli commit `d1615229de65a17e250594ea4e1f456671c12eba`: the head of capsule-cli pull
+  request #169 ("deal: seal taxonomy version 6 on new records"), not yet merged. The released
+  `v0.1.0-rc13` still seals taxonomy `5`.
+- Built from `git archive d1615229de65a17e250594ea4e1f456671c12eba` with `CGO_ENABLED=0 go build
+  -trimpath -o capsulectl ./cmd/capsulectl`. The `-ldflags -X` set `internal/cli.cliVersion` to
+  `v0.1.0-rc13-4-gd161522` (`git describe --tags` of that commit) and `internal/cli.cliCommit` to the
+  commit above, as `scripts/release-build.sh` does.
+- `capsulectl --version` prints
+  `capsulectl v0.1.0-rc13-4-gd161522 (commit d1615229de65a17e250594ea4e1f456671c12eba)`.
+- Once #169 merges, rebuild from the merged commit and run `build.sh` again. A re-run makes other
+  keys, ids and timestamps, so the bundles, the digests pinned in the test and
+  `expected_decisions.json` are replaced together.
 
 ## Commands
 
@@ -41,7 +48,7 @@ script is the record of how they were made.
 | `deal-1.bundle.json`, `deal-2.bundle.json` | the user's own copy (`bundle --deal`), replayed by the engine |
 | `deal-1.counterparty.bundle.json`, `deal-2.counterparty.bundle.json` | the counterparty's shared copy (`disclose --share counterparty`) |
 | `inputs/` | the `deal open`, `deal check` and `deal note --kind act` bodies |
-| `expected_decisions.json` | the engine's decision for every record of the two own copies, replayed in that order under `asg/everyday/0.3.3`; sorted canonical JSON |
+| `expected_decisions.json` | the engine's decision for every record of the two own copies that gets one (the two checks), replayed in that order under `asg/everyday/0.3.4`; sorted canonical JSON |
 
 Regenerate `expected_decisions.json` with `python -m tests.test_real_two_deal_bundle`.
 `tests/test_real_two_deal_bundle.py` compares it byte for byte.
@@ -56,18 +63,20 @@ Regenerate `expected_decisions.json` with `python -m tests.test_real_two_deal_bu
   copy (the user's own words and what was done).
 - No share names it. There is no email address, handle or local path anywhere.
 
-## Where the replay differs from the expectation
+## What the replay decides
 
-The two failing expectations are pinned as strict xfails in the test. They are not written into
-`expected_decisions.json` as passes.
+Only a check states an act, so only the two checks get a decision.
 
-- **r06 on deal 2 FAILS** (`prior_count` 0), though its target is the profile fingerprint deal 1's
-  check also had. A replay has no accepted earlier act: deal 1's check escalates (r02, r06), and
-  no sealed approval or action is replayed as its acceptance.
-- **The companions are DENIED, not read as not applicable.** Under the pack, `action_class_gate`
-  fails closed on a record with no action class, as it does on every record that states no act
-  (baseline, verdict, approval, action, report).
-- **The report capsules trip r27** (dedupe), on deal 1's second report and both of deal 2's.
+- **Deal 1's check asks.** The merchant is new: r02 and r06 fail on `counterparty_seen_before`.
+- **Deal 2's check reads the merchant as seen** (r02 and r06 pass, `prior_count` 1). Deal 1's act was
+  carried out: its sealed approval (`proceed: true`) approves the verdict on that check, and the
+  sealed action step names that approval under `authorized_by`. The replay counts the act as an
+  earlier one with that merchant (`counterparty_seen_before/3.0.0`), keyed on the profile
+  fingerprint both companions carry.
+- **Deal 2's check asks on r27**: it is the same act as deal 1's, in another deal (`dedupe`).
+- **No other record gets a decision**: the companions, baselines, verdicts, approvals, action steps
+  and both reports of each deal. No rule fires on them, the gate included. The counterparty's
+  report is withheld in the user's own copy, so nothing in it can be read.
 - **The shares withhold the companion, but still list it.** No share discloses a
   `counterparty_profile` record or carries its fingerprint. Each share does carry the companion's
   sealed capsule (digests and signature), and one step marked withheld with

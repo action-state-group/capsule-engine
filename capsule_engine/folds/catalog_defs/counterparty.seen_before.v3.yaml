@@ -1,0 +1,38 @@
+# Count of prior acts carried out per counterparty, leaving dry runs out.
+# Used by the counterparty_seen_before/3.0.0 wicket: zero means a first-time
+# counterparty, one or more means a repeat.
+#
+# The one change from counterparty.seen_before/2.0.0, which stays as it was
+# for the packs that pin it: a record whose disposition.decision is
+# carried_out is counted beside an accepted one. A replay writes one to its
+# own view when the sealed deal records show that an act whose check it
+# replayed was approved to proceed and then executed
+# (report/replay.py). Without it, an act that asked first and was then
+# approved and paid never made its counterparty known.
+# An act that was declined, or approved and never executed, has no such
+# record and is not counted.
+#
+# asg_payload.target is the same opaque counterparty reference the
+# counterparty_identity_change check uses to find a payee's prior record.
+# Records without it are skipped. The caller scans one operator's records
+# before evaluating (guards/checks/counterparty_seen_before.py).
+fold_id: counterparty.seen_before/3.0.0
+reads:
+  - path: asg_payload.target
+    erasure_class: commitment-ok
+  - path: disposition.decision
+    erasure_class: commitment-ok
+  - path: asg_payload.checkpoint.dry_run
+    erasure_class: commitment-ok
+    default: false
+filter:
+  - field: disposition.decision
+    op: in
+    value: [accept, carried_out]
+  - field: asg_payload.checkpoint.dry_run
+    op: ne
+    value: true
+key: asg_payload.target
+reduce:
+  reducer: count
+emit: prior_count

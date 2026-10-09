@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Builds the real two-deal bundle with capsulectl v0.1.0-rc13, on a throwaway
+# Builds the real two-deal bundle with capsulectl (README.md names the commit), on a throwaway
 # profile under this directory. Synthetic merchant, no real identity. Nothing
 # is sent anywhere: no `deal tick`, no cadence, no remote checker.
 set -euo pipefail
