@@ -141,13 +141,13 @@ def test_an_ask_gate_rule_re_declared_never_still_refuses(engine_for, action_cla
 
 
 def test_an_ask_gate_rule_on_a_class_with_no_approver_refuses_naming_the_missing_approver(tmp_path):
-    # agreement.accept names no approver_role in the taxonomy.
-    selectors: dict[str, Selector] = {"asks": {"action_classes": ["agreement.accept"], "on_match": "fail"}}
+    # external_commitment.other names no approver_role in the taxonomy.
+    selectors: dict[str, Selector] = {"asks": {"action_classes": ["external_commitment.other"], "on_match": "fail"}}
     engine, store = _direct_engine(tmp_path, selectors, frozenset({"asks"}))
     try:
-        decision = engine.check(_action(10, "agreement.accept"), dry_run=True)
+        decision = engine.check(_action(10, "external_commitment.other"), dry_run=True)
         assert decision.outcome == DENY
-        assert "action class 'agreement.accept' names no approver_role" in decision.reason
+        assert "action class 'external_commitment.other' names no approver_role" in decision.reason
     finally:
         store.close()
 

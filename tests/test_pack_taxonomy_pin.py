@@ -6,8 +6,8 @@ bytes).
 The taxonomy decides what a gated class does on a failure -- its
 ``approver_role`` makes it ask rather than refuse -- yet a pack's digest did
 not cover it: taxonomy 3 changed four classes from refuse to ask under an
-unchanged everyday 0.3.2 digest, taxonomy 4 four more, and taxonomy 5 one
-more. A pack that pins
+unchanged everyday 0.3.2 digest, taxonomy 4 four more, taxonomy 5 one
+more, and taxonomy 6 the three seller classes. A pack that pins
 the taxonomy moves its digest when the taxonomy moves, and does not load
 under any other one.
 
@@ -51,8 +51,8 @@ def test_the_engine_digest_of_the_taxonomy_is_the_jcs_digest_of_the_packaged_fil
     raw = json.loads((REPO / "capsule_engine" / "guards" / "action_taxonomy.json").read_text())
     assert TAXONOMY_DIGEST == json_digest(raw)
     assert (TAXONOMY_VERSION, TAXONOMY_DIGEST) == (
-        "5",
-        "af3a054cae880e13ce5d8d8bdaa64383e6f3af14fa2bf2ddb88aab226865b13a",
+        "6",
+        "fc12eb90bc2b3c85bb49c4d3d7be8f384c6e0b8e189bc3b68a753a4f1af5cd94",
     )
 
 
@@ -67,7 +67,13 @@ TAXONOMY_4_APPROVERS = {
     "communication.publish": "account_holder",
     "disclosure.personal": "account_holder",
 }
+TAXONOMY_5_DIGEST = "af3a054cae880e13ce5d8d8bdaa64383e6f3af14fa2bf2ddb88aab226865b13a"
 TAXONOMY_5_APPROVERS = {"communication.send": "account_holder"}
+TAXONOMY_6_APPROVERS = {
+    "marketplace.offer": "account_holder",
+    "marketplace.sale": "account_holder",
+    "agreement.accept": "account_holder",
+}
 
 
 class _Row(TypedDict):
@@ -89,13 +95,20 @@ def _undo(raw: _Taxonomy, version: str, approvers: dict[str, str]) -> _Taxonomy:
     return raw
 
 
+def test_taxonomy_6_differs_from_5_only_in_the_version_and_the_three_seller_approvers():
+    raw = json.loads((REPO / "capsule_engine" / "guards" / "action_taxonomy.json").read_text())
+    assert json_digest(_undo(raw, "5", TAXONOMY_6_APPROVERS)) == TAXONOMY_5_DIGEST
+
+
 def test_taxonomy_5_differs_from_4_only_in_the_version_and_the_communication_send_approver():
     raw = json.loads((REPO / "capsule_engine" / "guards" / "action_taxonomy.json").read_text())
+    raw = _undo(raw, "5", TAXONOMY_6_APPROVERS)
     assert json_digest(_undo(raw, "4", TAXONOMY_5_APPROVERS)) == TAXONOMY_4_DIGEST
 
 
 def test_taxonomy_4_differs_from_3_only_in_the_version_and_four_approver_roles():
     raw = json.loads((REPO / "capsule_engine" / "guards" / "action_taxonomy.json").read_text())
+    raw = _undo(raw, "5", TAXONOMY_6_APPROVERS)
     raw = _undo(raw, "4", TAXONOMY_5_APPROVERS)
     assert json_digest(_undo(raw, "3", TAXONOMY_4_APPROVERS)) == TAXONOMY_3_DIGEST
 

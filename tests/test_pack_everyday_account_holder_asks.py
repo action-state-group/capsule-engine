@@ -7,7 +7,9 @@ Before taxonomy version 3, money.purchase had no approver role: r06's
 first-contact failure denied every first purchase at a new merchant, though
 r06 declares ASK. Taxonomy 4 names the same approver on four more classes,
 the ones the pack's other ASK gate rules flag, and taxonomy 5 on
-communication.send, the class r13's first-message check flags. Integrity failures (dedupe, verify_before_dispatch) still
+communication.send, the class r13's first-message check flags. Taxonomy 6
+names it on the three seller classes price_floor covers, so a below-floor
+offer asks the seller. Integrity failures (dedupe, verify_before_dispatch) still
 deny, alone or beside a failure that could ask.
 
 Purchases run through a pack-installed engine, each on a fresh ledger.
@@ -33,6 +35,9 @@ GATED_ACCOUNT_HOLDER_CLASSES = ("booking.cancel", "data.delete", "communication.
 # Taxonomy 5: r13 (recipient_seen_before) declares ASK on a message to a new
 # recipient (tests/test_ask_declared_wickets.py).
 MESSAGE_ACCOUNT_HOLDER_CLASSES = ("communication.send",)
+# Taxonomy 6: price_floor declares ASK on a below-floor seller offer
+# (tests/test_price_floor_committed_bounds.py).
+SELLER_ACCOUNT_HOLDER_CLASSES = ("marketplace.offer", "marketplace.sale", "agreement.accept")
 OPERATOR = "household-account-holder"
 SIGNER = LocalSigner(key_id="everyday-account-holder-key", secret=b"everyday-account-holder-fixed-key")
 # A real accepted payment to the bakery makes it a known merchant.
@@ -85,11 +90,15 @@ def _failing(decision) -> list[str]:
 
 
 def test_exactly_the_consumer_commit_and_gated_classes_name_the_account_holder():
-    assert TAXONOMY_VERSION == "5"
+    assert TAXONOMY_VERSION == "6"
     named = {name: ac.approver_role for name, ac in TAXONOMY.items() if ac.approver_role is not None}
     assert named == {
         **dict.fromkeys(
-            ACCOUNT_HOLDER_CLASSES + GATED_ACCOUNT_HOLDER_CLASSES + MESSAGE_ACCOUNT_HOLDER_CLASSES, "account_holder"
+            ACCOUNT_HOLDER_CLASSES
+            + GATED_ACCOUNT_HOLDER_CLASSES
+            + MESSAGE_ACCOUNT_HOLDER_CLASSES
+            + SELLER_ACCOUNT_HOLDER_CLASSES,
+            "account_holder",
         ),
         "money.transfer": "treasury-approver",
     }
