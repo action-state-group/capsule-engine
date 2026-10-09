@@ -16,8 +16,9 @@ bundle: the record names the action's taxonomy class (``action_class``,
 ``taxonomy_version``) and the amount a spend cap evaluates (``spend_minor``),
 and the capsule binds the record by digest
 (``model_attestation.compute_attestation.agent_input_digest``). The
-counterparty's keyed fingerprints the record seals beside its body
-(``x-deal-v0.counterparty``) are carried as they are, never a clear value. A record
+counterparty's keyed fingerprints the record seals (``x-deal-v0.counterparty``
+beside its body, or a typed record's ``body.counterparty``) are carried as
+they are, never a clear value. A record
 that does not match that digest is never read.
 
 The action's target is the payee's per-deal fingerprint unless the payee is
@@ -207,17 +208,21 @@ def _bound(record: dict, disclosed: dict) -> bool:
     return isinstance(bound, str) and json_digest(disclosed) == bound
 
 
-def _checked_body(disclosed: dict) -> dict | None:
+def _checked_body(disclosed: dict) -> tuple[dict, object] | None:
     """The body of a deal check (an ``x-deal-v0`` check record, or a typed
-    ``proposed-action/v0``), or ``None`` for any other record."""
+    ``proposed-action/v0``) and the counterparty block it seals, or ``None``
+    for any other record. An ``x-deal-v0`` check seals the counterparty in its
+    block; capsulectl moves it into a typed record's body, the same
+    fingerprints under ``fp_alg`` ``hmac-sha256-chain-key``."""
     block = disclosed.get("x-deal-v0")
+    body = disclosed.get("body")
     if isinstance(block, dict) and block.get("record_type") == "check":
-        body = disclosed.get("body")
+        counterparty = block.get("counterparty")
     elif disclosed.get("type") == "proposed-action/v0":
-        body = disclosed.get("body")
+        counterparty = body.get("counterparty") if isinstance(body, dict) else None
     else:
         return None
-    return body if isinstance(body, dict) else None
+    return (body, counterparty) if isinstance(body, dict) else None
 
 
 def _minor(value: object) -> int | None:
@@ -225,8 +230,9 @@ def _minor(value: object) -> int | None:
 
 
 def _sealed_counterparty(block: object) -> tuple[dict[str, str] | None, str | None]:
-    """The fingerprints (kind -> hex) in a sealed ``x-deal-v0.counterparty``
-    block and their ``fp_alg``, or ``(None, None)`` when it holds none usable."""
+    """The fingerprints (kind -> hex) in a sealed counterparty block
+    (``_checked_body``) and their ``fp_alg``, or ``(None, None)`` when it
+    holds none usable."""
     if not isinstance(block, dict):
         return None, None
     ids, fp_alg = block.get("ids"), block.get("fp_alg")
@@ -350,7 +356,9 @@ def _bridge_deal_check(record: dict, disclosed: dict | None, counterparty_profil
     The rail and ``refundable`` come from the body's ``recourse`` block, where
     the producer writes them (a top-level ``rail`` is read when there is no
     recourse rail). The target is the payee's sealed fingerprint
-    (``_payee_target``), or ``counterparty_profile``'s when it is given in
+    (``_payee_target``) from the counterparty block the check seals
+    (``_checked_body``), typed or not, so a check sealing none has no target;
+    or ``counterparty_profile``'s when it is given in
     its agreed shape (``_profile_target``); given in any other, it is named
     in ``ignored_inputs``. The remaining body fields are carried only in the
     shape the action takes: a string, a boolean, an integer, or the SHA-256
@@ -362,8 +370,11 @@ def _bridge_deal_check(record: dict, disclosed: dict | None, counterparty_profil
     ``deal_id_conflict``, so the engine refuses whatever would be allowed."""
     if disclosed is None or not _bound(record, disclosed):
         return None
-    body = _checked_body(disclosed)
-    if body is None or not body.get("action_class") or not body.get("taxonomy_version"):
+    checked = _checked_body(disclosed)
+    if checked is None:
+        return None
+    body, sealed_counterparty = checked
+    if not body.get("action_class") or not body.get("taxonomy_version"):
         return None
     spend = body.get("spend_minor")
     authorized = body.get("spend_authorized_minor")
@@ -372,9 +383,8 @@ def _bridge_deal_check(record: dict, disclosed: dict | None, counterparty_profil
         spend = 0
         authorized = None
         returned, reverses = _returned_minor(body), _typed_ref_digest(body.get("reverses_ref"))
-    block = disclosed.get("x-deal-v0") or {}
     deal = _deal_id(disclosed)
-    counterparty_ids, fp_alg = _sealed_counterparty(block.get("counterparty"))
+    counterparty_ids, fp_alg = _sealed_counterparty(sealed_counterparty)
     target, ignored = _payee_target(counterparty_ids, fp_alg), ()
     if counterparty_profile is not None:
         profile_target = _profile_target(counterparty_profile)
