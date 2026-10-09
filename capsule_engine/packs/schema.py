@@ -83,6 +83,7 @@ __all__ = [
     "ClauseSpec",
     "EvidenceContract",
     "ScopeCensus",
+    "TaxonomyPin",
     "CounterpartyBinding",
     "OutcomeOverride",
     "TopologyProfile",
@@ -715,6 +716,19 @@ class ScopeCensus:
 
 
 @dataclass(frozen=True)
+class TaxonomyPin:
+    """The action taxonomy a pack was authored against: its
+    ``taxonomy_version`` and the SHA-256 over its JCS bytes
+    (``guards.classes.TAXONOMY_DIGEST``). The taxonomy decides what a gated
+    class does on a failure (its ``approver_role``: ask or refuse), so a pack
+    that pins it moves its own digest when the taxonomy moves, and the loader
+    refuses it under any other taxonomy."""
+
+    taxonomy_version: str
+    digest: str
+
+
+@dataclass(frozen=True)
 class CounterpartyBinding:
     """Which subject a profile's counterparty-scoped outcomes bind to
     (design §6b). ``direct`` is who the agent actually talks to; ``ultimate``
@@ -851,6 +865,10 @@ class PackDefinition:
     # identically to before (canonical_dict below includes it only when
     # non-empty, same convention as ``proposers``/``outcomes``).
     profiles: tuple[TopologyProfile, ...] = ()
+    # The taxonomy this pack pins. Optional, and in canonical_dict only when
+    # set, so a pack without it (everyday 0.3.2 and every earlier pack)
+    # parses and DIGESTS identically to before.
+    taxonomy: TaxonomyPin | None = None
 
     def canonical_dict(self) -> dict:
         """The JCS-canonicalizable form of this pack -- drives
@@ -918,6 +936,8 @@ class PackDefinition:
             }
         if self.profiles:
             out["profiles"] = [p.canonical_dict() for p in sorted(self.profiles, key=lambda p: p.profile_id)]
+        if self.taxonomy is not None:
+            out["taxonomy"] = {"taxonomy_version": self.taxonomy.taxonomy_version, "digest": self.taxonomy.digest}
         return out
 
     def definition_digest(self) -> str:

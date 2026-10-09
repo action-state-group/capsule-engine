@@ -25,7 +25,8 @@ Action Capsule evidence-result schema [recomputed-tier-code-identity]. When
 that field lands, this one is renamed onto it, never kept beside it. It is
 ``{kind, value, assurance}``: ``kind`` is ``source_tree_sha256`` (SHA-256
 over the sorted ``"<path>\\0<sha256 of file>\\n"`` lines of the
-verdict-producing source, see ``CODE_SCOPE``) or ``git_commit``; ``value`` is
+verdict-producing source and data tables, see ``CODE_SCOPE`` and
+``DATA_TABLES``) or ``git_commit``; ``value`` is
 the digest or commit, or ``"unknown"`` when it could not be resolved at
 check time; ``assurance`` is a level from the existing ladder (self-attested
 | witnessed | countersigned). Its limit: a code identity is a claim made by
@@ -62,6 +63,9 @@ LEDGER_PATH = PACK_DIR / "fixtures" / "mini_ledger.jsonl"
 # The source that produces a guard verdict: the checks and engine, the fold
 # engine caps reads, and the pack/manifest path that configures them.
 CODE_SCOPE = ("capsule_engine/guards", "capsule_engine/folds", "capsule_engine/policy", "capsule_engine/packs")
+# The data tables the guards read a verdict from (today the action taxonomy:
+# a class's approver role decides ask versus refuse), hashed with the source.
+DATA_TABLES = "capsule_engine/guards/*.json"
 EVALUATOR_TIERS = frozenset({"recomputed", "judged"})
 ASSURANCE_LEVELS = frozenset({"self-attested", "witnessed", "countersigned"})
 CODE_IDENTITY_KINDS = frozenset({"source_tree_sha256", "git_commit"})
@@ -118,11 +122,8 @@ RECORDING_DEFECT_ROW = {
 
 
 def source_tree_sha256(repo: Path = REPO) -> str:
-    lines = []
-    for scope in CODE_SCOPE:
-        for path in sorted((repo / scope).rglob("*.py")):
-            rel = path.relative_to(repo).as_posix()
-            lines.append(f"{rel}\0{hashlib.sha256(path.read_bytes()).hexdigest()}\n")
+    paths = [*(p for scope in CODE_SCOPE for p in (repo / scope).rglob("*.py")), *repo.glob(DATA_TABLES)]
+    lines = [f"{p.relative_to(repo).as_posix()}\0{hashlib.sha256(p.read_bytes()).hexdigest()}\n" for p in paths]
     return hashlib.sha256("".join(sorted(lines)).encode("utf-8")).hexdigest()
 
 
@@ -267,6 +268,21 @@ def test_the_hand_authored_row_projects_as_a_recording_defect():
     )
     assert projected.recording_defect is True
     assert projected.sufficiency == "UNKNOWN"
+
+
+def test_the_code_identity_moves_when_a_guard_data_table_changes(tmp_path):
+    guards = tmp_path / "capsule_engine" / "guards"
+    guards.mkdir(parents=True)
+    (guards / "engine.py").write_text("ENGINE = 1\n")
+    table = guards / "action_taxonomy.json"
+    table.write_text('{"approver_role": null}\n')
+    before = source_tree_sha256(tmp_path)
+    table.write_text('{"approver_role": "account_holder"}\n')
+    assert source_tree_sha256(tmp_path) != before
+
+
+def test_the_real_taxonomy_is_in_the_code_identity_scope():
+    assert REPO / "capsule_engine" / "guards" / "action_taxonomy.json" in set(REPO.glob(DATA_TABLES))
 
 
 def test_rerunning_each_row_from_its_recorded_pins_reproduces_its_record():
