@@ -43,7 +43,7 @@ per the design doc's lines-to-hold; it has no role in this check or in
 from __future__ import annotations
 
 from ..action import Action
-from ..capsule import ConstraintOutcome, not_applicable_evidence
+from ..capsule import LOCAL_ONLY_TARGET_PREFIX, ConstraintOutcome, not_applicable_evidence
 from ..plan import PlanDefinition
 from .base import CheckOutcome
 
@@ -63,9 +63,12 @@ def _binding_mismatch_reason(action: Action, plan: PlanDefinition) -> str | None
     ledger read (which window a session belongs to), so this pure check
     declares them rather than enforcing them."""
     subject = plan.binding.get("subject")
-    if subject is not None and action.target != subject:
-        return f"plan binds subject={subject!r}, action target is {action.target!r}"
-    return None
+    if subject is None or action.target == subject:
+        return None
+    if action.target is not None and action.target.startswith(LOCAL_ONLY_TARGET_PREFIX):
+        # A payee keyed per profile links the profile's deals: never in a reason.
+        return f"plan binds subject={subject!r}, action target is another payee"
+    return f"plan binds subject={subject!r}, action target is {action.target!r}"
 
 
 def check_plan_containment(action: Action, plan: PlanDefinition | None) -> CheckOutcome:

@@ -20,6 +20,17 @@ counterparty's keyed fingerprints the record seals beside its body
 (``x-deal-v0.counterparty``) are carried as they are, never a clear value. A record
 that does not match that digest is never read.
 
+The action's target is the payee's per-deal fingerprint unless the payee is
+also keyed per profile (``hmac-sha256-profile-key``, one value for one merchant
+across a profile's deals): live, from ``record.counterparty_profile`` in an
+external-check-input/v0 envelope (``action_for_check_input``); in a replay,
+from the check's companion, a bound ``counterparty_profile`` record whose one
+``about`` ref is the check's record digest. The companion states no act. A
+block that is not ``{fp_alg: "hmac-sha256-profile-key", ids: {payee: <64
+lowercase hex>}}`` is ignored, named in ``Action.ignored_inputs``, and the
+per-deal target stands. A decision sealed with the per-deal target is never
+rewritten, so it never matches one keyed per profile.
+
 ``_bridge_transfer_funds`` is the other non-default action mapping, and it
 mirrors the pattern already established by ``tests/test_guard_dry_run.py``
 and ``tests/test_guard_eur150k_bridge.py``: ``transfer_funds`` capsules in
@@ -55,6 +66,7 @@ __all__ = [
     "load_disclosed",
     "filter_since",
     "action_for_record",
+    "action_for_check_input",
     "replay",
 ]
 
@@ -223,6 +235,24 @@ def _payee_target(counterparty_ids: dict[str, str] | None, fp_alg: str | None) -
     return f"payee-fp:{fp_alg}:{payee}" if payee and fp_alg else None
 
 
+# The profile-scoped payee block's name, in the checker input and on the
+# companion record, and the fp_alg it must carry.
+_PROFILE_INPUT = "counterparty_profile"
+_PROFILE_FP_ALG = "hmac-sha256-profile-key"
+
+
+def _profile_target(block: object) -> str | None:
+    """The payee keyed per profile as a target, from a ``counterparty_profile``
+    block in its agreed shape, or ``None`` for anything else."""
+    if not isinstance(block, dict) or block.get("fp_alg") != _PROFILE_FP_ALG:
+        return None
+    ids = block.get("ids")
+    payee = ids.get("payee") if isinstance(ids, dict) else None
+    if not isinstance(payee, str) or not _HEX64.fullmatch(payee):
+        return None
+    return _payee_target({"payee": payee}, _PROFILE_FP_ALG)
+
+
 def _typed_ref_digest(value: object) -> str | None:
     """The digest of a typed record reference ``{type, digest_alg, digest}``
     when it is a SHA-256 one, or ``None``."""
@@ -243,7 +273,7 @@ def _returned_minor(body: dict) -> int | None:
     return next((v for v in (_minor(body.get(f)) for f in _RETURNED_AMOUNT_FIELDS) if v is not None), None)
 
 
-def _bridge_deal_check(record: dict, disclosed: dict | None) -> Action | None:
+def _bridge_deal_check(record: dict, disclosed: dict | None, counterparty_profile: object = None) -> Action | None:
     """The proposed action a capsulectl deal check states, from its own
     sealed record: the class it names, and the amount a spend cap evaluates,
     which is ``spend_minor`` only: never ``amount_minor`` (on a cancel it is
@@ -259,7 +289,9 @@ def _bridge_deal_check(record: dict, disclosed: dict | None) -> Action | None:
     The rail and ``refundable`` come from the body's ``recourse`` block, where
     the producer writes them (a top-level ``rail`` is read when there is no
     recourse rail). The target is the payee's sealed fingerprint
-    (``_payee_target``). The remaining body fields are carried only in the
+    (``_payee_target``), or ``counterparty_profile``'s when it is given in
+    its agreed shape (``_profile_target``); given in any other, it is named
+    in ``ignored_inputs``. The remaining body fields are carried only in the
     shape the action takes: a string, a boolean, an integer, or the SHA-256
     digest of a typed reference, and dropped otherwise.
     ``taxonomy_version`` makes it an act stated against a pinned taxonomy, so
@@ -280,6 +312,13 @@ def _bridge_deal_check(record: dict, disclosed: dict | None) -> Action | None:
         returned, reverses = _returned_minor(body), _typed_ref_digest(body.get("reverses_ref"))
     block = disclosed.get("x-deal-v0") or {}
     counterparty_ids, fp_alg = _sealed_counterparty(block.get("counterparty"))
+    target, ignored = _payee_target(counterparty_ids, fp_alg), ()
+    if counterparty_profile is not None:
+        profile_target = _profile_target(counterparty_profile)
+        if profile_target is None:
+            ignored = (_PROFILE_INPUT,)
+        else:
+            target = profile_target
     recourse = body.get("recourse") if isinstance(body.get("recourse"), dict) else {}
     return Action(
         verb=str(body.get("action") or "unknown"),
@@ -293,7 +332,7 @@ def _bridge_deal_check(record: dict, disclosed: dict | None) -> Action | None:
         spend_authorized_minor=_minor(authorized),
         currency=body.get("currency"),
         rail=_text(recourse.get("rail")) or _text(body.get("rail")),
-        target=_payee_target(counterparty_ids, fp_alg),
+        target=target,
         taxonomy_version=body["taxonomy_version"],
         counterparty_ids=counterparty_ids,
         counterparty_fp_alg=fp_alg,
@@ -310,6 +349,7 @@ def _bridge_deal_check(record: dict, disclosed: dict | None) -> Action | None:
         returned_minor=returned,
         reverses_ref=reverses,
         deal_id=_text(block.get("deal_id")),
+        ignored_inputs=ignored,
     )
 
 
@@ -326,15 +366,57 @@ def _states_no_act(record: dict, disclosed: dict | None) -> bool:
     return isinstance(record_type, str) and record_type != "check"
 
 
-def action_for_record(record: dict, disclosed: dict | None = None) -> Action:
+def action_for_record(record: dict, disclosed: dict | None = None, *, counterparty_profile: object = None) -> Action:
     """The action ``record`` states. ``disclosed`` is the record its capsule
-    sealed, when a bundle disclosed it (``load_disclosed``)."""
-    bridged = _bridge_deal_check(record, disclosed) or _bridge_transfer_funds(record)
+    sealed, when a bundle disclosed it (``load_disclosed``).
+    ``counterparty_profile`` is the payee keyed per profile for a deal check,
+    from the checker input or the check's companion (module docstring)."""
+    bridged = _bridge_deal_check(record, disclosed, counterparty_profile) or _bridge_transfer_funds(record)
     if bridged is not None:
         return bridged
     if _states_no_act(record, disclosed):
         return replace(Action.from_capsule(record), states_act=False)
     return Action.from_capsule(record)
+
+
+def action_for_check_input(entry: dict) -> Action:
+    """The action the ``record`` entry of an external-check-input/v0 envelope
+    states: the sealed capsule, its disclosed ``agent_input``, and, beside
+    them, the envelope's optional ``counterparty_profile``, which capsulectl
+    computes and passes and the capsule does not seal."""
+    capsule = {k: v for k, v in entry.items() if k not in ("agent_input", _PROFILE_INPUT)}
+    agent_input = entry.get("agent_input")
+    return action_for_record(
+        capsule,
+        agent_input if isinstance(agent_input, dict) else None,
+        counterparty_profile=entry.get(_PROFILE_INPUT),
+    )
+
+
+def _companion_profiles(records: list[dict], disclosed: dict[str, dict]) -> dict[str, object]:
+    """Each check's ``counterparty_profile`` block, by the check's record
+    digest, from the bound companions among ``records``: a
+    ``counterparty_profile`` record with exactly one ref, ``rel`` ``about``,
+    type ``deal-record``. A check two companions name gets their blocks as a
+    list, which is no block, so it is ignored; a companion without one gets
+    ``{}``, ignored the same way."""
+    found: dict[str, list[object]] = {}
+    for record in records:
+        shown = disclosed.get(record.get("capsule_id", ""))
+        if shown is None or not _bound(record, shown):
+            continue
+        block = shown.get("x-deal-v0")
+        if not isinstance(block, dict) or block.get("record_type") != _PROFILE_INPUT:
+            continue
+        refs = block.get("refs")
+        if not isinstance(refs, list) or len(refs) != 1 or not isinstance(refs[0], dict):
+            continue
+        (ref,) = refs
+        digest = _typed_ref_digest(ref)
+        if ref.get("rel") != "about" or ref.get("type") != "deal-record" or digest is None:
+            continue
+        found.setdefault(digest, []).append(block.get(_PROFILE_INPUT) or {})
+    return {digest: blocks[0] if len(blocks) == 1 else blocks for digest, blocks in found.items()}
 
 
 @dataclass(frozen=True)
@@ -399,8 +481,11 @@ def replay(
             ask_gate_selectors=gate_selectors,
             ask_wickets=ask_checks,
         )
+        profiles = _companion_profiles(records, disclosed or {})
         for record in records:
-            action = action_for_record(record, (disclosed or {}).get(record.get("capsule_id", "")))
+            shown = (disclosed or {}).get(record.get("capsule_id", ""))
+            profile = profiles.get(json_digest(shown)) if profiles and shown is not None else None
+            action = action_for_record(record, shown, counterparty_profile=profile)
             decision = engine.check(action, dry_run=True)
             cited_capsule = None
             for constraint in decision.constraints:

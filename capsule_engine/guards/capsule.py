@@ -66,6 +66,7 @@ __all__ = [
     "DENY",
     "ESCALATE",
     "LOCAL_ONLY_PAYLOAD_FIELDS",
+    "LOCAL_ONLY_TARGET_PREFIX",
     "ConstraintOutcome",
     "NotApplicableEvidence",
     "build_decision_capsule",
@@ -91,18 +92,35 @@ adding a path that exports decision capsules, needs the share boundary
 reviewed (see ``AGENTS.md``).
 """
 
+LOCAL_ONLY_TARGET_PREFIX = "payee-fp:hmac-sha256-profile-key:"
+"""The ``asg_payload.target`` of a payee keyed per profile (``report/replay.py``):
+one merchant has one such target across all of a profile's deals, so it links
+them. A decision whose target starts with it is local-only, as if ``target``
+were in ``LOCAL_ONLY_PAYLOAD_FIELDS``; a per-deal target
+(``payee-fp:hmac-sha256-deal-key:``) is not.
+"""
+
+
+def _local_only_fields(payload: dict) -> set[str]:
+    found = set(LOCAL_ONLY_PAYLOAD_FIELDS.intersection(payload))
+    target = payload.get("target")
+    if isinstance(target, str) and target.startswith(LOCAL_ONLY_TARGET_PREFIX):
+        found.add("target")
+    return found
+
 
 # `capsules` are sealed capsules as raw JSON objects, as every export path
 # holds them (a ledger record's capsule, a replayed decision); only
-# `capsule_id` and the keys of `asg_payload` are read.
+# `capsule_id`, the keys of `asg_payload` and its `target` are read.
 def local_only_refusal(capsules: Iterable[dict]) -> str | None:
     """``None`` when no capsule's ``asg_payload`` carries a field in
-    ``LOCAL_ONLY_PAYLOAD_FIELDS``; otherwise the reason an export refuses
+    ``LOCAL_ONLY_PAYLOAD_FIELDS`` or a target starting with
+    ``LOCAL_ONLY_TARGET_PREFIX``; otherwise the reason an export refuses
     them, naming the fields and the number of records and never a value."""
     fields: set[str] = set()
     records: set[str] = set()
     for capsule in capsules:
-        found = LOCAL_ONLY_PAYLOAD_FIELDS.intersection(capsule.get("asg_payload", {}))
+        found = _local_only_fields(capsule.get("asg_payload", {}))
         if found:
             fields |= found
             records.add(capsule["capsule_id"])

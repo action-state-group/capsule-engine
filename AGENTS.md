@@ -12,6 +12,12 @@ them. So every export path refuses such records, naming the fields and the recor
 a value. Today those paths are `capsule bundle` (the bundle file, its verify link and its offline
 viewer) and `capsule guard dry-run --share`. `tests/test_local_only_payload_fields.py` enforces this.
 
+One value is local-only by its prefix rather than its field: a `target` starting with
+`LOCAL_ONLY_TARGET_PREFIX` (`payee-fp:hmac-sha256-profile-key:`, beside the field list). That is a
+payee keyed per profile, one value for one merchant across all of a profile's deals, so it links
+them. The same refusal names `target` for it; a per-deal target is not refused.
+`tests/test_payee_fp_profile.py` enforces this.
+
 Adding a field to `LOCAL_ONLY_PAYLOAD_FIELDS`, sealing a new locally matched field on a decision,
 or adding a path that exports decision capsules needs the share boundary reviewed. A new export
 path calls `local_only_refusal` and gets a test in that file.

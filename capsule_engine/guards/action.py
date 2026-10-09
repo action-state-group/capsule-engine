@@ -117,6 +117,11 @@ class Action:
     ``states_act`` is ``False`` for a record that states no act of its own
     (a deal's baseline, verdict or approval; see ``report/replay.py``), read
     by ``dedupe``, which does not apply to it; it is never sealed.
+    ``ignored_inputs`` names each input the action was built without because
+    it was not in its agreed shape (``report/replay.py``: a
+    ``counterparty_profile`` block); the ``counterparty_seen_before`` evidence
+    lists them. Names only, never the value; it is never sealed in
+    ``asg_payload``.
     """
 
     verb: str
@@ -160,6 +165,7 @@ class Action:
     reverses_ref: str | None = None
     deal_id: str | None = None
     states_act: bool = True
+    ignored_inputs: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         if self.counterparty_account_ref is not None and _looks_like_raw_account_number(

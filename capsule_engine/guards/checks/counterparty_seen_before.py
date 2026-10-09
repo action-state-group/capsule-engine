@@ -7,8 +7,9 @@ operator's records, keyed by ``asg_payload.target`` -- the counterparty
 reference ``counterparty_identity_change`` finds a payee's prior record by.
 Only accepted actions count. A prior count of zero fails the check (a
 first-time counterparty); one or more passes it (a repeat). The evidence
-says which, with the count and the key it was read under. Applies only to
-the configured ``action_classes``.
+says which, with the count and the key it was read under, and names any
+input the action's target was built without (``Action.ignored_inputs``).
+Applies only to the configured ``action_classes``.
 """
 from __future__ import annotations
 
@@ -93,6 +94,8 @@ def _seen_before(
         "prior_count": prior_count,
         "seen_before": seen_before,
     }
+    if action.ignored_inputs:
+        evidence["ignored_inputs"] = list(action.ignored_inputs)
     if seen_before:
         return CheckOutcome(
             constraint=ConstraintOutcome(
