@@ -12,6 +12,8 @@ Purchases run through a pack-installed engine, each on a fresh ledger.
 """
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 from capsule_ledger.ledger import LedgerStore
 
@@ -19,8 +21,9 @@ from capsule_engine.guards import Action, GuardEngine, LocalSigner
 from capsule_engine.guards.capsule import ALLOW, DENY, ESCALATE
 from capsule_engine.guards.classes import TAXONOMY, TAXONOMY_VERSION
 from capsule_engine.packs import build_engine, install_pack, load_pack_dir
-from tests.test_pack_everyday_acceptance import PACK_DIR, PER_ACTION_MINOR
 
+PACK_DIR = Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog" / "everyday"
+PER_ACTION_MINOR = 2_500  # caps/5.0.0's per-action default, cited by the pack
 ACCOUNT_HOLDER_CLASSES = ("money.purchase", "money.subscription", "booking.create", "booking.modify")
 OPERATOR = "household-account-holder"
 SIGNER = LocalSigner(key_id="everyday-account-holder-key", secret=b"everyday-account-holder-fixed-key")
