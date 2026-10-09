@@ -107,6 +107,7 @@ INVALID_SCOPE_DIMENSION = "invalid_scope_dimension"
 SCOPE_MISMATCH = "scope_mismatch"
 UNKNOWN_CATALOG_REF = "unknown_catalog_ref"
 CATALOG_REF_DIGEST_MISMATCH = "catalog_ref_digest_mismatch"
+RETIRED_CATALOG_REF = "retired_catalog_ref"
 
 # Registry-pin verification (pins.py) -- a distinct failure family from
 # pack.yaml parsing: these are trust/integrity failures against a pins

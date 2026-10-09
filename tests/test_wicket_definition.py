@@ -4,11 +4,14 @@ per wicket (the manifest task's acceptance gate: "at least one worked
 example and a pinned digest test")."""
 from __future__ import annotations
 
+import dataclasses
 from pathlib import Path
 
 import pytest
+import yaml
 
 from capsule_engine.guards.wickets import (
+    RETIRED,
     Catalog,
     WicketDefinitionError,
     load_definition_file,
@@ -63,12 +66,26 @@ EXPECTED_DIGESTS = {
     "required_disclosure/1.0.0": "c8f216415be1fac673d1efc6df2e7a9666b5d5c8e639fbb3d8379a24bb8f5ebf",
     "promise_requires_approval/1.0.0": "b29e29e0a31ef764b282fa5754992b49b5ffc4f3fc261fb821987ae6c2e1c9b2",
     "promise_never/1.0.0": "836ae58f704a9c8ab8027fee344ca47ddb3de76a7a1973a650f42a3595e649f4",
-    "offer_expiry/1.0.0": "7b1072fc6997b07e7f08941a723e60d53fd3a54dbccfda6fa7391124ec2702ee",
+    # Replaces offer_expiry/1.0.0, retired at its digest (RETIRED_DIGESTS below).
+    "offer_expiry/1.0.1": "7bcd363b28475e3fac123fe2b8925f60f36bdaa3d22ebd5004ffe5290c4f2597",
     "seller.recipient_role/1.0.0": "001d4d4198921ffec5f492f88286765a075eece1418d15b68576d4fceec7826b",
     "seller.destination_rail/1.0.0": "fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800",
     # One accepted commitment per sale and item, across buyer threads. No pack cites it yet.
     "seller.single_commitment/1.0.0": "91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e",
 }
+
+# Retired (id, digest) pairs, pinned independently of guards/wickets/retired.py
+# so an edit to that table cannot quietly move or drop one. The bytes live
+# under tests/fixtures/retired_wickets/, outside the shipped catalog.
+RETIRED_FIXTURES = Path(__file__).parent / "fixtures" / "retired_wickets"
+RETIRED_DIGESTS = {
+    "offer_expiry/1.0.0": "7b1072fc6997b07e7f08941a723e60d53fd3a54dbccfda6fa7391124ec2702ee",
+}
+
+# Catalog definitions that predate the `semantics` field. Their digests are
+# pinned above and are not rewritten to add it. Every definition added from
+# now on states its rule in `semantics`; this set only ever shrinks.
+WITHOUT_SEMANTICS = frozenset(EXPECTED_DIGESTS) - {"offer_expiry/1.0.1"}
 
 
 @pytest.mark.parametrize("wicket_id,expected_digest", EXPECTED_DIGESTS.items())
@@ -143,3 +160,98 @@ def test_load_definition_file_matches_load_definition_text(tmp_path):
 def test_canonical_dict_shape():
     d = WicketDefinition(wicket_id="caps/1.0.0", check="caps", config={"a": 1})
     assert d.canonical_dict() == {"wicket_id": "caps/1.0.0", "check": "caps", "config": {"a": 1}}
+
+
+# -- semantics: the rule is data, so changing it moves the digest -------------
+
+
+def test_every_new_catalog_definition_states_its_semantics():
+    """A definition added to the catalog must carry `semantics`. The
+    definitions listed in WITHOUT_SEMANTICS predate the field; one that
+    gains it must leave that list."""
+    entries = Catalog(WICKET_CATALOG_DIR).list_entries()
+    missing = {e.definition.wicket_id for e in entries if e.definition.semantics is None}
+    assert missing == WITHOUT_SEMANTICS
+
+
+@pytest.mark.parametrize(
+    "entry",
+    [e for e in Catalog(WICKET_CATALOG_DIR).list_entries() if e.definition.semantics is not None],
+    ids=lambda e: e.definition.wicket_id,
+)
+def test_a_semantics_change_moves_the_digest(entry):
+    """For every catalog definition that states its rule, any rewording of
+    the rule is a different definition."""
+    reworded = dataclasses.replace(entry.definition, semantics=entry.definition.semantics + " Otherwise it passes.")
+    assert entry.definition.canonical_dict()["semantics"] == entry.definition.semantics
+    assert reworded.definition_digest() != entry.digest
+
+
+@pytest.mark.parametrize(
+    "entry",
+    [e for e in Catalog(WICKET_CATALOG_DIR).list_entries() if e.definition.semantics is not None],
+    ids=lambda e: e.definition.wicket_id,
+)
+def test_the_semantics_is_not_in_a_comment(entry):
+    """The rule lives in the YAML data, not beside it: stripping every
+    comment line leaves the definition, its semantics and its digest intact,
+    while dropping the `semantics` key changes the digest."""
+    text = entry.source_path.read_text()
+    uncommented = "\n".join(line for line in text.splitlines() if not line.lstrip().startswith("#"))
+    assert load_definition_text(uncommented).definition_digest() == entry.digest
+    data = yaml.safe_load(text)
+    del data["semantics"]
+    assert load_definition_text(yaml.safe_dump(data)).definition_digest() != entry.digest
+
+
+def test_a_definition_without_semantics_digests_as_before():
+    """Adding the optional field did not move any existing digest: the key is
+    absent from the canonical form when the definition does not state it."""
+    d = load_definition_text("wicket_id: dedupe/1.0.0\ncheck: dedupe\nconfig:\n  window_days: 7\n")
+    assert "semantics" not in d.canonical_dict()
+
+
+@pytest.mark.parametrize("value", ["", "   ", 7, ["a rule"]])
+def test_semantics_must_be_a_non_empty_string(value):
+    with pytest.raises(WicketDefinitionError) as exc_info:
+        load_definition_text(yaml.safe_dump({"wicket_id": "dedupe/9.0.0", "check": "dedupe", "semantics": value}))
+    assert exc_info.value.reason == "malformed_definition"
+
+
+# -- retirement ------------------------------------------------------------------
+
+
+def test_the_retired_table_matches_the_pins():
+    assert {r.wicket_id: r.digest for r in RETIRED} == RETIRED_DIGESTS
+    assert all(r.replaced_by in EXPECTED_DIGESTS for r in RETIRED)
+
+
+@pytest.mark.parametrize("wicket_id,digest", RETIRED_DIGESTS.items())
+def test_a_retired_definition_keeps_its_digest(wicket_id, digest):
+    """Retiring does not rewrite the bytes: the preserved definition still
+    digests to the value it was pinned at."""
+    data = yaml.safe_load((RETIRED_FIXTURES / f"{wicket_id.replace('/', '.')}.yaml").read_text())
+    assert WicketDefinition(**data).definition_digest() == digest
+
+
+@pytest.mark.parametrize("wicket_id", RETIRED_DIGESTS)
+def test_a_retired_definition_is_refused(wicket_id):
+    with pytest.raises(WicketDefinitionError) as exc_info:
+        load_definition_file(RETIRED_FIXTURES / f"{wicket_id.replace('/', '.')}.yaml")
+    assert exc_info.value.reason == "retired_definition"
+    (row,) = [r for r in RETIRED if r.wicket_id == wicket_id]
+    assert row.replaced_by in str(exc_info.value)
+
+
+def test_a_retired_definition_is_refused_by_the_catalog(tmp_path):
+    (tmp_path / "old.yaml").write_text((RETIRED_FIXTURES / "offer_expiry.1.0.0.yaml").read_text())
+    catalog = Catalog(tmp_path)
+    assert catalog.get("offer_expiry/1.0.0") is None
+    assert [e.reason for e in catalog.list_errors()] == ["retired_definition"]
+
+
+def test_retirement_is_by_digest_not_by_id():
+    """Only the exact retired pair is refused: the id with other bytes is a
+    different definition, judged on its own."""
+    d = load_definition_text("wicket_id: offer_expiry/1.0.0\ncheck: offer_expiry\nconfig:\n  max_age_seconds: 60\n")
+    assert d.definition_digest() != RETIRED_DIGESTS["offer_expiry/1.0.0"]

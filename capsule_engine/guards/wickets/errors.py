@@ -7,6 +7,7 @@ UNKNOWN_CHECK = "unknown_check"
 MALFORMED_DEFINITION = "malformed_definition"
 FLOAT_IN_DEFINITION = "float_in_definition"
 UNSAFE_INTEGER_IN_DEFINITION = "unsafe_integer_in_definition"
+RETIRED_DEFINITION = "retired_definition"
 
 
 class WicketDefinitionError(ValueError):

@@ -16,6 +16,14 @@ capsule format itself use) identifies "this configuration of this check", not
 the Python source file the check lives in -- a source-code change with no
 config change is invisible to this digest, and that is intentional: this is a
 policy-configuration digest, not a code-integrity digest.
+
+Because the digest cannot see the check's code, a definition may also carry
+``semantics``: a short normative statement of what passes, what fails and
+what is not applicable. It is data inside the digested body, never a YAML
+comment, so rewording the rule moves the digest. A definition without it
+digests exactly as before (the key is left out of the canonical form). A
+definition whose meaning moved under an unchanged digest is retired
+(``retired.py``) and refused here at parse time.
 """
 from __future__ import annotations
 
@@ -29,10 +37,12 @@ from .errors import (
     FLOAT_IN_DEFINITION,
     INVALID_WICKET_ID,
     MALFORMED_DEFINITION,
+    RETIRED_DEFINITION,
     UNKNOWN_CHECK,
     UNSAFE_INTEGER_IN_DEFINITION,
     WicketDefinitionError,
 )
+from .retired import RETIRED_IDS, retired_entry
 
 __all__ = ["WICKET_ID_RE", "KNOWN_CHECKS", "WicketDefinition", "parse_definition"]
 
@@ -95,10 +105,13 @@ class WicketDefinition:
     wicket_id: str
     check: str
     config: dict[str, Any] = field(default_factory=dict)
+    semantics: str | None = None
 
     def canonical_dict(self) -> dict:
         """The JCS-canonicalizable form of this definition -- drives definition_digest."""
-        return {"wicket_id": self.wicket_id, "check": self.check, "config": self.config}
+        # Left out when not stated, so a definition without it keeps its digest.
+        semantics = {} if self.semantics is None else {"semantics": self.semantics}
+        return {"wicket_id": self.wicket_id, "check": self.check, "config": self.config, **semantics}
 
     def definition_digest(self) -> str:
         """SHA-256 over the JCS bytes of the canonical definition."""
@@ -133,4 +146,18 @@ def parse_definition(data: Any) -> WicketDefinition:
     if not isinstance(config, dict):
         raise WicketDefinitionError(MALFORMED_DEFINITION, "config must be a mapping")
 
-    return WicketDefinition(wicket_id=wicket_id, check=check, config=config)
+    semantics = data.get("semantics")
+    if semantics is not None and (not isinstance(semantics, str) or not semantics.strip()):
+        raise WicketDefinitionError(MALFORMED_DEFINITION, "semantics must be a non-empty string")
+
+    definition = WicketDefinition(wicket_id=wicket_id, check=check, config=config, semantics=semantics)
+    # Only a retired id pays for a digest here, so a float or unsafe integer
+    # in any other definition still surfaces at definition_digest(), as before.
+    if wicket_id in RETIRED_IDS:
+        retired = retired_entry(wicket_id, definition.definition_digest())
+        if retired is not None:
+            raise WicketDefinitionError(
+                RETIRED_DEFINITION,
+                f"{wicket_id} at digest {retired.digest} is retired: {retired.reason}; use {retired.replaced_by}",
+            )
+    return definition
