@@ -440,7 +440,7 @@ def _parse_judge_pin(raw: Any, *, what: str) -> JudgePin:
         raise PackDefinitionError(INVALID_JUDGE_PIN, f"{what}.judge_pin.model_id must be a non-empty string")
     for key in ("prompt_template_hash", "schema_hash"):
         value = raw.get(key)
-        if not isinstance(value, str) or not _SHA256_HEX_RE.match(value):
+        if not isinstance(value, str) or not _SHA256_HEX_RE.fullmatch(value):
             raise PackDefinitionError(
                 INVALID_JUDGE_PIN, f"{what}.judge_pin.{key} must be 64 lowercase hex characters (SHA-256)"
             )
@@ -974,7 +974,7 @@ def _parse_clause_spec(raw: Any, *, outcome_id: str) -> ClauseSpec:
             )
 
     text_snapshot_digest = raw.get("text_snapshot_digest")
-    if text_snapshot_digest is not None and not _SHA256_HEX_RE.match(text_snapshot_digest):
+    if text_snapshot_digest is not None and not _SHA256_HEX_RE.fullmatch(text_snapshot_digest):
         raise PackDefinitionError(
             INVALID_CLAUSE,
             f"outcomes[{outcome_id!r}].clause.text_snapshot_digest must be a 64-char lowercase hex SHA-256 "

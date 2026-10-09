@@ -197,6 +197,7 @@ def test_prompt_text_never_enters_a_pack(tmp_path, entry):
         ({"model_id": ""}, "empty model_id"),
         ({"prompt_template_hash": "A" * 64}, "uppercase hash"),
         ({"prompt_template_hash": "a" * 63}, "short hash"),
+        ({"schema_hash": "a" * 64 + "\n"}, "hash with a trailing newline"),
         ({"schema_hash": None}, "missing schema hash"),
         ({"input_refs": []}, "no input refs"),
         ({"input_refs": ["message_body"]}, "unknown field"),

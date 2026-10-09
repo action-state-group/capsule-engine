@@ -87,7 +87,7 @@ def _parse_clause_spec(raw: Any, *, row_id: str) -> ClauseSpec:
             )
 
     text_snapshot_digest = raw.get("text_snapshot_digest")
-    if text_snapshot_digest is not None and not _SHA256_HEX_RE.match(text_snapshot_digest):
+    if text_snapshot_digest is not None and not _SHA256_HEX_RE.fullmatch(text_snapshot_digest):
         raise RegisterDefinitionError(
             INVALID_CLAUSE,
             f"register[{row_id!r}].clause.text_snapshot_digest must be a 64-char lowercase hex SHA-256 "

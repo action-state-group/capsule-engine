@@ -6,11 +6,9 @@
 #
 # Declared disposition: ask.
 #
-# Replaces price_floor/2.0.0, which is retired at its digest
-# (guards/wickets/retired.py): under it a record sealing no bounds_commitment
-# was in scope and not evaluable; now no floor is in force, so it is out of
-# scope. price_floor/1.0.0 is retired too.
-wicket_id: price_floor/2.0.1
+# Replaces price_floor/1.0.0, which is retired at its digest
+# (guards/wickets/retired.py): its check changed meaning under that digest.
+wicket_id: price_floor/2.0.0
 check: price_floor
 semantics: >-
   For an action in action_classes, the floor is min_total_minor in a
@@ -24,9 +22,9 @@ semantics: >-
   commitment fails naming bounds_commitment, and so does a sealed
   bounds_commitment that is not 64 lowercase hex. It is not applicable, naming
   the field, when the action carries no amount_minor or task_authority_ref,
-  when the record is missing or is not the one the reference names, or when
-  no opening is supplied. A record that seals no bounds_commitment puts no
-  floor in force, so the action is out of scope. A floor is never read from
-  the task-authority record itself. Any other action class is out of scope.
+  when the record is missing or is not the one the reference names, when the
+  record seals no bounds_commitment, or when no opening is supplied. A floor
+  is never read from the task-authority record itself. Any other action
+  class is out of scope.
 config:
   action_classes: [marketplace.offer, marketplace.sale, agreement.accept]

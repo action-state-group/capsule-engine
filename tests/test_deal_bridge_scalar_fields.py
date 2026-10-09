@@ -14,6 +14,8 @@ from typing import TypedDict
 from agent_action_capsule import json_digest
 
 from capsule_engine.folds.loader import load_definition_file as load_fold
+from capsule_engine.guards.capsule import not_applicable_evidence
+from capsule_engine.guards.checks import check_price_floor, task_authority_record_digest
 from capsule_engine.guards.wickets import load_definition_file
 from capsule_engine.report.replay import action_for_record, load_disclosed, load_records, replay
 
@@ -129,6 +131,26 @@ def test_a_typed_ref_that_is_not_sha256_is_dropped():
                 {"type": "record", "digest_alg": "SHA-256", "digest": "not-hex"},
                 {"digest_alg": "SHA-256", "digest": DIGEST}):
         assert _bridged({"task_authority_ref": ref}).task_authority_ref is None, ref
+
+
+def test_a_typed_ref_whose_digest_ends_in_a_newline_is_dropped():
+    """``$`` also matches before a final newline, so only a whole-value match
+    keeps a digest with one trailing from standing in for the real one."""
+    ref = {"type": "record", "digest_alg": "SHA-256", "digest": DIGEST + "\n"}
+    assert _bridged({"task_authority_ref": ref}).task_authority_ref is None
+    refund = _bridged({"direction": "in", "returned_minor": 1_000, "reverses_ref": ref})
+    assert (refund.returned_minor, refund.reverses_ref) == (1_000, None)
+
+
+def test_a_task_authority_ref_with_a_trailing_newline_never_binds_the_record():
+    """The record the digest names is supplied, but the reference is dropped,
+    so price_floor names the missing reference instead of reading the record."""
+    record = {"type": "task-authority/v0", "body": {"allowed_actions": ["sell"], "bounds_commitment": DIGEST}}
+    ref = {"type": "record", "digest_alg": "SHA-256", "digest": task_authority_record_digest(record) + "\n"}
+    action = replace(_bridged({"task_authority_ref": ref, "spend_minor": 150_000}), action_class="marketplace.sale")
+    out = check_price_floor(action, record, None, action_classes=["marketplace.sale"]).constraint
+    assert (out.result, out.evidence) == (
+        "n/a", not_applicable_evidence("price_floor", in_scope=True, missing_field="task_authority_ref"))
 
 
 def test_a_top_level_rail_is_read_when_there_is_no_recourse_rail():

@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""price_floor/2.0.0: the floor opened from a commitment, never read in clear.
+"""price_floor/2.0.1: the floor opened from a commitment, never read in clear.
 
 The task authority seals only ``body.bounds_commitment``; the user's own
 checker gets the ``commercial_bounds_opening`` (the commercial-bounds/v0
@@ -36,6 +36,8 @@ from capsule_engine.guards.checks import (
 from capsule_engine.guards.checks.price_floor import CommercialBoundsDocument, OpeningMismatchEvidence
 from capsule_engine.guards.engine import GuardDecision
 from capsule_engine.guards.wickets import WicketDefinition, load_definition_file
+from capsule_engine.packs.schema import NORMALIZED_ACTION_FIELDS
+from capsule_engine.report.result_from_folds import project_guard_constraint
 
 ROOT = Path(__file__).parent.parent / "capsule_engine"
 FLOOR = load_definition_file(ROOT / "guards" / "wickets" / "catalog_defs" / "price_floor.yaml")
@@ -224,6 +226,63 @@ def test_no_opening_is_n_a_naming_the_field():
     out = _check(1, None)
     assert (out.result, out.evidence) == (
         "n/a", not_applicable_evidence("price_floor", in_scope=True, missing_field="commercial_bounds_opening"))
+
+
+# -- no floor committed is out of scope ------------------------------------------
+
+
+NO_FLOOR: TaskAuthorityRecord = {"type": "task-authority/v0",
+                                 "body": {k: v for k, v in AUTHORITY["body"].items() if k != "bounds_commitment"}}
+
+
+@pytest.mark.parametrize("opening", [None, OPENING], ids=["no opening", "an opening"])
+def test_an_authority_committing_to_no_floor_is_out_of_scope(opening):
+    """No bounds_commitment means no floor is in force: out of scope, so a
+    sale without a floor never reads as not evaluable, and an opening handed
+    in beside it is never read."""
+    out = _check(1, opening, NO_FLOOR)
+    assert (out.result, out.evidence) == ("n/a", not_applicable_evidence("price_floor", in_scope=False))
+    assert "commits to no floor" in out.reason
+
+
+# -- what a sealed decision projects to in a Result -----------------------------
+
+# The checker input a price_floor n/a names is not a normalized action field,
+# so the caller adds it to the names the projection may match.
+PROJECTION_FIELDS = frozenset(NORMALIZED_ACTION_FIELDS) | {"commercial_bounds_opening"}
+
+
+# Reads the sealed capsule JSON: the test's decoding boundary.
+def _projected(decision: GuardDecision) -> dict[str, tuple[str | None, bool]]:
+    """Each sealed constraint's projected verdict and whether it is excluded."""
+    out = {}
+    for record in decision.capsule["constraints"]:
+        p = project_guard_constraint(record, candidate_fields=PROJECTION_FIELDS)
+        out[record["id"]] = (p.verdict, p.excluded)
+    return out
+
+
+def _sale(store, signer, record: TaskAuthorityRecord, opening: CommercialBoundsOpening | None) -> GuardDecision:
+    action = _action(150_000, action_class="marketplace.sale", action_id="sale/1",
+                     task_authority_ref=task_authority_record_digest(record))
+    return _engine(store, signer).check(action, task_authority_record=record, commercial_bounds_opening=opening)
+
+
+def test_an_unfloored_sale_projects_as_not_applicable_and_nothing_is_not_evaluable(store, signer):
+    projected = _projected(_sale(store, signer, NO_FLOOR, None))
+    assert projected["price_floor"] == (None, True)
+    assert all(verdict != "not_evaluable" for verdict, _ in projected.values()), projected
+
+
+def test_a_floored_sale_without_its_opening_projects_as_not_evaluable_naming_it(store, signer):
+    decision = _sale(store, signer, AUTHORITY, None)
+    (record,) = [c for c in decision.capsule["constraints"] if c["id"] == "price_floor"]
+    projected = project_guard_constraint(record, candidate_fields=PROJECTION_FIELDS)
+    assert (projected.evidence_status, projected.sufficiency, projected.verdict) == (
+        "NOT_FOUND", "GAP", "not_evaluable")
+    (constraint,) = [c for c in decision.constraints if c.id == "price_floor"]
+    assert constraint.evidence == not_applicable_evidence(
+        "price_floor", in_scope=True, missing_field="commercial_bounds_opening")
 
 
 # -- the engine: below the floor asks, and nothing private is sealed ------------

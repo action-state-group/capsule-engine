@@ -40,7 +40,16 @@ RETIRED: tuple[RetiredDefinition, ...] = (
             "the task-authority record to a private commercial-bounds document the record commits to) "
             "because the digest covered config only"
         ),
-        replaced_by="price_floor/2.0.0",
+        replaced_by="price_floor/2.0.1",
+    ),
+    RetiredDefinition(
+        wicket_id="price_floor/2.0.0",
+        digest="52fd588ea62ce467ad5ee59cef4347a4a0fbb0836d20ebfe783923805230bc9b",
+        reason=(
+            "its check changed meaning under this digest (a task-authority record that seals no "
+            "bounds_commitment went from in scope and not evaluable to out of scope)"
+        ),
+        replaced_by="price_floor/2.0.1",
     ),
 )
 

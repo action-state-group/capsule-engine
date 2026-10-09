@@ -71,9 +71,10 @@ EXPECTED_DIGESTS = {
     "seller.destination_rail/1.0.0": "fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800",
     # One accepted commitment per sale and item, across buyer threads. No pack cites it yet.
     "seller.single_commitment/1.0.0": "91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e",
-    # Replaces price_floor/1.0.0, retired at its digest (RETIRED_DIGESTS below):
-    # the floor is now opened from a commitment, never read in clear.
-    "price_floor/2.0.0": "52fd588ea62ce467ad5ee59cef4347a4a0fbb0836d20ebfe783923805230bc9b",
+    # Replaces price_floor/2.0.0 and 1.0.0, retired at their digests
+    # (RETIRED_DIGESTS below): the floor is opened from a commitment, never
+    # read in clear, and a record committing to none puts the action out of scope.
+    "price_floor/2.0.1": "c39f858b52a9697a70450680d90d0bbd0cb4e4eb79925d18e67623d587404977",
 }
 
 # Retired (id, digest) pairs, pinned independently of guards/wickets/retired.py
@@ -83,12 +84,13 @@ RETIRED_FIXTURES = Path(__file__).parent / "fixtures" / "retired_wickets"
 RETIRED_DIGESTS = {
     "offer_expiry/1.0.0": "7b1072fc6997b07e7f08941a723e60d53fd3a54dbccfda6fa7391124ec2702ee",
     "price_floor/1.0.0": "a7eb755a71cf9dabaf04fbd740fc9ceaad5f0ba883795adad6fd9038796dffa9",
+    "price_floor/2.0.0": "52fd588ea62ce467ad5ee59cef4347a4a0fbb0836d20ebfe783923805230bc9b",
 }
 
 # Catalog definitions that predate the `semantics` field. Their digests are
 # pinned above and are not rewritten to add it. Every definition added from
 # now on states its rule in `semantics`; this set only ever shrinks.
-WITHOUT_SEMANTICS = frozenset(EXPECTED_DIGESTS) - {"offer_expiry/1.0.1", "price_floor/2.0.0"}
+WITHOUT_SEMANTICS = frozenset(EXPECTED_DIGESTS) - {"offer_expiry/1.0.1", "price_floor/2.0.1"}
 
 
 @pytest.mark.parametrize("wicket_id,expected_digest", EXPECTED_DIGESTS.items())

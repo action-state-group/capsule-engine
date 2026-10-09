@@ -267,7 +267,7 @@ def _typed_ref_digest(value: object) -> str | None:
     if not isinstance(value, dict) or not _text(value.get("type")) or value.get("digest_alg") != "SHA-256":
         return None
     digest = value.get("digest")
-    return digest if isinstance(digest, str) and _HEX64.match(digest) else None
+    return digest if isinstance(digest, str) and _HEX64.fullmatch(digest) else None
 
 
 # The body fields that state the amount a money-in record returns, first

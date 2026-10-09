@@ -375,7 +375,7 @@ def _invocation_claims(
         # over. The row digest covers the whole row, capsule_id included;
         # the capsule_id is also cited on its own when it is itself a digest.
         digests = [executions_sha256, row.digest]
-        if row.capsule_id is not None and _HEX64.match(row.capsule_id):
+        if row.capsule_id is not None and _HEX64.fullmatch(row.capsule_id):
             digests.append(row.capsule_id)
         evidence = tuple(DigestRef(digest=d) for d in digests)
         if sufficiency == "SATISFIED":
@@ -591,7 +591,7 @@ def verify_layer_tally(doc: Mapping[str, object]) -> None:
     if not isinstance(cannot_see, list) or not cannot_see:
         raise _tally_error("source.coverage.cannot_see must be carried, non-empty")
     executions = source.get("executions_sha256") if isinstance(source, dict) else None
-    if not isinstance(executions, str) or not _HEX64.match(executions):
+    if not isinstance(executions, str) or not _HEX64.fullmatch(executions):
         raise _tally_error("source.executions_sha256 must be a SHA-256 hex digest")
     layers = doc.get("layers")
     if not isinstance(layers, list) or not layers:
