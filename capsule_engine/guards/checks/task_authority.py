@@ -65,7 +65,7 @@ class TaskAuthorityBody(TypedDict):
     preconditions: list[PreconditionBody]
     binding: NotRequired[dict[str, str]]
     window: NotRequired[str]
-    min_total_minor: NotRequired[int]
+    bounds_commitment: NotRequired[str]
     authorized_representation_classes: NotRequired[list[str]]
 
 

@@ -1,13 +1,29 @@
-# price_floor wicket: the lowest total the task authority accepts
-# (guards/checks/price_floor.py). The floor is min_total_minor in the body
-# of the sealed task-authority record the action cites, read only when the
-# engine's own digest of the record equals the action's task_authority_ref,
-# as task_authority/1.0.0 binds it; the action cannot carry its own floor.
-# Fails when Action.amount_minor is below the floor, in the action's own
-# minor units. The mirror of caps, which compares upward only.
+# price_floor wicket: the lowest total the user will take
+# (guards/checks/price_floor.py). The rule itself is the `semantics` field
+# below: it is inside the digested body, so rewording it moves the digest.
+# The floor is private: the task authority seals only a salted commitment to
+# it, and the checker on the user's own device opens it.
 #
 # Declared disposition: ask.
-wicket_id: price_floor/1.0.0
+#
+# Replaces price_floor/1.0.0, which is retired at its digest
+# (guards/wickets/retired.py): its check changed meaning under that digest.
+wicket_id: price_floor/2.0.0
 check: price_floor
+semantics: >-
+  For an action in action_classes, the floor is min_total_minor in a
+  commercial-bounds/v0 document. The task-authority record the action cites
+  (task_authority_ref, the SHA-256 digest of the whole record) seals only
+  body.bounds_commitment, commit_alg sha256-jcs-nonce256: SHA-256 over the
+  JCS bytes of {"nonce", "text"}, with text the document's JCS bytes. The
+  document, its nonce and that commitment are the checker input's
+  commercial_bounds_opening. An amount_minor at or above the opened floor
+  passes; below it fails. An opening that does not open the sealed
+  commitment fails naming bounds_commitment. It is not applicable, naming
+  the field, when the action carries no amount_minor or task_authority_ref,
+  when the record is missing or is not the one the reference names, when the
+  record seals no bounds_commitment, or when no opening is supplied. A floor
+  is never read from the task-authority record itself. Any other action
+  class is out of scope.
 config:
   action_classes: [marketplace.offer, marketplace.sale, agreement.accept]

@@ -7,8 +7,10 @@ containment, a pure function of ``(action, plan)`` with no ledger read.
 configuring them is in force (``GuardEngine(wickets=...)``); each takes the
 action, the ledger and that wicket's ``config``. ``TASK_AUTHORITY_CHECKS`` run the
 same way but take the task-authority body supplied with the decision in place
-of the ledger, and ``AUTHORIZATION_CHECKS`` both the task-authority record and
-the approval record supplied with it. ``RUNNABLE_CHECKS`` names all three."""
+of the ledger, ``AUTHORIZATION_CHECKS`` both the task-authority record and
+the approval record supplied with it, and ``COMMERCIAL_BOUNDS_CHECKS`` the
+task-authority record and the commercial-bounds opening supplied with it.
+``RUNNABLE_CHECKS`` names all four."""
 from collections.abc import Callable
 
 from capsule_ledger.ledger.api import LedgerAPI
@@ -31,7 +33,7 @@ from .destination_rail import check_destination_rail
 from .field_change_count import check_material_fields_changed, check_offer_fields_changed, fields_basis
 from .offer_expiry import check_offer_expiry
 from .plan_containment import check_plan_containment
-from .price_floor import FLOOR_PATH, check_price_floor
+from .price_floor import COMMITMENT_PATH, CommercialBoundsOpening, bounds_commitment, check_price_floor
 from .promise_never import check_promise_never
 from .promise_requires_approval import (
     AUTHORIZED_PATH,
@@ -143,8 +145,13 @@ TASK_AUTHORITY_CHECKS: dict[str, Callable[[Action, TaskAuthorityRecord | None, d
     "task_authority": lambda action, record, config: check_task_authority(
         action, record, action_classes=config["action_classes"]
     ),
-    "price_floor": lambda action, record, config: check_price_floor(
-        action, record, action_classes=config["action_classes"]
+}
+
+COMMERCIAL_BOUNDS_CHECKS: dict[
+    str, Callable[[Action, TaskAuthorityRecord | None, CommercialBoundsOpening | None, dict], CheckOutcome]
+] = {
+    "price_floor": lambda action, record, opening, config: check_price_floor(
+        action, record, opening, action_classes=config["action_classes"]
     ),
 }
 
@@ -161,25 +168,33 @@ AUTHORIZATION_CHECKS: dict[
     ),
 }
 
-RUNNABLE_CHECKS = frozenset(CONFIGURED_CHECKS) | frozenset(TASK_AUTHORITY_CHECKS) | frozenset(AUTHORIZATION_CHECKS)
+RUNNABLE_CHECKS = (
+    frozenset(CONFIGURED_CHECKS)
+    | frozenset(TASK_AUTHORITY_CHECKS)
+    | frozenset(AUTHORIZATION_CHECKS)
+    | frozenset(COMMERCIAL_BOUNDS_CHECKS)
+)
 
 __all__ = [
     "AUTHORIZATION_CHECKS",
     "AUTHORIZED_PATH",
     "CLASS_PATH",
+    "COMMERCIAL_BOUNDS_CHECKS",
+    "COMMITMENT_PATH",
     "AuthorizationBody",
     "AuthorizationRecord",
     "CONFIGURED_CHECKS",
     "RUNNABLE_CHECKS",
     "TASK_AUTHORITY_CHECKS",
-    "FLOOR_PATH",
     "PLAN_PATH",
     "TaskAuthorityBody",
     "TaskAuthorityRecord",
     "UnboundRecord",
     "CheckOutcome",
+    "CommercialBoundsOpening",
     "LimitSources",
     "authorization_record_digest",
+    "bounds_commitment",
     "bind_task_authority_record",
     "cap_for",
     "check_action_class_gate",

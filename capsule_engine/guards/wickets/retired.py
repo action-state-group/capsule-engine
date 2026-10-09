@@ -32,6 +32,16 @@ RETIRED: tuple[RetiredDefinition, ...] = (
         ),
         replaced_by="offer_expiry/1.0.1",
     ),
+    RetiredDefinition(
+        wicket_id="price_floor/1.0.0",
+        digest="a7eb755a71cf9dabaf04fbd740fc9ceaad5f0ba883795adad6fd9038796dffa9",
+        reason=(
+            "its check changed meaning under this digest (the floor moved from min_total_minor in clear on "
+            "the task-authority record to a private commercial-bounds document the record commits to) "
+            "because the digest covered config only"
+        ),
+        replaced_by="price_floor/2.0.0",
+    ),
 )
 
 _BY_PAIR = {(r.wicket_id, r.digest): r for r in RETIRED}

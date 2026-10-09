@@ -22,11 +22,13 @@ from .action import Action
 from .capsule import ALLOW, DENY, ESCALATE, ConstraintOutcome, build_decision_capsule, not_applicable_evidence
 from .checks import (
     AUTHORIZATION_CHECKS,
+    COMMERCIAL_BOUNDS_CHECKS,
     CONFIGURED_CHECKS,
     RUNNABLE_CHECKS,
     TASK_AUTHORITY_CHECKS,
     AuthorizationRecord,
     CheckOutcome,
+    CommercialBoundsOpening,
     LimitSources,
     TaskAuthorityRecord,
     cap_for,
@@ -219,6 +221,7 @@ class GuardEngine:
         chain_relation: str | None = None,
         task_authority_record: TaskAuthorityRecord | None = None,
         authorization_record: AuthorizationRecord | None = None,
+        commercial_bounds_opening: CommercialBoundsOpening | None = None,
     ) -> GuardDecision:
         """``task_authority_record`` is the whole sealed task-authority record
         ``action.task_authority_ref`` names, read only by a
@@ -228,7 +231,11 @@ class GuardEngine:
         ``action.authorized_by`` names, read only by a
         ``promise_requires_approval`` wicket and only when the engine's own
         digest of it equals that reference
-        (``guards/checks/promise_requires_approval.py``)."""
+        (``guards/checks/promise_requires_approval.py``).
+        ``commercial_bounds_opening`` is the checker input's opening of the
+        user's private floor, read only by a ``price_floor`` wicket and only
+        when it opens the ``bounds_commitment`` the bound task-authority
+        record seals (``guards/checks/price_floor.py``). It is never sealed."""
         ac = classify(action.action_class)
         consequential = ac.consequential
         may_fail_open = ac.fail_open_allowed and action.action_class in self._fail_open_classes
@@ -373,6 +380,10 @@ class GuardEngine:
         for wicket in self._wickets:
             if wicket.check in TASK_AUTHORITY_CHECKS:
                 out = TASK_AUTHORITY_CHECKS[wicket.check](action, task_authority_record, wicket.config)
+            elif wicket.check in COMMERCIAL_BOUNDS_CHECKS:
+                out = COMMERCIAL_BOUNDS_CHECKS[wicket.check](
+                    action, task_authority_record, commercial_bounds_opening, wicket.config
+                )
             elif wicket.check in AUTHORIZATION_CHECKS:
                 out = AUTHORIZATION_CHECKS[wicket.check](
                     action, task_authority_record, authorization_record, wicket.config

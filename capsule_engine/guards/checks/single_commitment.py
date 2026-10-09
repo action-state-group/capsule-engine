@@ -96,7 +96,10 @@ def check_single_commitment(
         return _outcome("n/a", "the action cites no task authority; the sale could not be identified",
                         not_applicable_evidence(_CHECK_ID, in_scope=True, missing_field="task_authority_ref"))
     if action.item_ref is None:
-        return _outcome("n/a", "the action names no item; the sale could not be identified",
+        # An ignored input is named, never the value it was given.
+        reason = ("the item_ref input was not in its agreed shape" if "item_ref" in action.ignored_inputs
+                  else "the action names no item")
+        return _outcome("n/a", f"{reason}; the sale could not be identified",
                         not_applicable_evidence(_CHECK_ID, in_scope=True, missing_field="item_ref"))
 
     acceptance = _first_acceptance(action, ledger, acceptance_classes, action.task_authority_ref, action.item_ref)

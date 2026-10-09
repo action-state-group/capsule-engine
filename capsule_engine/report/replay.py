@@ -31,6 +31,12 @@ lowercase hex>}}`` is ignored, named in ``Action.ignored_inputs``, and the
 per-deal target stands. A decision sealed with the per-deal target is never
 rewritten, so it never matches one keyed per profile.
 
+On a check of a sale's thread, the envelope's top-level ``item_ref`` (256
+random bits, lowercase hex, equal across the sale's threads) becomes
+``Action.item_ref`` for ``single_commitment``. No record carries it, so it is
+read only live, never in a replay. A value in any other shape is ignored and
+named in ``Action.ignored_inputs``.
+
 ``_bridge_transfer_funds`` is the other non-default action mapping, and it
 mirrors the pattern already established by ``tests/test_guard_dry_run.py``
 and ``tests/test_guard_eur150k_bridge.py``: ``transfer_funds`` capsules in
@@ -239,6 +245,8 @@ def _payee_target(counterparty_ids: dict[str, str] | None, fp_alg: str | None) -
 # companion record, and the fp_alg it must carry.
 _PROFILE_INPUT = "counterparty_profile"
 _PROFILE_FP_ALG = "hmac-sha256-profile-key"
+# The sale's item reference, top level in the checker input.
+_ITEM_INPUT = "item_ref"
 
 
 def _profile_target(block: object) -> str | None:
@@ -379,18 +387,25 @@ def action_for_record(record: dict, disclosed: dict | None = None, *, counterpar
     return Action.from_capsule(record)
 
 
-def action_for_check_input(entry: dict) -> Action:
+def action_for_check_input(entry: dict, *, item_ref: object = None) -> Action:
     """The action the ``record`` entry of an external-check-input/v0 envelope
     states: the sealed capsule, its disclosed ``agent_input``, and, beside
     them, the envelope's optional ``counterparty_profile``, which capsulectl
-    computes and passes and the capsule does not seal."""
+    computes and passes and the capsule does not seal. ``item_ref`` is the
+    envelope's top-level ``item_ref``, set on the action when it is 64
+    lowercase hex and named in ``ignored_inputs`` otherwise."""
     capsule = {k: v for k, v in entry.items() if k not in ("agent_input", _PROFILE_INPUT)}
     agent_input = entry.get("agent_input")
-    return action_for_record(
+    action = action_for_record(
         capsule,
         agent_input if isinstance(agent_input, dict) else None,
         counterparty_profile=entry.get(_PROFILE_INPUT),
     )
+    if item_ref is None:
+        return action
+    if isinstance(item_ref, str) and _HEX64.match(item_ref):
+        return replace(action, item_ref=item_ref)
+    return replace(action, ignored_inputs=(*action.ignored_inputs, _ITEM_INPUT))
 
 
 def _companion_profiles(records: list[dict], disclosed: dict[str, dict]) -> dict[str, object]:
