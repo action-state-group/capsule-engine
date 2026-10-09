@@ -7,8 +7,8 @@ containment, a pure function of ``(action, plan)`` with no ledger read.
 configuring them is in force (``GuardEngine(wickets=...)``); each takes the
 action, the ledger and that wicket's ``config``. ``TASK_AUTHORITY_CHECKS`` run the
 same way but take the task-authority body supplied with the decision in place
-of the ledger. ``RUNNABLE_CHECKS``
-names both."""
+of the ledger, and ``AUTHORIZATION_CHECKS`` both the task-authority record and
+the approval record supplied with it. ``RUNNABLE_CHECKS`` names all three."""
 from collections.abc import Callable
 
 from capsule_ledger.ledger.api import LedgerAPI
@@ -29,14 +29,28 @@ from .credential_pattern import check_credential_pattern
 from .dedupe import check_dedupe
 from .destination_rail import check_destination_rail
 from .field_change_count import check_material_fields_changed, check_offer_fields_changed, fields_basis
+from .offer_expiry import check_offer_expiry
 from .plan_containment import check_plan_containment
+from .price_floor import FLOOR_PATH, check_price_floor
+from .promise_never import check_promise_never
+from .promise_requires_approval import (
+    AUTHORIZED_PATH,
+    CLASS_PATH,
+    AuthorizationBody,
+    AuthorizationRecord,
+    authorization_record_digest,
+    check_promise_requires_approval,
+)
 from .recipient_role import check_recipient_role
 from .recurring_charge import check_recurring_charge
 from .refundability import check_refundability
+from .required_disclosure import check_required_disclosure
 from .task_authority import (
     PLAN_PATH,
     TaskAuthorityBody,
     TaskAuthorityRecord,
+    UnboundRecord,
+    bind_task_authority_record,
     check_task_authority,
     task_authority_record_digest,
 )
@@ -45,7 +59,10 @@ from .verify_before_dispatch import check_verify_before_dispatch
 
 CONFIGURED_CHECKS: dict[str, Callable[[Action, LedgerAPI, dict], CheckOutcome]] = {
     "destination_rail": lambda action, ledger, config: check_destination_rail(
-        action, watched_rails=config["watched_rails"], action_classes=config["action_classes"]
+        action,
+        watched_rails=config.get("watched_rails", []),
+        allowed_rails=config.get("allowed_rails"),
+        action_classes=config["action_classes"],
     ),
     "counterparty_identity_change": lambda action, ledger, config: check_counterparty_identity_change(
         action, ledger, action_classes=config["action_classes"]
@@ -99,25 +116,67 @@ CONFIGURED_CHECKS: dict[str, Callable[[Action, LedgerAPI, dict], CheckOutcome]] 
         upfront_max_bps=config["upfront_max_bps"],
         action_classes=config["action_classes"],
     ),
+    "required_disclosure": lambda action, ledger, config: check_required_disclosure(
+        action,
+        ledger,
+        definition=seen_before_fold(config["fold_id"], config["fold_digest"]),
+        representation_classes=config["representation_classes"],
+        required_classes=config["required_classes"],
+        action_classes=config["action_classes"],
+    ),
+    "offer_expiry": lambda action, ledger, config: check_offer_expiry(
+        action, max_age_seconds=config["max_age_seconds"], action_classes=config["action_classes"]
+    ),
+    "promise_never": lambda action, ledger, config: check_promise_never(
+        action,
+        representation_classes=config["representation_classes"],
+        never=config["never"],
+        action_classes=config["action_classes"],
+    ),
 }
 
 TASK_AUTHORITY_CHECKS: dict[str, Callable[[Action, TaskAuthorityRecord | None, dict], CheckOutcome]] = {
     "task_authority": lambda action, record, config: check_task_authority(
         action, record, action_classes=config["action_classes"]
     ),
+    "price_floor": lambda action, record, config: check_price_floor(
+        action, record, action_classes=config["action_classes"]
+    ),
 }
 
-RUNNABLE_CHECKS = frozenset(CONFIGURED_CHECKS) | frozenset(TASK_AUTHORITY_CHECKS)
+AUTHORIZATION_CHECKS: dict[
+    str, Callable[[Action, TaskAuthorityRecord | None, AuthorizationRecord | None, dict], CheckOutcome]
+] = {
+    "promise_requires_approval": lambda action, task_authority, approval, config: check_promise_requires_approval(
+        action,
+        task_authority,
+        approval,
+        representation_classes=config["representation_classes"],
+        requires_approval=config["requires_approval"],
+        action_classes=config["action_classes"],
+    ),
+}
+
+RUNNABLE_CHECKS = frozenset(CONFIGURED_CHECKS) | frozenset(TASK_AUTHORITY_CHECKS) | frozenset(AUTHORIZATION_CHECKS)
 
 __all__ = [
+    "AUTHORIZATION_CHECKS",
+    "AUTHORIZED_PATH",
+    "CLASS_PATH",
+    "AuthorizationBody",
+    "AuthorizationRecord",
     "CONFIGURED_CHECKS",
     "RUNNABLE_CHECKS",
     "TASK_AUTHORITY_CHECKS",
+    "FLOOR_PATH",
     "PLAN_PATH",
     "TaskAuthorityBody",
     "TaskAuthorityRecord",
+    "UnboundRecord",
     "CheckOutcome",
     "LimitSources",
+    "authorization_record_digest",
+    "bind_task_authority_record",
     "cap_for",
     "check_action_class_gate",
     "check_caps",
@@ -129,12 +188,17 @@ __all__ = [
     "check_dedupe",
     "check_destination_rail",
     "check_material_fields_changed",
+    "check_offer_expiry",
     "check_offer_fields_changed",
     "check_plan_containment",
+    "check_price_floor",
+    "check_promise_never",
+    "check_promise_requires_approval",
     "check_recipient_role",
     "check_recipient_seen_before",
     "check_recurring_charge",
     "check_refundability",
+    "check_required_disclosure",
     "check_task_authority",
     "task_authority_record_digest",
     "check_upfront_amount",

@@ -1,0 +1,16 @@
+# promise_never wicket: classes of statement the agent never makes
+# (guards/checks/promise_never.py). An action whose
+# Action.representation_class is in `never` fails, whatever it cites:
+# neither a bound approval nor the task authority clears it. Only a change
+# to the rule set that removes the class from `never` lifts it.
+#
+# `representation_classes` is the closed set; a class outside it fails
+# closed.
+#
+# Declared disposition: never.
+wicket_id: promise_never/1.0.0
+check: promise_never
+config:
+  action_classes: [communication.send, disclosure.personal, marketplace.offer, marketplace.sale, agreement.accept]
+  representation_classes: [price, condition, features, authenticity, availability, delivery_date, service_scope, warranty, refund_terms, payment_methods, pickup, deadline, address, other]
+  never: [authenticity]

@@ -2,7 +2,8 @@
 """recipient_role check: membership of the disclosure recipient's role.
 
 Reads ``Action.recipient_role``, one member of the closed set ``roles``
-(``fulfilling_merchant``, ``third_party``, ``self``), and passes when it is
+the wicket pins (``fulfilling_merchant``, ``third_party``, ``self``; a
+seller's set is ``buyer``, ``third_party``, ``self``), and passes when it is
 one of ``allowed_roles``. A role outside ``roles`` fails closed and the
 evidence says it was not recognised. It records the role, never who the
 recipient is. Applies only to the configured ``action_classes``.

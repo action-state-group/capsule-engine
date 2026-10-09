@@ -51,7 +51,10 @@ WICKET_ID_RE = re.compile(r"^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)*/\d+\.\d+\.\d+$"
 # ``counterparty_list``, ``recipient_role``, ``refundability``,
 # ``material_fields_changed``, ``offer_fields_changed``,
 # ``recipient_seen_before``, ``channel_change``, ``upfront_amount``,
-# ``task_authority`` -- ``guards/checks/__init__.py``'s ``RUNNABLE_CHECKS``). Closed for
+# ``task_authority``, and the seller-side ``price_floor``,
+# ``required_disclosure``, ``promise_requires_approval``, ``promise_never``,
+# ``offer_expiry`` --
+# ``guards/checks/__init__.py``'s ``RUNNABLE_CHECKS``). Closed for
 # the same reason ``folds/definition.py``'s ``KNOWN_REDUCERS`` is: an
 # unregistered name is a typo or a not-yet-built check, never silently
 # accepted as data.
@@ -77,6 +80,11 @@ KNOWN_CHECKS = frozenset(
         "channel_change",
         "upfront_amount",
         "task_authority",
+        "price_floor",
+        "required_disclosure",
+        "promise_requires_approval",
+        "promise_never",
+        "offer_expiry",
     }
 )
 

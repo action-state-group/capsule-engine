@@ -202,6 +202,9 @@ def _payload_extension(action: Action, checkpoint: dict, manifest_digest: str | 
         ("first_contact_channel", action.first_contact_channel),
         ("upfront_amount_minor", action.upfront_amount_minor),
         ("task_authority_ref", action.task_authority_ref),
+        ("representation_class", action.representation_class),
+        ("authorized_by", action.authorized_by),
+        ("proposal_at", action.proposal_at),
     )
     for name, value in scalars:
         if value is not None:

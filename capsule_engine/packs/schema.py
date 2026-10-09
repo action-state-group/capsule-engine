@@ -135,6 +135,9 @@ NORMALIZED_ACTION_FIELDS = frozenset(
         "first_contact_channel",
         "upfront_amount_minor",
         "task_authority_ref",
+        "representation_class",
+        "authorized_by",
+        "proposal_at",
     }
 )
 
