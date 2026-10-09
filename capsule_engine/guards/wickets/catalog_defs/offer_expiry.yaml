@@ -1,0 +1,16 @@
+# offer_expiry wicket: how old the proposal an action acts on may be
+# (guards/checks/offer_expiry.py). The age is the action's own timestamp
+# minus Action.proposal_at, both RFC 3339 UTC timestamps sealed on the
+# record, in whole seconds. Older than `max_age_seconds` fails: the
+# proposal has expired and a new proposed action is required. An age that
+# cannot be established also fails, with expiry_unverified in the evidence.
+# Default limit: 24 hours.
+#
+# Declared disposition: ask. The unverified case is meant to be
+# ASK_UNVERIFIED, which the pack schema's disposition set does not have
+# yet; until it does, the evidence marker tells the two apart.
+wicket_id: offer_expiry/1.0.0
+check: offer_expiry
+config:
+  action_classes: [marketplace.offer, marketplace.sale, agreement.accept]
+  max_age_seconds: 86400

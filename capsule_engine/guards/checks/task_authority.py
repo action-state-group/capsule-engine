@@ -36,6 +36,8 @@ __all__ = [
     "PLAN_PATH",
     "TaskAuthorityBody",
     "TaskAuthorityRecord",
+    "UnboundRecord",
+    "bind_task_authority_record",
     "check_task_authority",
     "task_authority_record_digest",
 ]
@@ -63,6 +65,8 @@ class TaskAuthorityBody(TypedDict):
     preconditions: list[PreconditionBody]
     binding: NotRequired[dict[str, str]]
     window: NotRequired[str]
+    min_total_minor: NotRequired[int]
+    authorized_representation_classes: NotRequired[list[str]]
 
 
 class TaskAuthorityRecord(TypedDict):
@@ -103,6 +107,40 @@ def _plan_in(record: TaskAuthorityRecord) -> PlanDefinition:
         raise _PlanUnreadable(f"the plan in the task-authority record does not parse ({exc})") from exc
 
 
+class UnboundRecord(Exception):
+    """The record the action's ``task_authority_ref`` names cannot be read.
+    ``missing_field`` names the input an in-scope n/a records."""
+
+    def __init__(self, message: str, missing_field: str) -> None:
+        self.missing_field = missing_field
+        super().__init__(message)
+
+
+def bind_task_authority_record(
+    action: Action, record: TaskAuthorityRecord | None
+) -> tuple[str, TaskAuthorityRecord]:
+    """``(ref, record)`` once the engine's own digest of ``record`` equals
+    ``action.task_authority_ref``. Raises ``UnboundRecord`` otherwise: a
+    record the reference does not bind is never read."""
+    ref = action.task_authority_ref
+    if ref is None:
+        raise UnboundRecord("the action carries no task_authority_ref; the task's bounds could not be checked",
+                            "task_authority_ref")
+    unread = "; the task's bounds could not be read"
+    if record is None:
+        raise UnboundRecord(f"no task-authority record was supplied{unread}", _INPUT)
+    try:
+        bound = task_authority_record_digest(record) == ref
+    except (FloatInDigestError, UnsafeIntegerError) as exc:
+        raise UnboundRecord(f"the supplied task-authority record has no digest ({exc}){unread}", _INPUT) from exc
+    if not bound:
+        raise UnboundRecord(
+            f"ref mismatch: the supplied task-authority record is not the record task_authority_ref names{unread}",
+            _INPUT,
+        )
+    return ref, record
+
+
 def _outcome(result: str, reason: str, evidence: TaskAuthorityEvidence | NotApplicableEvidence) -> CheckOutcome:
     return CheckOutcome(
         constraint=ConstraintOutcome(
@@ -122,20 +160,13 @@ def check_task_authority(
     if action.action_class not in action_classes:
         return _outcome("n/a", "the rule is not configured for this action class",
                         not_applicable_evidence(_CHECK_ID, in_scope=False))
-    ref = action.task_authority_ref
-    if ref is None:
-        return _outcome("n/a", "the action carries no task_authority_ref; the task's bounds could not be checked",
-                        not_applicable_evidence(_CHECK_ID, in_scope=True, missing_field="task_authority_ref"))
-    if record is None:
-        return _unread("no task-authority record was supplied")
     try:
-        bound = task_authority_record_digest(record) == ref
-    except (FloatInDigestError, UnsafeIntegerError) as exc:
-        return _unread(f"the supplied task-authority record has no digest ({exc})")
-    if not bound:
-        return _unread("ref mismatch: the supplied task-authority record is not the record task_authority_ref names")
+        ref, bound = bind_task_authority_record(action, record)
+    except UnboundRecord as exc:
+        return _outcome("n/a", str(exc),
+                        not_applicable_evidence(_CHECK_ID, in_scope=True, missing_field=exc.missing_field))
     try:
-        plan = _plan_in(record)
+        plan = _plan_in(bound)
     except _PlanUnreadable as exc:
         return _unread(str(exc))
     containment = check_plan_containment(action, plan).constraint
