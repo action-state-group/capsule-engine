@@ -78,7 +78,7 @@ OTHER_PACK_DIGESTS = {
     "eu-ai-act": "9d3197935b6b002ccd4682c7cfa2bacf01d9dbc2b3b04811e94dd50e6a2b9cfa",
     "eu-ai-act-deterministic": "b6f6b62454380c6ab4fc1c11fd4418045cc310b95f6a7cbbf2ea23bf54ca5609",
     "payments-safety": "81278051db5ca3755956b7adeaea727d333d12a0c14c51c7e030f15ea8b9666f",
-    "seller": "65e41f7e9a2a9cffc0f71027f8e7c5b70f3ccf2751e6cb95ba1c81649b41e1ac",
+    "seller": "e599c5aff8d4171d5e58cae33fdc7022e4ee3762d1a884bb6e6098aca532a353",
     "standard-vendor": "9ae420d59ebfb1f87ecd740c948be4d0df16cefac97d8640da24934302359ae2",
 }
 

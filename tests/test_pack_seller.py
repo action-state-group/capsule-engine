@@ -1,7 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
-"""The seller pack, asg/seller/0.1.1: what it cites, at which digest, and
-what each rule declares. 0.1.0 is kept byte for byte under
-``tests/fixtures/packs/seller-0.1.0`` and still loads at its digest.
+"""The seller pack, asg/seller/0.1.2: what it cites, at which digest, and
+what each rule declares. 0.1.0 and 0.1.1 are kept byte for byte under
+``tests/fixtures/packs/seller-0.1.0`` and ``seller-0.1.1`` and still load at
+their digests. 0.1.2 is 0.1.1 without the spending limit it cited only so
+the engine would run; every scenario decides the same under both.
 
 The scenarios are in ``test_pack_seller_acceptance.py``; this file pins the
 pack's own content, so a definition cited at another digest or a rule
@@ -17,10 +19,11 @@ from pathlib import Path
 
 import pytest
 import yaml
+from agent_action_capsule.canonical import json_digest
 from capsule_ledger.ledger import LedgerStore
 
 from capsule_engine.guards import Action, LocalSigner
-from capsule_engine.guards.capsule import ALLOW, DENY
+from capsule_engine.guards.capsule import ALLOW, DENY, not_applicable_evidence
 from capsule_engine.guards.checks import AuthorizationRecord, authorization_record_digest
 from capsule_engine.guards.classes import TAXONOMY_VERSION
 from capsule_engine.guards.wickets import Catalog
@@ -33,13 +36,15 @@ PACK_DIR = ROOT / "packs" / "catalog" / "seller"
 FROZEN_0_1_0_DIR = Path(__file__).parent / "fixtures" / "packs" / "seller-0.1.0"
 PACK_0_1_0_DIGEST = "7b854f0f0feb51381d936ad992bef659234d77a799a2a319585a856f65a19c77"
 PACK_0_1_0_FILE_SHA256 = "b03b7ebb491cdd250bedfba47fcaaa0e60f0316a88a2698db7b886ef5f4753e6"
+FROZEN_0_1_1_DIR = Path(__file__).parent / "fixtures" / "packs" / "seller-0.1.1"
+PACK_0_1_1_DIGEST = "65e41f7e9a2a9cffc0f71027f8e7c5b70f3ccf2751e6cb95ba1c81649b41e1ac"
+PACK_0_1_1_FILE_SHA256 = "edb54be219fdcd31602c5a8eebe159e31d8107e29a13a80496c7ed952972688e"
 CATALOG = Catalog(ROOT / "guards" / "wickets" / "catalog_defs")
 
 PACK = load_pack_dir(PACK_DIR)
 
 # Every definition the pack cites, by id.
 CITED = [
-    "caps/1.0.0",
     "dedupe/1.0.0",
     "verify_before_dispatch/1.0.0",
     "seller.recipient_role/1.0.0",
@@ -72,7 +77,7 @@ DECLARED = {
 
 
 def test_the_pack_id_and_taxonomy_pin():
-    assert PACK.pack_id == "asg/seller/0.1.1"
+    assert PACK.pack_id == "asg/seller/0.1.2"
     assert PACK.taxonomy.taxonomy_version == TAXONOMY_VERSION == "6"
 
 
@@ -90,7 +95,7 @@ def test_each_check_has_one_rule_with_its_declared_disposition():
 
 def test_the_address_is_measured_by_the_release_rule_not_the_gate():
     """The gate reads only the class, so it would ask on the address after
-    acceptance too; 0.1.1 cites neither the gate nor a rule on it."""
+    acceptance too; since 0.1.1 the pack cites neither the gate nor a rule on it."""
     assert not [o for o in PACK.obligations if o.check == "action_class_gate" or o.selector is not None]
     assert "action_class_gate" not in {w.check for w in PACK.constraints}
     (release,) = [w for w in PACK.constraints if w.check == "release_on_acceptance"]
@@ -108,11 +113,65 @@ def test_0_1_0_is_kept_byte_for_byte_and_still_loads_at_its_digest():
     assert pack.definition_digest() == PACK_0_1_0_DIGEST
 
 
-def test_caps_is_cited_for_the_engine_and_measures_no_rule():
+def test_0_1_1_is_kept_byte_for_byte_and_still_loads_at_its_digest():
+    frozen = FROZEN_0_1_1_DIR / "pack.yaml"
+    assert hashlib.sha256(frozen.read_bytes()).hexdigest() == PACK_0_1_1_FILE_SHA256
+    pack = load_pack_dir(FROZEN_0_1_1_DIR)
+    assert pack.pack_id == "asg/seller/0.1.1"
+    assert pack.definition_digest() == PACK_0_1_1_DIGEST
+
+
+def test_it_cites_no_spending_limit_and_no_rule_is_measured_by_one():
     assert "caps" not in DECLARED
-    (caps,) = [w for w in PACK.constraints if w.check == "caps"]
-    assert set(caps.config["caps_minor"]) == {"money.transfer"}
-    assert not {s.action_class for s in PACK.action_semantics} & set(caps.config["caps_minor"])
+    assert "caps" not in {w.check for w in PACK.constraints}
+    assert not [f for f in PACK.folds if f.fold_id.startswith("spend.")]
+    assert load_pack_dir(PACK_DIR).definition_digest() != PACK_0_1_1_DIGEST
+
+
+def _scenario_run(pack_dir: Path, tmp_path: Path):
+    """The fixture's scenarios under ``pack_dir``: each step's capsule, by name."""
+    acceptance = _acceptance_module()
+    acceptance.PACK_DIR = pack_dir
+    store = LedgerStore(tmp_path / "ledger")
+    try:
+        _, _, capsules, _ = acceptance._run_scenarios(store, project_dir=tmp_path / "project")
+    finally:
+        store.close()
+    return capsules
+
+
+# Checks whose evidence names an earlier record by capsule_id: the matched act
+# and the cited mandate.
+NAMES_A_CAPSULE_ID = frozenset({"dedupe", "verify_before_dispatch"})
+
+
+def _constraints(capsule: dict) -> dict[str, dict]:
+    return {c["id"]: c for c in capsule["constraints"]}
+
+
+def test_0_1_2_decides_every_scenario_as_0_1_1_did_and_records_caps_out_of_scope(tmp_path):
+    """Dropping the cited limit changes no decision: every scenario has the
+    same disposition and every constraint the same result under both, and
+    the same evidence except where it names an earlier record's capsule_id,
+    which covers the manifest digest. caps is still recorded, n/a and out of
+    scope, with the same evidence; only its method, the fold 0.1.1 cited,
+    is gone."""
+    old = _scenario_run(FROZEN_0_1_1_DIR, tmp_path / "0.1.1")
+    new = _scenario_run(PACK_DIR, tmp_path / "0.1.2")
+    assert list(old) == list(new) and len(new) == len(PACK.fixtures.scenarios)
+    out_of_scope = json_digest(not_applicable_evidence("caps", in_scope=False))
+    for name in new:
+        assert new[name]["disposition"] == old[name]["disposition"], name
+        before, after = _constraints(old[name]), _constraints(new[name])
+        assert list(after) == list(before), name
+        for check_id, record in after.items():
+            assert record["result"] == before[check_id]["result"], (name, check_id)
+            if check_id not in NAMES_A_CAPSULE_ID:
+                assert record.get("evidence_digest") == before[check_id].get("evidence_digest"), (name, check_id)
+        caps_before, caps_after = before["caps"], after["caps"]
+        assert caps_after["result"] == "n/a" and caps_after["evidence_digest"] == out_of_scope, name
+        assert caps_before["method"] == "spend.weekly/1.0.0" and "method" not in caps_after, name
+        assert caps_after == {k: v for k, v in caps_before.items() if k != "method"}, name
 
 
 def _copy(tmp_path: Path) -> Path:
@@ -133,7 +192,7 @@ def test_a_definition_cited_at_another_digest_is_refused_at_load(tmp_path, wicke
         load_pack_dir(pack_dir)
 
 
-# -- 0.1.1 is no looser than 0.1.0 on personal data -------------------------------
+# -- 0.1.1 and 0.1.2 are no looser than 0.1.0 on personal data -------------------
 
 
 def _acceptance_module():
@@ -148,17 +207,17 @@ def _acceptance_module():
 def _engines(tmp_path: Path):
     """One observe-mode engine per pack version, each on its own ledger."""
     signer = LocalSigner(key_id="seller-strictness-key", secret=b"seller-strictness-fixed-key")
-    for version, pack_dir in (("0.1.0", FROZEN_0_1_0_DIR), ("0.1.1", PACK_DIR)):
+    for version, pack_dir in (("0.1.0", FROZEN_0_1_0_DIR), ("0.1.1", FROZEN_0_1_1_DIR), ("0.1.2", PACK_DIR)):
         store = LedgerStore(tmp_path / version / "ledger")
         installed = install_pack(load_pack_dir(pack_dir), project_dir=tmp_path / version / "project", mode="observe")
         yield version, store, build_engine(installed, ledger=store, signer_provider=lambda: signer)
 
 
-def test_no_personal_disclosure_0_1_0_asked_on_is_allowed_by_0_1_1_without_an_acceptance(tmp_path):
+def test_no_personal_disclosure_0_1_0_asked_on_is_allowed_by_0_1_1_or_0_1_2_without_an_acceptance(tmp_path):
     """Every class a disclosure may declare, none, and one outside the set;
     to the buyer, the user and a third party; with and without a one-shot
     approval of the class. No acceptance is sealed. Where 0.1.0 did not
-    allow, 0.1.1 must not either -- and 0.1.1 refuses every one."""
+    allow, 0.1.1 and 0.1.2 must not either -- and both refuse every one."""
     acceptance = _acceptance_module()
     classes = [*CATALOG.get("promise_never/1.0.0").definition.config["representation_classes"], None, "phone"]
     cases = [(cls, role, approved) for cls in classes for role in ("buyer", "self", "third_party")
@@ -182,7 +241,7 @@ def test_no_personal_disclosure_0_1_0_asked_on_is_allowed_by_0_1_1_without_an_ac
                 outcomes.setdefault(version, []).append(decision.outcome)
         finally:
             store.close()
-    assert len(outcomes["0.1.0"]) == len(outcomes["0.1.1"]) == len(cases) == 96
-    for case, old, new in zip(cases, outcomes["0.1.0"], outcomes["0.1.1"], strict=True):
+    assert len(outcomes["0.1.0"]) == len(outcomes["0.1.1"]) == len(outcomes["0.1.2"]) == len(cases) == 96
+    for case, old, mid, new in zip(cases, outcomes["0.1.0"], outcomes["0.1.1"], outcomes["0.1.2"], strict=True):
         assert old != ALLOW, case  # 0.1.0 asked on (or refused) every personal disclosure
-        assert new == DENY, (case, old, new)
+        assert mid == new == DENY, (case, old, mid, new)

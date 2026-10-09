@@ -30,13 +30,7 @@
 # the action class, so it would ask after acceptance too. The gate also
 # refused an action whose class has no taxonomy row; release_on_acceptance
 # now refuses that itself.
-#
-# 0.1.2 cites no spending limit. 0.1.1 cited caps/1.0.0 (and its fold,
-# spend.weekly/1.0.0) only because the guard engine needed one to run; it
-# limits money.transfer alone, which no action here declares. The engine
-# now runs a pack that cites none and records caps as out of scope on every
-# action, as 0.1.1's decisions already did. No rule changes.
-pack_id: asg/seller/0.1.2
+pack_id: asg/seller/0.1.1
 
 obligations:
   # -- DO ------------------------------------------------------------------
@@ -165,6 +159,14 @@ action_semantics:
     optional_fields: [task_authority_ref, item_ref, authorized_by, cited_mandate_capsule_id, equivalence_key]
 
 constraints:
+  # Cited because the guard engine needs a spending-limit definition to
+  # run. caps/1.0.0 limits money.transfer alone, which no action in this
+  # pack declares, so it is out of scope on every seller action and no rule
+  # here is measured by it. (caps/5.0.0 would read an offer or an
+  # acceptance as money paid out.)
+  - wicket_ref: caps/1.0.0
+    digest: 906a75a0b908d38fa7b05823ba11f229c3d593516119ad757b541cee7083f54b
+    scope: [developer]
   - wicket_ref: dedupe/1.0.0
     digest: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
   - wicket_ref: verify_before_dispatch/1.0.0
@@ -195,6 +197,8 @@ constraints:
     digest: 6a8487fb059f171765810bdc4a248edfdaf6489ddac409b978f03aaa0fec5583
 
 folds:
+  - fold_ref: spend.weekly/1.0.0
+    digest: 3e7f6a3e8707de92b120bbc2aa0b5a78032df5d36e99f9955dd3ba948bba5e9c
   # Read by required_disclosure, which pins this same digest in its config.
   - fold_ref: disclosure.class_seen/1.0.0
     digest: 5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564
