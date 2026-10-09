@@ -261,7 +261,9 @@ def _bridge_deal_check(record: dict, disclosed: dict | None) -> Action | None:
     shape the action takes: a string, a boolean, an integer, or the SHA-256
     digest of a typed reference, and dropped otherwise.
     ``taxonomy_version`` makes it an act stated against a pinned taxonomy, so
-    ``dedupe`` keys it on the act, never on this record's type or id."""
+    ``dedupe`` keys it on the act, never on this record's type or id. The
+    deal is the record's sealed ``x-deal-v0.deal_id``, never the
+    ``action_id`` prefix."""
     if disclosed is None or not _bound(record, disclosed):
         return None
     body = _checked_body(disclosed)
@@ -274,7 +276,8 @@ def _bridge_deal_check(record: dict, disclosed: dict | None) -> Action | None:
         spend = 0  # money arriving is never spend, whatever spend_minor says
         authorized = None
         returned, reverses = _returned_minor(body), _typed_ref_digest(body.get("reverses_ref"))
-    counterparty_ids, fp_alg = _sealed_counterparty((disclosed.get("x-deal-v0") or {}).get("counterparty"))
+    block = disclosed.get("x-deal-v0") or {}
+    counterparty_ids, fp_alg = _sealed_counterparty(block.get("counterparty"))
     recourse = body.get("recourse") if isinstance(body.get("recourse"), dict) else {}
     return Action(
         verb=str(body.get("action") or "unknown"),
@@ -304,6 +307,7 @@ def _bridge_deal_check(record: dict, disclosed: dict | None) -> Action | None:
         task_authority_ref=_typed_ref_digest(body.get("task_authority_ref")),
         returned_minor=returned,
         reverses_ref=reverses,
+        deal_id=_text(block.get("deal_id")),
     )
 
 

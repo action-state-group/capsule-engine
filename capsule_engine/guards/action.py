@@ -109,6 +109,11 @@ class Action:
     which stays the spend (``0`` for money in); ``reverses_ref`` is the
     SHA-256 digest of the record of the act it reverses. Both are set only
     when money moves in, sealed when set, and read by ``dedupe``.
+    ``deal_id`` is the deal the act is checked in, as the deal's own sealed
+    record states it (``x-deal-v0.deal_id``, see ``report/replay.py``),
+    sealed when set and read by ``dedupe``: a repeat in the same deal is
+    refused, one in another deal may ask an approver. It never enters the
+    act key.
     ``states_act`` is ``False`` for a record that states no act of its own
     (a deal's baseline, verdict or approval; see ``report/replay.py``), read
     by ``dedupe``, which does not apply to it; it is never sealed.
@@ -153,6 +158,7 @@ class Action:
     item_ref: str | None = None
     returned_minor: int | None = None
     reverses_ref: str | None = None
+    deal_id: str | None = None
     states_act: bool = True
 
     def __post_init__(self) -> None:
@@ -214,4 +220,5 @@ class Action:
             taxonomy_version=payload.get("taxonomy_version"),
             returned_minor=payload.get("returned_minor"),
             reverses_ref=payload.get("reverses_ref"),
+            deal_id=payload.get("deal_id"),
         )

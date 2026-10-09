@@ -208,6 +208,7 @@ def _payload_extension(action: Action, checkpoint: dict, manifest_digest: str | 
         ("item_ref", action.item_ref),
         ("returned_minor", action.returned_minor),
         ("reverses_ref", action.reverses_ref),
+        ("deal_id", action.deal_id),
     )
     for name, value in scalars:
         if value is not None:

@@ -13,9 +13,12 @@ __all__ = ["CheckOutcome"]
 class CheckOutcome:
     """One check's result: the constraint record it produces, any fold
     envelope(s) it read as evidence, and an optional suggested chain link
-    (e.g. dedupe/verify_before_dispatch citing the capsule they matched)."""
+    (e.g. dedupe/verify_before_dispatch citing the capsule they matched).
+    ``asks_approver`` marks a failure the check itself found an approver may
+    resolve (dedupe: the same act in another deal); the engine reads it."""
 
     constraint: ConstraintOutcome
     fold_envelopes: tuple[dict, ...] = field(default_factory=tuple)
     chain_parent: str | None = None
     chain_relation: str | None = None
+    asks_approver: bool = False
