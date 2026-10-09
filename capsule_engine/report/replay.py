@@ -34,7 +34,7 @@ import json
 import re
 import tempfile
 from collections.abc import Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -289,12 +289,27 @@ def _bridge_deal_check(record: dict, disclosed: dict | None) -> Action | None:
     )
 
 
+def _states_no_act(record: dict, disclosed: dict | None) -> bool:
+    """Whether ``record`` is a deal record other than a check, read from the
+    ``x-deal-v0.record_type`` its capsule sealed: a baseline, verdict,
+    approval or intent states no act, and the action step carries out the
+    act its check already stated. Never read from ``action_id`` or
+    ``action_type``, and never from a record the capsule does not bind."""
+    if disclosed is None or not _bound(record, disclosed):
+        return False
+    block = disclosed.get("x-deal-v0")
+    record_type = block.get("record_type") if isinstance(block, dict) else None
+    return isinstance(record_type, str) and record_type != "check"
+
+
 def action_for_record(record: dict, disclosed: dict | None = None) -> Action:
     """The action ``record`` states. ``disclosed`` is the record its capsule
     sealed, when a bundle disclosed it (``load_disclosed``)."""
     bridged = _bridge_deal_check(record, disclosed) or _bridge_transfer_funds(record)
     if bridged is not None:
         return bridged
+    if _states_no_act(record, disclosed):
+        return replace(Action.from_capsule(record), states_act=False)
     return Action.from_capsule(record)
 
 
