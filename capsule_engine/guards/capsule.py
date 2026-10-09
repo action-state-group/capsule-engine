@@ -42,7 +42,7 @@ null) when no manifest is configured, same as every other optional
 """
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from typing import TypedDict
 
@@ -65,9 +65,11 @@ __all__ = [
     "ALLOW",
     "DENY",
     "ESCALATE",
+    "LOCAL_ONLY_PAYLOAD_FIELDS",
     "ConstraintOutcome",
     "NotApplicableEvidence",
     "build_decision_capsule",
+    "local_only_refusal",
     "not_applicable_evidence",
     "outcome_from_disposition",
 ]
@@ -75,6 +77,42 @@ __all__ = [
 ALLOW = "allow"
 DENY = "deny"
 ESCALATE = "escalate"
+
+LOCAL_ONLY_PAYLOAD_FIELDS = frozenset({"deal_id", "item_ref", "returned_minor", "reverses_ref"})
+"""``asg_payload`` fields sealed on a guard decision only so later checks on
+the same machine can match against it: the deal an act was checked in, the
+item a sale is about, and what a money-in record returns and reverses.
+
+They can name other counterparties' deals, so a decision capsule carrying
+any of them never enters an artifact made for another party. Every export
+path refuses such records (``local_only_refusal``); stripping the fields is
+not an option, because ``capsule_id`` covers them. Adding a field here, or
+adding a path that exports decision capsules, needs the share boundary
+reviewed (see ``AGENTS.md``).
+"""
+
+
+# `capsules` are sealed capsules as raw JSON objects, as every export path
+# holds them (a ledger record's capsule, a replayed decision); only
+# `capsule_id` and the keys of `asg_payload` are read.
+def local_only_refusal(capsules: Iterable[dict]) -> str | None:
+    """``None`` when no capsule's ``asg_payload`` carries a field in
+    ``LOCAL_ONLY_PAYLOAD_FIELDS``; otherwise the reason an export refuses
+    them, naming the fields and the number of records and never a value."""
+    fields: set[str] = set()
+    records: set[str] = set()
+    for capsule in capsules:
+        found = LOCAL_ONLY_PAYLOAD_FIELDS.intersection(capsule.get("asg_payload", {}))
+        if found:
+            fields |= found
+            records.add(capsule["capsule_id"])
+    if not records:
+        return None
+    return (
+        f"{len(records)} record(s) carry local-only payload fields ({', '.join(sorted(fields))}); "
+        "those records stay on this machine and never enter a share"
+    )
+
 
 # Disposition mapping (see module docstring). `escalate` -> decision
 # `needs_input` with verdict_class `hitl_dispatched`, the donated vector's pair.

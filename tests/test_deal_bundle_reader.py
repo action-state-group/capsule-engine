@@ -23,7 +23,8 @@ from agent_action_capsule import json_digest
 
 from capsule_engine.cli.main import main as cli_main
 from capsule_engine.policy import load_manifest_file, resolve_manifest
-from capsule_engine.report.render import decode_fragment
+from capsule_engine.report import build_dry_run_report
+from capsule_engine.report.render import decode_fragment, to_fragment_payload
 from capsule_engine.report.replay import action_for_record, load_disclosed, load_records, replay
 
 PACKAGE_DIR = Path(__file__).parent.parent / "capsule_engine"
@@ -143,9 +144,22 @@ def _rows(payload: dict) -> list[dict]:
 
 
 def test_cli_caps_from_manifest_denies_the_purchase_and_passes_the_cancel(tmp_path, capsys):
+    resolved = _resolved()
     for bundle in (REFUND, PARTIAL):
-        rc, payload = _dry_run(tmp_path, capsys, bundle, "--manifest", str(MANIFEST), "--caps-from-manifest")
+        rc = cli_main(["guard", "dry-run", "--ledger", str(bundle), "--since", "all", "--out", str(tmp_path / "r.html"),
+                       "--manifest", str(MANIFEST), "--caps-from-manifest"])
         assert rc == 0
+        # The rows come from the same report the CLI renders: its share link
+        # is refused here, since each decision seals the deal's deal_id.
+        payload = to_fragment_payload(build_dry_run_report(
+            [str(bundle)],
+            caps_fold=resolved.caps_fold(),
+            since=None,
+            caps_minor=resolved.caps_minor(),
+            per_action_minor=resolved.per_action_minor() or None,
+            per_action_reads=resolved.per_action_reads(),
+            manifest_digest=resolved.manifest_digest,
+        ))
         # A row's capsule is the guard's own decision for the step, under the
         # step's action_id.
         checks = _checks(bundle, key="action_id")
