@@ -99,6 +99,7 @@ def _cmd_guard_dry_run(args: argparse.Namespace) -> int:
     from agent_action_capsule import compute_capsule_id
 
     from ..folds.loader import load_definition_file
+    from ..guards.capsule import local_only_refusal
     from ..packs import PackDefinitionError, load_proposals_file
     from ..report import build_dry_run_report, build_dry_run_report_with_proposal, render_report_html
     from ..report.render import TelemetryConfig, decode_fragment, to_fragment_payload
@@ -183,6 +184,15 @@ def _cmd_guard_dry_run(args: argparse.Namespace) -> int:
         )
 
     report = _build()
+
+    # The printed link carries every row's decision capsule and the capsule
+    # it cites; one holding a local-only field must not leave this machine.
+    if args.share and evidence_visible:
+        shared = [c for section in report.guards for row in section.rows for c in (row.capsule, row.cited_capsule) if c]
+        refusal = local_only_refusal(shared)
+        if refusal is not None:
+            print(f"capsule guard dry-run --share: refused: {refusal}; rerun without --share", file=sys.stderr)
+            return 1
 
     telemetry = None
     if args.telemetry_opt_in and args.telemetry_endpoint:

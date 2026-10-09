@@ -26,6 +26,7 @@ import base64
 import dataclasses
 import json
 import os
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -43,6 +44,7 @@ from capsule_emit.period import add_period_arg, apply_period
 from capsule_ledger.ledger.api import ScanQuery
 
 from ..envcompat import env_get
+from ..guards.capsule import local_only_refusal
 from .format import build_echo, format_staleness
 
 __all__ = ["add_parser", "run"]
@@ -189,6 +191,10 @@ def run(args: argparse.Namespace) -> int:
         matched = list(store.scan(query))
         records = _collect_with_parents(store, matched)
         capsules = [r.capsule for r in records]
+        refusal = local_only_refusal(capsules)
+        if refusal is not None:
+            print(f"capsule bundle: refused: {refusal}; narrow the selection to records without them", file=sys.stderr)
+            return 2
         ids = [c["capsule_id"] for c in capsules]
 
         verification: dict[str, dict] = {}
