@@ -367,7 +367,7 @@ fixtures:
     - id: merchant-repeat-purchase
       outcome: allow
     - id: booking-create
-      outcome: deny
+      outcome: escalate
     - id: off-taxonomy-class
       outcome: deny
     - id: recipient-history-real-payment

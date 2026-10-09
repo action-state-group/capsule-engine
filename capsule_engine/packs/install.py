@@ -38,7 +38,14 @@ from ..policy.profile import PolicyProfile
 from ..policy.resolve import ResolvedManifest, resolve_manifest
 from .schema import PackDefinition
 
-__all__ = ["InstalledPack", "install_pack", "manifest_id_for_pack", "build_engine", "record_pack_activation"]
+__all__ = [
+    "InstalledPack",
+    "ask_gate_selectors",
+    "install_pack",
+    "manifest_id_for_pack",
+    "build_engine",
+    "record_pack_activation",
+]
 
 PACK_ENGINE = "pack/1"
 FOLD_ENGINE = "fold/1"
@@ -164,7 +171,9 @@ def build_engine(
     "now" for the cooling-off. Note this does NOT set ``dry_run`` -- that is a per-``check()``-call
     argument (``guards/engine.py``); a caller in ``mode="observe"`` must pass
     ``dry_run=True`` to every ``check()`` call itself (see this module's own
-    docstring)."""
+    docstring). An action_class_gate failure asks an approver only on the
+    selectors whose obligations all declare ``default_disposition: ASK``
+    (``ask_gate_selectors``)."""
     return GuardEngine(
         ledger=ledger,
         caps_fold=installed.resolved.caps_fold(),
@@ -174,7 +183,20 @@ def build_engine(
         signer_provider=signer_provider,
         manifest_digest=installed.resolved.manifest_digest,
         wickets=installed.resolved.configured_wickets(RUNNABLE_CHECKS),
+        ask_gate_selectors=ask_gate_selectors(installed.pack),
     )
+
+
+def ask_gate_selectors(pack: PackDefinition) -> frozenset[str]:
+    """The action_class_gate selectors bound to at least one obligation, every
+    one of which declares ``default_disposition: ASK``. A selector with a
+    NEVER or DO obligation, or with an obligation declaring none, is left out,
+    so failing it still refuses."""
+    declared: dict[str, set[str | None]] = {}
+    for o in pack.obligations:
+        if o.check == "action_class_gate" and o.selector is not None:
+            declared.setdefault(o.selector, set()).add(o.default_disposition)
+    return frozenset(sid for sid, dispositions in declared.items() if dispositions == {"ASK"})
 
 
 def record_pack_activation(
