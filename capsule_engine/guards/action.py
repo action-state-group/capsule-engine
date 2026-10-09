@@ -111,10 +111,14 @@ class Action:
     SHA-256 digest of the record of the act it reverses. Both are set only
     when money moves in, sealed when set, and read by ``dedupe``.
     ``deal_id`` is the deal the act is checked in, as the deal's own sealed
-    record states it (``x-deal-v0.deal_id``, see ``report/replay.py``),
-    sealed when set and read by ``dedupe``: a repeat in the same deal is
-    refused, one in another deal may ask an approver. It never enters the
-    act key.
+    record states it (``x-deal-v0.deal_id``, else a typed record's
+    ``chain_id``; see ``report/replay.py``), sealed when set and read by
+    ``dedupe``: a repeat in the same deal is refused, one in another deal may
+    ask an approver. It never enters the act key.
+    ``deal_id_conflict`` names the fields of a record that states its deal
+    twice, with different values; ``deal_id`` is then unset, and the engine
+    never allows the action (``GuardDecision.deal_id_conflict``). Names
+    only, never the values; it is never sealed in ``asg_payload``.
     ``states_act`` is ``False`` for a record that states no act of its own
     (a deal's baseline, verdict or approval; see ``report/replay.py``), read
     by ``dedupe``, which does not apply to it; it is never sealed.
@@ -166,6 +170,7 @@ class Action:
     returned_minor: int | None = None
     reverses_ref: str | None = None
     deal_id: str | None = None
+    deal_id_conflict: tuple[str, ...] = ()
     states_act: bool = True
     ignored_inputs: tuple[str, ...] = ()
 

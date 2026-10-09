@@ -295,6 +295,33 @@ def _returned_minor(body: dict) -> int | None:
     return next((v for v in (_minor(body.get(f)) for f in _RETURNED_AMOUNT_FIELDS) if v is not None), None)
 
 
+# Where a deal record names its deal: an ``x-deal-v0`` record in its block's
+# ``deal_id``, a typed record in its top-level ``chain_id``, which capsulectl
+# sets to exactly that value. Read only through ``_deal_id``.
+_DEAL_ID_FIELDS = ("x-deal-v0.deal_id", "chain_id")
+
+
+@dataclass(frozen=True)
+class _DealId:
+    """The deal a record names, or ``None``; ``conflict`` when it names two."""
+
+    value: str | None
+    conflict: bool = False
+
+
+def _deal_id(shown: dict) -> _DealId:
+    """The deal ``shown`` is in: ``x-deal-v0.deal_id`` when the record states
+    one, else its typed ``chain_id``. A record stating both, and not the same
+    value, names no deal and is a conflict: neither is picked. A stated value
+    that is not a non-empty string names no deal."""
+    block = shown.get("x-deal-v0")
+    stated = isinstance(block, dict) and "deal_id" in block
+    chained = "chain_id" in shown
+    if stated and chained and block["deal_id"] != shown["chain_id"]:
+        return _DealId(value=None, conflict=True)
+    return _DealId(value=_text(block["deal_id"]) if stated else _text(shown.get("chain_id")))
+
+
 def _bridge_deal_check(record: dict, disclosed: dict | None, counterparty_profile: object = None) -> Action | None:
     """The proposed action a capsulectl deal check states, from its own
     sealed record: the class it names, and the amount a spend cap evaluates,
@@ -318,8 +345,9 @@ def _bridge_deal_check(record: dict, disclosed: dict | None, counterparty_profil
     digest of a typed reference, and dropped otherwise.
     ``taxonomy_version`` makes it an act stated against a pinned taxonomy, so
     ``dedupe`` keys it on the act, never on this record's type or id. The
-    deal is the record's sealed ``x-deal-v0.deal_id``, never the
-    ``action_id`` prefix."""
+    deal is the one the record names (``_deal_id``), never the ``action_id``
+    prefix. A record naming two deals carries none, and names both fields in
+    ``deal_id_conflict``, so the engine refuses whatever would be allowed."""
     if disclosed is None or not _bound(record, disclosed):
         return None
     body = _checked_body(disclosed)
@@ -333,6 +361,7 @@ def _bridge_deal_check(record: dict, disclosed: dict | None, counterparty_profil
         authorized = None
         returned, reverses = _returned_minor(body), _typed_ref_digest(body.get("reverses_ref"))
     block = disclosed.get("x-deal-v0") or {}
+    deal = _deal_id(disclosed)
     counterparty_ids, fp_alg = _sealed_counterparty(block.get("counterparty"))
     target, ignored = _payee_target(counterparty_ids, fp_alg), ()
     if counterparty_profile is not None:
@@ -370,7 +399,8 @@ def _bridge_deal_check(record: dict, disclosed: dict | None, counterparty_profil
         task_authority_ref=_typed_ref_digest(body.get("task_authority_ref")),
         returned_minor=returned,
         reverses_ref=reverses,
-        deal_id=_text(block.get("deal_id")),
+        deal_id=deal.value,
+        deal_id_conflict=_DEAL_ID_FIELDS if deal.conflict else (),
         ignored_inputs=ignored,
     )
 
@@ -425,7 +455,10 @@ def action_for_check_input(entry: dict, *, item_ref: object = None) -> Action:
     them, the envelope's optional ``counterparty_profile``, which capsulectl
     computes and passes and the capsule does not seal. ``item_ref`` is the
     envelope's top-level ``item_ref``, set on the action when it is 64
-    lowercase hex and named in ``ignored_inputs`` otherwise."""
+    lowercase hex and named in ``ignored_inputs`` otherwise. The envelope's
+    other top-level members, ``party_role`` among them (a checker may read it
+    to pick a pack), are not read here: an input carrying one is decided as
+    one without it."""
     capsule = {k: v for k, v in entry.items() if k not in ("agent_input", _PROFILE_INPUT)}
     agent_input = entry.get("agent_input")
     action = action_for_record(
@@ -515,19 +548,21 @@ def _carried_out(action_digest: str, deal: dict[str, dict]) -> _CarriedOut | Non
     names an approval whose body seals ``proceed: true`` and an approver in
     ``_CONSENTING_APPROVERS``, and that approval's one ``approves`` ref names
     the check, or the verdict whose one ``checks`` ref names it. Every record
-    in the chain is in the action's deal. ``None`` when any link is missing,
-    unbound, declined, approved by no one who consents for the user, or of
-    another kind."""
+    in the chain names the action's deal (``_deal_id``). ``None`` when any
+    link is missing, unbound, declined, approved by no one who consents for
+    the user, of another kind, or names two deals."""
     action = deal.get(action_digest)
     if action is None or _record_type(action) != "action":
         return None
-    deal_id = action["x-deal-v0"].get("deal_id")
+    deal_id = _deal_id(action)
+    if deal_id.conflict:
+        return None
     approval_digest = _only_ref(action, "authorized_by")
     approval = deal.get(approval_digest) if approval_digest is not None else None
     if approval_digest is None or approval is None or _record_type(approval) != "approval":
         return None
     body = approval.get("body")
-    if approval["x-deal-v0"].get("deal_id") != deal_id or not isinstance(body, dict) or body.get("proceed") is not True:
+    if _deal_id(approval) != deal_id or not isinstance(body, dict) or body.get("proceed") is not True:
         return None
     if _text(body.get("approver")) not in _CONSENTING_APPROVERS:
         return None
@@ -538,7 +573,7 @@ def _carried_out(action_digest: str, deal: dict[str, dict]) -> _CarriedOut | Non
         approved = deal.get(check_digest) if check_digest is not None else None
     if check_digest is None or approved is None or _record_type(approved) != "check":
         return None
-    if approved["x-deal-v0"].get("deal_id") != deal_id:
+    if _deal_id(approved) != deal_id:
         return None
     return _CarriedOut(check=check_digest, approval=approval_digest, action=action_digest)
 

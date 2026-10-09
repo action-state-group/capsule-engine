@@ -16,6 +16,13 @@ action never evaluated is never allowed, and no later check counts it as an
 accepted act. A replay (``evaluate_under_record_taxonomy``) evaluates a record
 under the table it was sealed with when the engine carries that version
 (``classes.carried_taxonomy``), and holds it the same way when it does not.
+
+An action whose record states its deal twice, with different values
+(``Action.deal_id_conflict``), names no deal, so no check can place it in one.
+It is decided as any action without a deal, except that what would be allowed
+is refused and sealed ``reject``, its ``verdict`` ``not_evaluable``
+(``DealIdConflict``): neither value is picked, and the act is never counted
+later as seen or as spend.
 """
 from __future__ import annotations
 
@@ -68,7 +75,14 @@ if TYPE_CHECKING:
     # ``policy`` imports ``guards``; the engine only calls ``in_force``.
     from ..policy.limits import CapsLimits
 
-__all__ = ["ASK_RULE_EXCLUDED_CHECKS", "NOT_EVALUABLE", "GuardDecision", "GuardEngine", "TaxonomyMismatch"]
+__all__ = [
+    "ASK_RULE_EXCLUDED_CHECKS",
+    "NOT_EVALUABLE",
+    "DealIdConflict",
+    "GuardDecision",
+    "GuardEngine",
+    "TaxonomyMismatch",
+]
 
 NOT_EVALUABLE = "not_evaluable"
 
@@ -109,13 +123,18 @@ class GuardDecision:
     # Set when the action's taxonomy version is not the one its class was
     # evaluated under: the class-keyed checks were not evaluated.
     taxonomy_mismatch: TaxonomyMismatch | None = None
+    # Set when the action's record states its deal twice, with different
+    # values: the action is in no deal, and is never allowed.
+    deal_id_conflict: DealIdConflict | None = None
 
     @property
     def verdict(self) -> str:
         """``outcome``, except that a decision refused only because its
-        class-keyed checks were left unevaluated (``taxonomy_mismatch``, and
-        no constraint failed) is ``not_evaluable``."""
-        if self.taxonomy_mismatch is not None and not any(c.result == "fail" for c in self.constraints):
+        class-keyed checks were left unevaluated (``taxonomy_mismatch``) or
+        its deal could not be read (``deal_id_conflict``), with no constraint
+        failed, is ``not_evaluable``."""
+        unevaluated = self.taxonomy_mismatch is not None or self.deal_id_conflict is not None
+        if unevaluated and not any(c.result == "fail" for c in self.constraints):
             return NOT_EVALUABLE
         return self.outcome
 
@@ -125,6 +144,13 @@ class TaxonomyMismatch(TypedDict):
 
     record_taxonomy_version: str
     engine_taxonomy_version: str
+
+
+class DealIdConflict(TypedDict):
+    """The fields an action's record states its deal in, which differ.
+    Names only, never the values."""
+
+    fields: tuple[str, ...]
 
 
 class TaxonomyHeldEvidence(TypedDict):
@@ -454,6 +480,10 @@ class GuardEngine:
         if mismatch is not None and outcome == ALLOW:
             # Its class was never evaluated: refused, never sealed as accepted.
             outcome = DENY
+        conflict = DealIdConflict(fields=action.deal_id_conflict) if action.deal_id_conflict else None
+        if conflict is not None and outcome == ALLOW:
+            # Its deal is unknown, and neither stated value is picked.
+            outcome = DENY
 
         resolved_parent, resolved_relation = chain_parent, chain_relation
         if resolved_parent is None:
@@ -526,8 +556,9 @@ class GuardEngine:
             fold_envelopes=fold_envelopes,
             checkpoint=checkpoint,
             capsule=capsule,
-            reason=_summarize(constraints, outcome, ac, escalatable, mismatch_reason),
+            reason=_summarize(constraints, outcome, ac, escalatable, mismatch_reason, conflict),
             taxonomy_mismatch=mismatch,
+            deal_id_conflict=conflict,
         )
 
     def _taxonomy_for(self, action: Action) -> tuple[TaxonomyTable, TaxonomyMismatch | None, str | None]:
@@ -772,6 +803,7 @@ def _summarize(
     action_class: ActionClass,
     escalatable: frozenset[str],
     not_evaluated: str | None = None,
+    deal_id_conflict: DealIdConflict | None = None,
 ) -> str:
     parts = [f"{c.id}={c.result}" for c in constraints]
     summary = f"{outcome}: " + ", ".join(parts)
@@ -780,6 +812,13 @@ def _summarize(
         summary += f"; not evaluable: {not_evaluated}"
         if not fails:
             summary += "; refused because its action class was not evaluated"
+    if deal_id_conflict is not None:
+        summary += (
+            f"; not evaluable: the record states its deal in {' and '.join(deal_id_conflict['fields'])} "
+            "with different values, so it is in no deal"
+        )
+        if not fails:
+            summary += "; refused because its deal is not known"
     if outcome == DENY and fails and fails <= escalatable and action_class.approver_role is None:
         summary += (
             f"; every failure may ask an approver, but action class {action_class.name!r} "
