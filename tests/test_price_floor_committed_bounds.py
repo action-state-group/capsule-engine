@@ -189,6 +189,21 @@ def test_a_float_floor_has_no_commitment_and_fails():
     assert (_check(FLOOR_MINOR + 5_000, opening).result) == "fail"
 
 
+# -- a floor in clear on the record is never read -------------------------------
+
+
+def test_a_floor_in_clear_beside_the_commitment_is_never_read():
+    """A record that seals the commitment and also a min_total_minor in
+    clear: without an opening it is n/a, and with one the opened floor
+    decides, whatever the clear one says."""
+    both: TaskAuthorityRecord = copy.deepcopy(AUTHORITY)
+    both["body"]["min_total_minor"] = FLOOR_MINOR + 50_000
+    out = _check(FLOOR_MINOR + 10_000, None, both)
+    assert (out.result, out.evidence) == (
+        "n/a", not_applicable_evidence("price_floor", in_scope=True, missing_field="commercial_bounds_opening"))
+    assert _check(FLOOR_MINOR + 10_000, OPENING, both).result == "pass"
+
+
 # -- no opening is n/a ----------------------------------------------------------
 
 
