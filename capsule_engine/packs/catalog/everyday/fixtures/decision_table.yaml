@@ -26,8 +26,8 @@
 # disposition.verdict_class hitl_dispatched. caps-over-limit-on-watched-rail
 # fires caps 'fail' alongside destination_rail, so it denies.
 #
-# merchant-first-purchase fails counterparty_seen_before and denies: money.purchase
-# has no approver role, so the failure cannot escalate. merchant-repeat-purchase
+# merchant-first-purchase fails counterparty_seen_before alone and escalates the
+# same way: money.purchase names an approver role. merchant-repeat-purchase
 # passes because merchant-history-real-payment is a real accepted payment to
 # the same merchant (a dry run does not count).
 # out-of-scope-action passes action_class_gate (a non-consequential class);
@@ -391,7 +391,7 @@ rows:
       channel_change: {population: a, missing_field: channel}
       upfront_amount: {population: a, missing_field: upfront_amount_minor}
       task_authority: {population: a, missing_field: task_authority_ref}
-    verdict: deny
+    verdict: escalate
   - scenario: merchant-repeat-purchase
     action_id: make_purchase/everyday-fixture-merchant-repeat
     checks: {dedupe: pass, caps: pass, verify_before_dispatch: n/a, destination_rail: n/a, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: n/a, action_class_gate: n/a, counterparty_seen_before: pass, recipient_role: n/a, refundability: n/a, material_fields_changed: n/a, offer_fields_changed: n/a, recipient_seen_before: n/a, channel_change: n/a, upfront_amount: n/a, task_authority: n/a}

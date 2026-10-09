@@ -89,7 +89,10 @@ def test_caps_v2_is_untouched_and_carries_no_per_action_limit():
     assert "per_action_minor" not in entry.definition.config
 
 
-@pytest.mark.parametrize(("action_class", "outcome"), [("money.transfer", "escalate"), ("money.purchase", "deny")])
+@pytest.mark.parametrize(
+    ("action_class", "outcome"),
+    [("money.transfer", "escalate"), ("money.purchase", "escalate"), ("agreement.accept", "deny")],
+)
 def test_a_single_purchase_over_the_per_action_limit_fails_and_names_per_action(store, signer, action_class, outcome):
     """60.00 against 25.00 per action / 100.00 per week, nothing spent yet.
     The outcome is the engine's existing caps mapping: a class with an

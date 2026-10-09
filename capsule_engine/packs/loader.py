@@ -83,6 +83,7 @@ from .errors import (
     INVALID_JUDGE_PIN,
     INVALID_MEASURABILITY,
     INVALID_MODE,
+    INVALID_OBLIGATION_SELECTOR,
     INVALID_OUTCOME,
     INVALID_PACK_ID,
     INVALID_PROFILE_ID,
@@ -98,6 +99,7 @@ from .errors import (
     MISSING_EVIDENCE_RULE,
     MISSING_JUDGE_PIN,
     MISSING_OBLIGATION_CLAUSE,
+    MISSING_OBLIGATION_SELECTOR,
     MISSING_REFUSAL_REASON,
     MISSING_REQUIRED_FIELD,
     OBLIGATION_CHECK_NOT_DECLARED,
@@ -109,6 +111,7 @@ from .errors import (
     UNKNOWN_CATALOG_REF,
     UNKNOWN_EFFECT_CLAIM,
     UNKNOWN_NORMALIZED_FIELD,
+    UNKNOWN_OBLIGATION_SELECTOR,
     UNKNOWN_OUTCOME_IN_PROFILE_OVERRIDE,
     PackDefinitionError,
 )
@@ -192,7 +195,11 @@ def _require_nonempty_str(value: Any, field_name: str, example: str) -> str:
 
 
 def _parse_obligations(
-    raw: Any, *, declared_checks: set[str], allow_empty: bool = False
+    raw: Any,
+    *,
+    declared_checks: set[str],
+    check_selectors: dict[str, frozenset[str]],
+    allow_empty: bool = False,
 ) -> tuple[Obligation, ...]:
     if raw is None:
         if allow_empty:
@@ -239,6 +246,12 @@ def _parse_obligations(
                 f"obligations[{obligation_id!r}].mode={mode!r} must be one of {sorted(MODE_VALUES)}, or omitted "
                 "(defaults to 'structural')",
             )
+        if "selector" in entry and (mode == "judged" or measurability == "declared_not_measured"):
+            raise PackDefinitionError(
+                INVALID_OBLIGATION_SELECTOR,
+                f"obligations[{obligation_id!r}] names a selector but cites no check; a selector belongs "
+                "only to an obligation measured by a check that has selectors",
+            )
         if mode == "judged":
             obligations.append(_judged_obligation(entry, obligation_id=obligation_id, statement=statement))
             continue
@@ -277,6 +290,9 @@ def _parse_obligations(
                 "to a constraint that actually enforces it; add a constraints[] entry with check: "
                 f"{check!r}, or fix the typo",
             )
+        selector = _obligation_selector(
+            entry.get("selector"), check=check, selectors=check_selectors.get(check), obligation_id=obligation_id
+        )
         re_derivability_grade, default_disposition = _obligation_grades(
             entry.get("re_derivability_grade"), entry.get("default_disposition"), obligation_id=obligation_id
         )
@@ -285,12 +301,45 @@ def _parse_obligations(
                 id=obligation_id,
                 statement=statement,
                 check=check,
+                selector=selector,
                 re_derivability_grade=re_derivability_grade,
                 default_disposition=default_disposition,
                 mode=mode,
             )
         )
     return tuple(obligations)
+
+
+# Reads one obligation's raw YAML value: the loader's decoding boundary.
+def _obligation_selector(
+    raw: object, *, check: str, selectors: frozenset[str] | None, obligation_id: str
+) -> str | None:
+    """The selector an obligation is measured by, or ``None`` for a check without selectors.
+
+    A check with selectors produces one result for the whole action, so an
+    obligation citing it with no selector would fail whenever any selector
+    fails -- the reason it is required here.
+    """
+    what = f"obligations[{obligation_id!r}]"
+    if selectors is None:
+        if raw is not None:
+            raise PackDefinitionError(
+                INVALID_OBLIGATION_SELECTOR,
+                f"{what}.selector={raw!r}, but check {check!r} has no selectors; drop the selector",
+            )
+        return None
+    if raw is None:
+        raise PackDefinitionError(
+            MISSING_OBLIGATION_SELECTOR,
+            f"{what} cites check {check!r}, which has selectors {sorted(selectors)}; name the one this "
+            f"obligation is measured by, e.g. selector: {sorted(selectors)[0]!r}",
+        )
+    if not isinstance(raw, str) or raw not in selectors:
+        raise PackDefinitionError(
+            UNKNOWN_OBLIGATION_SELECTOR,
+            f"{what}.selector={raw!r} is not a selector of check {check!r} (selectors: {sorted(selectors)})",
+        )
+    return raw
 
 
 # Reads one obligation's raw YAML mapping: the loader's decoding boundary.
@@ -1285,8 +1334,12 @@ def load_pack_dir(pack_dir: str | Path) -> PackDefinition:
 
     constraints, constraint_scopes = _parse_constraints(data.get("constraints"), allow_empty=allow_empty_forward)
     declared_checks = {c.check for c in constraints}
+    check_selectors = {c.check: frozenset(c.config["selectors"]) for c in constraints if "selectors" in c.config}
     obligations = _parse_obligations(
-        data.get("obligations"), declared_checks=declared_checks, allow_empty=allow_empty_forward
+        data.get("obligations"),
+        declared_checks=declared_checks,
+        check_selectors=check_selectors,
+        allow_empty=allow_empty_forward,
     )
     action_semantics = _parse_action_semantics(data.get("action_semantics"), allow_empty=allow_empty_forward)
     folds = _parse_folds(data.get("folds"), pack_dir=pack_dir, allow_empty=allow_empty_forward)

@@ -22,7 +22,8 @@ ROOT = Path(__file__).parent.parent / "capsule_engine"
 SEEN = load_wicket(ROOT / "guards" / "wickets" / "catalog_defs" / "counterparty_seen_before.yaml")
 FOLD = load_fold(ROOT / "folds" / "catalog_defs" / "counterparty.seen_before.yaml")
 RAIL = load_wicket(ROOT / "guards" / "wickets" / "catalog_defs" / "destination_rail.yaml")
-CLASSES = ["money.purchase", "money.transfer"]
+# agreement.accept names no approver role.
+CLASSES = ["money.purchase", "money.transfer", "agreement.accept"]
 SEEN_BOTH = replace(SEEN, config={**SEEN.config, "action_classes": CLASSES})
 
 
@@ -96,7 +97,10 @@ def test_a_wrong_fold_digest_is_refused():
         seen_before_fold(SEEN.config["fold_id"], "0" * 64)
 
 
-@pytest.mark.parametrize(("action_class", "outcome"), [("money.transfer", "escalate"), ("money.purchase", "deny")])
+@pytest.mark.parametrize(
+    ("action_class", "outcome"),
+    [("money.transfer", "escalate"), ("money.purchase", "escalate"), ("agreement.accept", "deny")],
+)
 def test_a_first_time_counterparty_fails_and_asks_where_the_class_has_an_approver(store, caps_fold, signer,
                                                                                  action_class, outcome):
     decision = _engine(store, caps_fold, signer).check(_action(1, action_class=action_class))
@@ -134,8 +138,8 @@ def test_another_target_is_a_first_time_counterparty(store, caps_fold, signer):
 
 
 def test_a_refused_prior_attempt_does_not_make_the_counterparty_known(store, caps_fold, signer):
-    over = _engine(store, caps_fold, signer, wickets=(), caps_minor={"money.purchase": 1_000})
-    refused = over.check(_action(1))
+    # A cited mandate that is not on the ledger fails verify_before_dispatch.
+    refused = _engine(store, caps_fold, signer, wickets=()).check(_action(1, cited_mandate_capsule_id="0" * 64))
     assert refused.outcome == "deny"
     assert refused.capsule["disposition"]["decision"] != "accept"
     decision = _engine(store, caps_fold, signer).check(_action(2))

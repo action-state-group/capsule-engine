@@ -17,7 +17,13 @@
 # intent. A measured statement names exactly what its check reads, including
 # where that is narrower or wider than the rule. default_disposition is
 # declared data the guard engine does not read.
-pack_id: asg/everyday/0.3.1
+#
+# Eight rules share action_class_gate. Each names the one gate selector it
+# is measured by (selector:), so an action fails or passes only the rules
+# whose selector matched its class and is not applicable to the others. An
+# action whose class has no taxonomy row fails all eight: the gate fails
+# closed and none of them can be ruled out.
+pack_id: asg/everyday/0.3.2
 
 obligations:
   # -- DO ------------------------------------------------------------------
@@ -28,6 +34,7 @@ obligations:
       that is info.query alone. An action in any other class leaves this rule
       for the rules that apply to it.
     check: action_class_gate
+    selector: non_consequential
     default_disposition: DO
   - id: r02-ordinary-purchase
     statement: >-
@@ -54,6 +61,7 @@ obligations:
       adding to a cart is recognised only when declared in it. The step that
       pays, sends, books, publishes, signs or deletes goes to the other rules.
     check: action_class_gate
+    selector: non_consequential
     default_disposition: DO
   # -- ASK -----------------------------------------------------------------
   - id: r05-spending-limits
@@ -110,6 +118,7 @@ obligations:
       individual apart from one sent to a fulfilling merchant is not measured
       yet.
     check: action_class_gate
+    selector: personal_disclosure
     default_disposition: ASK
   - id: r12-personal-contact-to-a-new-party
     statement: >-
@@ -119,6 +128,7 @@ obligations:
       personal phone number or email, and whether the recipient is new, is
       not measured yet.
     check: action_class_gate
+    selector: personal_disclosure
     default_disposition: ASK
   - id: r13-message-to-a-new-recipient
     statement: >-
@@ -143,6 +153,7 @@ obligations:
       Flags an action declared as public posting (communication.publish), and
       records the class.
     check: action_class_gate
+    selector: public_posting
     default_disposition: ASK
   - id: r16-booking-with-a-commitment
     statement: >-
@@ -150,6 +161,7 @@ obligations:
       records the class. It flags every booking, whether or not money, a
       deposit or a penalty is involved.
     check: action_class_gate
+    selector: booking_create
     default_disposition: ASK
   - id: r17-cancellation
     statement: >-
@@ -157,12 +169,14 @@ obligations:
       records the class. Cancelling a subscription or another service is
       flagged only when it is declared in that class.
     check: action_class_gate
+    selector: booking_cancel
     default_disposition: ASK
   - id: r18-delete-persistent-data
     statement: >-
       Flags an action declared as deleting stored data (data.delete), and
       records the class.
     check: action_class_gate
+    selector: destructive_mutation
     default_disposition: ASK
   - id: r19-counterparty-identity-changed
     statement: >-
@@ -349,7 +363,7 @@ fixtures:
     - id: merchant-history-real-payment
       outcome: allow
     - id: merchant-first-purchase
-      outcome: deny
+      outcome: escalate
     - id: merchant-repeat-purchase
       outcome: allow
     - id: booking-create
