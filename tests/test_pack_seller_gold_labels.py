@@ -112,7 +112,7 @@ def test_rerunning_each_row_from_its_recorded_pins_reproduces_its_record(tmp_pat
     replayed = {c["action_id"]: c for c in capsules.values()}
     installed_wickets = {w.wicket_id: w.digest for w in installed.manifest.wickets}
     for row in _gold():
-        assert row["config_identity"]["pack_id"] == "asg/seller/0.1.0"
+        assert row["config_identity"]["pack_id"] == "asg/seller/0.1.1"
         assert row["config_identity"]["pack_digest"] == pack.definition_digest()
         for wicket_id, digest in row["config_identity"]["wickets"].items():
             assert installed_wickets[wicket_id] == digest, (row["action_id"], wicket_id)

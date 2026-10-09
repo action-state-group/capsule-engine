@@ -711,7 +711,9 @@ _ESCALATABLE = frozenset({"caps", "counterparty_seen_before"})
 _GATE = "action_class_gate"
 # Integrity checks: a failure is refused whatever a pack declares (a dedupe hit
 # on the same act in another deal asks through ``CheckOutcome.asks_approver``).
-_INTEGRITY_CHECKS = frozenset({"dedupe", "verify_before_dispatch", "single_commitment", "promise_never"})
+_INTEGRITY_CHECKS = frozenset(
+    {"dedupe", "verify_before_dispatch", "single_commitment", "promise_never", "release_on_acceptance"}
+)
 # Checks whose own config decides whether a failure asks.
 _OWN_ASK_RULE = frozenset({_GATE, "counterparty_list"})
 # The checks a declared ASK disposition never makes ask (``ask_wickets``).
@@ -758,7 +760,8 @@ def _decide(
     triggering class has an
     `approver_role` configured -- an integrity failure
     (`verify_before_dispatch`, whether the cited mandate is missing or fails
-    re-verification; `single_commitment`; `promise_never`), a dedupe hit in
+    re-verification; `single_commitment`; `promise_never`;
+    `release_on_acceptance`), a dedupe hit in
     the same deal, or an escalatable failure on a class with
     no approver configured all hard-deny, unconditionally."""
     fails = {c.id for c in constraints if c.result == "fail"}

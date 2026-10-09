@@ -48,16 +48,16 @@ OWN = (FIXTURE / "deal-1.bundle.json", FIXTURE / "deal-2.bundle.json")
 SHARES = (FIXTURE / "deal-1.counterparty.bundle.json", FIXTURE / "deal-2.counterparty.bundle.json")
 EXPECTED = FIXTURE / "expected_decisions.json"
 FIXTURE_SHA256 = {
-    "deal-1.bundle.json": "74109be0d4c2450da340f4f1dfc272d51f64eb17ccb861c8ebf88ed50ceb18c1",
-    "deal-1.counterparty.bundle.json": "dc5cdc47284797fe81d04b6a55efbc3faed67931bb206585284b7fd302bdfd5a",
-    "deal-2.bundle.json": "a152f148bd110a7373ee420293bc96783a390dd460cf75b496130d0e83cce1ba",
-    "deal-2.counterparty.bundle.json": "fde7f888f3246548509451d035f96facff7b016cddc66a397e6c204ef82cb3ac",
+    "deal-1.bundle.json": "22ee3f9771d8fad6917a50be8ff93894ad24e0a219c220d9d255bfe66327736d",
+    "deal-1.counterparty.bundle.json": "b9121ea5ea42251b25ae329af60f93a9bded09fb12e63044b0c10c7af1e82808",
+    "deal-2.bundle.json": "b9a6a26daa75d69f7e608c67abfa93072c2b26680c65660ee8e599cf1a9b7a36",
+    "deal-2.counterparty.bundle.json": "810a9d1f4d43f1b55a0db4cd51673e431b5ac169ee3543c293b23963848de298",
 }
 PACK = load_pack_dir(Path(capsule_engine.__file__).parent / "packs" / "catalog" / "everyday")
 FROZEN_0_3_3 = Path(__file__).parent / "fixtures" / "packs" / "everyday-0.3.3"
 PACK_ID = "asg/everyday/0.3.4"
 PACK_DIGEST = "cd98aaec5acf8cea86f91fc21dd7df6b36a67c7b55340489b66e6ce88b85117b"
-PRODUCER = {"commit": "d1615229de65a17e250594ea4e1f456671c12eba", "name": "capsulectl", "version": "v0.1.0-rc13-4-gd161522"}
+PRODUCER = {"commit": "831afeeb9fd76b7196486a9af38ca455b1230791", "name": "capsulectl", "version": "v0.1.0-rc13-6-g831afee"}
 TAXONOMY = "6"
 R02 = "r02-ordinary-purchase"
 R06 = "r06-new-merchant"
@@ -513,15 +513,16 @@ def test_no_share_discloses_a_companion_or_carries_its_fingerprint():
 
 def test_a_share_lists_the_companion_only_as_a_withheld_step():
     """What capsulectl's share does carry: the companion's sealed capsule (its
-    digests and signature, no record) and one withheld step naming its kind."""
+    digests and signature, no record) and one withheld step under the neutral
+    kind ``private`` (capsule-cli #170): the share never names the record type."""
     for own, share in zip(OWN, SHARES, strict=True):
         (companion,) = _of_type(own, "counterparty_profile")
         shared = _json(share)
         assert companion in {r["capsule_id"] for r in shared["records"]}
         assert companion not in shared["disclosures"]
         text = share.read_text(encoding="utf-8")
-        assert text.count("counterparty_profile") == 1
-        assert re.search(r'"capsule_id":"' + companion + r'","kind":"counterparty_profile","line":"[^"]*","n":\d+,"withheld":true', text)
+        assert "counterparty_profile" not in text
+        assert re.search(r'"capsule_id":"' + companion + r'","kind":"private","line":"[^"]*","n":\d+,"withheld":true', text)
 
 
 def test_the_engine_refuses_to_share_a_profile_keyed_decision(tmp_path, capsys):

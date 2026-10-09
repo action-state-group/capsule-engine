@@ -39,7 +39,7 @@ from ..action import Action
 from ..capsule import ConstraintOutcome, NotApplicableEvidence, not_applicable_evidence
 from .base import CheckOutcome
 
-__all__ = ["check_single_commitment"]
+__all__ = ["SealedAcceptance", "check_single_commitment", "first_sealed_acceptance"]
 
 _CHECK_ID = "single_commitment"
 _METHOD = "first_sealed_acceptance_v1"
@@ -50,7 +50,7 @@ class CommitmentEvidence(TypedDict):
     sale_has_acceptance: bool
 
 
-class _Acceptance(TypedDict):
+class SealedAcceptance(TypedDict):
     capsule_id: str
     counterparty: str | None
 
@@ -67,11 +67,16 @@ def _outcome(result: str, reason: str, evidence: CommitmentEvidence | NotApplica
     )
 
 
-def _first_acceptance(
-    action: Action, ledger: LedgerAPI, acceptance_classes: list[str], task_authority_ref: str, item_ref: str
-) -> _Acceptance | None:
+def first_sealed_acceptance(
+    operator: str, ledger: LedgerAPI, acceptance_classes: list[str], task_authority_ref: str, item_ref: str
+) -> SealedAcceptance | None:
+    """The sale's acceptance: the first record in ledger order, among
+    ``operator``'s, whose class is in ``acceptance_classes``, whose decision
+    was accept, which was not a dry run, and which carries the same
+    ``task_authority_ref`` and ``item_ref``. Shared with
+    ``release_on_acceptance``, so both read one acceptance per sale."""
     # ``ScanQuery.counterparty`` is the ledger's filter on ``operator``.
-    for record in ledger.scan(ScanQuery(counterparty=action.operator)):
+    for record in ledger.scan(ScanQuery(counterparty=operator)):
         capsule = record.capsule
         payload = capsule.get("asg_payload") or {}
         if payload.get("action_class") not in acceptance_classes:
@@ -82,7 +87,7 @@ def _first_acceptance(
             continue
         if payload.get("task_authority_ref") != task_authority_ref or payload.get("item_ref") != item_ref:
             continue
-        return _Acceptance(capsule_id=record.capsule_id, counterparty=payload.get("target"))
+        return SealedAcceptance(capsule_id=record.capsule_id, counterparty=payload.get("target"))
     return None
 
 
@@ -102,7 +107,9 @@ def check_single_commitment(
         return _outcome("n/a", f"{reason}; the sale could not be identified",
                         not_applicable_evidence(_CHECK_ID, in_scope=True, missing_field="item_ref"))
 
-    acceptance = _first_acceptance(action, ledger, acceptance_classes, action.task_authority_ref, action.item_ref)
+    acceptance = first_sealed_acceptance(
+        action.operator, ledger, acceptance_classes, action.task_authority_ref, action.item_ref
+    )
     if acceptance is None:
         return _outcome("pass", "no acceptance is sealed for this sale", _evidence(False))
     cites = action.cited_mandate_capsule_id == acceptance["capsule_id"]
