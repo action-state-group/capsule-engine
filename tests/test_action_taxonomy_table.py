@@ -128,10 +128,12 @@ def test_catch_all_declares_its_trigger_class():
 
 
 # Policy each pre-table class name carried before the table existed; a
-# sealed record holding one of these names must gate exactly as before.
+# sealed record holding one of these names must gate exactly as before,
+# except where a later taxonomy version changed it on purpose: taxonomy 4
+# named the account holder as data.delete's approver.
 LEGACY_POLICY = {
     "money.transfer": ("money.transfer", True, False, "treasury-approver", "COMMIT"),
-    "data.delete": ("data.delete", True, False, None, "MUTATE"),
+    "data.delete": ("data.delete", True, False, "account_holder", "MUTATE"),
     "comms.external": ("communication.send", True, False, None, "COMMUNICATE"),
     "info.query": ("info.query", False, True, None, None),
 }

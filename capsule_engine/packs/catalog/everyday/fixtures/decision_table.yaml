@@ -40,10 +40,13 @@
 # been addressed to the support desk. credential-absent passes it because
 # recipient-history-real-payment is a real accepted payment to the landlord.
 # disclosure-to-fulfilling-merchant passes recipient_role and
-# disclosure-to-third-party fails it; both also fail action_class_gate, so
-# both deny. declared-terms-in-bounds passes refundability,
-# material_fields_changed, offer_fields_changed, channel_change and
-# upfront_amount; each of the five rows after it fails exactly one of them.
+# disclosure-to-third-party fails it; both also fail action_class_gate on
+# r11 and r12, which declare ASK. disclosure.personal names an approver role,
+# so the first, failing the gate alone, escalates; the second also fails
+# recipient_role, which never asks, and denies. declared-terms-in-bounds
+# passes refundability, material_fields_changed, offer_fields_changed,
+# channel_change and upfront_amount; each of the five rows after it fails
+# exactly one of them.
 # task-inside-authority passes task_authority against the record supplied
 # with the decision; task-outside-authority names a payee that record's plan
 # does not bind, and fails it.
@@ -469,7 +472,7 @@ rows:
       channel_change: {population: c}
       upfront_amount: {population: c}
       task_authority: {population: c}
-    verdict: deny
+    verdict: escalate
   - scenario: disclosure-to-third-party
     action_id: share_address/everyday-fixture-third-party
     checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, destination_rail: n/a, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: n/a, action_class_gate: fail, counterparty_seen_before: n/a, recipient_role: fail, refundability: n/a, material_fields_changed: n/a, offer_fields_changed: n/a, recipient_seen_before: n/a, channel_change: n/a, upfront_amount: n/a, task_authority: n/a}

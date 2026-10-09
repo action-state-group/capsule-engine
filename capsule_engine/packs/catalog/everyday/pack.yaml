@@ -373,7 +373,7 @@ fixtures:
     - id: recipient-history-real-payment
       outcome: allow
     - id: disclosure-to-fulfilling-merchant
-      outcome: deny
+      outcome: escalate
     - id: disclosure-to-third-party
       outcome: deny
     - id: declared-terms-in-bounds

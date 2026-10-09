@@ -6,8 +6,9 @@ bytes).
 The taxonomy decides what a gated class does on a failure -- its
 ``approver_role`` makes it ask rather than refuse -- yet a pack's digest did
 not cover it: taxonomy 3 changed four classes from refuse to ask under an
-unchanged everyday 0.3.2 digest. A pack that pins the taxonomy moves its
-digest when the taxonomy moves, and does not load under any other one.
+unchanged everyday 0.3.2 digest, and taxonomy 4 four more. A pack that pins
+the taxonomy moves its digest when the taxonomy moves, and does not load
+under any other one.
 
 The pin is optional and everyday 0.3.2 does not carry it: adding it would move
 the digest the plugin vendors. The next everyday version is the one to adopt it.
@@ -48,9 +49,30 @@ def test_the_engine_digest_of_the_taxonomy_is_the_jcs_digest_of_the_packaged_fil
     raw = json.loads((REPO / "capsule_engine" / "guards" / "action_taxonomy.json").read_text())
     assert TAXONOMY_DIGEST == json_digest(raw)
     assert (TAXONOMY_VERSION, TAXONOMY_DIGEST) == (
-        "3",
-        "c826fcf92c18a6463b6a49fbc861e399e9afc423ba534bb69501c234b2c9b631",
+        "4",
+        "1ddce1235c3445b4ec92890d903934b08831c993f1b562e7f00082f87ca4c859",
     )
+
+
+# Taxonomy 4 named the account holder as approver on these four classes and
+# changed nothing else; undoing exactly that must give taxonomy 3 back.
+TAXONOMY_3_DIGEST = "c826fcf92c18a6463b6a49fbc861e399e9afc423ba534bb69501c234b2c9b631"
+TAXONOMY_4_APPROVERS = {
+    "booking.cancel": "account_holder",
+    "data.delete": "account_holder",
+    "communication.publish": "account_holder",
+    "disclosure.personal": "account_holder",
+}
+
+
+def test_taxonomy_4_differs_from_3_only_in_the_version_and_four_approver_roles():
+    raw = json.loads((REPO / "capsule_engine" / "guards" / "action_taxonomy.json").read_text())
+    rows = {row["name"]: row for row in raw["actions"]}
+    assert {name: rows[name]["approver_role"] for name in TAXONOMY_4_APPROVERS} == TAXONOMY_4_APPROVERS
+    raw["taxonomy_version"] = "3"
+    for name in TAXONOMY_4_APPROVERS:
+        rows[name]["approver_role"] = None
+    assert json_digest(raw) == TAXONOMY_3_DIGEST
 
 
 def test_everyday_0_3_2_carries_no_pin_and_keeps_its_vendored_digest():
