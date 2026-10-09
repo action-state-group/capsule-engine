@@ -92,11 +92,11 @@ def test_caps_v5_is_caps_v4_plus_per_action_reads_and_v4_is_unchanged():
     assert entry.digest == "2b07340e8fc858af76d8accf6afc3d6c9d05bb92d50abcfddd1fee8d9b51de35"
 
 
-def test_a_pre_authorisation_buffer_over_the_per_action_limit_is_denied_though_the_capture_is_under_it(store, signer):
+def test_a_pre_authorisation_buffer_over_the_per_action_limit_is_held_though_the_capture_is_under_it(store, signer):
     decision = _engine(store, signer).check(_action(1, CAPTURE, AUTHORIZED))
     caps = _caps(decision)
     assert caps.result == "fail"
-    assert decision.outcome == "deny"
+    assert decision.outcome == "escalate"
     assert caps.evidence["tripped"] == [{"limit": "per_action", "threshold_minor": PER_ACTION, "observed_minor": AUTHORIZED}]
     assert caps.evidence["per_action_basis"] == {
         "field": "spend_authorized_minor",
@@ -310,13 +310,13 @@ def test_the_everyday_pack_cites_caps_v5():
     assert caps.config["per_action_reads"] == "spend_authorized_minor"
 
 
-def test_the_installed_everyday_pack_denies_a_pay_check_whose_authorised_maximum_is_over_the_limit(
+def test_the_installed_everyday_pack_holds_a_pay_check_whose_authorised_maximum_is_over_the_limit(
     store, signer, tmp_path
 ):
     action = action_for_record(*_bound_check(BUFFERED_PAY))
     decision = _everyday_engine(store, signer, tmp_path).check(action)
     caps = _caps(decision)
-    assert decision.outcome == "deny"
+    assert decision.outcome == "escalate"
     assert caps.result == "fail"
     assert caps.evidence["per_action_basis"] == {
         "field": "spend_authorized_minor",

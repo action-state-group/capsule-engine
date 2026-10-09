@@ -211,9 +211,10 @@ def _scenarios() -> list[tuple[str, Action, str]]:
         ("merchant-history-real-payment", _payment("merchant-history", 17, "household-assistant-j@v1",
          amount_minor=700, target="shop/bakery", rail="card", counterparty_account_ref="acct-ref-bakery-1"), ALLOW),
         # No accepted action with the garden centre yet: counterparty_seen_before
-        # fails, and money.purchase has no approver role, so the decision denies.
+        # is the sole failing check and money.purchase names an approver role,
+        # so the decision escalates.
         ("merchant-first-purchase", _purchase("merchant-first", 18, "household-assistant-j@v1", amount_minor=1_800,
-         target="shop/garden-centre"), DENY),
+         target="shop/garden-centre"), ESCALATE),
         # The bakery has a real accepted payment, so a purchase there is a
         # repeat merchant and passes.
         ("merchant-repeat-purchase", _purchase("merchant-repeat", 19, "household-assistant-j@v1", amount_minor=900,

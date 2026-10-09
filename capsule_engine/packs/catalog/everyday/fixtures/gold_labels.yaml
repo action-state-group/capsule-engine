@@ -362,7 +362,7 @@ rows:
     value: 0c6adf29667ebc40fac8dde35c93a9a2ea7958f164f3c25cdbeb157db8aa5387
     assurance: self-attested
 - action_id: check_balance/everyday-fixture-out-of-scope
-  capsule_id: 387787dc50babca8be4d74ceb3a956973b4168571b765cf46412b434e2538201
+  capsule_id: 2da33bc649a78073e4ef93bd2dbd13b2034b228e90d742234ce4e435ce00d5cb
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.2
@@ -497,7 +497,7 @@ rows:
     value: 0c6adf29667ebc40fac8dde35c93a9a2ea7958f164f3c25cdbeb157db8aa5387
     assurance: self-attested
 - action_id: make_purchase/everyday-fixture-merchant-first
-  capsule_id: b16987ef33803673e08362a185a01c11e2f5cd64e0926b009bae6cb66b5431df
+  capsule_id: f2d772405a5141f3b057c6631a9200d2c5dc0d258d393353a6e19ba646117398
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.2
@@ -551,7 +551,7 @@ rows:
     value: 0c6adf29667ebc40fac8dde35c93a9a2ea7958f164f3c25cdbeb157db8aa5387
     assurance: self-attested
 - action_id: book_table/everyday-fixture-booking-create
-  capsule_id: 97275667017936783309ca997a3cec7dd91ee0af408c730893ee86eee6c3a660
+  capsule_id: 3de84b635a8f093f41d62ca54885045ce49d720ef59a24a885bf1425a1c220c7
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.2
@@ -578,7 +578,7 @@ rows:
     value: 0c6adf29667ebc40fac8dde35c93a9a2ea7958f164f3c25cdbeb157db8aa5387
     assurance: self-attested
 - action_id: do_unlisted/everyday-fixture-off-taxonomy
-  capsule_id: c3511cc78a4ad59417a9b6c926c3d12a68ce5416ff68c09993fd99e97f1d7588
+  capsule_id: 6668bb7afc45f4dbfe845510f625c4b02e3c8537d07085fcda396f6df2b13830
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.2
@@ -605,7 +605,7 @@ rows:
     value: 0c6adf29667ebc40fac8dde35c93a9a2ea7958f164f3c25cdbeb157db8aa5387
     assurance: self-attested
 - action_id: share_address/everyday-fixture-fulfilling-merchant
-  capsule_id: 9bf477c87595e9cc5a0f30589cfa7913f5a3896ad6567d35e8c047600e947635
+  capsule_id: 656aa8f17c3080fcb8349cbf83dd42778a21e05d6f195e82df52742f75b85cb2
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.2
@@ -632,7 +632,7 @@ rows:
     value: 0c6adf29667ebc40fac8dde35c93a9a2ea7958f164f3c25cdbeb157db8aa5387
     assurance: self-attested
 - action_id: share_address/everyday-fixture-third-party
-  capsule_id: 874523fbcfeb08ee53e717798fbb6630afb9e1fac2669d079eb6ce6b81d36871
+  capsule_id: 7dfc138185d9005a65178add0580fa0833768fa9bc866abc75b5807dbbec3d70
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.2

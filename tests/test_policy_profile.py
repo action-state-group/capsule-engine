@@ -121,8 +121,7 @@ def test_two_households_share_the_wicket_and_pack_and_differ_only_in_profile(tmp
     assert a.manifest.profile_digest != b.manifest.profile_digest
 
     # The same 30.00 purchase trips the per-action limit at 25.00 and passes
-    # at 40.00. (A caps breach on a class with no approver denies.) Each
-    # household's merchant is new to its ledger, so everyday 0.3.0's
+    # at 40.00. Each household's merchant is new to its ledger, so everyday 0.3.0's
     # first-purchase check fails in both.
     outcomes = {}
     for name, installed in (("a", a), ("b", b)):

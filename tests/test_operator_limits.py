@@ -6,9 +6,10 @@ the pack and its ``caps`` wicket keep their bytes and digests. The caps check
 applies the operator's value where one is in force and the wicket's default
 otherwise, and its sealed evidence names which (``limit_sources``) together
 with the profile digest, so a reader holding the decision and the activation
-record can tell an operator-set denial from a pack-default one without
-re-running the check. A lower limit takes effect at its activation; a higher
-one waits out a 12-hour cooling-off, during which the evidence names the
+record can tell an operator-set limit from a pack-default one without
+re-running the check. A purchase over a limit is held for the account holder
+(money.purchase names that approver role), never run. A lower limit takes
+effect at its activation; a higher one waits out a 12-hour cooling-off, during which the evidence names the
 pending raise. Neither the action's own timestamp nor a record appended
 without the node's key can bring a raise forward."""
 from __future__ import annotations
@@ -24,7 +25,7 @@ from capsule_ledger.ledger import LedgerStore
 
 from capsule_engine.events import build_event_capsule
 from capsule_engine.guards import Action, GuardDecision, GuardEngine, LocalSigner
-from capsule_engine.guards.capsule import DENY
+from capsule_engine.guards.capsule import DENY, ESCALATE
 from capsule_engine.guards.checks import check_caps
 from capsule_engine.guards.checks.caps import LimitSource
 from capsule_engine.packs import build_engine, install_pack, load_pack_dir, record_pack_activation
@@ -129,9 +130,9 @@ def _sealed_caps_evidence_digest(decision: GuardDecision) -> str:
     return caps["evidence_digest"]
 
 
-# everyday 0.3.1 asks before a first purchase from a merchant
+# everyday asks before a first purchase from a merchant
 # (counterparty_seen_before), and every shop here is new to a fresh ledger, so
-# a purchase the limit allows is still refused by that check alone.
+# a purchase the limit allows still fails that check alone.
 NEW_MERCHANT = "counterparty_seen_before"
 
 
@@ -146,13 +147,13 @@ def _per_action(caps) -> LimitSource:
 # -- the acceptance case -------------------------------------------------------
 
 
-def test_an_operator_set_5_dollar_limit_denies_a_6_dollar_purchase(household):
+def test_an_operator_set_5_dollar_limit_holds_a_6_dollar_purchase_for_approval(household):
     five = _profile(500)
     household.activate(five, "2026-10-08T09:00:00Z")
 
     decision, caps = household.check("six-dollars", 600, "2026-10-08T09:01:00Z")
 
-    assert decision.outcome == DENY
+    assert decision.outcome == ESCALATE
     assert caps.result == "fail"
     assert caps.evidence["tripped"] == [{"limit": "per_action", "threshold_minor": 500, "observed_minor": 600}]
     assert caps.evidence["per_action_cap_minor"] == 500
@@ -191,8 +192,8 @@ def test_an_operator_set_5_dollar_limit_denies_a_6_dollar_purchase(household):
 def test_with_no_profile_the_pack_default_applies_and_the_evidence_says_so(household):
     household.activate(None, "2026-10-08T09:00:00Z")
 
-    denied, caps = household.check("twenty-six-dollars", 2_600, "2026-10-08T09:01:00Z")
-    assert denied.outcome == DENY
+    held, caps = household.check("twenty-six-dollars", 2_600, "2026-10-08T09:01:00Z")
+    assert held.outcome == ESCALATE
     assert caps.evidence["tripped"] == [
         {"limit": "per_action", "threshold_minor": PACK_PER_ACTION_DEFAULT, "observed_minor": 2_600}
     ]
@@ -217,7 +218,7 @@ def test_lowering_a_limit_takes_effect_at_its_activation(household):
     household.activate(five, "2026-10-08T10:00:00Z")
 
     decision, caps = household.check("one-second-later", 600, "2026-10-08T10:00:01Z")
-    assert decision.outcome == DENY
+    assert decision.outcome == ESCALATE
     assert caps.evidence["per_action_cap_minor"] == 500
     assert _per_action(caps) == {"limit_source": "operator_profile", "profile_digest": five.profile_digest()}
 
@@ -228,7 +229,7 @@ def test_a_raise_inside_the_cooling_off_keeps_the_earlier_limit_and_says_why(hou
     household.activate(forty, "2026-10-08T10:00:00Z")
 
     held, caps = household.check("inside-cooling-off", 3_000, "2026-10-08T21:59:59Z")
-    assert held.outcome == DENY
+    assert held.outcome == ESCALATE
     assert caps.evidence["tripped"] == [{"limit": "per_action", "threshold_minor": 500, "observed_minor": 3_000}]
     assert _per_action(caps) == {
         "limit_source": "operator_profile",
@@ -256,7 +257,7 @@ def test_a_first_profile_above_the_pack_default_waits_too(household):
     household.activate(forty, "2026-10-08T09:00:00Z")
 
     decision, caps = household.check("first-profile-raise", 3_000, "2026-10-08T10:00:00Z")
-    assert decision.outcome == DENY
+    assert decision.outcome == ESCALATE
     assert caps.evidence["per_action_cap_minor"] == PACK_PER_ACTION_DEFAULT
     assert _per_action(caps) == {
         "limit_source": "definition_default",
@@ -274,7 +275,7 @@ def test_removing_a_lower_limit_is_a_raise_back_to_the_default_and_waits(househo
     household.activate(None, "2026-10-08T10:00:00Z")
 
     decision, caps = household.check("profile-removed", 600, "2026-10-08T11:00:00Z")
-    assert decision.outcome == DENY
+    assert decision.outcome == ESCALATE
     assert caps.evidence["per_action_cap_minor"] == 500
     assert _per_action(caps)["pending_raise"] == {
         "value_minor": PACK_PER_ACTION_DEFAULT,
@@ -292,12 +293,12 @@ def test_a_later_lowering_cancels_a_pending_raise(household):
 
     # Right after the lowering, nothing is pending: the raise is gone, not queued.
     decision, caps = household.check("raise-cancelled-now", 400, "2026-10-08T12:00:00Z")
-    assert decision.outcome == DENY
+    assert decision.outcome == ESCALATE
     assert _per_action(caps) == in_force_now
 
     # When the cancelled raise would have taken effect, 3.00 is in force.
     decision, caps = household.check("raise-cancelled", 400, "2026-10-08T22:00:01Z")
-    assert decision.outcome == DENY
+    assert decision.outcome == ESCALATE
     assert caps.evidence["per_action_cap_minor"] == 300
     assert _per_action(caps) == in_force_now
 
@@ -346,7 +347,7 @@ def test_an_action_stamped_after_the_cooling_off_does_not_reach_the_raise_early(
     household.activate(_profile(4_000), "2026-10-08T10:00:00Z")
 
     decision, caps = household.check("stamped-late", 3_000, "2026-10-09T00:00:00Z", now="2026-10-08T10:01:00Z")
-    assert decision.outcome == DENY
+    assert decision.outcome == ESCALATE
     assert caps.evidence["per_action_cap_minor"] == 500
     assert _per_action(caps)["pending_raise"]["effective_at"] == "2026-10-08T22:00:00Z"
 
@@ -356,7 +357,7 @@ def test_an_action_checked_after_the_cooling_off_but_stamped_inside_it_keeps_the
     household.activate(_profile(4_000), "2026-10-08T10:00:00Z")
 
     decision, caps = household.check("checked-late", 3_000, "2026-10-08T21:00:00Z", now="2026-10-08T23:00:00Z")
-    assert decision.outcome == DENY
+    assert decision.outcome == ESCALATE
     assert caps.evidence["per_action_cap_minor"] == 500
 
 
@@ -365,7 +366,7 @@ def test_an_action_stamped_before_a_lowering_does_not_escape_it(household):
     household.activate(_profile(500), "2026-10-08T10:00:00Z")
 
     decision, caps = household.check("stamped-early", 2_000, "2026-10-08T09:30:00Z", now="2026-10-08T10:01:00Z")
-    assert decision.outcome == DENY
+    assert decision.outcome == ESCALATE
     assert caps.evidence["per_action_cap_minor"] == 500
 
 
@@ -382,7 +383,7 @@ def test_an_engine_built_before_a_new_activation_fails_closed_until_rebuilt(hous
     assert [(c.id, c.result) for c in decision.constraints] == [("policy_binding", "fail")]
 
     decision, caps = household.check("fresh-engine", 2_000, "2026-10-08T10:01:00Z")
-    assert decision.outcome == DENY
+    assert decision.outcome == ESCALATE
     assert caps.evidence["per_action_cap_minor"] == 500
 
 

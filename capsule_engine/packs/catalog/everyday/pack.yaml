@@ -363,7 +363,7 @@ fixtures:
     - id: merchant-history-real-payment
       outcome: allow
     - id: merchant-first-purchase
-      outcome: deny
+      outcome: escalate
     - id: merchant-repeat-purchase
       outcome: allow
     - id: booking-create
