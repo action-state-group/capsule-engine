@@ -389,6 +389,60 @@ def test_an_approval_naming_no_approver_leaves_the_merchant_unseen():
     assert _unseen(_deals_changed({"approval": _without_body("approver")}))
 
 
+def _chain_id(other_deal: bool) -> Change:
+    """The record with a typed ``chain_id`` beside its ``x-deal-v0`` block:
+    its own deal, or another."""
+    return lambda record: {**record, "chain_id": "deal-" + "f" * 16 if other_deal else record["x-deal-v0"]["deal_id"]}
+
+
+def test_a_chain_naming_its_deal_twice_alike_is_still_seen():
+    same = _chain_id(other_deal=False)
+    seen = _seen_on_deal_2(_deals_changed({"check": same, "approval": same, "action": same}))
+    assert (seen.result, seen.evidence["prior_count"]) == ("pass", 1)
+
+
+@pytest.mark.parametrize("record_type", ["check", "approval", "action"])
+def test_a_chain_record_naming_two_deals_leaves_the_merchant_unseen(record_type):
+    """Deal 1's check, approval or action step stating a ``chain_id`` that is
+    not its ``x-deal-v0.deal_id``: in no deal, so the chain is not whole."""
+    assert _unseen(_deals_changed({record_type: _chain_id(other_deal=True)}))
+
+
+def test_a_chain_whose_every_record_names_two_deals_leaves_the_merchant_unseen():
+    """Alike in naming two deals is not one deal."""
+    other = _chain_id(other_deal=True)
+    assert _unseen(_deals_changed({"check": other, "approval": other, "action": other}))
+
+
+def _without_deal_id() -> Change:
+    return lambda record: {**record, "x-deal-v0": {k: v for k, v in record["x-deal-v0"].items() if k != "deal_id"}}
+
+
+def test_a_chain_stating_no_deal_on_any_record_is_still_seen():
+    """No record names a deal, so none names another: the chain stays whole,
+    as before."""
+    none = _without_deal_id()
+    seen = _seen_on_deal_2(_deals_changed({"check": none, "approval": none, "action": none}))
+    assert (seen.result, seen.evidence["prior_count"]) == ("pass", 1)
+
+
+def test_an_approval_naming_two_deals_breaks_a_chain_that_states_none():
+    """The check and action step state no deal, the approval names two: two
+    deals is not no deal, so the chain is not whole."""
+    none = _without_deal_id()
+    assert _unseen(_deals_changed({"check": none, "approval": _chain_id(other_deal=True), "action": none}))
+
+
+def test_deal_1s_check_naming_two_deals_still_asks_and_seals_no_deal():
+    """It asks about a first-time merchant, as it did: only what would be
+    allowed is refused. It names the conflict and seals no deal."""
+    result = _deals_changed({"check": _chain_id(other_deal=True)})
+    (check,) = [s for s in result.decisions if s.record["capsule_id"] in _checks(1)]
+    assert check.decision.deal_id_conflict == {"fields": ("x-deal-v0.deal_id", "chain_id")}
+    assert check.decision.outcome == ESCALATE
+    assert "deal_id" not in check.decision.capsule["asg_payload"]
+
+
 def test_an_approved_act_never_executed_leaves_the_merchant_unseen():
     assert _unseen(_deals_changed({"action": lambda record: None}))
 
