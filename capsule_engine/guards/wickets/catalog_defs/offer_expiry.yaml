@@ -1,16 +1,24 @@
 # offer_expiry wicket: how old the proposal an action acts on may be
-# (guards/checks/offer_expiry.py). The age is the action's own timestamp
-# minus Action.proposal_at, both RFC 3339 UTC timestamps sealed on the
-# record, in whole seconds. Older than `max_age_seconds` fails: the
-# proposal has expired and a new proposed action is required. An age that
-# cannot be established also fails, with expiry_unverified in the evidence.
-# Default limit: 24 hours.
+# (guards/checks/offer_expiry.py). The rule itself is the `semantics`
+# field below: it is inside the digested body, so rewording it moves the
+# digest. Default limit: 24 hours.
 #
 # Declared disposition: ask. The unverified case is meant to be
 # ASK_UNVERIFIED, which the pack schema's disposition set does not have
 # yet; until it does, the evidence marker tells the two apart.
-wicket_id: offer_expiry/1.0.0
+#
+# Replaces offer_expiry/1.0.0, which is retired at its digest
+# (guards/wickets/retired.py): its check changed meaning under that digest.
+wicket_id: offer_expiry/1.0.1
 check: offer_expiry
+semantics: >-
+  For an action in action_classes, the age is the action's timestamp minus
+  its proposal_at, both RFC 3339 UTC, in whole seconds. An age within
+  max_age_seconds passes. An older proposal fails as expired: acting needs a
+  new proposed action. If the age cannot be established (proposal_at or
+  timestamp missing or unreadable, or a proposal later than the action) the
+  rule fails with expiry_unverified. It is never not applicable for an
+  action in action_classes; any other action class is out of scope.
 config:
   action_classes: [marketplace.offer, marketplace.sale, agreement.accept]
   max_age_seconds: 86400

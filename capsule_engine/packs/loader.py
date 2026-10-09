@@ -38,6 +38,7 @@ rejected -- see ``load_pack_dir``.
 from __future__ import annotations
 
 import re
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
@@ -59,6 +60,7 @@ from ..guards.wickets.catalog import Catalog as WicketCatalog
 from ..guards.wickets.definition import WicketDefinition
 from ..guards.wickets.definition import parse_definition as parse_wicket_definition
 from ..guards.wickets.errors import WicketDefinitionError
+from ..guards.wickets.retired import RetiredDefinition, retired_entry
 from .errors import (
     CATALOG_REF_DIGEST_MISMATCH,
     DUPLICATE_ACTION_TYPE,
@@ -105,6 +107,7 @@ from .errors import (
     OBLIGATION_CHECK_NOT_DECLARED,
     PACK_NOT_FOUND,
     PROMPT_TEXT_IN_PACK,
+    RETIRED_CATALOG_REF,
     SCOPE_MISMATCH,
     TOPOLOGY_INVARIANT_OVERRIDE,
     UNKNOWN_ACTION_CLASS,
@@ -659,9 +662,24 @@ def _parse_scope(raw: Any, *, wicket_id: str) -> tuple[str, ...]:
 
 
 # `entry` is one raw pack.yaml mapping, decoded here at the loader boundary.
-def _resolve_catalog_ref(entry: dict, *, ref_key: str, catalog, what: str):
+def _resolve_catalog_ref(
+    entry: dict,
+    *,
+    ref_key: str,
+    catalog,
+    what: str,
+    retired: Callable[[str, str], RetiredDefinition | None] | None = None,
+):
     ref = _require_nonempty_str(entry.get(ref_key), f"{what}.{ref_key}", "caps/1.0.0")
     digest = _require_nonempty_str(entry.get("digest"), f"{what}.digest", "<64-char sha-256 hex>")
+    # A retired pair is gone from the catalog; say so, rather than report an
+    # unknown ref, so the pack author is told what replaced it.
+    row = retired(ref, digest) if retired is not None else None
+    if row is not None:
+        raise PackDefinitionError(
+            RETIRED_CATALOG_REF,
+            f"{what} cites {ref!r} at digest {digest}, which is retired: {row.reason}; cite {row.replaced_by} instead",
+        )
     found = catalog.get(ref)
     if found is None:
         raise PackDefinitionError(
@@ -714,7 +732,11 @@ def _parse_constraints(
         raw_scope = entry.get("scope") if isinstance(entry, dict) else None
         if isinstance(entry, dict) and "wicket_ref" in entry:
             definition = _resolve_catalog_ref(
-                entry, ref_key="wicket_ref", catalog=WicketCatalog(CORE_WICKET_CATALOG_DIR), what=f"constraints[{idx}]"
+                entry,
+                ref_key="wicket_ref",
+                catalog=WicketCatalog(CORE_WICKET_CATALOG_DIR),
+                what=f"constraints[{idx}]",
+                retired=retired_entry,
             )
         else:
             try:

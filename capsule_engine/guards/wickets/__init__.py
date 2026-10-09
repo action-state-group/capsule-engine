@@ -5,6 +5,7 @@ from .catalog import Catalog, CatalogEntry, CatalogLoadError
 from .definition import KNOWN_CHECKS, WicketDefinition, parse_definition
 from .errors import WicketDefinitionError
 from .loader import load_definition_file, load_definition_text
+from .retired import RETIRED, RetiredDefinition, retired_entry
 
 __all__ = [
     "Catalog",
@@ -16,4 +17,7 @@ __all__ = [
     "load_definition_text",
     "load_definition_file",
     "WicketDefinitionError",
+    "RETIRED",
+    "RetiredDefinition",
+    "retired_entry",
 ]
