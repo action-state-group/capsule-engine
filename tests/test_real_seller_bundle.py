@@ -265,10 +265,12 @@ def test_each_commit_reads_the_age_of_the_offer_the_buyer_accepted():
         records = {r["capsule_id"]: r for r in load_records([path])}
         (offer_id,) = [k for k, v in shown.items() if _type(v) == PROPOSED and _body(v)["action"] == "offer"]
         sourced = _replayed_check(path, "commit")
-        assert sourced.action.proposal_at == records[offer_id]["timestamp"]
+        assert sourced.action.proposal_at == shown[offer_id]["at"]
         expiry = _constraint(sourced.decision, "offer_expiry")
         assert expiry.result == "pass"
-        assert expiry.evidence["proposal_at"] == records[offer_id]["timestamp"]
+        assert expiry.evidence["proposal_at"] == shown[offer_id]["at"]
+        # One clock read in capsulectl, so the capsule's timestamp is the same instant.
+        assert records[offer_id]["timestamp"] == shown[offer_id]["at"]
 
 
 def test_an_offer_states_its_price_never_its_spend():
@@ -458,3 +460,14 @@ def test_the_real_seller_deals_replay_with_no_repeated_act():
 
 if __name__ == "__main__":
     sys.stdout.write(canonical(decisions_document()))
+
+
+def test_the_offer_age_is_read_from_the_record_never_its_capsule_timestamp():
+    """The offer's record seals ``at``; capsulectl sends that same value live as
+    ``record.proposal_at``. A capsule stamped at another instant does not move it."""
+    records, disclosed = _thread_a()
+    capsule, shown = _a_offer()
+    (i,) = [n for n, r in enumerate(records) if r["capsule_id"] == capsule["capsule_id"]]
+    records[i] = {**records[i], "timestamp": "2026-01-01T00:00:00Z"}
+    proposal_at, _ = _a_commit_expiry(records, disclosed)
+    assert proposal_at == shown["at"] != "2026-01-01T00:00:00Z"
