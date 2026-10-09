@@ -211,9 +211,10 @@ def _scenarios() -> list[tuple[str, Action, str]]:
         ("merchant-history-real-payment", _payment("merchant-history", 17, "household-assistant-j@v1",
          amount_minor=700, target="shop/bakery", rail="card", counterparty_account_ref="acct-ref-bakery-1"), ALLOW),
         # No accepted action with the garden centre yet: counterparty_seen_before
-        # fails, and money.purchase has no approver role, so the decision denies.
+        # is the sole failing check and money.purchase names an approver role,
+        # so the decision escalates.
         ("merchant-first-purchase", _purchase("merchant-first", 18, "household-assistant-j@v1", amount_minor=1_800,
-         target="shop/garden-centre"), DENY),
+         target="shop/garden-centre"), ESCALATE),
         # The bakery has a real accepted payment, so a purchase there is a
         # repeat merchant and passes.
         ("merchant-repeat-purchase", _purchase("merchant-repeat", 19, "household-assistant-j@v1", amount_minor=900,
@@ -315,7 +316,7 @@ def test_records_are_pack_attributed_and_observe_mode(run):
         assert capsule["asg_payload"]["manifest_digest"] == installed.resolved.manifest_digest, name
         assert capsule["asg_payload"]["checkpoint"].get("dry_run") is (True if name not in REAL_RUN else None), name
     assert activation["asg_payload"]["detail"]["packs"] == [
-        {"pack_id": "asg/everyday/0.3.1", "digest": installed.pack.definition_digest(), "mode": "observe"}
+        {"pack_id": "asg/everyday/0.3.2", "digest": installed.pack.definition_digest(), "mode": "observe"}
     ]
 
 

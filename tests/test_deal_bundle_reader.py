@@ -105,14 +105,14 @@ def test_a_record_its_capsule_did_not_seal_is_never_read():
     assert action_for_record(pay).action_class is None, "no record disclosed: the capsule alone names no class"
 
 
-def test_caps_v3_denies_a_purchase_over_the_per_action_limit():
+def test_caps_v3_holds_a_purchase_over_the_per_action_limit():
     for bundle in (REFUND, PARTIAL):
         action, decision, caps = _replay_checks(bundle)["pay"]
         assert action.action_class == "money.purchase"
         assert caps.result == "fail"
         assert caps.evidence["per_action_cap_minor"] == 2_500
         assert {"limit": "per_action", "threshold_minor": 2_500, "observed_minor": 55_880} in caps.evidence["tripped"]
-        assert decision.outcome == "deny"
+        assert decision.outcome == "escalate"
 
 
 @pytest.mark.parametrize(

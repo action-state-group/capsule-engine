@@ -95,11 +95,11 @@ def test_caps_v2_cites_the_operator_keyed_fold_by_digest():
     assert fold.key == "operator"
 
 
-def test_over_cap_booking_denies_and_evidence_names_the_fold_key(store, signer):
+def test_over_cap_booking_is_held_and_evidence_names_the_fold_key(store, signer):
     caps_minor = dict.fromkeys(_caps_v2_config()["caps_minor"], LIMIT_MINOR)
     decision = _engine(store, signer, caps_minor).check(_action(1, "booking.create", BOOKING_MINOR))
 
-    assert decision.outcome == "deny"
+    assert decision.outcome == "escalate"
     caps = _caps(decision)
     assert caps.result == "fail"
     assert caps.evidence["fold_key"] == {"path": "operator", "value": OPERATOR}
@@ -113,7 +113,7 @@ def test_booking_and_purchase_draw_on_one_pooled_total(store, signer, first, sec
     assert engine.check(_action(1, first, 15_000)).outcome == "allow"
 
     decision = engine.check(_action(2, second, 10_000))
-    assert decision.outcome == "deny"
+    assert decision.outcome == "escalate"
     assert _caps(decision).evidence["weekly_spend_minor"] == 15_000
 
 
@@ -123,7 +123,7 @@ def test_a_new_developer_string_does_not_reset_the_operator_total(store, signer,
     assert engine.check(_action(1, "money.purchase", 15_000, developer="trip-assistant@v1")).outcome == "allow"
 
     decision = engine.check(_action(2, "money.purchase", 10_000, developer=second_developer))
-    assert decision.outcome == "deny"
+    assert decision.outcome == "escalate"
     assert _caps(decision).evidence["weekly_spend_minor"] == 15_000
 
 
