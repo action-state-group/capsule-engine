@@ -47,9 +47,12 @@ from importlib import resources
 from types import MappingProxyType
 from typing import TypedDict
 
+from agent_action_capsule import json_digest
+
 __all__ = [
     "ActionClass",
     "TAXONOMY",
+    "TAXONOMY_DIGEST",
     "TAXONOMY_VERSION",
     "TRIGGER_CLASSES",
     "UNCLASSIFIED_DEFAULT",
@@ -245,12 +248,17 @@ def load_taxonomy_table(raw: object) -> TaxonomyTable:
     )
 
 
-def _load_packaged() -> TaxonomyTable:
-    text = resources.files("capsule_engine.guards").joinpath(_TABLE_FILE).read_text(encoding="utf-8")
-    return load_taxonomy_table(json.loads(text))
+def _load_packaged() -> tuple[TaxonomyTable, str]:
+    """The packaged table and the SHA-256 over its JCS bytes."""
+    raw = json.loads(resources.files("capsule_engine.guards").joinpath(_TABLE_FILE).read_text(encoding="utf-8"))
+    return load_taxonomy_table(raw), json_digest(raw)
 
 
-_TABLE = _load_packaged()
+_TABLE, _DIGEST = _load_packaged()
+
+# A pack may pin this with its version (``packs/schema.py`` ``TaxonomyPin``),
+# so a taxonomy change, even one keeping its version, moves the pack digest.
+TAXONOMY_DIGEST: str = _DIGEST
 
 TAXONOMY_VERSION: str = _TABLE.version
 UNVERSIONED_TAXONOMY_VERSION: str = _TABLE.unversioned_read_as

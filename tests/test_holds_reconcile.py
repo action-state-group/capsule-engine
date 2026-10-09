@@ -6,6 +6,8 @@ Acceptance criteria: hold-semantics spec §#53.
 """
 from __future__ import annotations
 
+import pytest
+
 from capsule_engine.folds.engine import evaluate_one
 from capsule_engine.guards import Action
 from capsule_engine.holds import HoldStatus
@@ -192,3 +194,23 @@ def test_fold_semantics_across_partial_over_within_and_over_beyond_tolerance(sto
     records = [r.capsule for r in store.scan()]
     final_trace = evaluate_one(hold_fold, records, key_value=DEVELOPER)
     assert final_trace.result == before == aggregate()
+
+
+@pytest.mark.parametrize("action_class", ["money.purchase", "money.subscription", "booking.create", "booking.modify"])
+def test_over_tolerance_escalates_for_the_account_holder_classes(store, hold_fold, signer, action_class):
+    """Taxonomy version 3 names ``account_holder`` as the approver for these
+    four consumer classes, so an over-tolerance breach on one of them asks
+    rather than refuses; before it, all four denied."""
+    from capsule_engine.holds import HoldEngine
+
+    engine = HoldEngine(
+        ledger=store, hold_fold=hold_fold, fold_digest=hold_fold.definition_digest(),
+        signer_provider=lambda: signer, cap_minor={action_class: 1_000_000}, tolerance_minor={action_class: 1_000},
+    )
+    action = Action(verb="act", operator=OPERATOR, developer=DEVELOPER, action_class=action_class, amount_minor=10_000)
+    reserve = engine.evaluate_and_reserve(action)
+    assert reserve.outcome == "allow"
+
+    over = engine.reconcile(reserve.capsule["capsule_id"], action_class=action_class, executed_amount_minor=50_000)
+    assert over.outcome == "escalate"
+    assert over.reason_code == OVER_TOLERANCE

@@ -46,6 +46,8 @@ UNKNOWN_EFFECT_CLAIM = "unknown_effect_claim"
 INVALID_RE_DERIVABILITY_GRADE = "invalid_re_derivability_grade"
 INVALID_DEFAULT_DISPOSITION = "invalid_default_disposition"
 INVALID_SCOPE_CENSUS = "invalid_scope_census"
+# taxonomy: the pinned action taxonomy is not the one this engine ships.
+TAXONOMY_PIN_MISMATCH = "taxonomy_pin_mismatch"
 
 # tier: whether an outcome
 # gates a session's job-success (must_have) or is reported without gating
