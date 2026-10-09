@@ -25,6 +25,7 @@ from agent_action_capsule import json_digest
 from capsule_engine.folds.loader import load_definition_file as load_fold
 from capsule_engine.guards.capsule import ALLOW, DENY, ESCALATE
 from capsule_engine.guards.checks.dedupe import equivalence_key_for_action
+from capsule_engine.guards.classes import TAXONOMY_VERSION
 from capsule_engine.report.replay import action_for_record, replay
 
 SPEND_WEEKLY = Path(__file__).parent.parent / "capsule_engine" / "folds" / "catalog_defs" / "spend.weekly.yaml"
@@ -83,7 +84,7 @@ def _check(deal: str | None, at: str, *, action_class: str = "money.purchase", a
     body: CheckBody = {
         "action": "pay",
         "action_class": action_class,
-        "taxonomy_version": "2",
+        "taxonomy_version": TAXONOMY_VERSION,
         "currency": "USD",
         "amount_minor": amount,
         "spend_minor": 0 if direction == "in" else amount,

@@ -635,7 +635,13 @@ def replay(
     (``_carried_out``), the replay writes that act to its own view as
     carried out (``_carried_out_record``), once, when it reaches the action
     step, so a later check counts it as an earlier act with that
-    counterparty. A refused check is never counted."""
+    counterparty. A refused check is never counted.
+    Each record is evaluated under the action taxonomy it was sealed with,
+    where the engine carries that version, so history at a carried version is
+    never refused for its version. A record naming one it does not carry
+    still gets a decision: its class-keyed checks are held ``n/a`` with
+    evidence naming both versions, and when nothing else fails it is refused
+    (``GuardEngine``), so no later check counts it as seen or as spend."""
     if not records:
         return ReplayResult(decisions=(), record_range=(0, -1))
 
@@ -656,6 +662,7 @@ def replay(
             wickets=wickets,
             ask_gate_selectors=gate_selectors,
             ask_wickets=ask_checks,
+            evaluate_under_record_taxonomy=True,
         )
         profiles = _companion_profiles(records, disclosed or {})
         deal = _deal_records(records, disclosed or {})

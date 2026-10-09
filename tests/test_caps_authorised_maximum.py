@@ -23,6 +23,7 @@ from agent_action_capsule import json_digest
 from capsule_engine.folds.loader import load_definition_file
 from capsule_engine.guards import Action, GuardEngine
 from capsule_engine.guards.checks import check_caps
+from capsule_engine.guards.classes import TAXONOMY_VERSION
 from capsule_engine.guards.wickets.catalog import Catalog as WicketCatalog
 from capsule_engine.policy import load_manifest_file, resolve_manifest
 from capsule_engine.report.replay import action_for_record, replay
@@ -222,7 +223,7 @@ class BoundCapsule(TypedDict):
 def _bound_check(body: DealCheckBody) -> tuple[BoundCapsule, DealCheck]:
     """A deal check record with ``body``, and a capsule that seals it."""
     record: DealCheck = {
-        "body": {"action": "pay", "action_class": "money.purchase", "taxonomy_version": "2", "currency": "USD", **body},
+        "body": {"action": "pay", "action_class": "money.purchase", "taxonomy_version": TAXONOMY_VERSION, "currency": "USD", **body},
         "x-deal-v0": {"record_type": "check", "deal_id": "deal-0000000000000000", "seq": 2},
     }
     capsule: BoundCapsule = {

@@ -83,6 +83,7 @@ capsule_engine = [
     "telemetry/fixtures/*.jsonl",
     "folds/catalog_defs/*.yaml",
     "guards/action_taxonomy.json",
+    "guards/action_taxonomy_v*.json",
     "guards/wickets/catalog_defs/*.yaml",
     "policy/catalog_defs/*.yaml",
     "packs/catalog/*/pack.yaml",

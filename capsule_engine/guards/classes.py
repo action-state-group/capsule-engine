@@ -33,6 +33,13 @@ its ``Action.taxonomy_version`` was set (``guards/capsule.py``); nothing in
 this package sets it by default yet, so existing records keep their bytes. A
 record without one is read as ``unversioned_records_read_as``.
 
+The engine evaluates under the current table only, except that a replay of
+historical records evaluates each under the table it was sealed with
+(``carried_taxonomy``). Earlier tables are carried byte-identical to what
+shipped, as ``action_taxonomy_v<N>.json``, for every version a sealed record
+can name; version 1 never had a table (it is what an unversioned record is
+read as), so it is not carried.
+
 Caps config resolves through this table (``checks.caps.resolve_caps_minor``),
 so a cap keyed by a legacy name and one keyed by its canonical name are one
 cap. Tolerances and fail-open opt-ins are still keyed by the raw
@@ -51,6 +58,8 @@ from agent_action_capsule import json_digest
 
 __all__ = [
     "ActionClass",
+    "CARRIED_TAXONOMY_VERSIONS",
+    "ENGINE_TAXONOMY",
     "TAXONOMY",
     "TAXONOMY_DIGEST",
     "TAXONOMY_VERSION",
@@ -63,6 +72,7 @@ __all__ = [
     "TaxonomyTableError",
     "UnmappedActionClass",
     "VersionedPayload",
+    "carried_taxonomy",
     "check_connector_declaration",
     "classify",
     "is_known_action_class",
@@ -74,6 +84,8 @@ __all__ = [
 ]
 
 _TABLE_FILE = "action_taxonomy.json"
+# Earlier tables, as shipped: "<version>" -> file. The current one is _TABLE_FILE.
+_EARLIER_TABLE_FILES = {v: f"action_taxonomy_v{v}.json" for v in ("2", "3", "4", "5")}
 _ROW_KEYS = frozenset(
     {"name", "trigger_class", "consequential", "fail_open_allowed", "approver_role", "legacy_aliases"}
 )
@@ -146,6 +158,16 @@ class TaxonomyTable:
     trigger_classes: tuple[str, ...]
     classes: Mapping[str, ActionClass]
     aliases: Mapping[str, str]
+
+    def resolve(self, action_class: str) -> ActionClass | None:
+        """The canonical row for a canonical or legacy name, or None."""
+        return self.classes.get(self.aliases.get(action_class, action_class))
+
+    def classify(self, action_class: str | None) -> ActionClass:
+        """``classify`` under this table."""
+        if action_class is None:
+            return UNCLASSIFIED_DEFAULT
+        return self.resolve(action_class) or UNCLASSIFIED_DEFAULT
 
 
 def _require_bool(value: object, where: str) -> bool:
@@ -248,13 +270,29 @@ def load_taxonomy_table(raw: object) -> TaxonomyTable:
     )
 
 
-def _load_packaged() -> tuple[TaxonomyTable, str]:
-    """The packaged table and the SHA-256 over its JCS bytes."""
-    raw = json.loads(resources.files("capsule_engine.guards").joinpath(_TABLE_FILE).read_text(encoding="utf-8"))
+def _load_packaged(name: str = _TABLE_FILE) -> tuple[TaxonomyTable, str]:
+    """The packaged table ``name`` and the SHA-256 over its JCS bytes."""
+    raw = json.loads(resources.files("capsule_engine.guards").joinpath(name).read_text(encoding="utf-8"))
     return load_taxonomy_table(raw), json_digest(raw)
 
 
+def _load_earlier() -> dict[str, TaxonomyTable]:
+    tables: dict[str, TaxonomyTable] = {}
+    for version, name in _EARLIER_TABLE_FILES.items():
+        table, _ = _load_packaged(name)
+        if table.version != version:
+            raise TaxonomyTableError(f"{name} declares taxonomy_version {table.version!r}, not {version!r}")
+        tables[version] = table
+    return tables
+
+
 _TABLE, _DIGEST = _load_packaged()
+_CARRIED: Mapping[str, TaxonomyTable] = MappingProxyType({**_load_earlier(), _TABLE.version: _TABLE})
+
+# The table this engine evaluates live decisions under.
+ENGINE_TAXONOMY: TaxonomyTable = _TABLE
+# Every taxonomy version a replay can evaluate a sealed record under.
+CARRIED_TAXONOMY_VERSIONS: tuple[str, ...] = tuple(_CARRIED)
 
 # A pack may pin this with its version (``packs/schema.py`` ``TaxonomyPin``),
 # so a taxonomy change, even one keeping its version, moves the pack digest.
@@ -276,10 +314,15 @@ INFO_QUERY = TAXONOMY["info.query"]
 UNCLASSIFIED_DEFAULT = ActionClass("unclassified", consequential=True)
 
 
+def carried_taxonomy(version: object) -> TaxonomyTable | None:
+    """The table for taxonomy ``version`` as it shipped, or None when this
+    engine does not carry it (only a string names a version)."""
+    return _CARRIED.get(version) if isinstance(version, str) else None
+
+
 def resolve(action_class: str) -> ActionClass | None:
     """The canonical row for a canonical or legacy name, or None."""
-    canonical = _TABLE.aliases.get(action_class, action_class)
-    return TAXONOMY.get(canonical)
+    return _TABLE.resolve(action_class)
 
 
 def is_known_action_class(action_class: str) -> bool:
@@ -299,9 +342,7 @@ def classify(action_class: str | None) -> ActionClass:
     conditioned on the name being *recognized*, only on it being *declared
     and known*. A legacy name resolves to its canonical row.
     """
-    if action_class is None:
-        return UNCLASSIFIED_DEFAULT
-    return resolve(action_class) or UNCLASSIFIED_DEFAULT
+    return _TABLE.classify(action_class)
 
 
 def trigger_class(action_class: str, *, after_prior_approval: bool = False) -> str | None:

@@ -5,8 +5,10 @@ Each selector matches on the canonical ``action_class`` and/or its
 ``trigger_class`` and/or ``consequential`` (``guards/action_taxonomy.json``),
 and declares the result a match produces (``on_match``: ``fail`` or
 ``pass``). Every key a selector sets must match. The check reads
-``Action.action_class`` only, resolved through ``classes.resolve`` so a
+``Action.action_class`` only, resolved through the taxonomy table so a
 legacy alias is its canonical class; it reads no fold and no other field.
+A replay passes the table the record was sealed under (``table``), and the
+evidence names that table's version; otherwise it is the engine's.
 
 Result: ``fail`` when any ``fail`` selector matches, else ``pass`` when any
 ``pass`` selector matches, else ``n/a`` out of scope. A class with no row in
@@ -23,7 +25,7 @@ from typing import TypedDict
 
 from ..action import Action
 from ..capsule import ConstraintOutcome, NotApplicableEvidence, not_applicable_evidence
-from ..classes import TAXONOMY, TAXONOMY_VERSION, TRIGGER_CLASSES, resolve
+from ..classes import ENGINE_TAXONOMY, TAXONOMY, TAXONOMY_VERSION, TRIGGER_CLASSES, TaxonomyTable
 from .base import CheckOutcome
 
 __all__ = ["Selector", "check_action_class_gate", "parse_selectors"]
@@ -113,14 +115,16 @@ def _matches(sel: Selector, action_class: str, trigger_class: str | None, conseq
     return "consequential" not in sel or sel["consequential"] == consequential
 
 
-def check_action_class_gate(action: Action, *, selectors: Mapping[str, Selector]) -> CheckOutcome:
+def check_action_class_gate(
+    action: Action, *, selectors: Mapping[str, Selector], table: TaxonomyTable = ENGINE_TAXONOMY
+) -> CheckOutcome:
     selectors = parse_selectors(selectors)
-    ac = resolve(action.action_class) if action.action_class is not None else None
+    ac = table.resolve(action.action_class) if action.action_class is not None else None
     if ac is None:
         return _outcome(
             "fail",
-            f"action class {action.action_class!r} has no row in taxonomy {TAXONOMY_VERSION}; fail closed",
-            UnmappedClassEvidence(action_class=action.action_class, in_taxonomy=False, taxonomy_version=TAXONOMY_VERSION),
+            f"action class {action.action_class!r} has no row in taxonomy {table.version}; fail closed",
+            UnmappedClassEvidence(action_class=action.action_class, in_taxonomy=False, taxonomy_version=table.version),
         )
     matched = sorted(sid for sid, sel in selectors.items() if _matches(sel, ac.name, ac.trigger_class, ac.consequential))
     if not matched:
@@ -131,7 +135,7 @@ def check_action_class_gate(action: Action, *, selectors: Mapping[str, Selector]
         action_class=ac.name,
         trigger_class=ac.trigger_class,
         consequential=ac.consequential,
-        taxonomy_version=TAXONOMY_VERSION,
+        taxonomy_version=table.version,
         matched_selectors=matched,
     )
     if any(selectors[sid]["on_match"] == "fail" for sid in matched):

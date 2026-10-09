@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -34,6 +35,7 @@ from capsule_engine.folds.loader import load_definition_file as load_fold
 from capsule_engine.guards import Action, GuardEngine
 from capsule_engine.guards.capsule import ALLOW, ESCALATE, LOCAL_ONLY_TARGET_PREFIX, local_only_refusal
 from capsule_engine.guards.checks.plan_containment import check_plan_containment
+from capsule_engine.guards.classes import TAXONOMY_VERSION
 from capsule_engine.guards.plan import parse_plan_definition
 from capsule_engine.guards.wickets import load_definition_file as load_wicket
 from capsule_engine.report.replay import action_for_check_input, action_for_record, replay
@@ -58,6 +60,14 @@ def _deal(n: int) -> tuple[dict, dict, str]:
     """Deal ``n``'s pay check, its companion, and the target capsulectl expects."""
     case = _cases()[n]
     return json.loads(case["check_jcs"]), json.loads(case["companion_jcs"]), case["expected_target"]
+
+
+def _at_engine_taxonomy(action: Action) -> Action:
+    """``action`` stated at the engine's taxonomy version. The vendored checks
+    are sealed at an earlier one, and a live check does not evaluate a class
+    drawn from another table; these tests are about the target, not the
+    taxonomy."""
+    return replace(action, taxonomy_version=TAXONOMY_VERSION)
 
 
 def _capsule(record: dict, seq: int, at: str) -> dict:
@@ -236,8 +246,8 @@ def _seen_before_on_deal_2(store, signer, *, with_profile: bool):
     engine running counterparty_seen_before/2.0.0, which counts no dry run."""
     fold = load_fold(SPEND_WEEKLY)
     members = [{"counterparty_profile": _profile_block(n)} if with_profile else {} for n in (0, 1)]
-    deal_1 = action_for_check_input(_entry(_deal(0)[0], 1, DAY_1, **members[0]))
-    deal_2 = action_for_check_input(_entry(_deal(1)[0], 2, DAY_2, **members[1]))
+    deal_1 = _at_engine_taxonomy(action_for_check_input(_entry(_deal(0)[0], 1, DAY_1, **members[0])))
+    deal_2 = _at_engine_taxonomy(action_for_check_input(_entry(_deal(1)[0], 2, DAY_2, **members[1])))
     plain = GuardEngine(ledger=store, caps_fold=fold, signer_provider=lambda: signer)
     assert plain.check(deal_1).capsule["disposition"]["decision"] == "accept"
     engine = GuardEngine(
@@ -305,7 +315,7 @@ def test_a_companion_carrying_no_block_is_ignored_and_noted():
 
 def test_the_seen_before_evidence_names_the_ignored_field_and_never_its_value(store, signer):
     check, _, _ = _deal(0)
-    action = action_for_check_input(_entry(check, 1, DAY_1, counterparty_profile=BAD_BLOCKS["uppercase hex"]))
+    action = _at_engine_taxonomy(action_for_check_input(_entry(check, 1, DAY_1, counterparty_profile=BAD_BLOCKS["uppercase hex"])))
     engine = GuardEngine(
         ledger=store, caps_fold=load_fold(SPEND_WEEKLY), signer_provider=lambda: signer,
         wickets=(load_wicket(SEEN_BEFORE_V2),),
@@ -321,7 +331,7 @@ def test_the_seen_before_evidence_names_the_ignored_field_and_never_its_value(st
 
 def test_a_good_value_notes_nothing(store, signer):
     check, _, _ = _deal(0)
-    action = action_for_check_input(_entry(check, 1, DAY_1, counterparty_profile=_profile_block(0)))
+    action = _at_engine_taxonomy(action_for_check_input(_entry(check, 1, DAY_1, counterparty_profile=_profile_block(0))))
     assert action.ignored_inputs == ()
     engine = GuardEngine(
         ledger=store, caps_fold=load_fold(SPEND_WEEKLY), signer_provider=lambda: signer,

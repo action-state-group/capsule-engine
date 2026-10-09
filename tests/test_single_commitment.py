@@ -24,7 +24,7 @@ from capsule_engine.folds.loader import load_definition_file as load_fold
 from capsule_engine.guards import Action, GuardEngine
 from capsule_engine.guards.capsule import ConstraintOutcome, not_applicable_evidence
 from capsule_engine.guards.checks import CONFIGURED_CHECKS
-from capsule_engine.guards.classes import resolve
+from capsule_engine.guards.classes import TAXONOMY_VERSION, resolve
 from capsule_engine.guards.engine import GuardDecision
 from capsule_engine.guards.wickets import Catalog, WicketDefinition, load_definition_file
 from capsule_engine.packs.loader import load_pack_dir
@@ -360,7 +360,7 @@ def _thread_entry(thread: str, verb: str, action_class: str, seq: int) -> dict[s
     """One external-check-input/v0 record entry for a check in ``thread``:
     the capsule and the deal check record it binds. The record names the sale
     by its task authority and never the item."""
-    body = {"action": verb, "action_class": action_class, "taxonomy_version": 4, "spend_minor": 175_000,
+    body = {"action": verb, "action_class": action_class, "taxonomy_version": TAXONOMY_VERSION, "spend_minor": 175_000,
             "currency": "USD", "task_authority_ref": {"type": "task-authority", "digest_alg": "SHA-256",
                                                       "digest": SALE}}
     sealed = {"x-deal-v0": {"record_type": "check", "deal_id": f"deal-{thread}"}, "body": body}

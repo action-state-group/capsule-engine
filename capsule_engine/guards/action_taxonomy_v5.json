@@ -1,0 +1,27 @@
+{
+  "taxonomy_version": "5",
+  "unversioned_records_read_as": "1",
+  "trigger_classes": ["COMMIT", "DISCLOSE", "COMMUNICATE", "SECURITY", "MUTATE", "DELEGATE", "CHANGE"],
+  "state_derived_trigger_classes": ["CHANGE"],
+  "actions": [
+    {"name": "money.purchase", "trigger_class": "COMMIT", "consequential": true, "fail_open_allowed": false, "approver_role": "account_holder", "legacy_aliases": []},
+    {"name": "money.transfer", "trigger_class": "COMMIT", "consequential": true, "fail_open_allowed": false, "approver_role": "treasury-approver", "legacy_aliases": []},
+    {"name": "money.subscription", "trigger_class": "COMMIT", "consequential": true, "fail_open_allowed": false, "approver_role": "account_holder", "legacy_aliases": []},
+    {"name": "money.refund", "trigger_class": "COMMIT", "consequential": true, "fail_open_allowed": false, "approver_role": null, "legacy_aliases": []},
+    {"name": "booking.create", "trigger_class": "COMMIT", "consequential": true, "fail_open_allowed": false, "approver_role": "account_holder", "legacy_aliases": []},
+    {"name": "booking.modify", "trigger_class": "COMMIT", "consequential": true, "fail_open_allowed": false, "approver_role": "account_holder", "legacy_aliases": []},
+    {"name": "booking.cancel", "trigger_class": "COMMIT", "consequential": true, "fail_open_allowed": false, "approver_role": "account_holder", "legacy_aliases": []},
+    {"name": "communication.send", "trigger_class": "COMMUNICATE", "consequential": true, "fail_open_allowed": false, "approver_role": "account_holder", "legacy_aliases": ["comms.external"]},
+    {"name": "communication.publish", "trigger_class": "COMMUNICATE", "consequential": true, "fail_open_allowed": false, "approver_role": "account_holder", "legacy_aliases": []},
+    {"name": "disclosure.personal", "trigger_class": "DISCLOSE", "consequential": true, "fail_open_allowed": false, "approver_role": "account_holder", "legacy_aliases": []},
+    {"name": "disclosure.secret", "trigger_class": "SECURITY", "consequential": true, "fail_open_allowed": false, "approver_role": null, "legacy_aliases": []},
+    {"name": "agreement.accept", "trigger_class": "COMMIT", "consequential": true, "fail_open_allowed": false, "approver_role": null, "legacy_aliases": []},
+    {"name": "marketplace.offer", "trigger_class": "COMMIT", "consequential": true, "fail_open_allowed": false, "approver_role": null, "legacy_aliases": []},
+    {"name": "marketplace.sale", "trigger_class": "COMMIT", "consequential": true, "fail_open_allowed": false, "approver_role": null, "legacy_aliases": []},
+    {"name": "data.delete", "trigger_class": "MUTATE", "consequential": true, "fail_open_allowed": false, "approver_role": "account_holder", "legacy_aliases": []},
+    {"name": "account.security_change", "trigger_class": "SECURITY", "consequential": true, "fail_open_allowed": false, "approver_role": null, "legacy_aliases": []},
+    {"name": "background.schedule", "trigger_class": "DELEGATE", "consequential": true, "fail_open_allowed": false, "approver_role": null, "legacy_aliases": []},
+    {"name": "external_commitment.other", "trigger_class": "COMMIT", "consequential": true, "fail_open_allowed": false, "approver_role": null, "legacy_aliases": []},
+    {"name": "info.query", "trigger_class": null, "consequential": false, "fail_open_allowed": true, "approver_role": null, "legacy_aliases": []}
+  ]
+}
