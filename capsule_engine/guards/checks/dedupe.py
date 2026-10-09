@@ -9,6 +9,16 @@ one already sitting in the ledger (operator, developer, action_type, and
 the ``verb`` prefix of ``action_id``), so a dedupe hit fires against
 capsules this guard never produced. A caller may override it per-action via
 ``Action.equivalence_key``.
+
+An act stated against a pinned action taxonomy (``taxonomy_version`` set,
+as the deal-check bridge in ``report/replay.py`` sets it from a deal check's
+sealed record) is keyed on the act alone: operator, developer, its
+``action_class``, its target and its amount. The record that states it (a deal
+check is ``fyi``, ``deal-<id>/<seq>``) never enters the key, neither its
+``action_type`` nor its ``action_id`` prefix, so the scan covers every type and
+a second check carrying the same act matches the decision on the first.
+Both sides go through ``_act_key``: an action and a capsule each project to
+the same fields, and the formula exists once.
 """
 from __future__ import annotations
 
@@ -27,35 +37,65 @@ def _capsule_verb(capsule: dict) -> str:
     return action_id.split("/", 1)[0] if action_id else ""
 
 
+def _act_key(
+    *,
+    operator: str,
+    developer: str,
+    action_type: str,
+    verb: str,
+    target: str | None,
+    action_class: str | None,
+    amount_minor: int | None,
+    taxonomy_pinned: bool,
+) -> str:
+    if taxonomy_pinned:
+        return json_digest(
+            {
+                "operator": operator,
+                "developer": developer,
+                "action_class": action_class,
+                "target": target,
+                "amount_minor": amount_minor,
+            }
+        )
+    return json_digest(
+        {"operator": operator, "developer": developer, "action_type": action_type, "verb": verb, "target": target}
+    )
+
+
 def equivalence_key_for_action(action: Action) -> str:
     if action.equivalence_key is not None:
         return action.equivalence_key
-    return json_digest(
-        {
-            "operator": action.operator,
-            "developer": action.developer,
-            "action_type": action.action_type,
-            "verb": action.verb,
-            "target": action.target,
-        }
+    return _act_key(
+        operator=action.operator,
+        developer=action.developer,
+        action_type=action.action_type,
+        verb=action.verb,
+        target=action.target,
+        action_class=action.action_class,
+        amount_minor=action.amount_minor,
+        taxonomy_pinned=action.taxonomy_version is not None,
     )
 
 
 def equivalence_key_for_capsule(capsule: dict) -> str:
-    return json_digest(
-        {
-            "operator": capsule.get("operator", ""),
-            "developer": capsule.get("developer", ""),
-            "action_type": capsule.get("action_type", ""),
-            "verb": _capsule_verb(capsule),
-            "target": (capsule.get("asg_payload") or {}).get("target"),
-        }
+    payload = capsule.get("asg_payload") or {}
+    return _act_key(
+        operator=capsule.get("operator", ""),
+        developer=capsule.get("developer", ""),
+        action_type=capsule.get("action_type", ""),
+        verb=_capsule_verb(capsule),
+        target=payload.get("target"),
+        action_class=payload.get("action_class"),
+        amount_minor=payload.get("amount_minor"),
+        taxonomy_pinned=payload.get("taxonomy_version") is not None,
     )
 
 
 def check_dedupe(action: Action, ledger: LedgerAPI, *, since: str | None = None) -> CheckOutcome:
     key = equivalence_key_for_action(action)
-    query = ScanQuery(action_type=action.action_type, since=since)
+    scanned_type = None if action.taxonomy_version is not None else action.action_type
+    query = ScanQuery(action_type=scanned_type, since=since)
     for record in ledger.scan(query):
         if equivalence_key_for_capsule(record.capsule) == key:
             return CheckOutcome(
