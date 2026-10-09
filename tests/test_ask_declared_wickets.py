@@ -50,7 +50,7 @@ TASK_AUTHORITY_REF = task_authority_record_digest(TASK_AUTHORITY)
 # ASK and are not excluded: r07 r08 r09 r10 r13 r19 r20 r21 r22 r26.
 # Never asked on, whatever a pack declares: the integrity checks, then the two
 # with their own ask rule. Spelled out so a test fails if the engine's set shrinks.
-EXCLUDED = ["dedupe", "verify_before_dispatch", "single_commitment", "promise_never",
+EXCLUDED = ["dedupe", "verify_before_dispatch", "single_commitment", "promise_never", "release_on_acceptance",
             "action_class_gate", "counterparty_list"]
 ASK_CHECKS = frozenset({
     "recurring_charge", "refundability", "material_fields_changed", "offer_fields_changed",

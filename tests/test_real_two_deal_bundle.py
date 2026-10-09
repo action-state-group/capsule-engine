@@ -31,6 +31,7 @@ from functools import cache
 from pathlib import Path
 from typing import TypedDict
 
+import pytest
 from agent_action_capsule import json_digest
 
 import capsule_engine
@@ -47,16 +48,16 @@ OWN = (FIXTURE / "deal-1.bundle.json", FIXTURE / "deal-2.bundle.json")
 SHARES = (FIXTURE / "deal-1.counterparty.bundle.json", FIXTURE / "deal-2.counterparty.bundle.json")
 EXPECTED = FIXTURE / "expected_decisions.json"
 FIXTURE_SHA256 = {
-    "deal-1.bundle.json": "74109be0d4c2450da340f4f1dfc272d51f64eb17ccb861c8ebf88ed50ceb18c1",
-    "deal-1.counterparty.bundle.json": "dc5cdc47284797fe81d04b6a55efbc3faed67931bb206585284b7fd302bdfd5a",
-    "deal-2.bundle.json": "a152f148bd110a7373ee420293bc96783a390dd460cf75b496130d0e83cce1ba",
-    "deal-2.counterparty.bundle.json": "fde7f888f3246548509451d035f96facff7b016cddc66a397e6c204ef82cb3ac",
+    "deal-1.bundle.json": "22ee3f9771d8fad6917a50be8ff93894ad24e0a219c220d9d255bfe66327736d",
+    "deal-1.counterparty.bundle.json": "b9121ea5ea42251b25ae329af60f93a9bded09fb12e63044b0c10c7af1e82808",
+    "deal-2.bundle.json": "b9a6a26daa75d69f7e608c67abfa93072c2b26680c65660ee8e599cf1a9b7a36",
+    "deal-2.counterparty.bundle.json": "810a9d1f4d43f1b55a0db4cd51673e431b5ac169ee3543c293b23963848de298",
 }
 PACK = load_pack_dir(Path(capsule_engine.__file__).parent / "packs" / "catalog" / "everyday")
 FROZEN_0_3_3 = Path(__file__).parent / "fixtures" / "packs" / "everyday-0.3.3"
 PACK_ID = "asg/everyday/0.3.4"
 PACK_DIGEST = "cd98aaec5acf8cea86f91fc21dd7df6b36a67c7b55340489b66e6ce88b85117b"
-PRODUCER = {"commit": "d1615229de65a17e250594ea4e1f456671c12eba", "name": "capsulectl", "version": "v0.1.0-rc13-4-gd161522"}
+PRODUCER = {"commit": "831afeeb9fd76b7196486a9af38ca455b1230791", "name": "capsulectl", "version": "v0.1.0-rc13-6-g831afee"}
 TAXONOMY = "6"
 R02 = "r02-ordinary-purchase"
 R06 = "r06-new-merchant"
@@ -141,11 +142,12 @@ def _record_type(capsule_id: str) -> str | None:
     return None
 
 
-def decisions_document() -> DecisionsDocument:
+def decisions_document(result: ReplayResult | None = None) -> DecisionsDocument:
     """The replay's decision for every record of the two own copies that
-    gets one (each check), in replay order."""
+    gets one (each check), in replay order: of ``result``, by default the
+    replay of the fixture as sealed."""
     decisions: list[Decision] = []
-    for sourced in _replayed().decisions:
+    for sourced in (result or _replayed()).decisions:
         rules = {r.obligation_id: r.result for r in obligation_results(PACK, sourced.decision.constraints)}
         decisions.append({
             "capsule_id": sourced.record["capsule_id"],
@@ -343,6 +345,10 @@ def _with_body(**fields: object) -> Change:
     return lambda record: {**record, "body": {**record["body"], **fields}}
 
 
+def _without_body(field: str) -> Change:
+    return lambda record: {**record, "body": {k: v for k, v in record["body"].items() if k != field}}
+
+
 def _unseen(result: ReplayResult) -> bool:
     seen = _seen_on_deal_2(result)
     return (seen.result, seen.evidence["prior_count"]) == ("fail", 0)
@@ -359,6 +365,28 @@ def test_an_approval_that_declines_leaves_the_merchant_unseen():
     """Deal 1's approval sealed as declined, its action step still there and
     pointing at it: the chain is whole but says no."""
     assert _unseen(_deals_changed({"approval": _with_body(choice="decline", proceed=False)}))
+
+
+def test_deal_1s_approval_was_sealed_under_the_users_standing_intent():
+    (approval_id,) = _of_type(OWN[0], "approval")
+    assert load_disclosed(OWN)[approval_id]["body"]["approver"] == "standing_intent"
+
+
+def test_an_approval_the_user_gave_counts_the_act_as_seen():
+    seen = _seen_on_deal_2(_deals_changed({"approval": _with_body(approver="user")}))
+    assert (seen.result, seen.evidence["prior_count"]) == ("pass", 1)
+
+
+@pytest.mark.parametrize("approver", ["agent_card", "", None, "User", ["user"], {"user": True}])
+def test_an_approval_no_user_gave_leaves_the_merchant_unseen(approver):
+    """An approval on the agent's own card certifies no one's consent, so the
+    act it approves stays unseen, as live counts it; so does any approver the
+    producer does not seal for the user or the user's standing intent."""
+    assert _unseen(_deals_changed({"approval": _with_body(approver=approver)}))
+
+
+def test_an_approval_naming_no_approver_leaves_the_merchant_unseen():
+    assert _unseen(_deals_changed({"approval": _without_body("approver")}))
 
 
 def test_an_approved_act_never_executed_leaves_the_merchant_unseen():
@@ -431,15 +459,16 @@ def test_no_share_discloses_a_companion_or_carries_its_fingerprint():
 
 def test_a_share_lists_the_companion_only_as_a_withheld_step():
     """What capsulectl's share does carry: the companion's sealed capsule (its
-    digests and signature, no record) and one withheld step naming its kind."""
+    digests and signature, no record) and one withheld step under the neutral
+    kind ``private`` (capsule-cli #170): the share never names the record type."""
     for own, share in zip(OWN, SHARES, strict=True):
         (companion,) = _of_type(own, "counterparty_profile")
         shared = _json(share)
         assert companion in {r["capsule_id"] for r in shared["records"]}
         assert companion not in shared["disclosures"]
         text = share.read_text(encoding="utf-8")
-        assert text.count("counterparty_profile") == 1
-        assert re.search(r'"capsule_id":"' + companion + r'","kind":"counterparty_profile","line":"[^"]*","n":\d+,"withheld":true', text)
+        assert "counterparty_profile" not in text
+        assert re.search(r'"capsule_id":"' + companion + r'","kind":"private","line":"[^"]*","n":\d+,"withheld":true', text)
 
 
 def test_the_engine_refuses_to_share_a_profile_keyed_decision(tmp_path, capsys):

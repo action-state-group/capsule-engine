@@ -25,7 +25,7 @@ from pathlib import Path
 import pytest
 from capsule_ledger.ledger import LedgerStore
 
-from capsule_engine.guards import Action, LocalSigner
+from capsule_engine.guards import Action, GuardDecision, LocalSigner
 from capsule_engine.guards.capsule import ALLOW, DENY, ESCALATE
 from capsule_engine.guards.checks import (
     AuthorizationRecord,
@@ -54,6 +54,9 @@ BUYER_B = _fingerprint("buyer-b")
 # A third buyer who was never told the item's condition.
 BUYER_C = _fingerprint("buyer-c")
 ITEM = "item-ref:" + hashlib.sha256(b"seller-fixture/item-1").hexdigest()
+# A second item the same user sells, accepted by buyer B: its acceptance is
+# a sealed acceptance, but of another sale by another buyer.
+ITEM_2 = "item-ref:" + hashlib.sha256(b"seller-fixture/item-2").hexdigest()
 
 # The user's private floor, 1,700.00: the record seals only its salted
 # commitment, and the opening is supplied beside each decision. This is
@@ -74,14 +77,20 @@ TASK_REF = task_authority_record_digest(TASK)
 # The user's word for one warranty statement, sealed and cited by digest.
 WARRANTY_APPROVAL: AuthorizationRecord = {"type": "approval/v0", "body": {"representation_class": "warranty"}}
 WARRANTY_APPROVAL_REF = authorization_record_digest(WARRANTY_APPROVAL)
-APPROVALS = {"statement-warranty-approved": WARRANTY_APPROVAL}
+# A one-shot approval of sharing the address: it does not release it.
+ADDRESS_APPROVAL: AuthorizationRecord = {"type": "approval/v0", "body": {"representation_class": "address"}}
+ADDRESS_APPROVAL_REF = authorization_record_digest(ADDRESS_APPROVAL)
+APPROVALS = {"statement-warranty-approved": WARRANTY_APPROVAL,
+             "address-to-a-before-acceptance-approved": ADDRESS_APPROVAL}
 
 # Steps recorded as real decisions rather than dry runs: only a real
 # accepted statement counts as made, and only a real accepted acceptance
 # seals the sale.
-REAL_RUN = frozenset({"condition-told-to-a", "condition-told-to-b", "acceptance-in-a"})
+REAL_RUN = frozenset({"condition-told-to-a", "condition-told-to-b", "acceptance-in-a", "acceptance-in-b-of-item-2"})
 # The step whose sealed acceptance later steps cite.
 ACCEPTANCE = "acceptance-in-a"
+# Buyer B's acceptance, of the other item.
+ACCEPTANCE_B = "acceptance-in-b-of-item-2"
 # A capsule id no record in the ledger has.
 UNKNOWN_MANDATE = "6" * 64
 
@@ -111,8 +120,9 @@ def _statement(name: str, minute: int, target: str, cls: str, **fields) -> Actio
 def _commitment(verb: str, action_class: str, name: str, minute: int, target: str, amount_minor: int,
                 **fields) -> Action:
     fields.setdefault("proposal_at", _at(minute - 1))
+    fields.setdefault("item_ref", ITEM)
     return Action(verb=verb, operator=OPERATOR, developer=DEVELOPER, action_class=action_class, target=target,
-                  amount_minor=amount_minor, currency="USD", task_authority_ref=TASK_REF, item_ref=ITEM,
+                  amount_minor=amount_minor, currency="USD", task_authority_ref=TASK_REF,
                   equivalence_key=f"{verb}/{name}", action_id=f"{verb}/seller-fixture-{name}",
                   timestamp=_at(minute), **fields)
 
@@ -122,15 +132,24 @@ def _offer(name: str, minute: int, target: str, amount_minor: int, **fields) -> 
 
 
 def _address(name: str, minute: int, target: str, role: str, **fields) -> Action:
-    return Action(verb="share_address", operator=OPERATOR, developer=DEVELOPER, action_class="disclosure.personal",
-                  target=target, recipient_role=role, representation_class="address",
-                  equivalence_key=f"share_address/{name}", action_id=f"share_address/seller-fixture-{name}",
+    """The user's personal data shared in the sale of ``ITEM``: the address
+    unless ``representation_class`` names another class. The disclosure
+    carries only its class, never the data."""
+    fields.setdefault("item_ref", ITEM)
+    fields.setdefault("action_class", "disclosure.personal")
+    fields.setdefault("representation_class", "address")
+    verb = "share_address" if fields["representation_class"] == "address" else "share_personal"
+    return Action(verb=verb, operator=OPERATOR, developer=DEVELOPER,
+                  target=target, recipient_role=role, task_authority_ref=TASK_REF,
+                  equivalence_key=f"{verb}/{name}", action_id=f"{verb}/seller-fixture-{name}",
                   timestamp=_at(minute), **fields)
 
 
-# A step that cites the acceptance names it by this marker; the runner
-# replaces it with the acceptance's capsule_id once that is sealed.
+# A step that cites an acceptance names it by a marker; the runner replaces
+# it with that acceptance's capsule_id once it is sealed.
 CITES_ACCEPTANCE = "<acceptance>"
+CITES_ACCEPTANCE_B = "<acceptance-b>"
+CITED = {CITES_ACCEPTANCE: ACCEPTANCE, CITES_ACCEPTANCE_B: ACCEPTANCE_B}
 
 
 def _scenarios() -> list[tuple[str, Action, str]]:
@@ -163,41 +182,72 @@ def _scenarios() -> list[tuple[str, Action, str]]:
         # dedupe's own formula (no equivalence_key given).
         ("pickup-told-to-a", _statement("pickup-a", 11, BUYER_A, "pickup", **REPEATED), ALLOW),
         ("pickup-told-to-a-again", _statement("pickup-a-again", 12, BUYER_A, "pickup", **REPEATED), DENY),
-        # The address to buyer A before the sale is accepted. Every
-        # personal-data disclosure fails the gate's personal_disclosure
-        # selector, whose rule declares ASK: it asks.
-        ("address-to-a-before-acceptance", _address("a-before", 13, BUYER_A, "buyer"), ESCALATE),
+        # The address to buyer A before the sale is accepted: no acceptance
+        # to cite, so release_on_acceptance refuses.
+        ("address-to-a-before-acceptance", _address("a-before", 13, BUYER_A, "buyer"), DENY),
+        # The same, with the user's one-shot approval of sharing the address:
+        # an approval does not release it.
+        ("address-to-a-before-acceptance-approved", _address("a-before-approved", 14, BUYER_A, "buyer",
+                                                             authorized_by=ADDRESS_APPROVAL_REF), DENY),
         # A disclosure citing a mandate that is not in the ledger.
-        ("address-citing-an-unknown-mandate", _address("a-unknown-mandate", 14, BUYER_A, "buyer",
+        # Personal data of any other class is held back the same way: a
+        # pickup detail and an unclassed detail before acceptance.
+        ("pickup-detail-to-a-before-acceptance", _address("pickup-a-before", 15, BUYER_A, "buyer",
+                                                          representation_class="pickup"), DENY),
+        ("other-detail-to-a-before-acceptance", _address("other-a-before", 16, BUYER_A, "buyer",
+                                                         representation_class="other"), DENY),
+        ("address-citing-an-unknown-mandate", _address("a-unknown-mandate", 17, BUYER_A, "buyer",
                                                        cited_mandate_capsule_id=UNKNOWN_MANDATE), DENY),
-        # A check that reads only the declared class, on a non-consequential one.
+        # A non-consequential class: nothing here measures it.
         ("listing-views-read", Action(verb="read_listing_views", operator=OPERATOR, developer=DEVELOPER,
                                       action_class="info.query", target="listing/own",
                                       equivalence_key="read_listing_views/1",
-                                      action_id="read_listing_views/seller-fixture-1", timestamp=_at(15)), ALLOW),
+                                      action_id="read_listing_views/seller-fixture-1", timestamp=_at(18)), ALLOW),
         # -- buyer A accepts --------------------------------------------------
-        ("acceptance-in-a", _commitment("accept", "agreement.accept", "accept-a", 16, BUYER_A, 175_000), ALLOW),
+        ("acceptance-in-a", _commitment("accept", "agreement.accept", "accept-a", 19, BUYER_A, 175_000), ALLOW),
         # -- after the acceptance ---------------------------------------------
         # Any commitment for the same sale in thread B is refused.
-        ("second-commitment-in-b", _offer("after-accept-b", 17, BUYER_B, 180_000), DENY),
-        # The address to buyer A, citing the acceptance: recipient_role
-        # passes for the buyer, the cited acceptance re-verifies, and the
-        # gate still asks.
-        ("address-to-a-after-acceptance", _address("a-after", 18, BUYER_A, "buyer",
-                                                   cited_mandate_capsule_id=CITES_ACCEPTANCE), ESCALATE),
+        ("second-commitment-in-b", _offer("after-accept-b", 20, BUYER_B, 180_000), DENY),
+        # Buyer B accepts the other item: a sealed acceptance of another sale.
+        ("acceptance-in-b-of-item-2", _commitment("accept", "agreement.accept", "accept-b-item-2", 21, BUYER_B,
+                                                  175_000, item_ref=ITEM_2), ALLOW),
+        # The address to buyer A, citing A's acceptance: released.
+        # recipient_role passes for the buyer and the acceptance re-verifies.
+        ("address-to-a-after-acceptance", _address("a-after", 22, BUYER_A, "buyer",
+                                                   cited_mandate_capsule_id=CITES_ACCEPTANCE), ALLOW),
+        # The same for the other classes: released to A once A accepted.
+        ("pickup-detail-to-a-after-acceptance", _address("pickup-a-after", 23, BUYER_A, "buyer",
+                                                         representation_class="pickup",
+                                                         cited_mandate_capsule_id=CITES_ACCEPTANCE), ALLOW),
+        ("other-detail-to-a-after-acceptance", _address("other-a-after", 24, BUYER_A, "buyer",
+                                                        representation_class="other",
+                                                        cited_mandate_capsule_id=CITES_ACCEPTANCE), ALLOW),
+        # The address to buyer C, a buyer too, citing A's acceptance: C did
+        # not accept, so it is refused though recipient_role passes.
+        ("address-to-c-after-acceptance", _address("c-after", 25, BUYER_C, "buyer",
+                                                   cited_mandate_capsule_id=CITES_ACCEPTANCE), DENY),
+        # The address in A's thread citing B's acceptance (of the other item).
+        ("address-to-a-citing-b-acceptance", _address("a-cites-b", 26, BUYER_A, "buyer",
+                                                      cited_mandate_capsule_id=CITES_ACCEPTANCE_B), DENY),
+        # The address to buyer C with its action class left out: nothing can
+        # show it is out of scope, so it is refused rather than passed as n/a.
+        ("address-with-no-action-class", _address("c-no-class", 27, BUYER_C, "buyer", action_class=None,
+                                                  cited_mandate_capsule_id=CITES_ACCEPTANCE), DENY),
         # The same address to someone who is not the buyer.
-        ("address-to-a-third-party", _address("third-party", 19, _fingerprint("someone-else"), "third_party",
+        ("address-to-a-third-party", _address("third-party", 28, _fingerprint("someone-else"), "third_party",
                                               cited_mandate_capsule_id=CITES_ACCEPTANCE), DENY),
         # The sale to buyer A, following its own acceptance, on an allowed rail.
-        ("sale-to-a-on-an-allowed-rail", _commitment("sell", "marketplace.sale", "sale-a", 20, BUYER_A, 175_000,
+        ("sale-to-a-on-an-allowed-rail", _commitment("sell", "marketplace.sale", "sale-a", 29, BUYER_A, 175_000,
                                                      rail="card", cited_mandate_capsule_id=CITES_ACCEPTANCE), ALLOW),
-        ("sale-to-a-on-a-rail-not-allowed", _commitment("sell", "marketplace.sale", "sale-a-cheque", 21, BUYER_A,
+        ("sale-to-a-on-a-rail-not-allowed", _commitment("sell", "marketplace.sale", "sale-a-cheque", 30, BUYER_A,
                                                         175_000, rail="cheque",
                                                         cited_mandate_capsule_id=CITES_ACCEPTANCE), ESCALATE),
     ]
 
 
-def _run_scenarios(ledger, *, project_dir):
+def _run_scenarios(ledger, *, project_dir, decisions: dict[str, GuardDecision] | None = None):
+    """Run every step in order; ``decisions``, when given, collects each
+    step's ``GuardDecision`` (its unsealed reasons and evidence)."""
     import dataclasses
 
     installed = install_pack(load_pack_dir(PACK_DIR), project_dir=project_dir, mode="observe")
@@ -214,8 +264,9 @@ def _run_scenarios(ledger, *, project_dir):
     )
     capsules: dict[str, dict] = {}
     for name, action, expected in _scenarios():
-        if action.cited_mandate_capsule_id == CITES_ACCEPTANCE:
-            action = dataclasses.replace(action, cited_mandate_capsule_id=capsules[ACCEPTANCE]["capsule_id"])
+        if action.cited_mandate_capsule_id in CITED:
+            cited = capsules[CITED[action.cited_mandate_capsule_id]]["capsule_id"]
+            action = dataclasses.replace(action, cited_mandate_capsule_id=cited)
         decision = engine.check(
             action,
             dry_run=name not in REAL_RUN,
@@ -226,6 +277,8 @@ def _run_scenarios(ledger, *, project_dir):
         if decision.outcome != expected:
             raise AssertionError(f"scenario {name!r}: expected {expected!r}, got {decision.outcome!r} ({decision.reason})")
         capsules[name] = decision.capsule
+        if decisions is not None:
+            decisions[name] = decision
     return installed, activation, capsules, list(ledger.scan())
 
 
@@ -233,12 +286,14 @@ def _run_scenarios(ledger, *, project_dir):
 def run(tmp_path_factory):
     tmp = tmp_path_factory.mktemp("seller")
     store = LedgerStore(tmp / "ledger")
+    decisions: dict[str, GuardDecision] = {}
     try:
-        installed, activation, capsules, records = _run_scenarios(store, project_dir=tmp / "project")
+        installed, activation, capsules, records = _run_scenarios(store, project_dir=tmp / "project",
+                                                                  decisions=decisions)
         verified = {name: store.verify(c["capsule_id"]) for name, c in capsules.items()}
     finally:
         store.close()
-    return installed, activation, capsules, records, verified
+    return installed, activation, capsules, records, verified, decisions
 
 
 # Reads raw capsule or fixture JSON/YAML: the test's decoding boundary.
@@ -253,7 +308,7 @@ def _failing(capsule: dict) -> list[str]:
 
 
 def test_every_declared_scenario_ran_at_its_declared_outcome(run):
-    installed, _, capsules, records, verified = run
+    installed, _, capsules, records, verified, _ = run
     declared = {s.id: s.outcome for s in installed.pack.fixtures.scenarios}
     assert list(declared) == list(capsules)
     for name, result in verified.items():
@@ -262,34 +317,118 @@ def test_every_declared_scenario_ran_at_its_declared_outcome(run):
 
 
 def test_records_are_pack_attributed_and_observe_mode(run):
-    installed, activation, capsules, _, _ = run
+    installed, activation, capsules, _, _, _ = run
     for name, capsule in capsules.items():
         assert capsule["asg_payload"]["manifest_digest"] == installed.resolved.manifest_digest, name
         assert capsule["asg_payload"]["checkpoint"].get("dry_run") is (True if name not in REAL_RUN else None), name
     assert activation["asg_payload"]["detail"]["packs"] == [
-        {"pack_id": "asg/seller/0.1.0", "digest": installed.pack.definition_digest(), "mode": "observe"}
+        {"pack_id": "asg/seller/0.1.1", "digest": installed.pack.definition_digest(), "mode": "observe"}
     ]
 
 
 # -- the acceptance criteria, each on its named record ---------------------------
 
 
-def test_the_address_before_acceptance_is_not_released(run):
-    capsule = run[2]["address-to-a-before-acceptance"]
+# release_on_acceptance's own reasons: fixed sentences, never a value.
+RELEASE_REASONS = {
+    "the disclosure cites no acceptance",
+    "the disclosure does not cite this sale's sealed acceptance by this recipient",
+    "the disclosure cites this sale's sealed acceptance by this recipient",
+    "the action class has no taxonomy row; it cannot be shown to be outside the rule",
+}
+
+
+def _release(run, name: str):
+    (outcome,) = [c for c in run[5][name].constraints if c.id == "release_on_acceptance"]
+    return outcome
+
+
+def _refused_on_release_alone(run, name: str) -> None:
+    capsule = run[2][name]
     assert _constraint(capsule, "recipient_role")["result"] == "pass"
-    assert _failing(capsule) == ["action_class_gate"]
-    assert capsule["disposition"]["decision"] == "needs_input"
+    assert _failing(capsule) == ["release_on_acceptance"]
+    assert capsule["disposition"]["decision"] == "reject"
+    # The decision's reason names the rule that refused it.
+    assert run[5][name].outcome == DENY
+    assert "release_on_acceptance=fail" in run[5][name].reason
 
 
-def test_the_address_after_acceptance_passes_the_seller_role_and_cites_the_acceptance(run):
+def test_the_address_before_acceptance_is_refused_by_the_release_rule(run):
+    _refused_on_release_alone(run, "address-to-a-before-acceptance")
+    assert _release(run, "address-to-a-before-acceptance").reason == "the disclosure cites no acceptance"
+
+
+def test_a_one_shot_approval_does_not_release_the_address(run):
+    name = "address-to-a-before-acceptance-approved"
+    assert run[2][name]["asg_payload"]["authorized_by"] == ADDRESS_APPROVAL_REF
+    _refused_on_release_alone(run, name)
+
+
+def test_the_address_after_acceptance_is_released_to_the_buyer_who_accepted(run):
     capsules = run[2]
     capsule = capsules["address-to-a-after-acceptance"]
     assert capsule["asg_payload"]["recipient_role"] == "buyer"
     assert _constraint(capsule, "recipient_role")["result"] == "pass"
     assert _constraint(capsule, "verify_before_dispatch")["result"] == "pass"
+    assert _constraint(capsule, "release_on_acceptance")["result"] == "pass"
     # The cited acceptance is sealed as the record's chain parent.
     assert capsule["chain"]["parent_capsule_id"] == capsules[ACCEPTANCE]["capsule_id"]
-    assert _failing(capsule) == ["action_class_gate"]
+    assert _failing(capsule) == []
+    assert capsule["disposition"]["decision"] == "accept"
+
+
+def test_the_address_to_another_buyer_citing_the_acceptance_is_refused(run):
+    name = "address-to-c-after-acceptance"
+    assert run[2][name]["asg_payload"]["recipient_role"] == "buyer"
+    _refused_on_release_alone(run, name)
+
+
+def test_the_address_citing_another_buyers_acceptance_is_refused(run):
+    capsules = run[2]
+    capsule = capsules["address-to-a-citing-b-acceptance"]
+    # B's acceptance is a real, re-verifying record; it is just not this sale's by A.
+    assert capsules[ACCEPTANCE_B]["disposition"]["decision"] == "accept"
+    assert _constraint(capsule, "verify_before_dispatch")["result"] == "pass"
+    _refused_on_release_alone(run, "address-to-a-citing-b-acceptance")
+
+
+def test_the_release_rule_names_no_value(run):
+    """Every release_on_acceptance record, pass or fail, holds none of the
+    references, counterparties or acceptance ids, and its reason is one of
+    the fixed sentences."""
+    capsules = run[2]
+    values = [BUYER_A, BUYER_B, BUYER_C, _fingerprint("someone-else"), ITEM, ITEM_2, TASK_REF,
+              capsules[ACCEPTANCE]["capsule_id"], capsules[ACCEPTANCE_B]["capsule_id"]]
+    measured = 0
+    for name in capsules:
+        outcome = _release(run, name)
+        if outcome.result == "n/a":
+            continue
+        measured += 1
+        assert outcome.reason in RELEASE_REASONS, name
+        assert set(outcome.evidence) == {"constraint_id", "representation_class", "bound_to_acceptance",
+                                         "missing_field"}, name
+        serialised = json.dumps({"reason": outcome.reason, "evidence": outcome.evidence})
+        for value in values:
+            assert value not in serialised, (name, value)
+    assert measured == 12
+
+
+@pytest.mark.parametrize("cls", ["pickup", "other"])
+def test_personal_data_of_another_class_is_held_until_the_buyer_accepts(run, cls):
+    capsules = run[2]
+    _refused_on_release_alone(run, f"{cls}-detail-to-a-before-acceptance")
+    after = capsules[f"{cls}-detail-to-a-after-acceptance"]
+    assert _failing(after) == []
+    assert after["disposition"]["decision"] == "accept"
+    assert _constraint(after, "release_on_acceptance")["result"] == "pass"
+
+
+def test_an_address_with_no_action_class_is_refused(run):
+    name = "address-with-no-action-class"
+    assert _failing(run[2][name]) == ["release_on_acceptance"]
+    assert run[2][name]["disposition"]["decision"] == "reject"
+    assert _release(run, name).evidence["missing_field"] == "action_class"
 
 
 def test_the_address_to_anyone_but_the_buyer_is_refused(run):
@@ -347,7 +486,7 @@ def test_a_denial_in_thread_b_names_nothing_from_thread_a(run):
 
 
 def test_fixture_is_reproducible_byte_for_byte(run):
-    _, _, _, records, _ = run
+    _, _, _, records, _, _ = run
     regenerated = [json.dumps(r.capsule, separators=(",", ":")) for r in records]
     assert regenerated == FIXTURE_PATH.read_text().splitlines()
 
