@@ -305,7 +305,7 @@ def test_the_everyday_pack_cites_caps_v5():
     from capsule_engine.packs import load_pack_dir
 
     pack = load_pack_dir(EVERYDAY_DIR)
-    assert pack.pack_id == "asg/everyday/0.3.4"
+    assert pack.pack_id == "asg/everyday/0.3.5"
     (caps,) = [w for w in pack.constraints if w.check == "caps"]
     assert caps.wicket_id == "caps/5.0.0"
     assert caps.config["per_action_reads"] == "spend_authorized_minor"

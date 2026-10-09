@@ -33,7 +33,7 @@ from capsule_engine.packs.schema import Obligation, PackDefinition
 from capsule_engine.report.replay import replay
 
 # everyday 0.3.2 as the plugin vendors it, kept byte for byte outside the
-# catalog (the catalog now holds 0.3.4).
+# catalog (the catalog now holds 0.3.5).
 PACK_DIR = Path(__file__).parent / "fixtures" / "packs" / "everyday-0.3.2"
 PACK = load_pack_dir(PACK_DIR)
 PACK_0_3_2_DIGEST = "6f333fa8b7a7e137abe6c61e5a32097ed06d493479a018807cbf4d2e4f5da7b2"

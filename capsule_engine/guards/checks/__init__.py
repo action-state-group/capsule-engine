@@ -76,6 +76,7 @@ CONFIGURED_CHECKS: dict[str, Callable[[Action, LedgerAPI, dict], CheckOutcome]] 
         ledger,
         definition=seen_before_fold(config["fold_id"], config["fold_digest"]),
         action_classes=config["action_classes"],
+        missing_target=config.get("missing_target", "n/a"),
     ),
     "credential_pattern": lambda action, ledger, config: check_credential_pattern(
         action, patterns=config["patterns"]

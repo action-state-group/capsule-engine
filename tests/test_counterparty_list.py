@@ -427,7 +427,9 @@ def test_a_profile_deny_list_refuses_a_listed_purchase_and_leaves_the_pack_uncha
     profile = _profile(mode="deny", entries=[_fp("payee", PAYEE)])
     installed, decision = _decide(tmp_path, profile, _sealed({"payee": PAYEE}))
     assert decision.outcome == DENY
-    assert _failed(decision) == ["counterparty_list"]
+    # The sealed action names no target, so counterparty_seen_before/4.0.0
+    # reads it as a first-time payee too; the list is what refuses it.
+    assert _failed(decision) == ["counterparty_seen_before", "counterparty_list"]
     assert _list_constraint(decision).evidence["matched_entry"] == _fp("payee", PAYEE)
     without = install_pack(_pack_with_list(), project_dir=tmp_path / "bare", mode="enforce")
     assert installed.manifest.wickets == without.manifest.wickets

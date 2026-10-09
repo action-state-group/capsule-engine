@@ -286,6 +286,12 @@ def _scenarios() -> list[tuple[str, Action, str]]:
          **_declared("v", target="buyer/bike-v", material_fields_changed=1)), ESCALATE),
         ("sale-deposit-over-a-quarter", _sale("sale-deposit-over", 34, f"{OPERATOR}-w",
          **_declared("w", target="buyer/bike-w", upfront_amount_minor=501)), ESCALATE),
+        # A purchase naming no merchant: counterparty_seen_before/4.0.0 reads it
+        # as a first-time merchant ("no payee named"), the sole failing check,
+        # and money.purchase names an approver role, so it escalates. Under
+        # 3.0.0 it was n/a and the purchase was allowed.
+        ("merchant-purchase-no-payee", _purchase("merchant-no-payee", 35, "household-assistant-x@v1",
+         amount_minor=900), ESCALATE),
     ]
 
 
@@ -344,7 +350,7 @@ def test_records_are_pack_attributed_and_observe_mode(run):
         assert capsule["asg_payload"]["manifest_digest"] == installed.resolved.manifest_digest, name
         assert capsule["asg_payload"]["checkpoint"].get("dry_run") is (True if name not in REAL_RUN else None), name
     assert activation["asg_payload"]["detail"]["packs"] == [
-        {"pack_id": "asg/everyday/0.3.4", "digest": installed.pack.definition_digest(), "mode": "observe"}
+        {"pack_id": "asg/everyday/0.3.5", "digest": installed.pack.definition_digest(), "mode": "observe"}
     ]
 
 

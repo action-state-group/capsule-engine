@@ -12,7 +12,7 @@ the taxonomy moves its digest when the taxonomy moves, and does not load
 under any other one.
 
 The pin is optional and everyday 0.3.2 does not carry it: adding it would move
-the digest the plugin vendors. everyday 0.3.3 and 0.3.4 carry it
+the digest the plugin vendors. everyday 0.3.3, 0.3.4 and 0.3.5 carry it
 (test_pack_everyday_sale_coverage.py); the pin is exercised here on 0.3.2's
 released bytes, kept under tests/fixtures/packs.
 """

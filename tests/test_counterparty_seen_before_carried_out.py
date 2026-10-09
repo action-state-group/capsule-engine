@@ -9,7 +9,8 @@ show that chain, the replay writes the act to its own view with
 ``disposition.decision`` ``carried_out``; counterparty.seen_before/3.0.0
 counts that beside an accepted decision. No other fold reads that value, so
 it is never spend. Version 2 of the fold and the wicket, and everyday 0.3.3,
-stay as they were.
+stay as they were. everyday 0.3.4, which cited version 3, is kept the same
+way since 0.3.5 replaced it in the catalog.
 """
 from __future__ import annotations
 
@@ -27,7 +28,8 @@ REPO = Path(__file__).parent.parent
 ROOT = REPO / "capsule_engine"
 WICKETS = ROOT / "guards" / "wickets" / "catalog_defs"
 FOLDS = ROOT / "folds" / "catalog_defs"
-PACK = load_pack_dir(ROOT / "packs" / "catalog" / "everyday")
+FROZEN_0_3_4 = REPO / "tests" / "fixtures" / "packs" / "everyday-0.3.4"
+PACK = load_pack_dir(FROZEN_0_3_4)
 FROZEN_0_3_3 = REPO / "tests" / "fixtures" / "packs" / "everyday-0.3.3"
 FROZEN_0_3_3_FILE_SHA256 = "f9768c624b78998528620acc0258ee0878a3e49d16df7ebbe00c84ef4e11b8ca"
 V2_FOLD_DIGEST = "6a1a357e4a3b950b7397c2790fe46c03f7e645d04aad1a9bb41533df9b4a4033"

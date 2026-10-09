@@ -48,7 +48,7 @@ script is the record of how they were made.
 | `deal-1.bundle.json`, `deal-2.bundle.json` | the user's own copy (`bundle --deal`), replayed by the engine |
 | `deal-1.counterparty.bundle.json`, `deal-2.counterparty.bundle.json` | the counterparty's shared copy (`disclose --share counterparty`) |
 | `inputs/` | the `deal open`, `deal check` and `deal note --kind act` bodies |
-| `expected_decisions.json` | the engine's decision for every record of the two own copies that gets one (the two checks), replayed in that order under `asg/everyday/0.3.4`; sorted canonical JSON |
+| `expected_decisions.json` | the engine's decision for every record of the two own copies that gets one (the two checks), replayed in that order under `asg/everyday/0.3.5`; sorted canonical JSON |
 
 Regenerate `expected_decisions.json` with `python -m tests.test_real_two_deal_bundle`.
 `tests/test_real_two_deal_bundle.py` compares it byte for byte.
@@ -71,7 +71,7 @@ Only a check states an act, so only the two checks get a decision.
 - **Deal 2's check reads the merchant as seen** (r02 and r06 pass, `prior_count` 1). Deal 1's act was
   carried out: its sealed approval (`proceed: true`) approves the verdict on that check, and the
   sealed action step names that approval under `authorized_by`. The replay counts the act as an
-  earlier one with that merchant (`counterparty_seen_before/3.0.0`), keyed on the profile
+  earlier one with that merchant (`counterparty_seen_before/4.0.0`, which counts as 3.0.0 does), keyed on the profile
   fingerprint both companions carry.
 - **Deal 2's check asks on r27**: it is the same act as deal 1's, in another deal (`dedupe`).
 - **No other record gets a decision**: the companions, baselines, verdicts, approvals, action steps
