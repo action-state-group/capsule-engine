@@ -230,6 +230,17 @@ def _typed_ref_digest(value: object) -> str | None:
     return digest if isinstance(digest, str) and _HEX64.match(digest) else None
 
 
+# The body fields that state the amount a money-in record returns, first
+# present wins: the producer's explicit ``returned_minor``, then a refund's
+# ``amount_minor``, then a partial cancel's ``cancelled_amount_minor``.
+_RETURNED_AMOUNT_FIELDS = ("returned_minor", "amount_minor", "cancelled_amount_minor")
+
+
+def _returned_minor(body: dict) -> int | None:
+    """The amount a money-in check returns (``_RETURNED_AMOUNT_FIELDS``)."""
+    return next((v for v in (_minor(body.get(f)) for f in _RETURNED_AMOUNT_FIELDS) if v is not None), None)
+
+
 def _bridge_deal_check(record: dict, disclosed: dict | None) -> Action | None:
     """The proposed action a capsulectl deal check states, from its own
     sealed record: the class it names, and the amount a spend cap evaluates,
@@ -237,7 +248,10 @@ def _bridge_deal_check(record: dict, disclosed: dict | None) -> Action | None:
     a refund) or ``cancelled_amount_minor``, and ``0`` for a record that says
     the money moved in. So a cancel is never spend. ``spend_authorized_minor``,
     the authorised maximum sealed beside it, is carried for a per-action cap
-    and dropped when the money moved in.
+    and dropped when the money moved in. When it moved in, the amount
+    returned (``_returned_minor``) and the SHA-256 digest of the reversed
+    act's record (the body's typed ``reverses_ref``) are carried for
+    ``dedupe`` beside the spend of ``0``, and never otherwise.
     Only a check is an action here: the step that acts on it is the same
     payment, and counting both would count it twice.
     The rail and ``refundable`` come from the body's ``recourse`` block, where
@@ -255,9 +269,11 @@ def _bridge_deal_check(record: dict, disclosed: dict | None) -> Action | None:
         return None
     spend = body.get("spend_minor")
     authorized = body.get("spend_authorized_minor")
+    returned = reverses = None
     if body.get("direction") == "in":
         spend = 0  # money arriving is never spend, whatever spend_minor says
         authorized = None
+        returned, reverses = _returned_minor(body), _typed_ref_digest(body.get("reverses_ref"))
     counterparty_ids, fp_alg = _sealed_counterparty((disclosed.get("x-deal-v0") or {}).get("counterparty"))
     recourse = body.get("recourse") if isinstance(body.get("recourse"), dict) else {}
     return Action(
@@ -286,6 +302,8 @@ def _bridge_deal_check(record: dict, disclosed: dict | None) -> Action | None:
         offer_fields_changed=_minor(body.get("offer_fields_changed")),
         offer_fields_basis=_text(body.get("offer_fields_basis")),
         task_authority_ref=_typed_ref_digest(body.get("task_authority_ref")),
+        returned_minor=returned,
+        reverses_ref=reverses,
     )
 
 

@@ -104,6 +104,11 @@ class Action:
     beside ``action_class`` when set, so a count over trigger classes can be
     recomputed against the table that was live; unset, the record keeps its
     prior bytes.
+    ``returned_minor`` is the amount a record moving money in (a refund, a
+    partial cancel) returns, in the same minor units as ``amount_minor``,
+    which stays the spend (``0`` for money in); ``reverses_ref`` is the
+    SHA-256 digest of the record of the act it reverses. Both are set only
+    when money moves in, sealed when set, and read by ``dedupe``.
     ``states_act`` is ``False`` for a record that states no act of its own
     (a deal's baseline, verdict or approval; see ``report/replay.py``), read
     by ``dedupe``, which does not apply to it; it is never sealed.
@@ -146,6 +151,8 @@ class Action:
     authorized_by: str | None = None
     proposal_at: str | None = None
     item_ref: str | None = None
+    returned_minor: int | None = None
+    reverses_ref: str | None = None
     states_act: bool = True
 
     def __post_init__(self) -> None:
@@ -205,4 +212,6 @@ class Action:
             counterparty_account_ref=payload.get("counterparty_account_ref"),
             recurrence=payload.get("recurrence"),
             taxonomy_version=payload.get("taxonomy_version"),
+            returned_minor=payload.get("returned_minor"),
+            reverses_ref=payload.get("reverses_ref"),
         )
