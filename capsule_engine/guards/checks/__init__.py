@@ -7,8 +7,8 @@ containment, a pure function of ``(action, plan)`` with no ledger read.
 configuring them is in force (``GuardEngine(wickets=...)``); each takes the
 action, the ledger and that wicket's ``config``. ``TASK_AUTHORITY_CHECKS`` run the
 same way but take the task-authority body supplied with the decision in place
-of the ledger, and ``AUTHORIZATION_CHECKS`` the approval record supplied with
-it. ``RUNNABLE_CHECKS`` names all three."""
+of the ledger, and ``AUTHORIZATION_CHECKS`` both the task-authority record and
+the approval record supplied with it. ``RUNNABLE_CHECKS`` names all three."""
 from collections.abc import Callable
 
 from capsule_ledger.ledger.api import LedgerAPI
@@ -32,12 +32,14 @@ from .field_change_count import check_material_fields_changed, check_offer_field
 from .offer_expiry import check_offer_expiry
 from .plan_containment import check_plan_containment
 from .price_floor import FLOOR_PATH, check_price_floor
-from .promise_class import (
+from .promise_never import check_promise_never
+from .promise_requires_approval import (
+    AUTHORIZED_PATH,
     CLASS_PATH,
     AuthorizationBody,
     AuthorizationRecord,
     authorization_record_digest,
-    check_promise_class,
+    check_promise_requires_approval,
 )
 from .recipient_role import check_recipient_role
 from .recurring_charge import check_recurring_charge
@@ -125,6 +127,12 @@ CONFIGURED_CHECKS: dict[str, Callable[[Action, LedgerAPI, dict], CheckOutcome]] 
     "offer_expiry": lambda action, ledger, config: check_offer_expiry(
         action, max_age_seconds=config["max_age_seconds"], action_classes=config["action_classes"]
     ),
+    "promise_never": lambda action, ledger, config: check_promise_never(
+        action,
+        representation_classes=config["representation_classes"],
+        never=config["never"],
+        action_classes=config["action_classes"],
+    ),
 }
 
 TASK_AUTHORITY_CHECKS: dict[str, Callable[[Action, TaskAuthorityRecord | None, dict], CheckOutcome]] = {
@@ -136,12 +144,15 @@ TASK_AUTHORITY_CHECKS: dict[str, Callable[[Action, TaskAuthorityRecord | None, d
     ),
 }
 
-AUTHORIZATION_CHECKS: dict[str, Callable[[Action, AuthorizationRecord | None, dict], CheckOutcome]] = {
-    "promise_class": lambda action, record, config: check_promise_class(
+AUTHORIZATION_CHECKS: dict[
+    str, Callable[[Action, TaskAuthorityRecord | None, AuthorizationRecord | None, dict], CheckOutcome]
+] = {
+    "promise_requires_approval": lambda action, task_authority, approval, config: check_promise_requires_approval(
         action,
-        record,
+        task_authority,
+        approval,
         representation_classes=config["representation_classes"],
-        never_without_approval=config["never_without_approval"],
+        requires_approval=config["requires_approval"],
         action_classes=config["action_classes"],
     ),
 }
@@ -150,6 +161,7 @@ RUNNABLE_CHECKS = frozenset(CONFIGURED_CHECKS) | frozenset(TASK_AUTHORITY_CHECKS
 
 __all__ = [
     "AUTHORIZATION_CHECKS",
+    "AUTHORIZED_PATH",
     "CLASS_PATH",
     "AuthorizationBody",
     "AuthorizationRecord",
@@ -180,7 +192,8 @@ __all__ = [
     "check_offer_fields_changed",
     "check_plan_containment",
     "check_price_floor",
-    "check_promise_class",
+    "check_promise_never",
+    "check_promise_requires_approval",
     "check_recipient_role",
     "check_recipient_seen_before",
     "check_recurring_charge",

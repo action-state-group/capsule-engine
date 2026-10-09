@@ -88,12 +88,15 @@ class Action:
     read by ``task_authority``.
     ``representation_class`` is the one class of statement the action makes
     to a counterparty (``price``, ``condition``, ``warranty``, ...), read by
-    ``promise_class`` and counted by ``required_disclosure``; a message that
+    ``promise_requires_approval`` and ``promise_never`` and counted by
+    ``required_disclosure``; a message that
     makes several statements is several actions, one class each. The
     statement itself never reaches the guard. ``authorized_by`` is the
     SHA-256 digest of the whole sealed approval record the action cites,
-    read by ``promise_class`` against the record supplied with the decision. ``proposal_at`` is the RFC 3339 UTC timestamp of the
-    proposal the action acts on, read by ``offer_expiry``.
+    read by ``promise_requires_approval`` against the record supplied with
+    the decision (``promise_never`` records it and ignores it).
+    ``proposal_at`` is the RFC 3339 UTC timestamp of the proposal the action
+    acts on, read by ``offer_expiry``.
     ``taxonomy_version`` (normally ``classes.TAXONOMY_VERSION``) is sealed
     beside ``action_class`` when set, so a count over trigger classes can be
     recomputed against the table that was live; unset, the record keeps its

@@ -5,6 +5,8 @@
 # actions addressed to Action.target that carried that
 # representation_class; a zero fails the check. It checks that a statement
 # of the class was recorded, never what it said or whether it was true.
+# A failure means: make the disclosure first, or change the task
+# authority. An approval never waives it.
 #
 # `representation_classes` is the closed set a class must come from;
 # `required_classes` outside it is refused when the check runs.

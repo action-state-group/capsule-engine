@@ -66,6 +66,7 @@ class TaskAuthorityBody(TypedDict):
     binding: NotRequired[dict[str, str]]
     window: NotRequired[str]
     min_total_minor: NotRequired[int]
+    authorized_representation_classes: NotRequired[list[str]]
 
 
 class TaskAuthorityRecord(TypedDict):

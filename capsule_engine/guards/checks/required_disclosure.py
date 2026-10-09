@@ -11,6 +11,12 @@ count and the classes still missing. It checks that a statement of the class
 was recorded, never what it said or whether it was true. Applies only to
 the configured ``action_classes``.
 
+A failure means the action cannot proceed as constructed: make the
+disclosure first, or change the task authority. It is never cleared by an
+approval: this check reads no approval record and ignores
+``Action.authorized_by``, because a one-shot approval does not waive a
+statement the person already required.
+
 ``required_classes`` must come from the closed set ``representation_classes``;
 a class outside it is a configuration error and raises ``ValueError``.
 """
@@ -96,6 +102,7 @@ def check_required_disclosure(
         missing_classes=missing,
     )
     if missing:
-        return _outcome("fail", f"no accepted prior statement of {missing} to this counterparty", evidence, method,
+        return _outcome("fail", f"no accepted prior statement of {missing} to this counterparty: make the disclosure "
+                                 "first or change the task authority; an approval does not waive it", evidence, method,
                         traces)
     return _outcome("pass", "every required class was stated to this counterparty", evidence, method, traces)

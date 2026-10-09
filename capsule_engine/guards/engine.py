@@ -195,9 +195,10 @@ class GuardEngine:
         ``task_authority`` wicket and only when the engine's own digest of it
         equals the reference (``guards/checks/task_authority.py``).
         ``authorization_record`` is the whole sealed approval record
-        ``action.authorized_by`` names, read only by a ``promise_class``
-        wicket and only when the engine's own digest of it equals that
-        reference (``guards/checks/promise_class.py``)."""
+        ``action.authorized_by`` names, read only by a
+        ``promise_requires_approval`` wicket and only when the engine's own
+        digest of it equals that reference
+        (``guards/checks/promise_requires_approval.py``)."""
         ac = classify(action.action_class)
         consequential = ac.consequential
         may_fail_open = ac.fail_open_allowed and action.action_class in self._fail_open_classes
@@ -342,7 +343,9 @@ class GuardEngine:
             if wicket.check in TASK_AUTHORITY_CHECKS:
                 out = TASK_AUTHORITY_CHECKS[wicket.check](action, task_authority_record, wicket.config)
             elif wicket.check in AUTHORIZATION_CHECKS:
-                out = AUTHORIZATION_CHECKS[wicket.check](action, authorization_record, wicket.config)
+                out = AUTHORIZATION_CHECKS[wicket.check](
+                    action, task_authority_record, authorization_record, wicket.config
+                )
             else:
                 out = CONFIGURED_CHECKS[wicket.check](action, self._ledger, wicket.config)
             constraints = (*constraints, out.constraint)

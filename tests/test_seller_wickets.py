@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
-"""The seller-side wickets: price_floor, required_disclosure, promise_class
-and offer_expiry, plus the seller configurations of recipient_role and
+"""The seller-side wickets: price_floor, required_disclosure,
+promise_requires_approval, promise_never and offer_expiry, plus the seller configurations of recipient_role and
 destination_rail. Each reads one number, one member of a closed set, one
 opaque reference or one timestamp from an action, never a list, an object
 or text. None of them judges whether a statement is true: they check that a
@@ -37,12 +37,13 @@ FOLDS = ROOT / "folds" / "catalog_defs"
 
 FLOOR = load_definition_file(CATALOG / "price_floor.yaml")
 DISCLOSURE = load_definition_file(CATALOG / "required_disclosure.yaml")
-PROMISE = load_definition_file(CATALOG / "promise_class.yaml")
+PROMISE_ASK = load_definition_file(CATALOG / "promise_requires_approval.yaml")
+PROMISE_NEVER = load_definition_file(CATALOG / "promise_never.yaml")
 EXPIRY = load_definition_file(CATALOG / "offer_expiry.yaml")
 SELLER_ROLE = load_definition_file(CATALOG / "recipient_role.seller.yaml")
 SELLER_RAIL = load_definition_file(CATALOG / "destination_rail.seller.yaml")
 SPEND = load_fold(FOLDS / "spend.weekly.v3.yaml")
-SELLER_DEFINITIONS = (FLOOR, DISCLOSURE, PROMISE, EXPIRY, SELLER_ROLE, SELLER_RAIL)
+SELLER_DEFINITIONS = (FLOOR, DISCLOSURE, PROMISE_ASK, PROMISE_NEVER, EXPIRY, SELLER_ROLE, SELLER_RAIL)
 
 # The closed set of representation classes, in this order.
 REPRESENTATION_CLASSES = [
@@ -73,6 +74,12 @@ BICYCLE: TaskAuthorityRecord = {
              "preconditions": [], "min_total_minor": 170_000},
 }
 BICYCLE_REF = task_authority_record_digest(BICYCLE)
+# The same task, with a warranty statement already inside its authority.
+WARRANTY_TASK: TaskAuthorityRecord = {
+    "type": "task-authority/v0",
+    "body": {**BICYCLE["body"], "authorized_representation_classes": ["warranty"]},
+}
+WARRANTY_TASK_REF = task_authority_record_digest(WARRANTY_TASK)
 
 
 def _action(**overrides) -> Action:
@@ -102,7 +109,7 @@ def _run(definition: WicketDefinition, action: Action, *, ledger=None, record=No
     if definition.check in TASK_AUTHORITY_CHECKS:
         return TASK_AUTHORITY_CHECKS[definition.check](action, record, definition.config).constraint
     if definition.check in AUTHORIZATION_CHECKS:
-        return AUTHORIZATION_CHECKS[definition.check](action, approval, definition.config).constraint
+        return AUTHORIZATION_CHECKS[definition.check](action, record, approval, definition.config).constraint
     return CONFIGURED_CHECKS[definition.check](action, ledger, definition.config).constraint
 
 
@@ -132,7 +139,8 @@ def test_new_fields_are_sealed_only_when_set(store, signer):
 
 def test_the_representation_class_set_is_pinned_verbatim():
     assert DISCLOSURE.config["representation_classes"] == REPRESENTATION_CLASSES
-    assert PROMISE.config["representation_classes"] == REPRESENTATION_CLASSES
+    assert PROMISE_ASK.config["representation_classes"] == REPRESENTATION_CLASSES
+    assert PROMISE_NEVER.config["representation_classes"] == REPRESENTATION_CLASSES
 
 
 def test_the_seller_configs_reuse_the_existing_checks_and_leave_v1_alone():
@@ -264,12 +272,23 @@ def test_required_disclosure_counts_only_this_class_to_this_counterparty(store, 
 
 
 def test_required_disclosure_does_not_count_a_refused_disclosure(store, signer):
-    refusing = _engine(store, signer, PROMISE)
+    refusing = _engine(store, signer, PROMISE_NEVER)
     out = refusing.check(_action(verb="tell", action_class="communication.send", amount_minor=None,
-                                 action_id="tell/refused", representation_class="warranty"))
+                                 action_id="tell/refused", representation_class="authenticity"))
     assert out.capsule["disposition"]["decision"] == "reject"
-    warranty_required = dataclasses.replace(DISCLOSURE, config={**DISCLOSURE.config, "required_classes": ["warranty"]})
-    assert _act(store, signer, warranty_required).result == "fail"
+    required = dataclasses.replace(DISCLOSURE, config={**DISCLOSURE.config, "required_classes": ["authenticity"]})
+    assert _act(store, signer, required).result == "fail"
+
+
+def test_required_disclosure_is_not_waived_by_an_approval(store, signer):
+    record, ref = _approval("condition")
+    engine = _engine(store, signer, DISCLOSURE, PROMISE_ASK)
+    out = engine.check(_action(action_id="offer/approved", authorized_by=ref, representation_class="condition"),
+                       authorization_record=record)
+    (disclosure,) = [c for c in out.constraints if c.id == "required_disclosure"]
+    assert disclosure.result == "fail"
+    assert "an approval does not waive it" in disclosure.reason
+    assert out.outcome == "deny"
 
 
 def test_required_disclosure_without_a_target_is_n_a(store, signer):
@@ -289,67 +308,86 @@ def test_required_disclosure_fold_is_the_pinned_catalog_fold():
     assert DISCLOSURE.config["fold_digest"] == fold.definition_digest()
 
 
-# -- promise_class --------------------------------------------------------------
+# -- promise_requires_approval ----------------------------------------------------
 
 
-def _promise(**overrides):
-    return _run(PROMISE, _action(action_class="communication.send", **overrides))
+def _ask(*, record=None, approval=None, **overrides):
+    return _run(PROMISE_ASK, _action(action_class="communication.send", **overrides), record=record,
+                approval=approval)
 
 
-@pytest.mark.parametrize("cls", ["authenticity", "warranty", "delivery_date"])
-def test_promise_class_never_without_approval(cls):
-    out = _promise(representation_class=cls)
+@pytest.mark.parametrize("cls", ["warranty", "delivery_date"])
+def test_promise_requires_approval_fails_without_one(cls):
+    out = _ask(representation_class=cls)
     assert out.result == "fail"
     assert out.evidence == {"representation_class": cls, "recognised": True, "requires_approval": True,
-                            "authorized_by": None, "approval_bound": False}
+                            "authority_basis": None, "task_authority_ref": None, "authorized_by": None}
     record, ref = _approval(cls)
-    approved = _run(PROMISE, _action(action_class="communication.send", representation_class=cls, authorized_by=ref),
-                    approval=record)
+    approved = _ask(representation_class=cls, authorized_by=ref, approval=record)
     assert approved.result == "pass"
     assert approved.evidence["authorized_by"] == ref
-    assert approved.evidence["approval_bound"] is True
+    assert approved.evidence["authority_basis"] == "authorized_by"
 
 
-def test_promise_class_passes_an_ordinary_representation():
-    out = _promise(representation_class="condition")
+def test_promise_requires_approval_passes_an_ordinary_representation():
+    out = _ask(representation_class="condition")
     assert out.result == "pass"
     assert out.evidence["requires_approval"] is False
-    assert out.evidence["approval_bound"] is False
+    assert out.evidence["authority_basis"] is None
+
+
+def test_promise_requires_approval_inside_task_authority_needs_no_approval():
+    out = _ask(representation_class="warranty", task_authority_ref=WARRANTY_TASK_REF, record=WARRANTY_TASK)
+    assert out.result == "pass"
+    assert out.evidence["authority_basis"] == "task_authority_ref"
+    assert out.evidence["task_authority_ref"] == WARRANTY_TASK_REF
+    assert out.evidence["authorized_by"] is None
+
+
+def test_promise_requires_approval_reads_only_the_task_authority_the_reference_binds():
+    # The record lists warranty, but the action cites another record.
+    assert _ask(representation_class="warranty", task_authority_ref=BICYCLE_REF, record=WARRANTY_TASK).result == "fail"
+    assert _ask(representation_class="warranty", task_authority_ref=FAKE_REF, record=WARRANTY_TASK).result == "fail"
+    # Bound, but it lists another class, or names none.
+    assert _ask(representation_class="delivery_date", task_authority_ref=WARRANTY_TASK_REF,
+                record=WARRANTY_TASK).result == "fail"
+    assert _ask(representation_class="warranty", task_authority_ref=BICYCLE_REF, record=BICYCLE).result == "fail"
+    as_text: TaskAuthorityRecord = {"body": {**BICYCLE["body"], "authorized_representation_classes": "warranty"}}
+    assert _ask(representation_class="warranty", task_authority_ref=task_authority_record_digest(as_text),
+                record=as_text).result == "fail"
 
 
 def _warranty(ref, approval):
-    return _run(PROMISE, _action(action_class="communication.send", representation_class="warranty",
-                                 authorized_by=ref), approval=approval)
+    return _ask(representation_class="warranty", authorized_by=ref, approval=approval)
 
 
-def test_promise_class_a_fabricated_ref_fails():
+def test_promise_requires_approval_a_fabricated_ref_fails():
     out = _warranty(FAKE_REF, None)
     assert out.result == "fail"
     assert out.evidence["authorized_by"] == FAKE_REF
-    assert out.evidence["approval_bound"] is False
+    assert out.evidence["authority_basis"] is None
     assert "no approval record" in out.reason
 
 
-def test_promise_class_a_record_without_a_ref_fails():
+def test_promise_requires_approval_a_record_without_a_ref_fails():
     out = _warranty(None, WARRANTY_APPROVAL)
     assert out.result == "fail"
     assert out.evidence["authorized_by"] is None
     assert "cites no approval" in out.reason
 
 
-def test_promise_class_a_record_the_ref_does_not_bind_fails():
+def test_promise_requires_approval_a_record_the_ref_does_not_bind_fails():
     out = _warranty(FAKE_REF, WARRANTY_APPROVAL)
     assert out.result == "fail"
-    assert out.evidence["approval_bound"] is False
     assert "ref mismatch" in out.reason
 
 
-def test_promise_class_a_bound_approval_for_another_class_fails():
-    record, ref = _approval("authenticity")
+def test_promise_requires_approval_a_bound_approval_for_another_class_fails():
+    record, ref = _approval("delivery_date")
     out = _warranty(ref, record)
     assert out.result == "fail"
-    assert out.evidence["approval_bound"] is False
-    assert "authenticity" in out.reason
+    assert out.evidence["authority_basis"] is None
+    assert "delivery_date" in out.reason
 
 
 @pytest.mark.parametrize(
@@ -357,40 +395,105 @@ def test_promise_class_a_bound_approval_for_another_class_fails():
     [{"type": "approval/v0"}, {"body": "warranty"}, {"body": {}}, {"body": {"representation_class": ["warranty"]}}],
     ids=["no-body", "body-not-object", "no-class", "class-not-scalar"],
 )
-def test_promise_class_a_bound_approval_naming_no_class_fails(record):
+def test_promise_requires_approval_a_bound_approval_naming_no_class_fails(record):
     out = _warranty(authorization_record_digest(record), record)
     assert out.result == "fail"
-    assert out.evidence["approval_bound"] is False
+    assert out.evidence["authority_basis"] is None
 
 
-def test_promise_class_an_approval_with_no_digest_fails():
+def test_promise_requires_approval_an_approval_with_no_digest_fails():
     record = {"body": {"representation_class": "warranty", "weight": 0.5}}
     out = _warranty(FAKE_REF, record)
     assert out.result == "fail"
     assert "no digest" in out.reason
 
 
-def test_promise_class_bound_approval_passes_through_the_engine(store, signer):
-    engine = _engine(store, signer, PROMISE)
+def test_promise_requires_approval_through_the_engine(store, signer):
+    engine = _engine(store, signer, PROMISE_ASK)
     action = _action(verb="tell", action_class="communication.send", amount_minor=None,
                      representation_class="warranty", authorized_by=APPROVAL_REF)
-    assert engine.check(dataclasses.replace(action, action_id="tell/bound"),
-                        authorization_record=WARRANTY_APPROVAL).outcome == "allow"
-    assert engine.check(dataclasses.replace(action, action_id="tell/unbound")).outcome == "deny"
-    fake = dataclasses.replace(action, action_id="tell/fake", authorized_by=FAKE_REF)
-    assert engine.check(fake, authorization_record=WARRANTY_APPROVAL).outcome == "deny"
+
+    def check(name, **kwargs):
+        out = engine.check(dataclasses.replace(action, action_id=f"tell/{name}", equivalence_key=f"tell-{name}",
+                                               **kwargs.pop("fields", {})), **kwargs)
+        return out.outcome, {c.id: c.result for c in out.constraints}["promise_requires_approval"]
+
+    assert check("bound", authorization_record=WARRANTY_APPROVAL) == ("allow", "pass")
+    assert check("authority", fields={"authorized_by": None, "task_authority_ref": WARRANTY_TASK_REF},
+                 task_authority_record=WARRANTY_TASK) == ("allow", "pass")
+    # ASK, but the engine does not read a declared disposition yet: refused.
+    assert check("unbound") == ("deny", "fail")
+    assert check("fake", fields={"authorized_by": FAKE_REF}, authorization_record=WARRANTY_APPROVAL) == ("deny", "fail")
 
 
-def test_promise_class_unrecognised_class_fails_closed():
+def test_promise_requires_approval_unrecognised_class_fails_closed():
     record, ref = _approval("guarantee")
-    out = _run(PROMISE, _action(action_class="communication.send", representation_class="guarantee",
-                                authorized_by=ref), approval=record)
+    out = _ask(representation_class="guarantee", authorized_by=ref, approval=record)
     assert out.result == "fail"
     assert out.evidence["recognised"] is False
 
 
-def test_promise_class_without_a_class_is_n_a():
-    assert _promise().evidence == _missing("promise_class", "representation_class")
+def test_promise_requires_approval_without_a_class_is_n_a():
+    assert _ask().evidence == _missing("promise_requires_approval", "representation_class")
+
+
+# -- promise_never --------------------------------------------------------------
+
+
+def _never(**overrides):
+    return _run(PROMISE_NEVER, _action(action_class="communication.send", **overrides))
+
+
+def test_the_two_promise_rules_split_the_classes():
+    assert PROMISE_ASK.config["requires_approval"] == ["warranty", "delivery_date"]
+    assert PROMISE_NEVER.config["never"] == ["authenticity"]
+
+
+def test_promise_never_fails_a_never_class():
+    out = _never(representation_class="authenticity")
+    assert out.result == "fail"
+    assert out.evidence == {"representation_class": "authenticity", "recognised": True, "never": True,
+                            "authorized_by": None}
+    assert "only a change to the rule set" in out.reason
+
+
+def test_promise_never_a_bound_approval_still_fails(store, signer):
+    record, ref = _approval("authenticity")
+    authority: TaskAuthorityRecord = {"body": {**BICYCLE["body"], "authorized_representation_classes": ["authenticity"]}}
+    authority_ref = task_authority_record_digest(authority)
+    assert _never(representation_class="authenticity", authorized_by=ref).result == "fail"
+    assert _never(representation_class="authenticity", authorized_by=ref).evidence["authorized_by"] == ref
+    engine = _engine(store, signer, PROMISE_NEVER, PROMISE_ASK)
+    out = engine.check(
+        _action(verb="tell", action_class="communication.send", amount_minor=None, action_id="tell/never",
+                representation_class="authenticity", authorized_by=ref, task_authority_ref=authority_ref),
+        authorization_record=record, task_authority_record=authority,
+    )
+    assert {c.id: c.result for c in out.constraints}["promise_never"] == "fail"
+    assert out.outcome == "deny"
+
+
+def test_promise_never_passes_other_classes():
+    out = _never(representation_class="warranty")
+    assert out.result == "pass"
+    assert out.evidence["never"] is False
+
+
+def test_promise_never_unrecognised_class_fails_closed():
+    out = _never(representation_class="guarantee")
+    assert out.result == "fail"
+    assert out.evidence["recognised"] is False
+
+
+def test_promise_never_without_a_class_is_n_a():
+    assert _never().evidence == _missing("promise_never", "representation_class")
+
+
+@pytest.mark.parametrize("definition,field", [(PROMISE_ASK, "requires_approval"), (PROMISE_NEVER, "never")])
+def test_promise_rules_refuse_a_class_outside_the_set(definition, field):
+    mutant = dataclasses.replace(definition, config={**definition.config, field: ["mood"]})
+    with pytest.raises(ValueError, match="mood"):
+        _run(mutant, _action(action_class="communication.send", representation_class="price"))
 
 
 # -- offer_expiry ---------------------------------------------------------------
@@ -400,28 +503,33 @@ def _expiry(**overrides):
     return _run(EXPIRY, _action(**overrides))
 
 
+def _unverified(field: str):
+    return {"expiry_unverified": True, "missing_field": field}
+
+
 def test_offer_expiry_within_the_limit_passes():
     out = _expiry(proposal_at="2026-10-07T09:00:00Z")  # exactly max_age_seconds old
     assert out.result == "pass"
     assert out.evidence == {"proposal_at": "2026-10-07T09:00:00Z", "decided_at": "2026-10-08T09:00:00Z",
-                            "age_seconds": 86_400, "max_age_seconds": 86_400}
+                            "age_seconds": 86_400, "max_age_seconds": 86_400, "expired": False}
 
 
-def test_offer_expiry_past_the_limit_is_not_evaluable_never_fail():
+def test_offer_expiry_past_the_limit_fails_and_needs_a_new_proposal():
     out = _expiry(proposal_at="2026-10-07T08:59:59Z")
-    assert out.result == "n/a"
-    assert "re-ask" in out.reason and "86401s" in out.reason
-    # The facts object a report reads as not evaluable (report/result_from_folds.py).
-    assert out.evidence == _missing("offer_expiry", "proposal_at")
+    assert out.result == "fail"
+    assert out.reason.startswith("proposal expired")
+    assert "a new proposed action is required" in out.reason
+    assert out.evidence == {"proposal_at": "2026-10-07T08:59:59Z", "decided_at": "2026-10-08T09:00:00Z",
+                            "age_seconds": 86_401, "max_age_seconds": 86_400, "expired": True}
 
 
-def test_an_expired_proposal_projects_as_not_evaluable(store, signer):
+def test_an_expired_proposal_is_never_not_evaluable(store, signer):
     engine = _engine(store, signer, EXPIRY)
     capsule = engine.check(_action(action_id="offer/stale", proposal_at="2026-10-01T09:00:00Z")).capsule
     (record,) = [c for c in capsule["constraints"] if c["id"] == "offer_expiry"]
+    assert record["result"] == "fail"
     projected = project_guard_constraint(record, candidate_fields=frozenset({"proposal_at"}))
-    assert projected.verdict == "not_evaluable"
-    assert projected.recording_defect is False
+    assert projected.verdict == "not_met"
 
 
 def test_offer_expiry_reads_fractional_seconds_down():
@@ -429,16 +537,27 @@ def test_offer_expiry_reads_fractional_seconds_down():
     assert out.evidence["age_seconds"] == 86_399
 
 
-def test_offer_expiry_without_inputs_is_n_a_naming_the_input():
-    assert _expiry().evidence == _missing("offer_expiry", "proposal_at")
-    assert _expiry(proposal_at="2026-10-07T09:00:00Z", timestamp=None).evidence == _missing("offer_expiry", "timestamp")
+def test_offer_expiry_without_inputs_fails_unverified():
+    out = _expiry()
+    assert out.result == "fail"
+    assert out.evidence == _unverified("proposal_at")
+    out = _expiry(proposal_at="2026-10-07T09:00:00Z", timestamp=None)
+    assert out.result == "fail"
+    assert out.evidence == _unverified("timestamp")
+    assert _expiry(proposal_at="2026-10-07T09:00:00Z", timestamp="now").evidence == _unverified("timestamp")
 
 
 @pytest.mark.parametrize("bad", ["yesterday", "2026-10-07", "2026-10-07T09:00:00", "2026-13-07T09:00:00Z", "2026-10-09T09:00:00Z"])
-def test_offer_expiry_unreadable_or_future_proposal_is_n_a(bad):
+def test_offer_expiry_unreadable_or_future_proposal_fails_unverified(bad):
     out = _expiry(proposal_at=bad)
-    assert out.result == "n/a"
-    assert out.evidence == _missing("offer_expiry", "proposal_at")
+    assert out.result == "fail"
+    assert out.evidence == _unverified("proposal_at")
+    assert "could not be established" in out.reason
+
+
+def test_offer_expiry_out_of_scope_class():
+    out = _expiry(action_class="money.purchase", proposal_at="2026-10-01T09:00:00Z")
+    assert out.evidence == not_applicable_evidence("offer_expiry", in_scope=False)
 
 
 # -- seller recipient_role and destination_rail ---------------------------------
@@ -479,14 +598,20 @@ def test_destination_rail_v1_evidence_is_unchanged():
 MUTANTS = [
     (FLOOR, "action_classes", dict(amount_minor=168_000, task_authority_ref=BICYCLE_REF), ["money.purchase"],
      "fail", "n/a"),
-    (PROMISE, "action_classes", dict(action_class="communication.send", representation_class="warranty"),
+    (PROMISE_ASK, "action_classes", dict(action_class="communication.send", representation_class="warranty"),
      ["marketplace.sale"], "fail", "n/a"),
-    (PROMISE, "never_without_approval", dict(action_class="communication.send", representation_class="warranty"),
-     ["authenticity"], "fail", "pass"),
-    (PROMISE, "representation_classes", dict(action_class="communication.send", representation_class="condition"),
+    (PROMISE_ASK, "requires_approval", dict(action_class="communication.send", representation_class="warranty"),
+     ["delivery_date"], "fail", "pass"),
+    (PROMISE_ASK, "representation_classes", dict(action_class="communication.send", representation_class="condition"),
      [c for c in REPRESENTATION_CLASSES if c != "condition"], "pass", "fail"),
+    (PROMISE_NEVER, "action_classes", dict(action_class="communication.send", representation_class="authenticity"),
+     ["marketplace.sale"], "fail", "n/a"),
+    (PROMISE_NEVER, "never", dict(action_class="communication.send", representation_class="authenticity"),
+     ["warranty"], "fail", "pass"),
+    (PROMISE_NEVER, "representation_classes", dict(action_class="communication.send", representation_class="price"),
+     [c for c in REPRESENTATION_CLASSES if c != "price"], "pass", "fail"),
     (EXPIRY, "action_classes", dict(proposal_at="2026-10-07T09:00:00Z"), ["agreement.accept"], "pass", "n/a"),
-    (EXPIRY, "max_age_seconds", dict(proposal_at="2026-10-07T09:00:00Z"), 86_399, "pass", "n/a"),
+    (EXPIRY, "max_age_seconds", dict(proposal_at="2026-10-07T09:00:00Z"), 86_399, "pass", "fail"),
     (SELLER_ROLE, "action_classes", dict(action_class="disclosure.personal", recipient_role="third_party"),
      ["communication.send"], "fail", "n/a"),
     (SELLER_ROLE, "roles", dict(action_class="disclosure.personal", recipient_role="buyer"), ["self"],
@@ -549,13 +674,13 @@ def test_engine_decides_the_bicycle(store, signer):
     assert {c.id: c.result for c in low.constraints}["price_floor"] == "fail"
 
 
-def test_engine_lets_an_expired_proposal_through(store, signer):
-    """offer_expiry records n/a, and the engine does not block on n/a: the
-    re-ask is the caller's to act on. Pinned for the same reason."""
+def test_engine_refuses_an_expired_proposal(store, signer):
+    """offer_expiry fails an expired proposal, so the engine no longer lets
+    it through. Declared ASK; refused for the same gap as above."""
     engine = _engine(store, signer, EXPIRY)
     out = engine.check(_action(action_id="offer/stale", proposal_at="2026-10-01T09:00:00Z"))
-    assert {c.id: c.result for c in out.constraints}["offer_expiry"] == "n/a"
-    assert out.outcome == "allow"
+    assert {c.id: c.result for c in out.constraints}["offer_expiry"] == "fail"
+    assert out.outcome == "deny"
 
 
 # -- a pack citing them ---------------------------------------------------------
