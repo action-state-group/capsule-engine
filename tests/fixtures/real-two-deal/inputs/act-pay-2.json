@@ -1,0 +1,1 @@
+{"action": "pay", "amount_minor": 2000, "currency": "USD", "payee": "Example Merchant", "rail": "card", "reference": "ORDER-SYN-0002"}

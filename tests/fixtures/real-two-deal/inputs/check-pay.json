@@ -1,0 +1,8 @@
+{
+  "action": "pay",
+  "description": "Place order: 1 synthetic widget box, $20.00 total, saved card",
+  "amount_minor": 2000, "authorized_max_minor": 2000,
+  "who": {"name": "Example Merchant", "domain": "example-merchant.test"},
+  "terms": {"item": "synthetic widget box", "quantity": 1, "price_minor": 2000, "currency": "USD"},
+  "recourse": {"rail": "card", "refundable": true}
+}
