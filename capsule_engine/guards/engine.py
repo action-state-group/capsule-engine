@@ -364,6 +364,8 @@ class GuardEngine:
         escalatable = self._escalatable
         if self._gate_failures_ask(gate_runs):
             escalatable = escalatable | {_GATE}
+        if dedupe_out.asks_approver:
+            escalatable = escalatable | {"dedupe"}
         outcome = _decide(constraints, ac, escalatable)
 
         resolved_parent, resolved_relation = chain_parent, chain_relation
@@ -556,11 +558,12 @@ def _decide(
     escalates only when every failing constraint is in ``escalatable``
     (``_ESCALATABLE`` -- `caps`, `counterparty_seen_before` -- plus a
     `counterparty_list` configured to ask, plus an `action_class_gate`
-    failure whose failing selectors' obligations all declare ASK) and the
+    failure whose failing selectors' obligations all declare ASK, plus a
+    `dedupe` hit on the same act in another deal) and the
     triggering class has an
     `approver_role` configured -- an integrity failure
     (`verify_before_dispatch`, whether the cited mandate is missing or fails
-    re-verification), a dedupe hit, or an escalatable failure on a class with
+    re-verification), a dedupe hit in the same deal, or an escalatable failure on a class with
     no approver configured all hard-deny, unconditionally."""
     fails = {c.id for c in constraints if c.result == "fail"}
     if not fails:
