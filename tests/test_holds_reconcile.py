@@ -105,19 +105,19 @@ def test_over_tolerance_escalates_when_approver_role_configured_never_adjusts_ag
 
 def test_over_tolerance_denies_when_no_approver_role_configured(store, hold_fold, signer):
     """A class with no approver_role hard-denies an over-tolerance breach,
-    same as an unapproved cap breach (D2) -- `data.delete` has no configured
-    approver in the starter taxonomy."""
+    same as an unapproved cap breach (D2) -- `agreement.accept` has no
+    configured approver in the taxonomy."""
     from capsule_engine.holds import HoldEngine
 
     engine = HoldEngine(
         ledger=store, hold_fold=hold_fold, fold_digest=hold_fold.definition_digest(),
-        signer_provider=lambda: signer, cap_minor={"data.delete": 1_000_000}, tolerance_minor={"data.delete": 1_000},
+        signer_provider=lambda: signer, cap_minor={"agreement.accept": 1_000_000}, tolerance_minor={"agreement.accept": 1_000},
     )
-    action = Action(verb="delete_records", operator=OPERATOR, developer=DEVELOPER, action_class="data.delete", amount_minor=10_000)
+    action = Action(verb="accept_terms", operator=OPERATOR, developer=DEVELOPER, action_class="agreement.accept", amount_minor=10_000)
     reserve = engine.evaluate_and_reserve(action)
     assert reserve.outcome == "allow"
 
-    over = engine.reconcile(reserve.capsule["capsule_id"], action_class="data.delete", executed_amount_minor=50_000)
+    over = engine.reconcile(reserve.capsule["capsule_id"], action_class="agreement.accept", executed_amount_minor=50_000)
     assert over.outcome == "deny"
     assert over.reason_code == OVER_TOLERANCE
 

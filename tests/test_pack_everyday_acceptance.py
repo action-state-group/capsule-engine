@@ -231,9 +231,12 @@ def _scenarios() -> list[tuple[str, Action, str]]:
          action_class="household.unlisted", target="service/unlisted",
          action_id="do_unlisted/everyday-fixture-off-taxonomy", timestamp="2026-08-10T10:21:00Z"), DENY),
         # The role of a disclosure's recipient. Every personal-data disclosure
-        # also fails action_class_gate, so both deny.
+        # also fails action_class_gate, whose rules (r11, r12) declare ASK, and
+        # disclosure.personal names an approver role: a shipping address to the
+        # fulfilling merchant fails the gate alone and escalates; one to a third
+        # party also fails recipient_role, which never asks, so it denies.
         ("disclosure-to-fulfilling-merchant", _disclosure("fulfilling-merchant", 22, recipient_role="fulfilling_merchant"),
-         DENY),
+         ESCALATE),
         ("disclosure-to-third-party", _disclosure("third-party", 23, recipient_role="third_party",
                                                      target="person/neighbour-2"), DENY),
         # Every declared input inside its limits: refundable, no pinned field

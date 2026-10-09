@@ -9,6 +9,10 @@ gate rule (r11 r12 r15 r17 r18). Now the engine reads the declared
 disposition: a failing selector bound to a NEVER obligation still refuses,
 and so does a class with no ``approver_role``, whose refusal names it.
 
+Taxonomy 4 names the account holder as approver on the four classes those
+rules gate (booking.cancel, data.delete, communication.publish,
+disclosure.personal), so each of them now asks too.
+
 Bookings run through a pack-installed engine, each on a fresh ledger; the
 mixed and unbound-selector cases build the engine directly.
 """
@@ -97,6 +101,30 @@ def test_a_never_declared_gate_rule_still_refuses(engine_for):
 
 
 @pytest.mark.parametrize(
+    ("action_class", "fields", "rules"),
+    [
+        ("booking.cancel", {}, ["r17-cancellation"]),
+        ("data.delete", {}, ["r18-delete-persistent-data"]),
+        ("communication.publish", {}, ["r15-public-posting"]),
+        # A shipping address shared with the merchant that fulfils the order:
+        # recipient_role passes, so the gate is the only failing check. r11 and
+        # r12 share the personal_disclosure selector, so both are cited.
+        (
+            "disclosure.personal",
+            {"recipient_role": "fulfilling_merchant", "target": "shop/bakery"},
+            ["r11-home-address-to-an-individual", "r12-personal-contact-to-a-new-party"],
+        ),
+    ],
+)
+def test_an_ask_gate_rule_asks_the_account_holder_citing_only_its_own_rules(engine_for, action_class, fields, rules):
+    decision = engine_for(PACK).check(_action(3, action_class, **fields), dry_run=True)
+    assert decision.outcome == ESCALATE
+    assert decision.capsule["disposition"]["decision"] == "needs_input"
+    assert [c.id for c in decision.constraints if c.result == "fail"] == ["action_class_gate"]
+    assert _failing_rules(decision) == rules
+
+
+@pytest.mark.parametrize(
     ("action_class", "rule"),
     [
         ("booking.cancel", "r17-cancellation"),
@@ -105,13 +133,23 @@ def test_a_never_declared_gate_rule_still_refuses(engine_for):
         ("disclosure.personal", "r11-home-address-to-an-individual"),
     ],
 )
-def test_an_ask_gate_rule_on_a_class_with_no_approver_refuses_naming_the_missing_approver(
-    engine_for, action_class, rule
-):
-    decision = engine_for(PACK).check(_action(3, action_class), dry_run=True)
+def test_an_ask_gate_rule_re_declared_never_still_refuses(engine_for, action_class, rule):
+    pack = _with_disposition(PACK, rule, "NEVER")
+    decision = engine_for(pack).check(_action(4, action_class), dry_run=True)
     assert decision.outcome == DENY
-    assert rule in _failing_rules(decision)
-    assert f"action class {action_class!r} names no approver_role" in decision.reason
+    assert "approver" not in decision.reason
+
+
+def test_an_ask_gate_rule_on_a_class_with_no_approver_refuses_naming_the_missing_approver(tmp_path):
+    # agreement.accept names no approver_role in the taxonomy.
+    selectors: dict[str, Selector] = {"asks": {"action_classes": ["agreement.accept"], "on_match": "fail"}}
+    engine, store = _direct_engine(tmp_path, selectors, frozenset({"asks"}))
+    try:
+        decision = engine.check(_action(10, "agreement.accept"), dry_run=True)
+        assert decision.outcome == DENY
+        assert "action class 'agreement.accept' names no approver_role" in decision.reason
+    finally:
+        store.close()
 
 
 def test_a_selector_asks_only_when_every_obligation_bound_to_it_declares_ask(engine_for):
@@ -129,6 +167,27 @@ def test_an_ask_gate_failure_beside_an_integrity_failure_refuses(engine_for):
     repeat = engine.check(_booking(4), dry_run=True)
     assert {c.id for c in repeat.constraints if c.result == "fail"} == {"action_class_gate", "dedupe"}
     assert repeat.outcome == DENY
+
+
+TAXONOMY_4_CLASSES = ["booking.cancel", "data.delete", "communication.publish", "disclosure.personal"]
+
+
+@pytest.mark.parametrize("action_class", TAXONOMY_4_CLASSES)
+def test_a_repeat_of_an_asking_class_is_a_dedupe_hit_and_refuses(engine_for, action_class):
+    engine = engine_for(PACK)
+    action = _action(11, action_class, target="service/repeat")
+    assert engine.check(action).outcome == ESCALATE
+    repeat = engine.check(action, dry_run=True)
+    assert {c.id for c in repeat.constraints if c.result == "fail"} == {"action_class_gate", "dedupe"}
+    assert repeat.outcome == DENY
+
+
+@pytest.mark.parametrize("action_class", TAXONOMY_4_CLASSES)
+def test_an_asking_class_citing_a_mandate_not_on_the_ledger_refuses(engine_for, action_class):
+    action = _action(12, action_class, cited_mandate_capsule_id="0" * 64)
+    decision = engine_for(PACK).check(action, dry_run=True)
+    assert {c.id for c in decision.constraints if c.result == "fail"} == {"action_class_gate", "verify_before_dispatch"}
+    assert decision.outcome == DENY
 
 
 def _gate(selectors: dict[str, Selector]) -> WicketDefinition:
