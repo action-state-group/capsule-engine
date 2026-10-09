@@ -20,15 +20,16 @@
 # statement never made, an address before acceptance) refuses whatever its
 # rule declares.
 #
-# 0.1.1 releases the address on acceptance (seller.release_on_acceptance)
-# where 0.1.0 asked on every personal-data disclosure through
-# action_class_gate's personal_disclosure selector. The gate is no longer
-# cited: it reads only the action class, so it would ask on the address
-# after acceptance too. The gate also refused an action whose class has no
-# taxonomy row; release_on_acceptance now refuses that itself. A
-# personal-data disclosure of another class is measured by recipient_role
-# and the statement-class rules (s04, s10), which refuse a class outside
-# their closed set.
+# 0.1.1 releases personal data only on acceptance
+# (seller.release_on_acceptance), where 0.1.0 asked on every personal-data
+# disclosure through action_class_gate's personal_disclosure selector.
+# Every class a disclosure may declare is held back until the receiving
+# buyer's acceptance, and an undeclared or unknown class is refused, so no
+# disclosure 0.1.0 asked on is allowed without an acceptance. No class is
+# released before acceptance. The gate is no longer cited: it reads only
+# the action class, so it would ask after acceptance too. The gate also
+# refused an action whose class has no taxonomy row; release_on_acceptance
+# now refuses that itself.
 pack_id: asg/seller/0.1.1
 
 obligations:
@@ -122,16 +123,16 @@ obligations:
       ledger or does not re-verify, and records the result.
     check: verify_before_dispatch
     default_disposition: NEVER
-  - id: s13-address-only-to-the-buyer-who-accepted
+  - id: s13-personal-data-only-to-the-buyer-who-accepted
     statement: >-
-      Detects a disclosure of the user's address (disclosure.personal of
-      class address) that does not cite the sale's sealed acceptance, or
-      whose recipient is not the buyer that accepted, and records the class,
-      whether the disclosure was bound to the acceptance and the name of a
-      missing field -- never the address, the item, the task authority or a
-      counterparty. An action whose class is missing or unknown, and a
-      disclosure that declares no class, are detected too. No approval
-      clears it.
+      Detects a disclosure of the user's personal data (disclosure.personal,
+      of any class, the address included) that does not cite the sale's
+      sealed acceptance, or whose recipient is not the buyer that accepted,
+      and records the class, whether the disclosure was bound to the
+      acceptance and the name of a missing field -- never the data, the
+      item, the task authority or a counterparty. An action whose class is
+      missing or unknown, and a disclosure that declares no known class,
+      are detected too. No approval clears it.
     check: release_on_acceptance
     default_disposition: NEVER
 
@@ -193,7 +194,7 @@ constraints:
     digest: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   # The address reaches only the buyer whose acceptance it cites.
   - wicket_ref: seller.release_on_acceptance/1.0.0
-    digest: 68d104278760690abda27ea143e15169994f7b1d56370992823ff1046b2a07eb
+    digest: 6a8487fb059f171765810bdc4a248edfdaf6489ddac409b978f03aaa0fec5583
 
 folds:
   - fold_ref: spend.weekly/1.0.0
@@ -235,6 +236,10 @@ fixtures:
       outcome: deny
     - id: address-to-a-before-acceptance-approved
       outcome: deny
+    - id: pickup-detail-to-a-before-acceptance
+      outcome: deny
+    - id: other-detail-to-a-before-acceptance
+      outcome: deny
     - id: address-citing-an-unknown-mandate
       outcome: deny
     - id: listing-views-read
@@ -246,6 +251,10 @@ fixtures:
     - id: acceptance-in-b-of-item-2
       outcome: allow
     - id: address-to-a-after-acceptance
+      outcome: allow
+    - id: pickup-detail-to-a-after-acceptance
+      outcome: allow
+    - id: other-detail-to-a-after-acceptance
       outcome: allow
     - id: address-to-c-after-acceptance
       outcome: deny

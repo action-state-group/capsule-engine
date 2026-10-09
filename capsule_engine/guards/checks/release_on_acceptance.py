@@ -1,11 +1,11 @@
 # SPDX-License-Identifier: Apache-2.0
-"""release_on_acceptance check: some personal data is released only to the
-buyer who accepted.
+"""release_on_acceptance check: personal data is released only to the buyer
+who accepted.
 
-A seller negotiates one sale with several buyers, one thread each. Some
-personal data (configured ``release_classes``, e.g. ``address``) may reach
-a buyer only once that buyer's acceptance is sealed. A disclosure in
-``action_classes`` whose ``representation_class`` is in ``release_classes``
+A seller negotiates one sale with several buyers, one thread each. Personal
+data may reach a buyer only once that buyer's acceptance is sealed.
+``release_classes`` is the closed set of classes a disclosure may declare;
+a disclosure in ``action_classes`` whose ``representation_class`` is in it
 passes only when ALL hold:
 
 - it names its sale (``task_authority_ref`` and ``item_ref``) and its
@@ -19,12 +19,13 @@ passes only when ALL hold:
 
 Anything else fails: no citation, a citation of another sale's or another
 buyer's acceptance, a record that is not a sealed acceptance, a missing
-reference. Two inputs fail closed because without them the action cannot
-be shown to be out of scope: an ``action_class`` that is missing or has no
-row in the action taxonomy (it is resolved there, so a legacy alias counts
-as its canonical class), and a disclosure in ``action_classes`` that
-declares no ``representation_class``. Any other class, or any other known
-action class, is ``n/a`` out of scope. The engine lists this as an integrity check, so a
+reference. Two inputs fail closed: an ``action_class`` that is missing or
+has no row in the action taxonomy (it is resolved there, so a legacy alias
+counts as its canonical class), because the action cannot be shown to be
+out of scope; and a disclosure in ``action_classes`` whose
+``representation_class`` is missing or outside ``release_classes``, because
+no class of personal data is released without an acceptance. Only another
+known action class is ``n/a`` out of scope. The engine lists this as an integrity check, so a
 failure refuses whatever the pack declares; a one-shot approval does not
 clear it.
 
@@ -98,12 +99,10 @@ def check_release_on_acceptance(
         return _outcome("n/a", "the rule is not configured for this action class",
                         not_applicable_evidence(_CHECK_ID, in_scope=False))
     cls = action.representation_class
-    if cls is None:
-        return _outcome("fail", "the disclosure declares no class; it cannot be shown to be outside the rule",
-                        _evidence(None, False, missing_field="representation_class"))
     if cls not in release_classes:
-        return _outcome("n/a", "this class is not released on acceptance",
-                        not_applicable_evidence(_CHECK_ID, in_scope=False))
+        # An undeclared class's name is the producer's free text, never recorded.
+        return _outcome("fail", "the disclosure declares no class this rule knows; it is not released",
+                        _evidence(None, False, missing_field="representation_class"))
     for field, value in (("task_authority_ref", action.task_authority_ref), ("item_ref", action.item_ref),
                          ("target", action.target)):
         if value is None:

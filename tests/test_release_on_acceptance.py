@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
-"""seller.release_on_acceptance/1.0.0: some personal data (the address)
-reaches a buyer only when the disclosure cites the sale's sealed acceptance
-and that acceptance was sealed for the same buyer. Anything else fails, and
+"""seller.release_on_acceptance/1.0.0: personal data of every class (the
+address included) reaches a buyer only when the disclosure cites the sale's
+sealed acceptance and that acceptance was sealed for the same buyer. Anything else fails, and
 the engine refuses it: an approval does not clear it. The outcome names no
 value: no reference, no counterparty, no capsule id.
 
@@ -25,6 +25,9 @@ from capsule_engine.guards.wickets import load_definition_file
 
 ROOT = Path(__file__).parent.parent / "capsule_engine"
 RELEASE = load_definition_file(ROOT / "guards" / "wickets" / "catalog_defs" / "release_on_acceptance.seller.yaml")
+PROMISE_NEVER = load_definition_file(ROOT / "guards" / "wickets" / "catalog_defs" / "promise_never.yaml")
+# Every class a disclosure may declare: the closed statement-class set.
+CLASSES = PROMISE_NEVER.config["representation_classes"]
 SPEND = load_fold(ROOT / "folds" / "catalog_defs" / "spend.weekly.v3.yaml")
 
 SALE = "a" * 64
@@ -82,8 +85,9 @@ def _assert_value_free(outcome) -> None:
 def test_the_definition_configures_the_check_and_states_its_rule():
     assert RELEASE.wicket_id == "seller.release_on_acceptance/1.0.0"
     assert RELEASE.check == "release_on_acceptance"
-    assert CONFIG == {"release_classes": ["address"], "acceptance_classes": ["agreement.accept"],
+    assert CONFIG == {"release_classes": CLASSES, "acceptance_classes": ["agreement.accept"],
                       "action_classes": ["disclosure.personal"]}
+    assert "address" in CLASSES and "pickup" in CLASSES and "other" in CLASSES
     assert "release_on_acceptance" in CONFIGURED_CHECKS
     # The rule is in the digested body: rewording it moves the digest.
     reworded = type(RELEASE)(RELEASE.wicket_id, RELEASE.check, RELEASE.config, RELEASE.semantics + " ")
@@ -91,6 +95,15 @@ def test_the_definition_configures_the_check_and_states_its_rule():
 
 
 # -- pass ------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize("cls", CLASSES)
+def test_every_class_is_held_until_and_released_on_the_recipients_acceptance(store, signer, cls):
+    before = _check(_share(representation_class=cls), store)
+    assert (before.result, before.evidence["representation_class"]) == ("fail", cls)
+    accepted = _accept(_engine(store, signer), 1)
+    after = _check(_share(representation_class=cls, cited_mandate_capsule_id=accepted), store)
+    assert (after.result, after.evidence["bound_to_acceptance"]) == ("pass", True)
 
 
 def test_citing_the_sales_acceptance_by_the_recipient_passes(store, signer):
@@ -222,10 +235,16 @@ def test_a_disclosure_declaring_no_class_fails_closed(store):
 # -- not applicable --------------------------------------------------------------
 
 
-def test_another_personal_class_is_out_of_scope(store):
-    outcome = _check(_share(representation_class="phone"), store)
-    assert outcome.result == "n/a"
-    assert outcome.evidence == {"constraint_id": "release_on_acceptance", "in_scope": False, "missing_field": None}
+@pytest.mark.parametrize("cls", ["phone", "Address", " address"])
+def test_a_class_outside_the_closed_set_is_refused_and_not_recorded(store, signer, cls):
+    """Even citing the recipient's own acceptance: no unknown class is
+    released, and its free-text name never reaches the evidence."""
+    accepted = _accept(_engine(store, signer), 1)
+    outcome = _check(_share(representation_class=cls, cited_mandate_capsule_id=accepted), store)
+    assert outcome.result == "fail"
+    assert outcome.evidence == {"constraint_id": "release_on_acceptance", "representation_class": None,
+                                "bound_to_acceptance": False, "missing_field": "representation_class"}
+    assert cls not in json.dumps({"reason": outcome.reason, "evidence": outcome.evidence})
 
 
 def test_another_action_class_is_out_of_scope(store):

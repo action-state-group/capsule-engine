@@ -132,13 +132,16 @@ def _offer(name: str, minute: int, target: str, amount_minor: int, **fields) -> 
 
 
 def _address(name: str, minute: int, target: str, role: str, **fields) -> Action:
-    """The user's address shared in the sale of ``ITEM``; the disclosure
-    carries only its class, never the address."""
+    """The user's personal data shared in the sale of ``ITEM``: the address
+    unless ``representation_class`` names another class. The disclosure
+    carries only its class, never the data."""
     fields.setdefault("item_ref", ITEM)
     fields.setdefault("action_class", "disclosure.personal")
-    return Action(verb="share_address", operator=OPERATOR, developer=DEVELOPER,
-                  target=target, recipient_role=role, representation_class="address", task_authority_ref=TASK_REF,
-                  equivalence_key=f"share_address/{name}", action_id=f"share_address/seller-fixture-{name}",
+    fields.setdefault("representation_class", "address")
+    verb = "share_address" if fields["representation_class"] == "address" else "share_personal"
+    return Action(verb=verb, operator=OPERATOR, developer=DEVELOPER,
+                  target=target, recipient_role=role, task_authority_ref=TASK_REF,
+                  equivalence_key=f"{verb}/{name}", action_id=f"{verb}/seller-fixture-{name}",
                   timestamp=_at(minute), **fields)
 
 
@@ -187,43 +190,56 @@ def _scenarios() -> list[tuple[str, Action, str]]:
         ("address-to-a-before-acceptance-approved", _address("a-before-approved", 14, BUYER_A, "buyer",
                                                              authorized_by=ADDRESS_APPROVAL_REF), DENY),
         # A disclosure citing a mandate that is not in the ledger.
-        ("address-citing-an-unknown-mandate", _address("a-unknown-mandate", 15, BUYER_A, "buyer",
+        # Personal data of any other class is held back the same way: a
+        # pickup detail and an unclassed detail before acceptance.
+        ("pickup-detail-to-a-before-acceptance", _address("pickup-a-before", 15, BUYER_A, "buyer",
+                                                          representation_class="pickup"), DENY),
+        ("other-detail-to-a-before-acceptance", _address("other-a-before", 16, BUYER_A, "buyer",
+                                                         representation_class="other"), DENY),
+        ("address-citing-an-unknown-mandate", _address("a-unknown-mandate", 17, BUYER_A, "buyer",
                                                        cited_mandate_capsule_id=UNKNOWN_MANDATE), DENY),
         # A non-consequential class: nothing here measures it.
         ("listing-views-read", Action(verb="read_listing_views", operator=OPERATOR, developer=DEVELOPER,
                                       action_class="info.query", target="listing/own",
                                       equivalence_key="read_listing_views/1",
-                                      action_id="read_listing_views/seller-fixture-1", timestamp=_at(16)), ALLOW),
+                                      action_id="read_listing_views/seller-fixture-1", timestamp=_at(18)), ALLOW),
         # -- buyer A accepts --------------------------------------------------
-        ("acceptance-in-a", _commitment("accept", "agreement.accept", "accept-a", 17, BUYER_A, 175_000), ALLOW),
+        ("acceptance-in-a", _commitment("accept", "agreement.accept", "accept-a", 19, BUYER_A, 175_000), ALLOW),
         # -- after the acceptance ---------------------------------------------
         # Any commitment for the same sale in thread B is refused.
-        ("second-commitment-in-b", _offer("after-accept-b", 18, BUYER_B, 180_000), DENY),
+        ("second-commitment-in-b", _offer("after-accept-b", 20, BUYER_B, 180_000), DENY),
         # Buyer B accepts the other item: a sealed acceptance of another sale.
-        ("acceptance-in-b-of-item-2", _commitment("accept", "agreement.accept", "accept-b-item-2", 19, BUYER_B,
+        ("acceptance-in-b-of-item-2", _commitment("accept", "agreement.accept", "accept-b-item-2", 21, BUYER_B,
                                                   175_000, item_ref=ITEM_2), ALLOW),
         # The address to buyer A, citing A's acceptance: released.
         # recipient_role passes for the buyer and the acceptance re-verifies.
-        ("address-to-a-after-acceptance", _address("a-after", 20, BUYER_A, "buyer",
+        ("address-to-a-after-acceptance", _address("a-after", 22, BUYER_A, "buyer",
                                                    cited_mandate_capsule_id=CITES_ACCEPTANCE), ALLOW),
+        # The same for the other classes: released to A once A accepted.
+        ("pickup-detail-to-a-after-acceptance", _address("pickup-a-after", 23, BUYER_A, "buyer",
+                                                         representation_class="pickup",
+                                                         cited_mandate_capsule_id=CITES_ACCEPTANCE), ALLOW),
+        ("other-detail-to-a-after-acceptance", _address("other-a-after", 24, BUYER_A, "buyer",
+                                                        representation_class="other",
+                                                        cited_mandate_capsule_id=CITES_ACCEPTANCE), ALLOW),
         # The address to buyer C, a buyer too, citing A's acceptance: C did
         # not accept, so it is refused though recipient_role passes.
-        ("address-to-c-after-acceptance", _address("c-after", 21, BUYER_C, "buyer",
+        ("address-to-c-after-acceptance", _address("c-after", 25, BUYER_C, "buyer",
                                                    cited_mandate_capsule_id=CITES_ACCEPTANCE), DENY),
         # The address in A's thread citing B's acceptance (of the other item).
-        ("address-to-a-citing-b-acceptance", _address("a-cites-b", 22, BUYER_A, "buyer",
+        ("address-to-a-citing-b-acceptance", _address("a-cites-b", 26, BUYER_A, "buyer",
                                                       cited_mandate_capsule_id=CITES_ACCEPTANCE_B), DENY),
         # The address to buyer C with its action class left out: nothing can
         # show it is out of scope, so it is refused rather than passed as n/a.
-        ("address-with-no-action-class", _address("c-no-class", 23, BUYER_C, "buyer", action_class=None,
+        ("address-with-no-action-class", _address("c-no-class", 27, BUYER_C, "buyer", action_class=None,
                                                   cited_mandate_capsule_id=CITES_ACCEPTANCE), DENY),
         # The same address to someone who is not the buyer.
-        ("address-to-a-third-party", _address("third-party", 24, _fingerprint("someone-else"), "third_party",
+        ("address-to-a-third-party", _address("third-party", 28, _fingerprint("someone-else"), "third_party",
                                               cited_mandate_capsule_id=CITES_ACCEPTANCE), DENY),
         # The sale to buyer A, following its own acceptance, on an allowed rail.
-        ("sale-to-a-on-an-allowed-rail", _commitment("sell", "marketplace.sale", "sale-a", 25, BUYER_A, 175_000,
+        ("sale-to-a-on-an-allowed-rail", _commitment("sell", "marketplace.sale", "sale-a", 29, BUYER_A, 175_000,
                                                      rail="card", cited_mandate_capsule_id=CITES_ACCEPTANCE), ALLOW),
-        ("sale-to-a-on-a-rail-not-allowed", _commitment("sell", "marketplace.sale", "sale-a-cheque", 26, BUYER_A,
+        ("sale-to-a-on-a-rail-not-allowed", _commitment("sell", "marketplace.sale", "sale-a-cheque", 30, BUYER_A,
                                                         175_000, rail="cheque",
                                                         cited_mandate_capsule_id=CITES_ACCEPTANCE), ESCALATE),
     ]
@@ -395,7 +411,17 @@ def test_the_release_rule_names_no_value(run):
         serialised = json.dumps({"reason": outcome.reason, "evidence": outcome.evidence})
         for value in values:
             assert value not in serialised, (name, value)
-    assert measured == 8
+    assert measured == 12
+
+
+@pytest.mark.parametrize("cls", ["pickup", "other"])
+def test_personal_data_of_another_class_is_held_until_the_buyer_accepts(run, cls):
+    capsules = run[2]
+    _refused_on_release_alone(run, f"{cls}-detail-to-a-before-acceptance")
+    after = capsules[f"{cls}-detail-to-a-after-acceptance"]
+    assert _failing(after) == []
+    assert after["disposition"]["decision"] == "accept"
+    assert _constraint(after, "release_on_acceptance")["result"] == "pass"
 
 
 def test_an_address_with_no_action_class_is_refused(run):

@@ -33,7 +33,8 @@
 # row but address-to-a-after-acceptance (release_on_acceptance, s13; the
 # unknown mandate also fails verify_before_dispatch; the row with no action
 # class fails it closed) are integrity failures and deny, the approved one
-# included. address-to-a-third-party also fails
+# included. The pickup and other-class details deny before acceptance and
+# allow after it, as the address does. address-to-a-third-party also fails
 # recipient_role, whose rule declares DO.
 
 rows:
@@ -228,6 +229,32 @@ rows:
       destination_rail: {population: c}
       task_authority: {population: c}
     verdict: deny
+  - scenario: pickup-detail-to-a-before-acceptance
+    action_id: share_personal/seller-fixture-pickup-a-before
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: pass, price_floor: n/a, promise_requires_approval: pass, promise_never: pass, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: fail}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      price_floor: {population: c}
+      required_disclosure: {population: c}
+      offer_expiry: {population: c}
+      single_commitment: {population: c}
+      destination_rail: {population: c}
+      task_authority: {population: c}
+    verdict: deny
+  - scenario: other-detail-to-a-before-acceptance
+    action_id: share_personal/seller-fixture-other-a-before
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: pass, price_floor: n/a, promise_requires_approval: pass, promise_never: pass, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: fail}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      price_floor: {population: c}
+      required_disclosure: {population: c}
+      offer_expiry: {population: c}
+      single_commitment: {population: c}
+      destination_rail: {population: c}
+      task_authority: {population: c}
+    verdict: deny
   - scenario: address-citing-an-unknown-mandate
     action_id: share_address/seller-fixture-a-unknown-mandate
     checks: {dedupe: pass, caps: n/a, verify_before_dispatch: fail, recipient_role: pass, price_floor: n/a, promise_requires_approval: pass, promise_never: pass, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: fail}
@@ -295,6 +322,30 @@ rows:
     verdict: allow
   - scenario: address-to-a-after-acceptance
     action_id: share_address/seller-fixture-a-after
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: pass, recipient_role: pass, price_floor: n/a, promise_requires_approval: pass, promise_never: pass, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: pass}
+    n_a:
+      caps: {population: c}
+      price_floor: {population: c}
+      required_disclosure: {population: c}
+      offer_expiry: {population: c}
+      single_commitment: {population: c}
+      destination_rail: {population: c}
+      task_authority: {population: c}
+    verdict: allow
+  - scenario: pickup-detail-to-a-after-acceptance
+    action_id: share_personal/seller-fixture-pickup-a-after
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: pass, recipient_role: pass, price_floor: n/a, promise_requires_approval: pass, promise_never: pass, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: pass}
+    n_a:
+      caps: {population: c}
+      price_floor: {population: c}
+      required_disclosure: {population: c}
+      offer_expiry: {population: c}
+      single_commitment: {population: c}
+      destination_rail: {population: c}
+      task_authority: {population: c}
+    verdict: allow
+  - scenario: other-detail-to-a-after-acceptance
+    action_id: share_personal/seller-fixture-other-a-after
     checks: {dedupe: pass, caps: n/a, verify_before_dispatch: pass, recipient_role: pass, price_floor: n/a, promise_requires_approval: pass, promise_never: pass, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: pass}
     n_a:
       caps: {population: c}
