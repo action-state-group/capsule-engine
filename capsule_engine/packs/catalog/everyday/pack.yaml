@@ -15,8 +15,12 @@
 #
 # Statements name what is detected and recorded -- the observable, never an
 # intent. A measured statement names exactly what its check reads, including
-# where that is narrower or wider than the rule. default_disposition is
-# declared data the guard engine does not read.
+# where that is narrower or wider than the rule. The guard engine reads
+# default_disposition: a failing check (or gate selector) whose rules all
+# declare ASK asks an approver when the action's class names one, and so does
+# a caps or counterparty_seen_before failure whatever its rules declare; any
+# other failure refuses, and an integrity check (dedupe in one deal, a cited
+# mandate) refuses whatever its rule declares.
 #
 # Eight rules share action_class_gate. Each names the one gate selector it
 # is measured by (selector:), so an action fails or passes only the rules
@@ -333,9 +337,9 @@ fixtures:
     - id: counterparty-same-account
       outcome: allow
     - id: counterparty-account-changed
-      outcome: deny
+      outcome: escalate
     - id: rail-watched
-      outcome: deny
+      outcome: escalate
     - id: credential-in-content
       outcome: deny
     - id: credential-absent
@@ -349,13 +353,13 @@ fixtures:
     - id: caps-first-draw
       outcome: allow
     - id: caps-over-limit-on-watched-rail
-      outcome: deny
+      outcome: escalate
     - id: caps-in-scope-amount-missing
       outcome: allow
     - id: out-of-scope-action
       outcome: allow
     - id: recurring-charge-set-up
-      outcome: deny
+      outcome: escalate
     - id: caps-second-first-draw
       outcome: allow
     - id: caps-over-limit-escalates
@@ -379,18 +383,18 @@ fixtures:
     - id: declared-terms-in-bounds
       outcome: allow
     - id: non-refundable-payment
-      outcome: deny
+      outcome: escalate
     - id: material-terms-changed
-      outcome: deny
+      outcome: escalate
     - id: offer-differs-from-stated
-      outcome: deny
+      outcome: escalate
     - id: channel-moved
-      outcome: deny
+      outcome: escalate
     - id: deposit-over-a-quarter
-      outcome: deny
+      outcome: escalate
     - id: task-inside-authority
       outcome: allow
     - id: task-outside-authority
-      outcome: deny
+      outcome: escalate
 
 bootstrap: AI-BOOTSTRAP.md

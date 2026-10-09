@@ -156,9 +156,9 @@ def _scenarios() -> list[tuple[str, Action, str]]:
         ("counterparty-same-account", _payment("same-account", 2, **water, amount_minor=1_700,
          counterparty_account_ref="acct-ref-water-1", equivalence_key="water-co/2026-09"), ALLOW),
         ("counterparty-account-changed", _payment("account-changed", 3, **water, amount_minor=1_600,
-         counterparty_account_ref="acct-ref-water-2", equivalence_key="water-co/2026-10"), DENY),
+         counterparty_account_ref="acct-ref-water-2", equivalence_key="water-co/2026-10"), ESCALATE),
         ("rail-watched", _payment("rail-watched", 4, "household-assistant-b@v1", amount_minor=1_000,
-         target="person/neighbour-1", rail="p2p", counterparty_account_ref="acct-ref-neighbour-1"), DENY),
+         target="person/neighbour-1", rail="p2p", counterparty_account_ref="acct-ref-neighbour-1"), ESCALATE),
         ("credential-in-content", _message("credential-in-content", 5, "household-assistant-c@v1",
          target="contact/support-desk", outgoing_content="Your verification code is 482913"), DENY),
         # A real accepted payment to the landlord: the earlier action that makes
@@ -179,11 +179,11 @@ def _scenarios() -> list[tuple[str, Action, str]]:
         ("caps-first-draw", _payment("caps-first-draw", 10, "household-assistant-f@v1", operator=f"{OPERATOR}-f", amount_minor=2_000,
          target="contractor/roof", rail="bank_transfer", counterparty_account_ref="acct-ref-roof-1"), ALLOW),
         # caps fails here (over the per-action limit) alongside
-        # destination_rail, so the decision is a deny;
-        # caps-over-limit-escalates below is the sole-failure case.
+        # destination_rail; caps always asks and r20 declares ASK, so the
+        # decision escalates. caps-over-limit-escalates below is the sole-failure case.
         ("caps-over-limit-on-watched-rail", _payment("caps-over-limit", 11, "household-assistant-f@v1", operator=f"{OPERATOR}-f",
          amount_minor=3_000, target="contractor/roof-extra", rail="p2p",
-         counterparty_account_ref="acct-ref-roof-2"), DENY),
+         counterparty_account_ref="acct-ref-roof-2"), ESCALATE),
         # Population (a): a cap IS configured for money.transfer and the
         # action carries no amount_minor -- the rule applied and could not be
         # evaluated. The engine still allows it; the record says why.
@@ -196,7 +196,7 @@ def _scenarios() -> list[tuple[str, Action, str]]:
          action_id="check_balance/everyday-fixture-out-of-scope", timestamp="2026-08-10T10:13:00Z"), ALLOW),
         ("recurring-charge-set-up", _payment("recurring-charge", 14, "household-assistant-h@v1", amount_minor=1_299,
          target="service/streaming", rail="card", counterparty_account_ref="acct-ref-streaming-1",
-         recurrence="monthly"), DENY),
+         recurrence="monthly"), ESCALATE),
         ("caps-second-first-draw", _payment("caps-second-first-draw", 15, "household-assistant-i@v1", operator=f"{OPERATOR}-i",
          amount_minor=2_500, target="builder/extension", rail="card",
          counterparty_account_ref="acct-ref-builder-1"), ALLOW),
@@ -244,17 +244,18 @@ def _scenarios() -> list[tuple[str, Action, str]]:
         ("declared-terms-in-bounds", _payment("terms-in-bounds", 24, "household-assistant-m@v1",
          operator=f"{OPERATOR}-m", **_declared()), ALLOW),
         # Each of the following moves one declared input past its limit, on its
-        # own household and payee.
+        # own household and payee. Each rule declares ASK and money.transfer
+        # names an approver role, so each escalates.
         ("non-refundable-payment", _payment("non-refundable", 25, "household-assistant-m@v1",
-         operator=f"{OPERATOR}-n", **_declared("n", refundable=False)), DENY),
+         operator=f"{OPERATOR}-n", **_declared("n", refundable=False)), ESCALATE),
         ("material-terms-changed", _payment("material-changed", 26, "household-assistant-m@v1",
-         operator=f"{OPERATOR}-o", **_declared("o", material_fields_changed=2)), DENY),
+         operator=f"{OPERATOR}-o", **_declared("o", material_fields_changed=2)), ESCALATE),
         ("offer-differs-from-stated", _payment("offer-differs", 27, "household-assistant-m@v1",
-         operator=f"{OPERATOR}-p", **_declared("p", offer_fields_changed=1)), DENY),
+         operator=f"{OPERATOR}-p", **_declared("p", offer_fields_changed=1)), ESCALATE),
         ("channel-moved", _payment("channel-moved", 28, "household-assistant-m@v1",
-         operator=f"{OPERATOR}-q", **_declared("q", channel="whatsapp")), DENY),
+         operator=f"{OPERATOR}-q", **_declared("q", channel="whatsapp")), ESCALATE),
         ("deposit-over-a-quarter", _payment("deposit-over", 29, "household-assistant-m@v1",
-         operator=f"{OPERATOR}-r", **_declared("r", upfront_amount_minor=501)), DENY),
+         operator=f"{OPERATOR}-r", **_declared("r", upfront_amount_minor=501)), ESCALATE),
         # A payment citing a task-authority record, supplied with the decision
         # (TASK_RECORDS): inside its plan, and to a payee its plan does not bind.
         ("task-inside-authority", _payment("task-inside", 30, "household-assistant-s@v1", operator=f"{OPERATOR}-s",
@@ -262,7 +263,7 @@ def _scenarios() -> list[tuple[str, Action, str]]:
          task_authority_ref=TASK_AUTHORITY_REF), ALLOW),
         ("task-outside-authority", _payment("task-outside", 31, "household-assistant-s@v1", operator=f"{OPERATOR}-t",
          amount_minor=2_000, target="service/roofer", rail="card", counterparty_account_ref="acct-ref-roofer-1",
-         task_authority_ref=TASK_AUTHORITY_REF), DENY),
+         task_authority_ref=TASK_AUTHORITY_REF), ESCALATE),
     ]
 
 

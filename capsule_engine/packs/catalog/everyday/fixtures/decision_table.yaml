@@ -24,7 +24,15 @@
 # caps-over-limit-escalates is the row where caps is the SOLE failing check:
 # it escalates, sealed as disposition.decision needs_input with
 # disposition.verdict_class hitl_dispatched. caps-over-limit-on-watched-rail
-# fires caps 'fail' alongside destination_rail, so it denies.
+# fires caps 'fail' alongside destination_rail; caps always asks, r20
+# declares ASK and money.transfer names an approver role, so it escalates too.
+#
+# A failing check escalates when every rule bound to it declares ASK and the
+# class names an approver role: counterparty-account-changed (r19),
+# rail-watched (r20), recurring-charge-set-up (r07), the five declared-input
+# rows (r08 r09 r10 r21 r22) and task-outside-authority (r26) each fail one
+# such check alone and escalate. dedupe-repeat (a dedupe hit in one deal) and
+# credential-in-content (r23 declares NEVER) still deny.
 #
 # merchant-first-purchase fails counterparty_seen_before alone and escalates the
 # same way: money.purchase names an approver role. merchant-repeat-purchase
@@ -46,10 +54,10 @@
 # recipient_role, which never asks, and denies. declared-terms-in-bounds
 # passes refundability, material_fields_changed, offer_fields_changed,
 # channel_change and upfront_amount; each of the five rows after it fails
-# exactly one of them.
+# exactly one of them, and escalates.
 # task-inside-authority passes task_authority against the record supplied
 # with the decision; task-outside-authority names a payee that record's plan
-# does not bind, and fails it.
+# does not bind, fails it, and escalates (r26 declares ASK).
 rows:
   - scenario: baseline-allow
     action_id: make_payment/everyday-fixture-baseline
@@ -102,7 +110,7 @@ rows:
       channel_change: {population: a, missing_field: channel}
       upfront_amount: {population: a, missing_field: upfront_amount_minor}
       task_authority: {population: a, missing_field: task_authority_ref}
-    verdict: deny
+    verdict: escalate
   - scenario: rail-watched
     action_id: make_payment/everyday-fixture-rail-watched
     checks: {dedupe: pass, caps: pass, verify_before_dispatch: n/a, destination_rail: fail, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: pass, action_class_gate: n/a, counterparty_seen_before: n/a, recipient_role: n/a, refundability: n/a, material_fields_changed: n/a, offer_fields_changed: n/a, recipient_seen_before: n/a, channel_change: n/a, upfront_amount: n/a, task_authority: n/a}
@@ -120,7 +128,7 @@ rows:
       channel_change: {population: a, missing_field: channel}
       upfront_amount: {population: a, missing_field: upfront_amount_minor}
       task_authority: {population: a, missing_field: task_authority_ref}
-    verdict: deny
+    verdict: escalate
   - scenario: credential-in-content
     action_id: send_message/everyday-fixture-credential-in-content
     checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, destination_rail: n/a, counterparty_identity_change: n/a, credential_pattern: fail, recurring_charge: n/a, action_class_gate: n/a, counterparty_seen_before: n/a, recipient_role: n/a, refundability: n/a, material_fields_changed: n/a, offer_fields_changed: n/a, recipient_seen_before: fail, channel_change: n/a, upfront_amount: n/a, task_authority: n/a}
@@ -265,7 +273,7 @@ rows:
       channel_change: {population: a, missing_field: channel}
       upfront_amount: {population: a, missing_field: upfront_amount_minor}
       task_authority: {population: a, missing_field: task_authority_ref}
-    verdict: deny
+    verdict: escalate
   - scenario: caps-in-scope-amount-missing
     action_id: make_payment/everyday-fixture-caps-amount-missing
     checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, destination_rail: pass, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: pass, action_class_gate: n/a, counterparty_seen_before: n/a, recipient_role: n/a, refundability: n/a, material_fields_changed: n/a, offer_fields_changed: n/a, recipient_seen_before: n/a, channel_change: n/a, upfront_amount: n/a, task_authority: n/a}
@@ -322,7 +330,7 @@ rows:
       channel_change: {population: a, missing_field: channel}
       upfront_amount: {population: a, missing_field: upfront_amount_minor}
       task_authority: {population: a, missing_field: task_authority_ref}
-    verdict: deny
+    verdict: escalate
   - scenario: caps-second-first-draw
     action_id: make_payment/everyday-fixture-caps-second-first-draw
     checks: {dedupe: pass, caps: pass, verify_before_dispatch: n/a, destination_rail: pass, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: pass, action_class_gate: n/a, counterparty_seen_before: n/a, recipient_role: n/a, refundability: n/a, material_fields_changed: n/a, offer_fields_changed: n/a, recipient_seen_before: n/a, channel_change: n/a, upfront_amount: n/a, task_authority: n/a}
@@ -517,7 +525,7 @@ rows:
       recipient_role: {population: c}
       recipient_seen_before: {population: c}
       task_authority: {population: a, missing_field: task_authority_ref}
-    verdict: deny
+    verdict: escalate
   - scenario: material-terms-changed
     action_id: make_payment/everyday-fixture-material-changed
     checks: {dedupe: pass, caps: pass, verify_before_dispatch: n/a, destination_rail: pass, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: pass, action_class_gate: n/a, counterparty_seen_before: n/a, recipient_role: n/a, refundability: pass, material_fields_changed: fail, offer_fields_changed: pass, recipient_seen_before: n/a, channel_change: pass, upfront_amount: pass, task_authority: n/a}
@@ -530,7 +538,7 @@ rows:
       recipient_role: {population: c}
       recipient_seen_before: {population: c}
       task_authority: {population: a, missing_field: task_authority_ref}
-    verdict: deny
+    verdict: escalate
   - scenario: offer-differs-from-stated
     action_id: make_payment/everyday-fixture-offer-differs
     checks: {dedupe: pass, caps: pass, verify_before_dispatch: n/a, destination_rail: pass, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: pass, action_class_gate: n/a, counterparty_seen_before: n/a, recipient_role: n/a, refundability: pass, material_fields_changed: pass, offer_fields_changed: fail, recipient_seen_before: n/a, channel_change: pass, upfront_amount: pass, task_authority: n/a}
@@ -543,7 +551,7 @@ rows:
       recipient_role: {population: c}
       recipient_seen_before: {population: c}
       task_authority: {population: a, missing_field: task_authority_ref}
-    verdict: deny
+    verdict: escalate
   - scenario: channel-moved
     action_id: make_payment/everyday-fixture-channel-moved
     checks: {dedupe: pass, caps: pass, verify_before_dispatch: n/a, destination_rail: pass, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: pass, action_class_gate: n/a, counterparty_seen_before: n/a, recipient_role: n/a, refundability: pass, material_fields_changed: pass, offer_fields_changed: pass, recipient_seen_before: n/a, channel_change: fail, upfront_amount: pass, task_authority: n/a}
@@ -556,7 +564,7 @@ rows:
       recipient_role: {population: c}
       recipient_seen_before: {population: c}
       task_authority: {population: a, missing_field: task_authority_ref}
-    verdict: deny
+    verdict: escalate
   - scenario: deposit-over-a-quarter
     action_id: make_payment/everyday-fixture-deposit-over
     checks: {dedupe: pass, caps: pass, verify_before_dispatch: n/a, destination_rail: pass, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: pass, action_class_gate: n/a, counterparty_seen_before: n/a, recipient_role: n/a, refundability: pass, material_fields_changed: pass, offer_fields_changed: pass, recipient_seen_before: n/a, channel_change: pass, upfront_amount: fail, task_authority: n/a}
@@ -569,7 +577,7 @@ rows:
       recipient_role: {population: c}
       recipient_seen_before: {population: c}
       task_authority: {population: a, missing_field: task_authority_ref}
-    verdict: deny
+    verdict: escalate
   - scenario: task-inside-authority
     action_id: make_payment/everyday-fixture-task-inside
     checks: {dedupe: pass, caps: pass, verify_before_dispatch: n/a, destination_rail: pass, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: pass, action_class_gate: n/a, counterparty_seen_before: n/a, recipient_role: n/a, refundability: n/a, material_fields_changed: n/a, offer_fields_changed: n/a, recipient_seen_before: n/a, channel_change: n/a, upfront_amount: n/a, task_authority: pass}
@@ -603,4 +611,4 @@ rows:
       recipient_seen_before: {population: c}
       channel_change: {population: a, missing_field: channel}
       upfront_amount: {population: a, missing_field: upfront_amount_minor}
-    verdict: deny
+    verdict: escalate

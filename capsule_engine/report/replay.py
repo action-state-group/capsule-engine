@@ -45,6 +45,8 @@ from ..folds.definition import FoldDefinition
 from ..folds.duration import parse_duration_seconds
 from ..guards import Action, GuardDecision, GuardEngine, LocalSigner
 from ..guards.wickets.definition import WicketDefinition
+from ..packs.install import engine_ask_sets
+from ..packs.schema import PackDefinition
 
 __all__ = [
     "SourcedDecision",
@@ -364,6 +366,7 @@ def replay(
     per_action_reads: str | None = None,
     disclosed: dict[str, dict] | None = None,
     wickets: tuple[WicketDefinition, ...] = (),
+    pack: PackDefinition | None = None,
 ) -> ReplayResult:
     """Feed every record through a fresh ``GuardEngine`` in dry-run mode, in
     order. Never blocks (``dry_run=True``) -- see ``engine.py``'s own
@@ -372,12 +375,16 @@ def replay(
     1-based position range (i.e. positions within the ``--since``-filtered
     window actually replayed, not the source ledger's absolute positions).
     ``wickets`` are configured checks run on every decision, as
-    ``GuardEngine(wickets=...)`` runs them; none by default."""
+    ``GuardEngine(wickets=...)`` runs them; none by default. ``pack`` is the
+    pack those wickets were installed from: given, the engine asks an approver
+    on the same failures ``packs.build_engine`` does (``engine_ask_sets``);
+    without it every gate or wicket failure refuses."""
     if not records:
         return ReplayResult(decisions=(), record_range=(0, -1))
 
     signer = LocalSigner(key_id="dry-run-report", secret=b"asg-guard-dry-run-report")
 
+    gate_selectors, ask_checks = engine_ask_sets(pack, wickets) if pack is not None else (frozenset(), frozenset())
     sourced: list[SourcedDecision] = []
     with tempfile.TemporaryDirectory() as tmp, LedgerStore(tmp) as store:
         engine = GuardEngine(
@@ -389,6 +396,8 @@ def replay(
             per_action_reads=per_action_reads,
             manifest_digest=manifest_digest,
             wickets=wickets,
+            ask_gate_selectors=gate_selectors,
+            ask_wickets=ask_checks,
         )
         for record in records:
             action = action_for_record(record, (disclosed or {}).get(record.get("capsule_id", "")))

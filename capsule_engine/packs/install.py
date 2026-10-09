@@ -29,8 +29,9 @@ import yaml
 from capsule_ledger.ledger.api import LedgerAPI
 
 from ..guards.checks import RUNNABLE_CHECKS
-from ..guards.engine import GuardEngine
+from ..guards.engine import ASK_RULE_EXCLUDED_CHECKS, GuardEngine
 from ..guards.signing import Signer
+from ..guards.wickets.definition import WicketDefinition
 from ..policy.activation import build_manifest_activation_capsule, find_latest_activation
 from ..policy.limits import read_caps_limits
 from ..policy.manifest import FoldRef, Manifest, PackRef, WicketRef
@@ -41,6 +42,8 @@ from .schema import PackDefinition
 __all__ = [
     "InstalledPack",
     "ask_gate_selectors",
+    "ask_wickets",
+    "engine_ask_sets",
     "install_pack",
     "manifest_id_for_pack",
     "build_engine",
@@ -173,7 +176,11 @@ def build_engine(
     ``dry_run=True`` to every ``check()`` call itself (see this module's own
     docstring). An action_class_gate failure asks an approver only on the
     selectors whose obligations all declare ``default_disposition: ASK``
-    (``ask_gate_selectors``)."""
+    (``ask_gate_selectors``); any other configured check asks on the same
+    condition (``ask_wickets``). ``engine_ask_sets`` derives both, for this
+    engine and for a replay of the same pack."""
+    wickets = installed.resolved.configured_wickets(RUNNABLE_CHECKS)
+    gate_selectors, checks = engine_ask_sets(installed.pack, wickets)
     return GuardEngine(
         ledger=ledger,
         caps_fold=installed.resolved.caps_fold(),
@@ -182,9 +189,21 @@ def build_engine(
         per_action_reads=installed.resolved.per_action_reads(),
         signer_provider=signer_provider,
         manifest_digest=installed.resolved.manifest_digest,
-        wickets=installed.resolved.configured_wickets(RUNNABLE_CHECKS),
-        ask_gate_selectors=ask_gate_selectors(installed.pack),
+        wickets=wickets,
+        ask_gate_selectors=gate_selectors,
+        ask_wickets=checks,
     )
+
+
+def engine_ask_sets(
+    pack: PackDefinition, wickets: tuple[WicketDefinition, ...]
+) -> tuple[frozenset[str], frozenset[str]]:
+    """The ``(ask_gate_selectors, ask_wickets)`` a ``GuardEngine`` running
+    ``wickets`` under ``pack`` is built with: the gate selectors and the
+    configured checks among ``wickets`` whose obligations all declare ASK.
+    ``build_engine`` and ``report.replay`` both build their engine from this,
+    so a replay of a pack-governed ledger decides as the live engine did."""
+    return ask_gate_selectors(pack), ask_wickets(pack) & {w.check for w in wickets}
 
 
 def ask_gate_selectors(pack: PackDefinition) -> frozenset[str]:
@@ -197,6 +216,22 @@ def ask_gate_selectors(pack: PackDefinition) -> frozenset[str]:
         if o.check == "action_class_gate" and o.selector is not None:
             declared.setdefault(o.selector, set()).add(o.default_disposition)
     return frozenset(sid for sid, dispositions in declared.items() if dispositions == {"ASK"})
+
+
+def ask_wickets(pack: PackDefinition) -> frozenset[str]:
+    """The configured checks (``RUNNABLE_CHECKS``) bound to at least one
+    obligation, every one of which declares ``default_disposition: ASK``. A
+    check with a NEVER or DO obligation, or with one declaring none, is left
+    out, and so are the integrity checks and the two with their own ask rule
+    (``ASK_RULE_EXCLUDED_CHECKS``): a declared disposition never makes any of
+    them ask. ``caps`` and ``counterparty_seen_before`` are reference checks
+    that ask whatever the pack declares (``guards/engine.py``
+    ``_ESCALATABLE``)."""
+    declared: dict[str, set[str | None]] = {}
+    for o in pack.obligations:
+        if o.check in RUNNABLE_CHECKS and o.check not in ASK_RULE_EXCLUDED_CHECKS:
+            declared.setdefault(o.check, set()).add(o.default_disposition)
+    return frozenset(check for check, dispositions in declared.items() if dispositions == {"ASK"})
 
 
 def record_pack_activation(
