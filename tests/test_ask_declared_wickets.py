@@ -5,7 +5,7 @@ it declares ``default_disposition: ASK`` (D2, ``guards/engine.py``
 
 Before this, only action_class_gate selectors were read this way: r08 r09 r10
 r21 r22 r26 (and r07 r19 r20) declare ASK on everyday 0.3.2, yet each failure
-refused. Now the engine reads the declared disposition for every configured
+refused. r13 asks too since taxonomy 5 named communication.send's approver. Now the engine reads the declared disposition for every configured
 check: a check bound to a NEVER, DO or undeclared obligation still refuses,
 an integrity check (dedupe in one deal, verify_before_dispatch,
 single_commitment, promise_never) refuses whatever its obligation declares,
@@ -195,19 +195,58 @@ def test_a_changed_payee_account_asks_citing_r19(engine_for):
     assert decision.outcome == ESCALATE
 
 
-def test_a_message_to_a_new_recipient_refuses_naming_the_missing_approver(engine_for):
-    # recipient_seen_before (r13) declares ASK and is escalatable, but
-    # communication.send names no approver_role in taxonomy 4, so it refuses.
-    message = Action(
-        verb="send_message", operator=f"{OPERATOR}-7", developer="household-assistant-wa@v1",
-        action_class="comms.external", target="contact/new-friend", outgoing_content="See you at noon.",
-        action_id="send_message/everyday-wickets-ask-7", timestamp="2026-08-10T14:07:00Z",
+def _message(n: int, content: str = "See you at noon.", **fields) -> Action:
+    """A message to a recipient nothing accepted has been addressed to."""
+    return Action(
+        verb="send_message", operator=f"{OPERATOR}-{n}", developer="household-assistant-wa@v1",
+        action_class="comms.external", target="contact/new-friend", outgoing_content=content,
+        action_id=f"send_message/everyday-wickets-ask-{n}", timestamp=f"2026-08-10T16:{n:02d}:00Z",
+        **fields,
     )
-    decision = engine_for(PACK).check(message, dry_run=True)
+
+
+R13 = "r13-message-to-a-new-recipient"
+
+
+def test_a_message_to_a_new_recipient_asks_citing_r13_only(engine_for):
+    # recipient_seen_before (r13) declares ASK, and since taxonomy 5
+    # communication.send (comms.external) names the account holder.
+    decision = engine_for(PACK).check(_message(7), dry_run=True)
     assert _failing_checks(decision) == {"recipient_seen_before"}
-    assert _failing_rules(decision) == ["r13-message-to-a-new-recipient"]
+    assert _failing_rules(decision) == [R13]
+    assert decision.outcome == ESCALATE
+    assert decision.capsule["disposition"]["decision"] == "needs_input"
+    assert decision.capsule["disposition"]["verdict_class"] == "hitl_dispatched"
+    for value in ("new-friend", "contact/", "noon", OPERATOR):
+        assert value not in decision.reason
+
+
+@pytest.mark.parametrize("disposition", ["NEVER", "DO", None])
+def test_r13_re_declared_never_do_or_undeclared_refuses_a_new_recipient(engine_for, disposition):
+    decision = engine_for(_with_disposition(PACK, R13, disposition)).check(_message(18), dry_run=True)
+    assert _failing_checks(decision) == {"recipient_seen_before"}
     assert decision.outcome == DENY
-    assert "action class 'communication.send' names no approver_role" in decision.reason
+
+
+def test_a_new_recipient_beside_a_credential_in_content_refuses(engine_for):
+    decision = engine_for(PACK).check(_message(19, "Your verification code is 482913"), dry_run=True)
+    assert _failing_checks(decision) == {"recipient_seen_before", "credential_pattern"}
+    assert decision.outcome == DENY
+
+
+def test_a_repeated_message_to_a_new_recipient_refuses_on_dedupe(engine_for):
+    engine = engine_for(PACK)
+    message = _message(20)
+    assert engine.check(message).outcome == ESCALATE
+    repeat = engine.check(message, dry_run=True)
+    assert _failing_checks(repeat) == {"recipient_seen_before", "dedupe"}
+    assert repeat.outcome == DENY
+
+
+def test_a_message_to_a_new_recipient_citing_a_mandate_not_on_the_ledger_refuses(engine_for):
+    decision = engine_for(PACK).check(_message(21, cited_mandate_capsule_id="0" * 64), dry_run=True)
+    assert _failing_checks(decision) == {"recipient_seen_before", "verify_before_dispatch"}
+    assert decision.outcome == DENY
 
 
 @pytest.mark.parametrize("disposition", ["NEVER", "DO", None])

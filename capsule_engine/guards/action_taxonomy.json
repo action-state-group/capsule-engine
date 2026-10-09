@@ -1,5 +1,5 @@
 {
-  "taxonomy_version": "4",
+  "taxonomy_version": "5",
   "unversioned_records_read_as": "1",
   "trigger_classes": ["COMMIT", "DISCLOSE", "COMMUNICATE", "SECURITY", "MUTATE", "DELEGATE", "CHANGE"],
   "state_derived_trigger_classes": ["CHANGE"],
@@ -11,7 +11,7 @@
     {"name": "booking.create", "trigger_class": "COMMIT", "consequential": true, "fail_open_allowed": false, "approver_role": "account_holder", "legacy_aliases": []},
     {"name": "booking.modify", "trigger_class": "COMMIT", "consequential": true, "fail_open_allowed": false, "approver_role": "account_holder", "legacy_aliases": []},
     {"name": "booking.cancel", "trigger_class": "COMMIT", "consequential": true, "fail_open_allowed": false, "approver_role": "account_holder", "legacy_aliases": []},
-    {"name": "communication.send", "trigger_class": "COMMUNICATE", "consequential": true, "fail_open_allowed": false, "approver_role": null, "legacy_aliases": ["comms.external"]},
+    {"name": "communication.send", "trigger_class": "COMMUNICATE", "consequential": true, "fail_open_allowed": false, "approver_role": "account_holder", "legacy_aliases": ["comms.external"]},
     {"name": "communication.publish", "trigger_class": "COMMUNICATE", "consequential": true, "fail_open_allowed": false, "approver_role": "account_holder", "legacy_aliases": []},
     {"name": "disclosure.personal", "trigger_class": "DISCLOSE", "consequential": true, "fail_open_allowed": false, "approver_role": "account_holder", "legacy_aliases": []},
     {"name": "disclosure.secret", "trigger_class": "SECURITY", "consequential": true, "fail_open_allowed": false, "approver_role": null, "legacy_aliases": []},

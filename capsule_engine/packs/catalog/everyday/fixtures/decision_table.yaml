@@ -45,7 +45,9 @@
 # check and the decision denies.
 #
 # credential-in-content also fails recipient_seen_before: nothing accepted has
-# been addressed to the support desk. credential-absent passes it because
+# been addressed to the support desk. r13 declares ASK and communication.send
+# names an approver role (taxonomy 5), but credential_pattern (r23 NEVER)
+# fails beside it, so the row still denies. credential-absent passes it because
 # recipient-history-real-payment is a real accepted payment to the landlord.
 # disclosure-to-fulfilling-merchant passes recipient_role and
 # disclosure-to-third-party fails it; both also fail action_class_gate on
