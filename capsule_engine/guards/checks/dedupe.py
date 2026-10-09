@@ -17,6 +17,10 @@ sealed record) is keyed on the act alone: operator, developer, its
 check is ``fyi``, ``deal-<id>/<seq>``) never enters the key, neither its
 ``action_type`` nor its ``action_id`` prefix, so the scan covers every type and
 a second check carrying the same act matches the decision on the first.
+An act that moves money in (``returned_minor`` or ``reverses_ref`` set; its
+``amount_minor`` is spend, ``0``) is keyed on the amount it returns and the act
+it reverses in place of the amount, so two refunds of different amounts never
+collide, and the same refund of the same act does.
 Both sides go through ``_act_key``: an action and a capsule each project to
 the same fields, and the formula exists once.
 
@@ -49,8 +53,21 @@ def _act_key(
     target: str | None,
     action_class: str | None,
     amount_minor: int | None,
+    returned_minor: int | None,
+    reverses_ref: str | None,
     taxonomy_pinned: bool,
 ) -> str:
+    if taxonomy_pinned and (returned_minor is not None or reverses_ref is not None):
+        return json_digest(
+            {
+                "operator": operator,
+                "developer": developer,
+                "action_class": action_class,
+                "target": target,
+                "returned_minor": returned_minor,
+                "reverses_ref": reverses_ref,
+            }
+        )
     if taxonomy_pinned:
         return json_digest(
             {
@@ -77,6 +94,8 @@ def equivalence_key_for_action(action: Action) -> str:
         target=action.target,
         action_class=action.action_class,
         amount_minor=action.amount_minor,
+        returned_minor=action.returned_minor,
+        reverses_ref=action.reverses_ref,
         taxonomy_pinned=action.taxonomy_version is not None,
     )
 
@@ -91,6 +110,8 @@ def equivalence_key_for_capsule(capsule: dict) -> str:
         target=payload.get("target"),
         action_class=payload.get("action_class"),
         amount_minor=payload.get("amount_minor"),
+        returned_minor=payload.get("returned_minor"),
+        reverses_ref=payload.get("reverses_ref"),
         taxonomy_pinned=payload.get("taxonomy_version") is not None,
     )
 

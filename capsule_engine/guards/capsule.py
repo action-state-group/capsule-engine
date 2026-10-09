@@ -206,6 +206,8 @@ def _payload_extension(action: Action, checkpoint: dict, manifest_digest: str | 
         ("authorized_by", action.authorized_by),
         ("proposal_at", action.proposal_at),
         ("item_ref", action.item_ref),
+        ("returned_minor", action.returned_minor),
+        ("reverses_ref", action.reverses_ref),
     )
     for name, value in scalars:
         if value is not None:
