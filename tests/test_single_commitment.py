@@ -355,7 +355,8 @@ def test_every_config_field_has_a_mutant():
 INPUT_ITEM = "3f" * 32
 
 
-def _thread_entry(thread: str, verb: str, action_class: str, seq: int) -> dict:
+# Raw decoded JSON on purpose: the entry ``action_for_check_input`` decodes.
+def _thread_entry(thread: str, verb: str, action_class: str, seq: int) -> dict[str, object]:
     """One external-check-input/v0 record entry for a check in ``thread``:
     the capsule and the deal check record it binds. The record names the sale
     by its task authority and never the item."""

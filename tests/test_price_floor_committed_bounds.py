@@ -18,6 +18,7 @@ import hashlib
 import json
 import re
 from pathlib import Path
+from typing import TypedDict
 
 import pytest
 from agent_action_capsule.canonical import jcs
@@ -32,6 +33,7 @@ from capsule_engine.guards.checks import (
     check_price_floor,
     task_authority_record_digest,
 )
+from capsule_engine.guards.checks.price_floor import CommercialBoundsDocument, OpeningMismatchEvidence
 from capsule_engine.guards.engine import GuardDecision
 from capsule_engine.guards.wickets import WicketDefinition, load_definition_file
 
@@ -43,12 +45,19 @@ VECTORS_SHA256 = "4b85fb3ea7bd7735c93e2f1dd8605e6c8cc40a279100698ecda989366fe7c4
 CLASSES = FLOOR.config["action_classes"]
 
 
+class GoldenVector(TypedDict):
+    document: CommercialBoundsDocument
+    nonce: str
+    text: str
+    bounds_commitment: str
+
+
 # Reads the vendored JSON vectors: the test's decoding boundary.
-def _vectors() -> list[dict]:
+def _vectors() -> list[GoldenVector]:
     return json.loads(VECTORS.read_text())["vectors"]
 
 
-def _opening(vector: dict) -> CommercialBoundsOpening:
+def _opening(vector: GoldenVector) -> CommercialBoundsOpening:
     return {"document": vector["document"], "nonce": vector["nonce"], "bounds_commitment": vector["bounds_commitment"]}
 
 
@@ -81,9 +90,9 @@ def _check(amount_minor: int, opening: object = OPENING, record: TaskAuthorityRe
     return check_price_floor(action, record, opening, action_classes=CLASSES).constraint
 
 
-def _mismatch(record: TaskAuthorityRecord = AUTHORITY) -> dict[str, str | bool]:
-    return {"task_authority_ref": task_authority_record_digest(record),
-            "bounds_commitment": record["body"]["bounds_commitment"], "opens_commitment": False}
+def _mismatch(record: TaskAuthorityRecord = AUTHORITY) -> OpeningMismatchEvidence:
+    return OpeningMismatchEvidence(task_authority_ref=task_authority_record_digest(record),
+                                   bounds_commitment=record["body"]["bounds_commitment"], opens_commitment=False)
 
 
 # -- the golden vectors ---------------------------------------------------------
@@ -121,23 +130,24 @@ def test_below_the_floor_fails_and_at_or_above_passes():
 # -- an opening that does not open the sealed commitment fails ------------------
 
 
-def _tampered_floor() -> dict:
+def _tampered_floor() -> CommercialBoundsOpening:
     out = copy.deepcopy(OPENING)
     out["document"]["min_total_minor"] = 100_000
     return out
 
 
-def _tampered_nonce() -> dict:
+def _tampered_nonce() -> CommercialBoundsOpening:
     return {**OPENING, "nonce": "0" * 64}
 
 
-def _restated_commitment() -> dict:
+def _restated_commitment() -> CommercialBoundsOpening:
     """An opening for a lower floor that recomputes, restating its own
     commitment: it still is not the one the authority seals."""
     return _opening(_vectors()[1])
 
 
-def _no_nonce() -> dict:
+# Out of the agreed shape on purpose: what a checker input could decode to.
+def _no_nonce() -> dict[str, object]:
     return {k: v for k, v in OPENING.items() if k != "nonce"}
 
 
@@ -161,7 +171,8 @@ def test_an_opening_that_does_not_open_the_sealed_commitment_fails_naming_it(ope
     assert "bounds_commitment" in out.reason
 
 
-def _sealed_document(document: object) -> tuple[dict, TaskAuthorityRecord]:
+# Out of the agreed shape on purpose: ``document`` is any decoded JSON object.
+def _sealed_document(document: dict[str, object]) -> tuple[dict[str, object], TaskAuthorityRecord]:
     """An opening of ``document`` and an authority sealing its commitment:
     the commitment holds, so only the document's own shape can fail it."""
     nonce = BICYCLE_VECTOR["nonce"]

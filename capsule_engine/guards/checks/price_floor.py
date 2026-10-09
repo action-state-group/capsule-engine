@@ -134,6 +134,9 @@ def _opened_floor(opening: object, sealed: str) -> int | None:
     try:
         if bounds_commitment(nonce, document) != sealed:
             return None
+    # A document holding a float or an unsafe integer has no JCS digest, so
+    # it opens no commitment: that is the mismatch the caller fails, not an
+    # error to raise.
     except (FloatInDigestError, UnsafeIntegerError):
         return None
     floor = document.get(_FLOOR)
