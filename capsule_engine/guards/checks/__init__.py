@@ -46,6 +46,7 @@ from .promise_requires_approval import (
 from .recipient_role import check_recipient_role
 from .recurring_charge import check_recurring_charge
 from .refundability import check_refundability
+from .release_on_acceptance import check_release_on_acceptance
 from .required_disclosure import check_required_disclosure
 from .single_commitment import check_single_commitment
 from .task_authority import (
@@ -139,6 +140,13 @@ CONFIGURED_CHECKS: dict[str, Callable[[Action, LedgerAPI, dict], CheckOutcome]] 
     "single_commitment": lambda action, ledger, config: check_single_commitment(
         action, ledger, acceptance_classes=config["acceptance_classes"], commit_classes=config["commit_classes"]
     ),
+    "release_on_acceptance": lambda action, ledger, config: check_release_on_acceptance(
+        action,
+        ledger,
+        release_classes=config["release_classes"],
+        acceptance_classes=config["acceptance_classes"],
+        action_classes=config["action_classes"],
+    ),
 }
 
 TASK_AUTHORITY_CHECKS: dict[str, Callable[[Action, TaskAuthorityRecord | None, dict], CheckOutcome]] = {
@@ -217,6 +225,7 @@ __all__ = [
     "check_recipient_seen_before",
     "check_recurring_charge",
     "check_refundability",
+    "check_release_on_acceptance",
     "check_required_disclosure",
     "check_single_commitment",
     "check_task_authority",
