@@ -104,6 +104,9 @@ class Action:
     beside ``action_class`` when set, so a count over trigger classes can be
     recomputed against the table that was live; unset, the record keeps its
     prior bytes.
+    ``states_act`` is ``False`` for a record that states no act of its own
+    (a deal's baseline, verdict or approval; see ``report/replay.py``), read
+    by ``dedupe``, which does not apply to it; it is never sealed.
     """
 
     verb: str
@@ -143,6 +146,7 @@ class Action:
     authorized_by: str | None = None
     proposal_at: str | None = None
     item_ref: str | None = None
+    states_act: bool = True
 
     def __post_init__(self) -> None:
         if self.counterparty_account_ref is not None and _looks_like_raw_account_number(

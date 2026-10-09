@@ -19,6 +19,9 @@ check is ``fyi``, ``deal-<id>/<seq>``) never enters the key, neither its
 a second check carrying the same act matches the decision on the first.
 Both sides go through ``_act_key``: an action and a capsule each project to
 the same fields, and the formula exists once.
+
+An action that states no act (``Action.states_act`` false) is not deduped: its
+``dedupe`` is ``n/a``, out of scope, and it never matches anything.
 """
 from __future__ import annotations
 
@@ -26,7 +29,7 @@ from agent_action_capsule import json_digest
 from capsule_ledger.ledger.api import LedgerAPI, ScanQuery
 
 from ..action import Action
-from ..capsule import ConstraintOutcome
+from ..capsule import ConstraintOutcome, not_applicable_evidence
 from .base import CheckOutcome
 
 __all__ = ["equivalence_key_for_action", "equivalence_key_for_capsule", "check_dedupe"]
@@ -93,6 +96,17 @@ def equivalence_key_for_capsule(capsule: dict) -> str:
 
 
 def check_dedupe(action: Action, ledger: LedgerAPI, *, since: str | None = None) -> CheckOutcome:
+    if not action.states_act:
+        return CheckOutcome(
+            constraint=ConstraintOutcome(
+                id="dedupe",
+                result="n/a",
+                reason="the record states no act",
+                evidence=not_applicable_evidence("dedupe", in_scope=False),
+                check_type="policy",
+                method="exact_match_index_v0",
+            )
+        )
     key = equivalence_key_for_action(action)
     scanned_type = None if action.taxonomy_version is not None else action.action_type
     query = ScanQuery(action_type=scanned_type, since=since)
