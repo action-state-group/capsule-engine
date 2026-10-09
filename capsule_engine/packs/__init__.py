@@ -13,6 +13,7 @@ from .enforce import accept_thresholds, enforce_pack, profile_for_accepted
 from .errors import PackDefinitionError, RegistryPinError
 from .install import InstalledPack, build_engine, install_pack, record_pack_activation
 from .loader import load_pack_dir
+from .obligation_results import ObligationResult, obligation_results
 from .pins import load_pins_file, verify_pins
 from .schema import ActionSemantic, Obligation, PackDefinition, PackFixtures, ProposerStub
 from .thresholds import ThresholdProposal, load_proposals_file, propose_thresholds, write_proposals_file
@@ -24,6 +25,8 @@ __all__ = [
     "ProposerStub",
     "PackFixtures",
     "load_pack_dir",
+    "ObligationResult",
+    "obligation_results",
     "PackDefinitionError",
     "InstalledPack",
     "install_pack",

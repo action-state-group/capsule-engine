@@ -17,6 +17,11 @@ INVALID_PACK_ID = "invalid_pack_id_namespace"
 MISSING_REQUIRED_FIELD = "missing_required_field"
 OBLIGATION_CHECK_NOT_DECLARED = "obligation_check_not_declared"
 DUPLICATE_OBLIGATION_ID = "duplicate_obligation_id"
+# obligation.selector -- the one named selector of a selector-configured
+# check (today action_class_gate) an obligation is measured by.
+MISSING_OBLIGATION_SELECTOR = "missing_obligation_selector"
+UNKNOWN_OBLIGATION_SELECTOR = "unknown_obligation_selector"
+INVALID_OBLIGATION_SELECTOR = "invalid_obligation_selector"
 INVALID_ACTION_SEMANTIC = "invalid_action_semantic"
 UNKNOWN_NORMALIZED_FIELD = "unknown_normalized_field"
 UNKNOWN_ACTION_CLASS = "unknown_action_class"

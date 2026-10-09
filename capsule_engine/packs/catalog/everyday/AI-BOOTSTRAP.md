@@ -73,7 +73,12 @@ catalog):
    the action taxonomy: a class with no consequential effect passes (today,
    `info.query` alone); public posting, creating or cancelling a booking,
    deleting stored data, and disclosing personal data are flagged. It reads
-   the declared class only, never what the action contains.
+   the declared class only, never what the action contains. Eight rules
+   cite this check, and each names the one selector it is measured by
+   (`selector:` in `pack.yaml`): a rule fails or passes only when its
+   selector matched the action's class, and does not apply otherwise, so a
+   booking fails the booking rule and no other.
+   `packs.obligation_results` reads one decision's result per rule.
 8. `counterparty_seen_before` (`counterparty_seen_before/2.0.0`) -- a
    purchase from a merchant the operator has no accepted earlier action with
    is flagged; a dry run does not count as an earlier action. The record

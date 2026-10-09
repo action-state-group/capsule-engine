@@ -357,11 +357,20 @@ class Obligation:
     cannot be re-derived by the person it stops. Both fields are emitted only
     when declared, so an obligation without them digests identically to
     before.
+
+    ``selector`` names one selector in the cited check's ``config.selectors``
+    (today only ``action_class_gate`` has them). Several obligations can
+    share one check, each measured by its own selector: the obligation fails
+    or passes only when its selector matched, and is not applicable when it
+    did not (``obligation_results.obligation_results``). ``loader.py``
+    requires one on every obligation citing a check that has selectors, and
+    refuses one the check does not name. Emitted only when declared.
     """
 
     id: str
     statement: str
     check: str | None = None
+    selector: str | None = None
     re_derivability_grade: str | None = None
     default_disposition: str | None = None
     measurability: str = "measured"
@@ -848,6 +857,7 @@ class PackDefinition:
                     "id": o.id,
                     "statement": o.statement,
                     **({"check": o.check} if o.check is not None else {}),
+                    **({"selector": o.selector} if o.selector is not None else {}),
                     **({"re_derivability_grade": o.re_derivability_grade} if o.re_derivability_grade else {}),
                     **({"default_disposition": o.default_disposition} if o.default_disposition else {}),
                     **({"measurability": o.measurability} if o.measurability != "measured" else {}),
