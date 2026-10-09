@@ -79,12 +79,16 @@ ALLOW = "allow"
 DENY = "deny"
 ESCALATE = "escalate"
 
-LOCAL_ONLY_PAYLOAD_FIELDS = frozenset({"deal_id", "item_ref", "returned_minor", "reverses_ref"})
+LOCAL_ONLY_PAYLOAD_FIELDS = frozenset(
+    {"deal_id", "equivalence_key_digest", "item_ref", "returned_minor", "reverses_ref"}
+)
 """``asg_payload`` fields sealed on a guard decision only so later checks on
 the same machine can match against it: the deal an act was checked in, the
-item a sale is about, and what a money-in record returns and reverses.
+item a sale is about, what a money-in record returns and reverses, and the
+digest of a caller's equivalence key.
 
-They can name other counterparties' deals, so a decision capsule carrying
+They can name other counterparties' deals, and a caller's key (an order or
+invoice number) is guessable from its digest, so a decision capsule carrying
 any of them never enters an artifact made for another party. Every export
 path refuses such records (``local_only_refusal``); stripping the fields is
 not an option, because ``capsule_id`` covers them. Adding a field here, or
@@ -269,6 +273,10 @@ def _payload_extension(action: Action, checkpoint: dict, manifest_digest: str | 
     for name, value in scalars:
         if value is not None:
             ext[name] = value
+    if action.sealed_equivalence_key is not None:
+        # The caller's key as its digest only, never raw: dedupe reads it back
+        # (``equivalence_key_for_capsule``).
+        ext["equivalence_key_digest"] = action.sealed_equivalence_key
     if action.taxonomy_version is not None:
         # Written only when set, so existing records keep their bytes; read
         # back with ``classes.record_taxonomy_version``.

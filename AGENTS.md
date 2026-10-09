@@ -4,9 +4,10 @@
 
 Some fields are sealed into a guard decision's `asg_payload` only so that later checks on the same
 machine can match against it. They are listed once, in `LOCAL_ONLY_PAYLOAD_FIELDS`
-(`capsule_engine/guards/capsule.py`): the deal an act was checked in, the item a sale is about, and
-what a money-in record returns and reverses. Those values can describe deals with other
-counterparties, so a decision capsule carrying any of them never enters an artifact made for
+(`capsule_engine/guards/capsule.py`): the deal an act was checked in, the item a sale is about,
+what a money-in record returns and reverses, and the digest of a caller's equivalence key (the raw
+key is never sealed; an order or invoice number is guessable from its digest). Those values can
+describe deals with other counterparties, so a decision capsule carrying any of them never enters an artifact made for
 another party. The fields cannot be stripped from a sealed capsule, because `capsule_id` covers
 them. So every export path refuses such records, naming the fields and the record count and never
 a value. Today those paths are `capsule bundle` (the bundle file, its verify link and its offline

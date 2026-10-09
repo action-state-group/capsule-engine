@@ -29,9 +29,13 @@ REFUND = DEAL_BUNDLES / "deal-purchase-then-refund.bundle.json"
 REFUND_DEAL_ID = "deal-1a2f6df4f4186be2"
 CAPS_MANIFEST = DEAL_BUNDLES / "caps-v3-manifest.yaml"
 
+# A caller's idempotency key: sealed only as its digest.
+CALLER_KEY = "invoice-2026-0917"
+
 # One distinctive value per field, so a leak of any value is greppable.
 LOCAL_VALUES = {
     "deal_id": "deal-cccccccccccccccc",
+    "equivalence_key_digest": "d" * 64,
     "item_ref": "item-ref-7f3e91",
     "returned_minor": 31_415,
     "reverses_ref": "e" * 64,
@@ -39,7 +43,10 @@ LOCAL_VALUES = {
 
 
 def test_the_local_only_fields_are_the_ones_sealed_for_local_matching():
-    assert frozenset({"deal_id", "item_ref", "returned_minor", "reverses_ref"}) == LOCAL_ONLY_PAYLOAD_FIELDS
+    assert (
+        frozenset({"deal_id", "equivalence_key_digest", "item_ref", "returned_minor", "reverses_ref"})
+        == LOCAL_ONLY_PAYLOAD_FIELDS
+    )
     assert set(LOCAL_VALUES) == LOCAL_ONLY_PAYLOAD_FIELDS
 
 
@@ -104,6 +111,19 @@ def test_bundle_refuses_a_decision_carrying_the_field(tmp_path, capsys, field):
     _assert_refusal_names_only(printed.err, field, 1)
 
 
+def test_bundle_refuses_a_decision_sealed_with_a_caller_key_and_names_neither_key_nor_digest(tmp_path, capsys):
+    keyed = _decision(2, equivalence_key=CALLER_KEY)
+    assert CALLER_KEY not in json.dumps(keyed)
+    out = tmp_path / "bundle.json"
+    rc = cli_main(["bundle", "--ledger", str(_ledger(tmp_path, [_decision(1), keyed])), "--out", str(out)])
+    printed = capsys.readouterr()
+    assert rc == 2
+    assert not out.exists()
+    _assert_refusal_names_only(printed.err, "equivalence_key_digest", 1)
+    assert CALLER_KEY not in printed.err
+    assert json_digest(CALLER_KEY) not in printed.err
+
+
 def test_bundle_exports_records_without_the_fields_byte_for_byte(tmp_path, capsys):
     capsules = [_decision(1), _decision(2)]
     out = tmp_path / "bundle.json"
@@ -162,6 +182,22 @@ def test_dry_run_share_refuses_a_decision_carrying_the_deal(tmp_path, capsys):
     assert "file://" not in printed.out
     # The dedupe row's decision and the earlier decision it cites.
     _assert_refusal_names_only(printed.err, "deal_id", 2)
+
+
+def test_dry_run_share_refuses_a_replayed_decision_keyed_by_a_caller(tmp_path, capsys):
+    """Two guard decisions under one caller key: replay keys each as it was
+    live, so the retry's dedupe row cites the first, and both replayed
+    decisions seal the digest."""
+    ledger = _ledger(tmp_path, [_decision(1, equivalence_key=CALLER_KEY), _decision(2, equivalence_key=CALLER_KEY)])
+    out = tmp_path / "report.html"
+    rc = _dry_run(out, ledger, "--share", "--no-manifest")
+    printed = capsys.readouterr()
+    assert rc == 1
+    assert not out.exists()
+    assert "file://" not in printed.out
+    _assert_refusal_names_only(printed.err, "equivalence_key_digest", 2)
+    assert CALLER_KEY not in printed.err
+    assert json_digest(CALLER_KEY) not in printed.err
 
 
 def test_dry_run_share_refuses_the_real_deal_bundle(tmp_path, capsys):

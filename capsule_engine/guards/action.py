@@ -12,6 +12,8 @@ import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 
+from agent_action_capsule import json_digest
+
 
 def _new_action_id(verb: str) -> str:
     return f"{verb}/{uuid.uuid4()}"
@@ -51,8 +53,14 @@ class Action:
     (e.g. a counterparty or recipient reference). ``cited_mandate_capsule_id``
     is the prior capsule this action claims authorization from, checked by
     ``verify_before_dispatch``. ``equivalence_key`` lets a caller override the
-    dedupe check's default equivalence formula for this action; it is not
-    sealed, so it never matches an earlier record carrying the same key.
+    dedupe check's default equivalence formula for this action, as an
+    idempotency key: it is sealed only as its ``json_digest``
+    (``asg_payload.equivalence_key_digest``, local-only), never raw, so a
+    retry under the same key matches the earlier record.
+    ``equivalence_key_digest`` is that sealed digest read back from a capsule
+    (``from_capsule``), so a replayed record is keyed as it was live; a caller
+    sets ``equivalence_key`` and never this. ``sealed_equivalence_key`` is the
+    one value both sides of dedupe and the capsule read.
 
     ``rail`` names the payment rail or destination type (e.g. ``"card"``,
     ``"p2p"``), read by ``destination_rail``. ``counterparty_account_ref`` is
@@ -145,6 +153,7 @@ class Action:
     target: str | None = None
     cited_mandate_capsule_id: str | None = None
     equivalence_key: str | None = None
+    equivalence_key_digest: str | None = None
     model_id: str | None = None
     provider: str | None = None
     rail: str | None = None
@@ -186,6 +195,20 @@ class Action:
                 "counterparty_account_ref looks like a raw account, card or IBAN number; it is sealed on the "
                 "capsule, so pass an opaque reference (a token or a digest) instead"
             )
+
+        if self.equivalence_key is not None and self.equivalence_key_digest is not None:
+            raise ValueError(
+                "equivalence_key and equivalence_key_digest are both set; a caller sets the key, "
+                "and only a replayed capsule carries the digest"
+            )
+
+    @property
+    def sealed_equivalence_key(self) -> str | None:
+        """The digest of the caller's equivalence key, as sealed on the
+        decision, or ``None`` when the action has none."""
+        if self.equivalence_key is not None:
+            return json_digest(self.equivalence_key)
+        return self.equivalence_key_digest
 
     def resolved_action_id(self) -> str:
         return self.action_id or _new_action_id(self.verb)
@@ -254,4 +277,5 @@ class Action:
             returned_minor=payload.get("returned_minor"),
             reverses_ref=payload.get("reverses_ref"),
             deal_id=payload.get("deal_id"),
+            equivalence_key_digest=payload.get("equivalence_key_digest"),
         )

@@ -8,10 +8,13 @@ default formula uses only fields present on any capsule, ours or a foreign
 one already sitting in the ledger (operator, developer, action_type, and
 the ``verb`` prefix of ``action_id``), so a dedupe hit fires against
 capsules this guard never produced. A caller may override it per-action via
-``Action.equivalence_key``. The override keys the action side only: the key
-is not sealed on the decision, so an earlier record is always keyed by the
-formula. A caller's key makes two acts distinct, and never matches an earlier
-record that carried the same key (``tests/test_dedupe_equivalence_key.py``).
+``Action.equivalence_key``, an idempotency key: the decision seals its
+``json_digest`` (``asg_payload.equivalence_key_digest``, local-only; never the
+raw key), and both sides read that digest before the formula. A retry under
+the same key matches the earlier record, two different keys keep two acts
+distinct, and a keyed act never matches an unkeyed one
+(``tests/test_dedupe_equivalence_key.py``). A record sealed before the digest
+existed is keyed by the formula.
 
 An act stated against a pinned action taxonomy (``taxonomy_version`` set,
 as the deal-check bridge in ``report/replay.py`` sets it from a deal check's
@@ -98,8 +101,9 @@ def _act_key(
 
 
 def equivalence_key_for_action(action: Action) -> str:
-    if action.equivalence_key is not None:
-        return action.equivalence_key
+    sealed = action.sealed_equivalence_key
+    if sealed is not None:
+        return sealed
     return _act_key(
         operator=action.operator,
         developer=action.developer,
@@ -116,6 +120,9 @@ def equivalence_key_for_action(action: Action) -> str:
 
 def equivalence_key_for_capsule(capsule: dict) -> str:
     payload = capsule.get("asg_payload") or {}
+    sealed = payload.get("equivalence_key_digest")
+    if sealed is not None:
+        return sealed
     return _act_key(
         operator=capsule.get("operator", ""),
         developer=capsule.get("developer", ""),
