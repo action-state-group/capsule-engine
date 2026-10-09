@@ -26,7 +26,7 @@ import json
 import re
 import sys
 import tempfile
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from functools import cache
 from pathlib import Path
 from typing import TypedDict
@@ -303,20 +303,21 @@ def test_the_carried_out_act_is_never_counted_as_spend():
 Change = Callable[[dict], dict | None]
 
 
-def _deal_1_changed(changes: dict[str, Change]) -> ReplayResult:
-    """The replay with deal 1's records of each ``record_type`` in ``changes``
-    passed through its function: a changed record, or ``None`` to drop it.
-    Every later deal-1 record that names a changed one by digest (``prev``,
-    ``refs``) is re-pointed and re-sealed, so the chain stays whole. A
-    re-sealed capsule binds its new record by digest; its signature no longer
-    verifies, and the replay reads only the binding."""
+def _deals_changed(changes: Mapping[str, Change], *, deals: tuple[int, ...] = (1,)) -> ReplayResult:
+    """The replay with the records of each ``record_type`` in ``changes``, in
+    the numbered ``deals``, passed through its function: a changed record, or
+    ``None`` to drop it. Every later record of those deals that names a
+    changed one by digest (``prev``, ``refs``) is re-pointed and re-sealed, so
+    the chain stays whole. A re-sealed capsule binds its new record by digest;
+    its signature no longer verifies, and the replay reads only the binding."""
     disclosed = dict(load_disclosed(OWN))
+    changing = {capsule_id for n in deals for capsule_id in _disclosed_records(OWN[n - 1])}
     moved: dict[str, str] = {}
     records = []
     for capsule in load_records(OWN):
         capsule_id = capsule["capsule_id"]
         sealed = disclosed.get(capsule_id)
-        if sealed is None or "x-deal-v0" not in sealed or capsule_id not in _disclosed_records(OWN[0]):
+        if sealed is None or "x-deal-v0" not in sealed or capsule_id not in changing:
             records.append(capsule)
             continue
         text = json.dumps(sealed)
@@ -350,25 +351,25 @@ def _unseen(result: ReplayResult) -> bool:
 def test_the_unchanged_chain_rewritten_is_still_seen():
     """The rewrite itself keeps the chain: changing nothing, deal 2 still
     reads the merchant as seen."""
-    seen = _seen_on_deal_2(_deal_1_changed({}))
+    seen = _seen_on_deal_2(_deals_changed({}))
     assert (seen.result, seen.evidence["prior_count"]) == ("pass", 1)
 
 
 def test_an_approval_that_declines_leaves_the_merchant_unseen():
     """Deal 1's approval sealed as declined, its action step still there and
     pointing at it: the chain is whole but says no."""
-    assert _unseen(_deal_1_changed({"approval": _with_body(choice="decline", proceed=False)}))
+    assert _unseen(_deals_changed({"approval": _with_body(choice="decline", proceed=False)}))
 
 
 def test_an_approved_act_never_executed_leaves_the_merchant_unseen():
-    assert _unseen(_deal_1_changed({"action": lambda record: None}))
+    assert _unseen(_deals_changed({"action": lambda record: None}))
 
 
 def test_a_purchase_the_guard_refused_leaves_the_merchant_unseen():
     """Deal 1's check names a class with no taxonomy row: the gate fails
     closed and the check is refused. Its approval and action step stay,
     re-pointed at it, and still count for nothing."""
-    result = _deal_1_changed({"check": _with_body(action_class="money.unlisted")})
+    result = _deals_changed({"check": _with_body(action_class="money.unlisted")})
     (check,) = [s for s in result.decisions if s.record["capsule_id"] in _checks(1)]
     assert check.decision.outcome == DENY
     assert check.action.target == _seen_on_deal_2(result).evidence["fold_key"]["value"]
@@ -537,3 +538,57 @@ def test_the_companion_names_its_check_by_digest():
 if __name__ == "__main__":
     EXPECTED.write_text(canonical(decisions_document()), encoding="utf-8")
     sys.stdout.write(f"wrote {EXPECTED}\n")
+
+
+# -- the same deals, sealed at another taxonomy version ---------------------------------
+
+
+def _restated_at(version: str) -> ReplayResult:
+    """Both deals with every check sealed at taxonomy ``version``."""
+    return _deals_changed({"check": _with_body(taxonomy_version=version)}, deals=(1, 2))
+
+
+def _summary(result: ReplayResult) -> list[tuple[str, str, list[str]]]:
+    return [
+        (s.record["capsule_id"], s.decision.outcome, sorted(c.id for c in s.decision.constraints if c.result == "fail"))
+        for s in result.decisions
+    ]
+
+
+def test_the_deals_sealed_at_taxonomy_5_replay_under_5():
+    """Each check is evaluated, never held, and gets the decision it gets at 6.
+    money.purchase is the same row in 5 as in 6, so this cannot tell which of
+    the two tables a check was evaluated under; ``test_record_taxonomy_gate``
+    replays a class whose row differs."""
+    at_5 = _restated_at("5")
+    assert _summary(at_5) == _summary(_replayed())
+    assert all(s.decision.taxonomy_mismatch is None for s in at_5.decisions)
+    assert all("taxonomy_mismatch" not in (c.evidence or {}) for s in at_5.decisions for c in s.decision.constraints)
+
+
+def test_the_deals_sealed_at_a_version_not_carried_are_held_each_still_decided():
+    at_1 = _restated_at("1")
+    assert [s.record["capsule_id"] for s in at_1.decisions] == _checks(1) + _checks(2)
+    mismatch = {"record_taxonomy_version": "1", "engine_taxonomy_version": TAXONOMY}
+    assert all(s.decision.taxonomy_mismatch == mismatch for s in at_1.decisions)
+    first, second = (s.decision for s in at_1.decisions)
+    # Neither the new merchant nor the caps is evaluated, so the first check is
+    # refused for its version; dedupe is an integrity check, so the repeat in
+    # deal 2 still asks.
+    assert (first.outcome, first.verdict) == ("deny", "not_evaluable")
+    held = {c.id for c in first.constraints if (c.evidence or {}).get("taxonomy_mismatch") == mismatch}
+    evaluated = {"dedupe", "verify_before_dispatch", "credential_pattern"}
+    assert held == {c.id for c in first.constraints} - evaluated
+    assert (second.verdict, [c.id for c in second.constraints if c.result == "fail"]) == ("escalate", ["dedupe"])
+
+
+def test_a_held_deal_is_never_seen_by_the_next():
+    """Deal 1 sealed at a version the engine does not carry is refused, so its
+    executed act is not carried out in the replay: deal 2, at its own version,
+    meets the merchant as new."""
+    result = _deals_changed({"check": _with_body(taxonomy_version="1")})
+    first, second = (s.decision for s in result.decisions)
+    assert (first.outcome, first.verdict) == ("deny", "not_evaluable")
+    assert second.taxonomy_mismatch is None
+    seen = _seen_on_deal_2(result)
+    assert (seen.result, seen.evidence["prior_count"]) == ("fail", 0)

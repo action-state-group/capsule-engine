@@ -5,13 +5,24 @@ escalate, and appends the decision as a capsule.
 Implements the gating-decisions doc §1 failure-semantics table literally --
 see ``docs/failure-semantics.md`` for the public short version. Every branch
 below cites the table row it implements.
+
+An action names the taxonomy its ``action_class`` was drawn from
+(``Action.taxonomy_version``). A live decision on an action naming another
+version than the engine's table never evaluates its class: ``caps`` and every
+configured check keyed on ``action_class`` is ``n/a``, in scope, with evidence
+naming both versions (``TaxonomyMismatch``). A held decision that nothing else
+fails is refused and sealed ``reject``, its ``verdict`` ``not_evaluable``: an
+action never evaluated is never allowed, and no later check counts it as an
+accepted act. A replay (``evaluate_under_record_taxonomy``) evaluates a record
+under the table it was sealed with when the engine carries that version
+(``classes.carried_taxonomy``), and holds it the same way when it does not.
 """
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypedDict
 
 from capsule_ledger.ledger.api import LedgerAPI
 
@@ -40,8 +51,15 @@ from .checks import (
     require_per_action_reads,
     resolve_caps_minor,
 )
-from .checks.action_class_gate import Selector
-from .classes import ActionClass, classify
+from .checks.action_class_gate import Selector, check_action_class_gate
+from .classes import (
+    CARRIED_TAXONOMY_VERSIONS,
+    ENGINE_TAXONOMY,
+    ActionClass,
+    TaxonomyTable,
+    carried_taxonomy,
+    classify,
+)
 from .plan import PlanDefinition
 from .signing import Signer, SigningKeyUnavailable
 from .wickets.definition import WicketDefinition
@@ -50,7 +68,9 @@ if TYPE_CHECKING:
     # ``policy`` imports ``guards``; the engine only calls ``in_force``.
     from ..policy.limits import CapsLimits
 
-__all__ = ["ASK_RULE_EXCLUDED_CHECKS", "GuardDecision", "GuardEngine"]
+__all__ = ["ASK_RULE_EXCLUDED_CHECKS", "NOT_EVALUABLE", "GuardDecision", "GuardEngine", "TaxonomyMismatch"]
+
+NOT_EVALUABLE = "not_evaluable"
 
 _DEDUPE_WINDOW_DAYS = 30
 
@@ -86,6 +106,35 @@ class GuardDecision:
     checkpoint: dict
     capsule: dict | None
     reason: str
+    # Set when the action's taxonomy version is not the one its class was
+    # evaluated under: the class-keyed checks were not evaluated.
+    taxonomy_mismatch: TaxonomyMismatch | None = None
+
+    @property
+    def verdict(self) -> str:
+        """``outcome``, except that a decision refused only because its
+        class-keyed checks were left unevaluated (``taxonomy_mismatch``, and
+        no constraint failed) is ``not_evaluable``."""
+        if self.taxonomy_mismatch is not None and not any(c.result == "fail" for c in self.constraints):
+            return NOT_EVALUABLE
+        return self.outcome
+
+
+class TaxonomyMismatch(TypedDict):
+    """The taxonomy version an action names, and the engine's."""
+
+    record_taxonomy_version: str
+    engine_taxonomy_version: str
+
+
+class TaxonomyHeldEvidence(TypedDict):
+    """``not_applicable_evidence`` for a class-keyed check left unevaluated
+    because of ``taxonomy_mismatch``."""
+
+    constraint_id: str
+    in_scope: bool
+    missing_field: None
+    taxonomy_mismatch: TaxonomyMismatch
 
 
 class GuardEngine:
@@ -111,6 +160,7 @@ class GuardEngine:
         clock: Callable[[], str] | None = None,
         ask_gate_selectors: frozenset[str] = frozenset(),
         ask_wickets: frozenset[str] = frozenset(),
+        evaluate_under_record_taxonomy: bool = False,
     ) -> None:
         if caps_limits is not None and (caps_minor or per_action_minor):
             raise ValueError("give caps limits as caps_limits or as caps_minor/per_action_minor, not both")
@@ -188,6 +238,10 @@ class GuardEngine:
         # decision" is checkable directly off the capsule. ``None`` when no
         # manifest is configured for this engine instance.
         self._manifest_digest = manifest_digest
+        # A replay of sealed history evaluates each record under the
+        # taxonomy it names, where the engine carries it; live, an action
+        # naming another taxonomy than the engine's is not evaluated.
+        self._evaluate_under_record_taxonomy = evaluate_under_record_taxonomy
         self._open: dict[str, _OpenDegradation] = {}
 
     # -- introspection (tests / recovery bookkeeping) -----------------------
@@ -236,7 +290,8 @@ class GuardEngine:
         user's private floor, read only by a ``price_floor`` wicket and only
         when it opens the ``bounds_commitment`` the bound task-authority
         record seals (``guards/checks/price_floor.py``). It is never sealed."""
-        ac = classify(action.action_class)
+        table, mismatch, mismatch_reason = self._taxonomy_for(action)
+        ac = table.classify(action.action_class)
         consequential = ac.consequential
         may_fail_open = ac.fail_open_allowed and action.action_class in self._fail_open_classes
         age_ms = self._checkpoint_age_ms()
@@ -338,6 +393,11 @@ class GuardEngine:
         since_dedupe = _shift(action.resolved_timestamp(), days=_DEDUPE_WINDOW_DAYS)
         dedupe_out = check_dedupe(action, self._ledger, since=since_dedupe)
 
+        def held(constraint: ConstraintOutcome) -> ConstraintOutcome:
+            if mismatch is None or constraint.id in _NEVER_HELD_CHECKS:
+                return constraint
+            return _taxonomy_held(constraint, mismatch, mismatch_reason)
+
         cap_minor, per_action_cap_minor, limit_sources = self._limits_for(action, caps_limits)
         if cap_minor is not None:
             caps_out = check_caps(
@@ -363,7 +423,7 @@ class GuardEngine:
 
         vbd_out = check_verify_before_dispatch(action, self._ledger)
 
-        constraints = (dedupe_out.constraint, caps_out.constraint, vbd_out.constraint)
+        constraints = (dedupe_out.constraint, held(caps_out.constraint), vbd_out.constraint)
         if self._plan is not None:
             # Pure function of (action, plan) -- no ledger read (module
             # docstring, guards/checks/plan_containment.py). Only added to
@@ -388,18 +448,25 @@ class GuardEngine:
                 out = AUTHORIZATION_CHECKS[wicket.check](
                     action, task_authority_record, authorization_record, wicket.config
                 )
+            elif wicket.check == _GATE:
+                out = check_action_class_gate(action, selectors=wicket.config["selectors"], table=table)
             else:
                 out = CONFIGURED_CHECKS[wicket.check](action, self._ledger, wicket.config)
-            constraints = (*constraints, out.constraint)
+            constraint = held(out.constraint)
+            constraints = (*constraints, constraint)
             if wicket.check == _GATE:
-                gate_runs.append((wicket, out.constraint))
-        fold_envelopes = tuple(caps_out.fold_envelopes)
+                gate_runs.append((wicket, constraint))
+        # A held caps result is not reported, so neither is the fold it read.
+        fold_envelopes = tuple(caps_out.fold_envelopes) if mismatch is None else ()
         escalatable = self._escalatable
         if self._gate_failures_ask(gate_runs):
             escalatable = escalatable | {_GATE}
         if dedupe_out.asks_approver:
             escalatable = escalatable | {"dedupe"}
         outcome = _decide(constraints, ac, escalatable)
+        if mismatch is not None and outcome == ALLOW:
+            # Its class was never evaluated: refused, never sealed as accepted.
+            outcome = DENY
 
         resolved_parent, resolved_relation = chain_parent, chain_relation
         if resolved_parent is None:
@@ -472,7 +539,38 @@ class GuardEngine:
             fold_envelopes=fold_envelopes,
             checkpoint=checkpoint,
             capsule=capsule,
-            reason=_summarize(constraints, outcome, ac, escalatable),
+            reason=_summarize(constraints, outcome, ac, escalatable, mismatch_reason),
+            taxonomy_mismatch=mismatch,
+        )
+
+    def _taxonomy_for(self, action: Action) -> tuple[TaxonomyTable, TaxonomyMismatch | None, str | None]:
+        """The table ``action``'s class is evaluated under and, when its
+        class-keyed checks are not evaluated at all, the mismatch and why.
+        An action naming no taxonomy version is read under the engine's."""
+        version = action.taxonomy_version
+        engine_version = ENGINE_TAXONOMY.version
+        if version is None or version == engine_version:
+            return ENGINE_TAXONOMY, None, None
+        mismatch = TaxonomyMismatch(record_taxonomy_version=version, engine_taxonomy_version=engine_version)
+        if not isinstance(version, str):
+            # A version is a string; a sealed number names no table, even one
+            # that reads like a version.
+            return ENGINE_TAXONOMY, mismatch, (
+                f"taxonomy_version {version!r} is not a version string; the engine's action taxonomy is "
+                f"version {engine_version}: action_class is not evaluated against a different table"
+            )
+        if not self._evaluate_under_record_taxonomy:
+            return ENGINE_TAXONOMY, mismatch, (
+                f"taxonomy_version {version} on the action; the engine's action taxonomy is version "
+                f"{engine_version}: action_class is not evaluated against a different table"
+            )
+        table = carried_taxonomy(version)
+        if table is not None:
+            return table, None, None
+        return ENGINE_TAXONOMY, mismatch, (
+            f"taxonomy_version {version} on the record; this engine carries action taxonomy versions "
+            f"{', '.join(CARRIED_TAXONOMY_VERSIONS)} and not {version}: action_class is not evaluated "
+            "against a different table"
         )
 
     def _gate_failures_ask(self, gate_runs: list[tuple[WicketDefinition, ConstraintOutcome]]) -> bool:
@@ -587,6 +685,31 @@ _INTEGRITY_CHECKS = frozenset({"dedupe", "verify_before_dispatch", "single_commi
 _OWN_ASK_RULE = frozenset({_GATE, "counterparty_list"})
 # The checks a declared ASK disposition never makes ask (``ask_wickets``).
 ASK_RULE_EXCLUDED_CHECKS = _INTEGRITY_CHECKS | _OWN_ASK_RULE
+# The checks a taxonomy mismatch never holds: ``credential_pattern`` and
+# ``plan_containment`` read no ``action_class``, and an integrity check
+# refuses whatever the taxonomy says (``dedupe``, ``single_commitment`` and
+# ``promise_never`` compare the class name as sealed, resolving it through no
+# table). ``caps`` and every other configured check is keyed on the class, so a
+# mismatch leaves it unevaluated (``_taxonomy_held``), including any check
+# added later.
+_NEVER_HELD_CHECKS = _INTEGRITY_CHECKS | {"credential_pattern", "plan_containment"}
+
+
+def _taxonomy_held(constraint: ConstraintOutcome, mismatch: TaxonomyMismatch, reason: str | None) -> ConstraintOutcome:
+    """``constraint`` not evaluated: ``n/a``, in scope, naming both versions."""
+    evidence = TaxonomyHeldEvidence(
+        constraint_id=constraint.id, in_scope=True, missing_field=None, taxonomy_mismatch=mismatch
+    )
+    return ConstraintOutcome(
+        id=constraint.id,
+        result="n/a",
+        reason=reason,
+        evidence=evidence,
+        severity=constraint.severity,
+        blocking=constraint.blocking,
+        check_type=constraint.check_type,
+        method=constraint.method,
+    )
 
 
 def _decide(
@@ -627,11 +750,16 @@ def _summarize(
     outcome: str,
     action_class: ActionClass,
     escalatable: frozenset[str],
+    not_evaluated: str | None = None,
 ) -> str:
     parts = [f"{c.id}={c.result}" for c in constraints]
     summary = f"{outcome}: " + ", ".join(parts)
     fails = {c.id for c in constraints if c.result == "fail"}
-    if outcome == DENY and fails <= escalatable and action_class.approver_role is None:
+    if not_evaluated is not None:
+        summary += f"; not evaluable: {not_evaluated}"
+        if not fails:
+            summary += "; refused because its action class was not evaluated"
+    if outcome == DENY and fails and fails <= escalatable and action_class.approver_role is None:
         summary += (
             f"; every failure may ask an approver, but action class {action_class.name!r} "
             "names no approver_role, so it is refused"

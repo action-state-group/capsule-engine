@@ -113,7 +113,10 @@ def test_caps_v3_holds_a_purchase_over_the_per_action_limit():
         assert caps.result == "fail"
         assert caps.evidence["per_action_cap_minor"] == 2_500
         assert {"limit": "per_action", "threshold_minor": 2_500, "observed_minor": 55_880} in caps.evidence["tripped"]
-        assert decision.outcome == "escalate"
+        # Sealed at taxonomy 2, replayed under it: money.purchase names no
+        # approver_role there (it gained one in 3), so the hold refuses.
+        assert action.taxonomy_version == "2"
+        assert decision.outcome == "deny"
 
 
 @pytest.mark.parametrize(
