@@ -39,7 +39,8 @@ from capsule_engine.packs.schema import PackDefinition
 
 REPO = Path(__file__).parent.parent
 WICKETS = REPO / "capsule_engine" / "guards" / "wickets" / "catalog_defs"
-PACK = load_pack_dir(REPO / "capsule_engine" / "packs" / "catalog" / "everyday")
+# 0.3.5's released pack.yaml; 0.3.6 changed only its caps wicket and fold.
+PACK = load_pack_dir(REPO / "tests" / "fixtures" / "packs" / "everyday-0.3.5")
 FROZEN_0_3_4 = REPO / "tests" / "fixtures" / "packs" / "everyday-0.3.4"
 FROZEN_0_3_4_FILE_SHA256 = "410d091a6725650222fffeba1550516fdf74c097e6293d3e5655e2e95e7b3646"
 V3_WICKET_DIGEST = "9cfab71d142ca7af8912218f4c4ea194f60fb02784d8536233cb7e18eddc24a8"

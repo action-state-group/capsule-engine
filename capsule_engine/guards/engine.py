@@ -30,6 +30,14 @@ history leaves the sale's acceptance unknown) is recorded ``n/a`` in scope,
 and the action is refused, sealed ``reject``, whatever else would allow or
 ask; with no constraint failed its ``verdict`` is ``not_evaluable``
 (``GuardDecision.not_evaluated_checks``).
+
+A check that could not be evaluated and asks (``CheckOutcome.asks_when_unevaluated``:
+``caps`` when an executed act in the window has a spend that cannot be read)
+is recorded ``n/a`` in scope, and an action that would be allowed is asked
+about instead, or refused when its class names no approver. It is never
+allowed on a total that is not known, and it is not refused for that alone.
+With no constraint failed its ``verdict`` is ``not_evaluable``
+(``GuardDecision.asked_unevaluated_checks``).
 """
 from __future__ import annotations
 
@@ -136,16 +144,22 @@ class GuardDecision:
     # The checks that could not be evaluated and fail closed
     # (``CheckOutcome.fails_closed``): the action is never allowed.
     not_evaluated_checks: tuple[str, ...] = ()
+    # The checks that could not be evaluated and ask
+    # (``CheckOutcome.asks_when_unevaluated``): the action is never allowed.
+    asked_unevaluated_checks: tuple[str, ...] = ()
 
     @property
     def verdict(self) -> str:
         """``outcome``, except that a decision refused only because its
         class-keyed checks were left unevaluated (``taxonomy_mismatch``), its
         deal could not be read (``deal_id_conflict``) or a check that fails
-        closed could not be evaluated (``not_evaluated_checks``), with no
+        closed could not be evaluated (``not_evaluated_checks``), or a decision
+        asked about because a check could not be evaluated
+        (``asked_unevaluated_checks``), with no
         constraint failed, is ``not_evaluable``."""
         unevaluated = (
             self.taxonomy_mismatch is not None or self.deal_id_conflict is not None or bool(self.not_evaluated_checks)
+            or bool(self.asked_unevaluated_checks)
         )
         if unevaluated and not any(c.result == "fail" for c in self.constraints):
             return NOT_EVALUABLE
@@ -500,10 +514,16 @@ class GuardEngine:
         if conflict is not None and outcome == ALLOW:
             # Its deal is unknown, and neither stated value is picked.
             outcome = DENY
+        # A held caps result was never evaluated at all; the mismatch decides it.
+        asks = mismatch is None and caps_out.asks_when_unevaluated and caps_constraint.result == "n/a"
+        asked_unevaluated = ("caps",) if asks else ()
         if not_evaluated:
             # A check that fails closed could not be evaluated: refused,
             # whatever else would allow or ask.
             outcome = DENY
+        elif asked_unevaluated and outcome == ALLOW:
+            # A check that asks could not be evaluated: never allowed on it.
+            outcome = ESCALATE if ac.approver_role is not None else DENY
 
         resolved_parent, resolved_relation = chain_parent, chain_relation
         if resolved_parent is None:
@@ -576,10 +596,12 @@ class GuardEngine:
             fold_envelopes=fold_envelopes,
             checkpoint=checkpoint,
             capsule=capsule,
-            reason=_summarize(constraints, outcome, ac, escalatable, mismatch_reason, conflict, tuple(not_evaluated)),
+            reason=_summarize(constraints, outcome, ac, escalatable, mismatch_reason, conflict, tuple(not_evaluated),
+                              asked_unevaluated),
             taxonomy_mismatch=mismatch,
             deal_id_conflict=conflict,
             not_evaluated_checks=tuple(not_evaluated),
+            asked_unevaluated_checks=asked_unevaluated,
         )
 
     def _taxonomy_for(self, action: Action) -> tuple[TaxonomyTable, TaxonomyMismatch | None, str | None]:
@@ -826,6 +848,7 @@ def _summarize(
     not_evaluated: str | None = None,
     deal_id_conflict: DealIdConflict | None = None,
     not_evaluated_checks: tuple[str, ...] = (),
+    asked_unevaluated_checks: tuple[str, ...] = (),
 ) -> str:
     parts = [f"{c.id}={c.result}" for c in constraints]
     summary = f"{outcome}: " + ", ".join(parts)
@@ -845,6 +868,10 @@ def _summarize(
         summary += f"; not evaluable: {', '.join(not_evaluated_checks)}"
         if not fails:
             summary += "; refused because a check that fails closed could not be evaluated"
+    if asked_unevaluated_checks:
+        summary += f"; not evaluable: {', '.join(asked_unevaluated_checks)}"
+        if not fails:
+            summary += "; asked, never allowed, because a check could not be evaluated"
     if outcome == DENY and fails and fails <= escalatable and action_class.approver_role is None:
         summary += (
             f"; every failure may ask an approver, but action class {action_class.name!r} "

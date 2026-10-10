@@ -47,14 +47,19 @@ leave a field unset when you do not have it, never `0` or `""`.
 **The checks** (each one is a wicket cited by digest from the engine's own
 catalog):
 
-1. `caps` (`caps/5.0.0`) -- the most this payment may take must be at or
+1. `caps` (`caps/5.1.0`) -- the most this payment may take must be at or
    under the per-action limit (default 25.00), and the operator's rolling
    7-day spend plus this amount must be at or under the window limit
    (default 100.00); the record names which limit tripped. The per-action
    limit reads `spend_authorized_minor` when it is set and not below
    `amount_minor`, and `amount_minor` otherwise; the record names which one
    it read and whether it fell back. The rolling total adds only
-   `amount_minor`, so a pre-authorisation is never counted twice. The limits cover every
+   `amount_minor`, so a pre-authorisation is never counted twice. A replay of
+   a deal counts every act the deal executed in that total once, a booking
+   or a signature as much as a payment, at the spend its record seals, and
+   money coming in as 0; an executed act whose spend cannot be read fails
+   the check with the reason "an earlier act has no recorded decision, so
+   the total cannot count it". The limits cover every
    class that pays money out (transfers, purchases, subscriptions, creating
    or changing a booking); cancelling a booking is not capped. The total is
    kept per `operator`, so a new agent version or a second tool acting for

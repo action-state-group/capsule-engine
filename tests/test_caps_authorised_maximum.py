@@ -301,13 +301,15 @@ def _everyday_engine(store, signer, tmp_path):
     return build_engine(installed, ledger=store, signer_provider=lambda: signer)
 
 
-def test_the_everyday_pack_cites_caps_v5():
+def test_the_everyday_pack_cites_caps_v5_1():
+    """5.1.0 is 5.0.0 over a fold that also counts executed acts; the
+    per-action limit reads the same field."""
     from capsule_engine.packs import load_pack_dir
 
     pack = load_pack_dir(EVERYDAY_DIR)
-    assert pack.pack_id == "asg/everyday/0.3.5"
+    assert pack.pack_id == "asg/everyday/0.3.6"
     (caps,) = [w for w in pack.constraints if w.check == "caps"]
-    assert caps.wicket_id == "caps/5.0.0"
+    assert caps.wicket_id == "caps/5.1.0"
     assert caps.config["per_action_reads"] == "spend_authorized_minor"
 
 

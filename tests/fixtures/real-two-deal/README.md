@@ -48,7 +48,7 @@ script is the record of how they were made.
 | `deal-1.bundle.json`, `deal-2.bundle.json` | the user's own copy (`bundle --deal`), replayed by the engine |
 | `deal-1.counterparty.bundle.json`, `deal-2.counterparty.bundle.json` | the counterparty's shared copy (`disclose --share counterparty`) |
 | `inputs/` | the `deal open`, `deal check` and `deal note --kind act` bodies |
-| `expected_decisions.json` | the engine's decision for every record of the two own copies that gets one (the two checks), replayed in that order under `asg/everyday/0.3.5`; sorted canonical JSON |
+| `expected_decisions.json` | the engine's decision for every record of the two own copies that gets one (the two checks), replayed in that order under `asg/everyday/0.3.6`; sorted canonical JSON |
 
 Regenerate `expected_decisions.json` with `python -m tests.test_real_two_deal_bundle`.
 `tests/test_real_two_deal_bundle.py` compares it byte for byte.

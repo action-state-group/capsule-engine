@@ -42,19 +42,19 @@ from capsule_engine.policy.limits import activation_records, read_caps_limits
 
 REPO = Path(__file__).parent.parent
 EVERYDAY_DIR = REPO / "capsule_engine" / "packs" / "catalog" / "everyday"
-CAPS_V5 = REPO / "capsule_engine" / "guards" / "wickets" / "catalog_defs" / "caps.v5.yaml"
+CAPS_V5 = REPO / "capsule_engine" / "guards" / "wickets" / "catalog_defs" / "caps.v5.1.yaml"
 SIGNER = LocalSigner(key_id="operator-limits-test-key", secret=b"operator-limits-test-fixed-key")
 # Same key id, different secret: a record made without this node's key.
 OTHER_KEY = LocalSigner(key_id="operator-limits-test-key", secret=b"not-this-node-secret")
 OPERATOR = "household-limits-fixture"
 
-# The everyday pack (0.3.5) and its caps wicket as released: an operator
+# The everyday pack (0.3.6) and its caps wicket as released: an operator
 # limit must not move either.
-EVERYDAY_PACK_DIGEST = "0400d22c4464e91728bac2d00ca3bf8551ec98cdd20ef18d803b5b4432d4e8f4"
-CAPS_V5_WICKET_DIGEST = "2807e174dc7c817917621f90a53f3fa54992b76fe3ec28e8567f814b9e72a741"
-CAPS_V5_FILE_SHA256 = "3f7ef8850e11d4a893ccaa7f85e1c9b2dde358980c946104dbc970f6989ad206"
+EVERYDAY_PACK_DIGEST = "8a8e0a7e1ca4319b6e45f2037f4af49e6592919f373e59874ce1ead7249b073d"
+CAPS_V5_WICKET_DIGEST = "7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8"
+CAPS_V5_FILE_SHA256 = "0588eebe725ae317e89234def7adce0010441e476a1031325a396964cb8bb7fe"
 
-# caps/5.0.0 defaults money.purchase to a 25.00 per-action limit and a
+# caps/5.1.0 defaults money.purchase to a 25.00 per-action limit and a
 # 100.00 rolling-window limit.
 PACK_PER_ACTION_DEFAULT = 2_500
 PACK_WINDOW_DEFAULT = 10_000
@@ -165,7 +165,7 @@ def test_an_operator_set_5_dollar_limit_holds_a_6_dollar_purchase_for_approval(h
     # The pack and its caps wicket are the released ones, byte for byte.
     assert household.installed.manifest.packs[0].digest == EVERYDAY_PACK_DIGEST
     assert household.pack.definition_digest() == EVERYDAY_PACK_DIGEST
-    (caps_ref,) = [w for w in household.installed.manifest.wickets if w.wicket_id == "caps/5.0.0"]
+    (caps_ref,) = [w for w in household.installed.manifest.wickets if w.wicket_id == "caps/5.1.0"]
     assert caps_ref.digest == CAPS_V5_WICKET_DIGEST
     assert hashlib.sha256(CAPS_V5.read_bytes()).hexdigest() == CAPS_V5_FILE_SHA256
 

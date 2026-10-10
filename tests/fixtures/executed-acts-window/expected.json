@@ -1,0 +1,648 @@
+{
+ "rule": "r05-spending-limits#7d",
+ "schema": "executed-acts-window-expected/v0",
+ "sequences": {
+  "accepted-and-fyi-same-act": [
+   {
+    "history_acts": 0,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 2000,
+    "r05_7d_verdict": "pass",
+    "step": 0
+   },
+   {
+    "history_acts": 1,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 4000,
+    "r05_7d_verdict": "pass",
+    "step": 1
+   },
+   {
+    "history_acts": 2,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 4000,
+    "r05_7d_verdict": "pass",
+    "step": 2
+   },
+   {
+    "history_acts": 3,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 4000,
+    "r05_7d_verdict": "pass",
+    "step": 3
+   },
+   {
+    "history_acts": 4,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 6000,
+    "r05_7d_verdict": "pass",
+    "step": 4
+   },
+   {
+    "history_acts": 5,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 6000,
+    "r05_7d_verdict": "pass",
+    "step": 5
+   },
+   {
+    "history_acts": 6,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 8000,
+    "r05_7d_verdict": "pass",
+    "step": 6
+   }
+  ],
+  "decided-pay": [
+   {
+    "history_acts": 0,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 2000,
+    "r05_7d_verdict": "pass",
+    "step": 0
+   },
+   {
+    "history_acts": 1,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 4000,
+    "r05_7d_verdict": "pass",
+    "step": 1
+   },
+   {
+    "history_acts": 2,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 6000,
+    "r05_7d_verdict": "pass",
+    "step": 2
+   },
+   {
+    "history_acts": 3,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 8000,
+    "r05_7d_verdict": "pass",
+    "step": 3
+   },
+   {
+    "history_acts": 4,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 10000,
+    "r05_7d_verdict": "pass",
+    "step": 4
+   },
+   {
+    "history_acts": 5,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "the 7-day total with this purchase is over the 7-day limit",
+    "r05_7d_value": 12000,
+    "r05_7d_verdict": "fail",
+    "step": 5
+   }
+  ],
+  "fyi-commit": [
+   {
+    "history_acts": 0,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 2000,
+    "r05_7d_verdict": "pass",
+    "step": 0
+   },
+   {
+    "history_acts": 1,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 4000,
+    "r05_7d_verdict": "pass",
+    "step": 1
+   },
+   {
+    "history_acts": 2,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 6000,
+    "r05_7d_verdict": "pass",
+    "step": 2
+   },
+   {
+    "history_acts": 3,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 8000,
+    "r05_7d_verdict": "pass",
+    "step": 3
+   },
+   {
+    "history_acts": 4,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 10000,
+    "r05_7d_verdict": "pass",
+    "step": 4
+   },
+   {
+    "history_acts": 5,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "the 7-day total with this purchase is over the 7-day limit",
+    "r05_7d_value": 12000,
+    "r05_7d_verdict": "fail",
+    "step": 5
+   }
+  ],
+  "fyi-commit-typed": [
+   {
+    "history_acts": 0,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 2000,
+    "r05_7d_verdict": "pass",
+    "step": 0
+   },
+   {
+    "history_acts": 1,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 4000,
+    "r05_7d_verdict": "pass",
+    "step": 1
+   },
+   {
+    "history_acts": 2,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 6000,
+    "r05_7d_verdict": "pass",
+    "step": 2
+   },
+   {
+    "history_acts": 3,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 8000,
+    "r05_7d_verdict": "pass",
+    "step": 3
+   },
+   {
+    "history_acts": 4,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 10000,
+    "r05_7d_verdict": "pass",
+    "step": 4
+   },
+   {
+    "history_acts": 5,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "the 7-day total with this purchase is over the 7-day limit",
+    "r05_7d_value": 12000,
+    "r05_7d_verdict": "fail",
+    "step": 5
+   }
+  ],
+  "fyi-sign": [
+   {
+    "history_acts": 0,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 2000,
+    "r05_7d_verdict": "pass",
+    "step": 0
+   },
+   {
+    "history_acts": 1,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 4000,
+    "r05_7d_verdict": "pass",
+    "step": 1
+   },
+   {
+    "history_acts": 2,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 6000,
+    "r05_7d_verdict": "pass",
+    "step": 2
+   },
+   {
+    "history_acts": 3,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 8000,
+    "r05_7d_verdict": "pass",
+    "step": 3
+   },
+   {
+    "history_acts": 4,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 10000,
+    "r05_7d_verdict": "pass",
+    "step": 4
+   },
+   {
+    "history_acts": 5,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "the 7-day total with this purchase is over the 7-day limit",
+    "r05_7d_value": 12000,
+    "r05_7d_verdict": "fail",
+    "step": 5
+   }
+  ],
+  "mixed-to-the-limit": [
+   {
+    "history_acts": 0,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 2000,
+    "r05_7d_verdict": "pass",
+    "step": 0
+   },
+   {
+    "history_acts": 1,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 4000,
+    "r05_7d_verdict": "pass",
+    "step": 1
+   },
+   {
+    "history_acts": 2,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 5500,
+    "r05_7d_verdict": "pass",
+    "step": 2
+   },
+   {
+    "history_acts": 3,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 7500,
+    "r05_7d_verdict": "pass",
+    "step": 3
+   },
+   {
+    "history_acts": 4,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 7500,
+    "r05_7d_verdict": "pass",
+    "step": 4
+   },
+   {
+    "history_acts": 5,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 10000,
+    "r05_7d_verdict": "pass",
+    "step": 5
+   },
+   {
+    "history_acts": 6,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "the 7-day total with this purchase is over the 7-day limit",
+    "r05_7d_value": 10001,
+    "r05_7d_verdict": "fail",
+    "step": 6
+   }
+  ],
+  "money-in-fyi": [
+   {
+    "history_acts": 0,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 2000,
+    "r05_7d_verdict": "pass",
+    "step": 0
+   },
+   {
+    "history_acts": 1,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 5000,
+    "r05_7d_verdict": "pass",
+    "step": 1
+   },
+   {
+    "history_acts": 2,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 5000,
+    "r05_7d_verdict": "pass",
+    "step": 2
+   },
+   {
+    "history_acts": 3,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 5000,
+    "r05_7d_verdict": "pass",
+    "step": 3
+   },
+   {
+    "history_acts": 4,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 7000,
+    "r05_7d_verdict": "pass",
+    "step": 4
+   }
+  ],
+  "spend-read-no-amount-minor": [
+   {
+    "history_acts": 0,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 2000,
+    "r05_7d_verdict": "pass",
+    "step": 0
+   },
+   {
+    "history_acts": 1,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 3500,
+    "r05_7d_verdict": "pass",
+    "step": 1
+   }
+  ],
+  "unchecked": [
+   {
+    "history_acts": 0,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 2000,
+    "r05_7d_verdict": "pass",
+    "step": 0
+   },
+   {
+    "history_acts": 1,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 4000,
+    "r05_7d_verdict": "pass",
+    "step": 1
+   },
+   {
+    "history_acts": 2,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 6000,
+    "r05_7d_verdict": "pass",
+    "step": 2
+   },
+   {
+    "history_acts": 3,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 8000,
+    "r05_7d_verdict": "pass",
+    "step": 3
+   },
+   {
+    "history_acts": 4,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 10000,
+    "r05_7d_verdict": "pass",
+    "step": 4
+   },
+   {
+    "history_acts": 5,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "the 7-day total with this purchase is over the 7-day limit",
+    "r05_7d_value": 12000,
+    "r05_7d_verdict": "fail",
+    "step": 5
+   }
+  ],
+  "unreadable-no-amount-at-all": [
+   {
+    "history_acts": 0,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 2000,
+    "r05_7d_verdict": "pass",
+    "step": 0
+   },
+   {
+    "history_acts": 1,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 4000,
+    "r05_7d_verdict": "pass",
+    "step": 1
+   },
+   {
+    "history_acts": 2,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "an earlier act has no recorded decision, so the total cannot count it",
+    "r05_7d_value": null,
+    "r05_7d_verdict": "not_evaluable",
+    "step": 2
+   }
+  ],
+  "unreadable-no-spend-minor": [
+   {
+    "history_acts": 0,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 2000,
+    "r05_7d_verdict": "pass",
+    "step": 0
+   },
+   {
+    "history_acts": 1,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 4000,
+    "r05_7d_verdict": "pass",
+    "step": 1
+   },
+   {
+    "history_acts": 2,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "an earlier act has no recorded decision, so the total cannot count it",
+    "r05_7d_value": null,
+    "r05_7d_verdict": "not_evaluable",
+    "step": 2
+   }
+  ],
+  "unreadable-outside-the-window": [
+   {
+    "history_acts": 0,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 2000,
+    "r05_7d_verdict": "pass",
+    "step": 0
+   },
+   {
+    "history_acts": 1,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 2000,
+    "r05_7d_verdict": "pass",
+    "step": 1
+   },
+   {
+    "history_acts": 2,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 4000,
+    "r05_7d_verdict": "pass",
+    "step": 2
+   }
+  ],
+  "unreadable-spend-a-string": [
+   {
+    "history_acts": 0,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 2000,
+    "r05_7d_verdict": "pass",
+    "step": 0
+   },
+   {
+    "history_acts": 1,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 4000,
+    "r05_7d_verdict": "pass",
+    "step": 1
+   },
+   {
+    "history_acts": 2,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "an earlier act has no recorded decision, so the total cannot count it",
+    "r05_7d_value": null,
+    "r05_7d_verdict": "not_evaluable",
+    "step": 2
+   }
+  ],
+  "unreadable-spend-an-object": [
+   {
+    "history_acts": 0,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 2000,
+    "r05_7d_verdict": "pass",
+    "step": 0
+   },
+   {
+    "history_acts": 1,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 4000,
+    "r05_7d_verdict": "pass",
+    "step": 1
+   },
+   {
+    "history_acts": 2,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "an earlier act has no recorded decision, so the total cannot count it",
+    "r05_7d_value": null,
+    "r05_7d_verdict": "not_evaluable",
+    "step": 2
+   }
+  ],
+  "unreadable-spend-negative": [
+   {
+    "history_acts": 0,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 2000,
+    "r05_7d_verdict": "pass",
+    "step": 0
+   },
+   {
+    "history_acts": 1,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 4000,
+    "r05_7d_verdict": "pass",
+    "step": 1
+   },
+   {
+    "history_acts": 2,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "an earlier act has no recorded decision, so the total cannot count it",
+    "r05_7d_value": null,
+    "r05_7d_verdict": "not_evaluable",
+    "step": 2
+   }
+  ],
+  "unreadable-window-edge": [
+   {
+    "history_acts": 0,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 2000,
+    "r05_7d_verdict": "pass",
+    "step": 0
+   },
+   {
+    "history_acts": 1,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 2000,
+    "r05_7d_verdict": "pass",
+    "step": 1
+   },
+   {
+    "history_acts": 2,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "an earlier act has no recorded decision, so the total cannot count it",
+    "r05_7d_value": null,
+    "r05_7d_verdict": "not_evaluable",
+    "step": 2
+   }
+  ],
+  "window-edge": [
+   {
+    "history_acts": 0,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 2000,
+    "r05_7d_verdict": "pass",
+    "step": 0
+   },
+   {
+    "history_acts": 1,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 2000,
+    "r05_7d_verdict": "pass",
+    "step": 1
+   },
+   {
+    "history_acts": 2,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 7000,
+    "r05_7d_verdict": "pass",
+    "step": 2
+   },
+   {
+    "history_acts": 3,
+    "r05_7d_limit": 10000,
+    "r05_7d_reason": "",
+    "r05_7d_value": 10000,
+    "r05_7d_verdict": "pass",
+    "step": 3
+   }
+  ]
+ }
+}
