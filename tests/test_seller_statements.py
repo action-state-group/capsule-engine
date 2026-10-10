@@ -439,8 +439,8 @@ def test_a_deal_claim_out_of_shape_is_ignored_and_named_never_echoed(change):
     assert dataclasses.replace(action, ignored_inputs=()) == bare
 
 
-@pytest.mark.parametrize("value", ["condition", {"class": "condition"}, [None], [["condition"]]],
-                         ids=["a string", "a mapping", "a null entry", "a list entry"])
+@pytest.mark.parametrize("value", ["condition", {"class": "condition"}, 5, True, [None], [["condition"]]],
+                         ids=["a string", "a mapping", "a number", "a boolean", "a null entry", "a list entry"])
 def test_deal_claims_not_a_list_of_entries_are_ignored_and_named(value):
     record = {**_input_with_claims()["record"], "deal_claims": value}
     assert deal_claim_statements(record) == DealClaims(statements=(), ignored=True)
