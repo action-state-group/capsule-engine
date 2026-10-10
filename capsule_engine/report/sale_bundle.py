@@ -210,8 +210,17 @@ def read_sale_bundle(bundle: dict) -> SaleBundle:
         findings.append("sale_bundle_not_valid")
     disclosed = _disclosed(bundle)
     records = [r for r in bundle.get("records") or [] if isinstance(r, dict)]
+    # A record is read only when its disclosure binds it AND the record itself
+    # verifies (identity, and no invalid signature), as capsulectl's verifier
+    # reads it: an edited record re-bound to its capsule is never interpreted.
+    verified = {c.capsule_id for c in sale.records if c.identity_ok and c.signature != "invalid"}
     bound = [disclosed[r["capsule_id"]] for r in records
-             if r.get("capsule_id") in disclosed and _bound(r, disclosed[r["capsule_id"]])]
+             if r.get("capsule_id") in disclosed and r.get("capsule_id") in verified
+             and _bound(r, disclosed[r["capsule_id"]])]
+    read_ids = {r.get("capsule_id") for r in records
+                if r.get("capsule_id") in disclosed and r.get("capsule_id") in verified
+                and _bound(r, disclosed[r["capsule_id"]])}
+    unread_seqs = [c.seq for c in sale.records if c.capsule_id not in read_ids and isinstance(c.seq, int)]
     if len(bound) != len(records):
         # A record of the sale's log it does not disclose may be a registration.
         findings.append("sale_record_not_disclosed")
@@ -236,7 +245,7 @@ def read_sale_bundle(bundle: dict) -> SaleBundle:
     if not isinstance(listed, list):
         findings.append("no_sale_threads")
         listed = []
-    opened, cut = _sale_log_openings(bound, findings)
+    opened, cut = _sale_log_openings(bound, findings, max(unread_seqs, default=None))
     present = _present(listed, registrations, opened, cut, findings)
     if set(carried) != set(present):
         findings.append("carried_threads_are_not_the_present_ones")
@@ -363,7 +372,8 @@ def _thread_binding(records: tuple[dict, ...], shown: dict[str, dict], thread_bu
     return None, digest
 
 
-def _sale_log_openings(bound: list[dict], findings: list[str]) -> tuple[dict[str, list[str]], dict[str, str] | None]:
+def _sale_log_openings(bound: list[dict], findings: list[str],
+                       last_unread_seq: int | None = None) -> tuple[dict[str, list[str]], dict[str, str] | None]:
     """What the sale's log says of its threads (AMENDMENT 11): each
     ``thread_opened`` record's ``task_authority_commitment``, by the digest
     of the registration it names, and the ``head_commitment`` of each
@@ -371,7 +381,10 @@ def _sale_log_openings(bound: list[dict], findings: list[str]) -> tuple[dict[str
     log holds no cut it can read). The bundle is the whole log at its certified
     checkpoint, so its latest cut is the latest one at or before it. A
     record of either kind that cannot be read is appended to ``findings``:
-    it may be the one that opens a thread."""
+    it may be the one that opens a thread. Only the latest cut counts: when
+    a record the bundle cannot read (``last_unread_seq``) comes after the
+    latest readable cut, it may be a later cut, so the log holds no cut it
+    can read."""
     opened: dict[str, list[str]] = {}
     cuts: list[dict] = []
     for shown in bound:
@@ -391,6 +404,8 @@ def _sale_log_openings(bound: list[dict], findings: list[str]) -> tuple[dict[str
     if not cuts:
         return opened, None
     latest = max(cuts, key=_seq)
+    if last_unread_seq is not None and last_unread_seq > _seq(latest):
+        return opened, None
     if sum(_seq(c) == _seq(latest) for c in cuts) != 1:
         # A cut that cannot be read is no cut: each present thread names
         # ``no_sale_cut`` (one name with capsulectl's verifier).
