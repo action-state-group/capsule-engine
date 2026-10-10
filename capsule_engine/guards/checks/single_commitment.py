@@ -26,14 +26,17 @@ the check refuses to pass when it cannot know: the history may be missing
 acts (``incomplete``), an act of this sale could not be read (``unread``),
 or an act of an acceptance class for this sale, before any accepted one,
 seals no disposition (``no_disposition``), so whether it was accepted is
-not known. Each is ``n/a``, in scope, naming ``history`` or ``disposition``
-as the missing input, and fails closed: the engine refuses
+not known; or an accepted commitment in the history, before any accepted
+one of this sale, names no ``item_ref``, so it may be this sale's. Each is
+``n/a``, in scope, naming ``history``, ``disposition`` or ``item_ref`` as
+the missing input, and fails closed: the engine refuses
 (``CheckOutcome.fails_closed``). A decision is never inferred from an act's
 ``authority_basis``.
 
 Applies only to the configured ``commit_classes``. A commitment missing
 ``task_authority_ref`` or ``item_ref`` cannot be placed in a sale, so it is
-``n/a`` naming the field, never a pass. A failure is an integrity failure:
+``n/a`` naming the field, never a pass; one missing ``item_ref`` also fails
+closed, since the sale's acceptance cannot be looked up without it. A failure is an integrity failure:
 the check is not escalatable, so the engine refuses rather than asks.
 
 The outcome carries no reference value. A checker result is sealed into a
@@ -52,7 +55,7 @@ from capsule_ledger.ledger.api import LedgerAPI, ScanQuery
 
 from ..action import Action
 from ..capsule import ConstraintOutcome, NotApplicableEvidence, not_applicable_evidence
-from ..history_state import INCOMPLETE, NO_DISPOSITION, UNREAD, history_state
+from ..history_state import DISPOSITION, INCOMPLETE, NO_DISPOSITION, UNREAD, history_state
 from .base import CheckOutcome
 
 __all__ = ["SaleAcceptance", "SealedAcceptance", "check_single_commitment", "first_sealed_acceptance",
@@ -64,6 +67,8 @@ _UNKNOWN_REASONS = {
     "history": "the history may be missing an act of this sale; whether it has an acceptance is not known",
     "disposition": ("an earlier commitment in this sale seals no disposition; whether it was accepted is not "
                     "known"),
+    "item_ref": ("an accepted commitment in the history names no item; whether it is this sale's is not "
+                 "known"),
 }
 
 
@@ -109,8 +114,9 @@ def sale_acceptance(operator: str, ledger: LedgerAPI, acceptance_classes: list[s
     ``operator``'s, whose class is in ``acceptance_classes``, whose decision
     was accept, which was not a dry run, and which carries the same
     ``item_ref``. Unknown when, before it, an act of this sale could not be
-    read or an act of an acceptance class seals no disposition, or when the
-    ledger says its history may be missing acts (module docstring)."""
+    read, an act of an acceptance class seals no disposition, or an accepted
+    commitment in the history names no item, or when the ledger says its
+    history may be missing acts (module docstring)."""
     found: SealedAcceptance | None = None
     unknown: str | None = None
     # ``ScanQuery.counterparty`` is the ledger's filter on ``operator``.
@@ -120,7 +126,15 @@ def sale_acceptance(operator: str, ledger: LedgerAPI, acceptance_classes: list[s
         state = history_state(capsule)
         if state == INCOMPLETE:
             return SaleAcceptance(acceptance=None, unknown="history")
-        if found is not None or unknown is not None or payload.get("item_ref") != item_ref:
+        if found is not None or unknown is not None:
+            continue
+        if state == DISPOSITION and payload.get("item_ref") is None and _accepted_commitment(
+                capsule, acceptance_classes):
+            # An accepted commitment in the history that names no item may
+            # be this sale's.
+            unknown = "item_ref"
+            continue
+        if payload.get("item_ref") != item_ref:
             continue
         if state == UNREAD:
             unknown = "history"
@@ -130,13 +144,22 @@ def sale_acceptance(operator: str, ledger: LedgerAPI, acceptance_classes: list[s
         if state == NO_DISPOSITION:
             unknown = "disposition"
             continue
-        if (capsule.get("disposition") or {}).get("decision") != "accept":
-            continue
-        if (payload.get("checkpoint") or {}).get("dry_run") is True:
+        if not _accepted_commitment(capsule, acceptance_classes):
             continue
         found = SealedAcceptance(capsule_id=record.capsule_id, counterparty=payload.get("target"),
                                  deal_id=payload.get("deal_id"))
     return SaleAcceptance(acceptance=found, unknown=unknown)
+
+
+def _accepted_commitment(capsule: dict, acceptance_classes: list[str]) -> bool:
+    """Whether ``capsule`` is an accepted commitment: an acceptance class,
+    decision accept, not a dry run."""
+    payload = capsule.get("asg_payload") or {}
+    return (
+        payload.get("action_class") in acceptance_classes
+        and (capsule.get("disposition") or {}).get("decision") == "accept"
+        and (payload.get("checkpoint") or {}).get("dry_run") is not True
+    )
 
 
 def first_sealed_acceptance(
@@ -159,11 +182,13 @@ def check_single_commitment(
         return _outcome("n/a", "the action cites no task authority; the sale could not be identified",
                         not_applicable_evidence(_CHECK_ID, in_scope=True, missing_field="task_authority_ref"))
     if action.item_ref is None:
-        # An ignored input is named, never the value it was given.
+        # An ignored input is named, never the value it was given. Without
+        # the item the sale's acceptance cannot be looked up: fails closed.
         reason = ("the item_ref input was not in its agreed shape" if "item_ref" in action.ignored_inputs
                   else "the action names no item")
         return _outcome("n/a", f"{reason}; the sale could not be identified",
-                        not_applicable_evidence(_CHECK_ID, in_scope=True, missing_field="item_ref"))
+                        not_applicable_evidence(_CHECK_ID, in_scope=True, missing_field="item_ref"),
+                        fails_closed=True)
 
     sale = sale_acceptance(action.operator, ledger, acceptance_classes, action.item_ref)
     if sale.unknown is not None:

@@ -276,7 +276,7 @@
           },
           "expect": {
             "single_commitment": "n/a",
-            "outcome": "allow",
+            "outcome": "deny",
             "missing_field": "item_ref"
           }
         }

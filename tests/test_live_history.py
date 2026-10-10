@@ -10,10 +10,12 @@ external-check-input/v0 of each check.
 
 Every act in those histories is sealed ``fyi`` with no disposition, as
 capsulectl seals every act but a payment today. Each check input is decided
-three ways: as sealed; with a sealed ``accept`` disposition added to every
+five ways: as sealed; with a sealed ``accept`` disposition added to every
 history act (what capsulectl will seal once the act types are registered
-effect types; synthetic, so those capsules no longer verify); and with its
-history removed. ``expected_live.json`` is every decision and the ledger each
+effect types; synthetic, so those capsules no longer verify); with its
+history removed; and, with that disposition, once with the ``item_ref``
+removed from the history's accepted commitments and once with it removed
+from the checked record (``HISTORIES``). ``expected_live.json`` is every decision and the ledger each
 was decided on, in sorted canonical JSON, compared byte for byte here and
 handed to the Go plugin. Regenerate it with ``python -m tests.test_live_history``.
 """
@@ -74,9 +76,14 @@ S11 = "s11-one-commitment-per-sale"
 SINGLE = load_definition_file(ROOT / "guards" / "wickets" / "catalog_defs" / "single_commitment.seller.yaml")
 SPEND = load_fold(ROOT / "folds" / "catalog_defs" / "spend.weekly.v3.yaml")
 
-# How each check input's history is given to the engine.
+# How each check input is given to the engine: its history as sealed, with
+# an accept disposition on every act, with none; with the disposition and
+# no item_ref on its accepted commitments; and with the disposition and no
+# item_ref on the checked record.
 AS_SEALED, DISPOSED, ABSENT = "as-sealed", "disposition-accept", "absent"
-HISTORIES = (AS_SEALED, DISPOSED, ABSENT)
+HISTORY_NO_ITEM, RECORD_NO_ITEM = "disposition-accept-commit-names-no-item", "disposition-accept-record-names-no-item"
+HISTORIES = (AS_SEALED, DISPOSED, ABSENT, HISTORY_NO_ITEM, RECORD_NO_ITEM)
+ACCEPTANCE_CLASS = "agreement.accept"
 
 
 class LedgerRow(TypedDict):
@@ -118,9 +125,15 @@ def _check_input(name: str) -> dict:
 def _given(envelope: dict, history: str) -> dict:
     """``envelope`` with its history given as ``history`` says."""
     envelope = copy.deepcopy(envelope)
-    if history == DISPOSED:
+    if history in (DISPOSED, HISTORY_NO_ITEM, RECORD_NO_ITEM):
         for entry in envelope["history"]:
             entry["disposition"] = {"decision": "accept"}
+    if history == HISTORY_NO_ITEM:
+        for entry in envelope["history"]:
+            if entry["agent_input"]["body"]["action_class"] == ACCEPTANCE_CLASS:
+                del entry["item_ref"]
+    elif history == RECORD_NO_ITEM:
+        del envelope["item_ref"]
     elif history == ABSENT:
         del envelope["history"]
         del envelope["history_scope"]
@@ -305,6 +318,40 @@ def test_no_history_is_not_evaluable_and_never_passes(name):
         "n/a", not_applicable_evidence("single_commitment", in_scope=True, missing_field="history"))
     assert live.decision.outcome == "deny"
     assert not live.written.complete
+
+
+def test_an_accepted_commit_in_the_history_naming_no_item_is_not_evaluable():
+    """It may be this sale's: never a pass. A's commit, the history's one
+    accepted commitment, names no item."""
+    live = _live("b-commit-1850", HISTORY_NO_ITEM)
+    s11 = _s11(live.decision)
+    assert (s11.result, s11.evidence) == (
+        "n/a", not_applicable_evidence("single_commitment", in_scope=True, missing_field="item_ref"))
+    assert "names no item" in s11.reason
+    assert live.decision.outcome == "deny"
+    assert live.decision.not_evaluated_checks == ("single_commitment",)
+
+
+def test_an_unaccepted_commit_naming_no_item_leaves_the_sale_to_the_others():
+    """Only an accepted commitment is held unknown for its missing item: as
+    sealed today (no disposition) the act counts for nothing, and the
+    history's other acts decide."""
+    envelope = _given(_check_input("b-commit-1850"), AS_SEALED)
+    for entry in envelope["history"]:
+        if entry["agent_input"]["body"]["action_class"] == ACCEPTANCE_CLASS:
+            del entry["item_ref"]
+    s11 = _s11(_decide(envelope).decision)
+    assert (s11.result, s11.evidence) == ("pass", {"constraint_id": "single_commitment", "sale_has_acceptance": False})
+
+
+@pytest.mark.parametrize("name", ["a-commit-1900", "b-commit-1850", "a-commit-again-1900"])
+def test_a_checked_commit_naming_no_item_is_not_evaluable_and_refused(name):
+    live = _live(name, RECORD_NO_ITEM)
+    s11 = _s11(live.decision)
+    assert (s11.result, s11.evidence) == (
+        "n/a", not_applicable_evidence("single_commitment", in_scope=True, missing_field="item_ref"))
+    assert live.decision.outcome == "deny"
+    assert live.decision.not_evaluated_checks == ("single_commitment",)
 
 
 def test_without_the_history_ledger_b_commit_passed():
