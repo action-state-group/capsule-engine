@@ -230,17 +230,34 @@ def _checked_body(disclosed: dict, *, history: bool = False) -> tuple[dict, obje
     for any other record. An ``x-deal-v0`` check seals the counterparty in its
     block; capsulectl moves it into a typed record's body, the same
     fingerprints under ``fp_alg`` ``hmac-sha256-chain-key``. With ``history``,
-    a typed act record (``action-record/v0``) is read the same way: it is how
-    a check input's history states an act carried out."""
+    an act carried out is read the same way, in either shape a check input's
+    history states one: a typed act record (``action-record/v0``), or an
+    ``x-deal-v0`` action step, which seals the counterparty in its block as a
+    check does. An action step whose body states an act taken without a check
+    (``body.unchecked``) is not read: it was never authorized."""
     block = disclosed.get("x-deal-v0")
     body = disclosed.get("body")
-    if isinstance(block, dict) and block.get("record_type") == "check":
+    record_type = block.get("record_type") if isinstance(block, dict) else None
+    if record_type == "check" or (history and _is_action_step(disclosed) and not _taken_unchecked(body)):
         counterparty = block.get("counterparty")
     elif disclosed.get("type") == "proposed-action/v0" or (history and disclosed.get("type") == _ACT_RECORD_TYPE):
         counterparty = body.get("counterparty") if isinstance(body, dict) else None
     else:
         return None
     return (body, counterparty) if isinstance(body, dict) else None
+
+
+def _is_action_step(disclosed: dict) -> bool:
+    """Whether ``disclosed`` is an ``x-deal-v0`` action step: an act carried
+    out, as a deal seals it."""
+    block = disclosed.get("x-deal-v0")
+    return isinstance(block, dict) and block.get("record_type") == _ACTION_STEP
+
+
+def _taken_unchecked(body: object) -> bool:
+    """Whether a deal record's ``body`` states an act taken without a check
+    or without authority (``_taken``)."""
+    return isinstance(body, dict) and (_UNCHECKED in body or _ATTEMPTED in body)
 
 
 def _minor(value: object) -> int | None:
@@ -456,6 +473,9 @@ def _bridge_deal_check(
         spend = 0
         authorized = None
         returned, reverses = _returned_minor(body), _typed_ref_digest(body.get("reverses_ref"))
+        if reverses is None and history and _is_action_step(disclosed):
+            # An action step names the act it reverses in its refs, not its body.
+            reverses = _only_ref(disclosed, "reverses")
     deal = _deal_id(disclosed)
     ignored: list[str] = []
     if act_counterparty is not None and sealed_counterparty is None:
@@ -705,15 +725,18 @@ def _aware(value: object) -> datetime | None:
 
 def action_for_history_entry(entry: dict) -> Action | None:
     """The act a ``history`` entry of an external-check-input/v0 envelope
-    records: its sealed typed act record (``action-record/v0``), bridged as a
-    deal check is (``_bridge_deal_check``), with the task authority its
-    ``authority_basis`` names and the inputs beside it read as
+    records: its sealed act, a typed act record (``action-record/v0``) or an
+    ``x-deal-v0`` action step, bridged as a deal check is
+    (``_bridge_deal_check``), with the task authority a typed record's
+    ``authority_basis`` names, the act an action step reverses read from its
+    ``refs`` (``rel`` ``reverses``), and the inputs beside it read as
     ``action_for_check_input`` reads them (the entry's own ``item_ref``),
     plus the entry's ``counterparty``: who the act was with, its target as
     its check's (``_bridge_deal_check``). ``counterparty_profile`` still
     replaces that target, as it does a check's. ``None`` when the entry is
-    not a typed act record its capsule binds, or
-    names no class or taxonomy: what it records cannot be read."""
+    not an act its capsule binds, or
+    names no class or taxonomy, or states an act taken without a check:
+    what it records cannot be read as a checked act."""
     capsule, agent_input = _entry_parts(entry)
     action = _bridge_deal_check(
         capsule, agent_input, entry.get(_PROFILE_INPUT), history=True, act_counterparty=entry.get(_COUNTERPARTY_INPUT)

@@ -3,9 +3,10 @@
 
 capsulectl hands its rules checker one external-check-input/v0 envelope per
 check: the ``record`` being checked and, as ``history``, the profile's
-earlier acts from every deal, newest first, each one the sealed capsule of a
-typed act record (``action-record/v0``) with its disclosed ``agent_input``
-and, beside it, the deal's ``item_ref`` when the deal is a sale's thread.
+earlier acts from every deal, newest first, each one the sealed capsule of an
+act (an ``x-deal-v0`` action step, or a typed ``action-record/v0``) with its
+disclosed ``agent_input`` and, beside it, the deal's ``item_ref`` when the
+deal is a sale's thread.
 ``history_scope.complete`` says whether every act in the window is there.
 
 ``history_ledger`` writes those acts into the ledger the engine reads, once,

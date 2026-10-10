@@ -70,8 +70,8 @@ R27 = "r27-no-commitment-beyond-task-bounds"
 
 # How each check input is given to the engine: as sealed; with a sealed
 # ``accept`` disposition added to every history act (capsulectl seals a
-# disposition on a payment only, and dedupe matches only an act whose
-# disposition is sealed; synthetic, so those capsules no longer verify);
+# disposition on a payment only, and seen_before counts only an accepted act;
+# synthetic, so those capsules no longer verify);
 # with that disposition and no ``counterparty_profile`` on either side (an act
 # checked before checks had a companion: the per-deal key is the only one);
 # and, on top of that, with each history act's ``counterparty`` dropped or
@@ -366,20 +366,28 @@ def test_without_a_readable_counterparty_the_repeat_is_not_matched(variant):
 
 
 @pytest.mark.parametrize("record_set", SETS)
-def test_as_sealed_an_act_with_no_disposition_is_never_matched(record_set):
+def test_as_sealed_an_act_with_no_disposition_is_matched(record_set):
     """capsulectl seals no disposition on a booking's act, and dedupe matches
-    only an act whose disposition is sealed: as sealed, the repeat passes."""
-    assert _rules(_live(record_set, REPEAT, AS_SEALED))[R27] == "pass"
+    every act the history holds: it was carried out, so as sealed the repeat
+    fails."""
+    assert _rules(_live(record_set, REPEAT, AS_SEALED))[R27] == "fail"
 
 
-def test_an_x_deal_act_record_is_not_read_so_its_counterparty_is_unused():
-    """A live history's x-deal-v0 act record is not read as an act
-    (``action_for_history_entry`` reads typed act records), whatever
-    counterparty is given beside it."""
-    (entry,) = _check_input("x-deal-v0", REPEAT)["history"]
+@pytest.mark.parametrize("record_set", SETS)
+def test_as_sealed_the_same_amount_at_another_hotel_passes(record_set):
+    assert _rules(_live(record_set, OTHER, AS_SEALED))[R27] == "pass"
+
+
+def test_an_x_deal_act_record_is_read_with_its_checks_target():
+    """A live history's x-deal-v0 action step is read as an act, keyed on the
+    same target as the new check, so the repeat is matched."""
+    envelope = _given(_check_input("x-deal-v0", REPEAT), NO_PROFILE)
+    (entry,) = envelope["history"]
     assert entry["agent_input"]["x-deal-v0"]["record_type"] == "action"
-    assert action_for_history_entry(entry) is None
-    assert _rules(_live("x-deal-v0", REPEAT, DISPOSED))[R27] == "pass"
+    act, check = action_for_history_entry(entry), action_for_check_input(envelope["record"])
+    assert act.target is not None
+    assert act.target == check.target
+    assert _rules(_live("x-deal-v0", REPEAT, DISPOSED))[R27] == "fail"
 
 
 # -- live and replay ----------------------------------------------------------------
@@ -402,13 +410,7 @@ def _replayed(record_set: str) -> dict[str, GuardDecision]:
     return {s.record["action_id"]: s.decision for s in result.decisions}
 
 
-# Where the replay and the live check (with the disposition sealed) decide r27
-# differently, and why: the replay matches deal 1's repeat against its own
-# decision on the first check; live, an x-deal-v0 act record is not read.
-LIVE_REPLAY_DIFFERENCES = {("x-deal-v0", REPEAT): ("fail", "pass")}
-
-
-def test_live_and_replay_decide_r27_alike_but_where_named():
+def test_live_and_replay_decide_r27_alike():
     differences = {}
     for record_set in SETS:
         for name in INPUTS:
@@ -417,7 +419,7 @@ def test_live_and_replay_decide_r27_alike_but_where_named():
             replayed = _rules(_replayed(record_set)[envelope["record"]["action_id"]])[R27]
             if live != replayed:
                 differences[(record_set, name)] = (replayed, live)
-    assert differences == LIVE_REPLAY_DIFFERENCES
+    assert differences == {}
 
 
 if __name__ == "__main__":
