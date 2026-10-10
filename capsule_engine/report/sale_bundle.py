@@ -10,7 +10,12 @@ carried in the private ``x-deal-sale/v0`` extension, ``{"threads": {<thread
 deal id>: <evidence-bundle/v2>}}``. The ``x-deal-v0`` section lists
 ``sale_threads``, one entry per registration, ``{registration, nonce,
 thread_id, member}``, where ``member`` is ``present``, ``missing`` or
-``never_opened`` (AMENDMENT 10).
+``never_opened`` (AMENDMENT 10). The sale's log also seals one
+``thread_opened`` per opened thread (its registration ref and a
+``task_authority_commitment``), and the bundle step seals each thread's
+report, then a ``sale_cut`` (a ``head_commitment`` per opened thread, by
+registration), then the sale's checkpoint. A ``present`` entry carries
+``opened: {nonce}`` and ``head: {nonce, record_digest}`` (AMENDMENT 11).
 
 ``read_sale_bundle`` verifies it. It decides whether the replay holds every
 thread of the sale, and the sale's key: the digest of the sale's own task
@@ -41,7 +46,16 @@ is skipped:
   in its one ``registration`` ref. Its sealed report's
   ``sale_authority_opening`` opens that task authority's
   ``sale_authority_commitment`` to the sale's key and names that task
-  authority by digest.
+  authority by digest;
+- the sale's log shows each carried thread opened and whole: exactly one
+  ``thread_opened`` names its registration, and ``opened.nonce`` opens it
+  to the digest of the thread's task authority; the latest ``sale_cut``
+  (the bundle is its whole log at its checkpoint, so the latest at or
+  before it) has a head for it, and ``head`` opens it to
+  ``record_digest``, the ``agent_input_digest`` of the capsule at the
+  thread's last ``seq``. A carried copy cut short is not whole;
+- a ``never_opened`` entry is named by no ``thread_opened`` and no head of
+  that cut. Every record of the sale's log is disclosed, so none is hidden.
 
 The sale is certified through the earliest of the signed checkpoints: the
 sale's and each carried thread's (``certified_until``). A registration, or a
@@ -70,9 +84,11 @@ What this does not establish:
   producer's own, and no witness receipt is read, so a producer holding the
   profile's keys can sign a log that leaves an act out. Only witnessing the
   sale's and its threads' checkpoints shows a log was not rewritten.
-- ``never_opened`` and the absence of ``threads_predate_registration`` are
-  the producer's word: nothing sealed on the sale's log shows a thread never
-  opened.
+- ``never_opened`` holds against the sale's log as its producer signed it:
+  a producer that never sealed a thread's ``thread_opened`` is the case of
+  the first point. The absence of ``threads_predate_registration`` is the
+  producer's word, but such a copy has no ``thread_opened`` or ``sale_cut``
+  for its present threads and is not complete.
 - The history holds the sale's registered threads only. A live check is
   given every act of every deal on the profile from its last 31 days, and
   holds a sale's acceptance unknown when an accepted commitment of another
@@ -220,12 +236,13 @@ def read_sale_bundle(bundle: dict) -> SaleBundle:
     if not isinstance(listed, list):
         findings.append("no_sale_threads")
         listed = []
-    present = _present(listed, registrations, findings)
+    opened, cut = _sale_log_openings(bound, findings)
+    present = _present(listed, registrations, opened, cut, findings)
     if set(carried) != set(present):
         findings.append("carried_threads_are_not_the_present_ones")
     threads: list[SaleThread] = []
     times = [_checkpoint_time(sale.checkpoint)]
-    for thread_id, registration in present.items():
+    for thread_id, (registration, entry) in present.items():
         thread_bundle = carried.get(thread_id)
         if not isinstance(thread_bundle, dict):
             continue
@@ -240,9 +257,11 @@ def read_sale_bundle(bundle: dict) -> SaleBundle:
         times.append(_checkpoint_time(checked.checkpoint))
         shown = _disclosed(thread_bundle)
         held = tuple(r for r in thread_bundle.get("records") or [] if isinstance(r, dict))
-        why = _thread_binding(held, shown, thread_bundle, thread_id, registration, key)
+        why, authority = _thread_binding(held, shown, thread_bundle, thread_id, registration, key)
         if why is not None:
             findings.append(why)
+        elif authority is not None:
+            findings.extend(_opened_and_whole(entry, registration, authority, thread_bundle, opened, cut))
         threads.append(SaleThread(thread_id=thread_id, records=held, disclosed=shown))
     certified = None if any(t is None for t in times) else min(t for t in times if t is not None)
     if certified is None:
@@ -282,14 +301,16 @@ def _record_keys(records: list) -> frozenset[object]:
     return frozenset(r.get("key_id") for r in records if isinstance(r, dict))
 
 
-def _present(listed: list, registrations: list[dict], findings: list[str]) -> dict[str, str]:
+def _present(listed: list, registrations: list[dict], opened: dict[str, list[str]], cut: dict[str, str] | None,
+             findings: list[str]) -> dict[str, tuple[str, dict]]:
     """The ``present`` threads ``sale_threads`` lists, thread id to the
-    digest of its registration, in registration order; each entry checked
-    against the ``thread`` record in its place (module docstring), and each
-    failure appended to ``findings``."""
+    digest of its registration and its entry, in registration order; each
+    entry checked against the ``thread`` record in its place, and a
+    ``never_opened`` one against ``opened`` and ``cut`` (module docstring).
+    Each failure is appended to ``findings``."""
     if len(listed) != len(registrations):
         findings.append("sale_threads_do_not_match_the_registrations")
-    present: dict[str, str] = {}
+    present: dict[str, tuple[str, dict]] = {}
     for entry, registration in zip(listed, registrations, strict=False):
         entry = entry if isinstance(entry, dict) else {}
         digest = json_digest(registration)
@@ -310,30 +331,131 @@ def _present(listed: list, registrations: list[dict], findings: list[str]) -> di
             findings.append("registration_opening_does_not_match")
             continue
         if member == _PRESENT:
-            present[thread_id] = digest
+            present[thread_id] = (digest, entry)
+        elif digest in opened:
+            findings.append("never_opened_but_opened")
+        elif cut is not None and digest in cut:
+            findings.append("never_opened_but_in_the_cut")
     return present
 
 
 def _thread_binding(records: tuple[dict, ...], shown: dict[str, dict], thread_bundle: dict, thread_id: str,
-                    registration: str, key: str | None) -> str | None:
+                    registration: str, key: str | None) -> tuple[str | None, str | None]:
     """Why a carried thread is not the registered thread of this sale
-    (module docstring), or ``None`` when it is."""
+    (module docstring), or ``None`` when it is, with the digest of its task
+    authority when it is."""
     bound = [shown[r["capsule_id"]] for r in records if r.get("capsule_id") in shown and _bound(r, shown[r["capsule_id"]])]
     authorities = [s for s in bound if s.get("type") == _TASK_AUTHORITY and s.get("chain_id") == thread_id]
     if len(authorities) != 1:
-        return "thread_has_no_task_authority_of_this_thread"
+        return "thread_has_no_task_authority_of_this_thread", None
     (authority,) = authorities
     refs = authority.get("refs") if isinstance(authority.get("refs"), list) else []
     named = [r for r in refs if isinstance(r, dict) and r.get("rel") == "registration"]
     if len(named) != 1 or _typed_ref_digest(named[0]) != registration:
-        return "thread_does_not_name_its_registration"
+        return "thread_does_not_name_its_registration", None
     opening = _sale_authority_opening(thread_bundle, records, shown)
     body = authority.get("body") if isinstance(authority.get("body"), dict) else {}
     nonce, text = _text(opening.get("nonce")), _text(opening.get("text"))
-    if (key is None or nonce is None or text != key or opening.get("record_digest") != json_digest(authority)
+    digest = json_digest(authority)
+    if (key is None or nonce is None or text != key or opening.get("record_digest") != digest
             or json_digest({"nonce": nonce, "text": text}) != body.get("sale_authority_commitment")):
-        return "thread_is_not_under_this_sale"
-    return None
+        return "thread_is_not_under_this_sale", None
+    return None, digest
+
+
+def _sale_log_openings(bound: list[dict], findings: list[str]) -> tuple[dict[str, list[str]], dict[str, str] | None]:
+    """What the sale's log says of its threads (AMENDMENT 11): each
+    ``thread_opened`` record's ``task_authority_commitment``, by the digest
+    of the registration it names, and the ``head_commitment`` of each
+    thread the latest ``sale_cut`` names, by registration (``None`` when the
+    log holds no cut). The bundle is the whole log at its certified
+    checkpoint, so its latest cut is the latest one at or before it. A
+    record of either kind that cannot be read is appended to ``findings``:
+    it may be the one that opens a thread."""
+    opened: dict[str, list[str]] = {}
+    cuts: list[dict] = []
+    for shown in bound:
+        kind = _record_type(shown)
+        body = shown.get("body") if isinstance(shown.get("body"), dict) else {}
+        if kind == "thread_opened":
+            refs = (shown.get(_PROFILE) or {}).get("refs")
+            named = [r for r in refs if isinstance(r, dict)] if isinstance(refs, list) else []
+            registration = _typed_ref_digest(named[0]) if len(named) == 1 and named[0].get("rel") == "registration" else None
+            commitment = _text(body.get("task_authority_commitment"))
+            if registration is None or commitment is None:
+                findings.append("thread_opened_not_read")
+                continue
+            opened.setdefault(registration, []).append(commitment)
+        elif kind == "sale_cut":
+            cuts.append(shown)
+    if not cuts:
+        return opened, None
+    latest = max(cuts, key=_seq)
+    if sum(_seq(c) == _seq(latest) for c in cuts) != 1:
+        findings.append("sale_cut_not_read")
+        return opened, {}
+    body = latest.get("body") if isinstance(latest.get("body"), dict) else {}
+    heads = body.get("thread_heads")
+    cut: dict[str, str] = {}
+    for head in heads if isinstance(heads, list) else [None]:
+        head = head if isinstance(head, dict) else {}
+        registration, commitment = _typed_ref_digest(head.get("registration")), _text(head.get("head_commitment"))
+        if registration is None or commitment is None or registration in cut:
+            findings.append("sale_cut_not_read")
+            return opened, {}
+        cut[registration] = commitment
+    return opened, cut
+
+
+def _opened_and_whole(entry: dict, registration: str, authority: str, thread_bundle: dict,
+                      opened: dict[str, list[str]], cut: dict[str, str] | None) -> list[str]:
+    """Why the sale's log does not show a present thread opened and whole
+    (AMENDMENT 11), or ``[]``: exactly one ``thread_opened`` names its
+    registration, and the entry's ``opened.nonce`` opens it to the digest
+    of the thread's task authority; the latest ``sale_cut`` has a head for
+    it, and the entry's ``head`` opens it to the digest of the carried
+    thread's last record."""
+    why: list[str] = []
+    commitments = opened.get(registration, [])
+    opening = entry.get("opened") if isinstance(entry.get("opened"), dict) else {}
+    if len(commitments) != 1:
+        why.append("opened_not_evidenced")
+    elif not _opens(opening.get("nonce"), authority, commitments[0]):
+        why.append("opening_does_not_match_the_thread")
+    if cut is None:
+        why.append("no_sale_cut")
+    elif registration not in cut:
+        why.append("thread_not_in_the_cut")
+    else:
+        head = entry.get("head") if isinstance(entry.get("head"), dict) else {}
+        digest = _text(head.get("record_digest"))
+        last = _last_record_digest(thread_bundle)
+        if digest is None or digest != last or not _opens(head.get("nonce"), digest, cut[registration]):
+            why.append("thread_not_whole_at_the_cut")
+    return why
+
+
+def _opens(nonce: object, text: str, commitment: str) -> bool:
+    """Whether ``nonce`` with ``text`` recomputes to ``commitment``."""
+    return isinstance(nonce, str) and json_digest({"nonce": nonce, "text": text}) == commitment
+
+
+def _last_record_digest(thread_bundle: dict) -> str | None:
+    """The ``agent_input_digest`` the capsule at its completeness
+    certificate's ``last_seq`` seals: the digest of the thread's last
+    record, disclosed or not. ``None`` when no one capsule is there."""
+    certificate = thread_bundle.get("completeness_certificate")
+    certificate = certificate if isinstance(certificate, dict) else {}
+    memberships = certificate.get("memberships") if isinstance(certificate.get("memberships"), dict) else {}
+    last = certificate.get("last_seq")
+    at = [cid for cid, m in memberships.items()
+          if isinstance(m, dict) and isinstance(m.get("log_coordinates"), dict)
+          and m["log_coordinates"].get("seq") == last]
+    records = [r for r in thread_bundle.get("records") or [] if isinstance(r, dict) and r.get("capsule_id") in at]
+    if len(at) != 1 or len(records) != 1:
+        return None
+    attestation = (records[0].get("model_attestation") or {}).get("compute_attestation") or {}
+    return _text(attestation.get("agent_input_digest"))
 
 
 def _sale_authority_opening(thread_bundle: dict, records: tuple[dict, ...], shown: dict[str, dict]) -> dict:

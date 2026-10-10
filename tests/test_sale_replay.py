@@ -8,9 +8,9 @@ and the seller commits and acts; then B is offered 1850, accepts, and the
 seller's commit to B is checked; then the seller's commit to A is checked
 again. ``check-inputs/`` holds the external-check-input/v0 of each check.
 ``sale.bundle.json`` is the user's own copy of the sale as capsulectl writes
-it: its checkpoint is the one cut at B's registration, before every check.
-``sale-after-c.bundle.json`` is the copy written after a third thread, C, is
-opened with nothing done in it, so its checkpoint is cut after every check.
+it: it seals each thread's report, then a ``sale_cut`` naming each thread's
+last record, then cuts the sale's checkpoint, after every check
+(AMENDMENT 11).
 
 Each check is decided live (its check input, as ``test_live_history``
 decides one) and by the replay of a sale bundle (``replay_sale``), with its
@@ -76,19 +76,18 @@ _STEPS.loader.exec_module(_steps)
 with_act_dispositions = _steps.with_act_dispositions
 withhold_thread = _steps.withhold_thread
 FIXTURE_SHA256 = {
-    "check-inputs/a-commit-1900.json": "e86eaef5d7cbd8b112f81741df63333d7837fc02a4e4f875a4cb2d4b3eaaa334",
-    "check-inputs/a-commit-again-1900.json": "fc6a4ddf2be75e2005f181d1669b3e97f6989ce8ba53e7ce6803a7476ecd6e55",
-    "check-inputs/a-offer-1900.json": "1c6c03ad72d46b488d5371dcfd163810b21f8a21073a87ef73ede5bff1191859",
-    "check-inputs/b-commit-1850.json": "217d006d71d42a15eeee492deea35efb8ec3844ebafb5b65283ecbea9e6c6b1b",
-    "check-inputs/b-offer-1850.json": "3c71c6b568d87c3746c6bad48fe21d343edc53fb9965fd47234893d49a2e22ca",
-    "sale-after-c.bundle.json": "b43c977755fe7b5c391339a80f25e5bfb89a0610ea7e5ded7a695fb78056e1ce",
-    "sale.bundle.json": "7d9bebdd4f3006595dd09fcf7682d4657e977b31c7e2fe721c62ddb6bec68ff3",
+    "check-inputs/a-commit-1900.json": "384d7d9d8d93a61b66610f92acacb3c0a381aa9455b64dd3b7b28baac49e6e24",
+    "check-inputs/a-commit-again-1900.json": "5249332dae104838405995cc741bd1bab3a75484347221eda044b5178703a403",
+    "check-inputs/a-offer-1900.json": "c30d3e57ee1f3339f5880ebf2414e6a2b1d3c04467e897a5195324e73fe5def1",
+    "check-inputs/b-commit-1850.json": "02771f9c209aff888ba1f61eeedea48ed4803e3e8c1eb1e89f6293bd7a501380",
+    "check-inputs/b-offer-1850.json": "389f5d85f0cc3a40c905cb087f8edb072eb23e0c73cd63955a145c947be76919",
+    "sale.bundle.json": "67cb7ef7bdafef928110f4459742c7b7b6ef273a6780cbf41b06895bd4ffc422",
 }
 PACK = load_pack_dir(ROOT / "packs" / "catalog" / "seller")
-PRODUCER = {"commit": "6ac32ecd8b4c1519e3b4d8958fcc59e64e4e2d01", "name": "capsulectl",
-            "version": "v0.1.0-rc14-22-g6ac32ec"}
-SALE_ID = "sale-8075313d1a419164"
-THREAD_A, THREAD_B, THREAD_C = "deal-0c3be926f60652f7", "deal-e1f03ed6c7bab932", "deal-9e30c18c5e56e0f8"
+PRODUCER = {"commit": "9691acadf137a92735f128ae5c3ecc27bc7d9390", "name": "capsulectl",
+            "version": "v0.1.0-rc14-23-g9691aca"}
+SALE_ID = "sale-c7b4c07ced894df9"
+THREAD_A, THREAD_B = "deal-ae1582c2fe995822", "deal-73bb7fe1c1462a86"
 S11 = "s11-one-commitment-per-sale"
 # Rules that read an input only a live check is given (the floor's opening,
 # the task-authority record), so a replay holds them n/a on every check.
@@ -96,11 +95,10 @@ LIVE_INPUT_RULES = ("s03-price-below-the-floor", "s08-stay-within-task-bounds")
 
 AS_SEALED, DISPOSED = "as-sealed", "disposition-accept"
 HISTORIES = (AS_SEALED, DISPOSED)
-# The sale bundle each replay reads: as capsulectl wrote it (checkpoint
-# before every check), the copy after C opened (checkpoint after every
-# check), and that copy with B withheld.
-AS_WRITTEN, AFTER_C, B_WITHHELD = "sale.bundle.json", "sale-after-c.bundle.json", "sale-after-c-b-withheld"
-SALES = (AS_WRITTEN, AFTER_C, B_WITHHELD)
+# The sale bundle each replay reads: as capsulectl wrote it, and that copy
+# with B withheld.
+AS_WRITTEN, B_WITHHELD = "sale.bundle.json", "sale-b-withheld"
+SALES = (AS_WRITTEN, B_WITHHELD)
 
 
 class LedgerRow(TypedDict):
@@ -139,7 +137,7 @@ def _check_input(name: str) -> dict:
 @cache
 def _sale(name: str) -> SaleBundle:
     if name == B_WITHHELD:
-        return read_sale_bundle(withhold_thread(_json(FIXTURE / AFTER_C), THREAD_B))
+        return read_sale_bundle(withhold_thread(_json(FIXTURE / AS_WRITTEN), THREAD_B))
     return load_sale_bundle(FIXTURE / name)
 
 
@@ -306,7 +304,7 @@ def _with_thread(sale: SaleBundle, thread_id: str, edit) -> SaleBundle:
 
 def _capsule_of(thread_id: str, record_type: str, action: str | None = None) -> str:
     """The ``capsule_id`` of a thread's record of one type (and action)."""
-    (thread,) = [t for t in _sale(AFTER_C).threads if t.thread_id == thread_id]
+    (thread,) = [t for t in _sale(AS_WRITTEN).threads if t.thread_id == thread_id]
     found = [cid for cid, s in thread.disclosed.items()
              if s.get("type") == record_type and (action is None or (s.get("body") or {}).get("action") == action)]
     return found[0]
@@ -323,12 +321,11 @@ def test_the_fixture_is_the_bytes_capsulectl_wrote():
 def test_every_record_was_sealed_by_the_pinned_capsulectl():
     producers = [e["agent_input"]["producer"] for n in INPUTS
                  for e in (_check_input(n)["record"], *_check_input(n)["history"])]
-    for name in (AS_WRITTEN, AFTER_C):
-        bundle = _json(FIXTURE / name)
-        bundles = [bundle, *bundle["extensions"][SALE_EXTENSION]["threads"].values()]
-        producers += [(d["agent_input"].get("x-deal-v0") or d["agent_input"]).get("producer")
-                      for b in bundles for d in b["disclosures"].values()
-                      if "agent_input" in d and "report" not in d["agent_input"]]
+    bundle = _json(FIXTURE / AS_WRITTEN)
+    bundles = [bundle, *bundle["extensions"][SALE_EXTENSION]["threads"].values()]
+    producers += [(d["agent_input"].get("x-deal-v0") or d["agent_input"]).get("producer")
+                  for b in bundles for d in b["disclosures"].values()
+                  if "agent_input" in d and "report" not in d["agent_input"]]
     assert producers
     assert all(p == PRODUCER for p in producers)
 
@@ -336,29 +333,31 @@ def test_every_record_was_sealed_by_the_pinned_capsulectl():
 def test_no_act_seals_a_disposition():
     """Why the PASS cells need ``with_act_dispositions``: capsulectl seals
     no disposition on an offer or commit act."""
-    acts = [r for t in _sale(AFTER_C).threads for r in t.records
+    acts = [r for t in _sale(AS_WRITTEN).threads for r in t.records
             if (t.disclosed.get(r["capsule_id"]) or {}).get("type") == "action-record/v0"]
     assert len(acts) == 3
     assert not any("disposition" in r for r in acts)
     assert not any("disposition" in e for n in INPUTS for e in _check_input(n)["history"])
 
 
-def test_the_copy_capsulectl_writes_is_certified_before_every_check():
-    """capsulectl cuts no checkpoint when nothing was appended to the sale's
-    log, so its copy carries the one cut at B's registration. The copy after
-    C opened carries one cut after every check."""
+def test_the_copy_capsulectl_writes_is_certified_after_every_check():
+    """The bundle step seals each thread's report, then the ``sale_cut``,
+    then cuts the sale's checkpoint: its last record is the cut, and every
+    checkpoint is after every check."""
     checks = [_check_input(n)["record"]["timestamp"] for n in INPUTS]
-    assert _json(FIXTURE / AS_WRITTEN)["checkpoint"]["timestamp"] < min(checks)
-    assert _json(FIXTURE / AFTER_C)["checkpoint"]["timestamp"] > max(checks)
+    bundle = _json(FIXTURE / AS_WRITTEN)
+    assert bundle["checkpoint"]["timestamp"] > max(checks)
+    assert all(t["checkpoint"]["timestamp"] > max(checks) for t in _threads(bundle).values())
+    assert _sale_record(bundle, "sale_cut") == bundle["records"][-1]
 
 
 # -- the sale bundle ----------------------------------------------------------------
 
 
 def test_the_sale_is_complete_and_keyed_on_its_task_authority():
-    sale = _sale(AFTER_C)
+    sale = _sale(AS_WRITTEN)
     assert (sale.complete, sale.findings) == (True, ())
-    assert [t.thread_id for t in sale.threads] == [THREAD_A, THREAD_B, THREAD_C]
+    assert [t.thread_id for t in sale.threads] == [THREAD_A, THREAD_B]
     openings = {t.thread_id: next(s["report"]["sale_authority_opening"]["text"] for s in t.disclosed.values()
                                   if "report" in s) for t in sale.threads}
     assert set(openings.values()) == {sale.key}
@@ -366,9 +365,9 @@ def test_the_sale_is_complete_and_keyed_on_its_task_authority():
 
 
 def test_the_sale_records_are_in_seal_order():
-    records = _sale(AFTER_C).records()
+    records = _sale(AS_WRITTEN).records()
     assert [r["timestamp"] for r in records] == sorted(r["timestamp"] for r in records)
-    assert len(records) == sum(len(t.records) for t in _sale(AFTER_C).threads)
+    assert len(records) == sum(len(t.records) for t in _sale(AS_WRITTEN).threads)
 
 
 def test_the_decisions_are_expected_live_json():
@@ -386,7 +385,7 @@ def test_the_decisions_are_expected_replay_json():
 @pytest.mark.parametrize("name", INPUTS)
 def test_the_replay_decides_s11_as_live_does(name, history):
     """Cell for cell: the result, reason and evidence."""
-    assert _cell(_replayed_check(AFTER_C, history, name)) == _cell(_live(name, history).decision)
+    assert _cell(_replayed_check(AS_WRITTEN, history, name)) == _cell(_live(name, history).decision)
 
 
 @pytest.mark.parametrize("history", HISTORIES)
@@ -398,9 +397,9 @@ def test_the_replay_reads_the_ledger_live_reads(name, history):
     live ledger also holds the statements of the checked record's
     ``deal_claims``, which ``single_commitment`` does not read. Only the
     sale's first check has no act before it."""
-    replayed = _sale_ledger(_given_sale(AFTER_C, history), name)
+    replayed = _sale_ledger(_given_sale(AS_WRITTEN, history), name)
     live = [r for r in _live(name, history).ledger if r["asg_payload"][LIVE_HISTORY] != STATEMENT]
-    key, item = _sale(AFTER_C).key, _check_input(name)["item_ref"]
+    key, item = _sale(AS_WRITTEN).key, _check_input(name)["item_ref"]
     assert bool(replayed) == (name != "a-offer-1900")
     assert [json.dumps(r, sort_keys=True).replace(key, item) for r in replayed] == [
         json.dumps(r, sort_keys=True) for r in live]
@@ -408,14 +407,14 @@ def test_the_replay_reads_the_ledger_live_reads(name, history):
 
 def test_a_follow_through_passes():
     for name in ("a-offer-1900", "a-commit-1900", "a-commit-again-1900"):
-        s11 = _s11(_replayed_check(AFTER_C, DISPOSED, name))
+        s11 = _s11(_replayed_check(AS_WRITTEN, DISPOSED, name))
         assert s11.result == "pass", name
-    assert _s11(_replayed_check(AFTER_C, DISPOSED, "a-commit-again-1900")).evidence["sale_has_acceptance"] is True
+    assert _s11(_replayed_check(AS_WRITTEN, DISPOSED, "a-commit-again-1900")).evidence["sale_has_acceptance"] is True
 
 
 @pytest.mark.parametrize("name", ["b-offer-1850", "b-commit-1850"])
 def test_b_after_a_is_denied_naming_s11(name):
-    decision = _replayed_check(AFTER_C, DISPOSED, name)
+    decision = _replayed_check(AS_WRITTEN, DISPOSED, name)
     assert _cell(decision)[0::2] == ("fail", {"constraint_id": "single_commitment", "sale_has_acceptance": True})
     assert decision.outcome == "deny"
     assert _rules(decision)[S11] == "fail"
@@ -423,7 +422,7 @@ def test_b_after_a_is_denied_naming_s11(name):
 
 @pytest.mark.parametrize("name", ["b-offer-1850", "b-commit-1850", "a-commit-again-1900"])
 def test_as_sealed_an_act_with_no_disposition_is_not_evaluable(name):
-    s11 = _s11(_replayed_check(AFTER_C, AS_SEALED, name))
+    s11 = _s11(_replayed_check(AS_WRITTEN, AS_SEALED, name))
     assert (s11.result, s11.evidence) == (
         "n/a", not_applicable_evidence("single_commitment", in_scope=True, missing_field="disposition"))
 
@@ -445,14 +444,19 @@ def test_with_b_withheld_every_s11_cell_is_not_evaluable(name, history):
 
 
 @pytest.mark.parametrize("history", HISTORIES)
-@pytest.mark.parametrize("name", INPUTS)
-def test_a_check_after_the_certified_checkpoint_is_not_evaluable(name, history):
-    """The copy capsulectl writes today: a thread registered after its
+def test_a_check_after_the_certified_checkpoint_is_not_evaluable(history):
+    """A copy certified only before its checks, as capsulectl wrote one
+    before its bundle step sealed a cut: a thread registered after the
     checkpoint would not be in it, so no check after it is complete."""
-    assert _sale(AS_WRITTEN).complete
-    decision = _replayed_check(AS_WRITTEN, history, name)
-    assert _cell(decision)[0::2] == HISTORY_UNKNOWN
-    assert decision.outcome == "deny"
+    first = min(_parse(_check_input(n)["record"]["timestamp"]) for n in INPUTS)
+    stale = dataclasses.replace(_given_sale(AS_WRITTEN, history), certified_until=first)
+    with tempfile.TemporaryDirectory() as tmp:
+        decided = replay_sale(stale, **_replay_options(tmp)).decisions
+    by_action = {s.record["action_id"]: s.decision for s in decided}
+    for name in INPUTS:
+        decision = by_action[_check_input(name)["record"]["action_id"]]
+        assert _cell(decision)[0::2] == HISTORY_UNKNOWN, name
+        assert decision.outcome == "deny", name
 
 
 @pytest.mark.parametrize("thread_id", [THREAD_A, THREAD_B])
@@ -461,7 +465,7 @@ def test_a_thread_replayed_alone_stays_not_evaluable(thread_id):
     replayed from its file as any deal bundle is."""
     with tempfile.TemporaryDirectory() as tmp:
         path = Path(tmp) / "thread.bundle.json"
-        path.write_text(json.dumps(_threads(_json(FIXTURE / AFTER_C))[thread_id]), encoding="utf-8")
+        path.write_text(json.dumps(_threads(_json(FIXTURE / AS_WRITTEN))[thread_id]), encoding="utf-8")
         result = replay(load_records([path]), disclosed=load_disclosed([path]), withheld=load_withheld([path]),
                         **_replay_options(tmp))
     decided = [s.decision for s in result.decisions]
@@ -474,7 +478,7 @@ def test_a_thread_replayed_alone_stays_not_evaluable(thread_id):
 @pytest.mark.parametrize("history", HISTORIES)
 def test_live_and_replay_differ_only_on_the_live_inputs(history):
     for name in INPUTS:
-        live, replayed = _rules(_live(name, history).decision), _rules(_replayed_check(AFTER_C, history, name))
+        live, replayed = _rules(_live(name, history).decision), _rules(_replayed_check(AS_WRITTEN, history, name))
         assert set(live) == set(replayed), name
         assert {r for r in live if live[r] != replayed[r]} == set(LIVE_INPUT_RULES), name
         assert all((replayed[r], live[r]) == ("n/a", "pass") for r in LIVE_INPUT_RULES), name
@@ -482,14 +486,14 @@ def test_live_and_replay_differ_only_on_the_live_inputs(history):
 
 def test_the_dispositions_step_refuses_a_sale_that_already_seals_them():
     with pytest.raises(SystemExit, match="rebuild the fixture"):
-        with_act_dispositions(with_act_dispositions(_sale(AFTER_C)))
+        with_act_dispositions(with_act_dispositions(_sale(AS_WRITTEN)))
 
 
 # -- every link is verified: a mismatch leaves the sale incomplete -------------------
 
 
 def _edited(edit) -> SaleBundle:
-    bundle = copy.deepcopy(_json(FIXTURE / AFTER_C))
+    bundle = copy.deepcopy(_json(FIXTURE / AS_WRITTEN))
     edit(bundle)
     return read_sale_bundle(bundle)
 
@@ -514,9 +518,8 @@ def _sale_record(bundle: dict, record_type: str) -> dict:
 
 
 def _carry_a_thread_with_no_entry(bundle: dict) -> None:
-    """C's entry dropped, and A's copy carried under C's id."""
-    _entries(bundle).pop(2)
-    _threads(bundle)[THREAD_C] = _threads(bundle)[THREAD_A]
+    """B's entry dropped, and B's copy still carried."""
+    _entries(bundle).pop(1)
 
 
 def _open_another_registration(bundle: dict) -> None:
@@ -540,7 +543,7 @@ EDITS = {
     "threads predate registration": (lambda b: b["extensions"]["x-deal-v0"].update(threads_predate_registration=True),
                                      "threads_predate_registration"),
     "the entries out of order": (lambda b: _entries(b).reverse(), "sale_threads_do_not_match_the_registrations"),
-    "an entry of an unknown state": (lambda b: _entries(b)[2].update(member="opened"), "unknown_thread_state"),
+    "an entry of an unknown state": (lambda b: _entries(b)[1].update(member="opened"), "unknown_thread_state"),
     "the sale's own record edited": (lambda b: _sale_record(b, "thread").update(operator="other"),
                                      "sale_bundle_not_valid"),
     "an entry opening another registration": (_open_another_registration, "registration_opening_does_not_match"),
@@ -679,21 +682,200 @@ def test_an_entry_opening_to_no_new_thread_is_named(ids):
                "nonce": n, "thread_id": t, "member": "present"}
               for r, t, n in zip(registrations, ids, nonces, strict=True)]
     findings: list[str] = []
-    present = sale_bundle._present(listed, registrations, findings)
+    present = sale_bundle._present(listed, registrations, {}, None, findings)
     assert findings == ["registration_opening_does_not_match"]
     assert list(present) == ([THREAD_B] if ids[0] == SALE_ID else [THREAD_A])
 
 
-def test_never_opened_is_the_producers_word():
-    """AMENDMENT 10 counts a ``never_opened`` registration as no thread, and
-    nothing sealed on the sale's log shows that a thread never opened. So a
-    copy that relabels B and leaves it out still reads as complete. The
-    README names this; the test pins it."""
+def test_never_opened_is_checked_against_the_sale_log():
+    """A copy that relabels B ``never_opened`` and leaves it out: the sale's
+    log seals B's ``thread_opened``, so the copy is incomplete, and A's
+    checks with it."""
     def relabel(b):
+        _entries(b)[1] = {k: v for k, v in _entries(b)[1].items() if k not in ("opened", "head")}
         _entries(b)[1]["member"] = "never_opened"
         _threads(b).pop(THREAD_B)
     sale = _edited(relabel)
-    assert (sale.complete, [t.thread_id for t in sale.threads]) == (True, [THREAD_A, THREAD_C])
+    assert sale.findings == ("never_opened_but_opened",)
+    assert [t.thread_id for t in sale.threads] == [THREAD_A]
+    assert not any(_scope(sale, n) for n in INPUTS if n.startswith("a-"))
+
+
+# -- the sale's log shows each thread opened and whole (AMENDMENT 11) -------------
+
+
+def _rebind_sale(bundle: dict, record_type: str, edit) -> dict:
+    """``edit`` applied to the sale's first record of ``record_type``, and
+    its capsule made to bind the edited record. The capsule no longer
+    verifies, so the sale is also not valid; the link is still checked,
+    and named."""
+    record = _sale_record(bundle, record_type)
+    shown = bundle["disclosures"][record["capsule_id"]]["agent_input"]
+    edit(shown)
+    record["model_attestation"]["compute_attestation"]["agent_input_digest"] = json_digest(shown)
+    return shown
+
+
+def _registration_of(bundle: dict, index: int) -> str:
+    return _entries(bundle)[index]["registration"]["digest"]
+
+
+def test_the_sale_log_opens_each_thread_and_cuts_it_whole():
+    """The fixture's records as A11 names them: one ``thread_opened`` per
+    thread, in A then B's order, and one ``sale_cut`` with a head for each."""
+    bundle = _json(FIXTURE / AS_WRITTEN)
+    shown = [d["agent_input"] for d in bundle["disclosures"].values()]
+    opened = [s["x-deal-v0"]["refs"][0]["digest"] for s in sorted(shown, key=lambda s: s.get("x-deal-v0", {}).get("seq", 0))
+              if s.get("x-deal-v0", {}).get("record_type") == "thread_opened"]
+    assert opened == [_registration_of(bundle, 0), _registration_of(bundle, 1)]
+    cut = bundle["disclosures"][_sale_record(bundle, "sale_cut")["capsule_id"]]["agent_input"]
+    assert [h["registration"]["digest"] for h in cut["body"]["thread_heads"]] == opened
+
+
+def _truncate(thread_bundle: dict) -> None:
+    """A thread's copy cut short by its last record: the record, its
+    membership and the certificate's ``last_seq`` all go."""
+    certificate = thread_bundle["completeness_certificate"]
+    last = thread_bundle["records"].pop()
+    certificate["memberships"].pop(last["capsule_id"])
+    certificate["last_seq"] -= 1
+
+
+def _a_thread_opened_naming_b(bundle: dict) -> None:
+    """A's ``thread_opened`` re-bound to name B's registration: A has none,
+    B has two."""
+    other = _registration_of(bundle, 1)
+    _rebind_sale(bundle, "thread_opened", lambda s: s["x-deal-v0"]["refs"][0].update(digest=other))
+
+
+def _a_dropped_from_the_cut(bundle: dict) -> None:
+    _rebind_sale(bundle, "sale_cut", lambda s: s["body"]["thread_heads"].pop(0))
+
+
+def _the_cut_unreadable(bundle: dict) -> None:
+    _rebind_sale(bundle, "sale_cut", lambda s: s["body"].update(thread_heads="all"))
+
+
+def _the_opened_record_unreadable(bundle: dict) -> None:
+    _rebind_sale(bundle, "thread_opened", lambda s: s["x-deal-v0"].pop("refs"))
+
+
+CUT_AND_OPENED = {
+    "a thread's head nonce edited": (lambda b: _entries(b)[0]["head"].update(nonce="0" * 64),
+                                     {"thread_not_whole_at_the_cut"}),
+    "a thread's head naming another record": (
+        lambda b: _entries(b)[0]["head"].update(record_digest=_entries(b)[1]["head"]["record_digest"]),
+        {"thread_not_whole_at_the_cut"}),
+    "a present entry with no head": (lambda b: _entries(b)[0].pop("head"), {"thread_not_whole_at_the_cut"}),
+    "a thread truncated by its last record": (
+        lambda b: _truncate(_threads(b)[THREAD_A]),
+        # Its last record is its sealed report, so its sale opening goes with it.
+        {"thread_not_valid", "thread_does_not_cover_its_log", "thread_is_not_under_this_sale"}),
+    "a thread's opened nonce edited": (lambda b: _entries(b)[0]["opened"].update(nonce="0" * 64),
+                                       {"opening_does_not_match_the_thread"}),
+    "a present entry with no opened": (lambda b: _entries(b)[0].pop("opened"), {"opening_does_not_match_the_thread"}),
+    "A's opened opening B's task authority": (
+        lambda b: _entries(b)[0].update(opened=_entries(b)[1]["opened"]), {"opening_does_not_match_the_thread"}),
+    "a thread_opened naming another registration": (_a_thread_opened_naming_b,
+                                                     {"sale_bundle_not_valid", "opened_not_evidenced"}),
+    "a thread_opened that cannot be read": (_the_opened_record_unreadable,
+                                            {"sale_bundle_not_valid", "thread_opened_not_read", "opened_not_evidenced"}),
+    "a thread missing from the cut": (_a_dropped_from_the_cut, {"sale_bundle_not_valid", "thread_not_in_the_cut"}),
+    "a cut that cannot be read": (_the_cut_unreadable,
+                                  {"sale_bundle_not_valid", "sale_cut_not_read", "thread_not_in_the_cut"}),
+}
+
+
+@pytest.mark.parametrize("edit,findings", CUT_AND_OPENED.values(), ids=CUT_AND_OPENED.keys())
+def test_a_thread_not_shown_opened_and_whole_leaves_the_sale_incomplete(edit, findings):
+    """Each named, nothing else; every check the copy carries is then
+    incomplete, so s11 is n/a on it."""
+    sale = _edited(edit)
+    assert set(sale.findings) == findings
+    for name in INPUTS:
+        assert _scope(sale, name) is False, name
+
+
+def test_a_truncated_thread_is_not_whole_at_the_cut():
+    """A's copy without its last record, the sale's own openings read from
+    the sale's log: its last record is no longer the cut's head for it."""
+    bundle = _json(FIXTURE / AS_WRITTEN)
+    found: list[str] = []
+    shown = [d["agent_input"] for d in bundle["disclosures"].values()]
+    opened_by, heads = sale_bundle._sale_log_openings(shown, found)
+    a = _threads(bundle)[THREAD_A]
+    authority = next(json_digest(d["agent_input"]) for d in a["disclosures"].values()
+                     if d["agent_input"].get("type") == "task-authority/v0")
+    whole = sale_bundle._opened_and_whole(_entries(bundle)[0], _registration_of(bundle, 0), authority, a,
+                                          opened_by, heads)
+    _truncate(a)
+    cut_short = sale_bundle._opened_and_whole(_entries(bundle)[0], _registration_of(bundle, 0), authority, a,
+                                              opened_by, heads)
+    assert (found, whole, cut_short) == ([], [], ["thread_not_whole_at_the_cut"])
+
+
+def _sale_log(thread_opened: bool, cut: bool) -> list[dict]:
+    """The sale's bound records an older producer, or this one, seals: two
+    registrations, a ``thread_opened`` for the first, and a cut naming it."""
+    registrations = [_registration(t, n) for t, n in ((THREAD_A, "a" * 64), (THREAD_B, "b" * 64))]
+    first = {"type": "deal-record", "digest_alg": "SHA-256", "digest": json_digest(registrations[0])}
+    log = list(registrations)
+    if thread_opened:
+        log.append({"x-deal-v0": {"record_type": "thread_opened", "seq": 4, "refs": [{"rel": "registration", **first}]},
+                    "body": {"task_authority_commitment": "c" * 64}})
+    if cut:
+        log.append({"x-deal-v0": {"record_type": "sale_cut", "seq": 6},
+                    "body": {"thread_heads": [{"registration": first, "head_commitment": "d" * 64}]}})
+    return log
+
+
+def _never_opened(registrations: list[dict], index: int, thread_id: str, nonce: str) -> dict:
+    return {"registration": {"type": "deal-record", "digest_alg": "SHA-256", "digest": json_digest(registrations[index])},
+            "nonce": nonce, "thread_id": thread_id, "member": "never_opened"}
+
+
+@pytest.mark.parametrize("opened,cut,findings", [
+    (False, False, []),
+    (True, False, ["never_opened_but_opened"]),
+    (False, True, ["never_opened_but_in_the_cut"]),
+], ids=["no thread_opened and no head: never opened", "a thread_opened names it", "the cut names it"])
+def test_never_opened_requires_no_opening_on_the_sale_log(opened, cut, findings):
+    """The first registration listed ``never_opened``: it holds only when no
+    ``thread_opened`` and no head in the cut names it. The reader's steps
+    are run on the records alone, as no sealed log here leaves a thread
+    unopened."""
+    log = _sale_log(opened, cut)
+    registrations = [r for r in log if r["x-deal-v0"]["record_type"] == "thread"]
+    found: list[str] = []
+    opened_by, heads = sale_bundle._sale_log_openings(log, found)
+    listed = [_never_opened(registrations, 0, THREAD_A, "a" * 64), _never_opened(registrations, 1, THREAD_B, "b" * 64)]
+    assert sale_bundle._present(listed, registrations, opened_by, heads, found) == {}
+    assert found == findings
+
+
+def test_an_old_copy_with_no_opening_and_no_cut_is_incomplete():
+    """A copy written before the sale's log sealed ``thread_opened`` and
+    ``sale_cut``: a present thread is shown neither opened nor whole."""
+    found: list[str] = []
+    opened_by, heads = sale_bundle._sale_log_openings(_sale_log(False, False), found)
+    assert (opened_by, heads, found) == ({}, None, [])
+    bundle = _json(FIXTURE / AS_WRITTEN)
+    entry, registration = _entries(bundle)[0], _registration_of(bundle, 0)
+    authority = next(json_digest(d["agent_input"]) for d in _threads(bundle)[THREAD_A]["disclosures"].values()
+                     if d["agent_input"].get("type") == "task-authority/v0")
+    why = sale_bundle._opened_and_whole(entry, registration, authority, _threads(bundle)[THREAD_A], opened_by, heads)
+    assert why == ["opened_not_evidenced", "no_sale_cut"]
+
+
+def test_the_latest_cut_is_read():
+    """Two cuts: the later one's heads are the ones read."""
+    log = _sale_log(True, True)
+    later = copy.deepcopy(log[-1])
+    later["x-deal-v0"]["seq"] = 8
+    later["body"]["thread_heads"][0]["head_commitment"] = "e" * 64
+    found: list[str] = []
+    _, heads = sale_bundle._sale_log_openings([later, *log], found)
+    assert (list(heads.values()), found) == (["e" * 64], [])
 
 
 # -- what one check's history holds ----------------------------------------------------
@@ -704,13 +886,13 @@ def _scope(sale: SaleBundle, name: str) -> bool:
 
 
 def test_every_check_of_the_complete_sale_has_a_complete_history():
-    assert all(_scope(_sale(AFTER_C), n) for n in INPUTS)
+    assert all(_scope(_sale(AS_WRITTEN), n) for n in INPUTS)
 
 
 def test_a_check_is_complete_only_when_its_whole_second_is_certified():
     """A check sealed at second T may be as late as T + 1s: the checkpoint
     must be at or after that. An earlier check is still complete."""
-    sale = _sale(AFTER_C)
+    sale = _sale(AS_WRITTEN)
     last = _parse(_check_input("a-commit-again-1900")["record"]["timestamp"])
     assert _scope(dataclasses.replace(sale, certified_until=last + timedelta(seconds=1)), "a-commit-again-1900")
     within = dataclasses.replace(sale, certified_until=last + timedelta(milliseconds=999))
@@ -732,7 +914,7 @@ def _retimed(sale: SaleBundle, capsule_id: str, timestamp: str) -> SaleBundle:
 def test_another_threads_act_in_the_checks_second_is_not_ordered():
     """A's commit act sealed in the second of B's commit check: before or
     after it is not sealed."""
-    sale = _sale(AFTER_C)
+    sale = _sale(AS_WRITTEN)
     act = _capsule_of(THREAD_A, "action-record/v0", "commit")
     retimed = _retimed(sale, act, _check_input("b-commit-1850")["record"]["timestamp"])
     assert not _scope(retimed, "b-commit-1850")
@@ -742,7 +924,7 @@ def test_another_threads_act_in_the_checks_second_is_not_ordered():
 def test_two_threads_acts_in_one_second_are_not_ordered():
     """A's commit act and B's offer act sealed in one second, both before
     B's commit check: which came first is not sealed."""
-    sale = _sale(AFTER_C)
+    sale = _sale(AS_WRITTEN)
     b_offer = _capsule_of(THREAD_B, "action-record/v0", "offer")
     a_commit = next(r for t in sale.threads for r in t.records
                     if r["capsule_id"] == _capsule_of(THREAD_A, "action-record/v0", "commit"))
@@ -754,7 +936,7 @@ def test_a_fraction_of_a_second_is_the_same_second():
     """A's commit act written at half past the second of B's commit check
     is still in that second: before or after the check is not sealed."""
     second = _check_input("b-commit-1850")["record"]["timestamp"]
-    sale = _retimed(_sale(AFTER_C), _capsule_of(THREAD_A, "action-record/v0", "commit"),
+    sale = _retimed(_sale(AS_WRITTEN), _capsule_of(THREAD_A, "action-record/v0", "commit"),
                     second.replace("Z", ".500Z"))
     assert not _scope(sale, "b-commit-1850")
 
@@ -763,10 +945,10 @@ def test_an_act_carries_its_checks_counterparty_profile():
     """As capsulectl gives an act the profile-keyed payee its check's
     companion seals. The companion's ``about`` ref names the check's sealed
     record by digest, the typed ``proposed-action/v0`` in a typed deal
-    (capsule-cli 6ac32ecd8b4c deal_profile.go, ``digestOf(cp.Check)``). The
+    (capsule-cli 9691acadf137 deal_profile.go, ``digestOf(cp.Check)``). The
     fixture's synthetic profile keys no payee, so here a companion is added
     to A's thread for the check A's commit act rests on."""
-    sale = _sale(AFTER_C)
+    sale = _sale(AS_WRITTEN)
     (thread,) = [t for t in sale.threads if t.thread_id == THREAD_A]
     check = thread.disclosed[_capsule_of(THREAD_A, "proposed-action/v0", "commit")]
     block = {"fp_alg": "hmac-sha256-profile-key", "ids": {"payee": "ab" * 32}}
@@ -787,7 +969,7 @@ def test_an_act_carries_its_checks_counterparty_profile():
 
 
 def test_an_act_with_no_readable_time_is_not_complete():
-    sale = _retimed(_sale(AFTER_C), _capsule_of(THREAD_A, "action-record/v0", "offer"), "yesterday")
+    sale = _retimed(_sale(AS_WRITTEN), _capsule_of(THREAD_A, "action-record/v0", "offer"), "yesterday")
     assert not _scope(sale, "b-commit-1850")
 
 
@@ -795,7 +977,7 @@ def test_a_record_carried_undisclosed_before_the_check_is_unread():
     """A's offer act, carried without its record: whether it is an act cannot
     be read, and it comes before the sale's first acceptance, so B's commit
     cannot know that acceptance."""
-    sale = _sale(AFTER_C)
+    sale = _sale(AS_WRITTEN)
     act = _capsule_of(THREAD_A, "action-record/v0", "offer")
     withheld = dataclasses.replace(sale, threads=tuple(
         dataclasses.replace(t, disclosed={k: v for k, v in t.disclosed.items() if k != act}) for t in sale.threads))
@@ -821,9 +1003,9 @@ def test_the_sale_history_is_read_by_single_commitment_alone():
     """Given with every check of the sale, it moves s11 only: every other
     rule reads the replay's own view."""
     for name in INPUTS:
-        with_sale = _rules(_replayed_check(AFTER_C, DISPOSED, name))
+        with_sale = _rules(_replayed_check(AS_WRITTEN, DISPOSED, name))
         with tempfile.TemporaryDirectory() as tmp:
-            sale = with_act_dispositions(_sale(AFTER_C))
+            sale = with_act_dispositions(_sale(AS_WRITTEN))
             plain = replay(sale.records(), disclosed=sale.disclosed(), **_replay_options(tmp))
         (without,) = [_rules(s.decision) for s in plain.decisions
                       if s.record["action_id"] == _check_input(name)["record"]["action_id"]]
