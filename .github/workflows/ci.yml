@@ -15,20 +15,18 @@ jobs:
       # capsule-ledger is archived: FROZEN at its final commit, as in pyproject.toml (2026-10-04).
       - name: install capsule-ledger (not yet on PyPI)
         run: pip install "capsule-ledger @ git+https://github.com/action-state-group/capsule-ledger.git@42fb45f69b067f623a4b9915ae8883dff22d5d27"
-      - name: install capsule-emit (ledger_io/period not yet in a PyPI release)
+      - name: install capsule-emit (main, pinned; ledger_io, period and evidence_file)
         # --force-reinstall: capsule-ledger's own install above already satisfies
         # "capsule-emit" from PyPI at the pinned floor, so a plain `pip install`
         # here is a silent no-op -- pip matches on version number, not source.
-        # Pinned to the emit-ledger-io-home branch because capsule-emit main
-        # does not have ledger_io/period yet -- repoint to plain
-        # "capsule-emit @ git+.../capsule-emit.git" (no @branch) once that PR
-        # merges, then drop this step entirely once the next capsule-emit
-        # release (>=0.9.0, see pyproject.toml's dependency comment) is cut
-        # and this repo's floor is bumped to match it. This PR is gated on
-        # the capsule-emit PR merging first.
+        # capsule-emit main (0.9.0) carries ledger_io/period (once on the
+        # emit-ledger-io-home branch, no longer an extra) and evidence_file, which
+        # the sale-bundle replay verifies thread bundles with. Pinned to a main
+        # commit; drop this step once 0.9.0 is on PyPI and this repo's floor
+        # is bumped to it.
         run: >
           pip install --force-reinstall --no-deps
-          "capsule-emit[ledger-io] @ git+https://github.com/action-state-group/capsule-emit.git@emit-ledger-io-home"
+          "capsule-emit @ git+https://github.com/action-state-group/capsule-emit.git@2a679547bdeddfbb8355f423a6bd95d4ddb354f7#subdirectory=python"
       - name: install
         run: pip install -e ".[dev]"
       - name: ruff

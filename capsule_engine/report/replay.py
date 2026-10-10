@@ -44,7 +44,12 @@ random bits, lowercase hex, equal across the sale's threads) becomes
 it is read only live, never from a deal record in a replay. A value in any
 other shape is ignored and named in ``Action.ignored_inputs``. A live check
 reads its history's acts through ``action_for_history_entry``
-(``report/live_history.py``).
+(``report/live_history.py``). A replay of a sale bundle keys the sale on
+the digest of the sale's own task authority instead, and gives
+``single_commitment`` each check's history of the sale's threads, read by the
+reader a live check's history is read by (``report/sale_bundle.py``). Only
+``single_commitment`` reads it: ``release_on_acceptance`` still reads the
+replay's own view, where no acceptance is sealed, so it releases nothing.
 
 ``_bridge_transfer_funds`` is the other non-default action mapping, and it
 mirrors the pattern already established by ``tests/test_guard_dry_run.py``
@@ -59,7 +64,7 @@ from __future__ import annotations
 import json
 import re
 import tempfile
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass, replace
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -67,6 +72,7 @@ from typing import TypedDict
 
 from agent_action_capsule import json_digest
 from capsule_ledger.ledger import LedgerStore
+from capsule_ledger.ledger.api import LedgerAPI
 
 from ..folds.definition import FoldDefinition
 from ..folds.duration import parse_duration_seconds
@@ -83,6 +89,8 @@ __all__ = [
     "bound_agent_input",
     "SourcedDecision",
     "ReplayResult",
+    "SaleCheck",
+    "SaleHistory",
     "load_records",
     "load_disclosed",
     "load_withheld",
@@ -1173,6 +1181,19 @@ class SourcedDecision:
 
 
 @dataclass(frozen=True)
+class SaleCheck:
+    """A replayed check is one of a sale's (``report/sale_bundle.py``):
+    ``item_ref`` is the sale's key, ``None`` when it cannot be read."""
+
+    item_ref: str | None
+
+
+# Writes the history of the sale a replayed record is a check of into the
+# ledger it is given, and says so; ``None`` for a record of no such sale.
+SaleHistory = Callable[[str, LedgerAPI], "SaleCheck | None"]
+
+
+@dataclass(frozen=True)
 class ReplayResult:
     """``decisions`` are the records that state an act, in order;
     ``undecided`` the records the replay gave no decision
@@ -1195,6 +1216,7 @@ def replay(
     withheld: frozenset[str] = frozenset(),
     wickets: tuple[WicketDefinition, ...] = (),
     pack: PackDefinition | None = None,
+    sale_history: SaleHistory | None = None,
 ) -> ReplayResult:
     """Feed every record through a fresh ``GuardEngine`` in dry-run mode, in
     order. Never blocks (``dry_run=True``) -- see ``engine.py``'s own
@@ -1235,7 +1257,13 @@ def replay(
     never refused for its version. A record naming one it does not carry
     still gets a decision: its class-keyed checks are held ``n/a`` with
     evidence naming both versions, and when nothing else fails it is refused
-    (``GuardEngine``), so no later check counts it as seen or as spend."""
+    (``GuardEngine``), so no later check counts it as seen or as spend.
+    ``sale_history`` is given for a replay of a sale bundle
+    (``report/sale_bundle.py``, ``replay_sale``). A check it says is the
+    sale's is decided with the sale's key as ``item_ref``, and
+    ``single_commitment`` reads the sale's acceptance from a fresh ledger it
+    writes for that check alone (``GuardEngine.check``'s ``sale_history``),
+    never from the replay's own view."""
     if not records:
         return ReplayResult(decisions=(), record_range=(0, -1))
 
@@ -1288,7 +1316,7 @@ def replay(
             action = action_for_record(record, shown, counterparty_profile=profile)
             if digest in offered_at:
                 action = replace(action, proposal_at=offered_at[digest])
-            decision = engine.check(action, dry_run=True)
+            action, decision = _decide(engine, action, record, sale_history)
             cited_capsule = None
             for constraint in decision.constraints:
                 cited_id = (constraint.evidence or {}).get("matched_capsule_id") or (
@@ -1304,3 +1332,19 @@ def replay(
                 decided_checks[digest] = sourced[-1]
 
     return ReplayResult(decisions=tuple(sourced), record_range=(1, len(records)), undecided=tuple(undecided))
+
+
+def _decide(engine: GuardEngine, action: Action, record: dict,
+            sale_history: SaleHistory | None) -> tuple[Action, GuardDecision]:
+    """The dry-run decision on ``action``, and the action decided: with the
+    sale's key and the sale's history for a check of a replayed sale
+    (``replay``), as given otherwise."""
+    capsule_id = _text(record.get("capsule_id"))
+    if sale_history is None or capsule_id is None:
+        return action, engine.check(action, dry_run=True)
+    with tempfile.TemporaryDirectory() as tmp, LedgerStore(tmp) as sale_ledger:
+        sale = sale_history(capsule_id, sale_ledger)
+        if sale is None:
+            return action, engine.check(action, dry_run=True)
+        action = replace(action, item_ref=sale.item_ref)
+        return action, engine.check(action, dry_run=True, sale_history=sale_ledger)
