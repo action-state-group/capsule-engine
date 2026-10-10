@@ -35,8 +35,10 @@ rewritten, so it never matches one keyed per profile.
 On a check of a sale's thread, the envelope's top-level ``item_ref`` (256
 random bits, lowercase hex, equal across the sale's threads) becomes
 ``Action.item_ref`` for ``single_commitment``. No deal record carries it, so
-it is read only live, never from a deal record in a replay. A value in any other shape is ignored and
-named in ``Action.ignored_inputs``.
+it is read only live, never from a deal record in a replay. A value in any
+other shape is ignored and named in ``Action.ignored_inputs``. A live check
+reads its history's acts through ``action_for_history_entry``
+(``report/live_history.py``).
 
 ``_bridge_transfer_funds`` is the other non-default action mapping, and it
 mirrors the pattern already established by ``tests/test_guard_dry_run.py``
@@ -77,6 +79,7 @@ __all__ = [
     "filter_since",
     "action_for_record",
     "action_for_check_input",
+    "action_for_history_entry",
     "replay",
 ]
 
@@ -208,17 +211,19 @@ def _bound(record: dict, disclosed: dict) -> bool:
     return isinstance(bound, str) and json_digest(disclosed) == bound
 
 
-def _checked_body(disclosed: dict) -> tuple[dict, object] | None:
+def _checked_body(disclosed: dict, *, history: bool = False) -> tuple[dict, object] | None:
     """The body of a deal check (an ``x-deal-v0`` check record, or a typed
     ``proposed-action/v0``) and the counterparty block it seals, or ``None``
     for any other record. An ``x-deal-v0`` check seals the counterparty in its
     block; capsulectl moves it into a typed record's body, the same
-    fingerprints under ``fp_alg`` ``hmac-sha256-chain-key``."""
+    fingerprints under ``fp_alg`` ``hmac-sha256-chain-key``. With ``history``,
+    a typed act record (``action-record/v0``) is read the same way: it is how
+    a check input's history states an act carried out."""
     block = disclosed.get("x-deal-v0")
     body = disclosed.get("body")
     if isinstance(block, dict) and block.get("record_type") == "check":
         counterparty = block.get("counterparty")
-    elif disclosed.get("type") == "proposed-action/v0":
+    elif disclosed.get("type") == "proposed-action/v0" or (history and disclosed.get("type") == _ACT_RECORD_TYPE):
         counterparty = body.get("counterparty") if isinstance(body, dict) else None
     else:
         return None
@@ -295,6 +300,25 @@ def _typed_ref_digest(value: object) -> str | None:
     return digest if isinstance(digest, str) and _HEX64.fullmatch(digest) else None
 
 
+# The typed record a check input's history carries for each act carried out
+# (capsule-cli internal/cli/rules_checker.go, rulesHistory), and the
+# ``authority_basis`` entry type that names the task authority it was taken
+# under (action_records.go): an act record has no ``task_authority_ref``.
+_ACT_RECORD_TYPE = "action-record/v0"
+_TASK_AUTHORITY_BASIS = "task_authority"
+
+
+def _basis_task_authority(body: dict) -> str | None:
+    """The digest of the task authority an act record's ``authority_basis``
+    names: the ``ref`` of its one entry of type ``task_authority``. ``None``
+    when it has none, more than one, or a ref that is not a SHA-256 typed
+    reference."""
+    basis = body.get("authority_basis")
+    entries = [e for e in basis if isinstance(e, dict) and e.get("type") == _TASK_AUTHORITY_BASIS] if isinstance(
+        basis, list) else []
+    return _typed_ref_digest(entries[0].get("ref")) if len(entries) == 1 else None
+
+
 # The ``direction`` a deal check states when the money moves to the user: a
 # refund, or a partial cancel. Such an act is never spend: the bridge carries
 # its spend as ``0`` whatever ``spend_minor`` says, so it adds nothing to the
@@ -341,7 +365,9 @@ def _deal_id(shown: dict) -> _DealId:
     return _DealId(value=_text(block["deal_id"]) if stated else _text(shown.get("chain_id")))
 
 
-def _bridge_deal_check(record: dict, disclosed: dict | None, counterparty_profile: object = None) -> Action | None:
+def _bridge_deal_check(
+    record: dict, disclosed: dict | None, counterparty_profile: object = None, *, history: bool = False
+) -> Action | None:
     """The proposed action a capsulectl deal check states, from its own
     sealed record: the class it names, and the amount a spend cap evaluates,
     which is ``spend_minor`` only: never ``amount_minor`` (on a cancel it is
@@ -371,10 +397,13 @@ def _bridge_deal_check(record: dict, disclosed: dict | None, counterparty_profil
     ``dedupe`` keys it on the act, never on this record's type or id. The
     deal is the one the record names (``_deal_id``), never the ``action_id``
     prefix. A record naming two deals carries none, and names both fields in
-    ``deal_id_conflict``, so the engine refuses whatever would be allowed."""
+    ``deal_id_conflict``, so the engine refuses whatever would be allowed.
+    With ``history``, a typed act record is bridged too (``_checked_body``),
+    and its task authority is the one its ``authority_basis`` names
+    (``_basis_task_authority``)."""
     if disclosed is None or not _bound(record, disclosed):
         return None
-    checked = _checked_body(disclosed)
+    checked = _checked_body(disclosed, history=history)
     if checked is None:
         return None
     body, sealed_counterparty = checked
@@ -423,7 +452,7 @@ def _bridge_deal_check(record: dict, disclosed: dict | None, counterparty_profil
         material_fields_basis=_text(body.get("material_fields_basis")),
         offer_fields_changed=_minor(body.get("offer_fields_changed")),
         offer_fields_basis=_text(body.get("offer_fields_basis")),
-        task_authority_ref=_typed_ref_digest(body.get("task_authority_ref")),
+        task_authority_ref=_basis_task_authority(body) if history else _typed_ref_digest(body.get("task_authority_ref")),
         returned_minor=returned,
         reverses_ref=reverses,
         deal_id=deal.value,
@@ -505,16 +534,40 @@ def action_for_check_input(entry: dict, *, item_ref: object = None) -> Action:
     reads and judges it) and named in ``ignored_inputs`` otherwise. The
     envelope's other top-level members, ``party_role`` among them (a checker
     may read it to pick a pack), are not read here: an input carrying one is
-    decided as one without it."""
+    decided as one without it. The act a history entry records is read by
+    ``action_for_history_entry``; here a history entry's typed act record
+    states no act."""
+    capsule, agent_input = _entry_parts(entry)
+    action = action_for_record(capsule, agent_input, counterparty_profile=entry.get(_PROFILE_INPUT))
+    return _with_inputs(action, entry, item_ref)
+
+
+def action_for_history_entry(entry: dict) -> Action | None:
+    """The act a ``history`` entry of an external-check-input/v0 envelope
+    records: its sealed typed act record (``action-record/v0``), bridged as a
+    deal check is (``_bridge_deal_check``), with the task authority its
+    ``authority_basis`` names and the inputs beside it read as
+    ``action_for_check_input`` reads them (the entry's own ``item_ref``).
+    ``None`` when the entry is not a typed act record its capsule binds, or
+    names no class or taxonomy: what it records cannot be read."""
+    capsule, agent_input = _entry_parts(entry)
+    action = _bridge_deal_check(capsule, agent_input, entry.get(_PROFILE_INPUT), history=True)
+    return _with_inputs(action, entry, None) if action is not None else None
+
+
+def _entry_parts(entry: dict) -> tuple[dict, dict | None]:
+    """An envelope entry's capsule, without the members capsulectl passes
+    beside it, and its disclosed ``agent_input``."""
     capsule = {
         k: v for k, v in entry.items() if k not in ("agent_input", _PROFILE_INPUT, _PROPOSAL_INPUT, _ITEM_INPUT)
     }
     agent_input = entry.get("agent_input")
-    action = action_for_record(
-        capsule,
-        agent_input if isinstance(agent_input, dict) else None,
-        counterparty_profile=entry.get(_PROFILE_INPUT),
-    )
+    return capsule, agent_input if isinstance(agent_input, dict) else None
+
+
+def _with_inputs(action: Action, entry: dict, item_ref: object) -> Action:
+    """``action`` with the ``item_ref`` and ``proposal_at`` passed beside
+    ``entry`` (``action_for_check_input``)."""
     ignored = list(action.ignored_inputs)
     if item_ref is None:
         item_ref = entry.get(_ITEM_INPUT)

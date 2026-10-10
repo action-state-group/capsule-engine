@@ -12,7 +12,9 @@ passes only when ALL hold:
   recipient (``target``);
 - it cites (``cited_mandate_capsule_id``) the sale's acceptance, found by
   ``single_commitment.first_sealed_acceptance`` so both checks read the same
-  record;
+  record: the sale is the ``item_ref``, under any task authority, and an
+  acceptance that is not known (a live history that cannot settle it) is
+  none;
 - that acceptance was sealed for the same recipient (its ``target`` equals
   the disclosure's);
 - the cited record re-verifies in the ledger.
@@ -110,9 +112,7 @@ def check_release_on_acceptance(
     if action.cited_mandate_capsule_id is None:
         return _outcome("fail", "the disclosure cites no acceptance", _evidence(cls, False))
 
-    acceptance = first_sealed_acceptance(
-        action.operator, ledger, acceptance_classes, action.task_authority_ref, action.item_ref
-    )
+    acceptance = first_sealed_acceptance(action.operator, ledger, acceptance_classes, action.item_ref)
     if (
         acceptance is None
         or action.cited_mandate_capsule_id != acceptance["capsule_id"]

@@ -69,6 +69,7 @@ __all__ = [
     "LOCAL_ONLY_TARGET_PREFIX",
     "ConstraintOutcome",
     "NotApplicableEvidence",
+    "act_payload",
     "build_decision_capsule",
     "local_only_refusal",
     "not_applicable_evidence",
@@ -231,6 +232,17 @@ def _to_constraint_record(outcome: ConstraintOutcome) -> ConstraintRecord:
         method=outcome.method,
         evidence_digest=evidence_digest,
     )
+
+
+def act_payload(action: Action) -> dict:
+    """The ``asg_payload`` members a decision on ``action`` seals about the
+    act, without its checkpoint: what a check reads of an earlier act. A live
+    check's history ledger writes them for each act in its history
+    (``report/live_history.py``), so a check reads a history act as it reads
+    a decision."""
+    ext = _payload_extension(action, {}, None)
+    del ext["checkpoint"]
+    return ext
 
 
 def _payload_extension(action: Action, checkpoint: dict, manifest_digest: str | None) -> dict:

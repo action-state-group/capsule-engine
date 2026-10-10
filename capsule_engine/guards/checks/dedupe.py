@@ -38,6 +38,12 @@ another counterparty; the earlier act is in the evidence only.
 
 An action that states no act (``Action.states_act`` false) is not deduped: its
 ``dedupe`` is ``n/a``, out of scope, and it never matches anything.
+
+On a ledger built from a live check's history (``report/live_history.py``),
+only an act whose capsule seals a disposition is matched
+(``history_state.counts_as_act``): an act sealed with none, an entry that
+could not be read and the marker of an incomplete history are skipped, so a
+history of such acts dedupes as an empty ledger does.
 """
 from __future__ import annotations
 
@@ -49,6 +55,7 @@ from capsule_ledger.ledger.api import LedgerAPI, ScanQuery
 
 from ..action import Action
 from ..capsule import ConstraintOutcome, not_applicable_evidence
+from ..history_state import counts_as_act
 from .base import CheckOutcome
 
 __all__ = ["equivalence_key_for_action", "equivalence_key_for_capsule", "check_dedupe"]
@@ -232,7 +239,7 @@ def check_dedupe(action: Action, ledger: LedgerAPI, *, since: str | None = None)
     query = ScanQuery(action_type=scanned_type, since=since)
     other_deal = None
     for record in ledger.scan(query):
-        if equivalence_key_for_capsule(record.capsule) != key:
+        if not counts_as_act(record.capsule) or equivalence_key_for_capsule(record.capsule) != key:
             continue
         earlier = _EarlierAct.of(record)
         if not _in_another_deal(action, earlier):

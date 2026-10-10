@@ -287,14 +287,19 @@ def test_a_commitment_missing_a_key_field_is_n_a_naming_it(store, signer, field)
     assert out.evidence == not_applicable_evidence("single_commitment", in_scope=True, missing_field=field)
 
 
-@pytest.mark.parametrize("overrides", [
-    dict(task_authority_ref=OTHER_SALE),
-    dict(item_ref="item/ref-2"),
-], ids=["another-sale", "another-item"])
-def test_an_acceptance_for_another_sale_or_item_does_not_count(store, signer, overrides):
+def test_an_acceptance_for_another_item_does_not_count(store, signer):
     engine = _engine(store, signer)
-    _accept_in_a(engine, **overrides)
+    _accept_in_a(engine, item_ref="item/ref-2")
     assert _constraint(engine.check(_action(action_id="offer/b"))).result == "pass"
+
+
+def test_an_acceptance_under_another_task_authority_for_the_same_item_counts(store, signer):
+    """The item names the sale. capsulectl seals one task authority per
+    thread, so A's acceptance and B's commitment cite different ones."""
+    engine = _engine(store, signer)
+    _accept_in_a(engine, task_authority_ref=OTHER_SALE)
+    out = _constraint(engine.check(_action(action_id="offer/b")))
+    assert (out.result, out.evidence) == ("fail", _says_only(True))
 
 
 def test_a_refused_acceptance_does_not_count(store, signer):

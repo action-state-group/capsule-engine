@@ -23,6 +23,13 @@ It is decided as any action without a deal, except that what would be allowed
 is refused and sealed ``reject``, its ``verdict`` ``not_evaluable``
 (``DealIdConflict``): neither value is picked, and the act is never counted
 later as seen or as spend.
+
+A configured check that could not be evaluated and fails closed
+(``CheckOutcome.fails_closed``: ``single_commitment`` when a live check's
+history leaves the sale's acceptance unknown) is recorded ``n/a`` in scope,
+and the action is refused, sealed ``reject``, whatever else would allow or
+ask; with no constraint failed its ``verdict`` is ``not_evaluable``
+(``GuardDecision.not_evaluated_checks``).
 """
 from __future__ import annotations
 
@@ -126,14 +133,20 @@ class GuardDecision:
     # Set when the action's record states its deal twice, with different
     # values: the action is in no deal, and is never allowed.
     deal_id_conflict: DealIdConflict | None = None
+    # The checks that could not be evaluated and fail closed
+    # (``CheckOutcome.fails_closed``): the action is never allowed.
+    not_evaluated_checks: tuple[str, ...] = ()
 
     @property
     def verdict(self) -> str:
         """``outcome``, except that a decision refused only because its
-        class-keyed checks were left unevaluated (``taxonomy_mismatch``) or
-        its deal could not be read (``deal_id_conflict``), with no constraint
-        failed, is ``not_evaluable``."""
-        unevaluated = self.taxonomy_mismatch is not None or self.deal_id_conflict is not None
+        class-keyed checks were left unevaluated (``taxonomy_mismatch``), its
+        deal could not be read (``deal_id_conflict``) or a check that fails
+        closed could not be evaluated (``not_evaluated_checks``), with no
+        constraint failed, is ``not_evaluable``."""
+        unevaluated = (
+            self.taxonomy_mismatch is not None or self.deal_id_conflict is not None or bool(self.not_evaluated_checks)
+        )
         if unevaluated and not any(c.result == "fail" for c in self.constraints):
             return NOT_EVALUABLE
         return self.outcome
@@ -450,6 +463,7 @@ class GuardEngine:
             plan_out = check_plan_containment(action, self._plan)
             constraints = (*constraints, plan_out.constraint)
         gate_runs: list[tuple[WicketDefinition, ConstraintOutcome]] = []
+        not_evaluated: list[str] = []
         for wicket in self._wickets:
             if wicket.check in TASK_AUTHORITY_CHECKS:
                 out = TASK_AUTHORITY_CHECKS[wicket.check](action, task_authority_record, wicket.config)
@@ -467,6 +481,8 @@ class GuardEngine:
                 out = CONFIGURED_CHECKS[wicket.check](action, self._ledger, wicket.config)
             constraint = held(out.constraint)
             constraints = (*constraints, constraint)
+            if out.fails_closed and constraint.result == "n/a":
+                not_evaluated.append(constraint.id)
             if wicket.check == _GATE:
                 gate_runs.append((wicket, constraint))
         # A held caps result is not reported, so neither is the fold it read.
@@ -483,6 +499,10 @@ class GuardEngine:
         conflict = DealIdConflict(fields=action.deal_id_conflict) if action.deal_id_conflict else None
         if conflict is not None and outcome == ALLOW:
             # Its deal is unknown, and neither stated value is picked.
+            outcome = DENY
+        if not_evaluated:
+            # A check that fails closed could not be evaluated: refused,
+            # whatever else would allow or ask.
             outcome = DENY
 
         resolved_parent, resolved_relation = chain_parent, chain_relation
@@ -556,9 +576,10 @@ class GuardEngine:
             fold_envelopes=fold_envelopes,
             checkpoint=checkpoint,
             capsule=capsule,
-            reason=_summarize(constraints, outcome, ac, escalatable, mismatch_reason, conflict),
+            reason=_summarize(constraints, outcome, ac, escalatable, mismatch_reason, conflict, tuple(not_evaluated)),
             taxonomy_mismatch=mismatch,
             deal_id_conflict=conflict,
+            not_evaluated_checks=tuple(not_evaluated),
         )
 
     def _taxonomy_for(self, action: Action) -> tuple[TaxonomyTable, TaxonomyMismatch | None, str | None]:
@@ -804,6 +825,7 @@ def _summarize(
     escalatable: frozenset[str],
     not_evaluated: str | None = None,
     deal_id_conflict: DealIdConflict | None = None,
+    not_evaluated_checks: tuple[str, ...] = (),
 ) -> str:
     parts = [f"{c.id}={c.result}" for c in constraints]
     summary = f"{outcome}: " + ", ".join(parts)
@@ -819,6 +841,10 @@ def _summarize(
         )
         if not fails:
             summary += "; refused because its deal is not known"
+    if not_evaluated_checks:
+        summary += f"; not evaluable: {', '.join(not_evaluated_checks)}"
+        if not fails:
+            summary += "; refused because a check that fails closed could not be evaluated"
     if outcome == DENY and fails and fails <= escalatable and action_class.approver_role is None:
         summary += (
             f"; every failure may ask an approver, but action class {action_class.name!r} "

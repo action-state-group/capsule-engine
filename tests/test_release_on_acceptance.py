@@ -146,11 +146,17 @@ def test_another_buyers_acceptance_of_another_item_fails(store, signer):
     _assert_value_free(outcome)
 
 
-@pytest.mark.parametrize(("field", "value"), [("task_authority_ref", OTHER_SALE), ("item_ref", OTHER_ITEM)])
-def test_the_recipients_acceptance_of_another_sale_fails(store, signer, field, value):
-    """The sale match: A's acceptance is real and to A, but of another sale."""
-    other = _accept(_engine(store, signer), 1, **{"sale" if field == "task_authority_ref" else "item": value})
+def test_the_recipients_acceptance_of_another_sale_fails(store, signer):
+    """The sale match: A's acceptance is real and to A, but of another item."""
+    other = _accept(_engine(store, signer), 1, item=OTHER_ITEM)
     assert _check(_share(cited_mandate_capsule_id=other), store).result == "fail"
+
+
+def test_the_recipients_acceptance_under_another_task_authority_of_the_same_item_is_this_sale(store, signer):
+    """The item names the sale: capsulectl seals one task authority per
+    thread, so the acceptance and the disclosure may cite different ones."""
+    other = _accept(_engine(store, signer), 1, sale=OTHER_SALE)
+    assert _check(_share(cited_mandate_capsule_id=other), store).result == "pass"
 
 
 def test_a_cited_record_that_is_not_an_acceptance_fails(store, signer):
