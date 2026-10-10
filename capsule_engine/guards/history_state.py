@@ -12,6 +12,8 @@ that builder writes carries ``asg_payload.live_history``, one of:
   what was decided on it is not known, which is not the same as "not
   accepted";
 - ``unread``: a history entry whose act could not be read;
+- ``statement``: a claim the user's agent made to the counterparty
+  (``guards/statements.py``), which states no act;
 - ``incomplete``: written once when the history is not known to be complete,
   so an act may be missing from the ledger.
 
@@ -27,6 +29,7 @@ __all__ = [
     "INCOMPLETE",
     "LIVE_HISTORY",
     "NO_DISPOSITION",
+    "STATEMENT",
     "UNREAD",
     "counts_as_act",
     "history_state",
@@ -36,6 +39,7 @@ LIVE_HISTORY = "live_history"
 DISPOSITION = "disposition"
 NO_DISPOSITION = "no_disposition"
 UNREAD = "unread"
+STATEMENT = "statement"
 INCOMPLETE = "incomplete"
 
 

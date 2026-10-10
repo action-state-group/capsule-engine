@@ -128,6 +128,10 @@ CONFIGURED_CHECKS: dict[str, Callable[[Action, LedgerAPI, dict], CheckOutcome]] 
         representation_classes=config["representation_classes"],
         required_classes=config["required_classes"],
         action_classes=config["action_classes"],
+        statement_definition=(
+            seen_before_fold(config["statement_fold_id"], config["statement_fold_digest"])
+            if "statement_fold_id" in config else None
+        ),
     ),
     "offer_expiry": lambda action, ledger, config: check_offer_expiry(
         action, max_age_seconds=config["max_age_seconds"], action_classes=config["action_classes"]

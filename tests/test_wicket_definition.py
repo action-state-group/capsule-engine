@@ -73,6 +73,8 @@ EXPECTED_DIGESTS = {
     # The seller-side checks, and the seller configurations of two existing
     # ones. No pack cites them yet.
     "required_disclosure/1.0.0": "c8f216415be1fac673d1efc6df2e7a9666b5d5c8e639fbb3d8379a24bb8f5ebf",
+    # Also counts a claim the agent made in the action's deal (the seller pack since 0.1.3).
+    "required_disclosure/1.1.0": "80f3af6e428f2331f6ab458997d996e172b9fc2e721b55fcf473f4e31d1492c0",
     "promise_requires_approval/1.0.0": "b29e29e0a31ef764b282fa5754992b49b5ffc4f3fc261fb821987ae6c2e1c9b2",
     "promise_never/1.0.0": "836ae58f704a9c8ab8027fee344ca47ddb3de76a7a1973a650f42a3595e649f4",
     # Replaces offer_expiry/1.0.0, retired at its digest (RETIRED_DIGESTS below).
@@ -107,6 +109,7 @@ WITHOUT_SEMANTICS = frozenset(EXPECTED_DIGESTS) - {
     "offer_fields_changed/1.1.0", "refundability/1.1.0", "task_authority/1.1.0", "upfront_amount/1.1.0",
     "counterparty_seen_before/3.0.0", "counterparty_seen_before/4.0.0", "seller.release_on_acceptance/1.0.0",
     "caps/5.1.0",
+    "required_disclosure/1.1.0",
 }
 
 

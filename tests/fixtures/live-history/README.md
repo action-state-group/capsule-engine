@@ -40,7 +40,7 @@ only to keep each external-check-input/v0 capsulectl hands it; it allows and nam
 | `buyer-a.bundle.json`, `buyer-b.bundle.json` | each thread's own copy, replayed by the engine in that order |
 | `check-inputs/<thread>-<action>-<amount>.json` | the external-check-input/v0 of each check, its `history` included |
 | `inputs/` | the sale, thread, claim, check and act bodies |
-| `expected_live.json` | each check input decided live under `asg/seller/0.1.2` with its history as sealed, with an `accept` disposition added to every history act, with no history, and (with that disposition) with no `item_ref` on the history's accepted commitments or on the checked record; the ledger each was decided on; sorted canonical JSON |
+| `expected_live.json` | each check input decided live under `asg/seller/0.1.3` with its history as sealed, with an `accept` disposition added to every history act, with no history, (with that disposition) with no `item_ref` on the history's accepted commitments or on the checked record, and (with that disposition) with every claim either thread sealed by the check's time added to the history; the ledger each was decided on; sorted canonical JSON |
 
 Regenerate `expected_live.json` with `python -m tests.test_live_history`.
 `tests/test_live_history.py` compares it byte for byte.
@@ -58,6 +58,9 @@ Regenerate `expected_live.json` with `python -m tests.test_live_history`.
 
 The `accept` dispositions in `expected_live.json` are added by the test, not sealed by capsulectl:
 those capsules no longer verify, and the engine does not verify them here.
+The claims in the history are added by the test too: capsulectl seals them (they are in the bundles,
+byte for byte) but puts only acts in a checker's history. Each is given as an act is: its capsule
+with its disclosed `agent_input`, and the sale's `item_ref` beside it.
 
 ## Identity
 
