@@ -15,10 +15,15 @@ class CheckOutcome:
     envelope(s) it read as evidence, and an optional suggested chain link
     (e.g. dedupe/verify_before_dispatch citing the capsule they matched).
     ``asks_approver`` marks a failure the check itself found an approver may
-    resolve (dedupe: the same act in another deal); the engine reads it."""
+    resolve (dedupe: the same act in another deal); the engine reads it.
+    ``fails_closed`` marks an in-scope ``n/a`` the check could not evaluate
+    and must not be allowed past (single_commitment: whether the sale has an
+    acceptance is not known); the engine refuses the action and the
+    decision's ``verdict`` is ``not_evaluable``."""
 
     constraint: ConstraintOutcome
     fold_envelopes: tuple[dict, ...] = field(default_factory=tuple)
     chain_parent: str | None = None
     chain_relation: str | None = None
     asks_approver: bool = False
+    fails_closed: bool = False
