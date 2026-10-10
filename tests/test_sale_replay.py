@@ -782,7 +782,7 @@ CUT_AND_OPENED = {
                                             {"sale_bundle_not_valid", "thread_opened_not_read", "opened_not_evidenced"}),
     "a thread missing from the cut": (_a_dropped_from_the_cut, {"sale_bundle_not_valid", "thread_not_in_the_cut"}),
     "a cut that cannot be read": (_the_cut_unreadable,
-                                  {"sale_bundle_not_valid", "sale_cut_not_read", "thread_not_in_the_cut"}),
+                                  {"sale_bundle_not_valid", "no_sale_cut"}),
 }
 
 

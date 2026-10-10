@@ -368,7 +368,7 @@ def _sale_log_openings(bound: list[dict], findings: list[str]) -> tuple[dict[str
     ``thread_opened`` record's ``task_authority_commitment``, by the digest
     of the registration it names, and the ``head_commitment`` of each
     thread the latest ``sale_cut`` names, by registration (``None`` when the
-    log holds no cut). The bundle is the whole log at its certified
+    log holds no cut it can read). The bundle is the whole log at its certified
     checkpoint, so its latest cut is the latest one at or before it. A
     record of either kind that cannot be read is appended to ``findings``:
     it may be the one that opens a thread."""
@@ -392,8 +392,9 @@ def _sale_log_openings(bound: list[dict], findings: list[str]) -> tuple[dict[str
         return opened, None
     latest = max(cuts, key=_seq)
     if sum(_seq(c) == _seq(latest) for c in cuts) != 1:
-        findings.append("sale_cut_not_read")
-        return opened, {}
+        # A cut that cannot be read is no cut: each present thread names
+        # ``no_sale_cut`` (one name with capsulectl's verifier).
+        return opened, None
     body = latest.get("body") if isinstance(latest.get("body"), dict) else {}
     heads = body.get("thread_heads")
     cut: dict[str, str] = {}
@@ -401,8 +402,7 @@ def _sale_log_openings(bound: list[dict], findings: list[str]) -> tuple[dict[str
         head = head if isinstance(head, dict) else {}
         registration, commitment = _typed_ref_digest(head.get("registration")), _text(head.get("head_commitment"))
         if registration is None or commitment is None or registration in cut:
-            findings.append("sale_cut_not_read")
-            return opened, {}
+            return opened, None
         cut[registration] = commitment
     return opened, cut
 
