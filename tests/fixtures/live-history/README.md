@@ -5,12 +5,17 @@ buyer threads. Every byte of the two bundles and the five check inputs is what c
 
 ## Producer
 
-- capsule-cli commit `65f54e528a788cace28b8e2df92f652b5d5629a9` (main after `v0.1.0-rc14`), built
+- capsule-cli commit `424e79479c40138fcb425674a2ec7c4e540ce478` (the head of capsule-cli pull request
+  #194, "deal: a history act carries the counterparty its check sealed", on main after `v0.1.0-rc14`), built
   with `git archive` and `CGO_ENABLED=0 go build -trimpath -ldflags "-s -w -buildid= -X …"`.
 - `capsulectl --version` prints
-  `capsulectl v0.1.0-rc14-11-g65f54e5 (commit 65f54e528a788cace28b8e2df92f652b5d5629a9)`.
+  `capsulectl v0.1.0-rc14-17-g424e794 (commit 424e79479c40138fcb425674a2ec7c4e540ce478)`.
+- Rebuilt with that commit on 2026-10-09 so each history act carries `counterparty`; against the
+  rc14-11 build it replaced, only `s09-no-repeated-act` on the second check of A's commit changed
+  (with the added disposition: `pass` to `fail`, as the replay decides it).
 - A re-run makes other keys, ids and timestamps, so the bundles, the check inputs, the digests
-  pinned in the test and `expected_live.json` are replaced together.
+  pinned in the test, the deal ids pinned in `tests/test_seller_statements.py` and `expected_live.json`
+  are replaced together.
 
 ## Commands
 
@@ -54,7 +59,8 @@ Regenerate `expected_live.json` with `python -m tests.test_live_history`.
   `task_authority_ref`s; the sale's `item_ref` is the one value they share.
 - **The history is newest first.** Acts sealed in the same second keep the order they were sealed in.
 - **An act record seals no counterparty.** A check does (the thread's buyer); the act that follows
-  it does not.
+  it does not. capsulectl gives each history act, beside its capsule, `counterparty`: the block its
+  check sealed, exactly as sealed, keyed per deal.
 
 The `accept` dispositions in `expected_live.json` are added by the test, not sealed by capsulectl:
 those capsules no longer verify, and the engine does not verify them here.

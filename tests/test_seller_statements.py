@@ -56,6 +56,8 @@ V1_1 = load_definition_file(WICKETS / "required_disclosure.v1.1.yaml")
 REPRESENTATION_CLASSES = V1_1.config["representation_classes"]
 FIXTURE = Path(__file__).parent / "fixtures" / "live-history"
 OWN = (FIXTURE / "buyer-a.bundle.json", FIXTURE / "buyer-b.bundle.json")
+# Each buyer thread's deal id, as capsulectl wrote it (re-pinned with the fixture on a rebuild).
+DEAL_A, DEAL_B = "deal-a4a44a1583055667", "deal-c8f7695110ba493e"
 PACK = load_pack_dir(ROOT / "packs" / "catalog" / "seller")
 FROZEN_0_1_2 = load_pack_dir(Path(__file__).parent / "fixtures" / "packs" / "seller-0.1.2")
 S05 = "s05-required-statement-made-first"
@@ -341,13 +343,13 @@ def test_a_claim_made_after_the_offer_does_not_count_for_it():
     for A's commits but not the offer."""
     records, disclosed = _bundle_records()
     (claim,) = [r for r in records if _is_claim(disclosed.get(r["capsule_id"])) and r["action_id"].startswith(
-        "deal-0e39b9755240e242/")]
+        f"{DEAL_A}/")]
     records.remove(claim)
-    offer = next(i for i, r in enumerate(records) if r["action_id"] == "deal-0e39b9755240e242/4")
+    offer = next(i for i, r in enumerate(records) if r["action_id"] == f"{DEAL_A}/4")
     records.insert(offer + 1, claim)
     decisions = _replay(records, disclosed)
-    assert _s05(decisions["deal-0e39b9755240e242/4"]).result == "fail"
-    assert _s05(decisions["deal-0e39b9755240e242/8"]).result == "pass"
+    assert _s05(decisions[f"{DEAL_A}/4"]).result == "fail"
+    assert _s05(decisions[f"{DEAL_A}/8"]).result == "pass"
 
 
 def test_a_claim_given_twice_is_one_statement_in_the_replay():
@@ -378,7 +380,7 @@ def test_the_fixture_claims_are_the_ones_capsulectl_sealed():
     stated = [statement_record(r, disclosed.get(r["capsule_id"])) for r in records]
     stated = [s for s in stated if s is not None]
     assert [(s["asg_payload"][STATED]["class"], s["asg_payload"][STATED]["deal_id"]) for s in stated] == [
-        ("condition", "deal-0e39b9755240e242"), ("condition", "deal-f9d99d4407f3eba8")]
+        ("condition", DEAL_A), ("condition", DEAL_B)]
     assert json.loads((FIXTURE / "inputs" / "claim-condition.json").read_text())["class"] == "condition"
 
 
