@@ -18,7 +18,10 @@ removed from the history's accepted commitments and once with it removed
 from the checked record; and, with that disposition, with every claim the
 agent made in either thread before the check added to the history beside
 the sale's ``item_ref`` (what capsulectl does not send today; synthetic, from
-the claim records the bundles seal) (``HISTORIES``). ``expected_live.json`` is every decision and the ledger each
+the claim records the bundles seal); and, with that disposition, with the
+checked record's ``deal_claims`` (AMENDMENT 9) added by the documented
+fixture step ``add_deal_claims.py``, which capsulectl does not pass yet
+(``HISTORIES``). ``expected_live.json`` is every decision and the ledger each
 was decided on, in sorted canonical JSON, compared byte for byte here and
 handed to the Go plugin. Regenerate it with ``python -m tests.test_live_history``.
 """
@@ -27,6 +30,7 @@ from __future__ import annotations
 import copy
 import dataclasses
 import hashlib
+import importlib.util
 import json
 import sys
 import tempfile
@@ -63,6 +67,10 @@ FIXTURE = Path(__file__).parent / "fixtures" / "live-history"
 OWN = (FIXTURE / "buyer-a.bundle.json", FIXTURE / "buyer-b.bundle.json")
 INPUTS = ("a-offer-1900", "a-commit-1900", "b-offer-1850", "b-commit-1850", "a-commit-again-1900")
 EXPECTED = FIXTURE / "expected_live.json"
+_STEP = importlib.util.spec_from_file_location("add_deal_claims", FIXTURE / "add_deal_claims.py")
+_step = importlib.util.module_from_spec(_STEP)
+_STEP.loader.exec_module(_step)
+with_deal_claims = _step.with_deal_claims
 FIXTURE_SHA256 = {
     "buyer-a.bundle.json": "b815ac5fea77adc16a266eaf293f55aa54af9b50a7571c24a810974d2db05361",
     "buyer-b.bundle.json": "db31a7564eaf23cd29cab7856a12979dd4e9291bbc050393dfa564d82e80ad07",
@@ -86,7 +94,8 @@ SPEND = load_fold(ROOT / "folds" / "catalog_defs" / "spend.weekly.v3.yaml")
 AS_SEALED, DISPOSED, ABSENT = "as-sealed", "disposition-accept", "absent"
 HISTORY_NO_ITEM, RECORD_NO_ITEM = "disposition-accept-commit-names-no-item", "disposition-accept-record-names-no-item"
 CLAIMS = "disposition-accept-claims-in-history"
-HISTORIES = (AS_SEALED, DISPOSED, ABSENT, HISTORY_NO_ITEM, RECORD_NO_ITEM, CLAIMS)
+DEAL_CLAIMS = "disposition-accept-record-deal-claims"
+HISTORIES = (AS_SEALED, DISPOSED, ABSENT, HISTORY_NO_ITEM, RECORD_NO_ITEM, CLAIMS, DEAL_CLAIMS)
 ACCEPTANCE_CLASS = "agreement.accept"
 
 
@@ -142,12 +151,20 @@ def claim_entries(before: str, item_ref: str) -> list[dict]:
     return sorted(entries, key=lambda e: e["timestamp"], reverse=True)
 
 
+def _thread_bundle(capsule_id: str) -> dict:
+    """The thread's own bundle that holds the checked record."""
+    (bundle,) = [b for b in map(_json, OWN) if any(r["capsule_id"] == capsule_id for r in b["records"])]
+    return bundle
+
+
 def _given(envelope: dict, history: str) -> dict:
     """``envelope`` with its history given as ``history`` says."""
     envelope = copy.deepcopy(envelope)
-    if history in (DISPOSED, HISTORY_NO_ITEM, RECORD_NO_ITEM, CLAIMS):
+    if history in (DISPOSED, HISTORY_NO_ITEM, RECORD_NO_ITEM, CLAIMS, DEAL_CLAIMS):
         for entry in envelope["history"]:
             entry["disposition"] = {"decision": "accept"}
+    if history == DEAL_CLAIMS:
+        envelope = with_deal_claims(envelope, _thread_bundle(envelope["record"]["capsule_id"]))
     if history == CLAIMS:
         envelope["history"] = sorted(
             [*envelope["history"], *claim_entries(envelope["record"]["timestamp"], envelope["item_ref"])],
@@ -557,13 +574,15 @@ LIVE_REPLAY_DIFFERENCES = {
 S05 = "s05-required-statement-made-first"
 
 
-def test_live_and_replay_differ_only_where_named():
-    """Live with the dispositions sealed and the agent's claims in the
-    history, which is what the replay reads from the bundles."""
+@pytest.mark.parametrize("given", [DEAL_CLAIMS, CLAIMS])
+def test_live_and_replay_differ_only_where_named(given):
+    """Live with the dispositions sealed and the deal's agent claims given,
+    beside the checked record (AMENDMENT 9) or in the history, which is
+    what the replay reads from the bundles."""
     differences = {}
     for name in INPUTS:
         envelope = _check_input(name)
-        live = _rules(_live(name, CLAIMS).decision)
+        live = _rules(_live(name, given).decision)
         replayed = _rules(_replayed()[envelope["record"]["action_id"]])
         assert set(live) == set(replayed), name
         for rule in live:
@@ -616,6 +635,71 @@ def test_a_claim_in_another_thread_is_not_a_statement_to_this_buyer():
     assert len(envelope["history"]) == len(_given(_check_input("a-commit-again-1900"), CLAIMS)["history"]) - 1
     (s05,) = [c for c in _decide(envelope).decision.constraints if c.id == "required_disclosure"]
     assert (s05.result, s05.evidence["stated_counts"]) == ("fail", {"condition": 0})
+
+
+# -- the deal's claims beside the checked record (AMENDMENT 9) ----------------------
+
+
+def test_with_deal_claims_every_check_finds_its_threads_statement():
+    """Each check input gets its own deal's claim, made before it, and passes
+    s05 on it alone: the history holds no claim."""
+    for name in INPUTS:
+        envelope = _given(_check_input(name), DEAL_CLAIMS)
+        (claim,) = envelope["record"]["deal_claims"]
+        assert not any(e["agent_input"].get("x-deal-v0") for e in envelope["history"]), name
+        live = _live(name, DEAL_CLAIMS)
+        (s05,) = [c for c in live.decision.constraints if c.id == "required_disclosure"]
+        assert (s05.result, s05.evidence["stated_counts"]) == ("pass", {"condition": 1}), name
+        assert live.written.statement == 1 and live.written.unread == 0, name
+        assert action_for_check_input(envelope["record"], item_ref=envelope["item_ref"]).ignored_inputs == (), name
+        assert [_row(r)["stated"] for r in live.ledger if _row(r)["live_history"] == STATEMENT] == ["condition"]
+        assert claim["source_kind"] == "agent" and claim["class"] == "condition", name
+
+
+def test_deal_claims_move_only_s05():
+    for name in INPUTS:
+        without, given = _rules(_live(name, DISPOSED).decision), _rules(_live(name, DEAL_CLAIMS).decision)
+        assert {r for r in given if given[r] != without[r]} == {S05}, name
+
+
+@pytest.mark.parametrize("at", ["as sealed", "+00:00"], ids=["same time", "same instant written otherwise"])
+def test_deal_claims_and_the_history_claim_are_one_statement(at):
+    """The same claim given both ways is written once, however each dates
+    it: the claim's own capsule_id makes it one."""
+    envelope = _given(_check_input("a-commit-again-1900"), DEAL_CLAIMS)
+    if at != "as sealed":
+        for claim in envelope["record"]["deal_claims"]:
+            claim["at"] = claim["at"].replace("Z", at)
+    envelope["history"] = _given(_check_input("a-commit-again-1900"), CLAIMS)["history"]
+    live = _decide(envelope)
+    (s05,) = [c for c in live.decision.constraints if c.id == "required_disclosure"]
+    assert s05.evidence["stated_counts"] == {"condition": 1}
+    assert live.written.statement == 2  # A's claim once, and B's, which is another deal's
+
+
+@pytest.mark.parametrize("given", [DEAL_CLAIMS, CLAIMS])
+def test_live_and_replay_count_the_same_statements(given):
+    """Beyond the result: s05's counts, per class, agree on every check."""
+    for name in INPUTS:
+        envelope = _check_input(name)
+        (live,) = [c for c in _live(name, given).decision.constraints if c.id == "required_disclosure"]
+        (replayed,) = [c for c in _replayed()[envelope["record"]["action_id"]].constraints
+                       if c.id == "required_disclosure"]
+        assert live.evidence["stated_counts"] == replayed.evidence["stated_counts"] == {"condition": 1}, name
+        assert live.evidence["prior_counts"] == replayed.evidence["prior_counts"], name
+
+
+def test_the_fixture_step_refuses_an_input_that_already_has_deal_claims():
+    envelope = _given(_check_input("a-offer-1900"), DEAL_CLAIMS)
+    with pytest.raises(SystemExit, match="rebuild the fixture"):
+        with_deal_claims(envelope, _thread_bundle(envelope["record"]["capsule_id"]))
+
+
+def test_no_vendored_check_input_carries_deal_claims_yet():
+    """When capsulectl passes them, the vendored inputs carry them and the
+    fixture step must go (it refuses such an input)."""
+    for name in INPUTS:
+        assert "deal_claims" not in _check_input(name)["record"], name
 
 if __name__ == "__main__":
     for path in sorted(p for p in FIXTURE.rglob("*.json") if p != EXPECTED):
