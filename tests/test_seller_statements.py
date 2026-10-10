@@ -70,7 +70,8 @@ OPERATOR = "synthetic-seller"
 def _claim(*, deal: str = "deal-a", record_type: str = "claim", **body) -> tuple[dict, dict]:
     """A capsule and the ``x-deal-v0`` record it binds by digest."""
     shown = {"body": {"source_kind": "agent", "class": "condition", "text_commitment": "ab" * 32, **body},
-             "x-deal-v0": {"record_type": record_type, "deal_id": deal, "profile": "x-deal-v0", "seq": 3}}
+             "x-deal-v0": {"record_type": record_type, "deal_id": deal, "profile": "x-deal-v0", "seq": 3,
+                           "at": "2026-10-10T00:41:06Z"}}
     shown["body"] = {k: v for k, v in shown["body"].items() if v is not None}
     capsule = {"capsule_id": json_digest(shown)[:8] + "c" * 56, "operator": OPERATOR, "action_type": "fyi",
                "timestamp": "2026-10-10T00:41:06Z",
@@ -83,7 +84,7 @@ def test_an_agent_claim_with_a_class_is_a_statement_in_its_deal():
     stated = statement_record(capsule, shown)
     assert stated["asg_payload"] == {STATED: {"class": "condition", "source_kind": "agent", "deal_id": "deal-a",
                                               "claim": capsule["capsule_id"]}}
-    assert stated["operator"] == OPERATOR and stated["timestamp"] == capsule["timestamp"]
+    assert stated["operator"] == OPERATOR and stated["timestamp"] == shown["x-deal-v0"]["at"]
     assert stated["capsule_id"] == json_digest({k: v for k, v in stated.items() if k != "capsule_id"})
     assert "disposition" not in stated and "target" not in stated["asg_payload"]
 
@@ -481,3 +482,16 @@ def test_no_deal_claims_is_nothing_ignored():
     record = {k: v for k, v in _input_with_claims()["record"].items() if k != "deal_claims"}
     assert deal_claim_statements(record) == DealClaims(statements=(), ignored=False)
     assert deal_claim_statements({**record, "deal_claims": []}) == DealClaims(statements=(), ignored=False)
+
+
+def test_a_statement_is_dated_by_the_claims_sealed_at_never_its_capsule_timestamp():
+    """capsulectl reads the clock once: the claim's ``at`` and its capsule's
+    ``timestamp`` are the same instant, but their strings may differ. The
+    replay dates a statement by ``at``, the value a live check receives in
+    ``deal_claims``, so live and replay write the same statement record."""
+    capsule, shown = _claim()
+    capsule = {**capsule, "timestamp": "2026-10-10T00:41:06.000Z"}
+    stated = statement_record(capsule, shown)
+    assert stated["timestamp"] == "2026-10-10T00:41:06Z"
+    entry = {**capsule, "agent_input": shown}
+    assert statement_for_history_entry(entry) == stated

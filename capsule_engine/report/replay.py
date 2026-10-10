@@ -534,8 +534,11 @@ def statement_record(record: dict, disclosed: dict | None) -> StatementRecord | 
     capsule_id = _text(record.get("capsule_id"))
     if body.get("source_kind") != _AGENT or sealed_class is None or deal is None or capsule_id is None:
         return None
+    # The claim's own sealed ``at``, never the capsule's ``timestamp``: the same
+    # instant (one clock read in capsulectl), but only ``at`` is the string a
+    # live check receives in ``deal_claims``, so the two never diverge.
     return make_statement_record(
-        operator=str(record.get("operator", "")), timestamp=_text(record.get("timestamp")),
+        operator=str(record.get("operator", "")), timestamp=_text(block.get("at")),
         sealed_class=sealed_class, source_kind=_AGENT, deal_id=deal, claim=capsule_id,
     )
 
