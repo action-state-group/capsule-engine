@@ -78,8 +78,9 @@ Each is a strict `xfail` in the test:
   floor is not checked against it.
 - A commit's check input carries no `proposal_at` and no acceptance, so live, `offer_expiry`
   cannot date the offer and asks on every commit.
-- A check input's history holds acts only, never the thread's claim, so live, s05 finds no
-  statement in the deal and asks on every commit; the replay reads the claim in the bundle and
-  passes it.
+- A check input carries no `record.deal_claims` (AMENDMENT 9) and its history holds acts only,
+  never the thread's claim, so live, s05 finds no statement in the deal and asks on every commit;
+  the replay reads the claim in the bundle and passes it. `../live-history/` shows the live pass
+  with `deal_claims` given.
 - A typed check names no payee, and a sale's spend is 0, so in a replay `dedupe` reads offers to
   different buyers at different prices as one act.

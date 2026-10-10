@@ -24,7 +24,9 @@ It is not an act, so it is never read as an unread one and never adds to a
 spend window. Only a claim sealed at or before the checked record's
 ``timestamp`` is written, so a claim made after the check never counts for
 it; when the checked record's time cannot be read, no claim is written. A
-claim given twice is written once.
+claim given twice is written once. The claims capsulectl passes beside the
+checked record as ``deal_claims`` (AMENDMENT 9) are written the same way,
+after the history's records, as ``deal_claim_statements`` reads them.
 
 Each record states what is known about it (``guards/history_state.py``). Its
 ``disposition`` is the one the act's capsule seals, and nothing else: an act
@@ -62,8 +64,14 @@ from ..folds.definition import FoldDefinition
 from ..guards.capsule import act_payload
 from ..guards.checks.caps import counts_executed_acts
 from ..guards.history_state import DISPOSITION, INCOMPLETE, LIVE_HISTORY, NO_DISPOSITION, STATEMENT, UNREAD
-from ..guards.statements import StatementRecord
-from .replay import ExecutedActs, action_for_history_entry, bound_agent_input, statement_for_history_entry
+from ..guards.statements import StatementRecord, claim_of
+from .replay import (
+    ExecutedActs,
+    action_for_history_entry,
+    bound_agent_input,
+    deal_claim_statements,
+    statement_for_history_entry,
+)
 
 __all__ = ["HistoryLedger", "history_ledger"]
 
@@ -130,16 +138,19 @@ def history_ledger(envelope: dict, ledger: LedgerAPI, *, caps_fold: FoldDefiniti
     counts = {DISPOSITION: 0, NO_DISPOSITION: 0, UNREAD: 0, STATEMENT: 0}
     executed = ExecutedActs([entry for _, _, entry in dated]) if counts_executed_acts(caps_fold) else None
     written: set[str] = set()
+    claims: set[str] = set()
     for at, _, entry in dated:
         stated = _statement_record(entry)
         if stated is not None and (checked_at is None or at > checked_at):
             # A claim sealed after the check, or with no check time to hold it to.
             continue
         record = stated or _act_record(entry)
-        if record["capsule_id"] in written:
+        if record["capsule_id"] in written or (stated is not None and claim_of(stated) in claims):
             # The same act, or claim, given twice: written, and counted, once.
             continue
         written.add(record["capsule_id"])
+        if stated is not None:
+            claims.add(claim_of(stated))
         counts[str(record["asg_payload"][LIVE_HISTORY])] += 1
         ledger.append(dict(record), consequential=False)
         if executed is not None and stated is None:
@@ -148,6 +159,14 @@ def history_ledger(envelope: dict, ledger: LedgerAPI, *, caps_fold: FoldDefiniti
                                     every_record_is_an_act=True)
             if spend is not None:
                 ledger.append(dict(spend), consequential=False)
+    if isinstance(checked, dict):
+        for stated in deal_claim_statements(checked).statements:
+            if claim_of(stated) in claims:
+                # Given in the history too: one claim, one statement.
+                continue
+            claims.add(claim_of(stated))
+            counts[STATEMENT] += 1
+            ledger.append(dict(_marked(stated)), consequential=False)
     if not complete:
         ledger.append(_incomplete_record(envelope.get("record")), consequential=False)
     return HistoryLedger(
@@ -164,8 +183,11 @@ def _statement_record(entry: dict) -> StatementRecord | None:
     user's agent made (``statement_for_history_entry``), marked
     ``statement``; ``None`` for any other entry."""
     stated = statement_for_history_entry(entry)
-    if stated is None:
-        return None
+    return _marked(stated) if stated is not None else None
+
+
+def _marked(stated: StatementRecord) -> StatementRecord:
+    """A statement record with its ``live_history`` marker."""
     return StatementRecord(**{**stated, "asg_payload": {**stated["asg_payload"], LIVE_HISTORY: STATEMENT}})
 
 
