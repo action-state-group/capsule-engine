@@ -12,7 +12,7 @@ it refuses a sale whose acts already seal a disposition.
 ``withhold_thread`` makes the copy an adjudicator receives when one buyer's
 thread is withheld: that thread's ``sale_threads`` entry keeps only its
 registration and ``member: missing``, and ``x-deal-sale/v0`` no longer
-carries it. capsule-cli 6ac32ecd8b4c writes only the user's own copy.
+carries it. capsule-cli 9691acadf137 writes only the user's own copy.
 """
 from __future__ import annotations
 

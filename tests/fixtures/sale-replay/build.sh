@@ -7,7 +7,7 @@
 # The steps are those of tests/fixtures/live-history/build.sh, one second apart: a record's
 # time is whole seconds and two threads are two logs, so a replay can order records of two
 # threads only when their seconds differ. The sale bundle is written last, a second after the
-# last check, so its checkpoint certifies every check.
+# last check; it seals a sale_cut, so its checkpoint certifies every check.
 set -euo pipefail
 CAPSULECTL="$1"; MATERIALITY="$2"; R="$3"
 cd "$R"
@@ -65,12 +65,8 @@ check "$b" check-commit-1850.json b-commit-1850
 # Buyer A again: the seller's commit to A is checked a second time, after B's.
 check "$a" check-commit-1900.json a-commit-again-1900
 
-# The user's own copy of the sale, with both threads carried in x-deal-sale/v0. Nothing was
-# appended to the sale's log since B's registration, so capsulectl cuts no new checkpoint: the
-# one this copy carries is the checkpoint cut at B's registration, before every check.
+# The user's own copy of the sale, with both threads carried in x-deal-sale/v0. capsulectl seals
+# each thread's report, then a sale_cut naming each thread's last record, then cuts the sale's
+# checkpoint, so the copy's checkpoint is after every check.
 ctl deal sale bundle --sale "$sale" --out out/sale.bundle.json >out/sale.bundle.summary.json
-# A third thread, opened last, with nothing done in it: its registration is appended to the
-# sale's log, so the next copy carries a checkpoint cut after every check.
-c=$(deal open --sale "$sale" --input in/open-c.json | jq -r .deal_id)
-ctl deal sale bundle --sale "$sale" --out out/sale-after-c.bundle.json >out/sale-after-c.bundle.summary.json
-printf '%s\n%s\n%s\n%s\n' "$sale" "$a" "$b" "$c" >out/deal-ids.txt
+printf '%s\n%s\n%s\n' "$sale" "$a" "$b" >out/deal-ids.txt
