@@ -18,7 +18,7 @@ from typing import TypedDict
 
 from agent_action_capsule import json_digest
 
-__all__ = ["CLASS_ALIASES", "STATED", "StatementRecord", "make_statement_record"]
+__all__ = ["CLASS_ALIASES", "STATED", "StatementRecord", "claim_of", "make_statement_record"]
 
 # The ``asg_payload`` member that holds a statement.
 STATED = "stated"
@@ -37,6 +37,12 @@ class _StatementBody(TypedDict):
 
 class StatementRecord(_StatementBody):
     capsule_id: str
+
+
+def claim_of(stated: StatementRecord) -> str:
+    """The ``capsule_id`` of the claim a statement record was written for:
+    what makes two statement records one statement, however each dates it."""
+    return str(stated["asg_payload"][STATED]["claim"])
 
 
 def make_statement_record(

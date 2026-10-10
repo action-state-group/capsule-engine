@@ -66,7 +66,7 @@ from ..folds.definition import FoldDefinition
 from ..folds.duration import parse_duration_seconds
 from ..guards import ALLOW, ESCALATE, Action, GuardDecision, GuardEngine, LocalSigner
 from ..guards.checks.caps import EXECUTED_DECISION, SPEND_UNREADABLE, counts_executed_acts
-from ..guards.statements import StatementRecord, make_statement_record
+from ..guards.statements import StatementRecord, claim_of, make_statement_record
 from ..guards.wickets.definition import WicketDefinition
 from ..packs.install import engine_ask_sets
 from ..packs.schema import PackDefinition
@@ -611,8 +611,16 @@ def deal_claim_statements(entry: dict) -> DealClaims:
     before the checked capsule's ``timestamp``. Any other entry, a
     ``deal_claims`` that is not a list, or a checked record whose deal cannot
     be read (unbound, or naming two deals) is ignored, and ``ignored`` says
-    so; nothing it holds is echoed. The same claim given twice is one
-    statement."""
+    so; nothing it holds is echoed. An empty list is no claims. The same
+    claim (one ``capsule_id``) given twice is one statement.
+
+    The entries are capsulectl's word, on the user's own device: an entry
+    names no deal of its own, so it is taken as the checked record's, and
+    its ``record_digest`` is checked for shape only, since a live check has
+    no claim record to recompute it from. A replay of the bundle reads the
+    sealed claims themselves. The time rule is "at or before", as for a
+    claim in the history: capsule times are whole seconds, and capsulectl
+    seals a claim and the step after it in one second."""
     claims = entry.get(_CLAIMS_INPUT)
     if claims is None:
         return DealClaims(statements=(), ignored=False)
@@ -632,7 +640,7 @@ def deal_claim_statements(entry: dict) -> DealClaims:
             operator=str(capsule.get("operator", "")), timestamp=claim["at"], sealed_class=claim["class"],
             source_kind=_AGENT, deal_id=deal, claim=claim["capsule_id"],
         )
-        statements.setdefault(stated["capsule_id"], stated)
+        statements.setdefault(claim_of(stated), stated)
     return DealClaims(statements=tuple(statements.values()), ignored=ignored)
 
 
@@ -1195,9 +1203,9 @@ def replay(
             if _gets_no_decision(record, shown, withheld):
                 undecided.append(record)
                 stated = statement_record(record, shown)
-                if stated is not None and stated["capsule_id"] not in written_statements:
+                if stated is not None and claim_of(stated) not in written_statements:
                     # A claim given twice (overlapping sources) is one statement.
-                    written_statements.add(stated["capsule_id"])
+                    written_statements.add(claim_of(stated))
                     store.append(dict(stated), consequential=False)
                 chain = _carried_out(digest, deal) if digest is not None else None
                 checked = decided_checks.pop(chain.check, None) if chain is not None else None

@@ -662,13 +662,31 @@ def test_deal_claims_move_only_s05():
         assert {r for r in given if given[r] != without[r]} == {S05}, name
 
 
-def test_deal_claims_and_the_history_claim_are_one_statement():
-    """The same claim given both ways is written once."""
+@pytest.mark.parametrize("at", ["as sealed", "+00:00"], ids=["same time", "same instant written otherwise"])
+def test_deal_claims_and_the_history_claim_are_one_statement(at):
+    """The same claim given both ways is written once, however each dates
+    it: the claim's own capsule_id makes it one."""
     envelope = _given(_check_input("a-commit-again-1900"), DEAL_CLAIMS)
+    if at != "as sealed":
+        for claim in envelope["record"]["deal_claims"]:
+            claim["at"] = claim["at"].replace("Z", at)
     envelope["history"] = _given(_check_input("a-commit-again-1900"), CLAIMS)["history"]
     live = _decide(envelope)
     (s05,) = [c for c in live.decision.constraints if c.id == "required_disclosure"]
     assert s05.evidence["stated_counts"] == {"condition": 1}
+    assert live.written.statement == 2  # A's claim once, and B's, which is another deal's
+
+
+@pytest.mark.parametrize("given", [DEAL_CLAIMS, CLAIMS])
+def test_live_and_replay_count_the_same_statements(given):
+    """Beyond the result: s05's counts, per class, agree on every check."""
+    for name in INPUTS:
+        envelope = _check_input(name)
+        (live,) = [c for c in _live(name, given).decision.constraints if c.id == "required_disclosure"]
+        (replayed,) = [c for c in _replayed()[envelope["record"]["action_id"]].constraints
+                       if c.id == "required_disclosure"]
+        assert live.evidence["stated_counts"] == replayed.evidence["stated_counts"] == {"condition": 1}, name
+        assert live.evidence["prior_counts"] == replayed.evidence["prior_counts"], name
 
 
 def test_the_fixture_step_refuses_an_input_that_already_has_deal_claims():
