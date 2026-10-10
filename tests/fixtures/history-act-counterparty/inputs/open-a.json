@@ -1,0 +1,5 @@
+{"type":"booking","channel":"web",
+ "intent":{"verbatim":"book me a double room at Example Hotel Shinjuku for October 3","max_total_minor":50000,"allowed":["commit"]},
+ "who":{"name":"Example Hotel Shinjuku","domain":"hotel.example"},
+ "terms":{"item":"double room","price_minor":38000,"currency":"USD","when":"2026-10-03"},
+ "recourse":{"rail":"card","refundable":true}}

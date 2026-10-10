@@ -61,17 +61,17 @@ OWN = (FIXTURE / "buyer-a.bundle.json", FIXTURE / "buyer-b.bundle.json")
 INPUTS = ("a-offer-1900", "a-commit-1900", "b-offer-1850", "b-commit-1850", "a-commit-again-1900")
 EXPECTED = FIXTURE / "expected_live.json"
 FIXTURE_SHA256 = {
-    "buyer-a.bundle.json": "b815ac5fea77adc16a266eaf293f55aa54af9b50a7571c24a810974d2db05361",
-    "buyer-b.bundle.json": "db31a7564eaf23cd29cab7856a12979dd4e9291bbc050393dfa564d82e80ad07",
-    "check-inputs/a-commit-1900.json": "5ef77bc9658cc2f3bc90d2f7fd7f327a7255f9c91674940c481e144b23d4737c",
-    "check-inputs/a-commit-again-1900.json": "20616bf8fc12431279c60a3778fd59da4e35d2ed64f3c3d113dd77ed698c88db",
-    "check-inputs/a-offer-1900.json": "37de8286f546fa148d97d174b94585ef73ff1330f4421202f85d7b518bd4dbcb",
-    "check-inputs/b-commit-1850.json": "4e60577005185eddb8ff811daa9c0d188a7abd8955c002ee2ed5f4804b33fe9b",
-    "check-inputs/b-offer-1850.json": "0228cdb51b67133b900ba0ec2258a87d952f11f51f630cd396e6075482787df0",
+    "buyer-a.bundle.json": "fff68aee95e7ade7c136a0cd5f4e9aa95f5af474b1beade2e90e21305fa519b7",
+    "buyer-b.bundle.json": "2b4bd231e0b3a33813827a334691b0705de2e860cf6874b5cfd7e2aecbd6fea3",
+    "check-inputs/a-commit-1900.json": "9c52de981c3c143af4edd0155dcd78e92157bafd8b4518fb7f9b2f7ad16cac2d",
+    "check-inputs/a-commit-again-1900.json": "2dfe6cc733b6e950a3e5d9fc96ffec63d833442cccb737f06feee7c1000519a2",
+    "check-inputs/a-offer-1900.json": "77ba3f4ffe3a007d23243430bd4739d6b09e96c5d0563cc96ba16be5077e6a3d",
+    "check-inputs/b-commit-1850.json": "d543da57152c2ab946697e6bf370898057838f1181a25531160d5ac0251d4111",
+    "check-inputs/b-offer-1850.json": "7eec70ffedd4a54a2162503ad1f4c8e96198f51e22b5c08360becaa0e43bb3ee",
 }
 PACK = load_pack_dir(ROOT / "packs" / "catalog" / "seller")
-PRODUCER = {"commit": "65f54e528a788cace28b8e2df92f652b5d5629a9", "name": "capsulectl",
-            "version": "v0.1.0-rc14-11-g65f54e5"}
+PRODUCER = {"commit": "424e79479c40138fcb425674a2ec7c4e540ce478", "name": "capsulectl",
+            "version": "v0.1.0-rc14-17-g424e794"}
 S11 = "s11-one-commitment-per-sale"
 SINGLE = load_definition_file(ROOT / "guards" / "wickets" / "catalog_defs" / "single_commitment.seller.yaml")
 SPEND = load_fold(ROOT / "folds" / "catalog_defs" / "spend.weekly.v3.yaml")
@@ -522,10 +522,6 @@ LIVE_REPLAY_DIFFERENCES = {
     ("a-commit-again-1900", S11): ("n/a", "pass"),
     ("a-offer-1900", S11): ("n/a", "pass"),
     ("a-commit-1900", S11): ("n/a", "pass"),
-    # The replay matches A's repeated commit against its own decision on the
-    # first, which names A; the history's act record seals no counterparty,
-    # so live it never matches the commit to A.
-    ("a-commit-again-1900", "s09-no-repeated-act"): ("fail", "pass"),
 }
 
 

@@ -32,6 +32,12 @@ lowercase hex>}}`` is ignored, named in ``Action.ignored_inputs``, and the
 per-deal target stands. A decision sealed with the per-deal target is never
 rewritten, so it never matches one keyed per profile.
 
+An act record seals no counterparty, so a live check's history act takes the
+target its check got: capsulectl gives the block that check sealed beside the
+act (``counterparty``), and it is read as the check's own block is, the
+profile-keyed payee still replacing it. A block that is not a check's
+(``_check_counterparty``) is ignored and named in ``Action.ignored_inputs``.
+
 On a check of a sale's thread, the envelope's top-level ``item_ref`` (256
 random bits, lowercase hex, equal across the sale's threads) becomes
 ``Action.item_ref`` for ``single_commitment``. No deal record carries it, so
@@ -280,6 +286,11 @@ _ITEM_INPUT = "item_ref"
 # The time of the accepted offer a seller's commit rests on, on the record
 # entry beside its capsule (AMENDMENT 7): the offer record's sealed ``at``.
 _PROPOSAL_INPUT = "proposal_at"
+# Who a history act was with, on each history entry beside its capsule: the
+# counterparty block the act's check sealed, exactly as sealed, and the
+# fp_algs a check seals it under (an x-deal-v0 check's, a typed check's).
+_COUNTERPARTY_INPUT = "counterparty"
+_CHECK_FP_ALGS = frozenset({"hmac-sha256-deal-key", "hmac-sha256-chain-key"})
 
 
 def _profile_target(block: object) -> str | None:
@@ -292,6 +303,16 @@ def _profile_target(block: object) -> str | None:
     if not isinstance(payee, str) or not _HEX64.fullmatch(payee):
         return None
     return _payee_target({"payee": payee}, _PROFILE_FP_ALG)
+
+
+def _check_counterparty(block: object) -> bool:
+    """Whether ``block`` is a check's counterparty block in its agreed shape,
+    ``{fp_alg: <a check's fp_alg>, ids: {<kind>: <64 lowercase hex>}}``, so
+    ``_sealed_counterparty`` may read it as the check's own."""
+    if not isinstance(block, dict) or block.get("fp_alg") not in _CHECK_FP_ALGS:
+        return False
+    ids = block.get("ids")
+    return isinstance(ids, dict) and all(isinstance(v, str) and _HEX64.fullmatch(v) for v in ids.values())
 
 
 def _typed_ref_digest(value: object) -> str | None:
@@ -369,7 +390,12 @@ def _deal_id(shown: dict) -> _DealId:
 
 
 def _bridge_deal_check(
-    record: dict, disclosed: dict | None, counterparty_profile: object = None, *, history: bool = False
+    record: dict,
+    disclosed: dict | None,
+    counterparty_profile: object = None,
+    *,
+    history: bool = False,
+    act_counterparty: object = None,
 ) -> Action | None:
     """The proposed action a capsulectl deal check states, from its own
     sealed record: the class it names, and the amount a spend cap evaluates,
@@ -403,7 +429,11 @@ def _bridge_deal_check(
     ``deal_id_conflict``, so the engine refuses whatever would be allowed.
     With ``history``, a typed act record is bridged too (``_checked_body``),
     and its task authority is the one its ``authority_basis`` names
-    (``_basis_task_authority``)."""
+    (``_basis_task_authority``). An act record seals no counterparty, so
+    ``act_counterparty``, the block its check sealed, given beside it, is
+    read in its place, as the check's own (``_check_counterparty``): the act
+    gets the target its check got, keyed per deal. Given in any other shape,
+    it is named in ``ignored_inputs`` and the act has no target from it."""
     if disclosed is None or not _bound(record, disclosed):
         return None
     checked = _checked_body(disclosed, history=history)
@@ -420,12 +450,18 @@ def _bridge_deal_check(
         authorized = None
         returned, reverses = _returned_minor(body), _typed_ref_digest(body.get("reverses_ref"))
     deal = _deal_id(disclosed)
+    ignored: list[str] = []
+    if act_counterparty is not None and sealed_counterparty is None:
+        if _check_counterparty(act_counterparty):
+            sealed_counterparty = act_counterparty
+        else:
+            ignored.append(_COUNTERPARTY_INPUT)
     counterparty_ids, fp_alg = _sealed_counterparty(sealed_counterparty)
-    target, ignored = _payee_target(counterparty_ids, fp_alg), ()
+    target = _payee_target(counterparty_ids, fp_alg)
     if counterparty_profile is not None:
         profile_target = _profile_target(counterparty_profile)
         if profile_target is None:
-            ignored = (_PROFILE_INPUT,)
+            ignored.insert(0, _PROFILE_INPUT)
         else:
             target = profile_target
     recourse = body.get("recourse") if isinstance(body.get("recourse"), dict) else {}
@@ -460,7 +496,7 @@ def _bridge_deal_check(
         reverses_ref=reverses,
         deal_id=deal.value,
         deal_id_conflict=_DEAL_ID_FIELDS if deal.conflict else (),
-        ignored_inputs=ignored,
+        ignored_inputs=tuple(ignored),
     )
 
 
@@ -550,11 +586,16 @@ def action_for_history_entry(entry: dict) -> Action | None:
     records: its sealed typed act record (``action-record/v0``), bridged as a
     deal check is (``_bridge_deal_check``), with the task authority its
     ``authority_basis`` names and the inputs beside it read as
-    ``action_for_check_input`` reads them (the entry's own ``item_ref``).
-    ``None`` when the entry is not a typed act record its capsule binds, or
+    ``action_for_check_input`` reads them (the entry's own ``item_ref``),
+    plus the entry's ``counterparty``: who the act was with, its target as
+    its check's (``_bridge_deal_check``). ``counterparty_profile`` still
+    replaces that target, as it does a check's. ``None`` when the entry is
+    not a typed act record its capsule binds, or
     names no class or taxonomy: what it records cannot be read."""
     capsule, agent_input = _entry_parts(entry)
-    action = _bridge_deal_check(capsule, agent_input, entry.get(_PROFILE_INPUT), history=True)
+    action = _bridge_deal_check(
+        capsule, agent_input, entry.get(_PROFILE_INPUT), history=True, act_counterparty=entry.get(_COUNTERPARTY_INPUT)
+    )
     return _with_inputs(action, entry, None) if action is not None else None
 
 
@@ -569,7 +610,9 @@ def _entry_parts(entry: dict) -> tuple[dict, dict | None]:
     """An envelope entry's capsule, without the members capsulectl passes
     beside it, and its disclosed ``agent_input``."""
     capsule = {
-        k: v for k, v in entry.items() if k not in ("agent_input", _PROFILE_INPUT, _PROPOSAL_INPUT, _ITEM_INPUT)
+        k: v
+        for k, v in entry.items()
+        if k not in ("agent_input", _PROFILE_INPUT, _PROPOSAL_INPUT, _ITEM_INPUT, _COUNTERPARTY_INPUT)
     }
     agent_input = entry.get("agent_input")
     return capsule, agent_input if isinstance(agent_input, dict) else None
