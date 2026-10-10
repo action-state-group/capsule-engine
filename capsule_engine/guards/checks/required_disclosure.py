@@ -24,7 +24,9 @@ action's deal (``Action.deal_id``) already holds a statement of it: a record
 agent made in that deal before the action, read from the bundle in a replay
 and from the check input's history live. Both counts are in the evidence,
 the deal's beside the counterparty's. The deal stands for the counterparty
-here: a seller's deal is one thread with one buyer. An action with neither a
+here: capsulectl opens one thread per buyer. A statement record names no
+counterparty, so a counterparty that changes within a deal is not seen here
+(``counterparty_identity_change`` reads that). An action with neither a
 target nor a deal is not applicable, as one with no target is without it;
 one with a target and no deal counts the counterparty's statements only, and
 one with a deal and no target the deal's only.

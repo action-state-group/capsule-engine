@@ -131,10 +131,53 @@ def test_a_personal_data_disclosure_class_is_never_read_as_a_statement():
     assert statement_record(capsule, shown) is None
 
 
-def test_a_history_entry_is_read_by_the_same_reader():
+def _envelope(*entries: dict, at: object = "2026-10-10T00:41:07Z") -> dict:
+    return {"record": {"operator": OPERATOR, "timestamp": at}, "history": list(entries),
+            "history_scope": {"complete": True, "days": 31, "max_records": 1000}}
+
+
+def test_live_writes_the_replays_record_plus_its_marker(store):
+    """The record a live check writes for a claim is the one the replay
+    writes, with ``live_history`` ``statement`` added to its payload."""
     capsule, shown = _claim()
     entry = {**capsule, "agent_input": shown, "item_ref": "3f" * 32}
-    assert statement_for_history_entry(entry) == statement_record(capsule, shown)
+    history_ledger(_envelope(entry), store)
+    (written,) = [r.capsule for r in store.scan()]
+    replayed = statement_record(capsule, shown)
+    assert statement_for_history_entry(entry) == replayed
+    assert written == {**replayed, "asg_payload": {**replayed["asg_payload"], "live_history": "statement"}}
+
+
+@pytest.mark.parametrize("at", ["2026-10-10T00:41:05Z", None, "yesterday"],
+                         ids=["checked before the claim", "no checked time", "checked time unreadable"])
+def test_live_counts_no_claim_sealed_after_the_check_or_when_its_time_is_unknown(store, at):
+    capsule, shown = _claim()
+    written = history_ledger(_envelope({**capsule, "agent_input": shown}, at=at), store)
+    assert (written.statement, written.unread) == (0, 0)
+    assert _check(store, _action()).result == "fail"
+
+
+def test_live_counts_a_claim_sealed_in_the_checks_own_second(store):
+    capsule, shown = _claim()
+    history_ledger(_envelope({**capsule, "agent_input": shown}, at=capsule["timestamp"]), store)
+    assert _check(store, _action()).result == "pass"
+
+
+def test_a_live_claim_never_adds_to_a_spend_window(store):
+    """Under a caps fold that counts every executed history act, a claim in
+    the history is still only a statement: no spend record follows it."""
+    capsule, shown = _claim()
+    spend = load_fold(FOLDS / "spend.weekly.v3.1.yaml")
+    history_ledger(_envelope({**capsule, "agent_input": shown}), store, caps_fold=spend)
+    assert [r.capsule["asg_payload"].get("live_history") for r in store.scan()] == ["statement"]
+
+
+def test_a_claim_given_twice_is_one_statement_live(store):
+    capsule, shown = _claim()
+    entry = {**capsule, "agent_input": shown}
+    written = history_ledger(_envelope(entry, copy.deepcopy(entry)), store)
+    assert written.statement == 1
+    assert _check(store, _action()).evidence["stated_counts"] == {"condition": 1}
 
 
 # -- the check -------------------------------------------------------------------------
@@ -300,6 +343,15 @@ def test_a_claim_made_after_the_offer_does_not_count_for_it():
     decisions = _replay(records, disclosed)
     assert _s05(decisions["deal-0e39b9755240e242/4"]).result == "fail"
     assert _s05(decisions["deal-0e39b9755240e242/8"]).result == "pass"
+
+
+def test_a_claim_given_twice_is_one_statement_in_the_replay():
+    """Overlapping sources give the claims twice; each is written once."""
+    records, disclosed = _bundle_records()
+    claims = [r for r in records if _is_claim(disclosed.get(r["capsule_id"]))]
+    decisions = _replay(records + claims, disclosed)
+    for action_id, decision in _offers_and_commits(decisions).items():
+        assert _s05(decision).evidence["stated_counts"] == {"condition": 1}, action_id
 
 
 def test_0_1_3_replays_the_fixture_as_0_1_2_except_s05():

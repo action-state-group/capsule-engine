@@ -21,7 +21,10 @@ agent made to the counterparty is written as the replay writes it
 (``statement_for_history_entry``), in state ``statement``, so ``required_disclosure``
 reads a statement made first in the deal the same way live and in a replay.
 It is not an act, so it is never read as an unread one and never adds to a
-spend window. A claim given twice is written once.
+spend window. Only a claim sealed at or before the checked record's
+``timestamp`` is written, so a claim made after the check never counts for
+it; when the checked record's time cannot be read, no claim is written. A
+claim given twice is written once.
 
 Each record states what is known about it (``guards/history_state.py``). Its
 ``disposition`` is the one the act's capsule seals, and nothing else: an act
@@ -122,11 +125,16 @@ def history_ledger(envelope: dict, ledger: LedgerAPI, *, caps_fold: FoldDefiniti
             complete = False
         dated.append((at, index, entry))
     dated.sort(key=lambda item: (item[0], item[1]))
+    checked = envelope.get("record")
+    checked_at = _time(checked.get("timestamp")) if isinstance(checked, dict) else None
     counts = {DISPOSITION: 0, NO_DISPOSITION: 0, UNREAD: 0, STATEMENT: 0}
     executed = ExecutedActs([entry for _, _, entry in dated]) if counts_executed_acts(caps_fold) else None
     written: set[str] = set()
-    for _, _, entry in dated:
+    for at, _, entry in dated:
         stated = _statement_record(entry)
+        if stated is not None and (checked_at is None or at > checked_at):
+            # A claim sealed after the check, or with no check time to hold it to.
+            continue
         record = stated or _act_record(entry)
         if record["capsule_id"] in written:
             # The same act, or claim, given twice: written, and counted, once.

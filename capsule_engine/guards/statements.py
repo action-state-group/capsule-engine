@@ -43,8 +43,9 @@ def make_statement_record(
     *, operator: str, timestamp: str | None, sealed_class: str, source_kind: str, deal_id: str, claim: str
 ) -> StatementRecord:
     """The record of one statement; its ``capsule_id`` is the digest of the
-    rest, so the replay and a live check write the same record for one
-    claim."""
+    rest, so the replay and a live check give one claim the same
+    ``capsule_id``. A live check adds its ``live_history`` marker to the
+    payload after the digest is taken (``report/live_history.py``)."""
     stated = {
         "class": CLASS_ALIASES.get(sealed_class, sealed_class),
         "source_kind": source_kind,

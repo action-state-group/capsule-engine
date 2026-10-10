@@ -1073,7 +1073,8 @@ def replay(
     the bytes it had.
     A claim the user's agent made to the counterparty is written to that view
     as a statement (``statement_record``) when the replay reaches it, so a
-    later check in the same deal finds it made first.
+    later check in the same deal finds it made first. A claim the sources
+    give more than once is written once.
     A seller's typed commit is decided with ``proposal_at`` the sealed time
     of the accepted offer it rests on (``_accepted_offer_at``), so
     ``offer_expiry`` reads that offer's age.
@@ -1111,13 +1112,16 @@ def replay(
         decided_checks: dict[str, SourcedDecision] = {}
         counts_spend = counts_executed_acts(caps_fold)
         executed_acts = ExecutedActs(records)
+        written_statements: set[str] = set()
         for record in records:
             shown = (disclosed or {}).get(record.get("capsule_id", ""))
             digest = json_digest(shown) if shown is not None else None
             if _gets_no_decision(record, shown, withheld):
                 undecided.append(record)
                 stated = statement_record(record, shown)
-                if stated is not None:
+                if stated is not None and stated["capsule_id"] not in written_statements:
+                    # A claim given twice (overlapping sources) is one statement.
+                    written_statements.add(stated["capsule_id"])
                     store.append(dict(stated), consequential=False)
                 chain = _carried_out(digest, deal) if digest is not None else None
                 checked = decided_checks.pop(chain.check, None) if chain is not None else None

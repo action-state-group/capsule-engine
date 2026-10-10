@@ -44,7 +44,10 @@
 # carried its class, and every offer and commit asked for the condition
 # statement it had just been given. Now a claim of a required class made in
 # the deal before the offer or commit satisfies s05; with none it still asks.
-# A sealed delivery_promise reads as delivery_date. Nothing else changes.
+# An offer or commit that names a deal and no target, which 0.1.2 held not
+# applicable, is now decided on the deal's claims, so with none it fails and
+# asks. A sealed delivery_promise reads as delivery_date. No other rule
+# changes.
 pack_id: asg/seller/0.1.3
 
 obligations:

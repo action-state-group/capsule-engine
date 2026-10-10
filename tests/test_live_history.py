@@ -612,7 +612,8 @@ def test_a_claim_in_another_thread_is_not_a_statement_to_this_buyer():
     envelope = _given(_check_input("a-commit-again-1900"), CLAIMS)
     own = _check_input("a-commit-again-1900")["record"]["agent_input"]["chain_id"]
     envelope["history"] = [e for e in envelope["history"] if e["agent_input"].get("x-deal-v0", {}).get(
-        "deal_id", own) != own]
+        "record_type") != "claim" or e["agent_input"]["x-deal-v0"]["deal_id"] != own]
+    assert len(envelope["history"]) == len(_given(_check_input("a-commit-again-1900"), CLAIMS)["history"]) - 1
     (s05,) = [c for c in _decide(envelope).decision.constraints if c.id == "required_disclosure"]
     assert (s05.result, s05.evidence["stated_counts"]) == ("fail", {"condition": 0})
 
