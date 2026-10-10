@@ -36,16 +36,7 @@
 # limits money.transfer alone, which no action here declares. The engine
 # now runs a pack that cites none and records caps as out of scope on every
 # action, as 0.1.1's decisions already did. No rule changes.
-#
-# 0.1.3 counts a statement the user's agent made in the deal as one made to
-# the counterparty (required_disclosure/1.1.0, with the fold
-# disclosure.statement_seen/1.0.0). A capsulectl claim record sealing
-# source_kind agent and a class states no act, so under 0.1.2 no decision
-# carried its class, and every offer and commit asked for the condition
-# statement it had just been given. Now a claim of a required class made in
-# the deal before the offer or commit satisfies s05; with none it still asks.
-# A sealed delivery_promise reads as delivery_date. Nothing else changes.
-pack_id: asg/seller/0.1.3
+pack_id: asg/seller/0.1.2
 
 obligations:
   # -- DO ------------------------------------------------------------------
@@ -79,13 +70,11 @@ obligations:
   - id: s05-required-statement-made-first
     statement: >-
       Flags an offer, an acceptance or a sale to a counterparty that has
-      not first received a statement in each required class (today
-      condition): an accepted earlier statement to that counterparty, or a
-      claim the agent made in the same deal before it. It records which
-      class is missing. It checks that a statement of the class was
-      recorded, never what it said. An approval does not clear it: the
-      action cannot proceed as constructed until the statement is made or
-      the task authority changes.
+      not first received an accepted statement in each required class
+      (today condition), and records which class is missing. It checks that
+      a statement of the class was recorded, never what it said. An
+      approval does not clear it: the action cannot proceed as constructed
+      until the statement is made or the task authority changes.
     check: required_disclosure
     default_disposition: ASK
   - id: s06-proposal-still-current
@@ -189,8 +178,8 @@ constraints:
     digest: b29e29e0a31ef764b282fa5754992b49b5ffc4f3fc261fb821987ae6c2e1c9b2
   - wicket_ref: promise_never/1.0.0
     digest: 836ae58f704a9c8ab8027fee344ca47ddb3de76a7a1973a650f42a3595e649f4
-  - wicket_ref: required_disclosure/1.1.0
-    digest: 80f3af6e428f2331f6ab458997d996e172b9fc2e721b55fcf473f4e31d1492c0
+  - wicket_ref: required_disclosure/1.0.0
+    digest: c8f216415be1fac673d1efc6df2e7a9666b5d5c8e639fbb3d8379a24bb8f5ebf
   - wicket_ref: offer_expiry/1.0.1
     digest: 7bcd363b28475e3fac123fe2b8925f60f36bdaa3d22ebd5004ffe5290c4f2597
   # One sale, several buyer threads: one accepted commitment.
@@ -206,11 +195,9 @@ constraints:
     digest: 6a8487fb059f171765810bdc4a248edfdaf6489ddac409b978f03aaa0fec5583
 
 folds:
-  # Read by required_disclosure, which pins these same digests in its config.
+  # Read by required_disclosure, which pins this same digest in its config.
   - fold_ref: disclosure.class_seen/1.0.0
     digest: 5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564
-  - fold_ref: disclosure.statement_seen/1.0.0
-    digest: 925e7ccd2e29b3f1984f966e968bdef47d0d22d2b85b8e0205a39d6a5a7ff0be
 
 holds_integration: none
 

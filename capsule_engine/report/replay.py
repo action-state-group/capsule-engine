@@ -66,6 +66,7 @@ from ..folds.definition import FoldDefinition
 from ..folds.duration import parse_duration_seconds
 from ..guards import ALLOW, ESCALATE, Action, GuardDecision, GuardEngine, LocalSigner
 from ..guards.checks.caps import EXECUTED_DECISION, SPEND_UNREADABLE, counts_executed_acts
+from ..guards.statements import StatementRecord, make_statement_record
 from ..guards.wickets.definition import WicketDefinition
 from ..packs.install import engine_ask_sets
 from ..packs.schema import PackDefinition
@@ -84,6 +85,8 @@ __all__ = [
     "action_for_check_input",
     "action_for_history_entry",
     "replay",
+    "statement_for_history_entry",
+    "statement_record",
 ]
 
 _TRANSFER_NOTE_RE = re.compile(r"amount_eur:\s*(\d+).*?target_iban:\s*([A-Z0-9]+)")
@@ -464,6 +467,39 @@ def _bridge_deal_check(
     )
 
 
+# The ``x-deal-v0`` record type of a statement in a deal (capsule-cli
+# internal/cli/deal_claims.go), and the ``source_kind`` of one the user's
+# agent made to the counterparty.
+_CLAIM = "claim"
+_AGENT = "agent"
+
+
+def statement_record(record: dict, disclosed: dict | None) -> StatementRecord | None:
+    """The record of the statement ``record`` makes to the counterparty
+    (``guards/statements.py``), or ``None`` when it makes none: it must be a
+    bound ``x-deal-v0`` ``claim`` whose body seals ``source_kind``
+    ``agent`` and a non-empty ``class``, in the one deal it names
+    (``_deal_id``; a record naming two names none). A disclosure record's
+    ``body.fields[].class`` is never read: that is the user's personal data
+    given out, not a statement about the deal. The same reader serves the
+    replay and a live check's history."""
+    if disclosed is None or not _bound(record, disclosed):
+        return None
+    block = disclosed.get("x-deal-v0")
+    body = disclosed.get("body")
+    if not isinstance(block, dict) or block.get("record_type") != _CLAIM or not isinstance(body, dict):
+        return None
+    sealed_class = _text(body.get("class"))
+    deal = _deal_id(disclosed).value
+    capsule_id = _text(record.get("capsule_id"))
+    if body.get("source_kind") != _AGENT or sealed_class is None or deal is None or capsule_id is None:
+        return None
+    return make_statement_record(
+        operator=str(record.get("operator", "")), timestamp=_text(record.get("timestamp")),
+        sealed_class=sealed_class, source_kind=_AGENT, deal_id=deal, claim=capsule_id,
+    )
+
+
 # A capsulectl deal report's sealed ``type``: what the user asked and what was
 # done, for one audience. It states no act.
 _REPORT_TYPE = "deal_report"
@@ -563,6 +599,14 @@ def bound_agent_input(entry: dict) -> dict | None:
     it, else ``None``."""
     capsule, agent_input = _entry_parts(entry)
     return agent_input if agent_input is not None and _bound(capsule, agent_input) else None
+
+
+def statement_for_history_entry(entry: dict) -> StatementRecord | None:
+    """The statement a ``history`` entry of an external-check-input/v0
+    envelope records (``statement_record``), read from its sealed capsule and
+    disclosed ``agent_input``; ``None`` when it records none."""
+    capsule, agent_input = _entry_parts(entry)
+    return statement_record(capsule, agent_input)
 
 
 def _entry_parts(entry: dict) -> tuple[dict, dict | None]:
@@ -1027,6 +1071,9 @@ def replay(
     replay's own decisions are dry runs and never count, so no act counts
     twice. Under any other fold nothing more is written, and a replay keeps
     the bytes it had.
+    A claim the user's agent made to the counterparty is written to that view
+    as a statement (``statement_record``) when the replay reaches it, so a
+    later check in the same deal finds it made first.
     A seller's typed commit is decided with ``proposal_at`` the sealed time
     of the accepted offer it rests on (``_accepted_offer_at``), so
     ``offer_expiry`` reads that offer's age.
@@ -1069,6 +1116,9 @@ def replay(
             digest = json_digest(shown) if shown is not None else None
             if _gets_no_decision(record, shown, withheld):
                 undecided.append(record)
+                stated = statement_record(record, shown)
+                if stated is not None:
+                    store.append(dict(stated), consequential=False)
                 chain = _carried_out(digest, deal) if digest is not None else None
                 checked = decided_checks.pop(chain.check, None) if chain is not None else None
                 if chain is not None and checked is not None and checked.decision.outcome in (ALLOW, ESCALATE):

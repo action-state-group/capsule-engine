@@ -16,7 +16,12 @@ record a decision on it would carry (``act_payload``), in ledger order:
 oldest first by the capsule's ``timestamp``, with acts of the same second in
 the order the envelope gives them (capsulectl's sort is stable, so that is
 the order they were sealed in). An act given twice (the same ``capsule_id``)
-is written once.
+is written once. A history entry that is a claim the user's
+agent made to the counterparty is written as the replay writes it
+(``statement_for_history_entry``), in state ``statement``, so ``required_disclosure``
+reads a statement made first in the deal the same way live and in a replay.
+It is not an act, so it is never read as an unread one and never adds to a
+spend window. A claim given twice is written once.
 
 Each record states what is known about it (``guards/history_state.py``). Its
 ``disposition`` is the one the act's capsule seals, and nothing else: an act
@@ -53,8 +58,9 @@ from capsule_ledger.ledger.api import LedgerAPI
 from ..folds.definition import FoldDefinition
 from ..guards.capsule import act_payload
 from ..guards.checks.caps import counts_executed_acts
-from ..guards.history_state import DISPOSITION, INCOMPLETE, LIVE_HISTORY, NO_DISPOSITION, UNREAD
-from .replay import ExecutedActs, action_for_history_entry, bound_agent_input
+from ..guards.history_state import DISPOSITION, INCOMPLETE, LIVE_HISTORY, NO_DISPOSITION, STATEMENT, UNREAD
+from ..guards.statements import StatementRecord
+from .replay import ExecutedActs, action_for_history_entry, bound_agent_input, statement_for_history_entry
 
 __all__ = ["HistoryLedger", "history_ledger"]
 
@@ -86,13 +92,15 @@ class _HistoryRecord(_Sealed):
 
 @dataclass(frozen=True)
 class HistoryLedger:
-    """What ``history_ledger`` wrote: how many acts in each state, and
-    whether the history was known to be complete."""
+    """What ``history_ledger`` wrote: how many records in each state (acts,
+    and statements, which are not acts), and whether the history was known to
+    be complete."""
 
     complete: bool
     disposition: int
     no_disposition: int
     unread: int
+    statement: int = 0
 
 
 def history_ledger(envelope: dict, ledger: LedgerAPI, *, caps_fold: FoldDefinition | None = None) -> HistoryLedger:
@@ -114,18 +122,19 @@ def history_ledger(envelope: dict, ledger: LedgerAPI, *, caps_fold: FoldDefiniti
             complete = False
         dated.append((at, index, entry))
     dated.sort(key=lambda item: (item[0], item[1]))
-    counts = {DISPOSITION: 0, NO_DISPOSITION: 0, UNREAD: 0}
+    counts = {DISPOSITION: 0, NO_DISPOSITION: 0, UNREAD: 0, STATEMENT: 0}
     executed = ExecutedActs([entry for _, _, entry in dated]) if counts_executed_acts(caps_fold) else None
     written: set[str] = set()
     for _, _, entry in dated:
-        record = _act_record(entry)
+        stated = _statement_record(entry)
+        record = stated or _act_record(entry)
         if record["capsule_id"] in written:
-            # The same act given twice: written, and counted, once.
+            # The same act, or claim, given twice: written, and counted, once.
             continue
         written.add(record["capsule_id"])
         counts[str(record["asg_payload"][LIVE_HISTORY])] += 1
         ledger.append(dict(record), consequential=False)
-        if executed is not None:
+        if executed is not None and stated is None:
             shown = bound_agent_input(entry)
             spend = executed.record(entry, shown, json_digest(shown) if shown is not None else record["capsule_id"],
                                     every_record_is_an_act=True)
@@ -138,7 +147,18 @@ def history_ledger(envelope: dict, ledger: LedgerAPI, *, caps_fold: FoldDefiniti
         disposition=counts[DISPOSITION],
         no_disposition=counts[NO_DISPOSITION],
         unread=counts[UNREAD],
+        statement=counts[STATEMENT],
     )
+
+
+def _statement_record(entry: dict) -> StatementRecord | None:
+    """The record the replay writes for a history entry that is a claim the
+    user's agent made (``statement_for_history_entry``), marked
+    ``statement``; ``None`` for any other entry."""
+    stated = statement_for_history_entry(entry)
+    if stated is None:
+        return None
+    return StatementRecord(**{**stated, "asg_payload": {**stated["asg_payload"], LIVE_HISTORY: STATEMENT}})
 
 
 def _time(value: object) -> datetime | None:

@@ -1,9 +1,12 @@
 # SPDX-License-Identifier: Apache-2.0
-"""The seller pack, asg/seller/0.1.2: what it cites, at which digest, and
-what each rule declares. 0.1.0 and 0.1.1 are kept byte for byte under
-``tests/fixtures/packs/seller-0.1.0`` and ``seller-0.1.1`` and still load at
-their digests. 0.1.2 is 0.1.1 without the spending limit it cited only so
-the engine would run; every scenario decides the same under both.
+"""The seller pack, asg/seller/0.1.3: what it cites, at which digest, and
+what each rule declares. 0.1.0, 0.1.1 and 0.1.2 are kept byte for byte under
+``tests/fixtures/packs/seller-0.1.0``, ``seller-0.1.1`` and ``seller-0.1.2``
+and still load at their digests. 0.1.2 is 0.1.1 without the spending limit
+it cited only so the engine would run; every scenario decides the same under
+both. 0.1.3 is 0.1.2 with s05 also counting a claim the agent made in the
+deal (required_disclosure/1.1.0); no scenario here holds a claim, so every
+one decides the same under both.
 
 The scenarios are in ``test_pack_seller_acceptance.py``; this file pins the
 pack's own content, so a definition cited at another digest or a rule
@@ -39,6 +42,9 @@ PACK_0_1_0_FILE_SHA256 = "b03b7ebb491cdd250bedfba47fcaaa0e60f0316a88a2698db7b886
 FROZEN_0_1_1_DIR = Path(__file__).parent / "fixtures" / "packs" / "seller-0.1.1"
 PACK_0_1_1_DIGEST = "65e41f7e9a2a9cffc0f71027f8e7c5b70f3ccf2751e6cb95ba1c81649b41e1ac"
 PACK_0_1_1_FILE_SHA256 = "edb54be219fdcd31602c5a8eebe159e31d8107e29a13a80496c7ed952972688e"
+FROZEN_0_1_2_DIR = Path(__file__).parent / "fixtures" / "packs" / "seller-0.1.2"
+PACK_0_1_2_DIGEST = "e599c5aff8d4171d5e58cae33fdc7022e4ee3762d1a884bb6e6098aca532a353"
+PACK_0_1_2_FILE_SHA256 = "6174f336f929bfce8bc64bbe34ddab71d57de2951766561796d8685f9dc39f35"
 CATALOG = Catalog(ROOT / "guards" / "wickets" / "catalog_defs")
 
 PACK = load_pack_dir(PACK_DIR)
@@ -51,7 +57,7 @@ CITED = [
     "price_floor/2.0.1",
     "promise_requires_approval/1.0.0",
     "promise_never/1.0.0",
-    "required_disclosure/1.0.0",
+    "required_disclosure/1.1.0",
     "offer_expiry/1.0.1",
     "seller.single_commitment/1.0.0",
     "seller.destination_rail/1.0.0",
@@ -77,7 +83,7 @@ DECLARED = {
 
 
 def test_the_pack_id_and_taxonomy_pin():
-    assert PACK.pack_id == "asg/seller/0.1.2"
+    assert PACK.pack_id == "asg/seller/0.1.3"
     assert PACK.taxonomy.taxonomy_version == TAXONOMY_VERSION == "6"
 
 
@@ -121,6 +127,28 @@ def test_0_1_1_is_kept_byte_for_byte_and_still_loads_at_its_digest():
     assert pack.definition_digest() == PACK_0_1_1_DIGEST
 
 
+def test_0_1_2_is_kept_byte_for_byte_and_still_loads_at_its_digest():
+    frozen = FROZEN_0_1_2_DIR / "pack.yaml"
+    assert hashlib.sha256(frozen.read_bytes()).hexdigest() == PACK_0_1_2_FILE_SHA256
+    pack = load_pack_dir(FROZEN_0_1_2_DIR)
+    assert pack.pack_id == "asg/seller/0.1.2"
+    assert pack.definition_digest() == PACK_0_1_2_DIGEST
+
+
+def test_0_1_3_changes_only_s05_and_its_folds():
+    """0.1.3 cites required_disclosure/1.1.0 where 0.1.2 cited 1.0.0, adds the
+    statement fold, and changes nothing else it cites or declares."""
+    old = load_pack_dir(FROZEN_0_1_2_DIR)
+    swapped = [w.wicket_id for w in old.constraints]
+    swapped[swapped.index("required_disclosure/1.0.0")] = "required_disclosure/1.1.0"
+    assert [w.wicket_id for w in PACK.constraints] == swapped
+    assert [f.fold_id for f in PACK.folds] == [*(f.fold_id for f in old.folds), "disclosure.statement_seen/1.0.0"]
+    assert [(o.id, o.check, o.default_disposition) for o in PACK.obligations] == [
+        (o.id, o.check, o.default_disposition) for o in old.obligations]
+    changed = [o.id for o, was in zip(PACK.obligations, old.obligations, strict=True) if o.statement != was.statement]
+    assert changed == ["s05-required-statement-made-first"]
+
+
 def test_it_cites_no_spending_limit_and_no_rule_is_measured_by_one():
     assert "caps" not in DECLARED
     assert "caps" not in {w.check for w in PACK.constraints}
@@ -157,7 +185,7 @@ def test_0_1_2_decides_every_scenario_as_0_1_1_did_and_records_caps_out_of_scope
     scope, with the same evidence; only its method, the fold 0.1.1 cited,
     is gone."""
     old = _scenario_run(FROZEN_0_1_1_DIR, tmp_path / "0.1.1")
-    new = _scenario_run(PACK_DIR, tmp_path / "0.1.2")
+    new = _scenario_run(FROZEN_0_1_2_DIR, tmp_path / "0.1.2")
     assert list(old) == list(new) and len(new) == len(PACK.fixtures.scenarios)
     out_of_scope = json_digest(not_applicable_evidence("caps", in_scope=False))
     for name in new:
@@ -172,6 +200,25 @@ def test_0_1_2_decides_every_scenario_as_0_1_1_did_and_records_caps_out_of_scope
         assert caps_after["result"] == "n/a" and caps_after["evidence_digest"] == out_of_scope, name
         assert caps_before["method"] == "spend.weekly/1.0.0" and "method" not in caps_after, name
         assert caps_after == {k: v for k, v in caps_before.items() if k != "method"}, name
+
+
+def test_0_1_3_decides_every_scenario_as_0_1_2_did(tmp_path):
+    """No scenario holds a claim, so s05 counts what it counted under 0.1.2:
+    every scenario has the same disposition and every constraint the same
+    result. Evidence is the same except where it names an earlier record's
+    capsule_id (which covers the manifest digest) and s05's, which now also
+    names the statement fold, the deal and the deal's counts."""
+    old = _scenario_run(FROZEN_0_1_2_DIR, tmp_path / "0.1.2")
+    new = _scenario_run(PACK_DIR, tmp_path / "0.1.3")
+    assert list(old) == list(new) and len(new) == len(PACK.fixtures.scenarios)
+    for name in new:
+        assert new[name]["disposition"] == old[name]["disposition"], name
+        before, after = _constraints(old[name]), _constraints(new[name])
+        assert list(after) == list(before), name
+        for check_id, record in after.items():
+            assert record["result"] == before[check_id]["result"], (name, check_id)
+            if check_id not in NAMES_A_CAPSULE_ID | {"required_disclosure"}:
+                assert record.get("evidence_digest") == before[check_id].get("evidence_digest"), (name, check_id)
 
 
 def _copy(tmp_path: Path) -> Path:
@@ -192,7 +239,7 @@ def test_a_definition_cited_at_another_digest_is_refused_at_load(tmp_path, wicke
         load_pack_dir(pack_dir)
 
 
-# -- 0.1.1 and 0.1.2 are no looser than 0.1.0 on personal data -------------------
+# -- 0.1.1, 0.1.2 and 0.1.3 are no looser than 0.1.0 on personal data -------------
 
 
 def _acceptance_module():
@@ -207,17 +254,18 @@ def _acceptance_module():
 def _engines(tmp_path: Path):
     """One observe-mode engine per pack version, each on its own ledger."""
     signer = LocalSigner(key_id="seller-strictness-key", secret=b"seller-strictness-fixed-key")
-    for version, pack_dir in (("0.1.0", FROZEN_0_1_0_DIR), ("0.1.1", FROZEN_0_1_1_DIR), ("0.1.2", PACK_DIR)):
+    for version, pack_dir in (("0.1.0", FROZEN_0_1_0_DIR), ("0.1.1", FROZEN_0_1_1_DIR), ("0.1.2", FROZEN_0_1_2_DIR),
+                              ("0.1.3", PACK_DIR)):
         store = LedgerStore(tmp_path / version / "ledger")
         installed = install_pack(load_pack_dir(pack_dir), project_dir=tmp_path / version / "project", mode="observe")
         yield version, store, build_engine(installed, ledger=store, signer_provider=lambda: signer)
 
 
-def test_no_personal_disclosure_0_1_0_asked_on_is_allowed_by_0_1_1_or_0_1_2_without_an_acceptance(tmp_path):
+def test_no_personal_disclosure_0_1_0_asked_on_is_allowed_by_a_later_version_without_an_acceptance(tmp_path):
     """Every class a disclosure may declare, none, and one outside the set;
     to the buyer, the user and a third party; with and without a one-shot
     approval of the class. No acceptance is sealed. Where 0.1.0 did not
-    allow, 0.1.1 and 0.1.2 must not either -- and both refuse every one."""
+    allow, 0.1.1, 0.1.2 and 0.1.3 must not either -- and each refuses every one."""
     acceptance = _acceptance_module()
     classes = [*CATALOG.get("promise_never/1.0.0").definition.config["representation_classes"], None, "phone"]
     cases = [(cls, role, approved) for cls in classes for role in ("buyer", "self", "third_party")
@@ -241,7 +289,8 @@ def test_no_personal_disclosure_0_1_0_asked_on_is_allowed_by_0_1_1_or_0_1_2_with
                 outcomes.setdefault(version, []).append(decision.outcome)
         finally:
             store.close()
-    assert len(outcomes["0.1.0"]) == len(outcomes["0.1.1"]) == len(outcomes["0.1.2"]) == len(cases) == 96
-    for case, old, mid, new in zip(cases, outcomes["0.1.0"], outcomes["0.1.1"], outcomes["0.1.2"], strict=True):
-        assert old != ALLOW, case  # 0.1.0 asked on (or refused) every personal disclosure
-        assert mid == new == DENY, (case, old, mid, new)
+    later = ("0.1.1", "0.1.2", "0.1.3")
+    assert {len(outcomes[v]) for v in ("0.1.0", *later)} == {len(cases)} and len(cases) == 96
+    for n, case in enumerate(cases):
+        assert outcomes["0.1.0"][n] != ALLOW, case  # 0.1.0 asked on (or refused) every personal disclosure
+        assert [outcomes[v][n] for v in later] == [DENY, DENY, DENY], case

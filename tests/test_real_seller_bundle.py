@@ -60,7 +60,7 @@ FIXTURE_SHA256 = {
     "check-inputs/c-offer-1600.json": "24e0879b98f0d89655e98fc4b4dcf6a0a78fdde5f98029c4e8917850ccb10977",
 }
 PACK = load_pack_dir(Path(capsule_engine.__file__).parent / "packs" / "catalog" / "seller")
-PACK_ID = "asg/seller/0.1.2"
+PACK_ID = "asg/seller/0.1.3"
 PRODUCER = {"commit": "831afeeb9fd76b7196486a9af38ca455b1230791", "name": "capsulectl", "version": "v0.1.0-rc13-6-g831afee"}
 FLOOR = 170000
 S03 = "s03-price-below-the-floor"
@@ -453,6 +453,12 @@ def test_an_offer_under_the_floor_asks():
 def test_a_live_commit_reads_the_age_of_the_accepted_offer():
     assert _constraint(_live("a-commit-1900"), "offer_expiry").result == "pass"
     assert _live("a-commit-1900").outcome == ALLOW
+
+
+@pytest.mark.xfail(strict=True, reason="a check input's history holds acts only, never the thread's claim, "
+                   "so live, required_disclosure finds no statement in the deal")
+def test_a_live_commit_after_the_threads_claim_finds_the_statement():
+    assert _constraint(_live("a-commit-1900"), "required_disclosure").result == "pass"
 
 
 @pytest.mark.xfail(strict=True, reason="a typed check names no payee (u286) and a sale's spend is 0, so "
