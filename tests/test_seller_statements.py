@@ -14,6 +14,8 @@ replay's order on that fixture's records.
 from __future__ import annotations
 
 import copy
+import dataclasses
+import importlib.util
 import json
 import tempfile
 from functools import cache
@@ -33,6 +35,9 @@ from capsule_engine.guards.wickets import load_definition_file
 from capsule_engine.packs import install_pack, load_pack_dir
 from capsule_engine.report.live_history import history_ledger
 from capsule_engine.report.replay import (
+    DealClaims,
+    action_for_check_input,
+    deal_claim_statements,
     load_disclosed,
     load_records,
     load_withheld,
@@ -375,3 +380,102 @@ def test_the_fixture_claims_are_the_ones_capsulectl_sealed():
     assert [(s["asg_payload"][STATED]["class"], s["asg_payload"][STATED]["deal_id"]) for s in stated] == [
         ("condition", "deal-0e39b9755240e242"), ("condition", "deal-f9d99d4407f3eba8")]
     assert json.loads((FIXTURE / "inputs" / "claim-condition.json").read_text())["class"] == "condition"
+
+
+# -- the deal's claims beside the checked record (AMENDMENT 9) ----------------------
+
+
+_STEP = importlib.util.spec_from_file_location("add_deal_claims", FIXTURE / "add_deal_claims.py")
+_step = importlib.util.module_from_spec(_STEP)
+_STEP.loader.exec_module(_step)
+
+
+def _input_with_claims(name: str = "a-commit-1900") -> dict:
+    """A real check input with ``record.deal_claims`` from the fixture step."""
+    envelope = json.loads((FIXTURE / "check-inputs" / f"{name}.json").read_text())
+    bundle = json.loads(OWN[0 if name.startswith("a-") else 1].read_text())
+    return _step.with_deal_claims(envelope, bundle)
+
+
+def test_a_deal_claim_is_the_statement_the_replay_writes_for_that_claim():
+    """Same claim, same record: the claim's sealed ``at`` is its capsule's
+    ``timestamp`` in the fixture, so even the ``capsule_id`` agrees."""
+    record = _input_with_claims()["record"]
+    (stated,) = deal_claim_statements(record).statements
+    records, disclosed = _bundle_records()
+    (claim,) = [r for r in records if r["capsule_id"] == record["deal_claims"][0]["capsule_id"]]
+    assert stated == statement_record(claim, disclosed[claim["capsule_id"]])
+
+
+def test_deal_claims_stay_out_of_the_bound_capsule():
+    """The action is the one the record states without them."""
+    record = _input_with_claims()["record"]
+    bare = {k: v for k, v in record.items() if k != "deal_claims"}
+    assert action_for_check_input(record) == action_for_check_input(bare)
+
+
+def _with(record: dict, **change) -> dict:
+    record = copy.deepcopy(record)
+    record["deal_claims"][0].update(change)
+    record["deal_claims"][0] = {k: v for k, v in record["deal_claims"][0].items() if v is not None}
+    return record
+
+
+@pytest.mark.parametrize("change", [
+    {"class": None}, {"class": ""}, {"source_kind": "counterparty"}, {"source_kind": None},
+    {"record_digest": "AB" * 32}, {"record_digest": "ab" * 31}, {"capsule_id": None},
+    {"text_commitment": None}, {"at": "yesterday"}, {"at": "2026-10-10T00:41:06"}, {"at": None},
+    {"at": "2030-01-01T00:00:00Z"},
+], ids=["no class", "empty class", "the buyer's", "no source_kind", "digest upper case", "digest short",
+        "no capsule_id", "no commitment", "at not a time", "at with no zone", "no at", "at after the check"])
+def test_a_deal_claim_out_of_shape_is_ignored_and_named_never_echoed(change):
+    record = _with(_input_with_claims()["record"], **change)
+    claims = deal_claim_statements(record)
+    assert (claims.statements, claims.ignored) == ((), True)
+    action = action_for_check_input(record)
+    assert action.ignored_inputs == ("deal_claims",)
+    # Nothing from the entry is carried: the action is the one without it, but for the name.
+    bare = action_for_check_input({k: v for k, v in record.items() if k != "deal_claims"})
+    assert dataclasses.replace(action, ignored_inputs=()) == bare
+
+
+@pytest.mark.parametrize("value", ["condition", {"class": "condition"}, [None], [["condition"]]],
+                         ids=["a string", "a mapping", "a null entry", "a list entry"])
+def test_deal_claims_not_a_list_of_entries_are_ignored_and_named(value):
+    record = {**_input_with_claims()["record"], "deal_claims": value}
+    assert deal_claim_statements(record) == DealClaims(statements=(), ignored=True)
+    assert action_for_check_input(record).ignored_inputs == ("deal_claims",)
+
+
+def test_deal_claims_on_a_record_its_capsule_does_not_bind_are_ignored():
+    record = copy.deepcopy(_input_with_claims()["record"])
+    record["agent_input"]["body"]["amount_minor"] += 1
+    assert deal_claim_statements(record) == DealClaims(statements=(), ignored=True)
+
+
+def test_one_bad_entry_leaves_the_good_one_counted_and_names_the_input():
+    record = copy.deepcopy(_input_with_claims()["record"])
+    record["deal_claims"].append({**record["deal_claims"][0], "class": ""})
+    claims = deal_claim_statements(record)
+    assert len(claims.statements) == 1 and claims.ignored
+
+
+def test_a_deal_claim_given_twice_is_one_statement_and_delivery_promise_is_delivery_date():
+    record = copy.deepcopy(_input_with_claims()["record"])
+    record["deal_claims"].append(copy.deepcopy(record["deal_claims"][0]))
+    assert len(deal_claim_statements(record).statements) == 1
+    record = _with(_input_with_claims()["record"], **{"class": "delivery_promise"})
+    (stated,) = deal_claim_statements(record).statements
+    assert stated["asg_payload"][STATED]["class"] == "delivery_date"
+
+
+def test_a_deal_claim_in_the_checks_own_second_counts():
+    record = _input_with_claims()["record"]
+    record = _with(record, at=record["timestamp"])
+    assert len(deal_claim_statements(record).statements) == 1
+
+
+def test_no_deal_claims_is_nothing_ignored():
+    record = {k: v for k, v in _input_with_claims()["record"].items() if k != "deal_claims"}
+    assert deal_claim_statements(record) == DealClaims(statements=(), ignored=False)
+    assert deal_claim_statements({**record, "deal_claims": []}) == DealClaims(statements=(), ignored=False)

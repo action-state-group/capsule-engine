@@ -84,6 +84,7 @@ __all__ = [
     "action_for_record",
     "action_for_check_input",
     "action_for_history_entry",
+    "deal_claim_statements",
     "replay",
     "statement_for_history_entry",
     "statement_record",
@@ -283,6 +284,9 @@ _ITEM_INPUT = "item_ref"
 # The time of the accepted offer a seller's commit rests on, on the record
 # entry beside its capsule (AMENDMENT 7): the offer record's sealed ``at``.
 _PROPOSAL_INPUT = "proposal_at"
+# The deal's earlier claims the user's agent made, on the checked record entry
+# beside its capsule (AMENDMENT 9): each the sealed claim record's own values.
+_CLAIMS_INPUT = "deal_claims"
 
 
 def _profile_target(block: object) -> str | None:
@@ -570,7 +574,9 @@ def action_for_check_input(entry: dict, *, item_ref: object = None) -> Action:
     entry; when it is not passed, the entry's own is read. Either is set on
     the action when it is 64 lowercase hex and named in ``ignored_inputs``
     otherwise. ``proposal_at`` is set when it is a string (``offer_expiry``
-    reads and judges it) and named in ``ignored_inputs`` otherwise. The
+    reads and judges it) and named in ``ignored_inputs`` otherwise.
+    ``deal_claims`` is read by ``deal_claim_statements``, and named in
+    ``ignored_inputs`` when any of it is ignored. The
     envelope's other top-level members, ``party_role`` among them (a checker
     may read it to pick a pack), are not read here: an input carrying one is
     decided as one without it. The act a history entry records is read by
@@ -578,7 +584,76 @@ def action_for_check_input(entry: dict, *, item_ref: object = None) -> Action:
     states no act."""
     capsule, agent_input = _entry_parts(entry)
     action = action_for_record(capsule, agent_input, counterparty_profile=entry.get(_PROFILE_INPUT))
-    return _with_inputs(action, entry, item_ref)
+    action = _with_inputs(action, entry, item_ref)
+    if _CLAIMS_INPUT in entry and deal_claim_statements(entry).ignored:
+        action = replace(action, ignored_inputs=(*action.ignored_inputs, _CLAIMS_INPUT))
+    return action
+
+
+@dataclass(frozen=True)
+class DealClaims:
+    """The statements a checked record entry's ``deal_claims`` makes, and
+    whether any of it was ignored."""
+
+    statements: tuple[StatementRecord, ...]
+    ignored: bool
+
+
+def deal_claim_statements(entry: dict) -> DealClaims:
+    """The statements the ``deal_claims`` beside a checked record entry make
+    (AMENDMENT 9), as ``statement_record`` writes them for the same claims in
+    a bundle: the claim's ``capsule_id``, its class (``delivery_promise`` read
+    as ``delivery_date``), ``source_kind`` ``agent``, the checked record's
+    deal and operator, and the claim's sealed ``at`` as its time. An entry
+    counts only in its agreed shape: ``capsule_id``, ``record_digest`` and
+    ``text_commitment`` 64 lowercase hex, a non-empty ``class``,
+    ``source_kind`` ``agent``, and ``at`` an RFC 3339 time with a zone at or
+    before the checked capsule's ``timestamp``. Any other entry, a
+    ``deal_claims`` that is not a list, or a checked record whose deal cannot
+    be read (unbound, or naming two deals) is ignored, and ``ignored`` says
+    so; nothing it holds is echoed. The same claim given twice is one
+    statement."""
+    claims = entry.get(_CLAIMS_INPUT)
+    if claims is None:
+        return DealClaims(statements=(), ignored=False)
+    capsule, agent_input = _entry_parts(entry)
+    deal = _deal_id(agent_input).value if agent_input is not None and _bound(capsule, agent_input) else None
+    checked_at = _aware(capsule.get("timestamp"))
+    if not isinstance(claims, list) or deal is None or checked_at is None:
+        return DealClaims(statements=(), ignored=True)
+    statements: dict[str, StatementRecord] = {}
+    ignored = False
+    for claim in claims:
+        at = _aware(claim.get("at")) if isinstance(claim, dict) else None
+        if at is None or at > checked_at or not _claim_in_shape(claim):
+            ignored = True
+            continue
+        stated = make_statement_record(
+            operator=str(capsule.get("operator", "")), timestamp=claim["at"], sealed_class=claim["class"],
+            source_kind=_AGENT, deal_id=deal, claim=claim["capsule_id"],
+        )
+        statements.setdefault(stated["capsule_id"], stated)
+    return DealClaims(statements=tuple(statements.values()), ignored=ignored)
+
+
+def _claim_in_shape(claim: dict) -> bool:
+    """Whether a ``deal_claims`` entry has its agreed members, each in shape
+    (``deal_claim_statements``); its ``at`` is checked by the caller."""
+    hexes = (claim.get(k) for k in ("capsule_id", "record_digest", "text_commitment"))
+    return (all(isinstance(v, str) and _HEX64.fullmatch(v) for v in hexes)
+            and _text(claim.get("class")) is not None and claim.get("source_kind") == _AGENT)
+
+
+def _aware(value: object) -> datetime | None:
+    """``value`` as an aware time, when it is an RFC 3339 string with a zone."""
+    if not isinstance(value, str):
+        return None
+    try:
+        at = _parse_ts(value)
+    except ValueError:
+        # Not a time: the caller ignores what it dates.
+        return None
+    return at if at.tzinfo is not None else None
 
 
 def action_for_history_entry(entry: dict) -> Action | None:
@@ -613,7 +688,8 @@ def _entry_parts(entry: dict) -> tuple[dict, dict | None]:
     """An envelope entry's capsule, without the members capsulectl passes
     beside it, and its disclosed ``agent_input``."""
     capsule = {
-        k: v for k, v in entry.items() if k not in ("agent_input", _PROFILE_INPUT, _PROPOSAL_INPUT, _ITEM_INPUT)
+        k: v for k, v in entry.items()
+        if k not in ("agent_input", _PROFILE_INPUT, _PROPOSAL_INPUT, _ITEM_INPUT, _CLAIMS_INPUT)
     }
     agent_input = entry.get("agent_input")
     return capsule, agent_input if isinstance(agent_input, dict) else None

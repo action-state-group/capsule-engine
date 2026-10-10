@@ -455,8 +455,8 @@ def test_a_live_commit_reads_the_age_of_the_accepted_offer():
     assert _live("a-commit-1900").outcome == ALLOW
 
 
-@pytest.mark.xfail(strict=True, reason="a check input's history holds acts only, never the thread's claim, "
-                   "so live, required_disclosure finds no statement in the deal")
+@pytest.mark.xfail(strict=True, reason="this capsulectl passes no record.deal_claims (AMENDMENT 9) and "
+                   "puts no claim in the history, so live, required_disclosure finds no statement in the deal")
 def test_a_live_commit_after_the_threads_claim_finds_the_statement():
     assert _constraint(_live("a-commit-1900"), "required_disclosure").result == "pass"
 
