@@ -40,10 +40,10 @@ An action that states no act (``Action.states_act`` false) is not deduped: its
 ``dedupe`` is ``n/a``, out of scope, and it never matches anything.
 
 On a ledger built from a live check's history (``report/live_history.py``),
-only an act whose capsule seals a disposition is matched
-(``history_state.counts_as_act``): an act sealed with none, an entry that
-could not be read and the marker of an incomplete history are skipped, so a
-history of such acts dedupes as an empty ledger does.
+every act the history holds is matched, whether or not its capsule seals a
+disposition (``history_state.counts_as_act``): a history act was carried
+out, so a repeat of it is a duplicate. An entry that could not be read, a
+statement and the marker of an incomplete history are skipped.
 """
 from __future__ import annotations
 

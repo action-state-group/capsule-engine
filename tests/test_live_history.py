@@ -47,7 +47,14 @@ from capsule_engine.guards import Action, GuardDecision, GuardEngine, LocalSigne
 from capsule_engine.guards.capsule import not_applicable_evidence
 from capsule_engine.guards.checks import RUNNABLE_CHECKS, check_dedupe
 from capsule_engine.guards.engine import NOT_EVALUABLE
-from capsule_engine.guards.history_state import DISPOSITION, LIVE_HISTORY, NO_DISPOSITION, STATEMENT
+from capsule_engine.guards.history_state import (
+    DISPOSITION,
+    INCOMPLETE,
+    LIVE_HISTORY,
+    NO_DISPOSITION,
+    STATEMENT,
+    UNREAD,
+)
 from capsule_engine.guards.wickets import load_definition_file
 from capsule_engine.packs import install_pack, load_pack_dir
 from capsule_engine.packs.install import engine_ask_sets
@@ -522,14 +529,24 @@ def test_a_check_that_fails_closed_with_nothing_failed_is_not_evaluable(store, s
     assert "not evaluable: single_commitment" in decision.reason
 
 
-def test_dedupe_skips_an_act_sealed_with_no_disposition(store):
+def test_dedupe_matches_an_act_sealed_with_no_disposition(store):
+    """Every history act was carried out, so a repeat of one is a duplicate,
+    whether or not its capsule seals a disposition."""
     store.append(_history_row(NO_DISPOSITION), consequential=False)
-    assert check_dedupe(_bare_action(), store).constraint.result == "pass"
+    assert check_dedupe(_bare_action(), store).constraint.result == "fail"
 
 
 def test_dedupe_matches_an_act_whose_disposition_is_sealed(store):
     store.append(_history_row(DISPOSITION), consequential=False)
     assert check_dedupe(_bare_action(), store).constraint.result == "fail"
+
+
+@pytest.mark.parametrize("state", (UNREAD, STATEMENT, INCOMPLETE))
+def test_dedupe_never_matches_a_record_that_is_not_a_read_act(store, state):
+    """An entry that could not be read, a statement and the incomplete marker
+    are not acts, even with an act's fields."""
+    store.append(_history_row(state), consequential=False)
+    assert check_dedupe(_bare_action(), store).constraint.result == "pass"
 
 
 # -- live and replay ----------------------------------------------------------------

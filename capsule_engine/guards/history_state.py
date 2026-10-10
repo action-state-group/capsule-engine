@@ -19,8 +19,10 @@ that builder writes carries ``asg_payload.live_history``, one of:
 
 A record without the member is not from a live history: a decision, or a
 replay's own record. A check that needs to know whether an act was accepted
-reads the state, and a record in any state but ``disposition`` never counts
-as an act it can match (``counts_as_act``).
+reads the state. Every history act was carried out, so an act in state
+``disposition`` or ``no_disposition`` counts as an earlier act a repeat can
+match (``counts_as_act``); an unread entry, a statement and the incomplete
+marker never do.
 """
 from __future__ import annotations
 
@@ -52,5 +54,6 @@ def history_state(capsule: dict) -> str | None:
 
 def counts_as_act(capsule: dict) -> bool:
     """Whether a check may match ``capsule`` as an earlier act: any record
-    not from a live history, and a history act whose disposition is sealed."""
-    return history_state(capsule) in (None, DISPOSITION)
+    not from a live history, and a history act that was read, whether or not
+    its capsule seals a disposition."""
+    return history_state(capsule) in (None, DISPOSITION, NO_DISPOSITION)
