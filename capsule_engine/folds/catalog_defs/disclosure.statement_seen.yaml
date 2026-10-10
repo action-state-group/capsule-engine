@@ -1,0 +1,32 @@
+# Count of a deal's statements to the counterparty per representation class.
+# Used by the required_disclosure/1.1.0 wicket beside
+# disclosure.class_seen/1.0.0: a required class counts as stated when either
+# fold counts one.
+#
+# A statement here is a capsulectl claim record whose capsule binds it, with
+# body.source_kind "agent" and a body.class: the seller's agent telling the
+# buyer something about the deal. The replay writes one record per such
+# claim when it reaches it in the bundle, and a live check writes one per
+# such claim in its check input's history (report/replay.py,
+# statement_record). The record's asg_payload.stated.class is the sealed
+# class, with the legacy delivery_promise read as delivery_date. It is never
+# read from a disclosure record's body.fields[].class, which is the user's
+# personal data given out, not a statement about the deal.
+#
+# The caller selects one operator's records in the action's deal before
+# evaluating (guards/checks/required_disclosure.py), so the count is per
+# class, in that deal, before the action.
+fold_id: disclosure.statement_seen/1.0.0
+reads:
+  - path: asg_payload.stated.class
+    erasure_class: commitment-ok
+  - path: asg_payload.stated.source_kind
+    erasure_class: commitment-ok
+filter:
+  - field: asg_payload.stated.source_kind
+    op: eq
+    value: agent
+key: asg_payload.stated.class
+reduce:
+  reducer: count
+emit: prior_count

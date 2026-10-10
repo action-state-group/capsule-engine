@@ -15,7 +15,10 @@ history act (what capsulectl will seal once the act types are registered
 effect types; synthetic, so those capsules no longer verify); with its
 history removed; and, with that disposition, once with the ``item_ref``
 removed from the history's accepted commitments and once with it removed
-from the checked record (``HISTORIES``). ``expected_live.json`` is every decision and the ledger each
+from the checked record; and, with that disposition, with every claim the
+agent made in either thread before the check added to the history beside
+the sale's ``item_ref`` (what capsulectl does not send today; synthetic, from
+the claim records the bundles seal) (``HISTORIES``). ``expected_live.json`` is every decision and the ledger each
 was decided on, in sorted canonical JSON, compared byte for byte here and
 handed to the Go plugin. Regenerate it with ``python -m tests.test_live_history``.
 """
@@ -40,7 +43,7 @@ from capsule_engine.guards import Action, GuardDecision, GuardEngine, LocalSigne
 from capsule_engine.guards.capsule import not_applicable_evidence
 from capsule_engine.guards.checks import RUNNABLE_CHECKS, check_dedupe
 from capsule_engine.guards.engine import NOT_EVALUABLE
-from capsule_engine.guards.history_state import DISPOSITION, LIVE_HISTORY, NO_DISPOSITION
+from capsule_engine.guards.history_state import DISPOSITION, LIVE_HISTORY, NO_DISPOSITION, STATEMENT
 from capsule_engine.guards.wickets import load_definition_file
 from capsule_engine.packs import install_pack, load_pack_dir
 from capsule_engine.packs.install import engine_ask_sets
@@ -82,7 +85,8 @@ SPEND = load_fold(ROOT / "folds" / "catalog_defs" / "spend.weekly.v3.yaml")
 # item_ref on the checked record.
 AS_SEALED, DISPOSED, ABSENT = "as-sealed", "disposition-accept", "absent"
 HISTORY_NO_ITEM, RECORD_NO_ITEM = "disposition-accept-commit-names-no-item", "disposition-accept-record-names-no-item"
-HISTORIES = (AS_SEALED, DISPOSED, ABSENT, HISTORY_NO_ITEM, RECORD_NO_ITEM)
+CLAIMS = "disposition-accept-claims-in-history"
+HISTORIES = (AS_SEALED, DISPOSED, ABSENT, HISTORY_NO_ITEM, RECORD_NO_ITEM, CLAIMS)
 ACCEPTANCE_CLASS = "agreement.accept"
 
 
@@ -94,6 +98,7 @@ class LedgerRow(TypedDict):
     deal_id: str | None
     item_ref: str | None
     task_authority_ref: str | None
+    stated: str | None
 
 
 class LiveDecision(TypedDict):
@@ -122,12 +127,31 @@ def _check_input(name: str) -> dict:
     return _json(FIXTURE / "check-inputs" / f"{name}.json")
 
 
+def claim_entries(before: str, item_ref: str) -> list[dict]:
+    """Every claim the agent made in either thread sealed by ``before``,
+    as a history entry: its capsule with its disclosed ``agent_input`` (what
+    capsulectl puts in the history for an act) and the sale's ``item_ref``
+    beside it, newest first."""
+    entries = []
+    for path in OWN:
+        bundle = _json(path)
+        for record in bundle["records"]:
+            shown = (bundle["disclosures"].get(record["capsule_id"]) or {}).get("agent_input")
+            if (shown or {}).get("x-deal-v0", {}).get("record_type") == "claim" and record["timestamp"] <= before:
+                entries.append({**record, "agent_input": shown, "item_ref": item_ref})
+    return sorted(entries, key=lambda e: e["timestamp"], reverse=True)
+
+
 def _given(envelope: dict, history: str) -> dict:
     """``envelope`` with its history given as ``history`` says."""
     envelope = copy.deepcopy(envelope)
-    if history in (DISPOSED, HISTORY_NO_ITEM, RECORD_NO_ITEM):
+    if history in (DISPOSED, HISTORY_NO_ITEM, RECORD_NO_ITEM, CLAIMS):
         for entry in envelope["history"]:
             entry["disposition"] = {"decision": "accept"}
+    if history == CLAIMS:
+        envelope["history"] = sorted(
+            [*envelope["history"], *claim_entries(envelope["record"]["timestamp"], envelope["item_ref"])],
+            key=lambda e: e["timestamp"], reverse=True)
     if history == HISTORY_NO_ITEM:
         for entry in envelope["history"]:
             if entry["agent_input"]["body"]["action_class"] == ACCEPTANCE_CLASS:
@@ -197,6 +221,7 @@ def _row(record: dict) -> LedgerRow:
         "deal_id": payload.get("deal_id"),
         "item_ref": payload.get("item_ref"),
         "task_authority_ref": payload.get("task_authority_ref"),
+        "stated": (payload.get("stated") or {}).get("class"),
     }
 
 
@@ -525,11 +550,16 @@ LIVE_REPLAY_DIFFERENCES = {
 }
 
 
+S05 = "s05-required-statement-made-first"
+
+
 def test_live_and_replay_differ_only_where_named():
+    """Live with the dispositions sealed and the agent's claims in the
+    history, which is what the replay reads from the bundles."""
     differences = {}
     for name in INPUTS:
         envelope = _check_input(name)
-        live = _rules(_live(name, DISPOSED).decision)
+        live = _rules(_live(name, CLAIMS).decision)
         replayed = _rules(_replayed()[envelope["record"]["action_id"]])
         assert set(live) == set(replayed), name
         for rule in live:
@@ -539,6 +569,49 @@ def test_live_and_replay_differ_only_where_named():
                 differences[(name, rule)] = (replayed[rule], live[rule])
     assert differences == LIVE_REPLAY_DIFFERENCES
 
+
+
+def test_without_the_claims_in_its_history_a_live_check_asks_for_the_statement():
+    """capsulectl does not put a claim in the history today, so live, every
+    offer and commit fails s05 and asks, while the replay, which reads the
+    claim in the bundle, passes it. The only other rule that moves is the
+    one already named."""
+    for name in INPUTS:
+        envelope = _check_input(name)
+        without, with_claims = _rules(_live(name, DISPOSED).decision), _rules(_live(name, CLAIMS).decision)
+        replayed = _rules(_replayed()[envelope["record"]["action_id"]])
+        assert (replayed[S05], with_claims[S05], without[S05]) == ("pass", "pass", "fail"), name
+        assert _live(name, DISPOSED).decision.outcome in ("escalate", "deny"), name
+        assert {r for r in without if without[r] != with_claims[r]} == {S05}, name
+
+
+def test_a_claim_in_the_history_is_a_statement_never_an_unread_act():
+    """The claim entries are written as statements, so s11 reads the same
+    sale with them as without them: a claim is not an act of the sale."""
+    for name in INPUTS:
+        live, without = _live(name, CLAIMS), _live(name, DISPOSED)
+        claims = claim_entries(_check_input(name)["record"]["timestamp"], _check_input(name)["item_ref"])
+        assert claims and live.written.statement == len(claims) and live.written.unread == 0, name
+        assert [_row(r)["stated"] for r in live.ledger if _row(r)["live_history"] == STATEMENT] == [
+            "condition"] * len(claims), name
+        assert (_s11(live.decision).result, _s11(live.decision).evidence) == (
+            _s11(without.decision).result, _s11(without.decision).evidence), name
+
+
+def test_a_claim_in_another_thread_is_not_a_statement_to_this_buyer():
+    """A's second commit comes after B's claim: the history holds both, and
+    only A's own deal's claim counts."""
+    live = _live("a-commit-again-1900", CLAIMS)
+    (s05,) = [c for c in live.decision.constraints if c.id == "required_disclosure"]
+    assert len(claim_entries(_check_input("a-commit-again-1900")["record"]["timestamp"], "")) == 2
+    assert s05.evidence["stated_counts"] == {"condition": 1}
+    envelope = _given(_check_input("a-commit-again-1900"), CLAIMS)
+    own = _check_input("a-commit-again-1900")["record"]["agent_input"]["chain_id"]
+    envelope["history"] = [e for e in envelope["history"] if e["agent_input"].get("x-deal-v0", {}).get(
+        "record_type") != "claim" or e["agent_input"]["x-deal-v0"]["deal_id"] != own]
+    assert len(envelope["history"]) == len(_given(_check_input("a-commit-again-1900"), CLAIMS)["history"]) - 1
+    (s05,) = [c for c in _decide(envelope).decision.constraints if c.id == "required_disclosure"]
+    assert (s05.result, s05.evidence["stated_counts"]) == ("fail", {"condition": 0})
 
 if __name__ == "__main__":
     for path in sorted(p for p in FIXTURE.rglob("*.json") if p != EXPECTED):

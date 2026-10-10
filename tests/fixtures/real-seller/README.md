@@ -41,7 +41,7 @@ only to keep each external-check-input/v0 capsulectl hands it; it allows and nam
 | `buyer-a.bundle.json`, `buyer-b.bundle.json`, `buyer-c.bundle.json` | each thread's own copy, replayed by the engine in that order |
 | `check-inputs/<thread>-<action>-<amount>.json` | the external-check-input/v0 of each check, as the pinned checker read it: the record, its task-authority record, the floor's opening, the sale's `item_ref` and `party_role` `seller` |
 | `inputs/` | the sale, thread, claim, check and act bodies |
-| `expected_decisions.json` | the replay's decision for every record that gets one, then the live decision on each check input, under `asg/seller/0.1.2`; sorted canonical JSON |
+| `expected_decisions.json` | the replay's decision for every record that gets one, then the live decision on each check input, under `asg/seller/0.1.3`; sorted canonical JSON |
 
 Regenerate `expected_decisions.json` with `python -m tests.test_real_seller_bundle`.
 `tests/test_real_seller_bundle.py` compares it byte for byte.
@@ -78,5 +78,8 @@ Each is a strict `xfail` in the test:
   floor is not checked against it.
 - A commit's check input carries no `proposal_at` and no acceptance, so live, `offer_expiry`
   cannot date the offer and asks on every commit.
+- A check input's history holds acts only, never the thread's claim, so live, s05 finds no
+  statement in the deal and asks on every commit; the replay reads the claim in the bundle and
+  passes it.
 - A typed check names no payee, and a sale's spend is 0, so in a replay `dedupe` reads offers to
   different buyers at different prices as one act.

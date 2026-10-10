@@ -322,7 +322,7 @@ def test_records_are_pack_attributed_and_observe_mode(run):
         assert capsule["asg_payload"]["manifest_digest"] == installed.resolved.manifest_digest, name
         assert capsule["asg_payload"]["checkpoint"].get("dry_run") is (True if name not in REAL_RUN else None), name
     assert activation["asg_payload"]["detail"]["packs"] == [
-        {"pack_id": "asg/seller/0.1.2", "digest": installed.pack.definition_digest(), "mode": "observe"}
+        {"pack_id": "asg/seller/0.1.3", "digest": installed.pack.definition_digest(), "mode": "observe"}
     ]
 
 
