@@ -139,7 +139,11 @@ def _check_input(name: str) -> dict:
 def _live(name: str) -> GuardDecision:
     """The decision on one check input, by a fresh engine under the pack, as
     the plugin makes it."""
-    entry = _check_input(name)
+    return _live_entry(_check_input(name))
+
+
+def _live_entry(entry: dict) -> GuardDecision:
+    """The decision on one check-input envelope, as ``_live`` makes it."""
     with tempfile.TemporaryDirectory() as tmp, LedgerStore(Path(tmp) / "ledger") as store:
         installed = install_pack(PACK, project_dir=Path(tmp) / "live-project", mode="observe")
         resolved = installed.resolved
@@ -471,3 +475,54 @@ def test_the_offer_age_is_read_from_the_record_never_its_capsule_timestamp():
     records[i] = {**records[i], "timestamp": "2026-01-01T00:00:00Z"}
     proposal_at, _ = _a_commit_expiry(records, disclosed)
     assert proposal_at == shown["at"] != "2026-01-01T00:00:00Z"
+
+
+# -- what capsulectl now sends beside the record (AMENDMENTS 6a and 7) -------------
+
+
+def _offer_at(path: Path) -> str:
+    (at,) = [v["at"] for v in _shown(path).values() if _type(v) == PROPOSED and _body(v)["action"] == "offer"]
+    return at
+
+
+def test_a_live_commit_given_proposal_at_reads_the_age_of_the_accepted_offer():
+    """capsulectl now sends ``record.proposal_at``: the accepted offer record's
+    ``at``, the value the replay derives. The 831afeeb inputs predate it; the
+    same input with it added dates the offer."""
+    entry = json.loads(json.dumps(_check_input("a-commit-1900")))
+    entry["record"]["proposal_at"] = _offer_at(OWN[0])
+    action = action_for_check_input(entry["record"], item_ref=entry.get("item_ref"))
+    assert action.proposal_at == _offer_at(OWN[0])
+    assert _constraint(_live_entry(entry), "offer_expiry").result == "pass"
+
+
+def test_a_proposal_at_in_another_shape_is_named_never_read():
+    entry = json.loads(json.dumps(_check_input("a-commit-1900")))
+    entry["record"]["proposal_at"] = 1760028866
+    action = action_for_check_input(entry["record"], item_ref=entry.get("item_ref"))
+    assert action.proposal_at is None
+    assert "proposal_at" in action.ignored_inputs
+
+
+def test_a_history_entry_carries_its_own_item_ref():
+    """A history entry names its sale's ``item_ref`` on the entry (AMENDMENT
+    6a); the record entry's comes from the envelope's top level."""
+    entry = _check_input("a-commit-1900")
+    (history,) = entry["history"]
+    given = json.loads(json.dumps(history))
+    given["item_ref"] = entry["item_ref"]
+    assert action_for_check_input(given).item_ref == entry["item_ref"]
+    assert action_for_check_input(history).item_ref is None
+    given["item_ref"] = "not-hex"
+    action = action_for_check_input(given)
+    assert (action.item_ref, "item_ref" in action.ignored_inputs) == (None, True)
+
+
+def test_the_extra_members_never_change_what_the_capsule_binds():
+    entry = json.loads(json.dumps(_check_input("a-commit-1900")))
+    plain = action_for_check_input(entry["record"])
+    entry["record"]["proposal_at"] = _offer_at(OWN[0])
+    entry["record"]["item_ref"] = entry["item_ref"]
+    given = action_for_check_input(entry["record"])
+    assert (given.verb, given.action_class, given.target, given.deal_id) == (
+        plain.verb, plain.action_class, plain.target, plain.deal_id)

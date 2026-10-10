@@ -266,8 +266,12 @@ def _payee_target(counterparty_ids: dict[str, str] | None, fp_alg: str | None) -
 # companion record, and the fp_alg it must carry.
 _PROFILE_INPUT = "counterparty_profile"
 _PROFILE_FP_ALG = "hmac-sha256-profile-key"
-# The sale's item reference, top level in the checker input.
+# The sale's item reference: top level in the checker input for the checked
+# record, and on each history entry for that act (AMENDMENT 6a).
 _ITEM_INPUT = "item_ref"
+# The time of the accepted offer a seller's commit rests on, on the record
+# entry beside its capsule (AMENDMENT 7): the offer record's sealed ``at``.
+_PROPOSAL_INPUT = "proposal_at"
 
 
 def _profile_target(block: object) -> str | None:
@@ -489,27 +493,43 @@ def action_for_record(record: dict, disclosed: dict | None = None, *, counterpar
 
 
 def action_for_check_input(entry: dict, *, item_ref: object = None) -> Action:
-    """The action the ``record`` entry of an external-check-input/v0 envelope
-    states: the sealed capsule, its disclosed ``agent_input``, and, beside
-    them, the envelope's optional ``counterparty_profile``, which capsulectl
-    computes and passes and the capsule does not seal. ``item_ref`` is the
-    envelope's top-level ``item_ref``, set on the action when it is 64
-    lowercase hex and named in ``ignored_inputs`` otherwise. The envelope's
-    other top-level members, ``party_role`` among them (a checker may read it
-    to pick a pack), are not read here: an input carrying one is decided as
-    one without it."""
-    capsule = {k: v for k, v in entry.items() if k not in ("agent_input", _PROFILE_INPUT)}
+    """The action an entry of an external-check-input/v0 envelope states, the
+    ``record`` entry or one of ``history``: the sealed capsule, its disclosed
+    ``agent_input``, and, beside them, what capsulectl computes and passes
+    and the capsule does not seal: ``counterparty_profile``, ``proposal_at``
+    (AMENDMENT 7) and, on a history entry, ``item_ref`` (AMENDMENT 6a).
+    ``item_ref`` is the envelope's top-level ``item_ref`` for the record
+    entry; when it is not passed, the entry's own is read. Either is set on
+    the action when it is 64 lowercase hex and named in ``ignored_inputs``
+    otherwise. ``proposal_at`` is set when it is a string (``offer_expiry``
+    reads and judges it) and named in ``ignored_inputs`` otherwise. The
+    envelope's other top-level members, ``party_role`` among them (a checker
+    may read it to pick a pack), are not read here: an input carrying one is
+    decided as one without it."""
+    capsule = {
+        k: v for k, v in entry.items() if k not in ("agent_input", _PROFILE_INPUT, _PROPOSAL_INPUT, _ITEM_INPUT)
+    }
     agent_input = entry.get("agent_input")
     action = action_for_record(
         capsule,
         agent_input if isinstance(agent_input, dict) else None,
         counterparty_profile=entry.get(_PROFILE_INPUT),
     )
+    ignored = list(action.ignored_inputs)
     if item_ref is None:
-        return action
-    if isinstance(item_ref, str) and _HEX64.fullmatch(item_ref):
-        return replace(action, item_ref=item_ref)
-    return replace(action, ignored_inputs=(*action.ignored_inputs, _ITEM_INPUT))
+        item_ref = entry.get(_ITEM_INPUT)
+    if item_ref is not None:
+        if isinstance(item_ref, str) and _HEX64.fullmatch(item_ref):
+            action = replace(action, item_ref=item_ref)
+        else:
+            ignored.append(_ITEM_INPUT)
+    proposal_at = entry.get(_PROPOSAL_INPUT)
+    if proposal_at is not None:
+        if isinstance(proposal_at, str):
+            action = replace(action, proposal_at=proposal_at)
+        else:
+            ignored.append(_PROPOSAL_INPUT)
+    return replace(action, ignored_inputs=tuple(ignored))
 
 
 def _companion_profiles(records: list[dict], disclosed: dict[str, dict]) -> dict[str, object]:
