@@ -15,7 +15,7 @@ jobs:
       # capsule-ledger is archived: FROZEN at its final commit, as in pyproject.toml (2026-10-04).
       - name: install capsule-ledger (not yet on PyPI)
         run: pip install "capsule-ledger @ git+https://github.com/action-state-group/capsule-ledger.git@42fb45f69b067f623a4b9915ae8883dff22d5d27"
-      - name: install capsule-emit (main, pinned: ledger_io/period and evidence_file)
+      - name: install capsule-emit (main, pinned; ledger_io, period and evidence_file)
         # --force-reinstall: capsule-ledger's own install above already satisfies
         # "capsule-emit" from PyPI at the pinned floor, so a plain `pip install`
         # here is a silent no-op -- pip matches on version number, not source.
