@@ -334,6 +334,7 @@ class GuardEngine:
         task_authority_record: TaskAuthorityRecord | None = None,
         authorization_record: AuthorizationRecord | None = None,
         commercial_bounds_opening: CommercialBoundsOpening | None = None,
+        sale_history: LedgerAPI | None = None,
     ) -> GuardDecision:
         """``task_authority_record`` is the whole sealed task-authority record
         ``action.task_authority_ref`` names, read only by a
@@ -347,7 +348,10 @@ class GuardEngine:
         ``commercial_bounds_opening`` is the checker input's opening of the
         user's private floor, read only by a ``price_floor`` wicket and only
         when it opens the ``bounds_commitment`` the bound task-authority
-        record seals (``guards/checks/price_floor.py``). It is never sealed."""
+        record seals (``guards/checks/price_floor.py``). It is never sealed.
+        ``sale_history`` is the ledger a replay builds for this check from a
+        sale bundle (``report/sale_bundle.py``): given, ``single_commitment``
+        reads the sale's acceptance from it instead of the engine's ledger."""
         table, mismatch, mismatch_reason = self._taxonomy_for(action)
         ac = table.classify(action.action_class)
         consequential = ac.consequential
@@ -492,7 +496,8 @@ class GuardEngine:
             elif wicket.check == _GATE:
                 out = check_action_class_gate(action, selectors=wicket.config["selectors"], table=table)
             else:
-                out = CONFIGURED_CHECKS[wicket.check](action, self._ledger, wicket.config)
+                reads = sale_history if sale_history is not None and wicket.check == _SALE_HISTORY_CHECK else self._ledger
+                out = CONFIGURED_CHECKS[wicket.check](action, reads, wicket.config)
             constraint = held(out.constraint)
             constraints = (*constraints, constraint)
             if out.fails_closed and constraint.result == "n/a":
@@ -770,6 +775,8 @@ def _caps_out_of_scope(reason: str, *, method: str | None) -> CheckOutcome:
 # a first-time counterparty. These two ask whatever a pack declares for them.
 _ESCALATABLE = frozenset({"caps", "counterparty_seen_before"})
 _GATE = "action_class_gate"
+# The one check that reads a replayed sale's history when a check is given one.
+_SALE_HISTORY_CHECK = "single_commitment"
 # Integrity checks: a failure is refused whatever a pack declares (a dedupe hit
 # on the same act in another deal asks through ``CheckOutcome.asks_approver``).
 _INTEGRITY_CHECKS = frozenset(

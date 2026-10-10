@@ -574,8 +574,10 @@ LIVE_INPUT_RULES = ("s03-price-below-the-floor", "s08-stay-within-task-bounds")
 # disposition sealed, decide a rule differently, and why. Every other rule of
 # every check is decided the same.
 LIVE_REPLAY_DIFFERENCES = {
-    # A replay never reads item_ref (no record carries it), so s11 is n/a
-    # there; its acceptances would be dry runs, which never count.
+    # A replay of thread bundles alone has no item_ref (no record carries
+    # it), so s11 is n/a there; its acceptances would be dry runs, which
+    # never count. A replay of a sale bundle decides s11 as live does
+    # (test_sale_replay.py).
     ("b-offer-1850", S11): ("n/a", "fail"),
     ("b-commit-1850", S11): ("n/a", "fail"),
     ("a-commit-again-1900", S11): ("n/a", "pass"),
