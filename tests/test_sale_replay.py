@@ -776,13 +776,17 @@ CUT_AND_OPENED = {
     "a present entry with no opened": (lambda b: _entries(b)[0].pop("opened"), {"opening_does_not_match_the_thread"}),
     "A's opened opening B's task authority": (
         lambda b: _entries(b)[0].update(opened=_entries(b)[1]["opened"]), {"opening_does_not_match_the_thread"}),
-    "a thread_opened naming another registration": (_a_thread_opened_naming_b,
-                                                     {"sale_bundle_not_valid", "opened_not_evidenced"}),
-    "a thread_opened that cannot be read": (_the_opened_record_unreadable,
-                                            {"sale_bundle_not_valid", "thread_opened_not_read", "opened_not_evidenced"}),
-    "a thread missing from the cut": (_a_dropped_from_the_cut, {"sale_bundle_not_valid", "thread_not_in_the_cut"}),
-    "a cut that cannot be read": (_the_cut_unreadable,
-                                  {"sale_bundle_not_valid", "no_sale_cut"}),
+    # Each edit below re-binds a sealed sale-log record to an edited body, so
+    # the record no longer verifies and is never interpreted (as capsulectl's
+    # verifier reads it): it is a record the copy cannot read.
+    "a thread_opened naming another registration": (
+        _a_thread_opened_naming_b, {"sale_bundle_not_valid", "sale_record_not_disclosed", "opened_not_evidenced"}),
+    "a thread_opened that cannot be read": (
+        _the_opened_record_unreadable, {"sale_bundle_not_valid", "sale_record_not_disclosed", "opened_not_evidenced"}),
+    "a thread missing from the cut": (
+        _a_dropped_from_the_cut, {"sale_bundle_not_valid", "sale_record_not_disclosed", "no_sale_cut"}),
+    "a cut that cannot be read": (
+        _the_cut_unreadable, {"sale_bundle_not_valid", "sale_record_not_disclosed", "no_sale_cut"}),
 }
 
 
@@ -1017,3 +1021,25 @@ if __name__ == "__main__":
         print(path.relative_to(FIXTURE), hashlib.sha256(path.read_bytes()).hexdigest(), file=sys.stderr)
     EXPECTED_LIVE.write_text(canonical(live_document()), encoding="utf-8")
     EXPECTED_REPLAY.write_text(canonical(replay_document()), encoding="utf-8")
+
+
+def test_a_readable_cut_without_a_present_thread_names_it_not_in_the_cut():
+    """A cut that verifies but has no head for a present thread: only a
+    producer holding the key can seal one, so it is checked on the reader."""
+    from capsule_engine.report.sale_bundle import _opened_and_whole
+    why = _opened_and_whole({}, "ab" * 32, "cd" * 32, {"records": []}, {}, {"ef" * 32: "01" * 32})
+    assert "thread_not_in_the_cut" in why and "no_sale_cut" not in why
+    assert "no_sale_cut" in _opened_and_whole({}, "ab" * 32, "cd" * 32, {"records": []}, {}, None)
+
+
+def test_only_the_latest_cut_counts_an_unreadable_later_record_leaves_no_cut():
+    """An older cut that reads is not used when a record the copy cannot read
+    comes after it: that record may be a later cut (capsulectl's rule)."""
+    from capsule_engine.report.sale_bundle import _sale_log_openings
+    registration = "ab" * 32
+    cut = {"x-deal-v0": {"record_type": "sale_cut", "seq": 7},
+           "body": {"thread_heads": [{"registration": {"type": "record", "digest_alg": "SHA-256", "digest": registration},
+                                      "head_commitment": "01" * 32}]}}
+    assert _sale_log_openings([cut], [], None)[1] == {registration: "01" * 32}
+    assert _sale_log_openings([cut], [], 6)[1] == {registration: "01" * 32}
+    assert _sale_log_openings([cut], [], 8)[1] is None
