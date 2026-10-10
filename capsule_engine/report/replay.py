@@ -65,12 +65,15 @@ from capsule_ledger.ledger import LedgerStore
 from ..folds.definition import FoldDefinition
 from ..folds.duration import parse_duration_seconds
 from ..guards import ALLOW, ESCALATE, Action, GuardDecision, GuardEngine, LocalSigner
+from ..guards.checks.caps import EXECUTED_DECISION, SPEND_UNREADABLE, counts_executed_acts
 from ..guards.wickets.definition import WicketDefinition
 from ..packs.install import engine_ask_sets
 from ..packs.schema import PackDefinition
 
 __all__ = [
     "MONEY_IN",
+    "ExecutedActs",
+    "bound_agent_input",
     "SourcedDecision",
     "ReplayResult",
     "load_records",
@@ -555,6 +558,13 @@ def action_for_history_entry(entry: dict) -> Action | None:
     return _with_inputs(action, entry, None) if action is not None else None
 
 
+def bound_agent_input(entry: dict) -> dict | None:
+    """An envelope entry's disclosed ``agent_input`` when its capsule binds
+    it, else ``None``."""
+    capsule, agent_input = _entry_parts(entry)
+    return agent_input if agent_input is not None and _bound(capsule, agent_input) else None
+
+
 def _entry_parts(entry: dict) -> tuple[dict, dict | None]:
     """An envelope entry's capsule, without the members capsulectl passes
     beside it, and its disclosed ``agent_input``."""
@@ -797,6 +807,162 @@ def _carried_out_record(sourced: SourcedDecision, chain: _CarriedOut, at: str | 
     return _CarriedOutRecord(**body, capsule_id=json_digest(body))
 
 
+# How a deal seals an act it executed: an ``x-deal-v0`` action step, or an
+# outcome stating an act taken without a check (``body.unchecked``); a typed
+# deal seals them as an ``action-record/v0`` and an ``action-outcome/v0``
+# (``body.attempted``) (capsule-cli deal_profile.go, action_records.go). A
+# typed action record of a disclosure (``body.disclosed``) moves no money.
+_ACTION_STEP, _OUTCOME_STEP = "action", "outcome"
+_UNCHECKED, _ATTEMPTED, _DISCLOSED = "unchecked", "attempted", "disclosed"
+_ACCEPT = "accept"
+
+
+@dataclass(frozen=True)
+class _ExecutedAct:
+    """An act a deal executed, as its record seals it: the spend it took
+    (``_executed_spend``), ``None`` when that cannot be read, and its class."""
+
+    spend_minor: int | None
+    action_class: str | None
+
+
+def _taken(shown: dict, *, every_record_is_an_act: bool) -> tuple[dict, bool] | None:
+    """The body stating the act the bound record ``shown`` records as
+    executed, and whether it was taken without a check; ``None`` for a
+    record that states no executed act. A check input's history holds acts
+    only (``every_record_is_an_act``), so any other record there is read as
+    a checked act's body."""
+    body = shown.get("body")
+    if not isinstance(body, dict):
+        return None
+    block = shown.get("x-deal-v0")
+    record_type = block.get("record_type") if isinstance(block, dict) else shown.get("type")
+    if record_type in (_OUTCOME_STEP, "action-outcome/v0") or _UNCHECKED in body or _ATTEMPTED in body:
+        taken = body.get(_UNCHECKED, body.get(_ATTEMPTED))
+        return (taken, True) if isinstance(taken, dict) else None
+    if record_type in (_ACTION_STEP, _ACT_RECORD_TYPE) or every_record_is_an_act:
+        return body, False
+    return None
+
+
+def _executed_spend(body: dict, *, unchecked: bool, accepted: bool) -> int | None:
+    """The spend the act ``body`` states took, or ``None`` when it cannot be
+    read. Money moved in (``MONEY_IN``) is ``0``, decided or not, and a
+    disclosure moves none. An accepted act is counted at its
+    ``amount_minor``, as the fold counts an accepted decision. An act taken
+    without a check is sealed before its spend is classed, so its
+    ``amount_minor`` stands in for a missing ``spend_minor``. Any other act
+    is counted at its ``spend_minor``, which must be an integer of at least
+    0."""
+    if body.get("direction") == MONEY_IN or _DISCLOSED in body:
+        return 0
+    if accepted:
+        return _minor(body.get("amount_minor"))
+    spend = _minor(body.get("spend_minor"))
+    if unchecked:
+        return spend if spend is not None else _minor(body.get("amount_minor"))
+    return spend if spend is not None and spend >= 0 else None
+
+
+def _executed_act(capsule: dict, shown: dict | None, *, every_record_is_an_act: bool = False) -> _ExecutedAct | None:
+    """The act the record ``shown``, bound by ``capsule``, states was
+    executed (``_taken``), or ``None`` for one that states none. An act whose
+    record is not given cannot be read: its spend is ``None``."""
+    if shown is None:
+        return _ExecutedAct(spend_minor=None, action_class=None)
+    taken = _taken(shown, every_record_is_an_act=every_record_is_an_act)
+    if taken is None:
+        return None
+    body, unchecked = taken
+    spend = _executed_spend(body, unchecked=unchecked, accepted=_sealed_accept(capsule))
+    return _ExecutedAct(spend_minor=spend, action_class=_text(body.get("action_class")))
+
+
+def _sealed_accept(capsule: dict) -> bool:
+    disposition = capsule.get("disposition")
+    return isinstance(disposition, dict) and disposition.get("decision") == _ACCEPT
+
+
+def _act_ids(capsule: dict) -> frozenset[str]:
+    """The identities an act's capsule carries: its ``capsule_id`` and
+    ``action_id``."""
+    return frozenset(v for v in (capsule.get("capsule_id"), capsule.get("action_id")) if isinstance(v, str) and v)
+
+
+class ExecutedActs:
+    """Each executed act counted once in the spend window. An accepted act
+    always counts. Any other act that shares a ``capsule_id`` or an
+    ``action_id`` with an accepted one, or with an act already counted, is the
+    same act and adds nothing. ``capsules`` are every act's capsule the
+    window may hold, so the accepted ones are known whatever their order."""
+
+    def __init__(self, capsules: Sequence[dict]) -> None:
+        self._accepted = frozenset().union(*(_act_ids(c) for c in capsules if _sealed_accept(c)))
+        self._counted: set[str] = set()
+
+    def record(self, capsule: dict, shown: dict | None, act_digest: str, *,
+               every_record_is_an_act: bool = False) -> _ExecutedRecord | None:
+        """The spend window's record of the act ``capsule`` binds
+        (``_executed_record``), or ``None`` when it states no executed act
+        or was counted already."""
+        act = _executed_act(capsule, shown, every_record_is_an_act=every_record_is_an_act)
+        if act is None:
+            return None
+        ids = _act_ids(capsule)
+        if not _sealed_accept(capsule):
+            if ids & (self._accepted | self._counted):
+                return None
+            self._counted |= ids
+        return _executed_record(capsule, act, act_digest)
+
+
+class _ExecutedCitation(TypedDict):
+    act: str
+
+
+class _ExecutedPayload(TypedDict, total=False):
+    amount_minor: int
+    action_class: str
+    spend_unreadable: bool
+    executed: _ExecutedCitation
+
+
+class _ExecutedBody(TypedDict):
+    operator: str | None
+    timestamp: str | None
+    disposition: _Disposition
+    asg_payload: _ExecutedPayload
+
+
+class _ExecutedRecord(_ExecutedBody):
+    capsule_id: str
+
+
+def _executed_record(capsule: dict, act: _ExecutedAct, act_digest: str) -> _ExecutedRecord:
+    """The record of an executed act for the spend window
+    (``spend.weekly/3.1.0``), under its capsule's operator and time, citing
+    the act's record by digest; its ``capsule_id`` is the digest of the rest.
+    It carries the act's spend as ``amount_minor``, or ``spend_unreadable``
+    and no amount when the spend cannot be read (``_executed_spend``), so
+    the window counts the act or is known not to. It is never a decision
+    and names no target, so it is never seen, and never the earlier act a
+    repeat duplicates."""
+    payload = _ExecutedPayload(executed=_ExecutedCitation(act=act_digest))
+    if act.spend_minor is None:
+        payload[SPEND_UNREADABLE] = True
+    else:
+        payload["amount_minor"] = act.spend_minor
+    if act.action_class is not None:
+        payload["action_class"] = act.action_class
+    body = _ExecutedBody(
+        operator=_text(capsule.get("operator")),
+        timestamp=_text(capsule.get("timestamp")),
+        disposition=_Disposition(decision=EXECUTED_DECISION),
+        asg_payload=payload,
+    )
+    return _ExecutedRecord(**body, capsule_id=json_digest(body))
+
+
 @dataclass(frozen=True)
 class SourcedDecision:
     """One replayed record, its resulting ``Action``, its real
@@ -854,6 +1020,13 @@ def replay(
     carried out (``_carried_out_record``), once, when it reaches the action
     step, so a later check counts it as an earlier act with that
     counterparty. A refused check is never counted.
+    Under a caps fold that counts executed acts (``spend.weekly/3.1.0``),
+    every act a deal executed is also written to the view when the replay
+    reaches it (``_executed_record``), whoever approved it and whether or not
+    it was checked, so a later check's spend window counts it once. The
+    replay's own decisions are dry runs and never count, so no act counts
+    twice. Under any other fold nothing more is written, and a replay keeps
+    the bytes it had.
     A seller's typed commit is decided with ``proposal_at`` the sealed time
     of the accepted offer it rests on (``_accepted_offer_at``), so
     ``offer_expiry`` reads that offer's age.
@@ -889,6 +1062,8 @@ def replay(
         deal = _deal_records(records, disclosed or {})
         offered_at = _accepted_offer_at(records, disclosed or {})
         decided_checks: dict[str, SourcedDecision] = {}
+        counts_spend = counts_executed_acts(caps_fold)
+        executed_acts = ExecutedActs(records)
         for record in records:
             shown = (disclosed or {}).get(record.get("capsule_id", ""))
             digest = json_digest(shown) if shown is not None else None
@@ -898,6 +1073,10 @@ def replay(
                 checked = decided_checks.pop(chain.check, None) if chain is not None else None
                 if chain is not None and checked is not None and checked.decision.outcome in (ALLOW, ESCALATE):
                     store.append(dict(_carried_out_record(checked, chain, _text(record.get("timestamp")))), consequential=False)
+                if counts_spend and digest is not None and _bound(record, shown):
+                    executed = executed_acts.record(record, shown, digest)
+                    if executed is not None:
+                        store.append(dict(executed), consequential=False)
                 continue
             profile = profiles.get(digest) if profiles and digest is not None else None
             action = action_for_record(record, shown, counterparty_profile=profile)

@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""A real two-deal bundle from capsulectl, replayed under everyday 0.3.5.
+"""A real two-deal bundle from capsulectl, replayed under everyday 0.3.6.
 
 ``fixtures/real-two-deal/`` holds what capsulectl wrote, byte for byte: two
 deals on one throwaway profile, each a purchase of the same item from the same
@@ -14,7 +14,8 @@ pack. Only a check states an act, so only the two checks get a decision: the
 companions, the deal's other records and the reports get none, and no rule
 fires on them. Deal 1's check asks (a first-time merchant), and its sealed
 approval and executed action carry it out, so deal 2's check reads the
-merchant as seen. ``expected_decisions.json`` is that replay's decision for
+merchant as seen, and its 7-day total counts deal 1's executed act.
+``expected_decisions.json`` is that replay's decision for
 every check, in sorted canonical JSON, compared byte for byte here and handed
 to the Go plugin's differential. Regenerate it with
 ``python -m tests.test_real_two_deal_bundle``.
@@ -55,8 +56,9 @@ FIXTURE_SHA256 = {
 }
 PACK = load_pack_dir(Path(capsule_engine.__file__).parent / "packs" / "catalog" / "everyday")
 FROZEN_0_3_3 = Path(__file__).parent / "fixtures" / "packs" / "everyday-0.3.3"
-PACK_ID = "asg/everyday/0.3.5"
-PACK_DIGEST = "0400d22c4464e91728bac2d00ca3bf8551ec98cdd20ef18d803b5b4432d4e8f4"
+FROZEN_0_3_5 = Path(__file__).parent / "fixtures" / "packs" / "everyday-0.3.5"
+PACK_ID = "asg/everyday/0.3.6"
+PACK_DIGEST = "8a8e0a7e1ca4319b6e45f2037f4af49e6592919f373e59874ce1ead7249b073d"
 PRODUCER = {"commit": "831afeeb9fd76b7196486a9af38ca455b1230791", "name": "capsulectl", "version": "v0.1.0-rc13-6-g831afee"}
 TAXONOMY = "6"
 R02 = "r02-ordinary-purchase"
@@ -205,7 +207,7 @@ def test_every_check_seals_taxonomy_6():
             assert _json(path)["disclosures"][capsule_id]["agent_input"]["body"]["taxonomy_version"] == TAXONOMY
 
 
-def test_the_pack_is_everyday_0_3_5_at_its_digest():
+def test_the_pack_is_everyday_0_3_6_at_its_digest():
     assert PACK.pack_id == PACK_ID
     assert PACK.definition_digest() == PACK_DIGEST
 
@@ -290,13 +292,29 @@ def test_under_0_3_3_deal_2_still_reads_a_first_time_merchant():
     assert (seen.result, seen.evidence["prior_count"]) == ("fail", 0)
 
 
-def test_the_carried_out_act_is_never_counted_as_spend():
-    """The record the replay writes for deal 1's act is counted by
-    counterparty.seen_before/3.0.0 only: deal 2's caps reads no spend."""
+def _caps_on_deal_2(result: ReplayResult):
     (check,) = _checks(2)
-    (sourced,) = [s for s in _replayed().decisions if s.record["capsule_id"] == check]
+    (sourced,) = [s for s in result.decisions if s.record["capsule_id"] == check]
     (caps,) = [c for c in sourced.decision.constraints if c.id == "caps"]
-    assert caps.evidence["weekly_spend_minor"] == 0
+    return caps
+
+
+def test_deal_2s_window_counts_deal_1s_executed_act_once():
+    """spend.weekly/3.1.0 counts deal 1's executed act at the spend its action
+    step seals. The check that led to it was decided as a dry run, which no
+    total counts, so it is counted once."""
+    caps = _caps_on_deal_2(_replayed())
+    assert caps.result == "pass"
+    assert caps.evidence["weekly_spend_minor"] == caps.evidence["amount_minor"] == 2_000
+    assert caps.evidence["projected_minor"] == 4_000
+
+
+def test_under_0_3_5_deal_2s_window_reads_no_spend():
+    """spend.weekly/3.0.0, which 0.3.5 cites, counts accepted decisions that
+    were not dry runs, and a replay writes none: the old version keeps its
+    meaning."""
+    result = _replay(tuple(load_records(OWN)), load_disclosed(OWN), load_withheld(OWN), load_pack_dir(FROZEN_0_3_5))
+    assert _caps_on_deal_2(result).evidence["weekly_spend_minor"] == 0
 
 
 # -- the same deals, changed: an act that was not carried out is not seen -------------

@@ -32,8 +32,10 @@ EXPECTED_DIGESTS = {
     "caps/2.0.0": "b7ea63ec3d9fdb872d3b5db952e774f04ff8f4b945ca803e49181b91b2a25f80",
     "caps/3.0.0": "54870cd7059d18c5a88221185cb0a49fe1ea09c30825548e1e3134569c5cb66f",
     "caps/4.0.0": "2b07340e8fc858af76d8accf6afc3d6c9d05bb92d50abcfddd1fee8d9b51de35",
-    # caps/4.0.0 with the per-action limit reading the authorised maximum; the everyday pack cites it.
+    # caps/4.0.0 with the per-action limit reading the authorised maximum; everyday 0.3.5 cites it.
     "caps/5.0.0": "2807e174dc7c817917621f90a53f3fa54992b76fe3ec28e8567f814b9e72a741",
+    # caps/5.0.0 over spend.weekly/3.1.0, which also counts executed acts; everyday 0.3.6 cites it.
+    "caps/5.1.0": "7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8",
     "verify_before_dispatch/1.0.0": "a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c",
     "caps_holds/1.0.0": "86a07c5c2739502b1211dbb1c73df0d6950f91ba454ff151ff32cb6946fc21f6",
     "hold_reconcile/1.0.0": "cf6f76b1aeb1d705f90f89c97667c2db035e697211f7f7dc0f8455c54acaec74",
@@ -104,6 +106,7 @@ WITHOUT_SEMANTICS = frozenset(EXPECTED_DIGESTS) - {
     "offer_expiry/1.0.1", "price_floor/2.0.1", "channel_change/1.1.0", "material_fields_changed/1.1.0",
     "offer_fields_changed/1.1.0", "refundability/1.1.0", "task_authority/1.1.0", "upfront_amount/1.1.0",
     "counterparty_seen_before/3.0.0", "counterparty_seen_before/4.0.0", "seller.release_on_acceptance/1.0.0",
+    "caps/5.1.0",
 }
 
 

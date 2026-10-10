@@ -42,15 +42,27 @@ Under a fold with a ``reversal`` clause (``spend.weekly/3.0.0``) the evidence
 adds ``reversals``: how many cancels or refunds took a linked charge back out
 of the total and by how much, and how many were unlinked and did nothing.
 Under a fold without one the evidence keeps the shape it had.
+
+Under a fold that also counts executed acts (``spend.weekly/3.1.0``, whose
+filter admits ``EXECUTED_DECISION``) a replay, or a live check's history
+ledger, writes a record for each executed act (``report/replay.py``,
+``ExecutedActs``). One whose spend could not be read carries
+``asg_payload.spend_unreadable`` and no amount, so the fold skips it. With one
+in the window the total is not known: the check is ``n/a``, in scope, naming
+``spend_minor``, with the reason ``WINDOW_UNREADABLE_REASON``, and the engine
+asks rather than allows (``CheckOutcome.asks_when_unevaluated``). A per-action
+limit the action exceeds still fails, and its evidence adds
+``window_unreadable_count``.
 """
 from __future__ import annotations
 
 from collections.abc import Mapping
+from dataclasses import replace
 from typing import Literal, NotRequired, TypedDict
 
 from capsule_ledger.ledger.api import LedgerAPI, ScanQuery
 
-from ...folds.definition import FoldDefinition
+from ...folds.definition import FilterClause, FoldDefinition, ReadField, Reduce
 from ...folds.engine import ReversalSummary, evaluate_one
 from ..action import Action
 from ..capsule import ConstraintOutcome, not_applicable_evidence
@@ -58,6 +70,9 @@ from ..classes import resolve
 from .base import CheckOutcome
 
 __all__ = [
+    "EXECUTED_DECISION",
+    "SPEND_UNREADABLE",
+    "WINDOW_UNREADABLE_REASON",
     "LIMIT_SOURCE_DEFAULT",
     "LIMIT_SOURCE_PROFILE",
     "PER_ACTION_READS",
@@ -71,6 +86,7 @@ __all__ = [
     "TwoLimitCapsEvidence",
     "cap_for",
     "check_caps",
+    "counts_executed_acts",
     "require_per_action_reads",
     "resolve_caps_minor",
 ]
@@ -82,6 +98,15 @@ PER_ACTION_READS = frozenset({"spend_authorized_minor"})
 # Where a limit's value came from (``limit_sources``).
 LIMIT_SOURCE_PROFILE = "operator_profile"
 LIMIT_SOURCE_DEFAULT = "definition_default"
+
+# The ``disposition.decision`` of the record a replay writes for an act a
+# deal executed. No guard decision carries it.
+EXECUTED_DECISION = "executed"
+# The ``asg_payload`` flag on such a record whose spend could not be read.
+SPEND_UNREADABLE = "spend_unreadable"
+WINDOW_UNREADABLE_REASON = "an earlier act has no recorded decision, so the total cannot count it"
+_DECISION_PATH = "disposition.decision"
+_UNREADABLE_PATH = f"asg_payload.{SPEND_UNREADABLE}"
 
 
 class FoldKey(TypedDict):
@@ -129,6 +154,8 @@ class CapsEvidence(TypedDict):
     reversals: NotRequired[ReversalSummary]
     # Only when the engine reads its limits from activated policy.
     limit_sources: NotRequired[LimitSources]
+    # Only when an executed act in the window has a spend that cannot be read.
+    window_unreadable_count: NotRequired[int]
 
 
 class CapTripped(TypedDict):
@@ -198,6 +225,41 @@ def _fold_key(action: Action, key: str | None, since: str | None) -> tuple[str |
     raise ValueError(f"caps cannot partition by fold key {key!r}; it reads developer or operator")
 
 
+def counts_executed_acts(definition: FoldDefinition | None) -> bool:
+    """Whether ``definition``'s filter admits the record a replay writes for
+    an executed act (``EXECUTED_DECISION``)."""
+    if definition is None:
+        return False
+    for clause in definition.filter:
+        if clause.field != _DECISION_PATH:
+            continue
+        if (clause.op == "eq" and clause.value == EXECUTED_DECISION) or (
+            clause.op == "in" and EXECUTED_DECISION in clause.value
+        ):
+            return True
+    return False
+
+
+def _unreadable_in_window(definition: FoldDefinition, records: list[dict], key_value: str | None, as_of: str) -> int:
+    """How many executed acts with a spend that could not be read fall in
+    ``definition``'s window under ``key_value``: the same key, window and
+    anchor the total was read under, counted instead of summed."""
+    reads = [ReadField(path="timestamp", erasure_class="commitment-ok"),
+             ReadField(path=_DECISION_PATH, erasure_class="commitment-ok"),
+             ReadField(path=_UNREADABLE_PATH, erasure_class="commitment-ok", default=False, has_default=True)]
+    if definition.key is not None:
+        reads.append(ReadField(path=definition.key, erasure_class="commitment-ok"))
+    probe = replace(
+        definition,
+        reads=tuple(reads),
+        filter=(FilterClause(field=_DECISION_PATH, op="eq", value=EXECUTED_DECISION),
+                FilterClause(field=_UNREADABLE_PATH, op="eq", value=True)),
+        reduce=Reduce(reducer="count"),
+        reversal=None,
+    )
+    return evaluate_one(probe, records, key_value=key_value, as_of=as_of).result or 0
+
+
 def require_per_action_reads(per_action_reads: str | None) -> None:
     """Raise ``ValueError`` unless ``per_action_reads`` is absent or one of
     ``PER_ACTION_READS``."""
@@ -245,12 +307,9 @@ def check_caps(
 
     key_value, query = _fold_key(action, definition.key, since)
     records = [r.capsule for r in ledger.scan(query)]
-    trace = evaluate_one(
-        definition,
-        records,
-        key_value=key_value,
-        as_of=as_of or action.resolved_timestamp(),
-    )
+    anchor = as_of or action.resolved_timestamp()
+    trace = evaluate_one(definition, records, key_value=key_value, as_of=anchor)
+    unreadable = _unreadable_in_window(definition, records, key_value, anchor) if counts_executed_acts(definition) else 0
     weekly_spend = trace.result or 0
     projected = weekly_spend + action.amount_minor
     envelope = trace.to_envelope()
@@ -267,6 +326,8 @@ def check_caps(
         evidence["reversals"] = trace.reversals
     if limit_sources is not None:
         evidence["limit_sources"] = limit_sources
+    if unreadable:
+        evidence["window_unreadable_count"] = unreadable
 
     if per_action_cap_minor is not None:
         basis = _per_action_basis(action, action.amount_minor) if per_action_reads is not None else None
@@ -274,6 +335,8 @@ def check_caps(
         result, reason, tripped = _judge_two_limits(
             per_action_amount, projected, cap_minor, per_action_cap_minor, basis["field"] if basis is not None else "amount"
         )
+        if unreadable and not any(t["limit"] == "per_action" for t in tripped):
+            return _window_unreadable(definition, envelope)
         two_limit = TwoLimitCapsEvidence(**evidence, per_action_cap_minor=per_action_cap_minor, tripped=tripped)
         if basis is not None:
             two_limit["per_action_basis"] = basis
@@ -289,6 +352,8 @@ def check_caps(
             fold_envelopes=(envelope,),
         )
 
+    if unreadable:
+        return _window_unreadable(definition, envelope)
     if projected <= cap_minor:
         return CheckOutcome(
             constraint=ConstraintOutcome(
@@ -311,6 +376,24 @@ def check_caps(
             method=definition.fold_id,
         ),
         fold_envelopes=(envelope,),
+    )
+
+
+def _window_unreadable(definition: FoldDefinition, envelope: dict) -> CheckOutcome:
+    """``n/a`` in scope, naming ``spend_minor``: an executed act in the
+    window has a spend that cannot be read, so the total is not known. The
+    engine asks rather than allows (``CheckOutcome.asks_when_unevaluated``)."""
+    return CheckOutcome(
+        constraint=ConstraintOutcome(
+            id="caps",
+            result="n/a",
+            reason=WINDOW_UNREADABLE_REASON,
+            evidence=not_applicable_evidence("caps", in_scope=True, missing_field="spend_minor"),
+            check_type="policy",
+            method=definition.fold_id,
+        ),
+        fold_envelopes=(envelope,),
+        asks_when_unevaluated=True,
     )
 
 

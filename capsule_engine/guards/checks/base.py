@@ -19,7 +19,10 @@ class CheckOutcome:
     ``fails_closed`` marks an in-scope ``n/a`` the check could not evaluate
     and must not be allowed past (single_commitment: whether the sale has an
     acceptance is not known); the engine refuses the action and the
-    decision's ``verdict`` is ``not_evaluable``."""
+    decision's ``verdict`` is ``not_evaluable``. ``asks_when_unevaluated``
+    marks an in-scope ``n/a`` an approver may still resolve (caps: an
+    executed act in the window has a spend that cannot be read): the engine
+    asks where it would allow, and the ``verdict`` is ``not_evaluable``."""
 
     constraint: ConstraintOutcome
     fold_envelopes: tuple[dict, ...] = field(default_factory=tuple)
@@ -27,3 +30,4 @@ class CheckOutcome:
     chain_relation: str | None = None
     asks_approver: bool = False
     fails_closed: bool = False
+    asks_when_unevaluated: bool = False

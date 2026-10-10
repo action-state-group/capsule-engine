@@ -15,7 +15,8 @@ one way. Each act is read by ``action_for_history_entry`` and written as the
 record a decision on it would carry (``act_payload``), in ledger order:
 oldest first by the capsule's ``timestamp``, with acts of the same second in
 the order the envelope gives them (capsulectl's sort is stable, so that is
-the order they were sealed in).
+the order they were sealed in). An act given twice (the same ``capsule_id``)
+is written once.
 
 Each record states what is known about it (``guards/history_state.py``). Its
 ``disposition`` is the one the act's capsule seals, and nothing else: an act
@@ -26,6 +27,14 @@ An entry whose act cannot be read is written as ``unread``, with its
 history is missing, is not a list, is not declared complete, or holds an
 entry with no readable time or an ``item_ref`` in another shape, one
 ``incomplete`` record is written after the acts.
+
+Under a caps fold that counts executed acts (``spend.weekly/3.1.0``), each act
+is also written as the spend window's record of it (``ExecutedActs``), right
+after it: every history entry is an executed act, counted once. An entry
+whose ``agent_input`` its capsule does not bind, or whose spend cannot be
+read, is written with ``spend_unreadable``, so the window is not evaluated
+rather than counted without it. Under any other fold nothing more is
+written.
 
 The capsules are read as given: their signatures are not verified here.
 capsulectl hands the envelope to the user's own checker, and every record
@@ -41,9 +50,11 @@ from typing import TypedDict
 from agent_action_capsule import json_digest
 from capsule_ledger.ledger.api import LedgerAPI
 
+from ..folds.definition import FoldDefinition
 from ..guards.capsule import act_payload
+from ..guards.checks.caps import counts_executed_acts
 from ..guards.history_state import DISPOSITION, INCOMPLETE, LIVE_HISTORY, NO_DISPOSITION, UNREAD
-from .replay import action_for_history_entry
+from .replay import ExecutedActs, action_for_history_entry, bound_agent_input
 
 __all__ = ["HistoryLedger", "history_ledger"]
 
@@ -84,10 +95,11 @@ class HistoryLedger:
     unread: int
 
 
-def history_ledger(envelope: dict, ledger: LedgerAPI) -> HistoryLedger:
+def history_ledger(envelope: dict, ledger: LedgerAPI, *, caps_fold: FoldDefinition | None = None) -> HistoryLedger:
     """Write the acts of ``envelope``'s ``history`` into ``ledger``, oldest
     first, and an ``incomplete`` record after them when the history is not
-    known to be complete (module docstring)."""
+    known to be complete (module docstring). ``caps_fold`` is the engine's;
+    when it counts executed acts, each act's spend record follows it."""
     history = envelope.get("history")
     scope = envelope.get("history_scope")
     complete = isinstance(history, list) and isinstance(scope, dict) and scope.get("complete") is True
@@ -103,10 +115,22 @@ def history_ledger(envelope: dict, ledger: LedgerAPI) -> HistoryLedger:
         dated.append((at, index, entry))
     dated.sort(key=lambda item: (item[0], item[1]))
     counts = {DISPOSITION: 0, NO_DISPOSITION: 0, UNREAD: 0}
+    executed = ExecutedActs([entry for _, _, entry in dated]) if counts_executed_acts(caps_fold) else None
+    written: set[str] = set()
     for _, _, entry in dated:
         record = _act_record(entry)
+        if record["capsule_id"] in written:
+            # The same act given twice: written, and counted, once.
+            continue
+        written.add(record["capsule_id"])
         counts[str(record["asg_payload"][LIVE_HISTORY])] += 1
         ledger.append(dict(record), consequential=False)
+        if executed is not None:
+            shown = bound_agent_input(entry)
+            spend = executed.record(entry, shown, json_digest(shown) if shown is not None else record["capsule_id"],
+                                    every_record_is_an_act=True)
+            if spend is not None:
+                ledger.append(dict(spend), consequential=False)
     if not complete:
         ledger.append(_incomplete_record(envelope.get("record")), consequential=False)
     return HistoryLedger(
