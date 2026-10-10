@@ -186,7 +186,10 @@ def _decide(envelope: dict) -> GuardDecision:
     """The decision on one check input under everyday, by a fresh engine
     whose ledger is the input's history (``history_ledger``)."""
     with tempfile.TemporaryDirectory() as tmp, LedgerStore(Path(tmp) / "ledger") as store:
-        return _engine(store, tmp, envelope).check(action_for_check_input(envelope["record"], item_ref=envelope.get("item_ref")))
+        return _engine(store, tmp, envelope).check(
+            action_for_check_input(envelope["record"], item_ref=envelope.get("item_ref")),
+            task_authority_record=envelope.get("task_authority_record"),
+        )
 
 
 @cache
