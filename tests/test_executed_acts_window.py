@@ -22,16 +22,19 @@ from pathlib import Path
 from typing import TypedDict
 
 import pytest
+from agent_action_capsule import json_digest
 from capsule_ledger.ledger import LedgerStore
 
 import capsule_engine
+from capsule_engine.folds.catalog import Catalog as FoldCatalog
 from capsule_engine.guards import GuardEngine, LocalSigner
 from capsule_engine.guards.capsule import ESCALATE
 from capsule_engine.guards.checks import RUNNABLE_CHECKS
-from capsule_engine.guards.checks.caps import WINDOW_UNREADABLE_REASON
+from capsule_engine.guards.checks.caps import WINDOW_UNREADABLE_REASON, check_caps
 from capsule_engine.guards.engine import NOT_EVALUABLE, GuardDecision
 from capsule_engine.packs import install_pack, load_pack_dir
 from capsule_engine.packs.install import engine_ask_sets
+from capsule_engine.packs.loader import CORE_FOLD_CATALOG_DIR
 from capsule_engine.packs.obligation_results import obligation_results
 from capsule_engine.report.live_history import history_ledger
 from capsule_engine.report.replay import action_for_check_input
@@ -161,3 +164,68 @@ def test_a_history_act_its_capsule_does_not_bind_is_unreadable():
     envelope["history"][0]["agent_input"]["body"]["spend_minor"] = 1
     window = _window(_decide_envelope(envelope))
     assert (window["r05_7d_verdict"], window["r05_7d_reason"]) == (NOT_EVALUABLE, WINDOW_UNREADABLE_REASON)
+
+
+# -- a history not declared complete ------------------------------------------------
+
+# The Go plugin's reason for the same case, word for word (its windowCoverage).
+HISTORY_INCOMPLETE = ("the history supplied is incomplete (more acts than it holds, or some could not be read), "
+                      "so the 7d total cannot be computed")
+
+
+def _incomplete(name: str, step: int) -> dict:
+    """The recorded envelope with its history declared not complete."""
+    envelope = _envelope(name, step)
+    envelope["history_scope"]["complete"] = False
+    return envelope
+
+
+def _caps(decision: GuardDecision):
+    (caps,) = [c for c in decision.constraints if c.id == "caps"]
+    return caps
+
+
+@pytest.mark.parametrize("name, step", [("decided-pay", 0), ("decided-pay", 3), ("unchecked", 2)])
+def test_a_history_not_declared_complete_leaves_the_window_not_evaluable_and_asks(name, step):
+    """The history may hold fewer acts than were carried out, so the total
+    is not known: r05 is ``n/a`` in scope with the plugin's reason, no field
+    named, and the check asks. Step 0 holds no acts at all."""
+    decision = _decide_envelope(_incomplete(name, step))
+    assert _window(decision)["r05_7d_reason"] == HISTORY_INCOMPLETE
+    assert decision.outcome == ESCALATE
+    assert decision.asked_unevaluated_checks == ("caps",)
+    assert _caps(decision).evidence == {"constraint_id": "caps", "in_scope": True, "missing_field": None}
+    (r05,) = [r for r in obligation_results(PACK, decision.constraints) if r.obligation_id == R05]
+    assert (r05.result, r05.reason) == ("n/a", HISTORY_INCOMPLETE)
+
+
+def test_a_history_not_declared_complete_outranks_an_unreadable_act():
+    decision = _decide_envelope(_incomplete("unreadable-no-spend-minor", 2))
+    assert _window(decision)["r05_7d_reason"] == HISTORY_INCOMPLETE
+
+
+def test_a_per_action_limit_the_action_exceeds_still_fails_on_an_incomplete_history():
+    """3000 is over the 2500 per-action limit whatever the window holds."""
+    envelope = _incomplete("decided-pay", 1)
+    record = envelope["record"]
+    body = record["agent_input"]["body"]
+    body["amount_minor"] = body["spend_minor"] = body["terms"]["price_minor"] = 3_000
+    record["model_attestation"]["compute_attestation"]["agent_input_digest"] = json_digest(record["agent_input"])
+    caps = _caps(_decide_envelope(envelope))
+    assert caps.result == "fail"
+    assert [t["limit"] for t in caps.evidence["tripped"]] == ["per_action"]
+
+
+def test_a_fold_keyed_by_developer_still_reads_the_marker():
+    """The ``incomplete`` record names no developer; caps reads it under the
+    checked record's operator."""
+    envelope = _incomplete("decided-pay", 0)
+    spend_v1 = FoldCatalog(CORE_FOLD_CATALOG_DIR).get("spend.weekly/1.0.0").definition
+    assert spend_v1.key == "developer"
+    with tempfile.TemporaryDirectory() as tmp, LedgerStore(Path(tmp) / "ledger") as store:
+        history_ledger(envelope, store)
+        action = action_for_check_input(envelope["record"])
+        outcome = check_caps(action, store, definition=spend_v1, cap_minor=10_000)
+    assert (outcome.constraint.result, outcome.constraint.reason) == ("n/a", HISTORY_INCOMPLETE)
+    assert outcome.asks_when_unevaluated
+
