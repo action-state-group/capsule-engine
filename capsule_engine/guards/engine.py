@@ -42,12 +42,13 @@ With no constraint failed its ``verdict`` is ``not_evaluable``
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime, timedelta, timezone
 from typing import TYPE_CHECKING, TypedDict
 
 from capsule_ledger.ledger.api import LedgerAPI
 
+from .. import code_identity as _code_identity
 from ..events.capsule import build_event_capsule
 from ..folds.definition import FoldDefinition
 from ..policy.errors import PolicyManifestError
@@ -147,6 +148,12 @@ class GuardDecision:
     # The checks that could not be evaluated and ask
     # (``CheckOutcome.asks_when_unevaluated``): the action is never allowed.
     asked_unevaluated_checks: tuple[str, ...] = ()
+    # code_identity: a local, interim field, pending a field in the Agent
+    # Action Capsule evidence-result schema [recomputed-tier-code-identity];
+    # renamed onto that field when it lands, never kept beside it. Captured
+    # when ``GuardEngine.check`` runs (``capsule_engine/code_identity.py``),
+    # assurance self-attested. Not sealed into the capsule.
+    code_identity: dict | None = None
 
     @property
     def verdict(self) -> str:
@@ -324,7 +331,15 @@ class GuardEngine:
 
     # -- the public API -------------------------------------------------
 
-    def check(
+    def check(self, action: Action, **options) -> GuardDecision:
+        """Decide ``action`` (``_check`` documents the options), and say what
+        code decided it: the code identity is captured here, as the check
+        starts -- never at import or install time, since an editable install
+        runs whatever source is on disk now."""
+        identity = _code_identity.capture()
+        return replace(self._check(action, **options), code_identity=identity)
+
+    def _check(
         self,
         action: Action,
         *,

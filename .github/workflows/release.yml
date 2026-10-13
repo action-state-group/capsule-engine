@@ -1,0 +1,121 @@
+name: Release
+
+# Builds the capsule-engine wheel and sdist when a v* tag is pushed, and
+# attaches them plus SHA256SUMS to the GitHub release for that tag. Nothing is
+# published to PyPI. Modelled on capsule-cli's release workflow.
+#
+# The tagged commit is stamped into the wheel (capsule_engine/_build_commit),
+# so an installed wheel reports it beside the source-tree digest it computes
+# at check time (capsule_engine/code_identity.py). The stamp is a claim the
+# wheel makes about itself; the build provenance attestation below is what
+# ties the wheel's bytes to this workflow at this commit. Each artifact gets a
+# GitHub build provenance attestation (Sigstore, keyless: no release key is
+# held anywhere), checked with
+#   gh attestation verify FILE --repo action-state-group/capsule-engine \
+#     --signer-workflow action-state-group/capsule-engine/.github/workflows/release.yml
+# The attestation bundle is also published, as capsule-engine-<version>.sigstore.json,
+# so the same check runs with no GitHub account: add --bundle with that file.
+#
+# The tag must equal "v" + the version in pyproject.toml. docs/RELEASING.md
+# has the steps.
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions: {}
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+      id-token: write # OIDC token for the build provenance attestation
+      attestations: write
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - name: Check the tag names the version in pyproject.toml
+        env:
+          VERSION: ${{ github.ref_name }}
+        run: |
+          declared="v$(python -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])')"
+          test "$declared" = "$VERSION" || { echo "tag $VERSION does not match pyproject.toml version $declared"; exit 1; }
+      - name: Stamp the commit into the package
+        env:
+          COMMIT: ${{ github.sha }}
+        run: printf '%s\n' "$COMMIT" > capsule_engine/_build_commit
+      - name: Build wheel and sdist
+        run: |
+          python -m pip install "build==1.2.2.post1"
+          python -m build --outdir dist .
+      - name: Check the code identity the installed wheel reports
+        # Installed outside the checkout, so nothing is imported from source:
+        # the wheel reports the stamped commit, and the same source-tree
+        # digest as the checkout it was built from.
+        env:
+          COMMIT: ${{ github.sha }}
+        run: |
+          expected="$(python -c 'from pathlib import Path; import sys; sys.path.insert(0, "."); from capsule_engine.code_identity import source_tree_sha256; print(source_tree_sha256(Path(".")))')"
+          python -m venv "$RUNNER_TEMP/wheel-venv"
+          "$RUNNER_TEMP/wheel-venv/bin/pip" install --quiet --no-deps dist/capsule_engine-*.whl
+          cd "$RUNNER_TEMP"
+          EXPECTED="$expected" "$RUNNER_TEMP/wheel-venv/bin/python" - <<'EOF'
+          import os
+          from capsule_engine.code_identity import capture
+          got = capture()
+          assert got["kind"] == "source_tree_sha256", got
+          assert got["value"] == os.environ["EXPECTED"], got
+          assert got["build_commit"] == os.environ["COMMIT"], got
+          assert got["assurance"] == "self-attested", got
+          print(got)
+          EOF
+      - name: Write SHA256SUMS
+        run: (cd dist && sha256sum capsule_engine-* > SHA256SUMS)
+      - name: Attest build provenance of the wheel and sdist
+        id: attest
+        uses: actions/attest-build-provenance@0f67c3f4856b2e3261c31976d6725780e5e4c373 # v4.1.1
+        with:
+          subject-path: dist/capsule_engine-*
+      - name: Attach the attestation bundle
+        # One attestation names both artifacts, so one bundle file covers
+        # them. Publishing it lets anyone check their provenance with no
+        # GitHub account: gh attestation verify FILE --bundle BUNDLE ...
+        env:
+          BUNDLE: ${{ steps.attest.outputs.bundle-path }}
+          VERSION: ${{ github.ref_name }}
+        run: |
+          cp "$BUNDLE" "dist/capsule-engine-$VERSION.sigstore.json"
+          (cd dist && sha256sum "capsule-engine-$VERSION.sigstore.json" >> SHA256SUMS)
+      - name: Publish GitHub release
+        # A tag with a hyphen (v0.1.0-rc1) is a pre-release: published as
+        # such and never marked the latest release.
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ github.ref_name }}
+        run: |
+          flags=()
+          case "$VERSION" in
+            *-*) flags=(--prerelease --latest=false) ;;
+          esac
+          if gh release view "$VERSION" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$VERSION" dist/* --repo "$GITHUB_REPOSITORY" --clobber
+            if [ "${#flags[@]}" -gt 0 ]; then
+              gh release edit "$VERSION" --repo "$GITHUB_REPOSITORY" "${flags[@]}"
+            fi
+          else
+            gh release create "$VERSION" dist/* --repo "$GITHUB_REPOSITORY" --verify-tag "${flags[@]}" \
+              --title "capsule-engine $VERSION" \
+              --notes "capsule-engine wheel and sdist, built from this tag. Not on PyPI. Verify with: sha256sum -c SHA256SUMS. Check the build attestation with no GitHub account: gh attestation verify FILE --bundle capsule-engine-$VERSION.sigstore.json --repo $GITHUB_REPOSITORY --signer-workflow $GITHUB_REPOSITORY/.github/workflows/release.yml. Each guard decision carries a code identity (a commit or source-tree digest, captured when the check runs) at assurance self-attested: the attestation covers these files, not the identity a running engine reports."
+          fi
