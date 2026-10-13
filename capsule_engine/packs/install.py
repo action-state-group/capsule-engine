@@ -40,6 +40,7 @@ from ..policy.resolve import ResolvedManifest, resolve_manifest
 from .schema import PackDefinition
 
 __all__ = [
+    "ASKING_DISPOSITIONS",
     "InstalledPack",
     "ask_gate_selectors",
     "ask_wickets",
@@ -55,6 +56,19 @@ FOLD_ENGINE = "fold/1"
 WICKET_ENGINE = "wicket/1"
 
 CATALOG_DIRNAME = ".capsule"
+
+# The declared dispositions that make a failing check or gate selector ask an
+# approver. ASK_UNVERIFIED escalates exactly as ASK does -- same outcome, same
+# sealed vocabulary -- because both stop and ask the person; what tells them
+# apart is the rule's declaration and the check's own evidence, never a new
+# outcome word (``packs/schema.py`` ``DEFAULT_DISPOSITION_VALUES``).
+ASKING_DISPOSITIONS = frozenset({"ASK", "ASK_UNVERIFIED"})
+
+
+def _all_ask(dispositions: set[str | None]) -> bool:
+    """True when every declared disposition asks (ASK or ASK_UNVERIFIED, in
+    any mix). An undeclared one (None), DO or NEVER keeps the refusal."""
+    return bool(dispositions) and dispositions <= ASKING_DISPOSITIONS
 
 
 def manifest_id_for_pack(pack_id: str) -> str:
@@ -175,9 +189,9 @@ def build_engine(
     argument (``guards/engine.py``); a caller in ``mode="observe"`` must pass
     ``dry_run=True`` to every ``check()`` call itself (see this module's own
     docstring). An action_class_gate failure asks an approver only on the
-    selectors whose obligations all declare ``default_disposition: ASK``
-    (``ask_gate_selectors``); any other configured check asks on the same
-    condition (``ask_wickets``). ``engine_ask_sets`` derives both, for this
+    selectors whose obligations all declare ``default_disposition: ASK`` or
+    ``ASK_UNVERIFIED`` (``ask_gate_selectors``); any other configured check
+    asks on the same condition (``ask_wickets``). ``engine_ask_sets`` derives both, for this
     engine and for a replay of the same pack."""
     wickets = installed.resolved.configured_wickets(RUNNABLE_CHECKS)
     gate_selectors, checks = engine_ask_sets(installed.pack, wickets)
@@ -208,19 +222,21 @@ def engine_ask_sets(
 
 def ask_gate_selectors(pack: PackDefinition) -> frozenset[str]:
     """The action_class_gate selectors bound to at least one obligation, every
-    one of which declares ``default_disposition: ASK``. A selector with a
-    NEVER or DO obligation, or with an obligation declaring none, is left out,
-    so failing it still refuses."""
+    one of which declares ``default_disposition: ASK`` or ``ASK_UNVERIFIED``
+    (``ASKING_DISPOSITIONS``). A selector with a NEVER or DO obligation, or
+    with an obligation declaring none, is left out, so failing it still
+    refuses."""
     declared: dict[str, set[str | None]] = {}
     for o in pack.obligations:
         if o.check == "action_class_gate" and o.selector is not None:
             declared.setdefault(o.selector, set()).add(o.default_disposition)
-    return frozenset(sid for sid, dispositions in declared.items() if dispositions == {"ASK"})
+    return frozenset(sid for sid, dispositions in declared.items() if _all_ask(dispositions))
 
 
 def ask_wickets(pack: PackDefinition) -> frozenset[str]:
     """The configured checks (``RUNNABLE_CHECKS``) bound to at least one
-    obligation, every one of which declares ``default_disposition: ASK``. A
+    obligation, every one of which declares ``default_disposition: ASK`` or
+    ``ASK_UNVERIFIED`` (``ASKING_DISPOSITIONS``). A
     check with a NEVER or DO obligation, or with one declaring none, is left
     out, and so are the integrity checks and the two with their own ask rule
     (``ASK_RULE_EXCLUDED_CHECKS``): a declared disposition never makes any of
@@ -231,7 +247,7 @@ def ask_wickets(pack: PackDefinition) -> frozenset[str]:
     for o in pack.obligations:
         if o.check in RUNNABLE_CHECKS and o.check not in ASK_RULE_EXCLUDED_CHECKS:
             declared.setdefault(o.check, set()).add(o.default_disposition)
-    return frozenset(check for check, dispositions in declared.items() if dispositions == {"ASK"})
+    return frozenset(check for check, dispositions in declared.items() if _all_ask(dispositions))
 
 
 def record_pack_activation(
