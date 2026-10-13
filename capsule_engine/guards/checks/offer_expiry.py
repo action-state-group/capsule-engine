@@ -54,10 +54,11 @@ def _outcome(
 
 
 def _unverified(reason: str, field: str) -> CheckOutcome:
-    # The intended disposition for this case is ASK_UNVERIFIED, which the
-    # pack schema's DEFAULT_DISPOSITION_VALUES does not have yet (adding it
-    # is an open item); the definition declares ASK, and this marker is what
-    # tells the two apart.
+    # This failure is the ASK_UNVERIFIED case (offer_expiry/1.0.2's
+    # semantics; packs/schema.py DEFAULT_DISPOSITION_VALUES): the rule
+    # applied and asks, without claiming the offer's age was evaluated. It
+    # asks an approver exactly as an expired proposal does, and seals no new
+    # word; this marker on the record is what tells the two apart.
     return _outcome("fail", f"{reason}; the offer's expiry could not be established",
                     UnverifiedEvidence(expiry_unverified=True, missing_field=field))
 
