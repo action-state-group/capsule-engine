@@ -3,7 +3,7 @@
 The thin single-node enforcement layer for AI agent actions: the guard that
 consumes compiled artifacts as data (never authors compile-time judgments
 itself), append-only fold compute over `capsule_emit.account`'s neutral
-semantics, the packs runtime (loader, schema, catalog packs), policy
+semantics, the Terms Packs (packs) runtime (loader, schema, catalog packs), policy
 activation, and the local console/report/bundle-viewer runtime.
 
 Built on top of [capsule-ledger](https://github.com/action-state-group/capsule-ledger)
