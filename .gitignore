@@ -7,3 +7,5 @@ dist/
 .ruff_cache/
 .DS_Store
 .venv/
+# Written by the release workflow at build time; never committed.
+capsule_engine/_build_commit
