@@ -26,7 +26,8 @@ that field lands, this one is renamed onto it, never kept beside it. It is
 ``{kind, value, assurance}``: ``kind`` is ``source_tree_sha256`` (SHA-256
 over the sorted ``"<path>\\0<sha256 of file>\\n"`` lines of the
 verdict-producing source and data tables, see ``CODE_SCOPE`` and
-``DATA_TABLES``) or ``git_commit``; ``value`` is
+``DATA_TABLES`` in ``capsule_engine/code_identity.py``, which the engine
+captures it with at check time) or ``git_commit``; ``value`` is
 the digest or commit, or ``"unknown"`` when it could not be resolved at
 check time; ``assurance`` is a level from the existing ladder (self-attested
 | witnessed | countersigned). Its limit: a code identity is a claim made by
@@ -42,7 +43,6 @@ wrote the record. It is counted on its own and never enters a rate.
 """
 from __future__ import annotations
 
-import hashlib
 import json
 import re
 from pathlib import Path
@@ -51,6 +51,8 @@ import pytest
 import yaml
 from capsule_ledger.ledger import LedgerStore
 
+from capsule_engine.code_identity import ASSURANCE_LEVELS, DATA_TABLES, source_tree_sha256
+from capsule_engine.code_identity import KINDS as CODE_IDENTITY_KINDS
 from capsule_engine.packs.loader import load_pack_dir
 from capsule_engine.packs.schema import NORMALIZED_ACTION_FIELDS
 from capsule_engine.report.result_from_folds import project_guard_constraint
@@ -60,15 +62,7 @@ PACK_DIR = REPO / "capsule_engine" / "packs" / "catalog" / "everyday"
 GOLD_PATH = PACK_DIR / "fixtures" / "gold_labels.yaml"
 LEDGER_PATH = PACK_DIR / "fixtures" / "mini_ledger.jsonl"
 
-# The source that produces a guard verdict: the checks and engine, the fold
-# engine caps reads, and the pack/manifest path that configures them.
-CODE_SCOPE = ("capsule_engine/guards", "capsule_engine/folds", "capsule_engine/policy", "capsule_engine/packs")
-# The data tables the guards read a verdict from (today the action taxonomy:
-# a class's approver role decides ask versus refuse), hashed with the source.
-DATA_TABLES = "capsule_engine/guards/*.json"
 EVALUATOR_TIERS = frozenset({"recomputed", "judged"})
-ASSURANCE_LEVELS = frozenset({"self-attested", "witnessed", "countersigned"})
-CODE_IDENTITY_KINDS = frozenset({"source_tree_sha256", "git_commit"})
 _HEX64 = re.compile(r"^[0-9a-f]{64}$")
 _HEX40 = re.compile(r"^[0-9a-f]{40}$")
 
@@ -119,12 +113,6 @@ RECORDING_DEFECT_ROW = {
         "assurance": "self-attested",
     },
 }
-
-
-def source_tree_sha256(repo: Path = REPO) -> str:
-    paths = [*(p for scope in CODE_SCOPE for p in (repo / scope).rglob("*.py")), *repo.glob(DATA_TABLES)]
-    lines = [f"{p.relative_to(repo).as_posix()}\0{hashlib.sha256(p.read_bytes()).hexdigest()}\n" for p in paths]
-    return hashlib.sha256("".join(sorted(lines)).encode("utf-8")).hexdigest()
 
 
 class GoldLabelError(ValueError):
@@ -378,9 +366,22 @@ def test_the_interim_field_never_appears_without_its_declaration(tmp_path):
     planted.write_text(f"row = {{'{FIELD}': None}}\n")
     assert _files_missing_declaration([planted]) == [str(planted)]
 
-    tracked = [p for p in REPO.rglob("*") if p.is_file() and ".git" not in p.parts and p.suffix in {".py", ".yaml", ".md"}]
+    # A virtualenv inside the checkout is not this repository's text (a
+    # dependency may use the same field name).
+    tracked = [
+        p for p in REPO.rglob("*")
+        if p.is_file() and not {".git", ".venv"} & set(p.parts) and p.suffix in {".py", ".yaml", ".md"}
+    ]
     users = [p for p in tracked if FIELD in p.read_text(errors="ignore")]
-    assert {p.name for p in users} == {"gold_labels.yaml", Path(__file__).name}
+    assert {p.name for p in users} == {
+        "gold_labels.yaml",
+        Path(__file__).name,
+        # Captured per check and carried on the guard decision.
+        "code_identity.py",
+        "engine.py",
+        "test_code_identity.py",
+        "README.md",
+    }
     assert _files_missing_declaration(tracked) == []
 
 
