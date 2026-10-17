@@ -8,13 +8,16 @@ here, never re-derived by hand.
 
 - **Owner:** agent-action-capsule, `schemas/evidence-result-v0.json` (spec:
   `spec/evidence-result-v0.md`)
-- **Copied from commit:** `8fdf5b9bfdce069ac83568b6e1ad71f72e7904e6` (agent-action-capsule
-  branch `feat/result-coverage-report`: main at `6e7deff`, with the EXAMPLE-ORG placeholder, plus
-  the PROPOSED `coverage_report` section, spec section 7.1, with lower-case epistemic types).
-  Re-copy from agent-action-capsule's main once that branch merges.
-- **Copied on:** 2026-10-01
+- **Copied from commit:** `b109a9e4b29703ed16637e994ce42eae0bcfc212` (agent-action-capsule
+  branch `feat/result-coverage-report`, PR #157, unmerged: main at `7662a003`, which admits
+  `x-` extension members on the document and on a claim, spec section 8a, plus the PROPOSED
+  `coverage_report` section, spec section 7.1, with lower-case epistemic types).
+  Feature-branch copy; re-copy from agent-action-capsule's main once #157 merges.
+- **Copied on:** 2026-10-16
+- **sha256:** `cf46d273e0220a6a6e9cfa4e41b331b6a6a155d053ca81cc33f3c004dfa734a9`
+  (pinned by `tests/test_report_result_extension_slot.py`)
 - **Form:** byte-for-byte; the file carries no local additions. Check with
-  `git -C <agent-action-capsule checkout> cat-file blob 8fdf5b9bfdce069ac83568b6e1ad71f72e7904e6:schemas/evidence-result-v0.json | cmp - capsule_engine/schemas/vendor/evidence-result-v0.json`.
+  `git -C <agent-action-capsule checkout> cat-file blob b109a9e4b29703ed16637e994ce42eae0bcfc212:schemas/evidence-result-v0.json | cmp - capsule_engine/schemas/vendor/evidence-result-v0.json`.
 - **Why it is vendored:** the agent-action-capsule release this repository pins
   does not ship the schema as an importable resource. Drop this copy and import
   the schema from agent-action-capsule once it does (see
