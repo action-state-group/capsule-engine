@@ -167,11 +167,13 @@ MEASURABILITY_VALUES = frozenset({"measured", "declared_not_measured"})
 # kinds ask "does any unit in the corpus carry this signal at all", never
 # "is the signal correct", which is exactly the honest, cheap-to-verify shape
 # of "this pack's corpus has -- or lacks -- the record type a term needs":
-#   * structured_field: a named key on a unit/message dict, outside whatever
-#     base schema the corpus's own reconstruction produces (e.g. a typed
-#     severity/efficacy label, a stated-constraint field, a restriction-
-#     reason-cited marker) -- present with a non-empty value anywhere means
-#     the corpus DOES carry it.
+#   * structured_field: a named key on a message dict inside a unit's
+#     ``messages`` (message level only, never a key on the unit itself; see
+#     ``corpus_verify._resolves_structured_field``), outside the base message
+#     keys the corpus's own reconstruction produces (role, content,
+#     tool_call_names) -- e.g. a typed severity/efficacy label, a
+#     stated-constraint field, a restriction-reason-cited marker. Present
+#     with a non-empty value on any message means the corpus DOES carry it.
 #   * tool_call_name: a named tool/function call appearing anywhere in a
 #     unit's tool-call trail.
 # An unrecognized kind is a typo, same "unregistered is a typo" doctrine as
@@ -189,14 +191,34 @@ EVIDENCE_INSTRUMENT_KINDS = frozenset({"structured_field", "tool_call_name"})
 TIER_VALUES = frozenset({"must_have", "informational"})
 
 # What an obligation's check failing should mean to the person the action is
-# for, by default: the agent may do it (DO), stop and ask them (ASK), or never
-# do it (NEVER). An engine built from an installed pack reads it: a failing check
-# or gate selector whose obligations all declare ASK asks an approver
-# (``packs/install.py`` ``ask_wickets``/``ask_gate_selectors``); caps and
-# counterparty_seen_before ask whatever is declared. Optional
-# and additive like ``re_derivability_grade``: an obligation with no
-# ``default_disposition`` parses and digests identically to before.
-DEFAULT_DISPOSITION_VALUES = frozenset({"DO", "ASK", "NEVER"})
+# for, by default: the agent may do it (DO), stop and ask them (ASK), never do
+# it (NEVER), or stop and ask them without claiming the rule was evaluated
+# (ASK_UNVERIFIED).
+#
+# ASK_UNVERIFIED (PRD v2.8 §8.1) means: the rule applied, we asked, and we are
+# NOT claiming to have evaluated it -- the input the rule declares was absent
+# or arrived in the wrong shape. It is a DISPOSITION (what the agent may do),
+# never an evidence verdict (what the evidence shows):
+#   * it is not a weak ASK. A plain ASK says the rule was evaluated and the
+#     action needs the person's approval; ASK_UNVERIFIED says the approval is
+#     being asked for because the rule could not be evaluated at all.
+#   * it is not the ``not_evaluable`` verdict, and does not replace it. §8.1's
+#     "uncertainty in a pre-action requirement may conservatively resolve to
+#     ASK while the evidence result remains not_evaluable" is this case made
+#     explicit: the disposition is ASK_UNVERIFIED and the evidence verdict for
+#     the same rule stays ``not_evaluable``. One word carrying both meanings
+#     is the collision [not-applicable-three-meanings-rename] fixed.
+# It is pack vocabulary only: the guard engine seals no new word for it. A
+# failing check or gate selector whose obligations all declare ASK or
+# ASK_UNVERIFIED (in any mix) asks an approver exactly as an all-ASK one does
+# (``packs/install.py`` ``ASKING_DISPOSITIONS``, ``ask_wickets``/
+# ``ask_gate_selectors``), and the check's own evidence (e.g. offer_expiry's
+# ``expiry_unverified``) is what records that the input could not be read.
+# caps and counterparty_seen_before ask whatever is declared. Optional and
+# additive like ``re_derivability_grade``: an obligation with no
+# ``default_disposition`` parses and digests identically to before, and a pack
+# that declares none of the new value digests as it did.
+DEFAULT_DISPOSITION_VALUES = frozenset({"DO", "ASK", "NEVER", "ASK_UNVERIFIED"})
 
 # The seven ways a ledger gets judged (standard-outcome-pack design §3) --
 # every standard outcome is tagged with exactly one. "structural" (presence/

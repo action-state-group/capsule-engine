@@ -79,6 +79,9 @@ EXPECTED_DIGESTS = {
     "promise_never/1.0.0": "836ae58f704a9c8ab8027fee344ca47ddb3de76a7a1973a650f42a3595e649f4",
     # Replaces offer_expiry/1.0.0, retired at its digest (RETIRED_DIGESTS below).
     "offer_expiry/1.0.1": "7bcd363b28475e3fac123fe2b8925f60f36bdaa3d22ebd5004ffe5290c4f2597",
+    # 1.0.1 with each failure's disposition stated: expired is ASK, expiry_unverified
+    # is ASK_UNVERIFIED. 1.0.1 is superseded, not retired: its verdicts did not move.
+    "offer_expiry/1.0.2": "aeba4bc4448c310393665b779159d454924503fd0bc9446f16d56ccc0dca32a4",
     "seller.recipient_role/1.0.0": "001d4d4198921ffec5f492f88286765a075eece1418d15b68576d4fceec7826b",
     "seller.destination_rail/1.0.0": "fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800",
     # One accepted commitment per sale and item, across buyer threads. No pack cites it yet.
@@ -105,7 +108,7 @@ RETIRED_DIGESTS = {
 # pinned above and are not rewritten to add it. Every definition added from
 # now on states its rule in `semantics`; this set only ever shrinks.
 WITHOUT_SEMANTICS = frozenset(EXPECTED_DIGESTS) - {
-    "offer_expiry/1.0.1", "price_floor/2.0.1", "channel_change/1.1.0", "material_fields_changed/1.1.0",
+    "offer_expiry/1.0.1", "offer_expiry/1.0.2", "price_floor/2.0.1", "channel_change/1.1.0", "material_fields_changed/1.1.0",
     "offer_fields_changed/1.1.0", "refundability/1.1.0", "task_authority/1.1.0", "upfront_amount/1.1.0",
     "counterparty_seen_before/3.0.0", "counterparty_seen_before/4.0.0", "seller.release_on_acceptance/1.0.0",
     "caps/5.1.0",
