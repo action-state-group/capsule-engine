@@ -41,6 +41,39 @@ modules this package uses). pip prints `capsule-emit 0.8.6 does not provide
 the extra 'ledger-io'`; that warning is harmless. With these steps the test
 suite passes (`pip install pytest "mcp<2"`, then `python -m pytest`).
 
+## Releases and code identity
+
+The version string (`__version__`, `pyproject.toml`) is `0.0.1` and does not
+name the code: it has never moved, and an editable install runs whatever
+source is on disk. So each guard decision carries `GuardDecision.code_identity`,
+captured by `capsule_engine/code_identity.py` when `GuardEngine.check` runs,
+not at import or install time. It is a local, interim field, pending a field
+in the Agent Action Capsule evidence-result schema [recomputed-tier-code-identity],
+and is not sealed into the decision capsule.
+
+- In a git checkout: `{"kind": "git_commit", "value": <HEAD>, "dirty": false}`
+  when `capsule_engine/` has no uncommitted change; otherwise
+  `{"kind": "source_tree_sha256", "value": <digest>, "dirty": true, "base_commit": <HEAD>}`.
+- Anywhere else (an installed wheel): `{"kind": "source_tree_sha256", "value": <digest>}`
+  over the installed files, plus `build_commit` when the wheel came from the
+  release workflow.
+- `"value": "unknown"` when neither resolves; the check still runs.
+
+The digest is SHA-256 over the guard, fold, policy and pack source and the
+guard data tables, so a checkout and a wheel built from it give the same
+value. Every identity carries `"assurance": "self-attested"`, from the
+`self-attested | witnessed | countersigned` levels: the engine reports on
+itself and nothing outside it has checked the report. It tells two decisions
+made by the same code from two made by different code; it is not something a
+reader of the decision can confirm.
+
+Which half has shipped: the code identity, in every decision, as above. The
+release side is written but has not run: `.github/workflows/release.yml`
+builds the wheel and sdist on a `v*` tag, writes `SHA256SUMS`, and attaches a
+GitHub build provenance attestation and its Sigstore bundle. No tag has been
+cut yet, so no release, attestation or bundle exists, and install is still
+from source (Install, above). [docs/RELEASING.md](docs/RELEASING.md) has the steps.
+
 ## The `capsule-engine` command
 
 | Command | What it does |

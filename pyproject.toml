@@ -75,6 +75,9 @@ include = ["capsule_engine*"]
 
 [tool.setuptools.package-data]
 capsule_engine = [
+    # Written only by .github/workflows/release.yml: the tagged commit
+    # (capsule_engine/code_identity.py reports it as build_commit).
+    "_build_commit",
     "report/static/*.js",
     "bundle_viewer/static/*.html",
     "console/*.css",
