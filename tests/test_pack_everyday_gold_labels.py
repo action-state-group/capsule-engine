@@ -45,6 +45,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -378,7 +379,9 @@ def test_the_interim_field_never_appears_without_its_declaration(tmp_path):
     planted.write_text(f"row = {{'{FIELD}': None}}\n")
     assert _files_missing_declaration([planted]) == [str(planted)]
 
-    tracked = [p for p in REPO.rglob("*") if p.is_file() and ".git" not in p.parts and p.suffix in {".py", ".yaml", ".md"}]
+    # Tracked files only: an untracked .venv or build tree can carry the field in third-party code.
+    listed = subprocess.run(["git", "ls-files", "-z"], cwd=REPO, capture_output=True, check=True).stdout.decode().split("\0")
+    tracked = [REPO / name for name in listed if Path(name).suffix in {".py", ".yaml", ".md"} and (REPO / name).is_file()]
     users = [p for p in tracked if FIELD in p.read_text(errors="ignore")]
     assert {p.name for p in users} == {"gold_labels.yaml", Path(__file__).name}
     assert _files_missing_declaration(tracked) == []
