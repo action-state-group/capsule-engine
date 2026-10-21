@@ -1,0 +1,23 @@
+# seller.recipient_role/1.1.0: seller.recipient_role/1.0.0
+# (recipient_role.seller.yaml) with the platform role recipient_role/1.1.0
+# adds (recipient_role.v1.1.yaml): the marketplace or mail relay a sale is
+# listed on may be given the user's email and nothing else. 1.0.0 stays as it
+# was for the records and packs that pin it.
+wicket_id: seller.recipient_role/1.1.0
+check: recipient_role
+semantics: >-
+  A disclosure in action_classes whose recipient_role is in allowed_roles
+  passes. One whose recipient_role is a key of role_classes passes only when
+  it names at least one class of data (disclosed_classes) and every class it
+  names is listed for that role; one naming no class, or any class not
+  listed, fails. Any other recipient_role in roles fails, and one outside
+  roles fails as not recognised. An action that carries no recipient_role is
+  not applicable, in scope; any other action class is not applicable. The
+  evidence records the role and the class names read, never who the
+  recipient is or the data.
+config:
+  action_classes: [disclosure.personal]
+  roles: [buyer, platform, third_party, self]
+  allowed_roles: [buyer, self]
+  role_classes:
+    platform: [email]

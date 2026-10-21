@@ -77,6 +77,7 @@ from capsule_ledger.ledger.api import LedgerAPI
 from ..folds.definition import FoldDefinition
 from ..folds.duration import parse_duration_seconds
 from ..guards import ALLOW, ESCALATE, Action, GuardDecision, GuardEngine, LocalSigner
+from ..guards.action import disclosed_classes_of
 from ..guards.checks.caps import EXECUTED_DECISION, SPEND_UNREADABLE, counts_executed_acts
 from ..guards.statements import StatementRecord, claim_of, make_statement_record
 from ..guards.wickets.definition import WicketDefinition
@@ -453,7 +454,10 @@ def _bridge_deal_check(
     its agreed shape (``_profile_target``); given in any other, it is named
     in ``ignored_inputs``. The remaining body fields are carried only in the
     shape the action takes: a string, a boolean, an integer, or the SHA-256
-    digest of a typed reference, and dropped otherwise.
+    digest of a typed reference, and dropped otherwise. A share's
+    ``disclosing``, the classes of data it gives, is carried as
+    ``disclosed_classes`` only as a non-empty list of known class names
+    (``DISCLOSED_CLASSES``); with any other member it is dropped whole.
     ``taxonomy_version`` makes it an act stated against a pinned taxonomy, so
     ``dedupe`` keys it on the act, never on this record's type or id. The
     deal is the one the record names (``_deal_id``), never the ``action_id``
@@ -519,6 +523,7 @@ def _bridge_deal_check(
         counterparty_fp_alg=fp_alg,
         refundable=_flag(recourse.get("refundable")),
         recipient_role=_text(body.get("recipient_role")),
+        disclosed_classes=disclosed_classes_of(body.get("disclosing")),
         channel=_text(body.get("channel")),
         first_contact_channel=_text(body.get("first_contact_channel")),
         upfront_amount_minor=_minor(body.get("upfront_amount_minor")),

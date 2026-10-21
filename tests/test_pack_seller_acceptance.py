@@ -242,7 +242,29 @@ def _scenarios() -> list[tuple[str, Action, str]]:
         ("sale-to-a-on-a-rail-not-allowed", _commitment("sell", "marketplace.sale", "sale-a-cheque", 30, BUYER_A,
                                                         175_000, rail="cheque",
                                                         cited_mandate_capsule_id=CITES_ACCEPTANCE), ESCALATE),
+        # The user's data to the platform the item is listed on, citing no
+        # acceptance (0.1.4). It reaches no buyer, so s13 does not apply, and
+        # s01 passes only email: the rest refuse. Each names its own platform,
+        # so no row repeats another for dedupe.
+        ("email-to-the-platform", _address("platform-email", 31, _fingerprint("platform-a"), "platform",
+                                           representation_class="other", disclosed_classes=("email",)), ALLOW),
+        ("phone-to-the-platform", _address("platform-phone", 32, _fingerprint("platform-b"), "platform",
+                                           representation_class="other", disclosed_classes=("phone",)), DENY),
+        ("address-to-the-platform", _address("platform-address", 33, _fingerprint("platform-c"), "platform",
+                                             disclosed_classes=("address",)), DENY),
+        ("platform-disclosure-naming-no-class", _address("platform-no-class", 34, _fingerprint("platform-d"),
+                                                         "platform", representation_class="other"), DENY),
+        ("email-and-phone-to-the-platform", _address("platform-email-and-phone", 35, _fingerprint("platform-e"),
+                                                     "platform", representation_class="other",
+                                                     disclosed_classes=("email", "phone")), DENY),
     ]
+
+
+# The scenarios that decide otherwise under a pack before 0.1.4, which has no
+# platform role: an email to the platform is refused there. A comparison with
+# an earlier pack (test_pack_seller.py) sets EXPECTED_OVERRIDES to these.
+BEFORE_PLATFORM = {"email-to-the-platform": DENY}
+EXPECTED_OVERRIDES: dict[str, str] = {}
 
 
 def _run_scenarios(ledger, *, project_dir, decisions: dict[str, GuardDecision] | None = None):
@@ -264,6 +286,7 @@ def _run_scenarios(ledger, *, project_dir, decisions: dict[str, GuardDecision] |
     )
     capsules: dict[str, dict] = {}
     for name, action, expected in _scenarios():
+        expected = EXPECTED_OVERRIDES.get(name, expected)
         if action.cited_mandate_capsule_id in CITED:
             cited = capsules[CITED[action.cited_mandate_capsule_id]]["capsule_id"]
             action = dataclasses.replace(action, cited_mandate_capsule_id=cited)
@@ -322,7 +345,7 @@ def test_records_are_pack_attributed_and_observe_mode(run):
         assert capsule["asg_payload"]["manifest_digest"] == installed.resolved.manifest_digest, name
         assert capsule["asg_payload"]["checkpoint"].get("dry_run") is (True if name not in REAL_RUN else None), name
     assert activation["asg_payload"]["detail"]["packs"] == [
-        {"pack_id": "asg/seller/0.1.3", "digest": installed.pack.definition_digest(), "mode": "observe"}
+        {"pack_id": "asg/seller/0.1.4", "digest": installed.pack.definition_digest(), "mode": "observe"}
     ]
 
 
@@ -434,6 +457,21 @@ def test_an_address_with_no_action_class_is_refused(run):
 def test_the_address_to_anyone_but_the_buyer_is_refused(run):
     capsule = run[2]["address-to-a-third-party"]
     assert _constraint(capsule, "recipient_role")["result"] == "fail"
+    assert capsule["disposition"]["decision"] == "reject"
+
+
+def test_an_email_to_the_platform_passes_without_an_acceptance(run):
+    capsule = run[2]["email-to-the-platform"]
+    assert _constraint(capsule, "recipient_role")["result"] == "pass"
+    assert _constraint(capsule, "release_on_acceptance")["result"] == "n/a"
+    assert capsule["disposition"]["decision"] == "accept"
+
+
+@pytest.mark.parametrize("name", ["phone-to-the-platform", "address-to-the-platform",
+                                  "platform-disclosure-naming-no-class", "email-and-phone-to-the-platform"])
+def test_anything_but_an_email_to_the_platform_is_refused(run, name):
+    capsule = run[2][name]
+    assert _failing(capsule) == ["recipient_role"]
     assert capsule["disposition"]["decision"] == "reject"
 
 

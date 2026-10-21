@@ -5,8 +5,12 @@ Each selector matches on the canonical ``action_class`` and/or its
 ``trigger_class`` and/or ``consequential`` (``guards/action_taxonomy.json``),
 and declares the result a match produces (``on_match``: ``fail`` or
 ``pass``). Every key a selector sets must match. The check reads
-``Action.action_class`` only, resolved through the taxonomy table so a
-legacy alias is its canonical class; it reads no fold and no other field.
+``Action.action_class``, resolved through the taxonomy table so a
+legacy alias is its canonical class; it reads no fold. A selector may also
+set ``except_recipient_roles``: it then does not match an action whose
+``recipient_role`` is one of them (action_class_gate/1.1.0 leaves a
+disclosure to a ``platform`` to ``recipient_role``, which measures it). That
+is the one other field it reads, and only for such a selector.
 A replay passes the table the record was sealed under (``table``), and the
 evidence names that table's version; otherwise it is the engine's.
 
@@ -33,6 +37,8 @@ __all__ = ["Selector", "check_action_class_gate", "parse_selectors"]
 _CHECK_ID = "action_class_gate"
 _METHOD = "taxonomy_selector_v0"
 _MATCH_KEYS = frozenset({"action_classes", "trigger_classes", "consequential"})
+# Narrows a selector; it selects nothing on its own.
+_EXCEPT_ROLES = "except_recipient_roles"
 _ON_MATCH = frozenset({"fail", "pass"})
 # Trigger classes a taxonomy row may declare; CHANGE is derived from state.
 _DECLARED_TRIGGERS = frozenset(ac.trigger_class for ac in TAXONOMY.values() if ac.trigger_class is not None)
@@ -44,6 +50,7 @@ class Selector(TypedDict, total=False):
     action_classes: list[str]
     trigger_classes: list[str]
     consequential: bool
+    except_recipient_roles: list[str]
     on_match: str
 
 
@@ -81,14 +88,14 @@ def parse_selectors(selectors: object) -> dict[str, Selector]:
             raise ValueError(f"selector id {sid!r} must be a non-empty string")
         if not isinstance(sel, dict):
             raise ValueError(f"selector {sid!r} must be a mapping")
-        unknown = sel.keys() - _MATCH_KEYS - {"on_match"}
+        unknown = sel.keys() - _MATCH_KEYS - {"on_match", _EXCEPT_ROLES}
         if unknown:
             raise ValueError(f"selector {sid!r} carries unknown keys {sorted(unknown)}")
         if not sel.keys() & _MATCH_KEYS:
             raise ValueError(f"selector {sid!r} selects nothing; set one of {sorted(_MATCH_KEYS)}")
         if sel.get("on_match") not in _ON_MATCH:
             raise ValueError(f"selector {sid!r} on_match must be one of {sorted(_ON_MATCH)}")
-        for key in ("action_classes", "trigger_classes"):
+        for key in ("action_classes", "trigger_classes", _EXCEPT_ROLES):
             if key in sel and (
                 not isinstance(sel[key], list) or not sel[key] or not all(isinstance(n, str) for n in sel[key])
             ):
@@ -108,6 +115,7 @@ def parse_selectors(selectors: object) -> dict[str, Selector]:
 
 
 def _matches(sel: Selector, action_class: str, trigger_class: str | None, consequential: bool) -> bool:
+    """Whether ``sel``'s class keys match; ``except_recipient_roles`` is read apart (``_excepted``)."""
     if "action_classes" in sel and action_class not in sel["action_classes"]:
         return False
     if "trigger_classes" in sel and trigger_class not in sel["trigger_classes"]:
@@ -126,11 +134,14 @@ def check_action_class_gate(
             f"action class {action.action_class!r} has no row in taxonomy {table.version}; fail closed",
             UnmappedClassEvidence(action_class=action.action_class, in_taxonomy=False, taxonomy_version=table.version),
         )
-    matched = sorted(sid for sid, sel in selectors.items() if _matches(sel, ac.name, ac.trigger_class, ac.consequential))
+    named = [sid for sid, sel in selectors.items() if _matches(sel, ac.name, ac.trigger_class, ac.consequential)]
+    matched = sorted(sid for sid in named if action.recipient_role not in selectors[sid].get(_EXCEPT_ROLES, ()))
     if not matched:
-        return _outcome(
-            "n/a", "no selector names this action class", not_applicable_evidence(_CHECK_ID, in_scope=False)
-        )
+        reason = "no selector names this action class"
+        if named:
+            reason = (f"the selectors naming action class {ac.name!r} leave out recipient_role "
+                      f"{action.recipient_role!r}")
+        return _outcome("n/a", reason, not_applicable_evidence(_CHECK_ID, in_scope=False))
     evidence = GateEvidence(
         action_class=ac.name,
         trigger_class=ac.trigger_class,

@@ -292,6 +292,23 @@ def _scenarios() -> list[tuple[str, Action, str]]:
         # 3.0.0 it was n/a and the purchase was allowed.
         ("merchant-purchase-no-payee", _purchase("merchant-no-payee", 35, "household-assistant-x@v1",
          amount_minor=900), ESCALATE),
+        # A disclosure to a platform, the marketplace or relay a listing goes
+        # through (0.3.7). recipient_role/1.1.0 passes one that gives only
+        # email, and action_class_gate/1.1.0 leaves it out of r11 and r12, so
+        # it is allowed; the producer pauses the first one to that platform.
+        # Any other class, or no class named, fails recipient_role, which
+        # never asks, so it denies. Each names its own platform, so no row
+        # repeats another for dedupe.
+        ("email-to-a-platform", _disclosure("platform-email", 36, target="platform/listings",
+         recipient_role="platform", disclosed_classes=("email",)), ALLOW),
+        ("phone-to-a-platform", _disclosure("platform-phone", 37, target="platform/listings-b",
+         recipient_role="platform", disclosed_classes=("phone",)), DENY),
+        ("home-address-to-a-platform", _disclosure("platform-home-address", 38, target="platform/listings-c",
+         recipient_role="platform", disclosed_classes=("home_address",)), DENY),
+        ("email-and-phone-to-a-platform", _disclosure("platform-email-and-phone", 39, target="platform/listings-d",
+         recipient_role="platform", disclosed_classes=("email", "phone")), DENY),
+        ("platform-disclosure-naming-no-class", _disclosure("platform-no-class", 40, target="platform/listings-e",
+         recipient_role="platform"), DENY),
     ]
 
 
@@ -350,7 +367,7 @@ def test_records_are_pack_attributed_and_observe_mode(run):
         assert capsule["asg_payload"]["manifest_digest"] == installed.resolved.manifest_digest, name
         assert capsule["asg_payload"]["checkpoint"].get("dry_run") is (True if name not in REAL_RUN else None), name
     assert activation["asg_payload"]["detail"]["packs"] == [
-        {"pack_id": "asg/everyday/0.3.6", "digest": installed.pack.definition_digest(), "mode": "observe"}
+        {"pack_id": "asg/everyday/0.3.7", "digest": installed.pack.definition_digest(), "mode": "observe"}
     ]
 
 

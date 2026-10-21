@@ -127,6 +127,7 @@ NORMALIZED_ACTION_FIELDS = frozenset(
         "outgoing_content",
         "recurrence",
         "recipient_role",
+        "disclosed_classes",
         "refundable",
         "material_fields_changed",
         "material_fields_basis",

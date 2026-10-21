@@ -36,6 +36,12 @@
 # included. The pickup and other-class details deny before acceptance and
 # allow after it, as the address does. address-to-a-third-party also fails
 # recipient_role, whose rule declares DO.
+#
+# The five *-platform rows (0.1.4) give the user's data to the platform the
+# item is listed on, citing no acceptance. release_on_acceptance does not
+# apply to them (n/a): they reach no buyer. email-to-the-platform passes
+# recipient_role and is allowed; a phone, an address, an email beside a
+# phone or a disclosure naming no class fails it and denies.
 
 rows:
   - scenario: condition-told-to-a
@@ -428,3 +434,73 @@ rows:
       release_on_acceptance: {population: c}
     verdict: escalate
 
+  - scenario: email-to-the-platform
+    action_id: share_personal/seller-fixture-platform-email
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: pass, price_floor: n/a, promise_requires_approval: pass, promise_never: pass, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: n/a}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      price_floor: {population: c}
+      required_disclosure: {population: c}
+      offer_expiry: {population: c}
+      single_commitment: {population: c}
+      destination_rail: {population: c}
+      task_authority: {population: c}
+      release_on_acceptance: {population: c}
+    verdict: allow
+  - scenario: phone-to-the-platform
+    action_id: share_personal/seller-fixture-platform-phone
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: fail, price_floor: n/a, promise_requires_approval: pass, promise_never: pass, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: n/a}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      price_floor: {population: c}
+      required_disclosure: {population: c}
+      offer_expiry: {population: c}
+      single_commitment: {population: c}
+      destination_rail: {population: c}
+      task_authority: {population: c}
+      release_on_acceptance: {population: c}
+    verdict: deny
+  - scenario: address-to-the-platform
+    action_id: share_address/seller-fixture-platform-address
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: fail, price_floor: n/a, promise_requires_approval: pass, promise_never: pass, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: n/a}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      price_floor: {population: c}
+      required_disclosure: {population: c}
+      offer_expiry: {population: c}
+      single_commitment: {population: c}
+      destination_rail: {population: c}
+      task_authority: {population: c}
+      release_on_acceptance: {population: c}
+    verdict: deny
+  - scenario: platform-disclosure-naming-no-class
+    action_id: share_personal/seller-fixture-platform-no-class
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: fail, price_floor: n/a, promise_requires_approval: pass, promise_never: pass, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: n/a}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      price_floor: {population: c}
+      required_disclosure: {population: c}
+      offer_expiry: {population: c}
+      single_commitment: {population: c}
+      destination_rail: {population: c}
+      task_authority: {population: c}
+      release_on_acceptance: {population: c}
+    verdict: deny
+  - scenario: email-and-phone-to-the-platform
+    action_id: share_personal/seller-fixture-platform-email-and-phone
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: fail, price_floor: n/a, promise_requires_approval: pass, promise_never: pass, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: n/a}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      price_floor: {population: c}
+      required_disclosure: {population: c}
+      offer_expiry: {population: c}
+      single_commitment: {population: c}
+      destination_rail: {population: c}
+      task_authority: {population: c}
+      release_on_acceptance: {population: c}
+    verdict: deny
