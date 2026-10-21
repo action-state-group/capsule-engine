@@ -163,8 +163,8 @@
     if (!payloads || !payloads.length) return "";
     return payloads.map(function (p) {
       var name = p.label + (p.check_id ? " · " + p.check_id : "");
-      return '<div class="rung-plain mono">' + escapeHTML(name) + " — withheld · digest " +
-        escapeHTML(p.digest) + "</div>";
+      return '<div class="rung-plain mono">' + escapeHTML(name) + " — " + escapeHTML(p.state) +
+        " · digest " + escapeHTML(p.digest) + "</div>";
     }).join("");
   }
 
