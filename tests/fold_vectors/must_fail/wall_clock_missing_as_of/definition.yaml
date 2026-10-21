@@ -1,0 +1,13 @@
+fold_id: kat.wall_clock_missing_as_of/1.0.0
+reads:
+  - path: developer
+    erasure_class: commitment-ok
+  - path: timestamp
+    erasure_class: commitment-ok
+key: developer
+window:
+  mode: rolling
+  duration: 7d
+reduce:
+  reducer: count
+emit: count

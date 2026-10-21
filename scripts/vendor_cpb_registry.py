@@ -47,8 +47,7 @@ checkout at ``../scitt-payload-binding`` next to this repo.
 ``provisional_field_conventions`` block -- against what a fresh vendor run
 against the checkout would produce, ignoring the commit-stamped provenance
 fields (``_vendored_commit`` / ``provisional_field_conventions._provenance.
-source``'s embedded commit sha), same rationale as
-``scripts/vendor_envcompat.py``'s ``--check``: those always differ from
+source``'s embedded commit sha): those always differ from
 whatever commit the checkout happens to be at, so diffing them would fail
 vendor-drift on every upstream commit, not just on real content drift.
 """
@@ -196,8 +195,7 @@ def main(argv: list[str]) -> int:
     if check:
         # --check compares content only -- registry.json's table plus the
         # hand-curated provisional_field_conventions block (minus its
-        # commit-stamped provenance source string, same rationale as
-        # vendor_envcompat.py's --check) -- and never needs a commit sha, so
+        # commit-stamped provenance source string) -- and never needs a commit sha, so
         # a dirty or detached checkout doesn't compromise it the way it
         # would a real vendor run.
         return _check(spb, live)

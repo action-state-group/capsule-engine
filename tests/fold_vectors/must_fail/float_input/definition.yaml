@@ -1,0 +1,11 @@
+fold_id: kat.float_input/1.0.0
+reads:
+  - path: developer
+    erasure_class: commitment-ok
+  - path: amount_minor
+    erasure_class: preimage
+key: developer
+reduce:
+  reducer: sum
+  field: amount_minor
+emit: money.minor_units

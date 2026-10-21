@@ -1,0 +1,11 @@
+fold_id: kat.last/1.0.0
+reads:
+  - path: developer
+    erasure_class: commitment-ok
+  - path: status
+    erasure_class: commitment-ok
+key: developer
+reduce:
+  reducer: last
+  field: status
+emit: string

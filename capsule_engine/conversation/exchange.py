@@ -13,8 +13,8 @@ registry entry #70, ``scitt-payload-binding``'s
 Conversation-detail capsules: ONE capsule shape spans
 mesh inference, tau2, and (once wired) real read-only investigation and
 internal-assist deployments. The labeled sub-digests are what make tier-2 fold-scoped
-disclosure possible: a holder can later disclose just the tool-call bytes
-(``payload_store.PayloadStore``) without disclosing the prompt or reasoning
+disclosure possible: the tool-call bytes can be disclosed and checked
+without disclosing the prompt or reasoning
 content, because each is committed under its own label rather than folded
 into one opaque digest. Raw message content NEVER enters this capsule --
 only digests; disclosure is always a separate, deliberate act.

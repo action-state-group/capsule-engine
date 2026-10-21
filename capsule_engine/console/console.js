@@ -108,35 +108,6 @@
       escapeHTML(assuranceGrade.grade) + "</span>";
   }
 
-  // Resolve-at-read rendering (item 5a). Reuses the existing verify-stage
-  // component verbatim (the same one the real cryptographic Verify section
-  // below uses): a match is the honest "pass" stage plus the resolved
-  // content in the same .inspector-sealed block "Sealed fields" already
-  // uses; a mismatch reuses verify-stage--fail (brick) -- a corrupted/
-  // tampered local payload copy is a genuine verification failure, the
-  // same product law that reserves brick for real crypto failures already
-  // covers this case, not a new exception. See cli/format.py's
-  // format_resolved_payload for the same rule applied to the CLI.
-  function resolvedPayloadHTML(resolved) {
-    if (!resolved) return "";
-    if (resolved.match) {
-      return (
-        '<div class="verify-stage verify-stage--pass"><span class="verify-stage-glyph">✓</span>' +
-        '<span class="verify-stage-name">resolved ' + escapeHTML(resolved.label) + "</span>" +
-        '<span class="verify-stage-detail">from your local payload store — not part of the record; ' +
-        "digest recomputed live: match</span></div>" +
-        '<div class="inspector-sealed">' + escapeHTML(JSON.stringify(resolved.content, null, 2)) + "</div>"
-      );
-    }
-    return (
-      '<div class="verify-stage verify-stage--fail"><span class="verify-stage-glyph">✕</span>' +
-      '<span class="verify-stage-name">resolved ' + escapeHTML(resolved.label) + " mismatch</span>" +
-      '<span class="verify-stage-detail">recomputed ' + escapeHTML(resolved.recomputed_digest) +
-      " ≠ recorded " + escapeHTML(resolved.digest) +
-      " — the local copy may be corrupted or tampered; treat this content as unverified</span></div>"
-    );
-  }
-
   function renderCheckpoint(data) {
     qs("checkpoint-line").textContent = data.line;
   }
@@ -184,6 +155,19 @@
     return row;
   }
 
+  // Payloads the capsule commits to by digest (disposition reason, check
+  // evidence). The record never carries the preimages, so each renders as
+  // withheld beside its digest, never as a blank field. Plain text, not a
+  // verify stage: a withheld payload is not a verification result.
+  function withheldPayloadsHTML(payloads) {
+    if (!payloads || !payloads.length) return "";
+    return payloads.map(function (p) {
+      var name = p.label + (p.check_id ? " · " + p.check_id : "");
+      return '<div class="rung-plain mono">' + escapeHTML(name) + " — " + escapeHTML(p.state) +
+        " · digest " + escapeHTML(p.digest) + "</div>";
+    }).join("");
+  }
+
   function renderInspector(detail) {
     var inspector = qs("inspector");
     inspector.innerHTML = "";
@@ -222,23 +206,12 @@
     checksSection.innerHTML = checksHTML;
     inspector.appendChild(checksSection);
 
-    // Resolved payloads (item 5a) -- deliberately its own section, not
-    // interleaved into "Checks that ran" above: that block's own product
-    // law (verified by test_console_js_blocked_check_result_never_uses_verify_stage_fail)
-    // is that a policy check failing is never rendered with the
-    // verify-stage--fail (brick) treatment reserved for real cryptographic
-    // verification. A resolved evidence digest MISMATCH is exactly that
-    // real kind of failure (a corrupted/tampered local copy), so it reuses
-    // verify-stage--fail here, in the one section allowed to.
-    var resolvedHTML = resolvedPayloadHTML(detail.resolved_reason);
-    detail.checks.forEach(function (check) {
-      resolvedHTML += resolvedPayloadHTML(check.resolved_evidence);
-    });
-    if (resolvedHTML) {
-      var resolvedSection = document.createElement("div");
-      resolvedSection.className = "inspector-section";
-      resolvedSection.innerHTML = '<div class="inspector-section-title">Resolved payloads</div>' + resolvedHTML;
-      inspector.appendChild(resolvedSection);
+    var payloadsHTML = withheldPayloadsHTML(detail.payloads);
+    if (payloadsHTML) {
+      var payloadsSection = document.createElement("div");
+      payloadsSection.className = "inspector-section";
+      payloadsSection.innerHTML = '<div class="inspector-section-title">Payloads</div>' + payloadsHTML;
+      inspector.appendChild(payloadsSection);
     }
 
     // Real cryptographic verification -- the one legitimate brick use in

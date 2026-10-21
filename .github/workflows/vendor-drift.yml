@@ -5,42 +5,6 @@ on:
   pull_request:
 
 jobs:
-  envcompat:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          path: capsule-engine
-      - uses: actions/checkout@v4
-        with:
-          repository: action-state-group/capsule-ledger
-          ref: 42fb45f69b067f623a4b9915ae8883dff22d5d27  # FROZEN 2026-10-04: archived; its final commit
-          path: capsule-ledger
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - name: check vendored envcompat.py matches capsule-ledger
-        working-directory: capsule-engine
-        run: python scripts/vendor_envcompat.py --check ../capsule-ledger
-
-  registry-conventions:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          path: capsule-engine
-      - uses: actions/checkout@v4
-        with:
-          repository: action-state-group/capsule-ledger
-          ref: 42fb45f69b067f623a4b9915ae8883dff22d5d27  # FROZEN 2026-10-04: archived; its final commit
-          path: capsule-ledger
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - name: check registry/conventions.json's action_class_conventions matches capsule-ledger's shim
-        working-directory: capsule-engine
-        run: python scripts/check_registry_conventions_drift.py ../capsule-ledger
-
   cpb-registry:
     runs-on: ubuntu-latest
     steps:
