@@ -94,8 +94,8 @@ def build_turn_capsule(
 
     Turn 0 opens the session standalone (no chain parent); every later turn
     chains to ``previous_turn_capsule_id`` with relation ``"follows"`` --
-    the same generic sequencing relation ``agent_action_capsule.emit()``'s
-    own default uses for a non-adapter caller. None of the chain-relation
+    the same generic sequencing relation capsule-emit's emit path
+    (``capsule_emit.core``) defaults to for a non-adapter caller. None of the chain-relation
     registry's seeded values (``confirms``/``supersedes``/``epoch_opens``)
     describe "next turn in an ongoing conversation", so this deliberately
     does not reach for one of them.
