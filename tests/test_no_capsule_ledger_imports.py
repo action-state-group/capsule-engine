@@ -30,23 +30,27 @@ def _imported_modules(path: Path) -> list[str]:
     return names
 
 
-def _import_module_names(tree: ast.Module) -> set[str]:
-    """Local names bound to ``importlib.import_module`` in this file, plus ``__import__``."""
-    names = {"__import__"}
+def _import_module_names(tree: ast.Module) -> tuple[set[str], set[str]]:
+    """Local names bound to ``importlib.import_module`` (plus ``__import__``),
+    and local names bound to the ``importlib`` module itself."""
+    functions, modules = {"__import__"}, {"importlib"}
     for node in ast.walk(tree):
         if isinstance(node, ast.ImportFrom) and node.module == "importlib":
-            names.update(alias.asname or alias.name for alias in node.names if alias.name == "import_module")
-    return names
+            functions.update(a.asname or a.name for a in node.names if a.name == "import_module")
+        elif isinstance(node, ast.Import):
+            modules.update(a.asname for a in node.names if a.name == "importlib" and a.asname)
+    return functions, modules
 
 
-def _is_loader(func: ast.expr, loaders: set[str]) -> bool:
+def _is_loader(func: ast.expr, loaders: tuple[set[str], set[str]]) -> bool:
+    functions, modules = loaders
     if isinstance(func, ast.Name):
-        return func.id in loaders
+        return func.id in functions
     return (
         isinstance(func, ast.Attribute)
         and func.attr == "import_module"
         and isinstance(func.value, ast.Name)
-        and func.value.id == "importlib"
+        and func.value.id in modules
     )
 
 
@@ -77,6 +81,9 @@ def test_detector_flags_an_aliased_import(tmp_path, monkeypatch):
         "from importlib import import_module as load\nload(name='capsule_ledger.ledger.records')\n",
         encoding="utf-8",
     )
+    (package / "f.py").write_text(
+        "import importlib as il\nil.import_module('capsule_ledger.ledger')\n", encoding="utf-8"
+    )
     (package / "fine.py").write_text(
         "from cll.ledger.api import LedgerAPI\nfrom capsule_ledger import registry\n"
         "import importlib\nimportlib.import_module('cll.ledger')\n"
@@ -90,4 +97,5 @@ def test_detector_flags_an_aliased_import(tmp_path, monkeypatch):
         "capsule_engine/c.py: capsule_ledger.ledger.store",
         "capsule_engine/d.py: capsule_ledger.ledger",
         "capsule_engine/e.py: capsule_ledger.ledger.records",
+        "capsule_engine/f.py: capsule_ledger.ledger",
     ]
