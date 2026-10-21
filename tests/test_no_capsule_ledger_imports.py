@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
-"""capsule-ledger is archived (#170). Ledger storage comes from
-checkpointed-local-log's ``cll.ledger``; nothing here imports the archived
-``capsule_ledger.ledger`` aliases of it."""
+"""capsule-ledger is archived (#170) and no longer a dependency: ledger
+storage comes from checkpointed-local-log's ``cll.ledger``, and nothing here
+imports ``capsule_ledger``."""
 from __future__ import annotations
 
 import ast
@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-FORBIDDEN = "capsule_ledger.ledger"
+FORBIDDEN = "capsule_ledger"
 
 
 def _imported_modules(path: Path) -> list[str]:
@@ -64,7 +64,7 @@ def _offenders() -> list[str]:
     return found
 
 
-def test_no_capsule_ledger_ledger_imports():
+def test_no_capsule_ledger_imports():
     assert _offenders() == []
 
 
@@ -84,18 +84,20 @@ def test_detector_flags_an_aliased_import(tmp_path, monkeypatch):
     (package / "f.py").write_text(
         "import importlib as il\nil.import_module('capsule_ledger.ledger')\n", encoding="utf-8"
     )
+    (package / "g.py").write_text("from capsule_ledger.payload_store import PayloadStore\n", encoding="utf-8")
     (package / "fine.py").write_text(
-        "from cll.ledger.api import LedgerAPI\nfrom capsule_ledger import registry\n"
+        "from cll.ledger.api import LedgerAPI\nfrom capsule_engine import registry\n"
         "import importlib\nimportlib.import_module('cll.ledger')\n"
-        "plugins.import_module('capsule_ledger.ledger')\n",
+        "plugins.import_module('capsule_ledger.ledger')\nimport capsule_ledgers\n",
         encoding="utf-8",
     )
     monkeypatch.setattr(sys.modules[__name__], "REPO_ROOT", tmp_path)
     assert _offenders() == [
         "capsule_engine/a.py: capsule_ledger.ledger.api",
-        "capsule_engine/b.py: capsule_ledger.ledger",
+        "capsule_engine/b.py: capsule_ledger",
         "capsule_engine/c.py: capsule_ledger.ledger.store",
         "capsule_engine/d.py: capsule_ledger.ledger",
         "capsule_engine/e.py: capsule_ledger.ledger.records",
         "capsule_engine/f.py: capsule_ledger.ledger",
+        "capsule_engine/g.py: capsule_ledger.payload_store",
     ]

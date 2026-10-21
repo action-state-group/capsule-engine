@@ -1,0 +1,11 @@
+fold_id: kat.max/1.0.0
+reads:
+  - path: developer
+    erasure_class: commitment-ok
+  - path: amount_minor
+    erasure_class: preimage
+key: developer
+reduce:
+  reducer: max
+  field: amount_minor
+emit: money.minor_units

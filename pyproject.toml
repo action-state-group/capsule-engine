@@ -17,24 +17,13 @@ classifiers = [
 ]
 # Capsule parsing goes through the public agent-action-capsule reference
 # library -- never vendored into this repo. Ledger storage is owned by
-# checkpointed-local-log (cll). capsule-ledger keeps its own minimal,
-# self-contained action-class label shim for its own core display surface;
-# this package's registry/ is the fuller interim vendor-of-record copy
-# -- the two are
-# independent by design, not two forks of one truth.
+# checkpointed-local-log (cll). This package's registry/ is the interim
+# vendor-of-record copy of the action-class and field conventions.
 dependencies = [
     "agent-action-capsule>=0.11.0",
-    # FROZEN 2026-10-04: capsule-ledger is archived (read-only since 2026-09-02).
-    # This pins its final commit (42fb45f69b06), which is what its main resolves
-    # to, so nothing changes; nothing new will land there.
-    # Ledger storage now comes from checkpointed-local-log below; what is still
-    # imported from here is capsule_ledger.payload_store, .registry and .vectors,
-    # which live only in capsule-ledger and get a new owner in #170's phase 2.
-    "capsule-ledger @ git+https://github.com/action-state-group/capsule-ledger.git@42fb45f69b067f623a4b9915ae8883dff22d5d27",
     # cll.ledger: LedgerStore, LedgerAPI, ScanQuery, LedgerRecord and
-    # VerificationResult. capsule_ledger.ledger.api, .store and .records were
-    # module aliases for these, so the objects are the same ones. 0.6.0 is the
-    # version capsule-ledger's own unbounded requirement resolved to.
+    # VerificationResult. They replaced the archived capsule-ledger (#170),
+    # whose ledger modules were aliases for these.
     "checkpointed-local-log>=0.6.0",
     # capsule_engine/schemas/evidence-contract-v0.json's validator entry point
     # (packs/contract_validate.py).

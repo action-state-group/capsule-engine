@@ -6,13 +6,13 @@ itself), append-only fold compute over `capsule_emit.account`'s neutral
 semantics, the Terms Packs (packs) runtime (loader, schema, catalog packs), policy
 activation, and the local console/report/bundle-viewer runtime.
 
-Built on top of [capsule-ledger](https://github.com/action-state-group/capsule-ledger)
-(the ledger store, chains, admission; that repository is archived, read-only,
-but it is still this package's ledger dependency, see Install) and the public
+Built on top of
+[checkpointed-local-log](https://github.com/action-state-group/checkpointed-local-log)
+(`cll.ledger`: the ledger store, chains, admission) and the public
 [agent-action-capsule](https://github.com/action-state-group/agent-action-capsule)
 reference library for capsule parsing. No library code from either is
 vendored here; two data files are (a schema and a registry snapshot, below),
-and `envcompat.py` is a small helper copied from capsule-ledger.
+and `envcompat.py` is a small helper copied from the archived capsule-ledger.
 
 `capsule-engine` does not depend on the separate `capsule-compiler` package:
 it evaluates already-compiled artifacts (folds, packs, policy manifests)
@@ -24,21 +24,18 @@ to requirements, which produced the EU AI Act packs' outcomes).
 
 ## Install
 
-capsule-engine is installed from source. Neither it nor capsule-ledger is on
-PyPI, so install capsule-ledger from its (archived) repository first, at its
-final commit (pinned the same way in `pyproject.toml`):
+capsule-engine is installed from source; it is not on PyPI:
 
 ```
 git clone https://github.com/action-state-group/capsule-engine.git
 cd capsule-engine
 python3 -m venv .venv && source .venv/bin/activate
-pip install "capsule-ledger @ git+https://github.com/action-state-group/capsule-ledger.git@42fb45f69b067f623a4b9915ae8883dff22d5d27"
 pip install -e .
 ```
 
-`capsule-emit` (0.12.0 or later) and `agent-action-capsule` (0.11.0 or
-later) come from PyPI. With these steps the test suite passes
-(`pip install pytest "mcp<2"`, then `python -m pytest`).
+`checkpointed-local-log` (0.6.0 or later), `capsule-emit` (0.12.0 or later)
+and `agent-action-capsule` (0.11.0 or later) come from PyPI. With these steps
+the test suite passes (`pip install pytest "mcp<2"`, then `python -m pytest`).
 
 ## The `capsule-engine` command
 

@@ -14,11 +14,8 @@ for the re-sync procedure and pinned-commit provenance. A future neutral
 ``capsule-registry`` repo (referenced throughout this module's docstrings,
 not yet created as of this move) would supersede this vendor copy the same
 way; until then, this copy is never to be read as the registry-of-record
-itself. capsule-ledger keeps its own separate, minimal, self-contained
-``describe_action_class`` shim (its own tiny embedded label data, no
-dependency on this package) for its own core read/verify display surface --
-that shim and this vendor copy are independent by design, not two forks of
-one truth.
+itself. capsule-ledger's own minimal ``describe_action_class`` shim is
+archived with it; this module is the one copy the engine's CLI and console use.
 
 ``action_class`` -- not the -02 spec's own closed ``action_type`` field
 (restricted to ``fyi``/``decide``, see ``guards/action.py``) -- is the

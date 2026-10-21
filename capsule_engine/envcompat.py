@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
-# Vendored from action-state-group/capsule-ledger, capsule_ledger/envcompat.py,
-# commit 696debcdf15c9c990491708dfa01f63faac9ffcb. Do not hand-edit -- re-run scripts/vendor_envcompat.py
-# against a capsule-ledger checkout instead.
+# Copied from action-state-group/capsule-ledger, capsule_ledger/envcompat.py, at commit
+# 696debcdf15c9c990491708dfa01f63faac9ffcb. capsule-ledger is archived, so this copy is now the
+# maintained one.
 """Env-var read helper."""
 from __future__ import annotations
 

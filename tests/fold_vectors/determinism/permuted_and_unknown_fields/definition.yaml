@@ -1,0 +1,17 @@
+fold_id: kat.determinism_probe/1.0.0
+reads:
+  - path: developer
+    erasure_class: commitment-ok
+  - path: disposition.verdict_class
+    erasure_class: commitment-ok
+  - path: amount_minor
+    erasure_class: preimage
+filter:
+  - field: disposition.verdict_class
+    op: eq
+    value: executed
+key: developer
+reduce:
+  reducer: sum
+  field: amount_minor
+emit: money.minor_units

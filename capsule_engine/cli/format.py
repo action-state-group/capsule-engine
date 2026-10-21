@@ -11,12 +11,10 @@ name this module invents.
 """
 from __future__ import annotations
 
-import json
 import re
 import shlex
 
-from capsule_ledger.payload_store import ResolvedPayload
-from capsule_ledger.registry import describe_action_class
+from ..registry import describe_action_class
 
 __all__ = [
     "format_staleness",
@@ -28,7 +26,6 @@ __all__ = [
     "format_action_class",
     "assurance_grade_parts",
     "format_assurance_grade",
-    "format_resolved_payload",
 ]
 
 _WINDOWS_DRIVE_RE = re.compile(r"[A-Za-z]:\\")
@@ -174,22 +171,3 @@ def format_assurance_grade(assurance: dict) -> str:
     copy."""
     grade, badged = assurance_grade_parts(assurance)
     return f"[{grade}]" if badged else grade
-
-
-def format_resolved_payload(label: str, resolved: ResolvedPayload, *, indent: str = "      ") -> list[str]:
-    """Render one resolve-at-read result (item 5): matched content is shown
-    beside the commitment with an explicit "not part of the record"
-    marking; a mismatch is a loud failure line, never a silent fallback to
-    the digest-only view."""
-    if resolved.match:
-        lines = [
-            f"{indent}resolved {label} "
-            "(from your local payload store — not part of the record; digest recomputed live: match):"
-        ]
-        lines.extend(f"{indent}  {line}" for line in json.dumps(resolved.content, indent=2, sort_keys=True).splitlines())
-        return lines
-    return [
-        f"{indent}⚠ resolved {label} found in your local payload store but does NOT match — "
-        f"recomputed {resolved.recomputed_digest} ≠ recorded {resolved.digest} "
-        "(the local copy may be corrupted or tampered; treat this content as unverified)"
-    ]

@@ -1,0 +1,3 @@
+{"developer": "agent-a", "disposition": {"verdict_class": "executed", "decision": "accept"}, "amount_minor": 1500}
+{"developer": "agent-a", "disposition": {"verdict_class": "blocked", "decision": "reject"}, "amount_minor": 900}
+{"developer": "agent-b", "disposition": {"verdict_class": "executed", "decision": "accept"}, "amount_minor": 300}

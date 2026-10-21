@@ -1,0 +1,12 @@
+# Attempts to declare a read on the reserved "now" pseudo-field — a fold
+# MUST NOT consult a wall clock or anything outside the declared capsule range.
+fold_id: kat.wall_clock_reserved_field/1.0.0
+reads:
+  - path: developer
+    erasure_class: commitment-ok
+  - path: now
+    erasure_class: commitment-ok
+key: developer
+reduce:
+  reducer: count
+emit: count

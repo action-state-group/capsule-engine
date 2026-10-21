@@ -25,13 +25,9 @@ REPO_ROOT = Path(__file__).parent.parent
 
 # ---- field-value facets ----
 # Note: interaction.disclosure/incident.flag/incident.report are NOT
-# registered as action_class_conventions entries -- that table is
-# drift-checked against capsule-ledger's own independent shim copy
-# (scripts/check_registry_conventions_drift.py), a repo out of this task's
-# scope (and slated for archival, w3-engine-residual-moves). The facets land
-# only in the field-value tables below, which carry no cross-repo sync
-# requirement; an unregistered action_class still renders as-is (never an
-# error) per the never-reject invariant.
+# registered as action_class_conventions entries; the facets land only in
+# the field-value tables below. An unregistered action_class still renders
+# as-is (never an error) per the never-reject invariant.
 def test_interaction_disclosure_kind_values_are_registered():
     for kind in ("ai", "emotion", "biometric"):
         fc = describe_field_value("interaction.disclosure_kind", kind)

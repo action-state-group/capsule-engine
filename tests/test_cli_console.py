@@ -17,6 +17,7 @@ from capsule_engine.console.server import build_server
 FIXTURE_LEDGER = Path(__file__).parent / "fixtures" / "sample_ledger.jsonl"
 APPROVE_ID = "76f263fef08da2470b4c3dbf0b4c6e52b818cdd20c3c08936d1c79dc6bf07c0a"
 CONFIRM_ID = "f51b56ab6267acb2123d7b46a9ec69e0bf1c8a12980b3008b1926b684b39dcbb"
+TWO_CHECKS_ID = "4c001686df744705826049e929e1fc614c258b236924371afcacc320cbbe1e33"
 
 
 def test_console_registered_as_a_full_arm_verb():
@@ -183,3 +184,15 @@ def test_console_tampered_record_fails_real_verification(running_server, tmp_pat
         assert "capsule_id_mismatch" in codes
     finally:
         _stop_server(server, thread)
+
+
+def test_console_record_detail_carries_digests_and_no_resolved_payloads(running_server):
+    """The resolve-at-read payload store left with capsule-ledger (#170): the
+    detail shows each check's committed digest and never a preimage."""
+    status, detail = _get_json(running_server + "/api/records/" + TWO_CHECKS_ID)
+    assert status == 200
+    assert "resolved_reason" not in detail
+    assert len(detail["checks"]) == 2
+    for check in detail["checks"]:
+        assert "evidence_digest" in check
+        assert "resolved_evidence" not in check
