@@ -36,10 +36,9 @@ pip install "capsule-ledger @ git+https://github.com/action-state-group/capsule-
 pip install -e .
 ```
 
-`capsule-emit` comes from PyPI (0.8.6 carries the `ledger_io` and `period`
-modules this package uses). pip prints `capsule-emit 0.8.6 does not provide
-the extra 'ledger-io'`; that warning is harmless. With these steps the test
-suite passes (`pip install pytest "mcp<2"`, then `python -m pytest`).
+`capsule-emit` (0.12.0 or later) and `agent-action-capsule` (0.11.0 or
+later) come from PyPI. With these steps the test suite passes
+(`pip install pytest "mcp<2"`, then `python -m pytest`).
 
 ## The `capsule-engine` command
 
