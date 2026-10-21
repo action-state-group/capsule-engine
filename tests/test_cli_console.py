@@ -192,6 +192,7 @@ def test_console_record_detail_carries_digests_and_no_resolved_payloads(running_
     status, detail = _get_json(running_server + "/api/records/" + TWO_CHECKS_ID)
     assert status == 200
     assert "resolved_reason" not in detail
+    assert detail["payloads"] == []  # the fixture's checks commit no evidence digest
     assert len(detail["checks"]) == 2
     for check in detail["checks"]:
         assert "evidence_digest" in check

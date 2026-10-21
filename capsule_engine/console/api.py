@@ -47,6 +47,22 @@ def _fingerprint(capsule_id: str) -> str:
     return capsule_id[:8] + "…" if capsule_id else ""
 
 
+def _withheld_payloads(capsule: dict) -> list[dict[str, Any]]:
+    """Every payload the capsule commits to by digest: the disposition reason
+    and each check's evidence. A capsule never carries the preimages, so each
+    one renders as withheld with its digest, never as a blank field."""
+    payloads = []
+    reason_digest = (capsule.get("disposition") or {}).get("reason_digest")
+    if reason_digest:
+        payloads.append({"label": "reason", "check_id": None, "digest": reason_digest, "state": "withheld"})
+    for c in capsule.get("constraints") or []:
+        if c.get("evidence_digest"):
+            payloads.append(
+                {"label": "evidence", "check_id": c.get("id"), "digest": c["evidence_digest"], "state": "withheld"}
+            )
+    return payloads
+
+
 def _action_class_info(capsule: dict) -> dict[str, Any] | None:
     action_class = (capsule.get("asg_payload") or {}).get("action_class")
     if not action_class:
@@ -220,6 +236,7 @@ def record_detail(store: LedgerAPI, capsule_id: str) -> dict[str, Any] | None:
             }
             for c in constraints
         ],
+        "payloads": _withheld_payloads(capsule),
         "chain": {"cites": cites, "cited_by": cited_by},
         "verify": {
             "ok": verify_result.ok if verify_result is not None else None,

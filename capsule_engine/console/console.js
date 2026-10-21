@@ -155,6 +155,19 @@
     return row;
   }
 
+  // Payloads the capsule commits to by digest (disposition reason, check
+  // evidence). The record never carries the preimages, so each renders as
+  // withheld beside its digest, never as a blank field. Plain text, not a
+  // verify stage: a withheld payload is not a verification result.
+  function withheldPayloadsHTML(payloads) {
+    if (!payloads || !payloads.length) return "";
+    return payloads.map(function (p) {
+      var name = p.label + (p.check_id ? " · " + p.check_id : "");
+      return '<div class="rung-plain mono">' + escapeHTML(name) + " — withheld · digest " +
+        escapeHTML(p.digest) + "</div>";
+    }).join("");
+  }
+
   function renderInspector(detail) {
     var inspector = qs("inspector");
     inspector.innerHTML = "";
@@ -192,6 +205,14 @@
     }
     checksSection.innerHTML = checksHTML;
     inspector.appendChild(checksSection);
+
+    var payloadsHTML = withheldPayloadsHTML(detail.payloads);
+    if (payloadsHTML) {
+      var payloadsSection = document.createElement("div");
+      payloadsSection.className = "inspector-section";
+      payloadsSection.innerHTML = '<div class="inspector-section-title">Payloads</div>' + payloadsHTML;
+      inspector.appendChild(payloadsSection);
+    }
 
     // Real cryptographic verification -- the one legitimate brick use in
     // this panel, reusing the verify-ritual component verbatim.
