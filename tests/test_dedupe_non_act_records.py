@@ -20,7 +20,7 @@ from pathlib import Path
 
 import pytest
 from agent_action_capsule import json_digest
-from capsule_ledger.ledger import LedgerStore
+from cll.ledger import LedgerStore
 
 from capsule_engine.folds.loader import load_definition_file as load_fold
 from capsule_engine.guards.capsule import DENY, not_applicable_evidence

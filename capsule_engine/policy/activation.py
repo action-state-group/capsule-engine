@@ -17,8 +17,8 @@ parent need not resolve).
 """
 from __future__ import annotations
 
-from capsule_ledger.ledger.api import LedgerAPI, ScanQuery
-from capsule_ledger.ledger.records import LedgerRecord
+from cll.ledger.api import LedgerAPI, ScanQuery
+from cll.ledger.records import LedgerRecord
 
 from ..events.capsule import build_event_capsule
 from ..guards.signing import Signer

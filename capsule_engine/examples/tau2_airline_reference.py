@@ -83,7 +83,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import capsule_emit
-from capsule_ledger.ledger import LedgerAPI, LedgerRecord, LedgerStore
+from cll.ledger import LedgerAPI, LedgerRecord, LedgerStore
 
 from capsule_engine.cli.format import format_coverage_footnote
 from capsule_engine.folds.engine import EvaluationTrace, evaluate_one

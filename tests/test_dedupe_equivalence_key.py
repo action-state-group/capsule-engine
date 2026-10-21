@@ -15,7 +15,7 @@ import json
 
 import pytest
 from agent_action_capsule import json_digest
-from capsule_ledger.ledger import LedgerStore
+from cll.ledger import LedgerStore
 
 from capsule_engine.guards import Action, GuardEngine, LocalSigner
 from capsule_engine.guards.checks.dedupe import equivalence_key_for_action, equivalence_key_for_capsule

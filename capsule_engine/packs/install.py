@@ -26,7 +26,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import yaml
-from capsule_ledger.ledger.api import LedgerAPI
+from cll.ledger.api import LedgerAPI
 
 from ..guards.checks import RUNNABLE_CHECKS
 from ..guards.engine import ASK_RULE_EXCLUDED_CHECKS, GuardEngine

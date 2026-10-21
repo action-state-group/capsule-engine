@@ -39,7 +39,7 @@ from pathlib import Path
 from typing import TypedDict
 
 import pytest
-from capsule_ledger.ledger import LedgerStore
+from cll.ledger import LedgerStore
 
 import capsule_engine
 from capsule_engine.folds.loader import load_definition_file as load_fold

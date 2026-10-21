@@ -19,7 +19,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
-from capsule_ledger.ledger.api import LedgerAPI, ScanQuery
+from cll.ledger.api import LedgerAPI, ScanQuery
 
 from ..cli.constraints_cmd import CHECKS, DEFAULT_CAPS_FOLD_ID
 from ..cli.format import summarize_action

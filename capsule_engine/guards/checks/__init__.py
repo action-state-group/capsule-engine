@@ -13,7 +13,7 @@ task-authority record and the commercial-bounds opening supplied with it.
 ``RUNNABLE_CHECKS`` names all four."""
 from collections.abc import Callable
 
-from capsule_ledger.ledger.api import LedgerAPI
+from cll.ledger.api import LedgerAPI
 
 from ..action import Action
 from .action_class_gate import check_action_class_gate

@@ -71,8 +71,8 @@ from pathlib import Path
 from typing import TypedDict
 
 from agent_action_capsule import json_digest
-from capsule_ledger.ledger import LedgerStore
-from capsule_ledger.ledger.api import LedgerAPI
+from cll.ledger import LedgerStore
+from cll.ledger.api import LedgerAPI
 
 from ..folds.definition import FoldDefinition
 from ..folds.duration import parse_duration_seconds

@@ -33,7 +33,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import yaml
-from capsule_ledger.ledger import LedgerStore
+from cll.ledger import LedgerStore
 
 from .guards.signing import LocalSigner, key_fingerprint
 from .packs import PackDefinition, install_pack

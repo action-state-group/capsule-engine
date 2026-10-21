@@ -9,7 +9,7 @@ from __future__ import annotations
 import hashlib
 
 import pytest
-from capsule_ledger.ledger import ScanQuery
+from cll.ledger import ScanQuery
 
 from capsule_engine.conversation import (
     EVENT_CONVERSATION_TURN,

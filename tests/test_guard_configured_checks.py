@@ -273,7 +273,7 @@ def test_recurrence_is_recorded_on_the_capsule(store, caps_fold, signer):
 
 
 def test_engine_with_no_configured_wickets_seals_the_same_capsule_as_before(tmp_path, caps_fold, signer):
-    from capsule_ledger.ledger import LedgerStore
+    from cll.ledger import LedgerStore
 
     a, b = LedgerStore(tmp_path / "a"), LedgerStore(tmp_path / "b")
     try:

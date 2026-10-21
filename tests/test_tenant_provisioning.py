@@ -8,7 +8,7 @@ from __future__ import annotations
 import json
 
 import pytest
-from capsule_ledger.ledger import LedgerStore
+from cll.ledger import LedgerStore
 
 from capsule_engine.cli.main import main
 from capsule_engine.packs import load_pack_dir

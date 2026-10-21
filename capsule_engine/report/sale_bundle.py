@@ -106,7 +106,7 @@ from pathlib import Path
 
 from agent_action_capsule import json_digest
 from capsule_emit.evidence_file import check_evidence_file
-from capsule_ledger.ledger.api import LedgerAPI
+from cll.ledger.api import LedgerAPI
 
 from .live_history import history_ledger
 from .replay import (

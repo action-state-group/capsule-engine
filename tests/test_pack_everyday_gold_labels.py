@@ -50,7 +50,7 @@ from pathlib import Path
 
 import pytest
 import yaml
-from capsule_ledger.ledger import LedgerStore
+from cll.ledger import LedgerStore
 
 from capsule_engine.packs.loader import load_pack_dir
 from capsule_engine.packs.schema import NORMALIZED_ACTION_FIELDS

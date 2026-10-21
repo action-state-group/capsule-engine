@@ -16,7 +16,7 @@ from pathlib import Path
 
 import pytest
 from agent_action_capsule import json_digest
-from capsule_ledger.ledger import LedgerStore
+from cll.ledger import LedgerStore
 
 from capsule_engine.guards import Action, LocalSigner
 from capsule_engine.guards.action import disclosed_classes_of

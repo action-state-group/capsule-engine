@@ -1,9 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
 """Server configuration and the backend seam.
 
-``backend`` selects how the server obtains its :class:`~capsule_ledger.ledger.api.LedgerAPI`
+``backend`` selects how the server obtains its :class:`~cll.ledger.api.LedgerAPI`
 binding. ``"local"`` -- the only value implemented in v0 -- opens a
-:class:`~capsule_ledger.ledger.store.LedgerStore` rooted at ``ledger_path`` (or imports a
+:class:`~cll.ledger.store.LedgerStore` rooted at ``ledger_path`` (or imports a
 JSONL fixture into one, reusing the CLI's own ``open_ledger`` convenience so a
 fixture under ``tests/fixtures/`` works here exactly as it does for `capsule log`) and
 keeps it open for the life of the process.
@@ -25,7 +25,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from capsule_emit.ledger_io import open_ledger
-from capsule_ledger.ledger.api import LedgerAPI
+from cll.ledger.api import LedgerAPI
 
 from ..envcompat import env_get
 

@@ -50,8 +50,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from agent_action_capsule import json_digest
-from capsule_ledger.ledger import LedgerRecord
-from capsule_ledger.ledger.api import LedgerAPI, ScanQuery
+from cll.ledger import LedgerRecord
+from cll.ledger.api import LedgerAPI, ScanQuery
 
 from ..action import Action
 from ..capsule import ConstraintOutcome, not_applicable_evidence

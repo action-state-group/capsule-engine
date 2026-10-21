@@ -11,7 +11,7 @@ digest itself, it only reads the verifier's own ``ok``.
 """
 from __future__ import annotations
 
-from capsule_ledger.ledger.api import LedgerAPI
+from cll.ledger.api import LedgerAPI
 
 from ..action import Action
 from ..capsule import ConstraintOutcome, not_applicable_evidence

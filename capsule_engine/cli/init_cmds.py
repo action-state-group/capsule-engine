@@ -32,7 +32,7 @@ import secrets
 import sys
 from pathlib import Path
 
-from capsule_ledger.ledger import LedgerStore
+from cll.ledger import LedgerStore
 
 from ..envcompat import env_get
 from ..guards.signing import LocalSigner

@@ -10,7 +10,7 @@ Applies only to the configured ``action_classes``.
 """
 from __future__ import annotations
 
-from capsule_ledger.ledger.api import LedgerAPI, ScanQuery
+from cll.ledger.api import LedgerAPI, ScanQuery
 
 from ..action import Action
 from ..capsule import ConstraintOutcome, not_applicable_evidence

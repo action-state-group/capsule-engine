@@ -24,7 +24,7 @@ from __future__ import annotations
 from functools import cache
 from pathlib import Path
 
-from capsule_ledger.ledger.api import LedgerAPI, ScanQuery
+from cll.ledger.api import LedgerAPI, ScanQuery
 
 from ...folds.catalog import Catalog
 from ...folds.definition import FoldDefinition

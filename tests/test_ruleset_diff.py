@@ -8,7 +8,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-from capsule_ledger.ledger import LedgerStore
+from cll.ledger import LedgerStore
 
 from capsule_engine.guards import LocalSigner
 from capsule_engine.packs import install_pack, load_pack_dir, record_pack_activation

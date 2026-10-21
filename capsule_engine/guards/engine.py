@@ -46,7 +46,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from typing import TYPE_CHECKING, TypedDict
 
-from capsule_ledger.ledger.api import LedgerAPI
+from cll.ledger.api import LedgerAPI
 
 from ..events.capsule import build_event_capsule
 from ..folds.definition import FoldDefinition

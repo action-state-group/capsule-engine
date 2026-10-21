@@ -166,7 +166,7 @@ def test_capsule_verify_offline_for_a_denied_call(tmp_path):
     # Re-import the exported flat-JSONL fixture into a fresh store and verify
     # independently, matching exactly what `capsule verify --ledger <file>`
     # does for a stranger who only has the fixture, not this test's live store.
-    from capsule_ledger.ledger import LedgerStore
+    from cll.ledger import LedgerStore
 
     verify_store = LedgerStore(str(tmp_path / "verify-store"))
     try:

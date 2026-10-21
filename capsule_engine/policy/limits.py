@@ -54,7 +54,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from itertools import pairwise
 
-from capsule_ledger.ledger.api import LedgerAPI, ScanQuery
+from cll.ledger.api import LedgerAPI, ScanQuery
 
 from ..events.capsule import event_signature_valid
 from ..guards.checks.caps import (

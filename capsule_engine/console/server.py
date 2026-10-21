@@ -24,7 +24,7 @@ import urllib.parse
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 
-from capsule_ledger.ledger.store import LedgerStore
+from cll.ledger.store import LedgerStore
 
 from . import api
 

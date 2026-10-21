@@ -59,7 +59,7 @@ from datetime import datetime
 from typing import TypedDict
 
 from agent_action_capsule import json_digest
-from capsule_ledger.ledger.api import LedgerAPI
+from cll.ledger.api import LedgerAPI
 
 from ..folds.definition import FoldDefinition
 from ..guards.capsule import act_payload
