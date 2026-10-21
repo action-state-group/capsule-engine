@@ -10,8 +10,8 @@ from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass, field
 
-from capsule_ledger.ledger.api import LedgerAPI
-from capsule_ledger.ledger.records import LedgerRecord
+from cll.ledger.api import LedgerAPI
+from cll.ledger.records import LedgerRecord
 
 from ..guards.signing import Signer
 from .capsules import build_session_close_capsule, build_turn_capsule

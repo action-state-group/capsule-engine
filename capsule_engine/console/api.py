@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 """Data-shaping functions for the local console server (`capsule console`).
 
-Pure functions over a real :class:`~capsule_ledger.ledger.api.LedgerAPI` -- no
+Pure functions over a real :class:`~cll.ledger.api.LedgerAPI` -- no
 HTTP, no server state -- so they're exercisable directly in tests without a
 socket. ``server.py`` is the thin HTTP wiring on top of this module. Every
 field returned here comes straight off a real capsule, a real
@@ -13,10 +13,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from capsule_ledger.ledger.api import LedgerAPI, ScanQuery
-from capsule_ledger.ledger.records import LedgerRecord
 from capsule_ledger.payload_store import PayloadStore
 from capsule_ledger.registry import describe_action_class
+from cll.ledger.api import LedgerAPI, ScanQuery
+from cll.ledger.records import LedgerRecord
 
 from ..cli.format import (
     assurance_grade_parts,

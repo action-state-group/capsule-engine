@@ -23,8 +23,8 @@ from __future__ import annotations
 from collections.abc import Sequence
 
 from agent_action_capsule.contracts import is_hex64
-from capsule_ledger.ledger.api import LedgerAPI, ScanQuery
-from capsule_ledger.ledger.records import LedgerRecord
+from cll.ledger.api import LedgerAPI, ScanQuery
+from cll.ledger.records import LedgerRecord
 
 from ..events.capsule import build_event_capsule
 from ..guards.signing import Signer

@@ -47,7 +47,7 @@ from __future__ import annotations
 
 from typing import TypedDict
 
-from capsule_ledger.ledger.api import LedgerAPI
+from cll.ledger.api import LedgerAPI
 
 from ..action import Action
 from ..capsule import ConstraintOutcome, NotApplicableEvidence, not_applicable_evidence

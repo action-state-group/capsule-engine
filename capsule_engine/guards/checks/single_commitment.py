@@ -51,7 +51,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TypedDict
 
-from capsule_ledger.ledger.api import LedgerAPI, ScanQuery
+from cll.ledger.api import LedgerAPI, ScanQuery
 
 from ..action import Action
 from ..capsule import ConstraintOutcome, NotApplicableEvidence, not_applicable_evidence

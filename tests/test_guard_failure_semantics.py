@@ -5,7 +5,7 @@ short version of the table each test below cites.
 """
 from dataclasses import dataclass
 
-from capsule_ledger.ledger import LedgerAPI
+from cll.ledger import LedgerAPI
 
 from capsule_engine.guards import Action, GuardEngine, LocalSigner, SigningKeyUnavailable
 from capsule_engine.guards.classes import classify

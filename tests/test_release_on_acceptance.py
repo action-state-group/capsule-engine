@@ -13,8 +13,8 @@ import json
 from pathlib import Path
 
 import pytest
-from capsule_ledger.ledger import LedgerStore
-from capsule_ledger.ledger.api import VerificationResult
+from cll.ledger import LedgerStore
+from cll.ledger.api import VerificationResult
 
 from capsule_engine.folds.loader import load_definition_file as load_fold
 from capsule_engine.guards import Action, GuardEngine

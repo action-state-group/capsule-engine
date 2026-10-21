@@ -70,7 +70,7 @@ from collections.abc import Mapping
 from dataclasses import replace
 from typing import Literal, NotRequired, TypedDict
 
-from capsule_ledger.ledger.api import LedgerAPI, ScanQuery
+from cll.ledger.api import LedgerAPI, ScanQuery
 
 from ...folds.definition import FilterClause, FoldDefinition, ReadField, Reduce
 from ...folds.engine import EvaluationTrace, ReversalSummary, evaluate_one

@@ -30,7 +30,7 @@ from typing import TypedDict
 
 import pytest
 from agent_action_capsule import json_digest
-from capsule_ledger.ledger import LedgerStore
+from cll.ledger import LedgerStore
 
 import capsule_engine
 from capsule_engine.guards import GuardDecision, GuardEngine, LocalSigner

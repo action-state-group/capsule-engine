@@ -27,8 +27,8 @@ from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass
 
-from capsule_ledger.ledger.api import LedgerAPI
-from capsule_ledger.ledger.records import LedgerRecord
+from cll.ledger.api import LedgerAPI
+from cll.ledger.records import LedgerRecord
 
 from ..events.capsule import build_event_capsule
 from .signing import Signer

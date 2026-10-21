@@ -293,7 +293,7 @@ def test_cli_requires_model_id_alongside_model_note(tmp_path):
 def test_cli_ledger_directory_binding_reads_a_real_store(tmp_path):
     """The real-deployment path: --ledger pointed at a LedgerStore directory,
     not a loose JSONL file."""
-    from capsule_ledger.ledger import LedgerStore
+    from cll.ledger import LedgerStore
 
     store_dir = tmp_path / "store"
     store = LedgerStore(store_dir)

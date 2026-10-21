@@ -41,7 +41,7 @@ from capsule_emit.ledger_io import (
     require_ledger_path,
 )
 from capsule_emit.period import add_period_arg, apply_period
-from capsule_ledger.ledger.api import ScanQuery
+from cll.ledger.api import ScanQuery
 
 from ..envcompat import env_get
 from ..guards.capsule import local_only_refusal

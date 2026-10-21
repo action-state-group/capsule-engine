@@ -38,7 +38,7 @@ from __future__ import annotations
 
 from typing import TypedDict
 
-from capsule_ledger.ledger.api import LedgerAPI, ScanQuery
+from cll.ledger.api import LedgerAPI, ScanQuery
 
 from ...folds.definition import FoldDefinition
 from ...folds.engine import EvaluationTrace, evaluate_one

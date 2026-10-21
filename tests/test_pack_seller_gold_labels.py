@@ -17,7 +17,7 @@ import json
 from pathlib import Path
 
 import yaml
-from capsule_ledger.ledger import LedgerStore
+from cll.ledger import LedgerStore
 
 from capsule_engine.packs.loader import load_pack_dir
 
