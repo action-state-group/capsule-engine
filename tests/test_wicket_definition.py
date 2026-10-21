@@ -52,11 +52,15 @@ EXPECTED_DIGESTS = {
     "counterparty_seen_before/4.0.0": "c7c20d9e57cb0a75184b9c6c4d037c9bea813a7b1105c581defd4481acf964b0",
     # Taxonomy-only selectors, no fold (guards/checks/action_class_gate.py).
     "action_class_gate/1.0.0": "fcc352838832e13f5e87662f0194ec4a7065bc989bbe624b43ac5d9d1b638ae2",
+    # personal_disclosure leaves out a disclosure to a platform; everyday 0.3.7 cites it.
+    "action_class_gate/1.1.0": "817a3d537b024689e7fcc20d37e5253f77075274c5b7d863dcc25eac39bc8f2b",
     # An empty deny list; the user's list rides in a policy profile. No pack cites it yet.
     "counterparty_list/1.0.0": "d95162931a6c1f88c763f2fd221d63b238888c1bdd7c6d594123ee5671e18f65",
     # The everyday pack 0.3.1 checks that each read one number, one member of
     # a closed set, or one opaque reference.
     "recipient_role/1.0.0": "917ab5edea21867f318b8dfd54a6d7b458cbabcc5cebfac6ff0c4861e918d43b",
+    # Adds a platform role that may be given email only; everyday 0.3.7 cites it.
+    "recipient_role/1.1.0": "57cb99bde24b5ae41ae214f4d2db0e8f20cbdf7ba31170b65da0561afdc499e1",
     "refundability/1.0.0": "410ad28fa2dd518502cbcbc00972d31ae4597722f17836ed2bf80e717f2f3294",
     "material_fields_changed/1.0.0": "b7c98d710e48c8fc87d92abf2599b04b6ac9ac6f129eee6335edb742f1dbc02a",
     "offer_fields_changed/1.0.0": "b1ca52ccdc821cbb57df844a10eb9e7d6242fff612fb5324c3c4f642d57f7ab1",
@@ -80,11 +84,15 @@ EXPECTED_DIGESTS = {
     # Replaces offer_expiry/1.0.0, retired at its digest (RETIRED_DIGESTS below).
     "offer_expiry/1.0.1": "7bcd363b28475e3fac123fe2b8925f60f36bdaa3d22ebd5004ffe5290c4f2597",
     "seller.recipient_role/1.0.0": "001d4d4198921ffec5f492f88286765a075eece1418d15b68576d4fceec7826b",
+    # The same platform role for a seller; seller 0.1.4 cites it.
+    "seller.recipient_role/1.1.0": "8ea4cc45972a840a56af5f0fefbd6092dee3797696a8cd3303940a98b7b7b35d",
     "seller.destination_rail/1.0.0": "fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800",
     # One accepted commitment per sale and item, across buyer threads. No pack cites it yet.
     "seller.single_commitment/1.0.0": "91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e",
     # An address reaches only the buyer whose sealed acceptance of the sale it cites.
     "seller.release_on_acceptance/1.0.0": "6a8487fb059f171765810bdc4a248edfdaf6489ddac409b978f03aaa0fec5583",
+    # Not applicable to a disclosure to a platform; seller 0.1.4 cites it.
+    "seller.release_on_acceptance/1.1.0": "933d72ab36863cb67ef2f0333b424fb4d559fa77bfeb1f5b63a61dee6307e28b",
     # Replaces price_floor/2.0.0 and 1.0.0, retired at their digests
     # (RETIRED_DIGESTS below): the floor is opened from a commitment, never
     # read in clear, and a record committing to none puts the action out of scope.
@@ -110,6 +118,8 @@ WITHOUT_SEMANTICS = frozenset(EXPECTED_DIGESTS) - {
     "counterparty_seen_before/3.0.0", "counterparty_seen_before/4.0.0", "seller.release_on_acceptance/1.0.0",
     "caps/5.1.0",
     "required_disclosure/1.1.0",
+    "action_class_gate/1.1.0", "recipient_role/1.1.0", "seller.recipient_role/1.1.0",
+    "seller.release_on_acceptance/1.1.0",
 }
 
 

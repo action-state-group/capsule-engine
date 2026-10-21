@@ -74,11 +74,13 @@ catalog):
    matched against one-time-code, password and card-security-code patterns.
 6. `recurring_charge` (`recurring_charge/1.0.0`) -- a payment whose
    declared recurrence is not one-time is flagged.
-7. `action_class_gate` (`action_class_gate/1.0.0`) -- named selectors over
+7. `action_class_gate` (`action_class_gate/1.1.0`) -- named selectors over
    the action taxonomy: a class with no consequential effect passes (today,
    `info.query` alone); public posting, creating or cancelling a booking,
-   deleting stored data, and disclosing personal data are flagged. It reads
-   the declared class only, never what the action contains. Eight rules
+   deleting stored data, and disclosing personal data are flagged, except a
+   disclosure to a platform, which `recipient_role` decides. It reads the
+   declared class, and the recipient's role for that one exception, never
+   what the action contains. Eight rules
    cite this check, and each names the one selector it is measured by
    (`selector:` in `pack.yaml`): a rule fails or passes only when its
    selector matched the action's class, and does not apply otherwise, so a
@@ -95,9 +97,13 @@ catalog):
    names the count and the key it was read under. A purchase with no
    `target`, or an empty one, is flagged as a first-time merchant, with the
    reason "no payee named".
-9. `recipient_role` (`recipient_role/1.0.0`) -- a personal-data disclosure
+9. `recipient_role` (`recipient_role/1.1.0`) -- a personal-data disclosure
    passes for the fulfilling merchant or the user and is flagged for a third
-   party; a role outside the set is flagged.
+   party; a role outside the set is flagged. A disclosure to a platform (a
+   marketplace, booking site or mail relay acting between the user and the
+   counterparty) passes only when every class of data it names is email, and
+   is flagged when it gives anything else or names no class. The first email
+   to a platform is paused by the producer, which knows who the platform is.
 10. `refundability` (`refundability/1.1.0`) -- a payment or sale declared
     not refundable is flagged.
 11. `material_fields_changed` (`material_fields_changed/1.1.0`) -- any

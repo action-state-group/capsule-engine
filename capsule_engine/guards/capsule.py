@@ -285,6 +285,8 @@ def _payload_extension(action: Action, checkpoint: dict, manifest_digest: str | 
     for name, value in scalars:
         if value is not None:
             ext[name] = value
+    if action.disclosed_classes is not None:
+        ext["disclosed_classes"] = list(action.disclosed_classes)
     if action.sealed_equivalence_key is not None:
         # The caller's key as its digest only, never raw: dedupe reads it back
         # (``equivalence_key_for_capsule``).

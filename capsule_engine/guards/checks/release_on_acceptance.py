@@ -27,7 +27,11 @@ counts as its canonical class), because the action cannot be shown to be
 out of scope; and a disclosure in ``action_classes`` whose
 ``representation_class`` is missing or outside ``release_classes``, because
 no class of personal data is released without an acceptance. Only another
-known action class is ``n/a`` out of scope. The engine lists this as an integrity check, so a
+known action class is ``n/a`` out of scope, and, when the wicket configures
+``except_recipient_roles`` (seller.release_on_acceptance/1.1.0: ``platform``),
+a disclosure whose ``recipient_role`` is one of them: it goes to no buyer, so
+there is no acceptance to cite, and ``recipient_role`` measures what it may
+carry. The engine lists this as an integrity check, so a
 failure refuses whatever the pack declares; a one-shot approval does not
 clear it.
 
@@ -92,6 +96,7 @@ def check_release_on_acceptance(
     release_classes: list[str],
     acceptance_classes: list[str],
     action_classes: list[str],
+    except_recipient_roles: list[str] | None = None,
 ) -> CheckOutcome:
     ac = resolve(action.action_class) if action.action_class is not None else None
     if ac is None:
@@ -99,6 +104,9 @@ def check_release_on_acceptance(
                         _evidence(None, False, missing_field="action_class"))
     if ac.name not in action_classes:
         return _outcome("n/a", "the rule is not configured for this action class",
+                        not_applicable_evidence(_CHECK_ID, in_scope=False))
+    if action.recipient_role is not None and action.recipient_role in (except_recipient_roles or ()):
+        return _outcome("n/a", f"the recipient is a {action.recipient_role}, not a buyer; recipient_role measures it",
                         not_applicable_evidence(_CHECK_ID, in_scope=False))
     cls = action.representation_class
     if cls not in release_classes:

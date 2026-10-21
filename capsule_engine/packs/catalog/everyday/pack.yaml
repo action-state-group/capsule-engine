@@ -27,7 +27,19 @@
 # whose selector matched its class and is not applicable to the others. An
 # action whose class has no taxonomy row fails all eight: the gate fails
 # closed and none of them can be ruled out.
-pack_id: asg/everyday/0.3.6
+#
+# 0.3.7 adds a platform recipient: a marketplace, booking site or
+# mail relay acting between the user and the counterparty. Rule 3
+# (recipient_role/1.1.0) passes a disclosure to a platform only when every
+# class of data it gives is email, as a listing's confirmation or a relay
+# needs, and refuses a phone, an address or any other class to one, or one
+# that names no class. Rules 11 and 12 (action_class_gate/1.1.0) no longer
+# flag a disclosure to a platform, which rule 3 decides. The first time an
+# email goes to a platform is a pause in the producer, which knows the
+# recipient (capsulectl's first telling); the pack has no recipient to count
+# it by. Nothing else changes: every other disclosure is flagged and checked
+# as in 0.3.6.
+pack_id: asg/everyday/0.3.7
 
 obligations:
   # -- DO ------------------------------------------------------------------
@@ -54,9 +66,12 @@ obligations:
     statement: >-
       Checks the role of whoever receives a personal-data disclosure
       (disclosure.personal), from the closed set fulfilling_merchant,
-      third_party or self, and records the role it read. It passes for the
-      fulfilling merchant or the user; it reads the role only, never who the
-      recipient is or what the disclosure contains.
+      platform, third_party or self, and records the role it read. It passes
+      for the fulfilling merchant or the user, and for a platform (a
+      marketplace, booking site or mail relay acting between the user and
+      the counterparty) only when every class of data the disclosure names
+      is email; it records those class names, never who the recipient is or
+      what the disclosure contains.
     check: recipient_role
     default_disposition: DO
   - id: r04-prepare-without-committing
@@ -124,21 +139,21 @@ obligations:
   - id: r11-home-address-to-an-individual
     statement: >-
       Flags every action declared as disclosing personal data
-      (disclosure.personal), and records the class. It reads the class only,
-      so it flags a disclosure whatever it
-      contains and whoever receives it; telling a home address sent to an
-      individual apart from one sent to a fulfilling merchant is not measured
-      yet.
+      (disclosure.personal) except one to a platform, which rule 3 decides,
+      and records the class. It reads the class and that role only, so it
+      flags a disclosure whatever it contains and whoever else receives it;
+      telling a home address sent to an individual apart from one sent to a
+      fulfilling merchant is not measured yet.
     check: action_class_gate
     selector: personal_disclosure
     default_disposition: ASK
   - id: r12-personal-contact-to-a-new-party
     statement: >-
       Flags every action declared as disclosing personal data
-      (disclosure.personal), and records the class. It reads the class only;
-      whether the disclosure carries a
-      personal phone number or email, and whether the recipient is new, is
-      not measured yet.
+      (disclosure.personal) except one to a platform, which rule 3 decides,
+      and records the class. It reads the class and that role only; whether
+      the disclosure carries a personal phone number or email, and whether
+      the recipient is new, is not measured yet.
     check: action_class_gate
     selector: personal_disclosure
     default_disposition: ASK
@@ -304,9 +319,10 @@ constraints:
     digest: 3617fdcaa39c03cf70a3254490328ccee5eaac0faba7cd52d9e3dc3fc50336c0
   - wicket_ref: recurring_charge/1.0.0
     digest: ea4ae204e5dc33f3a28e5e15471f404f20d4f8fca193d355a099a4a7e08b082e
-  # Named selectors over the action taxonomy; reads the declared class only.
-  - wicket_ref: action_class_gate/1.0.0
-    digest: fcc352838832e13f5e87662f0194ec4a7065bc989bbe624b43ac5d9d1b638ae2
+  # Named selectors over the action taxonomy; reads the declared class, and
+  # leaves a disclosure to a platform to recipient_role (1.1.0).
+  - wicket_ref: action_class_gate/1.1.0
+    digest: 817a3d537b024689e7fcc20d37e5253f77075274c5b7d863dcc25eac39bc8f2b
   # A purchase from a merchant the operator has no accepted or carried-out
   # act with. 3.0.0 counts an act that asked, was approved and was executed;
   # 4.0.0 also flags a purchase that names no merchant (no payee named).
@@ -315,8 +331,10 @@ constraints:
   # Each reads one number, one member of a closed set, or one opaque
   # reference from the action, never an object or text. The 1.1.0
   # definitions are 1.0.0's with marketplace.sale added to their classes.
-  - wicket_ref: recipient_role/1.0.0
-    digest: 917ab5edea21867f318b8dfd54a6d7b458cbabcc5cebfac6ff0c4861e918d43b
+  # recipient_role/1.1.0 also reads the classes a disclosure to a platform
+  # names, and passes only email.
+  - wicket_ref: recipient_role/1.1.0
+    digest: 57cb99bde24b5ae41ae214f4d2db0e8f20cbdf7ba31170b65da0561afdc499e1
   - wicket_ref: refundability/1.1.0
     digest: 1a471c09254a3db872c34a5e59d9e05e6da47cb396695a6cb6bf2bc055f4d811
   - wicket_ref: material_fields_changed/1.1.0
@@ -416,6 +434,16 @@ fixtures:
       outcome: escalate
     - id: merchant-purchase-no-payee
       outcome: escalate
+    - id: email-to-a-platform
+      outcome: allow
+    - id: phone-to-a-platform
+      outcome: deny
+    - id: home-address-to-a-platform
+      outcome: deny
+    - id: email-and-phone-to-a-platform
+      outcome: deny
+    - id: platform-disclosure-naming-no-class
+      outcome: deny
 
 # The action taxonomy this pack was authored against. The taxonomy decides
 # whether a gated class asks or refuses on a failure (its approver_role), so

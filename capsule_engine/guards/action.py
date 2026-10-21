@@ -34,6 +34,27 @@ def _looks_like_raw_account_number(value: str) -> bool:
     return bool(_RAW_DIGITS.match(compact) or _IBAN.match(compact))
 
 
+# The classes of personal data a disclosure may name, as the producer names
+# them (capsule-cli plugins/internal/plugin/deal_rules.go disclosureClasses).
+# Closed, so a value sealed as one is a class name and never the data.
+DISCLOSED_CLASSES = frozenset({
+    "name", "phone", "email", "home_address", "address", "pickup_location", "other_contact",
+    "credential", "verification_code", "payment_card", "id_document",
+})
+
+
+def disclosed_classes_of(value: object) -> tuple[str, ...] | None:
+    """``value`` as ``Action.disclosed_classes``: its classes sorted and each
+    named once, or ``None`` when it is not a non-empty list of members of
+    ``DISCLOSED_CLASSES``. One unknown member drops the whole value, never
+    kept: it may be the data itself."""
+    if not isinstance(value, (list, tuple)) or not value:
+        return None
+    if any(not isinstance(c, str) or c not in DISCLOSED_CLASSES for c in value):
+        return None
+    return tuple(sorted(set(value)))
+
+
 @dataclass(frozen=True)
 class Action:
     """One candidate action, as presented to the guard for a decision.
@@ -85,7 +106,15 @@ class Action:
     disclosure, one member of the role set the wicket pins
     (``fulfilling_merchant``, ``third_party``, ``self``; a seller's set has
     ``buyer`` in place of ``fulfilling_merchant``), read by
-    ``recipient_role``. ``refundable`` is whether the payment can be refunded,
+    ``recipient_role`` (a pack may add ``platform``: a marketplace, booking
+    site or mail relay acting between the user and the counterparty).
+    ``disclosed_classes`` are the classes of personal data a disclosure gives
+    (``email``, ``phone``, ``address``, ...; the closed set
+    ``DISCLOSED_CLASSES``), sorted and each named once: the names only, never
+    the values. They are the one field here that is a
+    list, of members of a closed set, and are sealed as one when set; read by
+    ``recipient_role`` for a role a pack allows only some classes.
+    ``refundable`` is whether the payment can be refunded,
     read by ``refundability``. ``material_fields_changed`` and
     ``offer_fields_changed`` count how many fields on a list pinned in the
     wicket config differ from what the user approved or stated, and
@@ -167,6 +196,7 @@ class Action:
     counterparty_ids: dict[str, str] | None = None
     counterparty_fp_alg: str | None = None
     recipient_role: str | None = None
+    disclosed_classes: tuple[str, ...] | None = None
     refundable: bool | None = None
     material_fields_changed: int | None = None
     material_fields_basis: str | None = None
@@ -194,6 +224,17 @@ class Action:
             raise ValueError(
                 "counterparty_account_ref looks like a raw account, card or IBAN number; it is sealed on the "
                 "capsule, so pass an opaque reference (a token or a digest) instead"
+            )
+
+        if self.disclosed_classes is not None and (
+            not isinstance(self.disclosed_classes, tuple)
+            or not self.disclosed_classes
+            or any(not isinstance(c, str) or c not in DISCLOSED_CLASSES for c in self.disclosed_classes)
+            or list(self.disclosed_classes) != sorted(set(self.disclosed_classes))
+        ):
+            raise ValueError(
+                "disclosed_classes must be a non-empty tuple of DISCLOSED_CLASSES names, sorted and each named "
+                "once (disclosed_classes_of builds one)"
             )
 
         if self.equivalence_key is not None and self.equivalence_key_digest is not None:
@@ -261,6 +302,7 @@ class Action:
             # Every optional scalar ``build_decision_capsule`` seals under its
             # own name, so a replayed record runs the same checks it ran live.
             recipient_role=payload.get("recipient_role"),
+            disclosed_classes=disclosed_classes_of(payload.get("disclosed_classes")),
             refundable=payload.get("refundable"),
             material_fields_changed=payload.get("material_fields_changed"),
             material_fields_basis=payload.get("material_fields_basis"),

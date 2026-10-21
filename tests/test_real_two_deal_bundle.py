@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""A real two-deal bundle from capsulectl, replayed under everyday 0.3.6.
+"""A real two-deal bundle from capsulectl, replayed under everyday 0.3.7.
 
 ``fixtures/real-two-deal/`` holds what capsulectl wrote, byte for byte: two
 deals on one throwaway profile, each a purchase of the same item from the same
@@ -57,8 +57,8 @@ FIXTURE_SHA256 = {
 PACK = load_pack_dir(Path(capsule_engine.__file__).parent / "packs" / "catalog" / "everyday")
 FROZEN_0_3_3 = Path(__file__).parent / "fixtures" / "packs" / "everyday-0.3.3"
 FROZEN_0_3_5 = Path(__file__).parent / "fixtures" / "packs" / "everyday-0.3.5"
-PACK_ID = "asg/everyday/0.3.6"
-PACK_DIGEST = "8a8e0a7e1ca4319b6e45f2037f4af49e6592919f373e59874ce1ead7249b073d"
+PACK_ID = "asg/everyday/0.3.7"
+PACK_DIGEST = "c1cea374102bba60de82e16663c550a278ee07a399c5faeb285fe1ea1ea27d4d"
 PRODUCER = {"commit": "831afeeb9fd76b7196486a9af38ca455b1230791", "name": "capsulectl", "version": "v0.1.0-rc13-6-g831afee"}
 TAXONOMY = "6"
 R02 = "r02-ordinary-purchase"
@@ -207,7 +207,7 @@ def test_every_check_seals_taxonomy_6():
             assert _json(path)["disclosures"][capsule_id]["agent_input"]["body"]["taxonomy_version"] == TAXONOMY
 
 
-def test_the_pack_is_everyday_0_3_6_at_its_digest():
+def test_the_pack_is_everyday_0_3_7_at_its_digest():
     assert PACK.pack_id == PACK_ID
     assert PACK.definition_digest() == PACK_DIGEST
 

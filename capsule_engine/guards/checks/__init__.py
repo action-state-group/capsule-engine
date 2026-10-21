@@ -89,7 +89,8 @@ CONFIGURED_CHECKS: dict[str, Callable[[Action, LedgerAPI, dict], CheckOutcome]] 
         action, mode=config["mode"], entries=config["entries"], action_classes=config["action_classes"]
     ),
     "recipient_role": lambda action, ledger, config: check_recipient_role(
-        action, roles=config["roles"], allowed_roles=config["allowed_roles"], action_classes=config["action_classes"]
+        action, roles=config["roles"], allowed_roles=config["allowed_roles"], action_classes=config["action_classes"],
+        role_classes=config.get("role_classes"),
     ),
     "refundability": lambda action, ledger, config: check_refundability(
         action, action_classes=config["action_classes"]
@@ -151,6 +152,7 @@ CONFIGURED_CHECKS: dict[str, Callable[[Action, LedgerAPI, dict], CheckOutcome]] 
         release_classes=config["release_classes"],
         acceptance_classes=config["acceptance_classes"],
         action_classes=config["action_classes"],
+        except_recipient_roles=config.get("except_recipient_roles"),
     ),
 }
 
