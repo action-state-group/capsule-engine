@@ -43,9 +43,14 @@ carries beside the act and no decision seals
 (``report/live_history.py``), is under the same algorithm, and at least one
 per-person identity kind (``email``, ``phone``, ``profile_id``,
 ``relay_address``) is on both sides and every such kind on both sides is
-equal. ``name``, ``payee`` and ``domain`` are never compared: a name is
+equal; ``name``, ``payee`` and ``domain`` are then not compared: a name is
 written many ways, and the thread default seals ``payee`` from it, while a
-marketplace domain is shared by every stranger on it. The acceptance is not
+marketplace domain is shared by every stranger on it. When neither side
+seals any per-person kind (an opening that named the buyer by name and
+domain only), the buyer is the same when both sides seal a ``name`` and a
+``domain`` and both are equal; with the deal equal too, that is the thread's
+own buyer. A per-person kind on one side only, a name alone or a domain
+alone is no buyer. The ``payee`` is never compared. The acceptance is not
 cited and not re-verified: the history entries are the producer's own
 sealed records on the user's device, the trust ``single_commitment`` places
 in them. A history that may be missing acts, an act of this sale that could
@@ -97,6 +102,9 @@ _NOT_ACCEPTED = "the history given shows no acceptance of this sale by this buye
 # perPartyKinds). A name, a payee and a domain are fingerprinted too but are
 # not identities.
 _PER_PERSON_KINDS = ("email", "phone", "profile_id", "relay_address")
+# What names the thread's own buyer when neither side seals a per-person
+# kind: both of these, equal. The payee is never read.
+_NO_PER_PERSON_KINDS = ("name", "domain")
 
 
 class ReleaseEvidence(TypedDict):
@@ -148,13 +156,19 @@ def _missing(action: Action, cls: str, field: str) -> CheckOutcome:
 def same_buyer(acceptance: ThreadCounterparty | None, fp_alg: str | None, ids: dict[str, str] | None) -> bool:
     """Whether the counterparty an acceptance's check sealed and the one a
     disclosure's check sealed are one buyer: both fingerprinted under the
-    same algorithm, at least one per-person identity kind on both sides, and
-    every per-person kind on both sides equal. Any other kind is ignored
-    (module docstring)."""
+    same algorithm, and either at least one per-person identity kind on both
+    sides with every per-person kind on both sides equal, or, when neither
+    side seals any per-person kind, both a ``name`` and a ``domain`` on both
+    sides, each equal. A payee is never read (module docstring)."""
     if acceptance is None or not fp_alg or not ids or acceptance["fp_alg"] != fp_alg:
         return False
-    shared = [k for k in _PER_PERSON_KINDS if k in acceptance["ids"] and k in ids]
-    return bool(shared) and all(acceptance["ids"][k] == ids[k] for k in shared)
+    theirs = acceptance["ids"]
+    if not any(k in theirs or k in ids for k in _PER_PERSON_KINDS):
+        # The deal is checked apart: this is the thread's own buyer by the
+        # opening's name and domain.
+        return all(k in theirs and k in ids and theirs[k] == ids[k] for k in _NO_PER_PERSON_KINDS)
+    shared = [k for k in _PER_PERSON_KINDS if k in theirs and k in ids]
+    return bool(shared) and all(theirs[k] == ids[k] for k in shared)
 
 
 def check_release_on_acceptance(

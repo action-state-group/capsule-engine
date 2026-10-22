@@ -11,10 +11,11 @@ Three layers, each against the same rule:
   capsulectl's own records from ``fixtures/live-history/``: buyer A's commit
   and its act are real; the share is A's (or B's) last check turned into a
   share, re-bound to its new body, so its capsule no longer verifies. That
-  fixture's openings named a buyer by name and domain only, which identify
-  no one person, so each test adds a profile id fingerprint to the
-  counterparty block on both sides, as capsulectl seals one for a buyer whose
-  opening names a marketplace profile;
+  fixture's openings named a buyer by name and domain only, so its blocks
+  seal no per-person kind: the buyer is matched on the name and the domain
+  together. Most tests add a profile id fingerprint to the counterparty block
+  on both sides, as capsulectl seals one for a buyer whose opening names a
+  marketplace profile; the rc14-shaped tests keep the blocks as sealed;
 - the same check replayed (``replay`` with a ``sale_history``), which writes
   the history through ``history_ledger`` too, cut to the live window.
 
@@ -69,6 +70,8 @@ def _fp(value: str) -> str:
 # opening's kinds), and B's.
 IDS_A = {"profile_id": _fp("profile-a"), "name": _fp("Buyer A"), "payee": _fp("Buyer A"), "domain": _fp("market")}
 IDS_B = {"profile_id": _fp("profile-b"), "name": _fp("Buyer B"), "payee": _fp("Buyer B"), "domain": _fp("market")}
+# A buyer an opening named by name and domain only.
+NAME_DOMAIN_A = {"name": IDS_A["name"], "payee": IDS_A["payee"], "domain": IDS_A["domain"]}
 
 
 # -- the check, on a history written as history_ledger writes it -------------------
@@ -233,6 +236,18 @@ def test_a_declined_commit_is_no_acceptance(store):
     ({"domain": _fp("market"), "email": _fp("a@x")}, {"domain": _fp("market"), "phone": _fp("555")}, "fail"),
     # One per-person kind equal, another on both sides differs.
     ({**IDS_A, "email": _fp("a@x")}, {**IDS_A, "email": _fp("b@x")}, "fail"),
+    # Neither side seals a per-person kind: the name and the domain together,
+    # the payee never read.
+    (NAME_DOMAIN_A, NAME_DOMAIN_A, "pass"),
+    (NAME_DOMAIN_A, {**NAME_DOMAIN_A, "payee": _fp("Buyer A.")}, "pass"),
+    (NAME_DOMAIN_A, {**NAME_DOMAIN_A, "name": _fp("Buyer B")}, "fail"),
+    (NAME_DOMAIN_A, {**NAME_DOMAIN_A, "domain": _fp("elsewhere")}, "fail"),
+    ({"name": IDS_A["name"]}, {"name": IDS_A["name"]}, "fail"),
+    ({"domain": IDS_A["domain"]}, {"domain": IDS_A["domain"]}, "fail"),
+    ({"name": IDS_A["name"], "payee": IDS_A["payee"]}, {"name": IDS_A["name"], "payee": IDS_A["payee"]}, "fail"),
+    # A per-person kind on one side only.
+    (NAME_DOMAIN_A, {"domain": IDS_A["domain"], "email": _fp("a@x")}, "fail"),
+    ({**NAME_DOMAIN_A, "email": _fp("a@x")}, NAME_DOMAIN_A, "fail"),
 ])
 def test_the_buyer_is_one_person_by_the_per_person_kinds(store, accepted, shared, result):
     _history(store, _commit(ids=accepted))
@@ -298,14 +313,15 @@ _NOT_ON_A_SHARE = ("amount_minor", "currency", "spend_minor", "terms", "material
 
 
 def share_input(thread: str, classes: tuple[str, ...], *, disposition: bool = True, complete: bool = True,
-                share_ids: dict | None = None, act_ids: dict | None = None) -> dict:
+                share_ids: dict | None = None, act_ids: dict | None = None, profile: bool = True) -> dict:
     """A share check input in ``thread`` after buyer A's commit act, from
     capsulectl's own check input: the checked record's body turned into a
     share of ``classes`` and re-bound, a profile id added to every counterparty
     block (``_PROFILES``), and, with ``disposition``, an ``accept`` sealed on
     every history act (capsulectl seals one on an approved commit act).
     ``share_ids`` and ``act_ids`` replace the share's ids and those beside
-    A's commit act."""
+    A's commit act. Without ``profile`` the blocks stay as rc14 sealed them:
+    name, payee and domain."""
     envelope = copy.deepcopy(_check_input(_BASE[thread]))
     record = envelope["record"]
     shown = record["agent_input"]
@@ -314,15 +330,16 @@ def share_input(thread: str, classes: tuple[str, ...], *, disposition: bool = Tr
         body.pop(key, None)
     body.update(action="share_contact", action_class="disclosure.personal", disclosing=list(classes),
                 recipient_role="buyer")
-    ids = body["counterparty"]["ids"]
-    ids["profile_id"] = _PROFILES[shown["chain_id"]]
+    if profile:
+        body["counterparty"]["ids"]["profile_id"] = _PROFILES[shown["chain_id"]]
     if share_ids is not None:
         body["counterparty"]["ids"] = share_ids
     record.pop("proposal_at", None)
     record["model_attestation"]["compute_attestation"]["agent_input_digest"] = json_digest(shown)
     for entry in envelope["history"]:
         chain = entry["agent_input"]["chain_id"]
-        entry["counterparty"]["ids"]["profile_id"] = _PROFILES[chain]
+        if profile:
+            entry["counterparty"]["ids"]["profile_id"] = _PROFILES[chain]
         if act_ids is not None and entry["agent_input"]["body"]["action_class"] == "agreement.accept":
             entry["counterparty"]["ids"] = act_ids
         if disposition:
@@ -440,6 +457,33 @@ def test_live_a_domain_and_another_kind_on_each_side_is_no_buyer():
     envelope = share_input("a", ("phone",), act_ids={"domain": _fp("d"), "email": _fp("a@x")},
                            share_ids={"domain": _fp("d"), "phone": _fp("555")})
     assert (_s13(live(envelope)).result, _s13(replayed(envelope)).result) == ("fail", "fail")
+
+
+def _both(envelope: dict) -> tuple[str, str]:
+    return _s13(live(envelope)).result, _s13(replayed(envelope)).result
+
+
+def test_live_an_rc14_thread_named_by_name_and_domain_is_its_own_buyer():
+    """The blocks as rc14 sealed them, no per-person kind: a share in A's
+    thread after A's commit passes on the name and the domain; B's thread
+    refuses, by deal and by name."""
+    envelope = share_input("a", ("phone",), profile=False)
+    assert _both(envelope) == ("pass", "pass")
+    assert live(envelope).outcome == "allow"
+    assert _both(share_input("b", ("phone",), profile=False)) == ("fail", "fail")
+
+
+def test_live_an_rc14_share_in_the_same_deal_under_another_name_refuses():
+    sealed = _check_input(_BASE["a"])["record"]["agent_input"]["body"]["counterparty"]["ids"]
+    envelope = share_input("a", ("phone",), profile=False, share_ids={**sealed, "name": _fp("someone else")})
+    assert _both(envelope) == ("fail", "fail")
+
+
+def test_live_a_per_person_kind_on_one_side_only_refuses():
+    sealed = _check_input(_BASE["a"])["record"]["agent_input"]["body"]["counterparty"]["ids"]
+    envelope = share_input("a", ("phone",), profile=False,
+                           share_ids={"domain": sealed["domain"], "email": _fp("a@x")})
+    assert _both(envelope) == ("fail", "fail")
 
 
 def test_replay_gives_s13_the_live_window_and_s11_the_whole_history():

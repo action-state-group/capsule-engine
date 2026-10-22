@@ -12,8 +12,9 @@
 # before acceptance. Anything else needs the sale's acceptance, the same
 # record as before (the first accepted, non-dry-run agreement.accept of the
 # item), in the share's own deal and by the same buyer: the counterparty
-# fingerprint each check seals, compared on the per-person identity kinds
-# only. binding selects this reading in the check (guards/checks/
+# fingerprint each check seals, compared on the per-person identity kinds,
+# or on the name and the domain together when neither side seals one (an
+# opening that named the buyer by name and domain only). binding selects this reading in the check (guards/checks/
 # release_on_acceptance.py); 1.0.0 and 1.1.0 have none and decide as they
 # always did. The rule itself is the `semantics` field below: it is inside
 # the digested body, so rewording it moves the digest. A failure refuses; it
@@ -36,7 +37,10 @@ semantics: >-
   history, and the one the disclosure's check sealed, under the same
   fingerprint algorithm, with at least one per-person identity (email,
   phone, profile_id, relay_address) on both sides and every one on both
-  sides equal; a name, a payee or a domain is never compared. Every other
+  sides equal; or, when neither side has any per-person identity, with a
+  name and a domain on both sides and both equal. A payee is never
+  compared, and a name or a domain is compared only when neither side has a
+  per-person identity. Every other
   such disclosure fails: no class or a class outside release_classes, no
   item_ref, deal_id or counterparty fingerprint, no known acceptance, or one
   in another deal or by another buyer. An action whose action_class is

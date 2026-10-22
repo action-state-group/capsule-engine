@@ -250,7 +250,7 @@ constraints:
   # deal; the public pickup area reaches any buyer; a disclosure to a
   # platform reaches no buyer and is left to s01.
   - wicket_ref: seller.release_on_acceptance/1.2.0
-    digest: 8a9709ec0332598aef7c3c6073c5ed5448fdf225040d83aa73080b9178634cde
+    digest: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
 
 folds:
   # Read by required_disclosure, which pins these same digests in its config.
