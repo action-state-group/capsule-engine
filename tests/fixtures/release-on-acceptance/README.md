@@ -30,7 +30,11 @@ bundle and the five check inputs is what capsulectl wrote.
 build.sh <capsulectl> <capsulectl-deal> builtin:neutral <dir>
 ```
 
-`<dir>` must hold `inputs/` (copied to `<dir>/in/`). The script uses a throwaway `HOME`,
+Before running, copy this directory's `inputs/` to `<dir>/in/` yourself: the script reads `in/` and
+copies nothing. It writes `out/sale.bundle.json` and `out/check-inputs/*.json`. To refresh the
+fixture, copy `out/sale.bundle.json` here and the five `out/check-inputs/` files named in
+`check-inputs/` (the script also writes `a-offer-1900`, which no test reads, so it is not kept). The
+script uses a throwaway `HOME`,
 `XDG_CONFIG_HOME` and plugin root under `<dir>`, and the profile `synthetic-seller`. Nothing is sent
 anywhere. A local stub rules checker is pinned only to keep each external-check-input/v0; it allows
 and names no rule.
