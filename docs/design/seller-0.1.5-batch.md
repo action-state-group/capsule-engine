@@ -1,6 +1,6 @@
 # Design note: the seller 0.1.5 / everyday 0.3.8 batch
 
-Status: converged v8.2, 2026-10-22 (Codex v8, `claude -p` v8, Sherlock2 on every what-point), Ethan's agent (session local_f0ad46ac). Reviewers: Codex, a
+Status: converged v8.3, 2026-10-22 (Codex v8, `claude -p` v8, Sherlock2 on every what-point), Ethan's agent (session local_f0ad46ac). Reviewers: Codex, a
 `claude -p` stand-in for Kimi, Sherlock2 (product rules and wording).
 
 Code read: capsule-engine 8e2f887, capsule-cli 3acdeee (rc19), actionstate-muse 69c759d.
@@ -381,7 +381,9 @@ a `message` record has no refs, and an offer check's only ref is `supersedes`.
   both a `source` and `no_proposal`.
 - Engine (E3): `offer_expiry/1.1.0` reads `Action.no_proposal`, bridged from the sealed check
   body: `true` with no `proposal_at` and no `source` ref is `n/a`; `true` beside a `proposal_at`
-  or beside any `source` ref, resolved or not, fails; a missing
+  fails; the bridge carries `no_proposal` only from a check that names no `source` ref, so a
+  record carrying both is decided on its source (unresolved: fails; resolved: that message's
+  age), never as not applicable (v8.3, from #202's review); a missing
   `proposal_at` otherwise fails `expiry_unverified` as today. On replay, `proposal_at` comes
   from the offer's `source` message; a withheld or unbound message leaves it unknown, so s06
   fails closed. 1.1.0, not 1.0.2, so it doesn't collide with PR #152's 1.0.2 (see below).
