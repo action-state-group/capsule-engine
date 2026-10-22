@@ -1,6 +1,6 @@
 # Design note: the seller 0.1.5 / everyday 0.3.8 batch
 
-Status: converged v8.3, 2026-10-22 (Codex v8, `claude -p` v8, Sherlock2 on every what-point), Ethan's agent (session local_f0ad46ac). Reviewers: Codex, a
+Status: converged v8.4, 2026-10-22 (Codex v8, `claude -p` v8, Sherlock2 on every what-point), Ethan's agent (session local_f0ad46ac). Reviewers: Codex, a
 `claude -p` stand-in for Kimi, Sherlock2 (product rules and wording).
 
 Code read: capsule-engine 8e2f887, capsule-cli 3acdeee (rc19), actionstate-muse 69c759d.
@@ -30,7 +30,7 @@ step, so a re-post replaces by construction and replay reads what was sealed (§
 can't carry the agent's own authenticity claim (§5). s13 compares the thread-keyed buyer
 fingerprint, never the profile-keyed target (§1), and a seller's cancel makes a later share ask
 (§1, Q7). `recipient_told_before` comes from the disclosure memory (§6). The commit path keeps
-the seller-offer-then-acceptance flow (§3), and `no_proposal` beside any `source` fails (§3).
+the seller-offer-then-acceptance flow (§3), and a check carrying `no_proposal` beside a `source` is decided on its source (§3).
 #191's consent gap is capsule-cli#380, a release blocker in this batch (§7). Q7-Q11 answered.
 Also from the `claude -p` round 2: the area guard sits where values exist, the disclosure note
 (§1); `proposal_at` is when a message was noted (§3); the post card names its classes (§5);
@@ -320,11 +320,14 @@ unverified; never Muse's own.
   " (unverified)" right after the claim, e.g. "The seller says it's authentic (unverified)". A
     bare "(unverified)" doesn't show whose claim it is. Sherlock2 confirmed the template (Q9): the
   role, never the person's name, and both the prefix and the suffix are required.
-- The template is one sentence: no sentence-ending mark (`.`, `!`, `?`) between the prefix and
-  the suffix, so "The seller says it's used. I guarantee it's authentic (unverified)" fails.
+- The template is one sentence: no sentence-ending mark (`.`, `!`, `?`, a line break `\n` or
+  `\r`, or `。`, `！`, `？`, `…`, `．`) between the prefix and the suffix, so "The seller says it's used. I guarantee it's authentic (unverified)" fails.
 - Engine (E2): when the envelope gives `representing_opening` and it opens the commitment,
-  `promise_never/1.1.0` also checks the template; a mismatch fails. Without an opening it relies
-  on capsulectl's check. Opening a salted commitment reuses the code `price_floor` uses for
+  `promise_never/1.1.0` also checks the template; a mismatch fails. A live check with no
+  opening fails. On replay the engine reads the opening from the deal report's
+  `representations` (inline, standalone or in-log) by the commitment it recomputes; with none,
+  s10 reads not evaluable ("the words for this attributed claim are not in the bundle"), never
+  a fail (v8.4, from #205's review and Sherlock2). Opening a salted commitment reuses the code `price_floor` uses for
   `commercial_bounds_opening`.
 - Every attributed claim asks, whatever the task authority orders: a class the user ordered
   says what may be said, not that the user made this claim. capsulectl adds its own
