@@ -1,0 +1,10 @@
+{
+  "note": "Engine decisions under asg/seller/0.1.4 (capsule-engine #173). Each file is byte for byte what its source wrote; this sidecar is not part of those bytes.",
+  "engine_commit": "7339028ab2117d6c7adec89a26cd5022b8ac7140",
+  "files": {
+    "real-seller/expected_decisions.json": {
+      "source_path": "tests/fixtures/real-seller/expected_decisions.json",
+      "sha256": "6da765638698bd46ab0a0f92489e1176766d925a85c29870bb1afd5ed78e0532"
+    }
+  }
+}

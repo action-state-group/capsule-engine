@@ -1,0 +1,261 @@
+{
+ "about": "Executed acts in the 7-day window that the G3 sequences do not reach, each decided by capsule-engine a710636c under asg/everyday/0.3.6 (engine-results.json) and held to it by internal/guard/g3_engine_test.go. Every act is one of ../g3-executed-acts-vectors/templates with the named edits (build.py).",
+ "sequences": [
+  {
+   "name": "pay-escalate",
+   "why": "a history act sealed with a decision other than accept is still an executed act: counted at its sealed spend",
+   "acts": [
+    {
+     "id": "p1",
+     "template": "pay",
+     "hours_ago": 50,
+     "disposition": "escalate"
+    }
+   ]
+  },
+  {
+   "name": "pay-reject",
+   "why": "as pay-escalate, sealed reject",
+   "acts": [
+    {
+     "id": "p1",
+     "template": "pay",
+     "hours_ago": 50,
+     "disposition": "reject"
+    }
+   ]
+  },
+  {
+   "name": "pay-no-decision",
+   "why": "the same pay sealed with no disposition: counted at its sealed spend",
+   "acts": [
+    {
+     "id": "p1",
+     "template": "pay",
+     "hours_ago": 50,
+     "disposition": null
+    }
+   ]
+  },
+  {
+   "name": "pay-escalate-unreadable",
+   "why": "a history act sealed escalate whose spend cannot be read leaves the window not evaluable",
+   "acts": [
+    {
+     "id": "p1",
+     "template": "pay",
+     "hours_ago": 50,
+     "disposition": "escalate",
+     "body": {
+      "spend_minor": null
+     }
+    }
+   ]
+  },
+  {
+   "name": "refund-out-spend",
+   "why": "an fyi refund stating money out with a spend: a reversal that cites no charge, so it adds nothing (unlinked)",
+   "acts": [
+    {
+     "id": "p1",
+     "template": "pay",
+     "hours_ago": 60
+    },
+    {
+     "id": "r1",
+     "template": "money-in",
+     "hours_ago": 50,
+     "body": {
+      "direction": "out",
+      "spend_minor": 500
+     }
+    }
+   ]
+  },
+  {
+   "name": "commit-cancel-class",
+   "why": "an executed act classed booking.cancel with a spend adds nothing (unlinked)",
+   "acts": [
+    {
+     "id": "c1",
+     "template": "commit",
+     "hours_ago": 50,
+     "body": {
+      "action_class": "booking.cancel",
+      "spend_minor": 700
+     }
+    }
+   ]
+  },
+  {
+   "name": "unchecked-cancel-class",
+   "why": "an act taken without a check, classed booking.cancel, adds nothing (unlinked)",
+   "acts": [
+    {
+     "id": "u1",
+     "template": "unchecked",
+     "hours_ago": 50,
+     "body": {
+      "action_class": "booking.cancel"
+     }
+    }
+   ]
+  },
+  {
+   "name": "commit-money-in",
+   "why": "an executed act stating money in counts 0 whatever its spend",
+   "acts": [
+    {
+     "id": "c1",
+     "template": "commit",
+     "hours_ago": 50,
+     "body": {
+      "direction": "in",
+      "spend_minor": 900
+     }
+    }
+   ]
+  },
+  {
+   "name": "pay-accept-refund-class",
+   "why": "an accepted act classed money.refund is the fold's reversal record, unlinked",
+   "acts": [
+    {
+     "id": "p1",
+     "template": "pay",
+     "hours_ago": 50,
+     "body": {
+      "action_class": "money.refund"
+     }
+    }
+   ]
+  },
+  {
+   "name": "per-action-over-unreadable",
+   "why": "a per-action limit the action exceeds still fails beside an unreadable act; the evidence names window_unreadable_count",
+   "check_body": {
+    "amount_minor": 3000,
+    "spend_minor": 3000
+   },
+   "acts": [
+    {
+     "id": "c1",
+     "template": "commit",
+     "hours_ago": 50,
+     "body": {
+      "spend_minor": null
+     }
+    }
+   ]
+  },
+  {
+   "name": "accepted-and-unreadable-same-action",
+   "why": "an unreadable record of an act already accepted (the same action_id) is the same act: dropped, so it does not hold the window",
+   "acts": [
+    {
+     "id": "p1",
+     "template": "pay",
+     "hours_ago": 50
+    },
+    {
+     "id": "c1",
+     "template": "commit",
+     "hours_ago": 40,
+     "same_action_id_as": "p1",
+     "body": {
+      "spend_minor": null
+     }
+    }
+   ]
+  },
+  {
+   "name": "accepted-and-unreadable-same-capsule",
+   "why": "as above, by capsule_id",
+   "acts": [
+    {
+     "id": "p1",
+     "template": "pay",
+     "hours_ago": 50
+    },
+    {
+     "id": "c1",
+     "template": "commit",
+     "hours_ago": 40,
+     "same_capsule_id_as": "p1",
+     "body": {
+      "spend_minor": null
+     }
+    }
+   ]
+  },
+  {
+   "name": "two-fyi-same-action-different-spend",
+   "why": "two records of one act: the older, which the engine writes first, is the one counted",
+   "acts": [
+    {
+     "id": "c1",
+     "template": "commit",
+     "hours_ago": 50,
+     "body": {
+      "spend_minor": 500
+     }
+    },
+    {
+     "id": "c2",
+     "template": "commit",
+     "hours_ago": 40,
+     "same_action_id_as": "c1",
+     "body": {
+      "spend_minor": 900
+     }
+    }
+   ]
+  },
+  {
+   "name": "unreadable-then-readable-same-action",
+   "why": "the older record of the act cannot be read: it holds the window, and the later copy is dropped",
+   "acts": [
+    {
+     "id": "c1",
+     "template": "commit",
+     "hours_ago": 50,
+     "body": {
+      "spend_minor": null
+     }
+    },
+    {
+     "id": "c2",
+     "template": "commit",
+     "hours_ago": 40,
+     "same_action_id_as": "c1",
+     "body": {
+      "spend_minor": 900
+     }
+    }
+   ]
+  },
+  {
+   "name": "same-action-across-window-edge",
+   "why": "a copy outside the window still claims the act, so the copy inside it is dropped",
+   "acts": [
+    {
+     "id": "c1",
+     "template": "commit",
+     "hours_ago": 200,
+     "body": {
+      "spend_minor": 500
+     }
+    },
+    {
+     "id": "c2",
+     "template": "commit",
+     "hours_ago": 40,
+     "same_action_id_as": "c1",
+     "body": {
+      "spend_minor": 900
+     }
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,7 @@
+ea0ee90d6f8e1b9fe9b269bbc2e4386a1b0894db3a5105c54dc25d86beaf7af5  ./check-inputs/a-commit-1900.claims-in-history.json
+b9a0f96f16913dedcc2143ab6823d09c1222a22710a5de829ca0f89d5c665a2a  ./check-inputs/a-commit-again-1900.claims-in-history.json
+fbf2981367e324133e3d8d3d124628f809d8bc9b63fc746cc57421056066ca67  ./check-inputs/a-offer-1900.claims-in-history.json
+a7a219898a3d33fbf60ff5440f10606421b02a862d7bc68555a1dc915c9f22cd  ./check-inputs/b-commit-1850.claims-in-history.json
+9578bea80608d578d6a8f0e301336968ffd0f427fc5709aa5b824d1bb1a213a8  ./check-inputs/b-offer-1850.claims-in-history.json
+d4f7c0a932374ee1ae739111b17817fc2077c14fcdc77ceb344d2ea49d1c69b9  ./expected.json
+07a90921be27f4d45b2b8de627a49b1bcbf52f5479e242e611736a80934de173  ./README.md

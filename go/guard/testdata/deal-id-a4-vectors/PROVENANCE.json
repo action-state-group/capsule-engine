@@ -1,0 +1,19 @@
+{
+  "note": "Copied byte for byte, except that the work-item name in generate_python_decisions.py's docstring was reworded for publication (MANIFEST.sha256 updated to match); this sidecar is not part of the copied bytes.",
+  "source": "The engine side's decision-level vectors for AMENDMENT 4's engine half, a deal id from a chain id and its conflict (MANIFEST.sha256 verified), generated at capsule-engine 582295c9b6739b57711de877eef43fc2f5b9ed8b (the PR #127 branch after merging main). The engine PR merged as 763f5a9c1227809d24200bd34e5e4366eb8706ff; regenerated there with Python 3.13 the corpus is byte-identical and every decision equal (only capsule_engine_commit differs).",
+  "engine_commit": "763f5a9c1227809d24200bd34e5e4366eb8706ff",
+  "files": {
+    "corpus.json": {
+      "sha256": "1399709f21841f9258ef2c8a2b68976799f9c6a59b6885cacd7ac93fcc921fb5"
+    },
+    "python-decisions.json": {
+      "sha256": "9a1b03ad2451b0e0023d95b608f8298bf11f018c86a4b46815794541e66b1d2f"
+    },
+    "generate_python_decisions.py": {
+      "sha256": "0eb5e92e0ac7dc201f5261edb28c3eb44050340349536eb4ad9719200ac24fe7"
+    },
+    "MANIFEST.sha256": {
+      "sha256": "ba264fe7ab643e2c671089df8e86e6e1448b902770ac9b018c5e358801122282"
+    }
+  }
+}

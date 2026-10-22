@@ -1,0 +1,144 @@
+{
+  "note": "Provenance sidecar for files vendored byte-for-byte; it is not part of the vendored bytes.",
+  "pack_id": "asg/everyday/0.3.4",
+  "source_repo": "action-state-group/capsule-engine",
+  "source_commit": "97a2aff71b8293f70dc335e6fb6a5fbe1ada31d0",
+  "source_ref": "capsule-engine PR #121 merge commit on main (asg/everyday/0.3.4: counterparty_seen_before/3.0.0 over the new fold counterparty.seen_before/3.0.0, which counts a carried_out record beside an accepted one, so an act that asked, was approved to proceed and was executed makes its counterparty known; r02 and r06 statements say so. Everything else 0.3.3 cites is unchanged.)",
+  "files": {
+    "pack.yaml": {
+      "source_path": "capsule_engine/packs/catalog/everyday/pack.yaml",
+      "sha256": "410d091a6725650222fffeba1550516fdf74c097e6293d3e5655e2e95e7b3646"
+    },
+    "wickets/action_class_gate.yaml": {
+      "source_path": "capsule_engine/guards/wickets/catalog_defs/action_class_gate.yaml",
+      "sha256": "4f92caf54bb267c8a5be6b3b2fce0f31cebf249c286e643147d843bb8e786631"
+    },
+    "wickets/caps.v5.yaml": {
+      "source_path": "capsule_engine/guards/wickets/catalog_defs/caps.v5.yaml",
+      "sha256": "3f7ef8850e11d4a893ccaa7f85e1c9b2dde358980c946104dbc970f6989ad206"
+    },
+    "wickets/caps.yaml": {
+      "source_path": "capsule_engine/guards/wickets/catalog_defs/caps.yaml",
+      "sha256": "58626fb76dd9b31b4143741891dc28c4e1981c5577fd48280661b162edaae211"
+    },
+    "wickets/channel_change.v1.1.yaml": {
+      "source_path": "capsule_engine/guards/wickets/catalog_defs/channel_change.v1.1.yaml",
+      "sha256": "dd5c0b1f2976569fa21c2df9b4003c52f07eda967cc141fc23d0914b045cf84c"
+    },
+    "wickets/counterparty_identity_change.yaml": {
+      "source_path": "capsule_engine/guards/wickets/catalog_defs/counterparty_identity_change.yaml",
+      "sha256": "7112565e4499ba4bd73a2a626a0e68f3c3026f509599f019a8fcd04da87197d3"
+    },
+    "wickets/counterparty_seen_before.v3.yaml": {
+      "source_path": "capsule_engine/guards/wickets/catalog_defs/counterparty_seen_before.v3.yaml",
+      "sha256": "d1c40c502e1b99aa9633f40c11d5d9ef527b1916e589a0cab4b08c1cd7a6c218"
+    },
+    "wickets/credential_pattern.yaml": {
+      "source_path": "capsule_engine/guards/wickets/catalog_defs/credential_pattern.yaml",
+      "sha256": "64cdda56d41c0ea4dda7797e50af6e6f468b66491baaf96d0e434242b2bdbd53"
+    },
+    "wickets/dedupe.yaml": {
+      "source_path": "capsule_engine/guards/wickets/catalog_defs/dedupe.yaml",
+      "sha256": "311f377c91cd489e1daa0db228f4a931acc5fdc8edc17d8bbda20937b1a7ebfb"
+    },
+    "wickets/destination_rail.yaml": {
+      "source_path": "capsule_engine/guards/wickets/catalog_defs/destination_rail.yaml",
+      "sha256": "4c0a78675683b261570db0ffe7a7a3c15e7502e5127a6837247690c7c2a6412f"
+    },
+    "wickets/material_fields_changed.v1.1.yaml": {
+      "source_path": "capsule_engine/guards/wickets/catalog_defs/material_fields_changed.v1.1.yaml",
+      "sha256": "212da145c23358cce2bd447ad02d5ceb7d71fe530d85b2d11a932724504dc637"
+    },
+    "wickets/offer_fields_changed.v1.1.yaml": {
+      "source_path": "capsule_engine/guards/wickets/catalog_defs/offer_fields_changed.v1.1.yaml",
+      "sha256": "032aa323565cb65307f75123dc17c0d193dc168c9d6e703b8959eef7afcecb9e"
+    },
+    "wickets/recipient_role.yaml": {
+      "source_path": "capsule_engine/guards/wickets/catalog_defs/recipient_role.yaml",
+      "sha256": "935f8683b53e592b16ad9ace025de7b1b515b27190feab1d620a58c7cf743759"
+    },
+    "wickets/recipient_seen_before.yaml": {
+      "source_path": "capsule_engine/guards/wickets/catalog_defs/recipient_seen_before.yaml",
+      "sha256": "02c75a69b91d5f4d04d1790c846eef3e99713c288e4035de074c213d9d49aeb9"
+    },
+    "wickets/recurring_charge.yaml": {
+      "source_path": "capsule_engine/guards/wickets/catalog_defs/recurring_charge.yaml",
+      "sha256": "f4eb1da6f7d94b96b0ef286fe4fe26eb01375ecba99eeb19d7485afad1c6ccee"
+    },
+    "wickets/refundability.v1.1.yaml": {
+      "source_path": "capsule_engine/guards/wickets/catalog_defs/refundability.v1.1.yaml",
+      "sha256": "849ea8c813c35401055d9e4d8a8b84b5479ca2e87ffaf3ba4ff70870cd2e2df5"
+    },
+    "wickets/task_authority.v1.1.yaml": {
+      "source_path": "capsule_engine/guards/wickets/catalog_defs/task_authority.v1.1.yaml",
+      "sha256": "bfb1d4424c27fdf7f02ed999d8513c884925252c85b0c3d55b53a3354ca10ddd"
+    },
+    "wickets/upfront_amount.v1.1.yaml": {
+      "source_path": "capsule_engine/guards/wickets/catalog_defs/upfront_amount.v1.1.yaml",
+      "sha256": "a90cee97c3b984fd1a1c01f8047e142ca302bc90ae6e39210d6767cbabd99d04"
+    },
+    "folds/counterparty.seen_before.v2.yaml": {
+      "source_path": "capsule_engine/folds/catalog_defs/counterparty.seen_before.v2.yaml",
+      "sha256": "a88edffc4ad13ea198de69adec66e80ff20e319962332d8bb9ad9cd1bd4dfaf9"
+    },
+    "folds/counterparty.seen_before.v3.yaml": {
+      "source_path": "capsule_engine/folds/catalog_defs/counterparty.seen_before.v3.yaml",
+      "sha256": "d33378f6c21f1b70deba6860a110f896e59364ddb3272292cc77c61bda9b87b2"
+    },
+    "folds/spend.weekly.v3.yaml": {
+      "source_path": "capsule_engine/folds/catalog_defs/spend.weekly.v3.yaml",
+      "sha256": "7cc9824d4a1a49ead74ceb6032b540c4898b0c9b925f7ac6053ed0715ecf0882"
+    },
+    "folds/spend.weekly.yaml": {
+      "source_path": "capsule_engine/folds/catalog_defs/spend.weekly.yaml",
+      "sha256": "f5cde341828bd77e403abdee234430271c46b549ca8d7aa4ee2cb21287f76159"
+    }
+  },
+  "engine_definition_digest": "cd98aaec5acf8cea86f91fc21dd7df6b36a67c7b55340489b66e6ce88b85117b",
+  "wicket_digests": {
+    "caps/5.0.0": "2807e174dc7c817917621f90a53f3fa54992b76fe3ec28e8567f814b9e72a741",
+    "dedupe/1.0.0": "18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb",
+    "destination_rail/1.0.0": "4d76251eba138b37e6be3e83390072315ebcea42cd8d790f7e9765ecf1f63429",
+    "counterparty_identity_change/1.0.0": "0cfb1cb380b355abb88ea385334f3bb31f2e145269a2768022f85005665fc6fe",
+    "credential_pattern/1.0.0": "3617fdcaa39c03cf70a3254490328ccee5eaac0faba7cd52d9e3dc3fc50336c0",
+    "recurring_charge/1.0.0": "ea4ae204e5dc33f3a28e5e15471f404f20d4f8fca193d355a099a4a7e08b082e",
+    "action_class_gate/1.0.0": "fcc352838832e13f5e87662f0194ec4a7065bc989bbe624b43ac5d9d1b638ae2",
+    "counterparty_seen_before/3.0.0": "9cfab71d142ca7af8912218f4c4ea194f60fb02784d8536233cb7e18eddc24a8",
+    "recipient_role/1.0.0": "917ab5edea21867f318b8dfd54a6d7b458cbabcc5cebfac6ff0c4861e918d43b",
+    "refundability/1.1.0": "1a471c09254a3db872c34a5e59d9e05e6da47cb396695a6cb6bf2bc055f4d811",
+    "material_fields_changed/1.1.0": "e8cd02743203d17cd0de9d548f85ec5b6b6135e80aba63136ae507ac84660042",
+    "offer_fields_changed/1.1.0": "f62c034140827beaa4b8ee13da8b56e4583994a973bc789d4a11812f9727a953",
+    "recipient_seen_before/1.0.0": "df8803e9c4bdab9deff48e772fcd21ff813d00157068dd250a8a5c6b45cd6c44",
+    "channel_change/1.1.0": "f84770c7571a0932629667c4df38f447777f8dc5dfcdfdf29b37514c1eee1ad1",
+    "upfront_amount/1.1.0": "2311833db12bf9465dcb5ecdd9f7aca079dbf638a19ed6dd18d607aad1811c10",
+    "task_authority/1.1.0": "5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab"
+  },
+  "fold_digests": {
+    "spend.weekly/3.0.0": "25907741320624a830c5854fc7f2d434bfa17528c8bfc17f4a8a4f84a39f1b18",
+    "counterparty.seen_before/3.0.0": "73dbf8cd8a36fadca0ac823d2b17592fdc457c24081bc44667f032601e914033"
+  },
+  "catalog_only": {
+    "note": "Definitions vendored from the same commit but not cited by this pack: caps/1.0.0 and spend.weekly/1.0.0 keep the 25-rule test fixture (internal/pack/testdata/everyday-25-test-fixture) resolvable against the vendored catalog; counterparty.seen_before/2.0.0 is the fold recipient_seen_before/1.0.0 names in its config, which the engine reads from its core fold catalog by id and digest (guards/checks seen_before_fold), not from the pack's folds.",
+    "wicket_digests": {
+      "caps/1.0.0": "906a75a0b908d38fa7b05823ba11f229c3d593516119ad757b541cee7083f54b"
+    },
+    "fold_digests": {
+      "spend.weekly/1.0.0": "3e7f6a3e8707de92b120bbc2aa0b5a78032df5d36e99f9955dd3ba948bba5e9c",
+      "counterparty.seen_before/2.0.0": "6a1a357e4a3b950b7397c2790fe46c03f7e645d04aad1a9bb41533df9b4a4033"
+    }
+  },
+  "how_computed": {
+    "engine": "capsule_engine.packs.loader.load_pack_dir(<dir>).definition_digest(); wicket and fold digests from guards/wickets/loader.py and folds/loader.py load_definition_file(...).definition_digest()",
+    "engine_source": "action-state-group/capsule-engine @ 97a2aff71b8293f70dc335e6fb6a5fbe1ada31d0, extracted read-only with git archive; not modified",
+    "agent_action_capsule": "0.7.0",
+    "pyyaml": "6.0.3",
+    "python": "3.13.7",
+    "computed_at": "2026-10-09"
+  },
+  "taxonomy": {
+    "note": "The pack pins the action taxonomy (taxonomy: in pack.yaml, inside the definition digest); the taxonomy is vendored at packs/engine/action_taxonomy.json and must equal the pin.",
+    "taxonomy_version": "6",
+    "sha256": "7563fcaeb6c192a27877fae3131bca1021526046c8976475c46eebf4fb374272",
+    "jcs_digest": "fc12eb90bc2b3c85bb49c4d3d7be8f384c6e0b8e189bc3b68a753a4f1af5cd94"
+  }
+}

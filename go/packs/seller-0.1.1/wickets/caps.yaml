@@ -1,0 +1,17 @@
+# Caps wicket: weekly_spend + amount <= cap, evaluated against a real fold
+# replay (guards/checks/caps.py). The check LOGIC (the fold evaluation,
+# the arithmetic) stays Python code -- this digest identifies "this
+# configuration of this check" (which fold + which per-class limits), never
+# the source file.
+#
+# `fold_digest` is the real, independently-computable `definition_digest()`
+# of capsule_ledger/folds/catalog_defs/spend.weekly.yaml (folds/definition.py) --
+# cited by digest, never copied here, per the "definitions-by-digest, never
+# definitions-by-copy" rule this task is built around.
+wicket_id: caps/1.0.0
+check: caps
+config:
+  fold_id: spend.weekly/1.0.0
+  fold_digest: 3e7f6a3e8707de92b120bbc2aa0b5a78032df5d36e99f9955dd3ba948bba5e9c
+  caps_minor:
+    money.transfer: 10000000

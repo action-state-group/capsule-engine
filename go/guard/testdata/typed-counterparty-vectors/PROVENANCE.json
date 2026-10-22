@@ -1,0 +1,28 @@
+{
+  "note": "corpus.json, generate_python_decisions.py, MANIFEST.sha256 and python-decisions.json are the engine side's go-vectors for a typed record's counterparty as its payee target (capsule-engine #133), copied byte for byte (MANIFEST.sha256 verified), except that the work-item name in the generator's docstring was reworded for publication (MANIFEST.sha256 updated to match). python-decisions.json was generated at the branch head b99a0e9 under asg/everyday/0.3.4; regenerated on the Go side at the merge b1c7fb4f every member is equal but capsule_engine_commit. python-decisions-0.3.5.json was GENERATED on the Go side with the same generator over the same corpus (python -P generate_python_decisions.py <checkout>) at capsule-engine c878edf0 (#135's merge, asg/everyday/0.3.5); the corpus it writes is byte-identical. Against the 0.3.4 file only the pack and the two cases whose check seals no usable payee (typed-no-counterparty, untyped-body-counterparty-only) differ: r06 n/a -> fail, allow -> escalate. python-decisions-0.3.6.json was GENERATED on the Go side the same way at capsule-engine a710636c (#138's merge, asg/everyday/0.3.6); the corpus it writes is byte-identical, and against the 0.3.5 file only the pack differs. python-decisions-0.3.5.json is now held to the frozen 0.3.5. This sidecar is not part of the vectors.",
+  "engine_commits": {
+    "python-decisions.json": "b99a0e9fc33391deecdd10583dfa3a067e8f7be8 (head of #133; merge b1c7fb4f, equal)",
+    "python-decisions-0.3.5.json": "c878edf0d8f6bfe2d9b7aba84e0023412efa4fb7",
+    "python-decisions-0.3.6.json": "a710636c29814ce67e838c673026fd2063d913f8"
+  },
+  "files": {
+    "corpus.json": {
+      "sha256": "99d5c623c2c05bc84433f5145556826d1e4ba681dc5d17e26468b5f593662408"
+    },
+    "generate_python_decisions.py": {
+      "sha256": "565c4dd7438dfc30182fab92e6f8084c4535a09fa8c100000dc4d8221b8191d6"
+    },
+    "MANIFEST.sha256": {
+      "sha256": "54e69ec165a84822c98c11d101cbf3d9d92f5db08bcd6f23c26ae7848751d02e"
+    },
+    "python-decisions.json": {
+      "sha256": "6e513d5b77f06e621f265d64377724e1aca45b6896f2ef0b44c3b703e1c51877"
+    },
+    "python-decisions-0.3.5.json": {
+      "sha256": "6286040064dece7ddfe4b1857d575818b8fe0f9359f474ddb09382765b862fb7"
+    },
+    "python-decisions-0.3.6.json": {
+      "sha256": "faf93f346c3449772a41d1a5320d1544f010ea242e8e4edb8311dec4bb4dc23c"
+    }
+  }
+}

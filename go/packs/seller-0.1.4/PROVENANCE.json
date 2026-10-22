@@ -1,0 +1,102 @@
+{
+  "note": "Provenance sidecar for files vendored byte-for-byte; it is not part of the vendored bytes.",
+  "pack_id": "asg/seller/0.1.4",
+  "source_repo": "action-state-group/capsule-engine",
+  "source_commit": "7339028ab2117d6c7adec89a26cd5022b8ac7140",
+  "source_ref": "capsule-engine #173 squash merge on main, 7339028 (asg/seller/0.1.4: 0.1.3 with seller.recipient_role/1.1.0, which adds the platform role passing only email (role_classes), and seller.release_on_acceptance/1.1.0, not applicable to a disclosure to a platform (except_recipient_roles). Every other definition 0.1.3 cites is byte-identical at 7339028. asg/seller/0.1.3 stays vendored and frozen at packs/seller-0.1.3.)",
+  "files": {
+    "pack.yaml": {
+      "source_path": "capsule_engine/packs/catalog/seller/pack.yaml",
+      "sha256": "c45e7a7d31c1910dd487137056a6fb6564be1664ad267aeb20d8f6c43cb58e72"
+    },
+    "folds/disclosure.class_seen.yaml": {
+      "source_path": "capsule_engine/folds/catalog_defs/disclosure.class_seen.yaml",
+      "sha256": "e327af925e00f27a60c5c6b91024298943896eede572c8c64e00dc14e2c51624"
+    },
+    "folds/disclosure.statement_seen.yaml": {
+      "source_path": "capsule_engine/folds/catalog_defs/disclosure.statement_seen.yaml",
+      "sha256": "4dade5a5045707fe340d0fe86f52045b3fe1e1eecbe3b6d6da5ef93b6a138be5"
+    },
+    "wickets/dedupe.yaml": {
+      "source_path": "capsule_engine/guards/wickets/catalog_defs/dedupe.yaml",
+      "sha256": "311f377c91cd489e1daa0db228f4a931acc5fdc8edc17d8bbda20937b1a7ebfb"
+    },
+    "wickets/destination_rail.seller.yaml": {
+      "source_path": "capsule_engine/guards/wickets/catalog_defs/destination_rail.seller.yaml",
+      "sha256": "743640b2224833e143ef94fb977fdfdccba16270fb83eb0e1b9397052fc5e802"
+    },
+    "wickets/offer_expiry.yaml": {
+      "source_path": "capsule_engine/guards/wickets/catalog_defs/offer_expiry.yaml",
+      "sha256": "74afcf555b1fe92324c4553001ffb81642248313a0366a51ef28f10fe4e84b13"
+    },
+    "wickets/price_floor.yaml": {
+      "source_path": "capsule_engine/guards/wickets/catalog_defs/price_floor.yaml",
+      "sha256": "c02beef09d675af2d15372fe9e18ddf1cb545649f60205d4b116780c348e2f7c"
+    },
+    "wickets/promise_never.yaml": {
+      "source_path": "capsule_engine/guards/wickets/catalog_defs/promise_never.yaml",
+      "sha256": "9149bef070602ef289728e0b4cb1f37f7f99df8e587d6d1c34e68b513baa9828"
+    },
+    "wickets/promise_requires_approval.yaml": {
+      "source_path": "capsule_engine/guards/wickets/catalog_defs/promise_requires_approval.yaml",
+      "sha256": "eecaca3fd527772a91d6485357525fb492f77cff45f1da7d7ed200aba7627ff3"
+    },
+    "wickets/recipient_role.seller.v1.1.yaml": {
+      "source_path": "capsule_engine/guards/wickets/catalog_defs/recipient_role.seller.v1.1.yaml",
+      "sha256": "bdbe091404fd9784b1a44b51bacdf3ff683fe28a2303f00f8eb402ad0439863a"
+    },
+    "wickets/release_on_acceptance.seller.v1.1.yaml": {
+      "source_path": "capsule_engine/guards/wickets/catalog_defs/release_on_acceptance.seller.v1.1.yaml",
+      "sha256": "4468158626a34c462940e55701276429440350cb5da058db65b7db2318a60ed1"
+    },
+    "wickets/required_disclosure.v1.1.yaml": {
+      "source_path": "capsule_engine/guards/wickets/catalog_defs/required_disclosure.v1.1.yaml",
+      "sha256": "b6c433dfa8e45ccf9b921b610f6bff2afcca323ef9adc980a6d55ccc002ef05c"
+    },
+    "wickets/single_commitment.seller.yaml": {
+      "source_path": "capsule_engine/guards/wickets/catalog_defs/single_commitment.seller.yaml",
+      "sha256": "e631e663594d3aa820709aabf77121fe169ac5f0305ed1f60f9daa8c0a1398e9"
+    },
+    "wickets/task_authority.v1.1.yaml": {
+      "source_path": "capsule_engine/guards/wickets/catalog_defs/task_authority.v1.1.yaml",
+      "sha256": "bfb1d4424c27fdf7f02ed999d8513c884925252c85b0c3d55b53a3354ca10ddd"
+    },
+    "wickets/verify_before_dispatch.yaml": {
+      "source_path": "capsule_engine/guards/wickets/catalog_defs/verify_before_dispatch.yaml",
+      "sha256": "ccd23466b3f4f670e77ff463e8ffad1672654b31095ac1bda15f68be4a129908"
+    }
+  },
+  "engine_definition_digest": "c14c8f8176a933f97c8a04064f6634f8f0e422178f71c4a531ac01631f529e5b",
+  "wicket_digests": {
+    "dedupe/1.0.0": "18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb",
+    "verify_before_dispatch/1.0.0": "a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c",
+    "seller.recipient_role/1.1.0": "8ea4cc45972a840a56af5f0fefbd6092dee3797696a8cd3303940a98b7b7b35d",
+    "price_floor/2.0.1": "c39f858b52a9697a70450680d90d0bbd0cb4e4eb79925d18e67623d587404977",
+    "promise_requires_approval/1.0.0": "b29e29e0a31ef764b282fa5754992b49b5ffc4f3fc261fb821987ae6c2e1c9b2",
+    "promise_never/1.0.0": "836ae58f704a9c8ab8027fee344ca47ddb3de76a7a1973a650f42a3595e649f4",
+    "required_disclosure/1.1.0": "80f3af6e428f2331f6ab458997d996e172b9fc2e721b55fcf473f4e31d1492c0",
+    "offer_expiry/1.0.1": "7bcd363b28475e3fac123fe2b8925f60f36bdaa3d22ebd5004ffe5290c4f2597",
+    "seller.single_commitment/1.0.0": "91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e",
+    "seller.destination_rail/1.0.0": "fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800",
+    "task_authority/1.1.0": "5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab",
+    "seller.release_on_acceptance/1.1.0": "933d72ab36863cb67ef2f0333b424fb4d559fa77bfeb1f5b63a61dee6307e28b"
+  },
+  "fold_digests": {
+    "disclosure.class_seen/1.0.0": "5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564",
+    "disclosure.statement_seen/1.0.0": "925e7ccd2e29b3f1984f966e968bdef47d0d22d2b85b8e0205a39d6a5a7ff0be"
+  },
+  "how_computed": {
+    "engine": "capsule_engine.packs.loader.load_pack_dir(<dir>).definition_digest(), and each cited wicket's and fold's definition_digest(), run on capsule-engine at 08cd96d (a git clone in a scratch directory, installed into a scratch virtualenv); the Go loader recomputes all of them",
+    "engine_source": "action-state-group/capsule-engine @ 7339028ab2117d6c7adec89a26cd5022b8ac7140, exported read-only (git worktree --detach) from the shared clone; not modified",
+    "computed_at": "2026-10-21",
+    "agent_action_capsule": "0.11.0",
+    "pyyaml": "6.0.3",
+    "python": "3.13.16"
+  },
+  "taxonomy": {
+    "note": "The pack pins the action taxonomy (taxonomy: in pack.yaml, inside the definition digest); the taxonomy is vendored at packs/engine/action_taxonomy.json and must equal the pin.",
+    "taxonomy_version": "6",
+    "sha256": "7563fcaeb6c192a27877fae3131bca1021526046c8976475c46eebf4fb374272",
+    "jcs_digest": "fc12eb90bc2b3c85bb49c4d3d7be8f384c6e0b8e189bc3b68a753a4f1af5cd94"
+  }
+}

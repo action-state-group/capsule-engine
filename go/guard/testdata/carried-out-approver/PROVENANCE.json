@@ -1,0 +1,22 @@
+{
+  "note": "corpus.json, generate_python_decisions.py and MANIFEST.sha256 are the engine side's go-vectors for the rule that a carried-out act needs the user's approval, vendored byte for byte except that the work-item name in corpus.json's note and in the generator's docstring was reworded for publication (MANIFEST.sha256 updated to match; no case, input or expected value changed). python-decisions.json was REGENERATED on the Go side with that generator (python -P generate_python_decisions.py <checkout>) against capsule-engine 7339028 (PR #173's merge, asg/everyday/0.3.7), on the real two-deal fixture rebuilt by capsulectl at capsule-cli 831afeeb. Against the a710636c (#138, 0.3.6) copy it replaces, the c878edf0 (#135, 0.3.5) one before it, and the d12932523db4 (#126, 0.3.4) one before it, every case's deal-2 seen result and every decisions-document member are equal but the pack id and digest. MANIFEST.sha256 still names the engine side's original python-decisions.json. This sidecar is not part of the vectors.",
+  "source_repo": "action-state-group/capsule-engine",
+  "source_commit": "7339028ab2117d6c7adec89a26cd5022b8ac7140",
+  "generated_at": "7339028ab2117d6c7adec89a26cd5022b8ac7140",
+  "generator": "generate_python_decisions.py <capsule-engine checkout>, run with that checkout's capsule_engine (python -P, PYTHONPATH=<checkout>); regenerated on the Go side",
+  "fixture": "the real two-deal fixture, vendored at ../real-two-deal-taxonomy-6 (capsule-engine tests/fixtures/real-two-deal at a710636c, PR #138's merge; bundles unchanged since #126)",
+  "files": {
+    "MANIFEST.sha256": {
+      "sha256": "7108dd0a8ab45612758acd18d553fde35767939df9b329f06d9890fae734b10a"
+    },
+    "corpus.json": {
+      "sha256": "41599c014e3ad96a88110d9974b379282cb081e0a4171e6e3b7178fb5bbb71ae"
+    },
+    "generate_python_decisions.py": {
+      "sha256": "7cdb8bc9dab1bb430a9f0eaf9fa98fe7e9b9b295bc7edd3ae294749051967dd3"
+    },
+    "python-decisions.json": {
+      "sha256": "2f06c7c5b9a2ce791067387f058513813964842a7c3cc96157771044b3ab3ee7"
+    }
+  }
+}

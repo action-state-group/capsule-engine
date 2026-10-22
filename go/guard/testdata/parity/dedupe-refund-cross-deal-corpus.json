@@ -1,0 +1,1811 @@
+{
+ "cases": [
+  {
+   "name": "refund/equal-refunds-different-acts",
+   "source": "engine-side refund-key vectors (engine #108)",
+   "steps": [
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/2",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-07T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "cancel",
+        "action_class": "money.refund",
+        "amount_minor": 1000,
+        "currency": "USD",
+        "direction": "in",
+        "reverses_ref": {
+         "digest": "1111111111111111111111111111111111111111111111111111111111111111",
+         "digest_alg": "SHA-256",
+         "type": "deal-record"
+        },
+        "spend_minor": 0,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "deal_id": "deal-0000000000000000",
+        "record_type": "check",
+        "seq": 2
+       }
+      }
+     }
+    },
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/3",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000003",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-08T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "cancel",
+        "action_class": "money.refund",
+        "amount_minor": 1000,
+        "currency": "USD",
+        "direction": "in",
+        "reverses_ref": {
+         "digest": "2222222222222222222222222222222222222222222222222222222222222222",
+         "digest_alg": "SHA-256",
+         "type": "deal-record"
+        },
+        "spend_minor": 0,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "deal_id": "deal-0000000000000000",
+        "record_type": "check",
+        "seq": 3
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "refund/equal-refunds-no-reverses-ref-no-payee",
+   "source": "engine-side refund-key vectors (engine #108)",
+   "steps": [
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/2",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-07T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "cancel",
+        "action_class": "money.refund",
+        "amount_minor": 1000,
+        "currency": "USD",
+        "direction": "in",
+        "spend_minor": 0,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "deal_id": "deal-0000000000000000",
+        "record_type": "check",
+        "seq": 2
+       }
+      }
+     }
+    },
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/3",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000003",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-08T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "cancel",
+        "action_class": "money.refund",
+        "amount_minor": 1000,
+        "currency": "USD",
+        "direction": "in",
+        "spend_minor": 0,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "deal_id": "deal-0000000000000000",
+        "record_type": "check",
+        "seq": 3
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "refund/purchase-refund-purchase-spend",
+   "source": "engine-side refund-key vectors (engine #108)",
+   "steps": [
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/2",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-07T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "pay",
+        "action_class": "money.purchase",
+        "amount_minor": 4500,
+        "currency": "USD",
+        "direction": "out",
+        "spend_minor": 4500,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "deal_id": "deal-0000000000000000",
+        "record_type": "check",
+        "seq": 2
+       }
+      }
+     }
+    },
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/3",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000003",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-08T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "cancel",
+        "action_class": "money.refund",
+        "amount_minor": 1000,
+        "currency": "USD",
+        "direction": "in",
+        "reverses_ref": {
+         "digest": "1111111111111111111111111111111111111111111111111111111111111111",
+         "digest_alg": "SHA-256",
+         "type": "deal-record"
+        },
+        "spend_minor": 0,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "deal_id": "deal-0000000000000000",
+        "record_type": "check",
+        "seq": 3
+       }
+      }
+     }
+    },
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/4",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000004",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-09T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "pay",
+        "action_class": "money.purchase",
+        "amount_minor": 700,
+        "currency": "USD",
+        "direction": "out",
+        "spend_minor": 700,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "deal_id": "deal-0000000000000000",
+        "record_type": "check",
+        "seq": 4
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "refund/repeated-purchase",
+   "source": "engine-side refund-key vectors (engine #108)",
+   "steps": [
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/2",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-07T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "pay",
+        "action_class": "money.purchase",
+        "amount_minor": 4500,
+        "currency": "USD",
+        "direction": "out",
+        "spend_minor": 4500,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "deal_id": "deal-0000000000000000",
+        "record_type": "check",
+        "seq": 2
+       }
+      }
+     }
+    },
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/3",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000003",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-08T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "pay",
+        "action_class": "money.purchase",
+        "amount_minor": 4500,
+        "currency": "USD",
+        "direction": "out",
+        "spend_minor": 4500,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "deal_id": "deal-0000000000000000",
+        "record_type": "check",
+        "seq": 3
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "refund/same-refund-same-act",
+   "source": "engine-side refund-key vectors (engine #108)",
+   "steps": [
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/2",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-07T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "cancel",
+        "action_class": "money.refund",
+        "amount_minor": 1000,
+        "currency": "USD",
+        "direction": "in",
+        "reverses_ref": {
+         "digest": "1111111111111111111111111111111111111111111111111111111111111111",
+         "digest_alg": "SHA-256",
+         "type": "deal-record"
+        },
+        "spend_minor": 0,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "deal_id": "deal-0000000000000000",
+        "record_type": "check",
+        "seq": 2
+       }
+      }
+     }
+    },
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/3",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000003",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-08T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "cancel",
+        "action_class": "money.refund",
+        "amount_minor": 1000,
+        "currency": "USD",
+        "direction": "in",
+        "reverses_ref": {
+         "digest": "1111111111111111111111111111111111111111111111111111111111111111",
+         "digest_alg": "SHA-256",
+         "type": "deal-record"
+        },
+        "spend_minor": 0,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "deal_id": "deal-0000000000000000",
+        "record_type": "check",
+        "seq": 3
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "refund/two-partial-refunds-different-amounts",
+   "source": "engine-side refund-key vectors (engine #108)",
+   "steps": [
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/2",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-07T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "cancel",
+        "action_class": "money.refund",
+        "amount_minor": 1000,
+        "currency": "USD",
+        "direction": "in",
+        "reverses_ref": {
+         "digest": "1111111111111111111111111111111111111111111111111111111111111111",
+         "digest_alg": "SHA-256",
+         "type": "deal-record"
+        },
+        "spend_minor": 0,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "deal_id": "deal-0000000000000000",
+        "record_type": "check",
+        "seq": 2
+       }
+      }
+     }
+    },
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/3",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000003",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-08T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "cancel",
+        "action_class": "money.refund",
+        "amount_minor": 2500,
+        "currency": "USD",
+        "direction": "in",
+        "reverses_ref": {
+         "digest": "1111111111111111111111111111111111111111111111111111111111111111",
+         "digest_alg": "SHA-256",
+         "type": "deal-record"
+        },
+        "spend_minor": 0,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "deal_id": "deal-0000000000000000",
+        "record_type": "check",
+        "seq": 3
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "cross-deal/deal-unstated-before",
+   "source": "engine-side cross-deal vectors (engine #111)",
+   "steps": [
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/1",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000001",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-07T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "pay",
+        "action_class": "money.purchase",
+        "amount_minor": 4500,
+        "currency": "USD",
+        "direction": "out",
+        "spend_minor": 4500,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "record_type": "check",
+        "seq": 1
+       }
+      }
+     }
+    },
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/2",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-08T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "pay",
+        "action_class": "money.purchase",
+        "amount_minor": 4500,
+        "currency": "USD",
+        "direction": "out",
+        "spend_minor": 4500,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "deal_id": "deal-bbbbbbbbbbbbbbbb",
+        "record_type": "check",
+        "seq": 2
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "cross-deal/deal-unstated-now",
+   "source": "engine-side cross-deal vectors (engine #111)",
+   "steps": [
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/1",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000001",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-07T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "pay",
+        "action_class": "money.purchase",
+        "amount_minor": 4500,
+        "currency": "USD",
+        "direction": "out",
+        "spend_minor": 4500,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "deal_id": "deal-aaaaaaaaaaaaaaaa",
+        "record_type": "check",
+        "seq": 1
+       }
+      }
+     }
+    },
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/2",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-08T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "pay",
+        "action_class": "money.purchase",
+        "amount_minor": 4500,
+        "currency": "USD",
+        "direction": "out",
+        "spend_minor": 4500,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "record_type": "check",
+        "seq": 2
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "cross-deal/different-amount-other-deal",
+   "source": "engine-side cross-deal vectors (engine #111)",
+   "steps": [
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/1",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000001",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-07T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "pay",
+        "action_class": "money.purchase",
+        "amount_minor": 4500,
+        "currency": "USD",
+        "direction": "out",
+        "spend_minor": 4500,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "deal_id": "deal-aaaaaaaaaaaaaaaa",
+        "record_type": "check",
+        "seq": 1
+       }
+      }
+     }
+    },
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/2",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-08T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "pay",
+        "action_class": "money.purchase",
+        "amount_minor": 4501,
+        "currency": "USD",
+        "direction": "out",
+        "spend_minor": 4501,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "deal_id": "deal-bbbbbbbbbbbbbbbb",
+        "record_type": "check",
+        "seq": 2
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "cross-deal/other-deal-outside-window",
+   "source": "engine-side cross-deal vectors (engine #111)",
+   "steps": [
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/1",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000001",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-07T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "pay",
+        "action_class": "money.purchase",
+        "amount_minor": 4500,
+        "currency": "USD",
+        "direction": "out",
+        "spend_minor": 4500,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "deal_id": "deal-aaaaaaaaaaaaaaaa",
+        "record_type": "check",
+        "seq": 1
+       }
+      }
+     }
+    },
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/2",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-11-16T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "pay",
+        "action_class": "money.purchase",
+        "amount_minor": 4500,
+        "currency": "USD",
+        "direction": "out",
+        "spend_minor": 4500,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "deal_id": "deal-bbbbbbbbbbbbbbbb",
+        "record_type": "check",
+        "seq": 2
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "cross-deal/other-deal-repeat-no-approver",
+   "source": "engine-side cross-deal vectors (engine #111)",
+   "steps": [
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/1",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000001",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-07T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "pay",
+        "action_class": "money.refund",
+        "amount_minor": 4500,
+        "currency": "USD",
+        "direction": "in",
+        "spend_minor": 0,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "deal_id": "deal-aaaaaaaaaaaaaaaa",
+        "record_type": "check",
+        "seq": 1
+       }
+      }
+     }
+    },
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/2",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-08T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "pay",
+        "action_class": "money.refund",
+        "amount_minor": 4500,
+        "currency": "USD",
+        "direction": "in",
+        "spend_minor": 0,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "deal_id": "deal-bbbbbbbbbbbbbbbb",
+        "record_type": "check",
+        "seq": 2
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "cross-deal/other-deal-repeat-with-approver",
+   "source": "engine-side cross-deal vectors (engine #111)",
+   "steps": [
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/1",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000001",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-07T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "pay",
+        "action_class": "money.purchase",
+        "amount_minor": 4500,
+        "currency": "USD",
+        "direction": "out",
+        "spend_minor": 4500,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "deal_id": "deal-aaaaaaaaaaaaaaaa",
+        "record_type": "check",
+        "seq": 1
+       }
+      }
+     }
+    },
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/2",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-08T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "pay",
+        "action_class": "money.purchase",
+        "amount_minor": 4500,
+        "currency": "USD",
+        "direction": "out",
+        "spend_minor": 4500,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "deal_id": "deal-bbbbbbbbbbbbbbbb",
+        "record_type": "check",
+        "seq": 2
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "cross-deal/same-deal-match-wins-over-other-deal",
+   "source": "engine-side cross-deal vectors (engine #111)",
+   "steps": [
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/1",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000001",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-07T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "pay",
+        "action_class": "money.purchase",
+        "amount_minor": 4500,
+        "currency": "USD",
+        "direction": "out",
+        "spend_minor": 4500,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "deal_id": "deal-aaaaaaaaaaaaaaaa",
+        "record_type": "check",
+        "seq": 1
+       }
+      }
+     }
+    },
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/2",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-08T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "pay",
+        "action_class": "money.purchase",
+        "amount_minor": 4500,
+        "currency": "USD",
+        "direction": "out",
+        "spend_minor": 4500,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "deal_id": "deal-bbbbbbbbbbbbbbbb",
+        "record_type": "check",
+        "seq": 2
+       }
+      }
+     }
+    },
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/3",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000003",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-09T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "pay",
+        "action_class": "money.purchase",
+        "amount_minor": 4500,
+        "currency": "USD",
+        "direction": "out",
+        "spend_minor": 4500,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "deal_id": "deal-bbbbbbbbbbbbbbbb",
+        "record_type": "check",
+        "seq": 3
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "cross-deal/same-deal-outside-window",
+   "source": "engine-side cross-deal vectors (engine #111)",
+   "steps": [
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/1",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000001",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-07T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "pay",
+        "action_class": "money.purchase",
+        "amount_minor": 4500,
+        "currency": "USD",
+        "direction": "out",
+        "spend_minor": 4500,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "deal_id": "deal-aaaaaaaaaaaaaaaa",
+        "record_type": "check",
+        "seq": 1
+       }
+      }
+     }
+    },
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/2",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-11-16T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "pay",
+        "action_class": "money.purchase",
+        "amount_minor": 4500,
+        "currency": "USD",
+        "direction": "out",
+        "spend_minor": 4500,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "deal_id": "deal-aaaaaaaaaaaaaaaa",
+        "record_type": "check",
+        "seq": 2
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "cross-deal/same-deal-repeat",
+   "source": "engine-side cross-deal vectors (engine #111)",
+   "steps": [
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/1",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000001",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-07T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "pay",
+        "action_class": "money.purchase",
+        "amount_minor": 4500,
+        "currency": "USD",
+        "direction": "out",
+        "spend_minor": 4500,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "deal_id": "deal-aaaaaaaaaaaaaaaa",
+        "record_type": "check",
+        "seq": 1
+       }
+      }
+     }
+    },
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/2",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-08T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "pay",
+        "action_class": "money.purchase",
+        "amount_minor": 4500,
+        "currency": "USD",
+        "direction": "out",
+        "spend_minor": 4500,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "deal_id": "deal-aaaaaaaaaaaaaaaa",
+        "record_type": "check",
+        "seq": 2
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "plugin/bare-string-reverses-ref-is-absent",
+   "source": "added by the plugin port (v0.0.7)",
+   "steps": [
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/1",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000001",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-07T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "cancel",
+        "action_class": "money.refund",
+        "amount_minor": 1000,
+        "currency": "USD",
+        "direction": "in",
+        "reverses_ref": "1111111111111111111111111111111111111111111111111111111111111111",
+        "spend_minor": 0,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "deal_id": "deal-aaaaaaaaaaaaaaaa",
+        "record_type": "check",
+        "seq": 1
+       }
+      }
+     }
+    },
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/2",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-08T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "cancel",
+        "action_class": "money.refund",
+        "amount_minor": 1000,
+        "currency": "USD",
+        "direction": "in",
+        "reverses_ref": "2222222222222222222222222222222222222222222222222222222222222222",
+        "spend_minor": 0,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "deal_id": "deal-aaaaaaaaaaaaaaaa",
+        "record_type": "check",
+        "seq": 2
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "plugin/typed-record-refs-different-acts-pass",
+   "source": "added by the plugin port (v0.0.7)",
+   "steps": [
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/1",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000001",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-07T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "cancel",
+        "action_class": "money.refund",
+        "amount_minor": 1000,
+        "currency": "USD",
+        "direction": "in",
+        "reverses_ref": {
+         "digest": "1111111111111111111111111111111111111111111111111111111111111111",
+         "digest_alg": "SHA-256",
+         "type": "record"
+        },
+        "spend_minor": 0,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "deal_id": "deal-aaaaaaaaaaaaaaaa",
+        "record_type": "check",
+        "seq": 1
+       }
+      }
+     }
+    },
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/2",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-08T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "cancel",
+        "action_class": "money.refund",
+        "amount_minor": 1000,
+        "currency": "USD",
+        "direction": "in",
+        "reverses_ref": {
+         "digest": "2222222222222222222222222222222222222222222222222222222222222222",
+         "digest_alg": "SHA-256",
+         "type": "record"
+        },
+        "spend_minor": 0,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "deal_id": "deal-aaaaaaaaaaaaaaaa",
+        "record_type": "check",
+        "seq": 2
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "plugin/typed-record-ref-same-act-refused",
+   "source": "added by the plugin port (v0.0.7)",
+   "steps": [
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/1",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000001",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-07T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "cancel",
+        "action_class": "money.refund",
+        "amount_minor": 1000,
+        "currency": "USD",
+        "direction": "in",
+        "reverses_ref": {
+         "digest": "1111111111111111111111111111111111111111111111111111111111111111",
+         "digest_alg": "SHA-256",
+         "type": "record"
+        },
+        "spend_minor": 0,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "deal_id": "deal-aaaaaaaaaaaaaaaa",
+        "record_type": "check",
+        "seq": 1
+       }
+      }
+     }
+    },
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/2",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-08T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "cancel",
+        "action_class": "money.refund",
+        "amount_minor": 1000,
+        "currency": "USD",
+        "direction": "in",
+        "reverses_ref": {
+         "digest": "1111111111111111111111111111111111111111111111111111111111111111",
+         "digest_alg": "SHA-256",
+         "type": "record"
+        },
+        "spend_minor": 0,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "deal_id": "deal-aaaaaaaaaaaaaaaa",
+        "record_type": "check",
+        "seq": 2
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "plugin/partial-cancels-key-on-cancelled-amount",
+   "source": "added by the plugin port (v0.0.7)",
+   "steps": [
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/1",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000001",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-07T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "cancel",
+        "action_class": "money.refund",
+        "cancelled_amount_minor": 3000,
+        "currency": "USD",
+        "direction": "in",
+        "spend_minor": 0,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "deal_id": "deal-aaaaaaaaaaaaaaaa",
+        "record_type": "check",
+        "seq": 1
+       }
+      }
+     }
+    },
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/2",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-08T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "cancel",
+        "action_class": "money.refund",
+        "cancelled_amount_minor": 2000,
+        "currency": "USD",
+        "direction": "in",
+        "spend_minor": 0,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "deal_id": "deal-aaaaaaaaaaaaaaaa",
+        "record_type": "check",
+        "seq": 2
+       }
+      }
+     }
+    },
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/3",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000003",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-09T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "cancel",
+        "action_class": "money.refund",
+        "cancelled_amount_minor": 3000,
+        "currency": "USD",
+        "direction": "in",
+        "spend_minor": 0,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "deal_id": "deal-aaaaaaaaaaaaaaaa",
+        "record_type": "check",
+        "seq": 3
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "plugin/explicit-returned-minor-wins",
+   "source": "added by the plugin port (v0.0.7)",
+   "steps": [
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/1",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000001",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-07T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "cancel",
+        "action_class": "money.refund",
+        "amount_minor": 1000,
+        "currency": "USD",
+        "direction": "in",
+        "returned_minor": 700,
+        "reverses_ref": {
+         "digest": "1111111111111111111111111111111111111111111111111111111111111111",
+         "digest_alg": "SHA-256",
+         "type": "record"
+        },
+        "spend_minor": 0,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "deal_id": "deal-aaaaaaaaaaaaaaaa",
+        "record_type": "check",
+        "seq": 1
+       }
+      }
+     }
+    },
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/2",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-08T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "cancel",
+        "action_class": "money.refund",
+        "amount_minor": 900,
+        "currency": "USD",
+        "direction": "in",
+        "returned_minor": 700,
+        "reverses_ref": {
+         "digest": "1111111111111111111111111111111111111111111111111111111111111111",
+         "digest_alg": "SHA-256",
+         "type": "record"
+        },
+        "spend_minor": 0,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "deal_id": "deal-aaaaaaaaaaaaaaaa",
+        "record_type": "check",
+        "seq": 2
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "plugin/money-out-ignores-reverses-ref",
+   "source": "added by the plugin port (v0.0.7)",
+   "steps": [
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/1",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000001",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-07T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "pay",
+        "action_class": "money.purchase",
+        "amount_minor": 1500,
+        "currency": "USD",
+        "direction": "out",
+        "reverses_ref": {
+         "digest": "1111111111111111111111111111111111111111111111111111111111111111",
+         "digest_alg": "SHA-256",
+         "type": "record"
+        },
+        "spend_minor": 1500,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "deal_id": "deal-aaaaaaaaaaaaaaaa",
+        "record_type": "check",
+        "seq": 1
+       }
+      }
+     }
+    },
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/2",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-08T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "pay",
+        "action_class": "money.purchase",
+        "amount_minor": 1500,
+        "currency": "USD",
+        "direction": "out",
+        "reverses_ref": {
+         "digest": "2222222222222222222222222222222222222222222222222222222222222222",
+         "digest_alg": "SHA-256",
+         "type": "record"
+        },
+        "spend_minor": 1500,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "deal_id": "deal-aaaaaaaaaaaaaaaa",
+        "record_type": "check",
+        "seq": 2
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "plugin/same-refund-same-act-other-deal",
+   "source": "added by the plugin port (v0.0.7)",
+   "steps": [
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/1",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000001",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-07T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "cancel",
+        "action_class": "money.refund",
+        "amount_minor": 1000,
+        "currency": "USD",
+        "direction": "in",
+        "reverses_ref": {
+         "digest": "1111111111111111111111111111111111111111111111111111111111111111",
+         "digest_alg": "SHA-256",
+         "type": "record"
+        },
+        "spend_minor": 0,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "deal_id": "deal-aaaaaaaaaaaaaaaa",
+        "record_type": "check",
+        "seq": 1
+       }
+      }
+     }
+    },
+    {
+     "check": {
+      "capsule": {
+       "action_id": "deal-0000000000000000/2",
+       "action_type": "fyi",
+       "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+       "developer": "capsulectl-deal",
+       "operator": "household-a",
+       "timestamp": "2026-10-08T12:00:00Z"
+      },
+      "record": {
+       "body": {
+        "action": "cancel",
+        "action_class": "money.refund",
+        "amount_minor": 1000,
+        "currency": "USD",
+        "direction": "in",
+        "reverses_ref": {
+         "digest": "1111111111111111111111111111111111111111111111111111111111111111",
+         "digest_alg": "SHA-256",
+         "type": "record"
+        },
+        "spend_minor": 0,
+        "taxonomy_version": "6"
+       },
+       "x-deal-v0": {
+        "counterparty": {
+         "fp_alg": "hmac-sha256-deal-key",
+         "ids": {
+          "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         }
+        },
+        "deal_id": "deal-bbbbbbbbbbbbbbbb",
+        "record_type": "check",
+        "seq": 2
+       }
+      }
+     }
+    }
+   ]
+  }
+ ],
+ "note": "Dedupe for v0.0.7: capsule-engine #108 (refund key) and #111 (cross-deal repeat). The refund/ and cross-deal/ cases are the engine side's vector inputs, with taxonomy_version restamped 4 (the shipped pack's taxonomy; the dedupe key reads only whether a version is set). The plugin/ cases are added here for the shapes the agreed producer field names fix.",
+ "pack_id": "asg/everyday/0.3.6"
+}

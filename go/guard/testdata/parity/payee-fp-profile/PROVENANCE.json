@@ -1,0 +1,22 @@
+{
+  "note": "Provenance sidecar; not part of the vendored bytes. Internal work-item references in generate.py's docstring and each vectors file's capsule_engine_path (a local checkout path, read by no test) were reworded for publication.",
+  "source": "the engine side's go-vectors for the engine half of the payee fingerprint profile (capsule-engine #115)",
+  "files": {
+    "capsulectl-vectors.json": {
+      "sha256": "141ec55a5d75900749392133e4dbc6b3b6bd8cb1ae7c8d6a1ceed1ac6c8a275d",
+      "origin": "capsule-cli internal/cli/testdata/payee-fp-profile/vectors.json at 705819215be60dbf0c9a7f95aa8de4eac693b27d (capsulectl's own two-deal records), as vendored in capsule-engine tests/fixtures/payee-fp-profile/vectors.json"
+    },
+    "generate.py": {
+      "sha256": "06bf69b3b4824cd1e3ce0e08c9b417af18394c80ca29dda152e8cbb9ad37b02b",
+      "origin": "the engine side's generate.py (sha256 0038a6d8f2fca195e1f77bbca5b58f0c76a8101ace31fb37b9b41dcda5f7d3fc) plus the live_seen_before bad-profile case; from capsule-engine 97a2aff it runs the shipped counterparty_seen_before/3.0.0, labels each replayed decision by its own record, and lists the records the replay gives no decision (undecided)"
+    },
+    "vectors-97a2aff.json": {
+      "sha256": "cbbffb8a2f638651ad00ad07a43dd76926b38b06bb5341fc37407a82ddb8b4ca",
+      "origin": "python -P generate.py <capsule-engine@97a2aff71b8293f70dc335e6fb6a5fbe1ada31d0> vectors-97a2aff.json (a scratch git clone checked out at the commit); against the 47c58cd run every check decision is unchanged, each companion moves from decisions to undecided (#121: a record that states no act gets no decision), and the r06 evidence names fold counterparty.seen_before/3.0.0"
+    },
+    "vectors-6d456fc.json": {
+      "sha256": "6193fcd42ec53e7ad2b78d01b0f03f95bc5b21161227fdcf0a0d35a0f7a21372",
+      "origin": "python -P generate.py <capsule-engine@6d456fc219473cfe2bfd1d98118f542edf73f5dd> vectors-6d456fc.json (Go side, 2026-10-09; a scratch git clone checked out at the commit), per the engine-side old-taxonomy ruling: replay and live_target byte-identical to 97a2aff; live_seen_before moves (taxonomy 4 live checks: deal 1 reject, r06 n/a with taxonomy_mismatch), as rule 1 says. Held by payee_fp_6d456fc_test.go; 97a2aff stays the historical file."
+    }
+  }
+}

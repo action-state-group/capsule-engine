@@ -1,0 +1,139 @@
+{
+  "note": "Provenance sidecar; not part of the vectors. Made on the Go side for the v0.0.11 port of asg/everyday/0.3.6.",
+  "capsule_engine_commit": "a710636c29814ce67e838c673026fd2063d913f8",
+  "how": "inputs/ by build.py; engine-results.json, ledger-results.json and scope-results.json by the engine scripts named in README.md, run from capsule-engine a710636c (a local read-only clone, checked out at the commit) with agent-action-capsule 0.7.0, PyYAML 6.0.3, Python 3.13.7",
+  "files": {
+    "README.md": {
+      "sha256": "2396f0782ef7d8ec3305169e179b66603e918178347f7df4c08b5f026dc2dc37"
+    },
+    "build.py": {
+      "sha256": "d268da8d1aefbe5f972fa722b36fec0a81e19adbf57e824631ab78ea2afc3043"
+    },
+    "corpus.json": {
+      "sha256": "fa6fed43fb135e06a1619dcd2e7710ecb7b6f9b5292c72b257f34fbfc03b696b"
+    },
+    "engine-results.json": {
+      "sha256": "a31fc553134f933d2ee44b7a97fd593c1f13adde4c4dd7b26954ae58e7cd7a57"
+    },
+    "inputs/accepted-and-unreadable-same-action/step-0.input.json": {
+      "sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703"
+    },
+    "inputs/accepted-and-unreadable-same-action/step-1.input.json": {
+      "sha256": "cdb4eedf90cb215e07d8d6b9f0f05c11fb2cee36edce0978d7a6ddbeb6c4d35c"
+    },
+    "inputs/accepted-and-unreadable-same-action/step-2.input.json": {
+      "sha256": "d29637d81cd1304f3cd0d774926d5c0ee12d99854d54ef94f21003eb4a87b57e"
+    },
+    "inputs/accepted-and-unreadable-same-capsule/step-0.input.json": {
+      "sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703"
+    },
+    "inputs/accepted-and-unreadable-same-capsule/step-1.input.json": {
+      "sha256": "0b286c3ac987a15c92c33e574a32220ed661e13152fd6d82f85721fc69f00f3a"
+    },
+    "inputs/accepted-and-unreadable-same-capsule/step-2.input.json": {
+      "sha256": "d00bb26176babef8fc153819349789c584b40c1a0f3ee13e0c4858ddce4003e6"
+    },
+    "inputs/commit-cancel-class/step-0.input.json": {
+      "sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703"
+    },
+    "inputs/commit-cancel-class/step-1.input.json": {
+      "sha256": "8235d77cac03b68b42bb595937b481dc13d04441f5ccab78c22bfc15fc97ec9a"
+    },
+    "inputs/commit-money-in/step-0.input.json": {
+      "sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703"
+    },
+    "inputs/commit-money-in/step-1.input.json": {
+      "sha256": "c2869a1bdf016b54180e78735bd2233329e6f845c7b08078dac6d5abe3be600b"
+    },
+    "inputs/pay-accept-refund-class/step-0.input.json": {
+      "sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703"
+    },
+    "inputs/pay-accept-refund-class/step-1.input.json": {
+      "sha256": "215818a862d5fcb9cffd682cbe1daf13974f1f1b72751732b4d34dd729185e46"
+    },
+    "inputs/pay-escalate-unreadable/step-0.input.json": {
+      "sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703"
+    },
+    "inputs/pay-escalate-unreadable/step-1.input.json": {
+      "sha256": "3ddb4eef848cc856d01976b86e7399c4bb2710609805d2ef45fbae83520ac0bd"
+    },
+    "inputs/pay-escalate/step-0.input.json": {
+      "sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703"
+    },
+    "inputs/pay-escalate/step-1.input.json": {
+      "sha256": "5d111abb6befffbc81cb6c87369c6b62cc49ded0104f8834fe3462a160fbd81f"
+    },
+    "inputs/pay-no-decision/step-0.input.json": {
+      "sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703"
+    },
+    "inputs/pay-no-decision/step-1.input.json": {
+      "sha256": "2e79a239a5d31e0960384bf9582df278717c00efa3dbde283e7659196159d3c0"
+    },
+    "inputs/pay-reject/step-0.input.json": {
+      "sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703"
+    },
+    "inputs/pay-reject/step-1.input.json": {
+      "sha256": "f6c67524bf831f18fd4141936cd36f73f26b3ceb07dad1644528e9a2182154fc"
+    },
+    "inputs/per-action-over-unreadable/step-0.input.json": {
+      "sha256": "91a1772c12ed63df4cf5102ec34e51be428c26f24a55697b0e2534b2e936b503"
+    },
+    "inputs/per-action-over-unreadable/step-1.input.json": {
+      "sha256": "fcc9dee6a1024644021557f166d759750115e9682702f4b769635eeb6b2ba023"
+    },
+    "inputs/refund-out-spend/step-0.input.json": {
+      "sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703"
+    },
+    "inputs/refund-out-spend/step-1.input.json": {
+      "sha256": "6e7cbae75bc1623483b6e43292a4a3073211cabd4581b2dc8bb7a437ba5ce3f0"
+    },
+    "inputs/refund-out-spend/step-2.input.json": {
+      "sha256": "bf4de00d821c1c4b9f869da44c86b27c0332c9e54fa2e004c9ff02ed3870b0b3"
+    },
+    "inputs/same-action-across-window-edge/step-0.input.json": {
+      "sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703"
+    },
+    "inputs/same-action-across-window-edge/step-1.input.json": {
+      "sha256": "68f94f374cfc45d91d669d312a47ce1b28e3a8904998a537e9a20980c625909e"
+    },
+    "inputs/same-action-across-window-edge/step-2.input.json": {
+      "sha256": "953a5e1e9d7a94ba3d1c15b595f1ebd7c1437e0fa24b109bec68c2f0e6420365"
+    },
+    "inputs/two-fyi-same-action-different-spend/step-0.input.json": {
+      "sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703"
+    },
+    "inputs/two-fyi-same-action-different-spend/step-1.input.json": {
+      "sha256": "000774eae07fa48d71c994af6349fbf7f80473385ba76829c0d75d33f17f59bc"
+    },
+    "inputs/two-fyi-same-action-different-spend/step-2.input.json": {
+      "sha256": "a530d9426373586f1335e53e9b25d387c0726454251b48404bd8f664209719ff"
+    },
+    "inputs/unchecked-cancel-class/step-0.input.json": {
+      "sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703"
+    },
+    "inputs/unchecked-cancel-class/step-1.input.json": {
+      "sha256": "9269c0465c45214fc68a2e9c129f82de54b3a2574cb077c475e428f70e2c3689"
+    },
+    "inputs/unreadable-then-readable-same-action/step-0.input.json": {
+      "sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703"
+    },
+    "inputs/unreadable-then-readable-same-action/step-1.input.json": {
+      "sha256": "b143f0168686456f90fc104fb6e65fb20bd967acf015196d32715af1f6b739c5"
+    },
+    "inputs/unreadable-then-readable-same-action/step-2.input.json": {
+      "sha256": "e149720f8641350f0209b19896b31aa83f3ea3f48082febed37e3c8ee3283cd9"
+    },
+    "ledger-results.json": {
+      "sha256": "430d0971cca2bec654fc76d410897c6204f7b251b1f2c083a9ee2347c36b0a1f"
+    },
+    "ledger_cases.py": {
+      "sha256": "5971e1ab5228bd28c7a9d129cb51bf6be573c881bb6f36cb6f9166618a6ff487"
+    },
+    "scope-results.json": {
+      "sha256": "a4c4cb72e5d48c652c658c11aad6f706bcbc04b297bf5ec60d4cdce1c15b5ec0"
+    },
+    "scope_cases.py": {
+      "sha256": "369fac1f7afa5d765ee42b7a93327efd9b9fc1412603e1f70e54a6148491d0a2"
+    }
+  }
+}

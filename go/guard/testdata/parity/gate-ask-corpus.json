@@ -1,0 +1,205 @@
+{
+  "note": "Decision-level differential for gate rules declared ASK escalating: an action_class_gate failure ESCALATEs only when every failing selector's obligations all declare default_disposition ASK AND the class names an approver_role; otherwise DENY. Each case runs on a fresh ledger under the installed everyday 0.3.2 pack; `redeclare` overrides obligation default_disposition for that case only (test-only pack variant; its digest differs). Steps run in order; the last step's decision is the one compared.",
+  "pack_id": "asg/everyday/0.3.7",
+  "cases": [
+    {
+      "name": "booking-create-asks",
+      "expect": "escalate (needs_input/hitl_dispatched): r16 declares ASK, booking.create names account_holder; r16 is the only failing rule",
+      "steps": [
+        {
+          "action": {
+            "verb": "act",
+            "operator": "household-gate-diff",
+            "developer": "household-assistant-gd@v1",
+            "action_class": "booking.create",
+            "action_id": "act/gate-diff-1",
+            "timestamp": "2026-08-10T14:01:00Z",
+            "amount_minor": 2000,
+            "currency": "EUR",
+            "target": "venue/restaurant"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "name": "booking-create-r16-never-refuses",
+      "expect": "deny: r16 re-declared NEVER, so booking_create leaves the ask set",
+      "steps": [
+        {
+          "action": {
+            "verb": "act",
+            "operator": "household-gate-diff",
+            "developer": "household-assistant-gd@v1",
+            "action_class": "booking.create",
+            "action_id": "act/gate-diff-2",
+            "timestamp": "2026-08-10T14:02:00Z",
+            "amount_minor": 2000,
+            "currency": "EUR",
+            "target": "venue/restaurant"
+          },
+          "dry_run": true
+        }
+      ],
+      "redeclare": {
+        "r16-booking-with-a-commitment": "NEVER"
+      }
+    },
+    {
+      "name": "booking-cancel-no-approver-refuses",
+      "expect": "deny: r17 declares ASK but booking.cancel names no approver_role; the reason names it",
+      "steps": [
+        {
+          "action": {
+            "verb": "act",
+            "operator": "household-gate-diff",
+            "developer": "household-assistant-gd@v1",
+            "action_class": "booking.cancel",
+            "action_id": "act/gate-diff-3",
+            "timestamp": "2026-08-10T14:03:00Z"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "name": "data-delete-no-approver-refuses",
+      "expect": "deny: r18 ASK, data.delete has no approver_role",
+      "steps": [
+        {
+          "action": {
+            "verb": "act",
+            "operator": "household-gate-diff",
+            "developer": "household-assistant-gd@v1",
+            "action_class": "data.delete",
+            "action_id": "act/gate-diff-4",
+            "timestamp": "2026-08-10T14:04:00Z"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "name": "public-posting-no-approver-refuses",
+      "expect": "deny: r15 ASK, communication.publish has no approver_role",
+      "steps": [
+        {
+          "action": {
+            "verb": "act",
+            "operator": "household-gate-diff",
+            "developer": "household-assistant-gd@v1",
+            "action_class": "communication.publish",
+            "action_id": "act/gate-diff-5",
+            "timestamp": "2026-08-10T14:05:00Z"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "name": "personal-disclosure-no-approver-refuses",
+      "expect": "deny: r11+r12 ASK, disclosure.personal has no approver_role",
+      "steps": [
+        {
+          "action": {
+            "verb": "act",
+            "operator": "household-gate-diff",
+            "developer": "household-assistant-gd@v1",
+            "action_class": "disclosure.personal",
+            "action_id": "act/gate-diff-6",
+            "timestamp": "2026-08-10T14:06:00Z"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "name": "personal-disclosure-r12-never-leaves-ask-set",
+      "expect": "deny; ask_gate_selectors drops personal_disclosure because r12 is re-declared NEVER (r11 still ASK)",
+      "steps": [
+        {
+          "action": {
+            "verb": "act",
+            "operator": "household-gate-diff",
+            "developer": "household-assistant-gd@v1",
+            "action_class": "disclosure.personal",
+            "action_id": "act/gate-diff-7",
+            "timestamp": "2026-08-10T14:07:00Z"
+          },
+          "dry_run": true
+        }
+      ],
+      "redeclare": {
+        "r12-personal-contact-to-a-new-party": "NEVER"
+      }
+    },
+    {
+      "name": "off-taxonomy-fails-closed",
+      "expect": "deny: no taxonomy row, the gate fails closed on no selector",
+      "steps": [
+        {
+          "action": {
+            "verb": "act",
+            "operator": "household-gate-diff",
+            "developer": "household-assistant-gd@v1",
+            "action_class": "household.unlisted",
+            "action_id": "act/gate-diff-8",
+            "timestamp": "2026-08-10T14:08:00Z"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "name": "info-query-passes",
+      "expect": "allow: non_consequential pass selector",
+      "steps": [
+        {
+          "action": {
+            "verb": "act",
+            "operator": "household-gate-diff",
+            "developer": "household-assistant-gd@v1",
+            "action_class": "info.query",
+            "action_id": "act/gate-diff-9",
+            "timestamp": "2026-08-10T14:09:00Z"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "name": "booking-create-repeat-dedupe-refuses",
+      "expect": "deny: the second identical booking fails dedupe (integrity) beside the ASK gate failure",
+      "steps": [
+        {
+          "action": {
+            "verb": "act",
+            "operator": "household-gate-diff",
+            "developer": "household-assistant-gd@v1",
+            "action_class": "booking.create",
+            "action_id": "act/gate-diff-10",
+            "timestamp": "2026-08-10T14:10:00Z",
+            "amount_minor": 2000,
+            "currency": "EUR",
+            "target": "venue/restaurant"
+          },
+          "dry_run": false
+        },
+        {
+          "action": {
+            "verb": "act",
+            "operator": "household-gate-diff",
+            "developer": "household-assistant-gd@v1",
+            "action_class": "booking.create",
+            "action_id": "act/gate-diff-10",
+            "timestamp": "2026-08-10T14:10:00Z",
+            "amount_minor": 2000,
+            "currency": "EUR",
+            "target": "venue/restaurant"
+          },
+          "dry_run": true
+        }
+      ]
+    }
+  ]
+}

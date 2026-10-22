@@ -1,0 +1,2693 @@
+{
+ "capsule_engine_commit": "7339028ab2117d6c7adec89a26cd5022b8ac7140",
+ "cases": {
+  "cross-deal/deal-unstated-before": [
+   {
+    "candidate_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+    "decision_capsule_id": "705f6f5a86802d5b5cba9642cc197c699d31c5521e618b42d1c7395bb998796c",
+    "decision_capsule_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+    "dedupe_evidence": {
+     "equivalence_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160"
+    },
+    "dedupe_evidence_digest": "0a9caa33ad89a467c80d10eec848bbb5162ba69a9e2197fe32463ef0f19373fb",
+    "dedupe_matched_step": null,
+    "dedupe_reason": "no equivalent action in window",
+    "dedupe_result": "pass",
+    "failing_constraints": [
+     "caps",
+     "counterparty_seen_before"
+    ],
+    "outcome": "escalate",
+    "record": {
+     "action_id": "deal-0000000000000000/1",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "pay",
+       "action_class": "money.purchase",
+       "amount_minor": 4500,
+       "currency": "USD",
+       "direction": "out",
+       "spend_minor": 4500,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "record_type": "check",
+       "seq": 1
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000001",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "13829fb2f5e326f7b8468be04204ff1c763dc693fe7e6eb717aadcb3659f45c2"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-07T12:00:00Z"
+    },
+    "sealed_deal_id": null,
+    "sealed_returned_minor": null,
+    "sealed_reverses_ref": null
+   },
+   {
+    "candidate_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+    "decision_capsule_id": "43ade8b30913c0ff0702f53a2f50024289a781f568300d46877031bfcb30d592",
+    "decision_capsule_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+    "dedupe_evidence": {
+     "equivalence_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+     "matched_capsule_id": "705f6f5a86802d5b5cba9642cc197c699d31c5521e618b42d1c7395bb998796c"
+    },
+    "dedupe_evidence_digest": "23306318780509b7b640221c9b9157ade9cd3c9110625cc6836f3af6d5c5d6fd",
+    "dedupe_matched_step": 0,
+    "dedupe_reason": "equivalent action already recorded",
+    "dedupe_result": "fail",
+    "failing_constraints": [
+     "dedupe",
+     "caps",
+     "counterparty_seen_before"
+    ],
+    "outcome": "deny",
+    "record": {
+     "action_id": "deal-0000000000000000/2",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "pay",
+       "action_class": "money.purchase",
+       "amount_minor": 4500,
+       "currency": "USD",
+       "direction": "out",
+       "spend_minor": 4500,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "deal_id": "deal-bbbbbbbbbbbbbbbb",
+       "record_type": "check",
+       "seq": 2
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "67e1bb737bf04c3aeec9f937f26ea253834ab6de46d22da53c0a9fd5e9993e22"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-08T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-bbbbbbbbbbbbbbbb",
+    "sealed_returned_minor": null,
+    "sealed_reverses_ref": null
+   }
+  ],
+  "cross-deal/deal-unstated-now": [
+   {
+    "candidate_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+    "decision_capsule_id": "e7757eec9f73ddd1f2e0afaece0675301184e14619bbd9d578b3270482e1fdd1",
+    "decision_capsule_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+    "dedupe_evidence": {
+     "equivalence_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160"
+    },
+    "dedupe_evidence_digest": "0a9caa33ad89a467c80d10eec848bbb5162ba69a9e2197fe32463ef0f19373fb",
+    "dedupe_matched_step": null,
+    "dedupe_reason": "no equivalent action in window",
+    "dedupe_result": "pass",
+    "failing_constraints": [
+     "caps",
+     "counterparty_seen_before"
+    ],
+    "outcome": "escalate",
+    "record": {
+     "action_id": "deal-0000000000000000/1",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "pay",
+       "action_class": "money.purchase",
+       "amount_minor": 4500,
+       "currency": "USD",
+       "direction": "out",
+       "spend_minor": 4500,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "deal_id": "deal-aaaaaaaaaaaaaaaa",
+       "record_type": "check",
+       "seq": 1
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000001",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "f94181140c5ebaee083324da6f28f7bc40d982a4a1c1257b474d3c0ea93470c4"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-07T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-aaaaaaaaaaaaaaaa",
+    "sealed_returned_minor": null,
+    "sealed_reverses_ref": null
+   },
+   {
+    "candidate_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+    "decision_capsule_id": "906543c8f1e58a33f8645b2bd598bc561b733173110900586e11faa27a2b7ebc",
+    "decision_capsule_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+    "dedupe_evidence": {
+     "equivalence_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+     "matched_capsule_id": "e7757eec9f73ddd1f2e0afaece0675301184e14619bbd9d578b3270482e1fdd1"
+    },
+    "dedupe_evidence_digest": "0b04ba7fa9bb4d48720139939328b3d361416683b85f5a102e1a75159aafd381",
+    "dedupe_matched_step": 0,
+    "dedupe_reason": "equivalent action already recorded",
+    "dedupe_result": "fail",
+    "failing_constraints": [
+     "dedupe",
+     "caps",
+     "counterparty_seen_before"
+    ],
+    "outcome": "deny",
+    "record": {
+     "action_id": "deal-0000000000000000/2",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "pay",
+       "action_class": "money.purchase",
+       "amount_minor": 4500,
+       "currency": "USD",
+       "direction": "out",
+       "spend_minor": 4500,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "record_type": "check",
+       "seq": 2
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "7270cf64dc058b3492ae114bf5d6fd052fd3ee2990e93e28f525e81f084e995a"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-08T12:00:00Z"
+    },
+    "sealed_deal_id": null,
+    "sealed_returned_minor": null,
+    "sealed_reverses_ref": null
+   }
+  ],
+  "cross-deal/different-amount-other-deal": [
+   {
+    "candidate_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+    "decision_capsule_id": "e7757eec9f73ddd1f2e0afaece0675301184e14619bbd9d578b3270482e1fdd1",
+    "decision_capsule_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+    "dedupe_evidence": {
+     "equivalence_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160"
+    },
+    "dedupe_evidence_digest": "0a9caa33ad89a467c80d10eec848bbb5162ba69a9e2197fe32463ef0f19373fb",
+    "dedupe_matched_step": null,
+    "dedupe_reason": "no equivalent action in window",
+    "dedupe_result": "pass",
+    "failing_constraints": [
+     "caps",
+     "counterparty_seen_before"
+    ],
+    "outcome": "escalate",
+    "record": {
+     "action_id": "deal-0000000000000000/1",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "pay",
+       "action_class": "money.purchase",
+       "amount_minor": 4500,
+       "currency": "USD",
+       "direction": "out",
+       "spend_minor": 4500,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "deal_id": "deal-aaaaaaaaaaaaaaaa",
+       "record_type": "check",
+       "seq": 1
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000001",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "f94181140c5ebaee083324da6f28f7bc40d982a4a1c1257b474d3c0ea93470c4"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-07T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-aaaaaaaaaaaaaaaa",
+    "sealed_returned_minor": null,
+    "sealed_reverses_ref": null
+   },
+   {
+    "candidate_key": "328791ae6ccd78a5b051e524a88d1b1f7b64b8ad546f49175d9e353a81b06618",
+    "decision_capsule_id": "f6a30f0299ea3e18a152ba32043f9285e24e7cf0e0237b84c1266f3fa1f8263f",
+    "decision_capsule_key": "328791ae6ccd78a5b051e524a88d1b1f7b64b8ad546f49175d9e353a81b06618",
+    "dedupe_evidence": {
+     "equivalence_key": "328791ae6ccd78a5b051e524a88d1b1f7b64b8ad546f49175d9e353a81b06618"
+    },
+    "dedupe_evidence_digest": "ddbd176ac980e96fc8fac286427b7c7ca920429af61adcbbd5a75e4f02f1f8c7",
+    "dedupe_matched_step": null,
+    "dedupe_reason": "no equivalent action in window",
+    "dedupe_result": "pass",
+    "failing_constraints": [
+     "caps",
+     "counterparty_seen_before"
+    ],
+    "outcome": "escalate",
+    "record": {
+     "action_id": "deal-0000000000000000/2",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "pay",
+       "action_class": "money.purchase",
+       "amount_minor": 4501,
+       "currency": "USD",
+       "direction": "out",
+       "spend_minor": 4501,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "deal_id": "deal-bbbbbbbbbbbbbbbb",
+       "record_type": "check",
+       "seq": 2
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "973449619109c10a4cc1b673fe4b93390953283cad3f8a9cd99cd36b7eea95b8"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-08T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-bbbbbbbbbbbbbbbb",
+    "sealed_returned_minor": null,
+    "sealed_reverses_ref": null
+   }
+  ],
+  "cross-deal/other-deal-outside-window": [
+   {
+    "candidate_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+    "decision_capsule_id": "e7757eec9f73ddd1f2e0afaece0675301184e14619bbd9d578b3270482e1fdd1",
+    "decision_capsule_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+    "dedupe_evidence": {
+     "equivalence_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160"
+    },
+    "dedupe_evidence_digest": "0a9caa33ad89a467c80d10eec848bbb5162ba69a9e2197fe32463ef0f19373fb",
+    "dedupe_matched_step": null,
+    "dedupe_reason": "no equivalent action in window",
+    "dedupe_result": "pass",
+    "failing_constraints": [
+     "caps",
+     "counterparty_seen_before"
+    ],
+    "outcome": "escalate",
+    "record": {
+     "action_id": "deal-0000000000000000/1",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "pay",
+       "action_class": "money.purchase",
+       "amount_minor": 4500,
+       "currency": "USD",
+       "direction": "out",
+       "spend_minor": 4500,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "deal_id": "deal-aaaaaaaaaaaaaaaa",
+       "record_type": "check",
+       "seq": 1
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000001",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "f94181140c5ebaee083324da6f28f7bc40d982a4a1c1257b474d3c0ea93470c4"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-07T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-aaaaaaaaaaaaaaaa",
+    "sealed_returned_minor": null,
+    "sealed_reverses_ref": null
+   },
+   {
+    "candidate_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+    "decision_capsule_id": "4223d551f25e0242459f699889b0ab5c1d1edf05a5705ec6794ada670bad68f5",
+    "decision_capsule_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+    "dedupe_evidence": {
+     "equivalence_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160"
+    },
+    "dedupe_evidence_digest": "0a9caa33ad89a467c80d10eec848bbb5162ba69a9e2197fe32463ef0f19373fb",
+    "dedupe_matched_step": null,
+    "dedupe_reason": "no equivalent action in window",
+    "dedupe_result": "pass",
+    "failing_constraints": [
+     "caps",
+     "counterparty_seen_before"
+    ],
+    "outcome": "escalate",
+    "record": {
+     "action_id": "deal-0000000000000000/2",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "pay",
+       "action_class": "money.purchase",
+       "amount_minor": 4500,
+       "currency": "USD",
+       "direction": "out",
+       "spend_minor": 4500,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "deal_id": "deal-bbbbbbbbbbbbbbbb",
+       "record_type": "check",
+       "seq": 2
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "67e1bb737bf04c3aeec9f937f26ea253834ab6de46d22da53c0a9fd5e9993e22"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-11-16T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-bbbbbbbbbbbbbbbb",
+    "sealed_returned_minor": null,
+    "sealed_reverses_ref": null
+   }
+  ],
+  "cross-deal/other-deal-repeat-no-approver": [
+   {
+    "candidate_key": "ccc730b9eb64a0fd6072029b9fa603aab58d579659b97f23d1873673bf721c1a",
+    "decision_capsule_id": "51d56580c8a18d17bf139ad03891087c07bfa669de8371a1d8140709eb983d81",
+    "decision_capsule_key": "ccc730b9eb64a0fd6072029b9fa603aab58d579659b97f23d1873673bf721c1a",
+    "dedupe_evidence": {
+     "equivalence_key": "ccc730b9eb64a0fd6072029b9fa603aab58d579659b97f23d1873673bf721c1a"
+    },
+    "dedupe_evidence_digest": "f33919eddb743fb9ce00579cfef39ed380a57e6f846a045df61bcb0fc7b82d68",
+    "dedupe_matched_step": null,
+    "dedupe_reason": "no equivalent action in window",
+    "dedupe_result": "pass",
+    "failing_constraints": [],
+    "outcome": "allow",
+    "record": {
+     "action_id": "deal-0000000000000000/1",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "pay",
+       "action_class": "money.refund",
+       "amount_minor": 4500,
+       "currency": "USD",
+       "direction": "in",
+       "spend_minor": 0,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "deal_id": "deal-aaaaaaaaaaaaaaaa",
+       "record_type": "check",
+       "seq": 1
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000001",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "bea9dc21a528c6464f3726c154b3ee7f1d3a08fc4e6d5c47a0522fabfcf0f5a0"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-07T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-aaaaaaaaaaaaaaaa",
+    "sealed_returned_minor": 4500,
+    "sealed_reverses_ref": null
+   },
+   {
+    "candidate_key": "ccc730b9eb64a0fd6072029b9fa603aab58d579659b97f23d1873673bf721c1a",
+    "decision_capsule_id": "ffad0d41c2731c427e61fecc5b8a9061bff75c66251669d4bd36840c20727b17",
+    "decision_capsule_key": "ccc730b9eb64a0fd6072029b9fa603aab58d579659b97f23d1873673bf721c1a",
+    "dedupe_evidence": {
+     "equivalence_key": "ccc730b9eb64a0fd6072029b9fa603aab58d579659b97f23d1873673bf721c1a",
+     "matched_amount_minor": 0,
+     "matched_at": "2026-10-07T12:00:00Z",
+     "matched_capsule_id": "51d56580c8a18d17bf139ad03891087c07bfa669de8371a1d8140709eb983d81",
+     "matched_currency": "USD",
+     "repeat": "other_deal"
+    },
+    "dedupe_evidence_digest": "9073c108ec4b3705f457fb858df2b7f44dd615d42f7001b4e97e8f435dc4dc5e",
+    "dedupe_matched_step": 0,
+    "dedupe_reason": "the same act was taken in another deal inside the window: confirm it is not a duplicate",
+    "dedupe_result": "fail",
+    "failing_constraints": [
+     "dedupe"
+    ],
+    "outcome": "deny",
+    "record": {
+     "action_id": "deal-0000000000000000/2",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "pay",
+       "action_class": "money.refund",
+       "amount_minor": 4500,
+       "currency": "USD",
+       "direction": "in",
+       "spend_minor": 0,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "deal_id": "deal-bbbbbbbbbbbbbbbb",
+       "record_type": "check",
+       "seq": 2
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "8a3b44ed685a3954fe61eba01639ed66f4213d7944e261da7169b702e0d25fce"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-08T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-bbbbbbbbbbbbbbbb",
+    "sealed_returned_minor": 4500,
+    "sealed_reverses_ref": null
+   }
+  ],
+  "cross-deal/other-deal-repeat-with-approver": [
+   {
+    "candidate_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+    "decision_capsule_id": "e7757eec9f73ddd1f2e0afaece0675301184e14619bbd9d578b3270482e1fdd1",
+    "decision_capsule_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+    "dedupe_evidence": {
+     "equivalence_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160"
+    },
+    "dedupe_evidence_digest": "0a9caa33ad89a467c80d10eec848bbb5162ba69a9e2197fe32463ef0f19373fb",
+    "dedupe_matched_step": null,
+    "dedupe_reason": "no equivalent action in window",
+    "dedupe_result": "pass",
+    "failing_constraints": [
+     "caps",
+     "counterparty_seen_before"
+    ],
+    "outcome": "escalate",
+    "record": {
+     "action_id": "deal-0000000000000000/1",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "pay",
+       "action_class": "money.purchase",
+       "amount_minor": 4500,
+       "currency": "USD",
+       "direction": "out",
+       "spend_minor": 4500,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "deal_id": "deal-aaaaaaaaaaaaaaaa",
+       "record_type": "check",
+       "seq": 1
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000001",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "f94181140c5ebaee083324da6f28f7bc40d982a4a1c1257b474d3c0ea93470c4"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-07T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-aaaaaaaaaaaaaaaa",
+    "sealed_returned_minor": null,
+    "sealed_reverses_ref": null
+   },
+   {
+    "candidate_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+    "decision_capsule_id": "c002625d4a0c59bda53fb9b46dbd3a9bb8807944e2478e6804d30b5b39d40f66",
+    "decision_capsule_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+    "dedupe_evidence": {
+     "equivalence_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+     "matched_amount_minor": 4500,
+     "matched_at": "2026-10-07T12:00:00Z",
+     "matched_capsule_id": "e7757eec9f73ddd1f2e0afaece0675301184e14619bbd9d578b3270482e1fdd1",
+     "matched_currency": "USD",
+     "repeat": "other_deal"
+    },
+    "dedupe_evidence_digest": "9cd9e0a3eb87d6f71c7708a2c6934b7c29871fa5c9fab6ed323099f26fd27740",
+    "dedupe_matched_step": 0,
+    "dedupe_reason": "the same act was taken in another deal inside the window: confirm it is not a duplicate",
+    "dedupe_result": "fail",
+    "failing_constraints": [
+     "dedupe",
+     "caps",
+     "counterparty_seen_before"
+    ],
+    "outcome": "escalate",
+    "record": {
+     "action_id": "deal-0000000000000000/2",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "pay",
+       "action_class": "money.purchase",
+       "amount_minor": 4500,
+       "currency": "USD",
+       "direction": "out",
+       "spend_minor": 4500,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "deal_id": "deal-bbbbbbbbbbbbbbbb",
+       "record_type": "check",
+       "seq": 2
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "67e1bb737bf04c3aeec9f937f26ea253834ab6de46d22da53c0a9fd5e9993e22"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-08T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-bbbbbbbbbbbbbbbb",
+    "sealed_returned_minor": null,
+    "sealed_reverses_ref": null
+   }
+  ],
+  "cross-deal/same-deal-match-wins-over-other-deal": [
+   {
+    "candidate_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+    "decision_capsule_id": "e7757eec9f73ddd1f2e0afaece0675301184e14619bbd9d578b3270482e1fdd1",
+    "decision_capsule_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+    "dedupe_evidence": {
+     "equivalence_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160"
+    },
+    "dedupe_evidence_digest": "0a9caa33ad89a467c80d10eec848bbb5162ba69a9e2197fe32463ef0f19373fb",
+    "dedupe_matched_step": null,
+    "dedupe_reason": "no equivalent action in window",
+    "dedupe_result": "pass",
+    "failing_constraints": [
+     "caps",
+     "counterparty_seen_before"
+    ],
+    "outcome": "escalate",
+    "record": {
+     "action_id": "deal-0000000000000000/1",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "pay",
+       "action_class": "money.purchase",
+       "amount_minor": 4500,
+       "currency": "USD",
+       "direction": "out",
+       "spend_minor": 4500,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "deal_id": "deal-aaaaaaaaaaaaaaaa",
+       "record_type": "check",
+       "seq": 1
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000001",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "f94181140c5ebaee083324da6f28f7bc40d982a4a1c1257b474d3c0ea93470c4"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-07T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-aaaaaaaaaaaaaaaa",
+    "sealed_returned_minor": null,
+    "sealed_reverses_ref": null
+   },
+   {
+    "candidate_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+    "decision_capsule_id": "c002625d4a0c59bda53fb9b46dbd3a9bb8807944e2478e6804d30b5b39d40f66",
+    "decision_capsule_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+    "dedupe_evidence": {
+     "equivalence_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+     "matched_amount_minor": 4500,
+     "matched_at": "2026-10-07T12:00:00Z",
+     "matched_capsule_id": "e7757eec9f73ddd1f2e0afaece0675301184e14619bbd9d578b3270482e1fdd1",
+     "matched_currency": "USD",
+     "repeat": "other_deal"
+    },
+    "dedupe_evidence_digest": "9cd9e0a3eb87d6f71c7708a2c6934b7c29871fa5c9fab6ed323099f26fd27740",
+    "dedupe_matched_step": 0,
+    "dedupe_reason": "the same act was taken in another deal inside the window: confirm it is not a duplicate",
+    "dedupe_result": "fail",
+    "failing_constraints": [
+     "dedupe",
+     "caps",
+     "counterparty_seen_before"
+    ],
+    "outcome": "escalate",
+    "record": {
+     "action_id": "deal-0000000000000000/2",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "pay",
+       "action_class": "money.purchase",
+       "amount_minor": 4500,
+       "currency": "USD",
+       "direction": "out",
+       "spend_minor": 4500,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "deal_id": "deal-bbbbbbbbbbbbbbbb",
+       "record_type": "check",
+       "seq": 2
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "67e1bb737bf04c3aeec9f937f26ea253834ab6de46d22da53c0a9fd5e9993e22"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-08T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-bbbbbbbbbbbbbbbb",
+    "sealed_returned_minor": null,
+    "sealed_reverses_ref": null
+   },
+   {
+    "candidate_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+    "decision_capsule_id": "c49bf781c25e33aaaee2373cf5b0edc9b4af5e276f45446069348bae2e86e9b4",
+    "decision_capsule_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+    "dedupe_evidence": {
+     "equivalence_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+     "matched_capsule_id": "c002625d4a0c59bda53fb9b46dbd3a9bb8807944e2478e6804d30b5b39d40f66"
+    },
+    "dedupe_evidence_digest": "0b84fb427585c9e830404dee5f3e950f848ae454e1db79a190ccd33e4e4784c7",
+    "dedupe_matched_step": 1,
+    "dedupe_reason": "equivalent action already recorded (c002625d4a0c59bd\u2026)",
+    "dedupe_result": "fail",
+    "failing_constraints": [
+     "dedupe",
+     "caps",
+     "counterparty_seen_before"
+    ],
+    "outcome": "deny",
+    "record": {
+     "action_id": "deal-0000000000000000/3",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "pay",
+       "action_class": "money.purchase",
+       "amount_minor": 4500,
+       "currency": "USD",
+       "direction": "out",
+       "spend_minor": 4500,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "deal_id": "deal-bbbbbbbbbbbbbbbb",
+       "record_type": "check",
+       "seq": 3
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000003",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "bbf50bb1064c3873fb15683f51c830b010affed18fd1e615774b55c23d1e870e"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-09T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-bbbbbbbbbbbbbbbb",
+    "sealed_returned_minor": null,
+    "sealed_reverses_ref": null
+   }
+  ],
+  "cross-deal/same-deal-outside-window": [
+   {
+    "candidate_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+    "decision_capsule_id": "e7757eec9f73ddd1f2e0afaece0675301184e14619bbd9d578b3270482e1fdd1",
+    "decision_capsule_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+    "dedupe_evidence": {
+     "equivalence_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160"
+    },
+    "dedupe_evidence_digest": "0a9caa33ad89a467c80d10eec848bbb5162ba69a9e2197fe32463ef0f19373fb",
+    "dedupe_matched_step": null,
+    "dedupe_reason": "no equivalent action in window",
+    "dedupe_result": "pass",
+    "failing_constraints": [
+     "caps",
+     "counterparty_seen_before"
+    ],
+    "outcome": "escalate",
+    "record": {
+     "action_id": "deal-0000000000000000/1",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "pay",
+       "action_class": "money.purchase",
+       "amount_minor": 4500,
+       "currency": "USD",
+       "direction": "out",
+       "spend_minor": 4500,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "deal_id": "deal-aaaaaaaaaaaaaaaa",
+       "record_type": "check",
+       "seq": 1
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000001",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "f94181140c5ebaee083324da6f28f7bc40d982a4a1c1257b474d3c0ea93470c4"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-07T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-aaaaaaaaaaaaaaaa",
+    "sealed_returned_minor": null,
+    "sealed_reverses_ref": null
+   },
+   {
+    "candidate_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+    "decision_capsule_id": "48ba7fa95a0a82bd12525e1a7dd953eb5ac3c1a3b324d4fd8058b6dae2bb2ca8",
+    "decision_capsule_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+    "dedupe_evidence": {
+     "equivalence_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160"
+    },
+    "dedupe_evidence_digest": "0a9caa33ad89a467c80d10eec848bbb5162ba69a9e2197fe32463ef0f19373fb",
+    "dedupe_matched_step": null,
+    "dedupe_reason": "no equivalent action in window",
+    "dedupe_result": "pass",
+    "failing_constraints": [
+     "caps",
+     "counterparty_seen_before"
+    ],
+    "outcome": "escalate",
+    "record": {
+     "action_id": "deal-0000000000000000/2",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "pay",
+       "action_class": "money.purchase",
+       "amount_minor": 4500,
+       "currency": "USD",
+       "direction": "out",
+       "spend_minor": 4500,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "deal_id": "deal-aaaaaaaaaaaaaaaa",
+       "record_type": "check",
+       "seq": 2
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "6e5967bdee8940a336726591db3c3b1064a94d222378c15c1c060e4d60fd7216"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-11-16T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-aaaaaaaaaaaaaaaa",
+    "sealed_returned_minor": null,
+    "sealed_reverses_ref": null
+   }
+  ],
+  "cross-deal/same-deal-repeat": [
+   {
+    "candidate_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+    "decision_capsule_id": "e7757eec9f73ddd1f2e0afaece0675301184e14619bbd9d578b3270482e1fdd1",
+    "decision_capsule_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+    "dedupe_evidence": {
+     "equivalence_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160"
+    },
+    "dedupe_evidence_digest": "0a9caa33ad89a467c80d10eec848bbb5162ba69a9e2197fe32463ef0f19373fb",
+    "dedupe_matched_step": null,
+    "dedupe_reason": "no equivalent action in window",
+    "dedupe_result": "pass",
+    "failing_constraints": [
+     "caps",
+     "counterparty_seen_before"
+    ],
+    "outcome": "escalate",
+    "record": {
+     "action_id": "deal-0000000000000000/1",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "pay",
+       "action_class": "money.purchase",
+       "amount_minor": 4500,
+       "currency": "USD",
+       "direction": "out",
+       "spend_minor": 4500,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "deal_id": "deal-aaaaaaaaaaaaaaaa",
+       "record_type": "check",
+       "seq": 1
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000001",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "f94181140c5ebaee083324da6f28f7bc40d982a4a1c1257b474d3c0ea93470c4"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-07T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-aaaaaaaaaaaaaaaa",
+    "sealed_returned_minor": null,
+    "sealed_reverses_ref": null
+   },
+   {
+    "candidate_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+    "decision_capsule_id": "f1e94c1bc790c8e6b8fbc11d8b91d9ba07c8e1075149040497cd65e3c62d6378",
+    "decision_capsule_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+    "dedupe_evidence": {
+     "equivalence_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+     "matched_capsule_id": "e7757eec9f73ddd1f2e0afaece0675301184e14619bbd9d578b3270482e1fdd1"
+    },
+    "dedupe_evidence_digest": "0b04ba7fa9bb4d48720139939328b3d361416683b85f5a102e1a75159aafd381",
+    "dedupe_matched_step": 0,
+    "dedupe_reason": "equivalent action already recorded (e7757eec9f73ddd1\u2026)",
+    "dedupe_result": "fail",
+    "failing_constraints": [
+     "dedupe",
+     "caps",
+     "counterparty_seen_before"
+    ],
+    "outcome": "deny",
+    "record": {
+     "action_id": "deal-0000000000000000/2",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "pay",
+       "action_class": "money.purchase",
+       "amount_minor": 4500,
+       "currency": "USD",
+       "direction": "out",
+       "spend_minor": 4500,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "deal_id": "deal-aaaaaaaaaaaaaaaa",
+       "record_type": "check",
+       "seq": 2
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "6e5967bdee8940a336726591db3c3b1064a94d222378c15c1c060e4d60fd7216"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-08T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-aaaaaaaaaaaaaaaa",
+    "sealed_returned_minor": null,
+    "sealed_reverses_ref": null
+   }
+  ],
+  "plugin/bare-string-reverses-ref-is-absent": [
+   {
+    "candidate_key": "28c1c178f79053f5c854b26988881f3a9c57880cb5f29cc287cc24056c75dd44",
+    "decision_capsule_id": "da8e445af1b5c629b92c202f918fca2812a038b73dbef876c51b17aaee454ae8",
+    "decision_capsule_key": "28c1c178f79053f5c854b26988881f3a9c57880cb5f29cc287cc24056c75dd44",
+    "dedupe_evidence": {
+     "equivalence_key": "28c1c178f79053f5c854b26988881f3a9c57880cb5f29cc287cc24056c75dd44"
+    },
+    "dedupe_evidence_digest": "22774ca86ac71d97cae0f62eb360e937fb6c34e4b209259d076dd2631d1b8ed4",
+    "dedupe_matched_step": null,
+    "dedupe_reason": "no equivalent action in window",
+    "dedupe_result": "pass",
+    "failing_constraints": [],
+    "outcome": "allow",
+    "record": {
+     "action_id": "deal-0000000000000000/1",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "cancel",
+       "action_class": "money.refund",
+       "amount_minor": 1000,
+       "currency": "USD",
+       "direction": "in",
+       "reverses_ref": "1111111111111111111111111111111111111111111111111111111111111111",
+       "spend_minor": 0,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "deal_id": "deal-aaaaaaaaaaaaaaaa",
+       "record_type": "check",
+       "seq": 1
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000001",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "a610a535dfc791d2ea5b7a066749a3bae78c4c9ffd623d06ef7fe0c2bc65e7a6"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-07T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-aaaaaaaaaaaaaaaa",
+    "sealed_returned_minor": 1000,
+    "sealed_reverses_ref": null
+   },
+   {
+    "candidate_key": "28c1c178f79053f5c854b26988881f3a9c57880cb5f29cc287cc24056c75dd44",
+    "decision_capsule_id": "18a80f148504ab7a85f6376a321f0e02051dac119b96e79ecada33ea064e207e",
+    "decision_capsule_key": "28c1c178f79053f5c854b26988881f3a9c57880cb5f29cc287cc24056c75dd44",
+    "dedupe_evidence": {
+     "equivalence_key": "28c1c178f79053f5c854b26988881f3a9c57880cb5f29cc287cc24056c75dd44",
+     "matched_capsule_id": "da8e445af1b5c629b92c202f918fca2812a038b73dbef876c51b17aaee454ae8"
+    },
+    "dedupe_evidence_digest": "47a922caa618f7635baa8210734bd6ecd83904e3c058ff46afd5312dd9f54863",
+    "dedupe_matched_step": 0,
+    "dedupe_reason": "equivalent action already recorded (da8e445af1b5c629\u2026)",
+    "dedupe_result": "fail",
+    "failing_constraints": [
+     "dedupe"
+    ],
+    "outcome": "deny",
+    "record": {
+     "action_id": "deal-0000000000000000/2",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "cancel",
+       "action_class": "money.refund",
+       "amount_minor": 1000,
+       "currency": "USD",
+       "direction": "in",
+       "reverses_ref": "2222222222222222222222222222222222222222222222222222222222222222",
+       "spend_minor": 0,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "deal_id": "deal-aaaaaaaaaaaaaaaa",
+       "record_type": "check",
+       "seq": 2
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "3f6db7aca3c5a16f10d4a0f76c6b207e20b686394f5e8a3948444725b5ba977a"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-08T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-aaaaaaaaaaaaaaaa",
+    "sealed_returned_minor": 1000,
+    "sealed_reverses_ref": null
+   }
+  ],
+  "plugin/explicit-returned-minor-wins": [
+   {
+    "candidate_key": "ce3215b212c2a87dfea48b14871eec1a56197a96f67d93c877c1307d4a02d15f",
+    "decision_capsule_id": "3a86c0ee8494cd38e87e112aa61c2a6fd62c3ac9ebc9cdea143425f1b1cd754a",
+    "decision_capsule_key": "ce3215b212c2a87dfea48b14871eec1a56197a96f67d93c877c1307d4a02d15f",
+    "dedupe_evidence": {
+     "equivalence_key": "ce3215b212c2a87dfea48b14871eec1a56197a96f67d93c877c1307d4a02d15f"
+    },
+    "dedupe_evidence_digest": "692c65829ea3675e924e53ff69415106c53e8e5248c15d79c772a473edb91dcd",
+    "dedupe_matched_step": null,
+    "dedupe_reason": "no equivalent action in window",
+    "dedupe_result": "pass",
+    "failing_constraints": [],
+    "outcome": "allow",
+    "record": {
+     "action_id": "deal-0000000000000000/1",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "cancel",
+       "action_class": "money.refund",
+       "amount_minor": 1000,
+       "currency": "USD",
+       "direction": "in",
+       "returned_minor": 700,
+       "reverses_ref": {
+        "digest": "1111111111111111111111111111111111111111111111111111111111111111",
+        "digest_alg": "SHA-256",
+        "type": "record"
+       },
+       "spend_minor": 0,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "deal_id": "deal-aaaaaaaaaaaaaaaa",
+       "record_type": "check",
+       "seq": 1
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000001",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "0da0556a0488d1cd039af125e84adb28ce80f2dd6ebb747808a1ae82100b2f55"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-07T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-aaaaaaaaaaaaaaaa",
+    "sealed_returned_minor": 700,
+    "sealed_reverses_ref": "1111111111111111111111111111111111111111111111111111111111111111"
+   },
+   {
+    "candidate_key": "ce3215b212c2a87dfea48b14871eec1a56197a96f67d93c877c1307d4a02d15f",
+    "decision_capsule_id": "f3ac0857eabc169bc119099180f5625c2e12271fc6a6c0d126decb877481d405",
+    "decision_capsule_key": "ce3215b212c2a87dfea48b14871eec1a56197a96f67d93c877c1307d4a02d15f",
+    "dedupe_evidence": {
+     "equivalence_key": "ce3215b212c2a87dfea48b14871eec1a56197a96f67d93c877c1307d4a02d15f",
+     "matched_capsule_id": "3a86c0ee8494cd38e87e112aa61c2a6fd62c3ac9ebc9cdea143425f1b1cd754a"
+    },
+    "dedupe_evidence_digest": "6f00837c90dd67d5d83591b9a15de968a6d4b662381240aa08f057fb90a934a0",
+    "dedupe_matched_step": 0,
+    "dedupe_reason": "equivalent action already recorded (3a86c0ee8494cd38\u2026)",
+    "dedupe_result": "fail",
+    "failing_constraints": [
+     "dedupe"
+    ],
+    "outcome": "deny",
+    "record": {
+     "action_id": "deal-0000000000000000/2",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "cancel",
+       "action_class": "money.refund",
+       "amount_minor": 900,
+       "currency": "USD",
+       "direction": "in",
+       "returned_minor": 700,
+       "reverses_ref": {
+        "digest": "1111111111111111111111111111111111111111111111111111111111111111",
+        "digest_alg": "SHA-256",
+        "type": "record"
+       },
+       "spend_minor": 0,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "deal_id": "deal-aaaaaaaaaaaaaaaa",
+       "record_type": "check",
+       "seq": 2
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "5cc83e8c35385992aba5d14e7756e11ad1421b7e9e781cdaece81dbb5cd3f12f"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-08T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-aaaaaaaaaaaaaaaa",
+    "sealed_returned_minor": 700,
+    "sealed_reverses_ref": "1111111111111111111111111111111111111111111111111111111111111111"
+   }
+  ],
+  "plugin/money-out-ignores-reverses-ref": [
+   {
+    "candidate_key": "b5ece25a8d135aacee12d12584b881857cdfa73d5d1bd832e804440b55a444e4",
+    "decision_capsule_id": "bf6b791f5a552b13a9823c6228d0cbf0d23771afe05170f7b02d50e86e176a24",
+    "decision_capsule_key": "b5ece25a8d135aacee12d12584b881857cdfa73d5d1bd832e804440b55a444e4",
+    "dedupe_evidence": {
+     "equivalence_key": "b5ece25a8d135aacee12d12584b881857cdfa73d5d1bd832e804440b55a444e4"
+    },
+    "dedupe_evidence_digest": "45e6095b1a58a01f850a21cd370db696bb31f30042d16976c84dcea0c6672c46",
+    "dedupe_matched_step": null,
+    "dedupe_reason": "no equivalent action in window",
+    "dedupe_result": "pass",
+    "failing_constraints": [
+     "counterparty_seen_before"
+    ],
+    "outcome": "escalate",
+    "record": {
+     "action_id": "deal-0000000000000000/1",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "pay",
+       "action_class": "money.purchase",
+       "amount_minor": 1500,
+       "currency": "USD",
+       "direction": "out",
+       "reverses_ref": {
+        "digest": "1111111111111111111111111111111111111111111111111111111111111111",
+        "digest_alg": "SHA-256",
+        "type": "record"
+       },
+       "spend_minor": 1500,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "deal_id": "deal-aaaaaaaaaaaaaaaa",
+       "record_type": "check",
+       "seq": 1
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000001",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "55df6103b2f7e157e4949582eba92f0d64356e55ec91314931b0b209b9415aee"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-07T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-aaaaaaaaaaaaaaaa",
+    "sealed_returned_minor": null,
+    "sealed_reverses_ref": null
+   },
+   {
+    "candidate_key": "b5ece25a8d135aacee12d12584b881857cdfa73d5d1bd832e804440b55a444e4",
+    "decision_capsule_id": "43f9036b56bd22b14b1ced36dce5170bfd0561412c41a1047d40c96acb947f30",
+    "decision_capsule_key": "b5ece25a8d135aacee12d12584b881857cdfa73d5d1bd832e804440b55a444e4",
+    "dedupe_evidence": {
+     "equivalence_key": "b5ece25a8d135aacee12d12584b881857cdfa73d5d1bd832e804440b55a444e4",
+     "matched_capsule_id": "bf6b791f5a552b13a9823c6228d0cbf0d23771afe05170f7b02d50e86e176a24"
+    },
+    "dedupe_evidence_digest": "71d1feedb0a45d74e1a82a1ea377b096450dd0556c2eddf10b8ac8c9e10fde3a",
+    "dedupe_matched_step": 0,
+    "dedupe_reason": "equivalent action already recorded (bf6b791f5a552b13\u2026)",
+    "dedupe_result": "fail",
+    "failing_constraints": [
+     "dedupe",
+     "counterparty_seen_before"
+    ],
+    "outcome": "deny",
+    "record": {
+     "action_id": "deal-0000000000000000/2",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "pay",
+       "action_class": "money.purchase",
+       "amount_minor": 1500,
+       "currency": "USD",
+       "direction": "out",
+       "reverses_ref": {
+        "digest": "2222222222222222222222222222222222222222222222222222222222222222",
+        "digest_alg": "SHA-256",
+        "type": "record"
+       },
+       "spend_minor": 1500,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "deal_id": "deal-aaaaaaaaaaaaaaaa",
+       "record_type": "check",
+       "seq": 2
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "57f64070ab9b46bb1a7b5f4806711a0c0f221cb5761448f699ee6c9a613dfeec"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-08T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-aaaaaaaaaaaaaaaa",
+    "sealed_returned_minor": null,
+    "sealed_reverses_ref": null
+   }
+  ],
+  "plugin/partial-cancels-key-on-cancelled-amount": [
+   {
+    "candidate_key": "11a30a17c3d9319b4a78c6c1e8b7f896d505448eddd7c391f0ec63ca6523852d",
+    "decision_capsule_id": "33ce8aca9bbc71cc39de78ba2af3ad552346ae036aeac11840484047e2bce65c",
+    "decision_capsule_key": "11a30a17c3d9319b4a78c6c1e8b7f896d505448eddd7c391f0ec63ca6523852d",
+    "dedupe_evidence": {
+     "equivalence_key": "11a30a17c3d9319b4a78c6c1e8b7f896d505448eddd7c391f0ec63ca6523852d"
+    },
+    "dedupe_evidence_digest": "f526fc964475532e47d75877282ccbe8e931c21922f7f17c9f4e4de2c85a162d",
+    "dedupe_matched_step": null,
+    "dedupe_reason": "no equivalent action in window",
+    "dedupe_result": "pass",
+    "failing_constraints": [],
+    "outcome": "allow",
+    "record": {
+     "action_id": "deal-0000000000000000/1",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "cancel",
+       "action_class": "money.refund",
+       "cancelled_amount_minor": 3000,
+       "currency": "USD",
+       "direction": "in",
+       "spend_minor": 0,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "deal_id": "deal-aaaaaaaaaaaaaaaa",
+       "record_type": "check",
+       "seq": 1
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000001",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "66491e916b6f39d399bcc4d06fa75031e3f57802fa939dafbe7ae1875ad5fcaf"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-07T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-aaaaaaaaaaaaaaaa",
+    "sealed_returned_minor": 3000,
+    "sealed_reverses_ref": null
+   },
+   {
+    "candidate_key": "221509789bcd0d75a8f309c828b19c4c1924c3de3a85359ac2594889b89e941e",
+    "decision_capsule_id": "3e3bd2f0cd7d3ba2c6ed53a7a0374e93f85122281db68f7ce3008ca685ec09c3",
+    "decision_capsule_key": "221509789bcd0d75a8f309c828b19c4c1924c3de3a85359ac2594889b89e941e",
+    "dedupe_evidence": {
+     "equivalence_key": "221509789bcd0d75a8f309c828b19c4c1924c3de3a85359ac2594889b89e941e"
+    },
+    "dedupe_evidence_digest": "80d63bbbb88e673d6dfdc219b3e32132d38878817e392e7cf65e9deb9193186a",
+    "dedupe_matched_step": null,
+    "dedupe_reason": "no equivalent action in window",
+    "dedupe_result": "pass",
+    "failing_constraints": [],
+    "outcome": "allow",
+    "record": {
+     "action_id": "deal-0000000000000000/2",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "cancel",
+       "action_class": "money.refund",
+       "cancelled_amount_minor": 2000,
+       "currency": "USD",
+       "direction": "in",
+       "spend_minor": 0,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "deal_id": "deal-aaaaaaaaaaaaaaaa",
+       "record_type": "check",
+       "seq": 2
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "6b9a6822bcc49ba7b3881c36a5580b099e1abdfd30a1cb83c41f096112dbc942"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-08T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-aaaaaaaaaaaaaaaa",
+    "sealed_returned_minor": 2000,
+    "sealed_reverses_ref": null
+   },
+   {
+    "candidate_key": "11a30a17c3d9319b4a78c6c1e8b7f896d505448eddd7c391f0ec63ca6523852d",
+    "decision_capsule_id": "74879ef35a4ef444c966e436f8ce2d5f6baa8d39c6ce4c0e5b3060f18998099d",
+    "decision_capsule_key": "11a30a17c3d9319b4a78c6c1e8b7f896d505448eddd7c391f0ec63ca6523852d",
+    "dedupe_evidence": {
+     "equivalence_key": "11a30a17c3d9319b4a78c6c1e8b7f896d505448eddd7c391f0ec63ca6523852d",
+     "matched_capsule_id": "33ce8aca9bbc71cc39de78ba2af3ad552346ae036aeac11840484047e2bce65c"
+    },
+    "dedupe_evidence_digest": "555fd1983bc5f0f71e2efb5c0f985d717654e9df4a09136d68d884ab9458ebe1",
+    "dedupe_matched_step": 0,
+    "dedupe_reason": "equivalent action already recorded (33ce8aca9bbc71cc\u2026)",
+    "dedupe_result": "fail",
+    "failing_constraints": [
+     "dedupe"
+    ],
+    "outcome": "deny",
+    "record": {
+     "action_id": "deal-0000000000000000/3",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "cancel",
+       "action_class": "money.refund",
+       "cancelled_amount_minor": 3000,
+       "currency": "USD",
+       "direction": "in",
+       "spend_minor": 0,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "deal_id": "deal-aaaaaaaaaaaaaaaa",
+       "record_type": "check",
+       "seq": 3
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000003",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "550f663aea1ee1596760aa0f27e8d28a0e715f9cea249854b1e4dff80b8ad7a8"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-09T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-aaaaaaaaaaaaaaaa",
+    "sealed_returned_minor": 3000,
+    "sealed_reverses_ref": null
+   }
+  ],
+  "plugin/same-refund-same-act-other-deal": [
+   {
+    "candidate_key": "501688af755b37287eb4a8cb250b4bd02ce5defcc8c12a90892d70e26c6cf775",
+    "decision_capsule_id": "8de21e773d5a170ad21706a695a71b95b072a7086bb7501cd263dad52c4f0083",
+    "decision_capsule_key": "501688af755b37287eb4a8cb250b4bd02ce5defcc8c12a90892d70e26c6cf775",
+    "dedupe_evidence": {
+     "equivalence_key": "501688af755b37287eb4a8cb250b4bd02ce5defcc8c12a90892d70e26c6cf775"
+    },
+    "dedupe_evidence_digest": "cf6a8801ecdd6f18bce0f3b52a20b23e6d7ec7c6ce56dc89ea5ec47d9413c7cd",
+    "dedupe_matched_step": null,
+    "dedupe_reason": "no equivalent action in window",
+    "dedupe_result": "pass",
+    "failing_constraints": [],
+    "outcome": "allow",
+    "record": {
+     "action_id": "deal-0000000000000000/1",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "cancel",
+       "action_class": "money.refund",
+       "amount_minor": 1000,
+       "currency": "USD",
+       "direction": "in",
+       "reverses_ref": {
+        "digest": "1111111111111111111111111111111111111111111111111111111111111111",
+        "digest_alg": "SHA-256",
+        "type": "record"
+       },
+       "spend_minor": 0,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "deal_id": "deal-aaaaaaaaaaaaaaaa",
+       "record_type": "check",
+       "seq": 1
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000001",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "09ca8bf2beca12589c95ba7e9965236a7ad80aeac726bac4be232db6d4899de2"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-07T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-aaaaaaaaaaaaaaaa",
+    "sealed_returned_minor": 1000,
+    "sealed_reverses_ref": "1111111111111111111111111111111111111111111111111111111111111111"
+   },
+   {
+    "candidate_key": "501688af755b37287eb4a8cb250b4bd02ce5defcc8c12a90892d70e26c6cf775",
+    "decision_capsule_id": "092fc707df814f800b46515e0cb3a4ecf47b0f2612601ca5135bb2e61fbf3d93",
+    "decision_capsule_key": "501688af755b37287eb4a8cb250b4bd02ce5defcc8c12a90892d70e26c6cf775",
+    "dedupe_evidence": {
+     "equivalence_key": "501688af755b37287eb4a8cb250b4bd02ce5defcc8c12a90892d70e26c6cf775",
+     "matched_amount_minor": 0,
+     "matched_at": "2026-10-07T12:00:00Z",
+     "matched_capsule_id": "8de21e773d5a170ad21706a695a71b95b072a7086bb7501cd263dad52c4f0083",
+     "matched_currency": "USD",
+     "repeat": "other_deal"
+    },
+    "dedupe_evidence_digest": "af5d03e156433762c376af61b5bc2775e975e4b1a2cf99bfd5a8984e346f3147",
+    "dedupe_matched_step": 0,
+    "dedupe_reason": "the same act was taken in another deal inside the window: confirm it is not a duplicate",
+    "dedupe_result": "fail",
+    "failing_constraints": [
+     "dedupe"
+    ],
+    "outcome": "deny",
+    "record": {
+     "action_id": "deal-0000000000000000/2",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "cancel",
+       "action_class": "money.refund",
+       "amount_minor": 1000,
+       "currency": "USD",
+       "direction": "in",
+       "reverses_ref": {
+        "digest": "1111111111111111111111111111111111111111111111111111111111111111",
+        "digest_alg": "SHA-256",
+        "type": "record"
+       },
+       "spend_minor": 0,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "deal_id": "deal-bbbbbbbbbbbbbbbb",
+       "record_type": "check",
+       "seq": 2
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "6af1fca5901e02985b0761fd9fc5f9248d39c4f3681e2780d248c9bb4485bbf7"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-08T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-bbbbbbbbbbbbbbbb",
+    "sealed_returned_minor": 1000,
+    "sealed_reverses_ref": "1111111111111111111111111111111111111111111111111111111111111111"
+   }
+  ],
+  "plugin/typed-record-ref-same-act-refused": [
+   {
+    "candidate_key": "501688af755b37287eb4a8cb250b4bd02ce5defcc8c12a90892d70e26c6cf775",
+    "decision_capsule_id": "8de21e773d5a170ad21706a695a71b95b072a7086bb7501cd263dad52c4f0083",
+    "decision_capsule_key": "501688af755b37287eb4a8cb250b4bd02ce5defcc8c12a90892d70e26c6cf775",
+    "dedupe_evidence": {
+     "equivalence_key": "501688af755b37287eb4a8cb250b4bd02ce5defcc8c12a90892d70e26c6cf775"
+    },
+    "dedupe_evidence_digest": "cf6a8801ecdd6f18bce0f3b52a20b23e6d7ec7c6ce56dc89ea5ec47d9413c7cd",
+    "dedupe_matched_step": null,
+    "dedupe_reason": "no equivalent action in window",
+    "dedupe_result": "pass",
+    "failing_constraints": [],
+    "outcome": "allow",
+    "record": {
+     "action_id": "deal-0000000000000000/1",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "cancel",
+       "action_class": "money.refund",
+       "amount_minor": 1000,
+       "currency": "USD",
+       "direction": "in",
+       "reverses_ref": {
+        "digest": "1111111111111111111111111111111111111111111111111111111111111111",
+        "digest_alg": "SHA-256",
+        "type": "record"
+       },
+       "spend_minor": 0,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "deal_id": "deal-aaaaaaaaaaaaaaaa",
+       "record_type": "check",
+       "seq": 1
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000001",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "09ca8bf2beca12589c95ba7e9965236a7ad80aeac726bac4be232db6d4899de2"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-07T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-aaaaaaaaaaaaaaaa",
+    "sealed_returned_minor": 1000,
+    "sealed_reverses_ref": "1111111111111111111111111111111111111111111111111111111111111111"
+   },
+   {
+    "candidate_key": "501688af755b37287eb4a8cb250b4bd02ce5defcc8c12a90892d70e26c6cf775",
+    "decision_capsule_id": "b90529a8f0b884863eef817e3778abe233c1c4f3b2d515a01431d8a8feba2938",
+    "decision_capsule_key": "501688af755b37287eb4a8cb250b4bd02ce5defcc8c12a90892d70e26c6cf775",
+    "dedupe_evidence": {
+     "equivalence_key": "501688af755b37287eb4a8cb250b4bd02ce5defcc8c12a90892d70e26c6cf775",
+     "matched_capsule_id": "8de21e773d5a170ad21706a695a71b95b072a7086bb7501cd263dad52c4f0083"
+    },
+    "dedupe_evidence_digest": "6709f5d6493870b72e22e55c701f96a890e1d02894c4eddb03181b05687dd889",
+    "dedupe_matched_step": 0,
+    "dedupe_reason": "equivalent action already recorded (8de21e773d5a170a\u2026)",
+    "dedupe_result": "fail",
+    "failing_constraints": [
+     "dedupe"
+    ],
+    "outcome": "deny",
+    "record": {
+     "action_id": "deal-0000000000000000/2",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "cancel",
+       "action_class": "money.refund",
+       "amount_minor": 1000,
+       "currency": "USD",
+       "direction": "in",
+       "reverses_ref": {
+        "digest": "1111111111111111111111111111111111111111111111111111111111111111",
+        "digest_alg": "SHA-256",
+        "type": "record"
+       },
+       "spend_minor": 0,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "deal_id": "deal-aaaaaaaaaaaaaaaa",
+       "record_type": "check",
+       "seq": 2
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "7f5b6512123121961679810bb977ead77d8592918bca457c73098e10be9a248e"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-08T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-aaaaaaaaaaaaaaaa",
+    "sealed_returned_minor": 1000,
+    "sealed_reverses_ref": "1111111111111111111111111111111111111111111111111111111111111111"
+   }
+  ],
+  "plugin/typed-record-refs-different-acts-pass": [
+   {
+    "candidate_key": "501688af755b37287eb4a8cb250b4bd02ce5defcc8c12a90892d70e26c6cf775",
+    "decision_capsule_id": "8de21e773d5a170ad21706a695a71b95b072a7086bb7501cd263dad52c4f0083",
+    "decision_capsule_key": "501688af755b37287eb4a8cb250b4bd02ce5defcc8c12a90892d70e26c6cf775",
+    "dedupe_evidence": {
+     "equivalence_key": "501688af755b37287eb4a8cb250b4bd02ce5defcc8c12a90892d70e26c6cf775"
+    },
+    "dedupe_evidence_digest": "cf6a8801ecdd6f18bce0f3b52a20b23e6d7ec7c6ce56dc89ea5ec47d9413c7cd",
+    "dedupe_matched_step": null,
+    "dedupe_reason": "no equivalent action in window",
+    "dedupe_result": "pass",
+    "failing_constraints": [],
+    "outcome": "allow",
+    "record": {
+     "action_id": "deal-0000000000000000/1",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "cancel",
+       "action_class": "money.refund",
+       "amount_minor": 1000,
+       "currency": "USD",
+       "direction": "in",
+       "reverses_ref": {
+        "digest": "1111111111111111111111111111111111111111111111111111111111111111",
+        "digest_alg": "SHA-256",
+        "type": "record"
+       },
+       "spend_minor": 0,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "deal_id": "deal-aaaaaaaaaaaaaaaa",
+       "record_type": "check",
+       "seq": 1
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000001",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "09ca8bf2beca12589c95ba7e9965236a7ad80aeac726bac4be232db6d4899de2"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-07T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-aaaaaaaaaaaaaaaa",
+    "sealed_returned_minor": 1000,
+    "sealed_reverses_ref": "1111111111111111111111111111111111111111111111111111111111111111"
+   },
+   {
+    "candidate_key": "2189033043c6c4655f2c21686a369510c07f41529979526359264b14774e215c",
+    "decision_capsule_id": "074de392d8c79834146500d8e267456d2f09222019b5ea81d93193f1073eca2d",
+    "decision_capsule_key": "2189033043c6c4655f2c21686a369510c07f41529979526359264b14774e215c",
+    "dedupe_evidence": {
+     "equivalence_key": "2189033043c6c4655f2c21686a369510c07f41529979526359264b14774e215c"
+    },
+    "dedupe_evidence_digest": "4b8af24602d4eec8c2c5968a6f7c59746c0e9cb1a7350f92d6c2c2b51fb87cbf",
+    "dedupe_matched_step": null,
+    "dedupe_reason": "no equivalent action in window",
+    "dedupe_result": "pass",
+    "failing_constraints": [],
+    "outcome": "allow",
+    "record": {
+     "action_id": "deal-0000000000000000/2",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "cancel",
+       "action_class": "money.refund",
+       "amount_minor": 1000,
+       "currency": "USD",
+       "direction": "in",
+       "reverses_ref": {
+        "digest": "2222222222222222222222222222222222222222222222222222222222222222",
+        "digest_alg": "SHA-256",
+        "type": "record"
+       },
+       "spend_minor": 0,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "deal_id": "deal-aaaaaaaaaaaaaaaa",
+       "record_type": "check",
+       "seq": 2
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "a3e68f900fdf0e3b914cd64671ef1f77a0ea11385c403a92697914363a4124a2"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-08T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-aaaaaaaaaaaaaaaa",
+    "sealed_returned_minor": 1000,
+    "sealed_reverses_ref": "2222222222222222222222222222222222222222222222222222222222222222"
+   }
+  ],
+  "refund/equal-refunds-different-acts": [
+   {
+    "candidate_key": "501688af755b37287eb4a8cb250b4bd02ce5defcc8c12a90892d70e26c6cf775",
+    "decision_capsule_id": "fafd344fda761e721a3305487dc6522980ed99a85e62759d47edb08358039a71",
+    "decision_capsule_key": "501688af755b37287eb4a8cb250b4bd02ce5defcc8c12a90892d70e26c6cf775",
+    "dedupe_evidence": {
+     "equivalence_key": "501688af755b37287eb4a8cb250b4bd02ce5defcc8c12a90892d70e26c6cf775"
+    },
+    "dedupe_evidence_digest": "cf6a8801ecdd6f18bce0f3b52a20b23e6d7ec7c6ce56dc89ea5ec47d9413c7cd",
+    "dedupe_matched_step": null,
+    "dedupe_reason": "no equivalent action in window",
+    "dedupe_result": "pass",
+    "failing_constraints": [],
+    "outcome": "allow",
+    "record": {
+     "action_id": "deal-0000000000000000/2",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "cancel",
+       "action_class": "money.refund",
+       "amount_minor": 1000,
+       "currency": "USD",
+       "direction": "in",
+       "reverses_ref": {
+        "digest": "1111111111111111111111111111111111111111111111111111111111111111",
+        "digest_alg": "SHA-256",
+        "type": "deal-record"
+       },
+       "spend_minor": 0,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "deal_id": "deal-0000000000000000",
+       "record_type": "check",
+       "seq": 2
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "0082e813d8f62fc7a121b4befd57ab3210cab0badc03cd6e906ccae60b3b809d"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-07T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-0000000000000000",
+    "sealed_returned_minor": 1000,
+    "sealed_reverses_ref": "1111111111111111111111111111111111111111111111111111111111111111"
+   },
+   {
+    "candidate_key": "2189033043c6c4655f2c21686a369510c07f41529979526359264b14774e215c",
+    "decision_capsule_id": "2253a2348aa2b503e1c0541cec25a7b9d4e7d13a6f541951f937714cc9d5fea8",
+    "decision_capsule_key": "2189033043c6c4655f2c21686a369510c07f41529979526359264b14774e215c",
+    "dedupe_evidence": {
+     "equivalence_key": "2189033043c6c4655f2c21686a369510c07f41529979526359264b14774e215c"
+    },
+    "dedupe_evidence_digest": "4b8af24602d4eec8c2c5968a6f7c59746c0e9cb1a7350f92d6c2c2b51fb87cbf",
+    "dedupe_matched_step": null,
+    "dedupe_reason": "no equivalent action in window",
+    "dedupe_result": "pass",
+    "failing_constraints": [],
+    "outcome": "allow",
+    "record": {
+     "action_id": "deal-0000000000000000/3",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "cancel",
+       "action_class": "money.refund",
+       "amount_minor": 1000,
+       "currency": "USD",
+       "direction": "in",
+       "reverses_ref": {
+        "digest": "2222222222222222222222222222222222222222222222222222222222222222",
+        "digest_alg": "SHA-256",
+        "type": "deal-record"
+       },
+       "spend_minor": 0,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "deal_id": "deal-0000000000000000",
+       "record_type": "check",
+       "seq": 3
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000003",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "02687a333e1b851d21a9625b13540b2d30cd1df30183157c435d22a4ad8bf847"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-08T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-0000000000000000",
+    "sealed_returned_minor": 1000,
+    "sealed_reverses_ref": "2222222222222222222222222222222222222222222222222222222222222222"
+   }
+  ],
+  "refund/equal-refunds-no-reverses-ref-no-payee": [
+   {
+    "candidate_key": "c807a50d47354e4e1a56263ed2651a26ddefc12cfd80a9a7f67c37149ca48a19",
+    "decision_capsule_id": "fb13c02f5e44cb7659aea862c8b289fb199aa4edadb4a09e86238af710b018b0",
+    "decision_capsule_key": "c807a50d47354e4e1a56263ed2651a26ddefc12cfd80a9a7f67c37149ca48a19",
+    "dedupe_evidence": {
+     "equivalence_key": "c807a50d47354e4e1a56263ed2651a26ddefc12cfd80a9a7f67c37149ca48a19"
+    },
+    "dedupe_evidence_digest": "fb380056c85314e89f529d889129a5b5820d548fbe7682fafec44fd497b5886d",
+    "dedupe_matched_step": null,
+    "dedupe_reason": "no equivalent action in window",
+    "dedupe_result": "pass",
+    "failing_constraints": [],
+    "outcome": "allow",
+    "record": {
+     "action_id": "deal-0000000000000000/2",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "cancel",
+       "action_class": "money.refund",
+       "amount_minor": 1000,
+       "currency": "USD",
+       "direction": "in",
+       "spend_minor": 0,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "deal_id": "deal-0000000000000000",
+       "record_type": "check",
+       "seq": 2
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "facf8b006cb48f959a5d759c06fc329c67d5321a0b17e47e260d9509d5a38633"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-07T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-0000000000000000",
+    "sealed_returned_minor": 1000,
+    "sealed_reverses_ref": null
+   },
+   {
+    "candidate_key": "c807a50d47354e4e1a56263ed2651a26ddefc12cfd80a9a7f67c37149ca48a19",
+    "decision_capsule_id": "6417049d81aedd31d5b49713f0ecdef7d1b9b2f4bc8cae71f2023bf743b75f74",
+    "decision_capsule_key": "c807a50d47354e4e1a56263ed2651a26ddefc12cfd80a9a7f67c37149ca48a19",
+    "dedupe_evidence": {
+     "equivalence_key": "c807a50d47354e4e1a56263ed2651a26ddefc12cfd80a9a7f67c37149ca48a19",
+     "matched_capsule_id": "fb13c02f5e44cb7659aea862c8b289fb199aa4edadb4a09e86238af710b018b0"
+    },
+    "dedupe_evidence_digest": "f5df03026fbff82ad9363604bdfd6eca2824b7cab6a53c79a55bbb6f3a92bd61",
+    "dedupe_matched_step": 0,
+    "dedupe_reason": "equivalent action already recorded (fb13c02f5e44cb76\u2026)",
+    "dedupe_result": "fail",
+    "failing_constraints": [
+     "dedupe"
+    ],
+    "outcome": "deny",
+    "record": {
+     "action_id": "deal-0000000000000000/3",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "cancel",
+       "action_class": "money.refund",
+       "amount_minor": 1000,
+       "currency": "USD",
+       "direction": "in",
+       "spend_minor": 0,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "deal_id": "deal-0000000000000000",
+       "record_type": "check",
+       "seq": 3
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000003",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "d79e4f5d144465e791614e1be250ba3c4b8af110f2f19d8fa68098002e1aa6c2"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-08T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-0000000000000000",
+    "sealed_returned_minor": 1000,
+    "sealed_reverses_ref": null
+   }
+  ],
+  "refund/purchase-refund-purchase-spend": [
+   {
+    "candidate_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+    "decision_capsule_id": "e74d4ae69d06553688e3d27182283839a2bacf65faf31852a74e1104b742230d",
+    "decision_capsule_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+    "dedupe_evidence": {
+     "equivalence_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160"
+    },
+    "dedupe_evidence_digest": "0a9caa33ad89a467c80d10eec848bbb5162ba69a9e2197fe32463ef0f19373fb",
+    "dedupe_matched_step": null,
+    "dedupe_reason": "no equivalent action in window",
+    "dedupe_result": "pass",
+    "failing_constraints": [
+     "caps",
+     "counterparty_seen_before"
+    ],
+    "outcome": "escalate",
+    "record": {
+     "action_id": "deal-0000000000000000/2",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "pay",
+       "action_class": "money.purchase",
+       "amount_minor": 4500,
+       "currency": "USD",
+       "direction": "out",
+       "spend_minor": 4500,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "deal_id": "deal-0000000000000000",
+       "record_type": "check",
+       "seq": 2
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "2885cac86acdf633aa47110675a965d9ba8e57a91744a3798942e6a683cd1ef3"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-07T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-0000000000000000",
+    "sealed_returned_minor": null,
+    "sealed_reverses_ref": null
+   },
+   {
+    "candidate_key": "501688af755b37287eb4a8cb250b4bd02ce5defcc8c12a90892d70e26c6cf775",
+    "decision_capsule_id": "1695d08c453ea0f4c74bec97256b42add00b29c3fe0e58bcd6296cdb54322a52",
+    "decision_capsule_key": "501688af755b37287eb4a8cb250b4bd02ce5defcc8c12a90892d70e26c6cf775",
+    "dedupe_evidence": {
+     "equivalence_key": "501688af755b37287eb4a8cb250b4bd02ce5defcc8c12a90892d70e26c6cf775"
+    },
+    "dedupe_evidence_digest": "cf6a8801ecdd6f18bce0f3b52a20b23e6d7ec7c6ce56dc89ea5ec47d9413c7cd",
+    "dedupe_matched_step": null,
+    "dedupe_reason": "no equivalent action in window",
+    "dedupe_result": "pass",
+    "failing_constraints": [],
+    "outcome": "allow",
+    "record": {
+     "action_id": "deal-0000000000000000/3",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "cancel",
+       "action_class": "money.refund",
+       "amount_minor": 1000,
+       "currency": "USD",
+       "direction": "in",
+       "reverses_ref": {
+        "digest": "1111111111111111111111111111111111111111111111111111111111111111",
+        "digest_alg": "SHA-256",
+        "type": "deal-record"
+       },
+       "spend_minor": 0,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "deal_id": "deal-0000000000000000",
+       "record_type": "check",
+       "seq": 3
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000003",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "5d62dba4ff179fd8b459ee5b521d3dc8f3a5e5d04e9f82aef89f87f42d874cea"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-08T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-0000000000000000",
+    "sealed_returned_minor": 1000,
+    "sealed_reverses_ref": "1111111111111111111111111111111111111111111111111111111111111111"
+   },
+   {
+    "candidate_key": "b3f4517289ac565553d56d9fc27432dfcbed02efcbbfb1b438f7caec855b85b1",
+    "decision_capsule_id": "3bc5e8edac2bd1b1b47cb5828f759afb45a03f98f9d9b49cb2d0201a3ec600d9",
+    "decision_capsule_key": "b3f4517289ac565553d56d9fc27432dfcbed02efcbbfb1b438f7caec855b85b1",
+    "dedupe_evidence": {
+     "equivalence_key": "b3f4517289ac565553d56d9fc27432dfcbed02efcbbfb1b438f7caec855b85b1"
+    },
+    "dedupe_evidence_digest": "23c979ec611ae7cf8408deb878e89480af9b0f4ef5c540922c8b15505111fcad",
+    "dedupe_matched_step": null,
+    "dedupe_reason": "no equivalent action in window",
+    "dedupe_result": "pass",
+    "failing_constraints": [
+     "counterparty_seen_before"
+    ],
+    "outcome": "escalate",
+    "record": {
+     "action_id": "deal-0000000000000000/4",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "pay",
+       "action_class": "money.purchase",
+       "amount_minor": 700,
+       "currency": "USD",
+       "direction": "out",
+       "spend_minor": 700,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "deal_id": "deal-0000000000000000",
+       "record_type": "check",
+       "seq": 4
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000004",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "0d99ad5495795a93ea5c46b185fd74f6553c7c782a343078cc73850d5c991217"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-09T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-0000000000000000",
+    "sealed_returned_minor": null,
+    "sealed_reverses_ref": null
+   }
+  ],
+  "refund/repeated-purchase": [
+   {
+    "candidate_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+    "decision_capsule_id": "e74d4ae69d06553688e3d27182283839a2bacf65faf31852a74e1104b742230d",
+    "decision_capsule_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+    "dedupe_evidence": {
+     "equivalence_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160"
+    },
+    "dedupe_evidence_digest": "0a9caa33ad89a467c80d10eec848bbb5162ba69a9e2197fe32463ef0f19373fb",
+    "dedupe_matched_step": null,
+    "dedupe_reason": "no equivalent action in window",
+    "dedupe_result": "pass",
+    "failing_constraints": [
+     "caps",
+     "counterparty_seen_before"
+    ],
+    "outcome": "escalate",
+    "record": {
+     "action_id": "deal-0000000000000000/2",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "pay",
+       "action_class": "money.purchase",
+       "amount_minor": 4500,
+       "currency": "USD",
+       "direction": "out",
+       "spend_minor": 4500,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "deal_id": "deal-0000000000000000",
+       "record_type": "check",
+       "seq": 2
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "2885cac86acdf633aa47110675a965d9ba8e57a91744a3798942e6a683cd1ef3"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-07T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-0000000000000000",
+    "sealed_returned_minor": null,
+    "sealed_reverses_ref": null
+   },
+   {
+    "candidate_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+    "decision_capsule_id": "7c403c3dd607badfdfe96adae0b6dea3a609ac4606c175338e4f501007c5e269",
+    "decision_capsule_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+    "dedupe_evidence": {
+     "equivalence_key": "86cdc8e099e3c98a88a0f61fedd6be3f8dcad4480c67d462fd4f3cb50db45160",
+     "matched_capsule_id": "e74d4ae69d06553688e3d27182283839a2bacf65faf31852a74e1104b742230d"
+    },
+    "dedupe_evidence_digest": "158a1d46e193610e790b3e0d71b09d8ba33fbe362d49fb6314b670e9350cf93b",
+    "dedupe_matched_step": 0,
+    "dedupe_reason": "equivalent action already recorded (e74d4ae69d065536\u2026)",
+    "dedupe_result": "fail",
+    "failing_constraints": [
+     "dedupe",
+     "caps",
+     "counterparty_seen_before"
+    ],
+    "outcome": "deny",
+    "record": {
+     "action_id": "deal-0000000000000000/3",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "pay",
+       "action_class": "money.purchase",
+       "amount_minor": 4500,
+       "currency": "USD",
+       "direction": "out",
+       "spend_minor": 4500,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "deal_id": "deal-0000000000000000",
+       "record_type": "check",
+       "seq": 3
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000003",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "7b933d154c487707d73abfc8c3024229b07f310c8d8e60d087862c6e4b70c071"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-08T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-0000000000000000",
+    "sealed_returned_minor": null,
+    "sealed_reverses_ref": null
+   }
+  ],
+  "refund/same-refund-same-act": [
+   {
+    "candidate_key": "501688af755b37287eb4a8cb250b4bd02ce5defcc8c12a90892d70e26c6cf775",
+    "decision_capsule_id": "fafd344fda761e721a3305487dc6522980ed99a85e62759d47edb08358039a71",
+    "decision_capsule_key": "501688af755b37287eb4a8cb250b4bd02ce5defcc8c12a90892d70e26c6cf775",
+    "dedupe_evidence": {
+     "equivalence_key": "501688af755b37287eb4a8cb250b4bd02ce5defcc8c12a90892d70e26c6cf775"
+    },
+    "dedupe_evidence_digest": "cf6a8801ecdd6f18bce0f3b52a20b23e6d7ec7c6ce56dc89ea5ec47d9413c7cd",
+    "dedupe_matched_step": null,
+    "dedupe_reason": "no equivalent action in window",
+    "dedupe_result": "pass",
+    "failing_constraints": [],
+    "outcome": "allow",
+    "record": {
+     "action_id": "deal-0000000000000000/2",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "cancel",
+       "action_class": "money.refund",
+       "amount_minor": 1000,
+       "currency": "USD",
+       "direction": "in",
+       "reverses_ref": {
+        "digest": "1111111111111111111111111111111111111111111111111111111111111111",
+        "digest_alg": "SHA-256",
+        "type": "deal-record"
+       },
+       "spend_minor": 0,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "deal_id": "deal-0000000000000000",
+       "record_type": "check",
+       "seq": 2
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "0082e813d8f62fc7a121b4befd57ab3210cab0badc03cd6e906ccae60b3b809d"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-07T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-0000000000000000",
+    "sealed_returned_minor": 1000,
+    "sealed_reverses_ref": "1111111111111111111111111111111111111111111111111111111111111111"
+   },
+   {
+    "candidate_key": "501688af755b37287eb4a8cb250b4bd02ce5defcc8c12a90892d70e26c6cf775",
+    "decision_capsule_id": "f68fd6b74d9c5b2536246b62bf37b1573fb64e542ef07b83dcab95d8b72d76dc",
+    "decision_capsule_key": "501688af755b37287eb4a8cb250b4bd02ce5defcc8c12a90892d70e26c6cf775",
+    "dedupe_evidence": {
+     "equivalence_key": "501688af755b37287eb4a8cb250b4bd02ce5defcc8c12a90892d70e26c6cf775",
+     "matched_capsule_id": "fafd344fda761e721a3305487dc6522980ed99a85e62759d47edb08358039a71"
+    },
+    "dedupe_evidence_digest": "d6632d98b2cb7316eb991786b121d0d9c44ee23927c17998c2e01eee11853c9d",
+    "dedupe_matched_step": 0,
+    "dedupe_reason": "equivalent action already recorded (fafd344fda761e72\u2026)",
+    "dedupe_result": "fail",
+    "failing_constraints": [
+     "dedupe"
+    ],
+    "outcome": "deny",
+    "record": {
+     "action_id": "deal-0000000000000000/3",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "cancel",
+       "action_class": "money.refund",
+       "amount_minor": 1000,
+       "currency": "USD",
+       "direction": "in",
+       "reverses_ref": {
+        "digest": "1111111111111111111111111111111111111111111111111111111111111111",
+        "digest_alg": "SHA-256",
+        "type": "deal-record"
+       },
+       "spend_minor": 0,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "deal_id": "deal-0000000000000000",
+       "record_type": "check",
+       "seq": 3
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000003",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "5d62dba4ff179fd8b459ee5b521d3dc8f3a5e5d04e9f82aef89f87f42d874cea"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-08T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-0000000000000000",
+    "sealed_returned_minor": 1000,
+    "sealed_reverses_ref": "1111111111111111111111111111111111111111111111111111111111111111"
+   }
+  ],
+  "refund/two-partial-refunds-different-amounts": [
+   {
+    "candidate_key": "501688af755b37287eb4a8cb250b4bd02ce5defcc8c12a90892d70e26c6cf775",
+    "decision_capsule_id": "fafd344fda761e721a3305487dc6522980ed99a85e62759d47edb08358039a71",
+    "decision_capsule_key": "501688af755b37287eb4a8cb250b4bd02ce5defcc8c12a90892d70e26c6cf775",
+    "dedupe_evidence": {
+     "equivalence_key": "501688af755b37287eb4a8cb250b4bd02ce5defcc8c12a90892d70e26c6cf775"
+    },
+    "dedupe_evidence_digest": "cf6a8801ecdd6f18bce0f3b52a20b23e6d7ec7c6ce56dc89ea5ec47d9413c7cd",
+    "dedupe_matched_step": null,
+    "dedupe_reason": "no equivalent action in window",
+    "dedupe_result": "pass",
+    "failing_constraints": [],
+    "outcome": "allow",
+    "record": {
+     "action_id": "deal-0000000000000000/2",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "cancel",
+       "action_class": "money.refund",
+       "amount_minor": 1000,
+       "currency": "USD",
+       "direction": "in",
+       "reverses_ref": {
+        "digest": "1111111111111111111111111111111111111111111111111111111111111111",
+        "digest_alg": "SHA-256",
+        "type": "deal-record"
+       },
+       "spend_minor": 0,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "deal_id": "deal-0000000000000000",
+       "record_type": "check",
+       "seq": 2
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "0082e813d8f62fc7a121b4befd57ab3210cab0badc03cd6e906ccae60b3b809d"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-07T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-0000000000000000",
+    "sealed_returned_minor": 1000,
+    "sealed_reverses_ref": "1111111111111111111111111111111111111111111111111111111111111111"
+   },
+   {
+    "candidate_key": "e5af9f406676dfe19d04e6c434d077dd2efb0b1d99f57b679cb7710827206dfd",
+    "decision_capsule_id": "397f8199a7fd92482518aa08eb651791dc5dac9686733e91fb58a095cabd488b",
+    "decision_capsule_key": "e5af9f406676dfe19d04e6c434d077dd2efb0b1d99f57b679cb7710827206dfd",
+    "dedupe_evidence": {
+     "equivalence_key": "e5af9f406676dfe19d04e6c434d077dd2efb0b1d99f57b679cb7710827206dfd"
+    },
+    "dedupe_evidence_digest": "431941d02ad224aa3febd6610587a321acfeb351836887528bb40489f3502018",
+    "dedupe_matched_step": null,
+    "dedupe_reason": "no equivalent action in window",
+    "dedupe_result": "pass",
+    "failing_constraints": [],
+    "outcome": "allow",
+    "record": {
+     "action_id": "deal-0000000000000000/3",
+     "action_type": "fyi",
+     "agent_input": {
+      "body": {
+       "action": "cancel",
+       "action_class": "money.refund",
+       "amount_minor": 2500,
+       "currency": "USD",
+       "direction": "in",
+       "reverses_ref": {
+        "digest": "1111111111111111111111111111111111111111111111111111111111111111",
+        "digest_alg": "SHA-256",
+        "type": "deal-record"
+       },
+       "spend_minor": 0,
+       "taxonomy_version": "6"
+      },
+      "x-deal-v0": {
+       "counterparty": {
+        "fp_alg": "hmac-sha256-deal-key",
+        "ids": {
+         "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+       },
+       "deal_id": "deal-0000000000000000",
+       "record_type": "check",
+       "seq": 3
+      }
+     },
+     "capsule_id": "0000000000000000000000000000000000000000000000000000000000000003",
+     "developer": "capsulectl-deal",
+     "model_attestation": {
+      "compute_attestation": {
+       "agent_input_digest": "32293c202099fc84a6e45b01a4c18604bd3b728fb718db7d2f7b21c915160526"
+      }
+     },
+     "operator": "household-a",
+     "timestamp": "2026-10-08T12:00:00Z"
+    },
+    "sealed_deal_id": "deal-0000000000000000",
+    "sealed_returned_minor": 2500,
+    "sealed_reverses_ref": "1111111111111111111111111111111111111111111111111111111111111111"
+   }
+  ]
+ },
+ "pack_definition_digest": "c1cea374102bba60de82e16663c550a278ee07a399c5faeb285fe1ea1ea27d4d",
+ "pack_id": "asg/everyday/0.3.7",
+ "source": "internal/guard/testdata/parity/generate_dedupe_refund_cross_deal.py"
+}

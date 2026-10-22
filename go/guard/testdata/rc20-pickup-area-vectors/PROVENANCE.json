@@ -1,0 +1,49 @@
+{
+  "note": "Vectors for the Go port's pickup_area disclosure class: capsulectl v0.1.0-rc20, the release that ships the pickup_area disclosure class, run through capsule-engine's release-on-acceptance fixture steps. This sidecar is not part of the vectors.",
+  "producer": "capsulectl v0.1.0-rc20 (capsule-cli 401f39b54b6504750aa0e3de5a20749f85a5713c), core and deal plugin built from git archive of the tag with the release ldflags (capsulectl --version: capsulectl v0.1.0-rc20 (commit 401f39b54b6504750aa0e3de5a20749f85a5713c))",
+  "engine_commit": "0b9a293992eb322ee0d26df840fcf129884b58cf",
+  "sources": {
+    "sale.bundle.json, check-inputs/a-commit-1900.json, a-share-phone.json, a-share-pickup-area.json, b-share-phone.json, b-share-pickup-area.json": "out/ of capsule-engine tests/fixtures/release-on-acceptance/build.sh (at 0c93a58), run unmodified with that rc20 capsulectl and deal plugin, materiality builtin:neutral, and the fixture's inputs/ copied to in/, on a throwaway HOME, XDG_CONFIG_HOME and plugin root. Nothing was sent anywhere.",
+    "check-inputs/a-share-platform-*.json": "a-share-pickup-area.json with body.recipient_role and body.disclosing_to set to platform and body.disclosing to [pickup_area], [email, pickup_area] or [email], the record re-bound to its edited agent_input (agent_action_capsule.json_digest).",
+    "expected_live.json, expected_replay.json": "expected_live.json written by capsule-engine at 0b9a293 (git archive; the merge of #206, as for ../sale-standalone-report-vectors, and after #195's pickup_area class) through tests/test_sale_replay.py's own live_document() and replay_document(), with FIXTURE set to this directory, PACK to load_pack_dir of this repo's packs/seller-0.1.4, SALES to the copy as written and HISTORIES to as-sealed. The live document decides all eight inputs; the replay decides the five capsulectl wrote, since the platform variants keep the original share's action_id. expected_replay.json regenerated the same way by capsule-engine at 0c93a58fccb6d39797d55ec7174aae16d24f0923 (the merge of #205), whose replay reads the task authority the bundle discloses (s08 n/a to pass); expected_live.json regenerated there is byte for byte this one.",
+    "verify/sale.verify.json": "stdout of that rc20 capsulectl's verify --bundle sale.bundle.json (exit 0, VALID)."
+  },
+  "files": {
+    "check-inputs/a-commit-1900.json": {
+      "sha256": "b3003663de82a65d69192959496cbefce462528bac35601d46a4ddc48329ce9b"
+    },
+    "check-inputs/a-share-phone.json": {
+      "sha256": "7f37f0a138824943b901fe82d5afc7abd6c25e01d2ee4b7716965a9520e8a287"
+    },
+    "check-inputs/a-share-pickup-area.json": {
+      "sha256": "3c4629b089707d748e233a768efd321f2b175aa2ab7a15c49e712dfebf6074f6"
+    },
+    "check-inputs/a-share-platform-email.json": {
+      "sha256": "0b20ffc1f28a37997d5f396595607c55a3ca1e81b9b330b63b298e7d4fa50d1c"
+    },
+    "check-inputs/a-share-platform-pickup-area-email.json": {
+      "sha256": "941a2d425b31e4171e1793a25e450247bf606d8edd6f2d2bd877cbcaf469353d"
+    },
+    "check-inputs/a-share-platform-pickup-area.json": {
+      "sha256": "82389bafac9333cca6699d1905c1539914f1a2018b9882e77448b594968ef2e1"
+    },
+    "check-inputs/b-share-phone.json": {
+      "sha256": "6aff183decea6002ef52022fbd9ce96a7a6b64a4338bee11b7ad661c312e55c5"
+    },
+    "check-inputs/b-share-pickup-area.json": {
+      "sha256": "ea8e01d45e1498ae1c86057f0832a5899c0ad52d48124cfab352d61879911952"
+    },
+    "expected_live.json": {
+      "sha256": "b9a44099e3b930391e9659f467e40af30d592d9399ae7d035ab7529bc046fcf6"
+    },
+    "expected_replay.json": {
+      "sha256": "4c03ec446abf56fe6058539b2cd629f5b93921003d373d31f96259d1c3a3ac21"
+    },
+    "sale.bundle.json": {
+      "sha256": "7c3be6290becd217b66e7645717b3f6a921344837d76f448f2d3a501c9a161a7"
+    },
+    "verify/sale.verify.json": {
+      "sha256": "1397afe7b71c9ecef03822f5387d74317ab7271f463e5728bb373880a2237430"
+    }
+  }
+}

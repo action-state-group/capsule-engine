@@ -1,0 +1,1945 @@
+{
+ "definition": "promise_never/1.1.0",
+ "definition_digest": "ed9e02ed17cbd08a0f846023e7091e7636d504ba1f18c6b9173e0a2443d92b8b",
+ "sentence_marks": [
+  "\n",
+  "\u000b",
+  "\f",
+  "\r",
+  "\u001c",
+  "\u001d",
+  "\u001e",
+  "!",
+  ".",
+  "?",
+  "\u0085",
+  "\u0589",
+  "\u061d",
+  "\u061e",
+  "\u061f",
+  "\u06d4",
+  "\u0700",
+  "\u0701",
+  "\u0702",
+  "\u07f9",
+  "\u0837",
+  "\u0839",
+  "\u083d",
+  "\u083e",
+  "\u0964",
+  "\u0965",
+  "\u104a",
+  "\u104b",
+  "\u1362",
+  "\u1367",
+  "\u1368",
+  "\u166e",
+  "\u1735",
+  "\u1736",
+  "\u17d4",
+  "\u17d5",
+  "\u1803",
+  "\u1809",
+  "\u1944",
+  "\u1945",
+  "\u1aa8",
+  "\u1aa9",
+  "\u1aaa",
+  "\u1aab",
+  "\u1b4e",
+  "\u1b4f",
+  "\u1b5a",
+  "\u1b5b",
+  "\u1b5e",
+  "\u1b5f",
+  "\u1b7d",
+  "\u1b7e",
+  "\u1b7f",
+  "\u1c3b",
+  "\u1c3c",
+  "\u1c7e",
+  "\u1c7f",
+  "\u2024",
+  "\u2026",
+  "\u2028",
+  "\u2029",
+  "\u203c",
+  "\u203d",
+  "\u2047",
+  "\u2048",
+  "\u2049",
+  "\u2cf9",
+  "\u2cfa",
+  "\u2cfb",
+  "\u2e2e",
+  "\u2e3c",
+  "\u2e53",
+  "\u2e54",
+  "\u3002",
+  "\ua4ff",
+  "\ua60e",
+  "\ua60f",
+  "\ua6f3",
+  "\ua6f7",
+  "\ua876",
+  "\ua877",
+  "\ua8ce",
+  "\ua8cf",
+  "\ua92f",
+  "\ua9c8",
+  "\ua9c9",
+  "\uaa5d",
+  "\uaa5e",
+  "\uaa5f",
+  "\uaaf0",
+  "\uaaf1",
+  "\uabeb",
+  "\ufe12",
+  "\ufe15",
+  "\ufe16",
+  "\ufe52",
+  "\ufe56",
+  "\ufe57",
+  "\uff01",
+  "\uff0e",
+  "\uff1f",
+  "\uff61",
+  "\ud802\ude56",
+  "\ud802\ude57",
+  "\ud803\udf55",
+  "\ud803\udf56",
+  "\ud803\udf57",
+  "\ud803\udf58",
+  "\ud803\udf59",
+  "\ud803\udf86",
+  "\ud803\udf87",
+  "\ud803\udf88",
+  "\ud803\udf89",
+  "\ud804\udc47",
+  "\ud804\udc48",
+  "\ud804\udcbe",
+  "\ud804\udcbf",
+  "\ud804\udcc0",
+  "\ud804\udcc1",
+  "\ud804\udd41",
+  "\ud804\udd42",
+  "\ud804\udd43",
+  "\ud804\uddc5",
+  "\ud804\uddc6",
+  "\ud804\uddcd",
+  "\ud804\uddde",
+  "\ud804\udddf",
+  "\ud804\ude38",
+  "\ud804\ude39",
+  "\ud804\ude3b",
+  "\ud804\ude3c",
+  "\ud804\udea9",
+  "\ud804\udfd4",
+  "\ud804\udfd5",
+  "\ud805\udc4b",
+  "\ud805\udc4c",
+  "\ud805\uddc2",
+  "\ud805\uddc3",
+  "\ud805\uddc9",
+  "\ud805\uddca",
+  "\ud805\uddcb",
+  "\ud805\uddcc",
+  "\ud805\uddcd",
+  "\ud805\uddce",
+  "\ud805\uddcf",
+  "\ud805\uddd0",
+  "\ud805\uddd1",
+  "\ud805\uddd2",
+  "\ud805\uddd3",
+  "\ud805\uddd4",
+  "\ud805\uddd5",
+  "\ud805\uddd6",
+  "\ud805\uddd7",
+  "\ud805\ude41",
+  "\ud805\ude42",
+  "\ud805\udf3c",
+  "\ud805\udf3d",
+  "\ud805\udf3e",
+  "\ud806\udd44",
+  "\ud806\udd46",
+  "\ud806\ude42",
+  "\ud806\ude43",
+  "\ud806\ude9b",
+  "\ud806\ude9c",
+  "\ud807\udc41",
+  "\ud807\udc42",
+  "\ud807\udef7",
+  "\ud807\udef8",
+  "\ud807\udf43",
+  "\ud807\udf44",
+  "\ud81a\ude6e",
+  "\ud81a\ude6f",
+  "\ud81a\udef5",
+  "\ud81a\udf37",
+  "\ud81a\udf38",
+  "\ud81a\udf44",
+  "\ud81b\udd6e",
+  "\ud81b\udd6f",
+  "\ud81b\ude98",
+  "\ud82f\udc9f",
+  "\ud836\ude88"
+ ],
+ "vectors": [
+  {
+   "text": "The seller says it's authentic (unverified)",
+   "fits": true
+  },
+  {
+   "text": "The seller says  (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says   (unverified)",
+   "fits": false
+  },
+  {
+   "text": "the seller says it's authentic (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's authentic",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's authentic (unverified) ",
+   "fits": false
+  },
+  {
+   "text": " The seller says it's authentic (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says(unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says x (unverified)",
+   "fits": true
+  },
+  {
+   "text": "The seller says x (unverified) (unverified)",
+   "fits": true
+  },
+  {
+   "text": "The seller says The seller says x (unverified)",
+   "fits": true
+  },
+  {
+   "text": "The seller says it's\nreal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \n (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u000breal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u000b (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\freal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \f (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\rreal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \r (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u001creal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u001c (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u001dreal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u001d (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u001ereal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u001e (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's!real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says ! (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's.real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says . (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's?real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says ? (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u0085real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u0085 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u0589real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u0589 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u061dreal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u061d (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u061ereal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u061e (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u061freal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u061f (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u06d4real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u06d4 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u0700real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u0700 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u0701real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u0701 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u0702real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u0702 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u07f9real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u07f9 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u0837real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u0837 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u0839real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u0839 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u083dreal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u083d (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u083ereal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u083e (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u0964real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u0964 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u0965real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u0965 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u104areal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u104a (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u104breal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u104b (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u1362real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u1362 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u1367real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u1367 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u1368real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u1368 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u166ereal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u166e (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u1735real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u1735 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u1736real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u1736 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u17d4real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u17d4 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u17d5real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u17d5 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u1803real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u1803 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u1809real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u1809 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u1944real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u1944 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u1945real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u1945 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u1aa8real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u1aa8 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u1aa9real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u1aa9 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u1aaareal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u1aaa (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u1aabreal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u1aab (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u1b4ereal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u1b4e (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u1b4freal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u1b4f (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u1b5areal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u1b5a (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u1b5breal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u1b5b (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u1b5ereal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u1b5e (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u1b5freal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u1b5f (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u1b7dreal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u1b7d (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u1b7ereal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u1b7e (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u1b7freal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u1b7f (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u1c3breal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u1c3b (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u1c3creal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u1c3c (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u1c7ereal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u1c7e (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u1c7freal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u1c7f (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u2024real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u2024 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u2026real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u2026 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u2028real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u2028 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u2029real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u2029 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u203creal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u203c (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u203dreal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u203d (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u2047real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u2047 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u2048real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u2048 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u2049real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u2049 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u2cf9real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u2cf9 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u2cfareal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u2cfa (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u2cfbreal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u2cfb (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u2e2ereal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u2e2e (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u2e3creal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u2e3c (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u2e53real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u2e53 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u2e54real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u2e54 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\u3002real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u3002 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ua4ffreal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ua4ff (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ua60ereal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ua60e (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ua60freal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ua60f (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ua6f3real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ua6f3 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ua6f7real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ua6f7 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ua876real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ua876 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ua877real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ua877 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ua8cereal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ua8ce (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ua8cfreal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ua8cf (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ua92freal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ua92f (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ua9c8real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ua9c8 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ua9c9real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ua9c9 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\uaa5dreal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \uaa5d (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\uaa5ereal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \uaa5e (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\uaa5freal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \uaa5f (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\uaaf0real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \uaaf0 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\uaaf1real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \uaaf1 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\uabebreal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \uabeb (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ufe12real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ufe12 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ufe15real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ufe15 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ufe16real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ufe16 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ufe52real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ufe52 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ufe56real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ufe56 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ufe57real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ufe57 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\uff01real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \uff01 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\uff0ereal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \uff0e (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\uff1freal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \uff1f (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\uff61real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \uff61 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud802\ude56real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud802\ude56 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud802\ude57real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud802\ude57 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud803\udf55real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud803\udf55 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud803\udf56real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud803\udf56 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud803\udf57real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud803\udf57 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud803\udf58real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud803\udf58 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud803\udf59real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud803\udf59 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud803\udf86real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud803\udf86 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud803\udf87real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud803\udf87 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud803\udf88real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud803\udf88 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud803\udf89real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud803\udf89 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud804\udc47real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud804\udc47 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud804\udc48real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud804\udc48 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud804\udcbereal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud804\udcbe (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud804\udcbfreal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud804\udcbf (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud804\udcc0real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud804\udcc0 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud804\udcc1real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud804\udcc1 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud804\udd41real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud804\udd41 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud804\udd42real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud804\udd42 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud804\udd43real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud804\udd43 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud804\uddc5real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud804\uddc5 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud804\uddc6real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud804\uddc6 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud804\uddcdreal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud804\uddcd (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud804\udddereal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud804\uddde (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud804\udddfreal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud804\udddf (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud804\ude38real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud804\ude38 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud804\ude39real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud804\ude39 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud804\ude3breal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud804\ude3b (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud804\ude3creal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud804\ude3c (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud804\udea9real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud804\udea9 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud804\udfd4real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud804\udfd4 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud804\udfd5real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud804\udfd5 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud805\udc4breal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud805\udc4b (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud805\udc4creal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud805\udc4c (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud805\uddc2real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud805\uddc2 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud805\uddc3real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud805\uddc3 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud805\uddc9real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud805\uddc9 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud805\uddcareal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud805\uddca (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud805\uddcbreal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud805\uddcb (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud805\uddccreal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud805\uddcc (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud805\uddcdreal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud805\uddcd (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud805\uddcereal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud805\uddce (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud805\uddcfreal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud805\uddcf (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud805\uddd0real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud805\uddd0 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud805\uddd1real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud805\uddd1 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud805\uddd2real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud805\uddd2 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud805\uddd3real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud805\uddd3 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud805\uddd4real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud805\uddd4 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud805\uddd5real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud805\uddd5 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud805\uddd6real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud805\uddd6 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud805\uddd7real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud805\uddd7 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud805\ude41real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud805\ude41 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud805\ude42real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud805\ude42 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud805\udf3creal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud805\udf3c (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud805\udf3dreal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud805\udf3d (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud805\udf3ereal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud805\udf3e (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud806\udd44real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud806\udd44 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud806\udd46real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud806\udd46 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud806\ude42real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud806\ude42 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud806\ude43real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud806\ude43 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud806\ude9breal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud806\ude9b (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud806\ude9creal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud806\ude9c (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud807\udc41real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud807\udc41 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud807\udc42real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud807\udc42 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud807\udef7real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud807\udef7 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud807\udef8real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud807\udef8 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud807\udf43real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud807\udf43 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud807\udf44real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud807\udf44 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud81a\ude6ereal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud81a\ude6e (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud81a\ude6freal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud81a\ude6f (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud81a\udef5real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud81a\udef5 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud81a\udf37real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud81a\udf37 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud81a\udf38real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud81a\udf38 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud81a\udf44real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud81a\udf44 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud81b\udd6ereal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud81b\udd6e (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud81b\udd6freal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud81b\udd6f (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud81b\ude98real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud81b\ude98 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud82f\udc9freal (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud82f\udc9f (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says it's\ud836\ude88real (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \ud836\ude88 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \t (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \tx\t (unverified)",
+   "fits": true
+  },
+  {
+   "text": "The seller says \n (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \nx\n (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u000b (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u000bx\u000b (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \f (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \fx\f (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \r (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \rx\r (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u001c (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u001cx\u001c (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u001d (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u001dx\u001d (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u001e (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u001ex\u001e (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u001f (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u001fx\u001f (unverified)",
+   "fits": true
+  },
+  {
+   "text": "The seller says   (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says  x  (unverified)",
+   "fits": true
+  },
+  {
+   "text": "The seller says \u0085 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u0085x\u0085 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u00a0 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u00a0x\u00a0 (unverified)",
+   "fits": true
+  },
+  {
+   "text": "The seller says \u1680 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u1680x\u1680 (unverified)",
+   "fits": true
+  },
+  {
+   "text": "The seller says \u2000 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u2000x\u2000 (unverified)",
+   "fits": true
+  },
+  {
+   "text": "The seller says \u2001 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u2001x\u2001 (unverified)",
+   "fits": true
+  },
+  {
+   "text": "The seller says \u2002 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u2002x\u2002 (unverified)",
+   "fits": true
+  },
+  {
+   "text": "The seller says \u2003 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u2003x\u2003 (unverified)",
+   "fits": true
+  },
+  {
+   "text": "The seller says \u2004 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u2004x\u2004 (unverified)",
+   "fits": true
+  },
+  {
+   "text": "The seller says \u2005 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u2005x\u2005 (unverified)",
+   "fits": true
+  },
+  {
+   "text": "The seller says \u2006 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u2006x\u2006 (unverified)",
+   "fits": true
+  },
+  {
+   "text": "The seller says \u2007 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u2007x\u2007 (unverified)",
+   "fits": true
+  },
+  {
+   "text": "The seller says \u2008 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u2008x\u2008 (unverified)",
+   "fits": true
+  },
+  {
+   "text": "The seller says \u2009 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u2009x\u2009 (unverified)",
+   "fits": true
+  },
+  {
+   "text": "The seller says \u200a (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u200ax\u200a (unverified)",
+   "fits": true
+  },
+  {
+   "text": "The seller says \u2028 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u2028x\u2028 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u2029 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u2029x\u2029 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u202f (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u202fx\u202f (unverified)",
+   "fits": true
+  },
+  {
+   "text": "The seller says \u205f (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u205fx\u205f (unverified)",
+   "fits": true
+  },
+  {
+   "text": "The seller says \u3000 (unverified)",
+   "fits": false
+  },
+  {
+   "text": "The seller says \u3000x\u3000 (unverified)",
+   "fits": true
+  },
+  {
+   "text": "The seller says \u180e (unverified)",
+   "fits": true
+  },
+  {
+   "text": "The seller says \u180ex\u180e (unverified)",
+   "fits": true
+  },
+  {
+   "text": "The seller says \u200b (unverified)",
+   "fits": true
+  },
+  {
+   "text": "The seller says \u200bx\u200b (unverified)",
+   "fits": true
+  },
+  {
+   "text": "The seller says \ufeff (unverified)",
+   "fits": true
+  },
+  {
+   "text": "The seller says \ufeffx\ufeff (unverified)",
+   "fits": true
+  },
+  {
+   "text": "The seller says \u2060 (unverified)",
+   "fits": true
+  },
+  {
+   "text": "The seller says \u2060x\u2060 (unverified)",
+   "fits": true
+  }
+ ]
+}

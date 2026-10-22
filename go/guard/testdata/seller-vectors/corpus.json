@@ -1,0 +1,455 @@
+{
+ "note": "corpus.json is the seller pack's fixture scenario (tests/test_pack_seller_acceptance.py), exported as data: one synthetic sale, two buyer threads and a third buyer, run IN ORDER on ONE ledger, because required_disclosure, single_commitment and verify_before_dispatch read what the earlier steps sealed. A step with \"cites_acceptance\": true sets cited_mandate_capsule_id to the capsule_id the step named by \"acceptance_step\" sealed. Every step is checked with the corpus's task_authority_record and commercial_bounds_opening; a step naming \"authorization_record\" is checked with that record too.",
+ "pack": "capsule_engine/packs/catalog/seller (asg/seller/0.1.0)",
+ "acceptance_step": "acceptance-in-a",
+ "task_authority_record": {
+  "type": "task-authority/v0",
+  "body": {
+   "outcome_id": "seller.sell_one_item/1.0.0",
+   "allowed_actions": [
+    "offer",
+    "accept",
+    "sell"
+   ],
+   "preconditions": [],
+   "bounds_commitment": "13563d6685d99e1bd4b5508a85a6ca679331cb3ff60e8516177ccafcfd5b4998"
+  }
+ },
+ "task_authority_ref": "4f3daa3f232d82511f2a208234ba6fbcdd628cc8fd3ab564682281facbb9b3b1",
+ "commercial_bounds_opening": {
+  "document": {
+   "type": "commercial-bounds/v0",
+   "min_total_minor": 170000
+  },
+  "nonce": "43a3c8a2914ecd228f722ed9f47dc4b4005cc1e257bc64777c0635a41ba7ea67",
+  "bounds_commitment": "13563d6685d99e1bd4b5508a85a6ca679331cb3ff60e8516177ccafcfd5b4998"
+ },
+ "steps": [
+  {
+   "name": "condition-told-to-a",
+   "dry_run": false,
+   "cites_acceptance": false,
+   "action": {
+    "verb": "tell",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/seller-fixture-condition-a",
+    "timestamp": "2026-10-09T10:01:00Z",
+    "target": "cp-fp:8750c05eae488009da8185b826b24a5bf39beea02990b45967558bbc1c9525ba",
+    "equivalence_key": "tell/condition-a",
+    "extra": {},
+    "representation_class": "condition"
+   },
+   "expected_outcome": "allow"
+  },
+  {
+   "name": "condition-told-to-b",
+   "dry_run": false,
+   "cites_acceptance": false,
+   "action": {
+    "verb": "tell",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/seller-fixture-condition-b",
+    "timestamp": "2026-10-09T10:02:00Z",
+    "target": "cp-fp:0332b9d3a12dc7bae70bc62d778e573f3ca8593d9efe62e4bb69a613c5c5b6e2",
+    "equivalence_key": "tell/condition-b",
+    "extra": {},
+    "representation_class": "condition"
+   },
+   "expected_outcome": "allow"
+  },
+  {
+   "name": "counter-above-floor-in-a",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/seller-fixture-counter-a",
+    "timestamp": "2026-10-09T10:03:00Z",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:8750c05eae488009da8185b826b24a5bf39beea02990b45967558bbc1c9525ba",
+    "equivalence_key": "offer/counter-a",
+    "extra": {},
+    "task_authority_ref": "4f3daa3f232d82511f2a208234ba6fbcdd628cc8fd3ab564682281facbb9b3b1",
+    "proposal_at": "2026-10-09T10:02:00Z",
+    "item_ref": "item-ref:279f2db092a5cedb13e0cbe00eda28d0b970f7492af7592213d97b92b489a572"
+   },
+   "expected_outcome": "allow"
+  },
+  {
+   "name": "offer-below-floor-in-b",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/seller-fixture-below-floor-b",
+    "timestamp": "2026-10-09T10:04:00Z",
+    "amount_minor": 168000,
+    "currency": "USD",
+    "target": "cp-fp:0332b9d3a12dc7bae70bc62d778e573f3ca8593d9efe62e4bb69a613c5c5b6e2",
+    "equivalence_key": "offer/below-floor-b",
+    "extra": {},
+    "task_authority_ref": "4f3daa3f232d82511f2a208234ba6fbcdd628cc8fd3ab564682281facbb9b3b1",
+    "proposal_at": "2026-10-09T10:03:00Z",
+    "item_ref": "item-ref:279f2db092a5cedb13e0cbe00eda28d0b970f7492af7592213d97b92b489a572"
+   },
+   "expected_outcome": "escalate"
+  },
+  {
+   "name": "offer-before-required-statement",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/seller-fixture-no-condition-c",
+    "timestamp": "2026-10-09T10:05:00Z",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:ac57e8580af91d3685978e3cdb9ac36b40add643ad8ac8fc508ffc3fb5e2f1a5",
+    "equivalence_key": "offer/no-condition-c",
+    "extra": {},
+    "task_authority_ref": "4f3daa3f232d82511f2a208234ba6fbcdd628cc8fd3ab564682281facbb9b3b1",
+    "proposal_at": "2026-10-09T10:04:00Z",
+    "item_ref": "item-ref:279f2db092a5cedb13e0cbe00eda28d0b970f7492af7592213d97b92b489a572"
+   },
+   "expected_outcome": "escalate"
+  },
+  {
+   "name": "offer-on-a-stale-proposal",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/seller-fixture-stale-a",
+    "timestamp": "2026-10-09T10:06:00Z",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:8750c05eae488009da8185b826b24a5bf39beea02990b45967558bbc1c9525ba",
+    "equivalence_key": "offer/stale-a",
+    "extra": {},
+    "task_authority_ref": "4f3daa3f232d82511f2a208234ba6fbcdd628cc8fd3ab564682281facbb9b3b1",
+    "proposal_at": "2026-10-07T10:06:00Z",
+    "item_ref": "item-ref:279f2db092a5cedb13e0cbe00eda28d0b970f7492af7592213d97b92b489a572"
+   },
+   "expected_outcome": "escalate"
+  },
+  {
+   "name": "offer-outside-the-task",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "action": {
+    "verb": "offer_bundle",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer_bundle/seller-fixture-bundle-a",
+    "timestamp": "2026-10-09T10:07:00Z",
+    "amount_minor": 190000,
+    "currency": "USD",
+    "target": "cp-fp:8750c05eae488009da8185b826b24a5bf39beea02990b45967558bbc1c9525ba",
+    "equivalence_key": "offer_bundle/bundle-a",
+    "extra": {},
+    "task_authority_ref": "4f3daa3f232d82511f2a208234ba6fbcdd628cc8fd3ab564682281facbb9b3b1",
+    "proposal_at": "2026-10-09T10:06:00Z",
+    "item_ref": "item-ref:279f2db092a5cedb13e0cbe00eda28d0b970f7492af7592213d97b92b489a572"
+   },
+   "expected_outcome": "escalate"
+  },
+  {
+   "name": "statement-warranty-unapproved",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "action": {
+    "verb": "tell",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/seller-fixture-warranty-unapproved",
+    "timestamp": "2026-10-09T10:08:00Z",
+    "target": "cp-fp:8750c05eae488009da8185b826b24a5bf39beea02990b45967558bbc1c9525ba",
+    "equivalence_key": "tell/warranty-unapproved",
+    "extra": {},
+    "representation_class": "warranty"
+   },
+   "expected_outcome": "escalate"
+  },
+  {
+   "name": "statement-warranty-approved",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "action": {
+    "verb": "tell",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/seller-fixture-warranty-approved",
+    "timestamp": "2026-10-09T10:09:00Z",
+    "target": "cp-fp:8750c05eae488009da8185b826b24a5bf39beea02990b45967558bbc1c9525ba",
+    "equivalence_key": "tell/warranty-approved",
+    "extra": {},
+    "representation_class": "warranty",
+    "authorized_by": "6eea944171a9b650cb20061b358b9bf8e32c1b7c9120e3c49f26576e8f787100"
+   },
+   "expected_outcome": "allow",
+   "authorization_record": {
+    "type": "approval/v0",
+    "body": {
+     "representation_class": "warranty"
+    }
+   }
+  },
+  {
+   "name": "statement-authenticity",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "action": {
+    "verb": "tell",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/seller-fixture-authenticity",
+    "timestamp": "2026-10-09T10:10:00Z",
+    "target": "cp-fp:8750c05eae488009da8185b826b24a5bf39beea02990b45967558bbc1c9525ba",
+    "equivalence_key": "tell/authenticity",
+    "extra": {},
+    "representation_class": "authenticity",
+    "authorized_by": "6eea944171a9b650cb20061b358b9bf8e32c1b7c9120e3c49f26576e8f787100"
+   },
+   "expected_outcome": "deny"
+  },
+  {
+   "name": "pickup-told-to-a",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "action": {
+    "verb": "tell",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant-repeat@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/seller-fixture-pickup-a",
+    "timestamp": "2026-10-09T10:11:00Z",
+    "target": "cp-fp:8750c05eae488009da8185b826b24a5bf39beea02990b45967558bbc1c9525ba",
+    "extra": {},
+    "representation_class": "pickup"
+   },
+   "expected_outcome": "allow"
+  },
+  {
+   "name": "pickup-told-to-a-again",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "action": {
+    "verb": "tell",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant-repeat@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/seller-fixture-pickup-a-again",
+    "timestamp": "2026-10-09T10:12:00Z",
+    "target": "cp-fp:8750c05eae488009da8185b826b24a5bf39beea02990b45967558bbc1c9525ba",
+    "extra": {},
+    "representation_class": "pickup"
+   },
+   "expected_outcome": "deny"
+  },
+  {
+   "name": "address-to-a-before-acceptance",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "action": {
+    "verb": "share_address",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "disclosure.personal",
+    "action_id": "share_address/seller-fixture-a-before",
+    "timestamp": "2026-10-09T10:13:00Z",
+    "target": "cp-fp:8750c05eae488009da8185b826b24a5bf39beea02990b45967558bbc1c9525ba",
+    "equivalence_key": "share_address/a-before",
+    "extra": {},
+    "recipient_role": "buyer",
+    "representation_class": "address"
+   },
+   "expected_outcome": "escalate"
+  },
+  {
+   "name": "address-citing-an-unknown-mandate",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "action": {
+    "verb": "share_address",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "disclosure.personal",
+    "action_id": "share_address/seller-fixture-a-unknown-mandate",
+    "timestamp": "2026-10-09T10:14:00Z",
+    "target": "cp-fp:8750c05eae488009da8185b826b24a5bf39beea02990b45967558bbc1c9525ba",
+    "cited_mandate_capsule_id": "6666666666666666666666666666666666666666666666666666666666666666",
+    "equivalence_key": "share_address/a-unknown-mandate",
+    "extra": {},
+    "recipient_role": "buyer",
+    "representation_class": "address"
+   },
+   "expected_outcome": "deny"
+  },
+  {
+   "name": "listing-views-read",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "action": {
+    "verb": "read_listing_views",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "info.query",
+    "action_id": "read_listing_views/seller-fixture-1",
+    "timestamp": "2026-10-09T10:15:00Z",
+    "target": "listing/own",
+    "equivalence_key": "read_listing_views/1",
+    "extra": {}
+   },
+   "expected_outcome": "allow"
+  },
+  {
+   "name": "acceptance-in-a",
+   "dry_run": false,
+   "cites_acceptance": false,
+   "action": {
+    "verb": "accept",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "agreement.accept",
+    "action_id": "accept/seller-fixture-accept-a",
+    "timestamp": "2026-10-09T10:16:00Z",
+    "amount_minor": 175000,
+    "currency": "USD",
+    "target": "cp-fp:8750c05eae488009da8185b826b24a5bf39beea02990b45967558bbc1c9525ba",
+    "equivalence_key": "accept/accept-a",
+    "extra": {},
+    "task_authority_ref": "4f3daa3f232d82511f2a208234ba6fbcdd628cc8fd3ab564682281facbb9b3b1",
+    "proposal_at": "2026-10-09T10:15:00Z",
+    "item_ref": "item-ref:279f2db092a5cedb13e0cbe00eda28d0b970f7492af7592213d97b92b489a572"
+   },
+   "expected_outcome": "allow"
+  },
+  {
+   "name": "second-commitment-in-b",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/seller-fixture-after-accept-b",
+    "timestamp": "2026-10-09T10:17:00Z",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:0332b9d3a12dc7bae70bc62d778e573f3ca8593d9efe62e4bb69a613c5c5b6e2",
+    "equivalence_key": "offer/after-accept-b",
+    "extra": {},
+    "task_authority_ref": "4f3daa3f232d82511f2a208234ba6fbcdd628cc8fd3ab564682281facbb9b3b1",
+    "proposal_at": "2026-10-09T10:16:00Z",
+    "item_ref": "item-ref:279f2db092a5cedb13e0cbe00eda28d0b970f7492af7592213d97b92b489a572"
+   },
+   "expected_outcome": "deny"
+  },
+  {
+   "name": "address-to-a-after-acceptance",
+   "dry_run": true,
+   "cites_acceptance": true,
+   "action": {
+    "verb": "share_address",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "disclosure.personal",
+    "action_id": "share_address/seller-fixture-a-after",
+    "timestamp": "2026-10-09T10:18:00Z",
+    "target": "cp-fp:8750c05eae488009da8185b826b24a5bf39beea02990b45967558bbc1c9525ba",
+    "equivalence_key": "share_address/a-after",
+    "extra": {},
+    "recipient_role": "buyer",
+    "representation_class": "address"
+   },
+   "expected_outcome": "escalate"
+  },
+  {
+   "name": "address-to-a-third-party",
+   "dry_run": true,
+   "cites_acceptance": true,
+   "action": {
+    "verb": "share_address",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "disclosure.personal",
+    "action_id": "share_address/seller-fixture-third-party",
+    "timestamp": "2026-10-09T10:19:00Z",
+    "target": "cp-fp:a5b9f881f4411a00586e56fe10598f96e5ebab3c91419222b6f47917805fc229",
+    "equivalence_key": "share_address/third-party",
+    "extra": {},
+    "recipient_role": "third_party",
+    "representation_class": "address"
+   },
+   "expected_outcome": "deny"
+  },
+  {
+   "name": "sale-to-a-on-an-allowed-rail",
+   "dry_run": true,
+   "cites_acceptance": true,
+   "action": {
+    "verb": "sell",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.sale",
+    "action_id": "sell/seller-fixture-sale-a",
+    "timestamp": "2026-10-09T10:20:00Z",
+    "amount_minor": 175000,
+    "currency": "USD",
+    "target": "cp-fp:8750c05eae488009da8185b826b24a5bf39beea02990b45967558bbc1c9525ba",
+    "equivalence_key": "sell/sale-a",
+    "rail": "card",
+    "extra": {},
+    "task_authority_ref": "4f3daa3f232d82511f2a208234ba6fbcdd628cc8fd3ab564682281facbb9b3b1",
+    "proposal_at": "2026-10-09T10:19:00Z",
+    "item_ref": "item-ref:279f2db092a5cedb13e0cbe00eda28d0b970f7492af7592213d97b92b489a572"
+   },
+   "expected_outcome": "allow"
+  },
+  {
+   "name": "sale-to-a-on-a-rail-not-allowed",
+   "dry_run": true,
+   "cites_acceptance": true,
+   "action": {
+    "verb": "sell",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.sale",
+    "action_id": "sell/seller-fixture-sale-a-cheque",
+    "timestamp": "2026-10-09T10:21:00Z",
+    "amount_minor": 175000,
+    "currency": "USD",
+    "target": "cp-fp:8750c05eae488009da8185b826b24a5bf39beea02990b45967558bbc1c9525ba",
+    "equivalence_key": "sell/sale-a-cheque",
+    "rail": "cheque",
+    "extra": {},
+    "task_authority_ref": "4f3daa3f232d82511f2a208234ba6fbcdd628cc8fd3ab564682281facbb9b3b1",
+    "proposal_at": "2026-10-09T10:20:00Z",
+    "item_ref": "item-ref:279f2db092a5cedb13e0cbe00eda28d0b970f7492af7592213d97b92b489a572"
+   },
+   "expected_outcome": "escalate"
+  }
+ ]
+}

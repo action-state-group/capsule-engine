@@ -1,0 +1,14 @@
+{
+  "note": "capsule-engine #140 (AMENDMENT 9) record.deal_claims reader, decided by the engine: each file byte for byte as generated; this sidecar is not part of those bytes.",
+  "generated": "deal-claims-cases.json = python gen_deal_claims_cases.py <envelope> deal-claims-cases.json, run with PYTHONPATH at a git clone of capsule-engine b455063a26b8263bbedb80fc2bc837aff2732e69 (#140 7efd3553, #142 f91eb140), capsule_engine resolving to that clone. The cases are the engine test_seller_statements.py AMENDMENT 9 cases (out of shape, not a list, given twice, own second, delivery_promise) plus a class outside the set, an offset at, two claims, null, absent and empty.",
+  "envelope": "internal/guard/testdata/live-history-ledger-vectors/engine-b455063a/live-history/given/a-commit-1900.disposition-accept-record-deal-claims.json (the engine _given bytes for that way, vendored by #105), sha256 72d3603141b23bfa41d720fe9087bb8174cfc5f91e83c77cab2d7476d6cbd5d6",
+  "engine_commit": "b455063a26b8263bbedb80fc2bc837aff2732e69",
+  "files": {
+    "gen_deal_claims_cases.py": {
+      "sha256": "f6b059a3dcd0568c547f8a3c897646f33423d7b8235dc5f9f6f4d6418de9ec82"
+    },
+    "deal-claims-cases.json": {
+      "sha256": "dc93633f5aceb7efc5810049e97f9df61b2940eece9838638a76faba60419cb1"
+    }
+  }
+}

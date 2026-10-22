@@ -1,0 +1,345 @@
+{
+ "note": "Decision-level differential for taxonomy 6's seller-class approver: taxonomy 6 sets approver_role account_holder on marketplace.offer, marketplace.sale and agreement.accept, so a price_floor/2.0.0 failure (declared ASK -> ask_wickets {price_floor}) ESCALATES citing price_floor only; integrity failures beside it (seller.single_commitment/1.0.0, promise_never/1.0.0, same-deal dedupe) still DENY. No catalog pack cites price_floor, so each case runs a GuardEngine configured directly with wickets [price_floor/2.0.0, seller.single_commitment/1.0.0, promise_never/1.0.0] (catalog definitions at the commit under test) and ask_wickets as given (default [price_floor]), on a fresh ledger. Every step passes task_authority_record and, per its `opening` field, the commercial_bounds_opening (true: the golden opening; false: none; 'bad_nonce': the golden opening with nonce replaced by 64 zeros). The floor is capsulectl's first commercial-bounds golden vector (capsule-engine tests/fixtures/commercial-bounds/vectors.json). Steps run in order; the last step's decision is compared.",
+ "task_authority_record": {
+  "type": "task-authority/v0",
+  "body": {
+   "outcome_id": "household.sell_the_bicycle/1.0.0",
+   "allowed_actions": [
+    "offer",
+    "sell"
+   ],
+   "preconditions": [],
+   "bounds_commitment": "13563d6685d99e1bd4b5508a85a6ca679331cb3ff60e8516177ccafcfd5b4998"
+  }
+ },
+ "task_authority_ref": "97e7e75da19bf70863b695c1549ce063afd10c07087564dde922a25a7a67a4bc",
+ "commercial_bounds_opening": {
+  "document": {
+   "type": "commercial-bounds/v0",
+   "min_total_minor": 170000
+  },
+  "nonce": "43a3c8a2914ecd228f722ed9f47dc4b4005cc1e257bc64777c0635a41ba7ea67",
+  "bounds_commitment": "13563d6685d99e1bd4b5508a85a6ca679331cb3ff60e8516177ccafcfd5b4998"
+ },
+ "bad_nonce": "0000000000000000000000000000000000000000000000000000000000000000",
+ "cases": [
+  {
+   "name": "below-floor-offer-asks",
+   "expect": "escalate needs_input/hitl_dispatched: price_floor fails alone on marketplace.offer, which names account_holder in taxonomy 6",
+   "steps": [
+    {
+     "action": {
+      "verb": "offer",
+      "operator": "household-tax6-diff",
+      "developer": "assistant-t6@v1",
+      "action_class": "marketplace.offer",
+      "amount_minor": 168000,
+      "currency": "USD",
+      "target": "buyer/t6-1",
+      "item_ref": "item/bicycle",
+      "task_authority_ref": "97e7e75da19bf70863b695c1549ce063afd10c07087564dde922a25a7a67a4bc",
+      "action_id": "offer/tax6-diff-1",
+      "timestamp": "2026-10-08T09:01:00Z"
+     },
+     "opening": true,
+     "dry_run": false
+    }
+   ]
+  },
+  {
+   "name": "below-floor-sale-asks",
+   "expect": "escalate: same on marketplace.sale",
+   "steps": [
+    {
+     "action": {
+      "verb": "sell",
+      "operator": "household-tax6-diff",
+      "developer": "assistant-t6@v1",
+      "action_class": "marketplace.sale",
+      "amount_minor": 168000,
+      "currency": "USD",
+      "target": "buyer/t6-2",
+      "item_ref": "item/bicycle",
+      "task_authority_ref": "97e7e75da19bf70863b695c1549ce063afd10c07087564dde922a25a7a67a4bc",
+      "action_id": "sell/tax6-diff-2",
+      "timestamp": "2026-10-08T09:02:00Z"
+     },
+     "opening": true,
+     "dry_run": false
+    }
+   ]
+  },
+  {
+   "name": "below-floor-accept-asks",
+   "expect": "escalate: same on agreement.accept (no earlier acceptance in the sale, so single_commitment passes)",
+   "steps": [
+    {
+     "action": {
+      "verb": "accept",
+      "operator": "household-tax6-diff",
+      "developer": "assistant-t6@v1",
+      "action_class": "agreement.accept",
+      "amount_minor": 168000,
+      "currency": "USD",
+      "target": "buyer/t6-3",
+      "item_ref": "item/bicycle",
+      "task_authority_ref": "97e7e75da19bf70863b695c1549ce063afd10c07087564dde922a25a7a67a4bc",
+      "action_id": "accept/tax6-diff-3",
+      "timestamp": "2026-10-08T09:03:00Z"
+     },
+     "opening": true,
+     "dry_run": false
+    }
+   ]
+  },
+  {
+   "name": "at-floor-allows",
+   "expect": "allow: price_floor passes at the floor itself",
+   "steps": [
+    {
+     "action": {
+      "verb": "offer",
+      "operator": "household-tax6-diff",
+      "developer": "assistant-t6@v1",
+      "action_class": "marketplace.offer",
+      "amount_minor": 170000,
+      "currency": "USD",
+      "target": "buyer/t6-4",
+      "item_ref": "item/bicycle",
+      "task_authority_ref": "97e7e75da19bf70863b695c1549ce063afd10c07087564dde922a25a7a67a4bc",
+      "action_id": "offer/tax6-diff-4",
+      "timestamp": "2026-10-08T09:04:00Z"
+     },
+     "opening": true,
+     "dry_run": false
+    }
+   ]
+  },
+  {
+   "name": "above-floor-allows",
+   "expect": "allow",
+   "steps": [
+    {
+     "action": {
+      "verb": "offer",
+      "operator": "household-tax6-diff",
+      "developer": "assistant-t6@v1",
+      "action_class": "marketplace.offer",
+      "amount_minor": 175000,
+      "currency": "USD",
+      "target": "buyer/t6-5",
+      "item_ref": "item/bicycle",
+      "task_authority_ref": "97e7e75da19bf70863b695c1549ce063afd10c07087564dde922a25a7a67a4bc",
+      "action_id": "offer/tax6-diff-5",
+      "timestamp": "2026-10-08T09:05:00Z"
+     },
+     "opening": true,
+     "dry_run": false
+    }
+   ]
+  },
+  {
+   "name": "no-opening-allows-n-a",
+   "expect": "allow: price_floor n/a naming commercial_bounds_opening (in scope)",
+   "steps": [
+    {
+     "action": {
+      "verb": "offer",
+      "operator": "household-tax6-diff",
+      "developer": "assistant-t6@v1",
+      "action_class": "marketplace.offer",
+      "amount_minor": 168000,
+      "currency": "USD",
+      "target": "buyer/t6-6",
+      "item_ref": "item/bicycle",
+      "task_authority_ref": "97e7e75da19bf70863b695c1549ce063afd10c07087564dde922a25a7a67a4bc",
+      "action_id": "offer/tax6-diff-6",
+      "timestamp": "2026-10-08T09:06:00Z"
+     },
+     "opening": false,
+     "dry_run": false
+    }
+   ]
+  },
+  {
+   "name": "opening-does-not-open-commitment-asks",
+   "expect": "escalate: an opening whose nonce does not open the sealed commitment fails naming bounds_commitment; declared ASK",
+   "steps": [
+    {
+     "action": {
+      "verb": "offer",
+      "operator": "household-tax6-diff",
+      "developer": "assistant-t6@v1",
+      "action_class": "marketplace.offer",
+      "amount_minor": 175000,
+      "currency": "USD",
+      "target": "buyer/t6-7",
+      "item_ref": "item/bicycle",
+      "task_authority_ref": "97e7e75da19bf70863b695c1549ce063afd10c07087564dde922a25a7a67a4bc",
+      "action_id": "offer/tax6-diff-7",
+      "timestamp": "2026-10-08T09:07:00Z"
+     },
+     "opening": "bad_nonce",
+     "dry_run": false
+    }
+   ]
+  },
+  {
+   "name": "below-floor-after-acceptance-in-sale-refuses",
+   "expect": "deny: single_commitment (integrity) fails beside price_floor",
+   "steps": [
+    {
+     "action": {
+      "verb": "accept",
+      "operator": "household-tax6-diff",
+      "developer": "assistant-t6@v1",
+      "action_class": "agreement.accept",
+      "amount_minor": 175000,
+      "currency": "USD",
+      "target": "buyer/t6-accepted",
+      "item_ref": "item/bicycle",
+      "task_authority_ref": "97e7e75da19bf70863b695c1549ce063afd10c07087564dde922a25a7a67a4bc",
+      "action_id": "accept/tax6-diff-8",
+      "timestamp": "2026-10-08T09:08:00Z"
+     },
+     "opening": true,
+     "dry_run": false
+    },
+    {
+     "action": {
+      "verb": "offer",
+      "operator": "household-tax6-diff",
+      "developer": "assistant-t6@v1",
+      "action_class": "marketplace.offer",
+      "amount_minor": 168000,
+      "currency": "USD",
+      "target": "buyer/t6-9",
+      "item_ref": "item/bicycle",
+      "task_authority_ref": "97e7e75da19bf70863b695c1549ce063afd10c07087564dde922a25a7a67a4bc",
+      "action_id": "offer/tax6-diff-9",
+      "timestamp": "2026-10-08T09:09:00Z"
+     },
+     "opening": true,
+     "dry_run": false
+    }
+   ]
+  },
+  {
+   "name": "below-floor-never-representation-refuses",
+   "expect": "deny: promise_never (integrity) fails beside price_floor",
+   "steps": [
+    {
+     "action": {
+      "verb": "offer",
+      "operator": "household-tax6-diff",
+      "developer": "assistant-t6@v1",
+      "action_class": "marketplace.offer",
+      "amount_minor": 168000,
+      "currency": "USD",
+      "target": "buyer/t6-10",
+      "item_ref": "item/bicycle",
+      "task_authority_ref": "97e7e75da19bf70863b695c1549ce063afd10c07087564dde922a25a7a67a4bc",
+      "action_id": "offer/tax6-diff-10",
+      "timestamp": "2026-10-08T09:10:00Z",
+      "representation_class": "authenticity"
+     },
+     "opening": true,
+     "dry_run": false
+    }
+   ]
+  },
+  {
+   "name": "below-floor-repeat-same-deal-refuses",
+   "expect": "deny: the second identical offer is a same-deal dedupe hit beside price_floor (first step escalates)",
+   "steps": [
+    {
+     "action": {
+      "verb": "offer",
+      "operator": "household-tax6-diff",
+      "developer": "assistant-t6@v1",
+      "action_class": "marketplace.offer",
+      "amount_minor": 168000,
+      "currency": "USD",
+      "target": "buyer/t6-11",
+      "item_ref": "item/bicycle",
+      "task_authority_ref": "97e7e75da19bf70863b695c1549ce063afd10c07087564dde922a25a7a67a4bc",
+      "action_id": "offer/tax6-diff-11",
+      "timestamp": "2026-10-08T09:11:00Z"
+     },
+     "opening": true,
+     "dry_run": false
+    },
+    {
+     "action": {
+      "verb": "offer",
+      "operator": "household-tax6-diff",
+      "developer": "assistant-t6@v1",
+      "action_class": "marketplace.offer",
+      "amount_minor": 168000,
+      "currency": "USD",
+      "target": "buyer/t6-11",
+      "item_ref": "item/bicycle",
+      "task_authority_ref": "97e7e75da19bf70863b695c1549ce063afd10c07087564dde922a25a7a67a4bc",
+      "action_id": "offer/tax6-diff-11",
+      "timestamp": "2026-10-08T09:11:00Z"
+     },
+     "opening": true,
+     "dry_run": false
+    }
+   ]
+  },
+  {
+   "name": "below-floor-not-declared-ask-refuses",
+   "expect": "deny: price_floor not in ask_wickets (its rule not declared ASK)",
+   "steps": [
+    {
+     "action": {
+      "verb": "offer",
+      "operator": "household-tax6-diff",
+      "developer": "assistant-t6@v1",
+      "action_class": "marketplace.offer",
+      "amount_minor": 168000,
+      "currency": "USD",
+      "target": "buyer/t6-12",
+      "item_ref": "item/bicycle",
+      "task_authority_ref": "97e7e75da19bf70863b695c1549ce063afd10c07087564dde922a25a7a67a4bc",
+      "action_id": "offer/tax6-diff-12",
+      "timestamp": "2026-10-08T09:12:00Z"
+     },
+     "opening": true,
+     "dry_run": false
+    }
+   ],
+   "ask_wickets": []
+  },
+  {
+   "name": "below-floor-on-a-class-with-no-approver-refuses",
+   "expect": "deny: price_floor configured to also cover external_commitment.other, which names no approver_role; reason names the missing approver",
+   "steps": [
+    {
+     "action": {
+      "verb": "commit",
+      "operator": "household-tax6-diff",
+      "developer": "assistant-t6@v1",
+      "action_class": "external_commitment.other",
+      "amount_minor": 168000,
+      "currency": "USD",
+      "target": "buyer/t6-13",
+      "item_ref": "item/bicycle",
+      "task_authority_ref": "97e7e75da19bf70863b695c1549ce063afd10c07087564dde922a25a7a67a4bc",
+      "action_id": "commit/tax6-diff-13",
+      "timestamp": "2026-10-08T09:13:00Z"
+     },
+     "opening": true,
+     "dry_run": false
+    }
+   ],
+   "price_floor_action_classes": [
+    "marketplace.offer",
+    "marketplace.sale",
+    "agreement.accept",
+    "external_commitment.other"
+   ]
+  }
+ ]
+}

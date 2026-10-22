@@ -1,0 +1,610 @@
+{
+ "field": "asg_payload.equivalence_key_digest",
+ "key_digests": {
+  "bill-2026-09": "2c1794d27201b22186f04c832785d924d9c6fd7265fb3ed446954bfa19ed20c1",
+  "bill-2026-10": "0eb04f421daae1931a988dae1546a22d381dbb405cd7bbaf9375f70a520b77b9",
+  "order-123": "7dd11f786cdcd40663a4ecaea52af7e8afe22892389f24da52f6ce2d9781921c"
+ },
+ "rule": "sealed = json_digest(equivalence_key) (JCS of the JSON string, sha256, lowercase hex) when the caller sets a key, else the field is omitted; dedupe key for an action = sealed digest if set else the default formula; for a capsule = asg_payload.equivalence_key_digest if present else the formula; field is LOCAL-ONLY (refused by every share)",
+ "scenarios": {
+  "keyed_then_unkeyed_never_match": [
+   {
+    "action_key": "7dd11f786cdcd40663a4ecaea52af7e8afe22892389f24da52f6ce2d9781921c",
+    "capsule": {
+     "action_id": "pay/dedupe-equivalence-key-1",
+     "action_type": "decide",
+     "asg_payload": {
+      "action_class": "money.transfer",
+      "amount_minor": 1250,
+      "checkpoint": {
+       "age_ms": 0,
+       "anchor_status": "unanchored",
+       "tree_size": 0,
+       "witness_reachable": true
+      },
+      "currency": "EUR",
+      "equivalence_key_digest": "7dd11f786cdcd40663a4ecaea52af7e8afe22892389f24da52f6ce2d9781921c",
+      "target": "payee/garden-centre"
+     },
+     "asg_signature": {
+      "alg": "hmac-sha256",
+      "key_id": "dedupe-equivalence-key",
+      "sig": "4a8ce157af7f1aaab94bd7e1de5e2c26872161cf55a2cedf37fbe4670ea0ad47"
+     },
+     "assurance": {
+      "attestation_mode": "self_attested",
+      "effect_mode": "not_applicable",
+      "ledger_mode": "standalone"
+     },
+     "canonicalization_id": "jcs",
+     "capsule_id": "2130276fe3a6e6e7504175458dc3c8f23f79e021786508c21ec4f6c3588fe5a0",
+     "constraints": [
+      {
+       "check_type": "policy",
+       "evidence_digest": "a36eca58e3a5b3efcba8f656371e62d3de06b64198032b9723c3126009c81fb7",
+       "id": "dedupe",
+       "method": "exact_match_index_v0",
+       "result": "pass",
+       "severity": "blocking"
+      },
+      {
+       "check_type": "policy",
+       "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+       "id": "caps",
+       "method": "spend.weekly/1.0.0",
+       "result": "n/a",
+       "severity": "blocking"
+      },
+      {
+       "check_type": "policy",
+       "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+       "id": "verify_before_dispatch",
+       "method": "agent_action_capsule.verify",
+       "result": "n/a",
+       "severity": "blocking"
+      }
+     ],
+     "developer": "assistant@v1",
+     "disposition": {
+      "approver": "policy",
+      "decision": "accept",
+      "human_disposed": false,
+      "reason_digest": "6a2eb9ff2ad0a1cd7b79af569a8253767f24f781183dd623061154dd56695abd"
+     },
+     "format_version": "4",
+     "operator": "dedupe-equivalence-key",
+     "spec_version": "draft-mih-scitt-agent-action-capsule-02",
+     "timestamp": "2026-10-09T12:01:00Z"
+    },
+    "capsule_key": "7dd11f786cdcd40663a4ecaea52af7e8afe22892389f24da52f6ce2d9781921c",
+    "dedupe": "pass",
+    "equivalence_key": "order-123",
+    "outcome": "allow"
+   },
+   {
+    "action_key": "89848f8710d93bc70a3cbd155342928a19a8acf13c2bcbbd23c020a77ac255bb",
+    "capsule": {
+     "action_id": "pay/dedupe-equivalence-key-2",
+     "action_type": "decide",
+     "asg_payload": {
+      "action_class": "money.transfer",
+      "amount_minor": 1250,
+      "checkpoint": {
+       "age_ms": 0,
+       "anchor_status": "unanchored",
+       "tree_size": 1,
+       "witness_reachable": true
+      },
+      "currency": "EUR",
+      "target": "payee/garden-centre"
+     },
+     "asg_signature": {
+      "alg": "hmac-sha256",
+      "key_id": "dedupe-equivalence-key",
+      "sig": "4f5117bd8e0986b6b11405ae4a0c734ecc6f024bd3fc24da16eb95ea94c5402d"
+     },
+     "assurance": {
+      "attestation_mode": "self_attested",
+      "effect_mode": "not_applicable",
+      "ledger_mode": "standalone"
+     },
+     "canonicalization_id": "jcs",
+     "capsule_id": "37216fe9ddc331efc1d25541fe767b5f92c5d58c4097a98ebd9417eb8e97650c",
+     "constraints": [
+      {
+       "check_type": "policy",
+       "evidence_digest": "c70a35399f4f7f6811e38e05bec633a30422d2c118fd28d98f2713ae476c74cb",
+       "id": "dedupe",
+       "method": "exact_match_index_v0",
+       "result": "pass",
+       "severity": "blocking"
+      },
+      {
+       "check_type": "policy",
+       "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+       "id": "caps",
+       "method": "spend.weekly/1.0.0",
+       "result": "n/a",
+       "severity": "blocking"
+      },
+      {
+       "check_type": "policy",
+       "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+       "id": "verify_before_dispatch",
+       "method": "agent_action_capsule.verify",
+       "result": "n/a",
+       "severity": "blocking"
+      }
+     ],
+     "developer": "assistant@v1",
+     "disposition": {
+      "approver": "policy",
+      "decision": "accept",
+      "human_disposed": false,
+      "reason_digest": "6a2eb9ff2ad0a1cd7b79af569a8253767f24f781183dd623061154dd56695abd"
+     },
+     "format_version": "4",
+     "operator": "dedupe-equivalence-key",
+     "spec_version": "draft-mih-scitt-agent-action-capsule-02",
+     "timestamp": "2026-10-09T12:02:00Z"
+    },
+    "capsule_key": "89848f8710d93bc70a3cbd155342928a19a8acf13c2bcbbd23c020a77ac255bb",
+    "dedupe": "pass",
+    "equivalence_key": null,
+    "outcome": "allow"
+   }
+  ],
+  "retry_same_key_denied": [
+   {
+    "action_key": "7dd11f786cdcd40663a4ecaea52af7e8afe22892389f24da52f6ce2d9781921c",
+    "capsule": {
+     "action_id": "pay/dedupe-equivalence-key-1",
+     "action_type": "decide",
+     "asg_payload": {
+      "action_class": "money.transfer",
+      "amount_minor": 1250,
+      "checkpoint": {
+       "age_ms": 0,
+       "anchor_status": "unanchored",
+       "tree_size": 0,
+       "witness_reachable": true
+      },
+      "currency": "EUR",
+      "equivalence_key_digest": "7dd11f786cdcd40663a4ecaea52af7e8afe22892389f24da52f6ce2d9781921c",
+      "target": "payee/garden-centre"
+     },
+     "asg_signature": {
+      "alg": "hmac-sha256",
+      "key_id": "dedupe-equivalence-key",
+      "sig": "4a8ce157af7f1aaab94bd7e1de5e2c26872161cf55a2cedf37fbe4670ea0ad47"
+     },
+     "assurance": {
+      "attestation_mode": "self_attested",
+      "effect_mode": "not_applicable",
+      "ledger_mode": "standalone"
+     },
+     "canonicalization_id": "jcs",
+     "capsule_id": "2130276fe3a6e6e7504175458dc3c8f23f79e021786508c21ec4f6c3588fe5a0",
+     "constraints": [
+      {
+       "check_type": "policy",
+       "evidence_digest": "a36eca58e3a5b3efcba8f656371e62d3de06b64198032b9723c3126009c81fb7",
+       "id": "dedupe",
+       "method": "exact_match_index_v0",
+       "result": "pass",
+       "severity": "blocking"
+      },
+      {
+       "check_type": "policy",
+       "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+       "id": "caps",
+       "method": "spend.weekly/1.0.0",
+       "result": "n/a",
+       "severity": "blocking"
+      },
+      {
+       "check_type": "policy",
+       "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+       "id": "verify_before_dispatch",
+       "method": "agent_action_capsule.verify",
+       "result": "n/a",
+       "severity": "blocking"
+      }
+     ],
+     "developer": "assistant@v1",
+     "disposition": {
+      "approver": "policy",
+      "decision": "accept",
+      "human_disposed": false,
+      "reason_digest": "6a2eb9ff2ad0a1cd7b79af569a8253767f24f781183dd623061154dd56695abd"
+     },
+     "format_version": "4",
+     "operator": "dedupe-equivalence-key",
+     "spec_version": "draft-mih-scitt-agent-action-capsule-02",
+     "timestamp": "2026-10-09T12:01:00Z"
+    },
+    "capsule_key": "7dd11f786cdcd40663a4ecaea52af7e8afe22892389f24da52f6ce2d9781921c",
+    "dedupe": "pass",
+    "equivalence_key": "order-123",
+    "outcome": "allow"
+   },
+   {
+    "action_key": "7dd11f786cdcd40663a4ecaea52af7e8afe22892389f24da52f6ce2d9781921c",
+    "capsule": {
+     "action_id": "pay/dedupe-equivalence-key-2",
+     "action_type": "decide",
+     "asg_payload": {
+      "action_class": "money.transfer",
+      "amount_minor": 1250,
+      "checkpoint": {
+       "age_ms": 0,
+       "anchor_status": "unanchored",
+       "tree_size": 1,
+       "witness_reachable": true
+      },
+      "currency": "EUR",
+      "equivalence_key_digest": "7dd11f786cdcd40663a4ecaea52af7e8afe22892389f24da52f6ce2d9781921c",
+      "target": "payee/garden-centre"
+     },
+     "asg_signature": {
+      "alg": "hmac-sha256",
+      "key_id": "dedupe-equivalence-key",
+      "sig": "8c52b8c2705c5c7782a1b4a9cc116640e3681856d36b2bdf0052a5936decccb7"
+     },
+     "assurance": {
+      "attestation_mode": "self_attested",
+      "effect_mode": "not_applicable",
+      "ledger_mode": "chained"
+     },
+     "canonicalization_id": "jcs",
+     "capsule_id": "3bc9d2a8339430c826b7e9c89bda7046f1b9780afcc186ec46833efbf71873b1",
+     "chain": {
+      "parent_capsule_id": "2130276fe3a6e6e7504175458dc3c8f23f79e021786508c21ec4f6c3588fe5a0",
+      "relation": "confirms"
+     },
+     "constraints": [
+      {
+       "check_type": "policy",
+       "evidence_digest": "112466943b1e61bd9c3bbb25f12c2b16fd471f5ff154ef553501aa029830a8e7",
+       "id": "dedupe",
+       "method": "exact_match_index_v0",
+       "result": "fail",
+       "severity": "blocking"
+      },
+      {
+       "check_type": "policy",
+       "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+       "id": "caps",
+       "method": "spend.weekly/1.0.0",
+       "result": "n/a",
+       "severity": "blocking"
+      },
+      {
+       "check_type": "policy",
+       "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+       "id": "verify_before_dispatch",
+       "method": "agent_action_capsule.verify",
+       "result": "n/a",
+       "severity": "blocking"
+      }
+     ],
+     "developer": "assistant@v1",
+     "disposition": {
+      "approver": "policy",
+      "decision": "reject",
+      "human_disposed": false,
+      "reason_digest": "150530be2dd8f1bcfbdd3e6ea6423804f4da6bf1662ce542f883a8cba3642212",
+      "verdict_class": "blocked"
+     },
+     "format_version": "4",
+     "operator": "dedupe-equivalence-key",
+     "spec_version": "draft-mih-scitt-agent-action-capsule-02",
+     "timestamp": "2026-10-09T12:02:00Z"
+    },
+    "capsule_key": "7dd11f786cdcd40663a4ecaea52af7e8afe22892389f24da52f6ce2d9781921c",
+    "dedupe": "fail",
+    "equivalence_key": "order-123",
+    "outcome": "deny"
+   }
+  ],
+  "two_keys_distinct": [
+   {
+    "action_key": "2c1794d27201b22186f04c832785d924d9c6fd7265fb3ed446954bfa19ed20c1",
+    "capsule": {
+     "action_id": "pay/dedupe-equivalence-key-1",
+     "action_type": "decide",
+     "asg_payload": {
+      "action_class": "money.transfer",
+      "amount_minor": 1250,
+      "checkpoint": {
+       "age_ms": 0,
+       "anchor_status": "unanchored",
+       "tree_size": 0,
+       "witness_reachable": true
+      },
+      "currency": "EUR",
+      "equivalence_key_digest": "2c1794d27201b22186f04c832785d924d9c6fd7265fb3ed446954bfa19ed20c1",
+      "target": "payee/garden-centre"
+     },
+     "asg_signature": {
+      "alg": "hmac-sha256",
+      "key_id": "dedupe-equivalence-key",
+      "sig": "5d76b12808c07a741a37997f856d8a3a8d5df57f4bd236bf418358d610cdd706"
+     },
+     "assurance": {
+      "attestation_mode": "self_attested",
+      "effect_mode": "not_applicable",
+      "ledger_mode": "standalone"
+     },
+     "canonicalization_id": "jcs",
+     "capsule_id": "aa9eff0f07fa02946c0983b48a4f64a67fd29e659e3e1c2087e89f451e07ca3d",
+     "constraints": [
+      {
+       "check_type": "policy",
+       "evidence_digest": "d60227f9c725b6a212841511c8794e1356a73116268cf8fcdeb376fee7f65c7d",
+       "id": "dedupe",
+       "method": "exact_match_index_v0",
+       "result": "pass",
+       "severity": "blocking"
+      },
+      {
+       "check_type": "policy",
+       "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+       "id": "caps",
+       "method": "spend.weekly/1.0.0",
+       "result": "n/a",
+       "severity": "blocking"
+      },
+      {
+       "check_type": "policy",
+       "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+       "id": "verify_before_dispatch",
+       "method": "agent_action_capsule.verify",
+       "result": "n/a",
+       "severity": "blocking"
+      }
+     ],
+     "developer": "assistant@v1",
+     "disposition": {
+      "approver": "policy",
+      "decision": "accept",
+      "human_disposed": false,
+      "reason_digest": "6a2eb9ff2ad0a1cd7b79af569a8253767f24f781183dd623061154dd56695abd"
+     },
+     "format_version": "4",
+     "operator": "dedupe-equivalence-key",
+     "spec_version": "draft-mih-scitt-agent-action-capsule-02",
+     "timestamp": "2026-10-09T12:01:00Z"
+    },
+    "capsule_key": "2c1794d27201b22186f04c832785d924d9c6fd7265fb3ed446954bfa19ed20c1",
+    "dedupe": "pass",
+    "equivalence_key": "bill-2026-09",
+    "outcome": "allow"
+   },
+   {
+    "action_key": "0eb04f421daae1931a988dae1546a22d381dbb405cd7bbaf9375f70a520b77b9",
+    "capsule": {
+     "action_id": "pay/dedupe-equivalence-key-2",
+     "action_type": "decide",
+     "asg_payload": {
+      "action_class": "money.transfer",
+      "amount_minor": 1250,
+      "checkpoint": {
+       "age_ms": 0,
+       "anchor_status": "unanchored",
+       "tree_size": 1,
+       "witness_reachable": true
+      },
+      "currency": "EUR",
+      "equivalence_key_digest": "0eb04f421daae1931a988dae1546a22d381dbb405cd7bbaf9375f70a520b77b9",
+      "target": "payee/garden-centre"
+     },
+     "asg_signature": {
+      "alg": "hmac-sha256",
+      "key_id": "dedupe-equivalence-key",
+      "sig": "88cf249efaf69f09858ead3e269081a03168ba7efc377a302b03a8c30ddd4193"
+     },
+     "assurance": {
+      "attestation_mode": "self_attested",
+      "effect_mode": "not_applicable",
+      "ledger_mode": "standalone"
+     },
+     "canonicalization_id": "jcs",
+     "capsule_id": "024f156f1a9d601cfea1e8cf2efb6e133c3a38bc9f4182fede74f98fdcb79176",
+     "constraints": [
+      {
+       "check_type": "policy",
+       "evidence_digest": "93f322ef5145c65fa4fdb98219d870982a7fd7bea3bc62867a8f2784430b0c6f",
+       "id": "dedupe",
+       "method": "exact_match_index_v0",
+       "result": "pass",
+       "severity": "blocking"
+      },
+      {
+       "check_type": "policy",
+       "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+       "id": "caps",
+       "method": "spend.weekly/1.0.0",
+       "result": "n/a",
+       "severity": "blocking"
+      },
+      {
+       "check_type": "policy",
+       "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+       "id": "verify_before_dispatch",
+       "method": "agent_action_capsule.verify",
+       "result": "n/a",
+       "severity": "blocking"
+      }
+     ],
+     "developer": "assistant@v1",
+     "disposition": {
+      "approver": "policy",
+      "decision": "accept",
+      "human_disposed": false,
+      "reason_digest": "6a2eb9ff2ad0a1cd7b79af569a8253767f24f781183dd623061154dd56695abd"
+     },
+     "format_version": "4",
+     "operator": "dedupe-equivalence-key",
+     "spec_version": "draft-mih-scitt-agent-action-capsule-02",
+     "timestamp": "2026-10-09T12:02:00Z"
+    },
+    "capsule_key": "0eb04f421daae1931a988dae1546a22d381dbb405cd7bbaf9375f70a520b77b9",
+    "dedupe": "pass",
+    "equivalence_key": "bill-2026-10",
+    "outcome": "allow"
+   }
+  ],
+  "unkeyed_repeat_denied": [
+   {
+    "action_key": "89848f8710d93bc70a3cbd155342928a19a8acf13c2bcbbd23c020a77ac255bb",
+    "capsule": {
+     "action_id": "pay/dedupe-equivalence-key-1",
+     "action_type": "decide",
+     "asg_payload": {
+      "action_class": "money.transfer",
+      "amount_minor": 1250,
+      "checkpoint": {
+       "age_ms": 0,
+       "anchor_status": "unanchored",
+       "tree_size": 0,
+       "witness_reachable": true
+      },
+      "currency": "EUR",
+      "target": "payee/garden-centre"
+     },
+     "asg_signature": {
+      "alg": "hmac-sha256",
+      "key_id": "dedupe-equivalence-key",
+      "sig": "d49af1ece9eb0fb7de524374191a507244b68ae4aaa680cd58b83946b097d590"
+     },
+     "assurance": {
+      "attestation_mode": "self_attested",
+      "effect_mode": "not_applicable",
+      "ledger_mode": "standalone"
+     },
+     "canonicalization_id": "jcs",
+     "capsule_id": "cc0c6bd21370d4117322e52489833f5eea101e45cb98a2132f39af8a0a797a30",
+     "constraints": [
+      {
+       "check_type": "policy",
+       "evidence_digest": "c70a35399f4f7f6811e38e05bec633a30422d2c118fd28d98f2713ae476c74cb",
+       "id": "dedupe",
+       "method": "exact_match_index_v0",
+       "result": "pass",
+       "severity": "blocking"
+      },
+      {
+       "check_type": "policy",
+       "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+       "id": "caps",
+       "method": "spend.weekly/1.0.0",
+       "result": "n/a",
+       "severity": "blocking"
+      },
+      {
+       "check_type": "policy",
+       "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+       "id": "verify_before_dispatch",
+       "method": "agent_action_capsule.verify",
+       "result": "n/a",
+       "severity": "blocking"
+      }
+     ],
+     "developer": "assistant@v1",
+     "disposition": {
+      "approver": "policy",
+      "decision": "accept",
+      "human_disposed": false,
+      "reason_digest": "6a2eb9ff2ad0a1cd7b79af569a8253767f24f781183dd623061154dd56695abd"
+     },
+     "format_version": "4",
+     "operator": "dedupe-equivalence-key",
+     "spec_version": "draft-mih-scitt-agent-action-capsule-02",
+     "timestamp": "2026-10-09T12:01:00Z"
+    },
+    "capsule_key": "89848f8710d93bc70a3cbd155342928a19a8acf13c2bcbbd23c020a77ac255bb",
+    "dedupe": "pass",
+    "equivalence_key": null,
+    "outcome": "allow"
+   },
+   {
+    "action_key": "89848f8710d93bc70a3cbd155342928a19a8acf13c2bcbbd23c020a77ac255bb",
+    "capsule": {
+     "action_id": "pay/dedupe-equivalence-key-2",
+     "action_type": "decide",
+     "asg_payload": {
+      "action_class": "money.transfer",
+      "amount_minor": 1250,
+      "checkpoint": {
+       "age_ms": 0,
+       "anchor_status": "unanchored",
+       "tree_size": 1,
+       "witness_reachable": true
+      },
+      "currency": "EUR",
+      "target": "payee/garden-centre"
+     },
+     "asg_signature": {
+      "alg": "hmac-sha256",
+      "key_id": "dedupe-equivalence-key",
+      "sig": "8984fcc2bc6b168d15ac9c2c1968203e3d84c903c8dcca7f760af55dff51eb8a"
+     },
+     "assurance": {
+      "attestation_mode": "self_attested",
+      "effect_mode": "not_applicable",
+      "ledger_mode": "chained"
+     },
+     "canonicalization_id": "jcs",
+     "capsule_id": "f7e4818a41c8544febc90b6abe91a64f39ccdd366f6e0fd6cebba966394f01a5",
+     "chain": {
+      "parent_capsule_id": "cc0c6bd21370d4117322e52489833f5eea101e45cb98a2132f39af8a0a797a30",
+      "relation": "confirms"
+     },
+     "constraints": [
+      {
+       "check_type": "policy",
+       "evidence_digest": "6ee5a55bb56eba6e7af1bee54c03b95be4c4a8c463b183869c3303cf7d3e95c2",
+       "id": "dedupe",
+       "method": "exact_match_index_v0",
+       "result": "fail",
+       "severity": "blocking"
+      },
+      {
+       "check_type": "policy",
+       "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+       "id": "caps",
+       "method": "spend.weekly/1.0.0",
+       "result": "n/a",
+       "severity": "blocking"
+      },
+      {
+       "check_type": "policy",
+       "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+       "id": "verify_before_dispatch",
+       "method": "agent_action_capsule.verify",
+       "result": "n/a",
+       "severity": "blocking"
+      }
+     ],
+     "developer": "assistant@v1",
+     "disposition": {
+      "approver": "policy",
+      "decision": "reject",
+      "human_disposed": false,
+      "reason_digest": "150530be2dd8f1bcfbdd3e6ea6423804f4da6bf1662ce542f883a8cba3642212",
+      "verdict_class": "blocked"
+     },
+     "format_version": "4",
+     "operator": "dedupe-equivalence-key",
+     "spec_version": "draft-mih-scitt-agent-action-capsule-02",
+     "timestamp": "2026-10-09T12:02:00Z"
+    },
+    "capsule_key": "89848f8710d93bc70a3cbd155342928a19a8acf13c2bcbbd23c020a77ac255bb",
+    "dedupe": "fail",
+    "equivalence_key": null,
+    "outcome": "deny"
+   }
+  ]
+ }
+}

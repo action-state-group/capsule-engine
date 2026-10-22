@@ -1,0 +1,466 @@
+{
+  "capsule_engine_commit": "7339028ab2117d6c7adec89a26cd5022b8ac7140",
+  "decisions": {
+    "0.3.2": {
+      "sale-channel-moved-asks": {
+        "caps_result": "n/a",
+        "decision": "accept",
+        "failing_constraints": [],
+        "outcome": "allow",
+        "reason": "allow: dedupe=pass, caps=n/a, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=n/a, material_fields_changed=n/a, offer_fields_changed=n/a, recipient_seen_before=n/a, channel_change=n/a, upfront_amount=n/a, task_authority=n/a",
+        "results_of_six": {
+          "channel_change": "n/a",
+          "material_fields_changed": "n/a",
+          "offer_fields_changed": "n/a",
+          "refundability": "n/a",
+          "task_authority": "n/a",
+          "upfront_amount": "n/a"
+        },
+        "verdict_class": null
+      },
+      "sale-deposit-over-absolute-asks": {
+        "caps_result": "n/a",
+        "decision": "accept",
+        "failing_constraints": [],
+        "outcome": "allow",
+        "reason": "allow: dedupe=pass, caps=n/a, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=n/a, material_fields_changed=n/a, offer_fields_changed=n/a, recipient_seen_before=n/a, channel_change=n/a, upfront_amount=n/a, task_authority=n/a",
+        "results_of_six": {
+          "channel_change": "n/a",
+          "material_fields_changed": "n/a",
+          "offer_fields_changed": "n/a",
+          "refundability": "n/a",
+          "task_authority": "n/a",
+          "upfront_amount": "n/a"
+        },
+        "verdict_class": null
+      },
+      "sale-deposit-over-share-asks": {
+        "caps_result": "n/a",
+        "decision": "accept",
+        "failing_constraints": [],
+        "outcome": "allow",
+        "reason": "allow: dedupe=pass, caps=n/a, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=n/a, material_fields_changed=n/a, offer_fields_changed=n/a, recipient_seen_before=n/a, channel_change=n/a, upfront_amount=n/a, task_authority=n/a",
+        "results_of_six": {
+          "channel_change": "n/a",
+          "material_fields_changed": "n/a",
+          "offer_fields_changed": "n/a",
+          "refundability": "n/a",
+          "task_authority": "n/a",
+          "upfront_amount": "n/a"
+        },
+        "verdict_class": null
+      },
+      "sale-far-over-caps-allows": {
+        "caps_result": "n/a",
+        "decision": "accept",
+        "failing_constraints": [],
+        "outcome": "allow",
+        "reason": "allow: dedupe=pass, caps=n/a, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=n/a, material_fields_changed=n/a, offer_fields_changed=n/a, recipient_seen_before=n/a, channel_change=n/a, upfront_amount=n/a, task_authority=n/a",
+        "results_of_six": {
+          "channel_change": "n/a",
+          "material_fields_changed": "n/a",
+          "offer_fields_changed": "n/a",
+          "refundability": "n/a",
+          "task_authority": "n/a",
+          "upfront_amount": "n/a"
+        },
+        "verdict_class": null
+      },
+      "sale-in-bounds-allows": {
+        "caps_result": "n/a",
+        "decision": "accept",
+        "failing_constraints": [],
+        "outcome": "allow",
+        "reason": "allow: dedupe=pass, caps=n/a, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=n/a, material_fields_changed=n/a, offer_fields_changed=n/a, recipient_seen_before=n/a, channel_change=n/a, upfront_amount=n/a, task_authority=n/a",
+        "results_of_six": {
+          "channel_change": "n/a",
+          "material_fields_changed": "n/a",
+          "offer_fields_changed": "n/a",
+          "refundability": "n/a",
+          "task_authority": "n/a",
+          "upfront_amount": "n/a"
+        },
+        "verdict_class": null
+      },
+      "sale-material-basis-other-list-allows": {
+        "caps_result": "n/a",
+        "decision": "accept",
+        "failing_constraints": [],
+        "outcome": "allow",
+        "reason": "allow: dedupe=pass, caps=n/a, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=n/a, material_fields_changed=n/a, offer_fields_changed=n/a, recipient_seen_before=n/a, channel_change=n/a, upfront_amount=n/a, task_authority=n/a",
+        "results_of_six": {
+          "channel_change": "n/a",
+          "material_fields_changed": "n/a",
+          "offer_fields_changed": "n/a",
+          "refundability": "n/a",
+          "task_authority": "n/a",
+          "upfront_amount": "n/a"
+        },
+        "verdict_class": null
+      },
+      "sale-material-terms-changed-asks": {
+        "caps_result": "n/a",
+        "decision": "accept",
+        "failing_constraints": [],
+        "outcome": "allow",
+        "reason": "allow: dedupe=pass, caps=n/a, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=n/a, material_fields_changed=n/a, offer_fields_changed=n/a, recipient_seen_before=n/a, channel_change=n/a, upfront_amount=n/a, task_authority=n/a",
+        "results_of_six": {
+          "channel_change": "n/a",
+          "material_fields_changed": "n/a",
+          "offer_fields_changed": "n/a",
+          "refundability": "n/a",
+          "task_authority": "n/a",
+          "upfront_amount": "n/a"
+        },
+        "verdict_class": null
+      },
+      "sale-no-refundable-field-allows": {
+        "caps_result": "n/a",
+        "decision": "accept",
+        "failing_constraints": [],
+        "outcome": "allow",
+        "reason": "allow: dedupe=pass, caps=n/a, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=n/a, material_fields_changed=n/a, offer_fields_changed=n/a, recipient_seen_before=n/a, channel_change=n/a, upfront_amount=n/a, task_authority=n/a",
+        "results_of_six": {
+          "channel_change": "n/a",
+          "material_fields_changed": "n/a",
+          "offer_fields_changed": "n/a",
+          "refundability": "n/a",
+          "task_authority": "n/a",
+          "upfront_amount": "n/a"
+        },
+        "verdict_class": null
+      },
+      "sale-non-refundable-asks": {
+        "caps_result": "n/a",
+        "decision": "accept",
+        "failing_constraints": [],
+        "outcome": "allow",
+        "reason": "allow: dedupe=pass, caps=n/a, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=n/a, material_fields_changed=n/a, offer_fields_changed=n/a, recipient_seen_before=n/a, channel_change=n/a, upfront_amount=n/a, task_authority=n/a",
+        "results_of_six": {
+          "channel_change": "n/a",
+          "material_fields_changed": "n/a",
+          "offer_fields_changed": "n/a",
+          "refundability": "n/a",
+          "task_authority": "n/a",
+          "upfront_amount": "n/a"
+        },
+        "verdict_class": null
+      },
+      "sale-offer-differs-asks": {
+        "caps_result": "n/a",
+        "decision": "accept",
+        "failing_constraints": [],
+        "outcome": "allow",
+        "reason": "allow: dedupe=pass, caps=n/a, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=n/a, material_fields_changed=n/a, offer_fields_changed=n/a, recipient_seen_before=n/a, channel_change=n/a, upfront_amount=n/a, task_authority=n/a",
+        "results_of_six": {
+          "channel_change": "n/a",
+          "material_fields_changed": "n/a",
+          "offer_fields_changed": "n/a",
+          "refundability": "n/a",
+          "task_authority": "n/a",
+          "upfront_amount": "n/a"
+        },
+        "verdict_class": null
+      },
+      "sale-outside-task-asks": {
+        "caps_result": "n/a",
+        "decision": "accept",
+        "failing_constraints": [],
+        "outcome": "allow",
+        "reason": "allow: dedupe=pass, caps=n/a, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=n/a, material_fields_changed=n/a, offer_fields_changed=n/a, recipient_seen_before=n/a, channel_change=n/a, upfront_amount=n/a, task_authority=n/a",
+        "results_of_six": {
+          "channel_change": "n/a",
+          "material_fields_changed": "n/a",
+          "offer_fields_changed": "n/a",
+          "refundability": "n/a",
+          "task_authority": "n/a",
+          "upfront_amount": "n/a"
+        },
+        "verdict_class": null
+      },
+      "sale-two-limits-asks-citing-both": {
+        "caps_result": "n/a",
+        "decision": "accept",
+        "failing_constraints": [],
+        "outcome": "allow",
+        "reason": "allow: dedupe=pass, caps=n/a, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=n/a, material_fields_changed=n/a, offer_fields_changed=n/a, recipient_seen_before=n/a, channel_change=n/a, upfront_amount=n/a, task_authority=n/a",
+        "results_of_six": {
+          "channel_change": "n/a",
+          "material_fields_changed": "n/a",
+          "offer_fields_changed": "n/a",
+          "refundability": "n/a",
+          "task_authority": "n/a",
+          "upfront_amount": "n/a"
+        },
+        "verdict_class": null
+      }
+    },
+    "0.3.6": {
+      "sale-channel-moved-asks": {
+        "caps_result": "n/a",
+        "decision": "needs_input",
+        "failing_constraints": [
+          "channel_change"
+        ],
+        "outcome": "escalate",
+        "reason": "escalate: dedupe=pass, caps=n/a, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=pass, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=fail, upfront_amount=pass, task_authority=pass",
+        "results_of_six": {
+          "channel_change": "fail",
+          "material_fields_changed": "pass",
+          "offer_fields_changed": "pass",
+          "refundability": "pass",
+          "task_authority": "pass",
+          "upfront_amount": "pass"
+        },
+        "verdict_class": "hitl_dispatched"
+      },
+      "sale-deposit-over-absolute-asks": {
+        "caps_result": "n/a",
+        "decision": "needs_input",
+        "failing_constraints": [
+          "upfront_amount"
+        ],
+        "outcome": "escalate",
+        "reason": "escalate: dedupe=pass, caps=n/a, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=pass, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=pass, upfront_amount=fail, task_authority=pass",
+        "results_of_six": {
+          "channel_change": "pass",
+          "material_fields_changed": "pass",
+          "offer_fields_changed": "pass",
+          "refundability": "pass",
+          "task_authority": "pass",
+          "upfront_amount": "fail"
+        },
+        "verdict_class": "hitl_dispatched"
+      },
+      "sale-deposit-over-share-asks": {
+        "caps_result": "n/a",
+        "decision": "needs_input",
+        "failing_constraints": [
+          "upfront_amount"
+        ],
+        "outcome": "escalate",
+        "reason": "escalate: dedupe=pass, caps=n/a, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=pass, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=pass, upfront_amount=fail, task_authority=pass",
+        "results_of_six": {
+          "channel_change": "pass",
+          "material_fields_changed": "pass",
+          "offer_fields_changed": "pass",
+          "refundability": "pass",
+          "task_authority": "pass",
+          "upfront_amount": "fail"
+        },
+        "verdict_class": "hitl_dispatched"
+      },
+      "sale-far-over-caps-allows": {
+        "caps_result": "n/a",
+        "decision": "accept",
+        "failing_constraints": [],
+        "outcome": "allow",
+        "reason": "allow: dedupe=pass, caps=n/a, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=pass, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=pass, upfront_amount=pass, task_authority=pass",
+        "results_of_six": {
+          "channel_change": "pass",
+          "material_fields_changed": "pass",
+          "offer_fields_changed": "pass",
+          "refundability": "pass",
+          "task_authority": "pass",
+          "upfront_amount": "pass"
+        },
+        "verdict_class": null
+      },
+      "sale-in-bounds-allows": {
+        "caps_result": "n/a",
+        "decision": "accept",
+        "failing_constraints": [],
+        "outcome": "allow",
+        "reason": "allow: dedupe=pass, caps=n/a, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=pass, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=pass, upfront_amount=pass, task_authority=pass",
+        "results_of_six": {
+          "channel_change": "pass",
+          "material_fields_changed": "pass",
+          "offer_fields_changed": "pass",
+          "refundability": "pass",
+          "task_authority": "pass",
+          "upfront_amount": "pass"
+        },
+        "verdict_class": null
+      },
+      "sale-material-basis-other-list-allows": {
+        "caps_result": "n/a",
+        "decision": "accept",
+        "failing_constraints": [],
+        "outcome": "allow",
+        "reason": "allow: dedupe=pass, caps=n/a, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=n/a, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=pass, upfront_amount=pass, task_authority=pass",
+        "results_of_six": {
+          "channel_change": "pass",
+          "material_fields_changed": "n/a",
+          "offer_fields_changed": "pass",
+          "refundability": "pass",
+          "task_authority": "pass",
+          "upfront_amount": "pass"
+        },
+        "verdict_class": null
+      },
+      "sale-material-terms-changed-asks": {
+        "caps_result": "n/a",
+        "decision": "needs_input",
+        "failing_constraints": [
+          "material_fields_changed"
+        ],
+        "outcome": "escalate",
+        "reason": "escalate: dedupe=pass, caps=n/a, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=fail, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=pass, upfront_amount=pass, task_authority=pass",
+        "results_of_six": {
+          "channel_change": "pass",
+          "material_fields_changed": "fail",
+          "offer_fields_changed": "pass",
+          "refundability": "pass",
+          "task_authority": "pass",
+          "upfront_amount": "pass"
+        },
+        "verdict_class": "hitl_dispatched"
+      },
+      "sale-no-refundable-field-allows": {
+        "caps_result": "n/a",
+        "decision": "accept",
+        "failing_constraints": [],
+        "outcome": "allow",
+        "reason": "allow: dedupe=pass, caps=n/a, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=n/a, material_fields_changed=pass, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=pass, upfront_amount=pass, task_authority=pass",
+        "results_of_six": {
+          "channel_change": "pass",
+          "material_fields_changed": "pass",
+          "offer_fields_changed": "pass",
+          "refundability": "n/a",
+          "task_authority": "pass",
+          "upfront_amount": "pass"
+        },
+        "verdict_class": null
+      },
+      "sale-non-refundable-asks": {
+        "caps_result": "n/a",
+        "decision": "needs_input",
+        "failing_constraints": [
+          "refundability"
+        ],
+        "outcome": "escalate",
+        "reason": "escalate: dedupe=pass, caps=n/a, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=fail, material_fields_changed=pass, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=pass, upfront_amount=pass, task_authority=pass",
+        "results_of_six": {
+          "channel_change": "pass",
+          "material_fields_changed": "pass",
+          "offer_fields_changed": "pass",
+          "refundability": "fail",
+          "task_authority": "pass",
+          "upfront_amount": "pass"
+        },
+        "verdict_class": "hitl_dispatched"
+      },
+      "sale-offer-differs-asks": {
+        "caps_result": "n/a",
+        "decision": "needs_input",
+        "failing_constraints": [
+          "offer_fields_changed"
+        ],
+        "outcome": "escalate",
+        "reason": "escalate: dedupe=pass, caps=n/a, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=pass, offer_fields_changed=fail, recipient_seen_before=n/a, channel_change=pass, upfront_amount=pass, task_authority=pass",
+        "results_of_six": {
+          "channel_change": "pass",
+          "material_fields_changed": "pass",
+          "offer_fields_changed": "fail",
+          "refundability": "pass",
+          "task_authority": "pass",
+          "upfront_amount": "pass"
+        },
+        "verdict_class": "hitl_dispatched"
+      },
+      "sale-outside-task-asks": {
+        "caps_result": "n/a",
+        "decision": "needs_input",
+        "failing_constraints": [
+          "task_authority"
+        ],
+        "outcome": "escalate",
+        "reason": "escalate: dedupe=pass, caps=n/a, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=pass, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=pass, upfront_amount=pass, task_authority=fail",
+        "results_of_six": {
+          "channel_change": "pass",
+          "material_fields_changed": "pass",
+          "offer_fields_changed": "pass",
+          "refundability": "pass",
+          "task_authority": "fail",
+          "upfront_amount": "pass"
+        },
+        "verdict_class": "hitl_dispatched"
+      },
+      "sale-two-limits-asks-citing-both": {
+        "caps_result": "n/a",
+        "decision": "needs_input",
+        "failing_constraints": [
+          "channel_change",
+          "material_fields_changed"
+        ],
+        "outcome": "escalate",
+        "reason": "escalate: dedupe=pass, caps=n/a, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=fail, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=fail, upfront_amount=pass, task_authority=pass",
+        "results_of_six": {
+          "channel_change": "fail",
+          "material_fields_changed": "fail",
+          "offer_fields_changed": "pass",
+          "refundability": "pass",
+          "task_authority": "pass",
+          "upfront_amount": "pass"
+        },
+        "verdict_class": "hitl_dispatched"
+      }
+    }
+  },
+  "packs": {
+    "0.3.2": {
+      "definition_digest": "6f333fa8b7a7e137abe6c61e5a32097ed06d493479a018807cbf4d2e4f5da7b2",
+      "pack_id": "asg/everyday/0.3.2",
+      "pack_yaml_sha256": "b2d5408cc71ea6b70b6c2318dc633c459cd2cab1dca4e6eaaf880bc7fc583f24",
+      "taxonomy_pin": null,
+      "wicket_digests": {
+        "action_class_gate/1.0.0": "fcc352838832e13f5e87662f0194ec4a7065bc989bbe624b43ac5d9d1b638ae2",
+        "caps/5.0.0": "2807e174dc7c817917621f90a53f3fa54992b76fe3ec28e8567f814b9e72a741",
+        "channel_change/1.0.0": "fb580fc03afe1e641286c3ba62650d8e7150be91c6de0c6dac6a225a2eb6c793",
+        "counterparty_identity_change/1.0.0": "0cfb1cb380b355abb88ea385334f3bb31f2e145269a2768022f85005665fc6fe",
+        "counterparty_seen_before/2.0.0": "c82a29eae8ef72736851d275ffa4d85e511a21d202822366d3b03bf3834c8cd0",
+        "credential_pattern/1.0.0": "3617fdcaa39c03cf70a3254490328ccee5eaac0faba7cd52d9e3dc3fc50336c0",
+        "dedupe/1.0.0": "18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb",
+        "destination_rail/1.0.0": "4d76251eba138b37e6be3e83390072315ebcea42cd8d790f7e9765ecf1f63429",
+        "material_fields_changed/1.0.0": "b7c98d710e48c8fc87d92abf2599b04b6ac9ac6f129eee6335edb742f1dbc02a",
+        "offer_fields_changed/1.0.0": "b1ca52ccdc821cbb57df844a10eb9e7d6242fff612fb5324c3c4f642d57f7ab1",
+        "recipient_role/1.0.0": "917ab5edea21867f318b8dfd54a6d7b458cbabcc5cebfac6ff0c4861e918d43b",
+        "recipient_seen_before/1.0.0": "df8803e9c4bdab9deff48e772fcd21ff813d00157068dd250a8a5c6b45cd6c44",
+        "recurring_charge/1.0.0": "ea4ae204e5dc33f3a28e5e15471f404f20d4f8fca193d355a099a4a7e08b082e",
+        "refundability/1.0.0": "410ad28fa2dd518502cbcbc00972d31ae4597722f17836ed2bf80e717f2f3294",
+        "task_authority/1.0.0": "bdb53ad1d4f3f18dc3a8ed5752c4429725df1df692f1e3b3687517f40074c150",
+        "upfront_amount/1.0.0": "30996a832fa0cd94dc9a64f11e69d903f73a6e6415bff4005a665460a0798a6f"
+      }
+    },
+    "0.3.6": {
+      "definition_digest": "c1cea374102bba60de82e16663c550a278ee07a399c5faeb285fe1ea1ea27d4d",
+      "pack_id": "asg/everyday/0.3.7",
+      "pack_yaml_sha256": "9d003090ad99607d2a6dfaccb3303feca14d49ca32baf37e169589cbd0ae77ae",
+      "taxonomy_pin": {
+        "digest": "fc12eb90bc2b3c85bb49c4d3d7be8f384c6e0b8e189bc3b68a753a4f1af5cd94",
+        "taxonomy_version": "6"
+      },
+      "wicket_digests": {
+        "action_class_gate/1.1.0": "817a3d537b024689e7fcc20d37e5253f77075274c5b7d863dcc25eac39bc8f2b",
+        "caps/5.1.0": "7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8",
+        "channel_change/1.1.0": "f84770c7571a0932629667c4df38f447777f8dc5dfcdfdf29b37514c1eee1ad1",
+        "counterparty_identity_change/1.0.0": "0cfb1cb380b355abb88ea385334f3bb31f2e145269a2768022f85005665fc6fe",
+        "counterparty_seen_before/4.0.0": "c7c20d9e57cb0a75184b9c6c4d037c9bea813a7b1105c581defd4481acf964b0",
+        "credential_pattern/1.0.0": "3617fdcaa39c03cf70a3254490328ccee5eaac0faba7cd52d9e3dc3fc50336c0",
+        "dedupe/1.0.0": "18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb",
+        "destination_rail/1.0.0": "4d76251eba138b37e6be3e83390072315ebcea42cd8d790f7e9765ecf1f63429",
+        "material_fields_changed/1.1.0": "e8cd02743203d17cd0de9d548f85ec5b6b6135e80aba63136ae507ac84660042",
+        "offer_fields_changed/1.1.0": "f62c034140827beaa4b8ee13da8b56e4583994a973bc789d4a11812f9727a953",
+        "recipient_role/1.1.0": "57cb99bde24b5ae41ae214f4d2db0e8f20cbdf7ba31170b65da0561afdc499e1",
+        "recipient_seen_before/1.0.0": "df8803e9c4bdab9deff48e772fcd21ff813d00157068dd250a8a5c6b45cd6c44",
+        "recurring_charge/1.0.0": "ea4ae204e5dc33f3a28e5e15471f404f20d4f8fca193d355a099a4a7e08b082e",
+        "refundability/1.1.0": "1a471c09254a3db872c34a5e59d9e05e6da47cb396695a6cb6bf2bc055f4d811",
+        "task_authority/1.1.0": "5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab",
+        "upfront_amount/1.1.0": "2311833db12bf9465dcb5ecdd9f7aca079dbf638a19ed6dd18d607aad1811c10"
+      }
+    }
+  },
+  "taxonomy_file_sha256": "7563fcaeb6c192a27877fae3131bca1021526046c8976475c46eebf4fb374272",
+  "taxonomy_jcs_digest": "fc12eb90bc2b3c85bb49c4d3d7be8f384c6e0b8e189bc3b68a753a4f1af5cd94",
+  "taxonomy_version": "6"
+}

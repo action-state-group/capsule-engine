@@ -1,0 +1,74 @@
+{
+ "definition_digest": "81013aedbc3d930dcb9a4871d932373eca9de6968e5cff9fb450158d1fcc576a",
+ "pack_id": "asg/seller/0.1.5",
+ "sale_complete": true,
+ "vectors": [
+  {
+   "capsule_id": "e8952b367a03164e00cc668b9a200522ff8c6efdc6ae4426111e0166bdfccba3",
+   "check": "a-commit-1900",
+   "evidence": {
+    "constraint_id": "release_on_acceptance",
+    "in_scope": false,
+    "missing_field": null
+   },
+   "reason": "the rule is not configured for this action class",
+   "result": "n/a"
+  },
+  {
+   "capsule_id": "343698d6c19ddc6426880b6dc1805f614a816b9e37a52ecc0e00ad9f2ba5e28d",
+   "check": "a-share-phone",
+   "evidence": {
+    "bound_to_acceptance": true,
+    "constraint_id": "release_on_acceptance",
+    "disclosed_classes": [
+     "phone"
+    ],
+    "missing_field": null
+   },
+   "reason": "the history given shows this buyer accepted this sale in this deal",
+   "result": "pass"
+  },
+  {
+   "capsule_id": "10602ccdca63467a172e36e26d873ea6576d5f03be0266d184d467eb7c263865",
+   "check": "a-share-pickup-area",
+   "evidence": {
+    "bound_to_acceptance": false,
+    "constraint_id": "release_on_acceptance",
+    "disclosed_classes": [
+     "pickup_area"
+    ],
+    "missing_field": null
+   },
+   "reason": "every class the disclosure names may go to a buyer before acceptance",
+   "result": "pass"
+  },
+  {
+   "capsule_id": "bc68db9504329c63f35b19b79063eedbbfc8bf0e6a382810445b988dee33b774",
+   "check": "b-share-phone",
+   "evidence": {
+    "bound_to_acceptance": false,
+    "constraint_id": "release_on_acceptance",
+    "disclosed_classes": [
+     "phone"
+    ],
+    "missing_field": null
+   },
+   "reason": "the history given shows no acceptance of this sale by this buyer in this deal",
+   "result": "fail"
+  },
+  {
+   "capsule_id": "f5b3a7ab8fb5974dda67373ad051b015237b9aa0a148aaca7b13e5dcd0698b05",
+   "check": "b-share-pickup-area",
+   "evidence": {
+    "bound_to_acceptance": false,
+    "constraint_id": "release_on_acceptance",
+    "disclosed_classes": [
+     "pickup_area"
+    ],
+    "missing_field": null
+   },
+   "reason": "every class the disclosure names may go to a buyer before acceptance",
+   "result": "pass"
+  }
+ ]
+}

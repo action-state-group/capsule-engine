@@ -1,0 +1,21 @@
+# promise_requires_approval wicket: classes of statement the agent may make
+# only inside its task authority or with a one-shot approval
+# (guards/checks/promise_requires_approval.py). An action whose
+# Action.representation_class is in `requires_approval` passes when the
+# digest-bound task-authority record's body.authorized_representation_classes
+# lists the class (no approval event needed), or when Action.authorized_by is
+# the SHA-256 digest of the sealed approval record supplied with the
+# decision, the engine's own digest of that record equals it, and the
+# record's body.representation_class is the action's class. Otherwise it
+# fails. Classes no approval may clear are in promise_never/1.0.0.
+#
+# `representation_classes` is the closed set; a class outside it fails
+# closed.
+#
+# Declared disposition: ask.
+wicket_id: promise_requires_approval/1.0.0
+check: promise_requires_approval
+config:
+  action_classes: [communication.send, disclosure.personal, marketplace.offer, marketplace.sale, agreement.accept]
+  representation_classes: [price, condition, features, authenticity, availability, delivery_date, service_scope, warranty, refund_terms, payment_methods, pickup, deadline, address, other]
+  requires_approval: [warranty, delivery_date]

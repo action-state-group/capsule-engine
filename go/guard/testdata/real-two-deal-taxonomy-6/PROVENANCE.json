@@ -1,0 +1,66 @@
+{
+  "note": "TEST data vendored byte-for-byte from capsule-engine #138's merge (a710636c): the fixture rebuilt by capsulectl at capsule-cli 831afeeb, the rc14 content (bundles and inputs unchanged since #126, d12932523db4), replayed under asg/everyday/0.3.6 (against #135's 0.3.5 replay only the pack header changed); this sidecar is not part of the vendored bytes. Do not edit the fixtures.",
+  "source_repo": "action-state-group/capsule-engine",
+  "source_commit": "a710636c29814ce67e838c673026fd2063d913f8",
+  "producer": {
+    "name": "capsulectl",
+    "version": "v0.1.0-rc13-6-g831afee",
+    "commit": "831afeeb9fd76b7196486a9af38ca455b1230791",
+    "note": "capsule-cli main after #169 merged (also carries #168, #170, #171); a re-run is not byte-identical (new keys, ids and timestamps): the bundles and expected decisions are replaced together"
+  },
+  "files": {
+    "README.md": {
+      "source_path": "tests/fixtures/real-two-deal/README.md",
+      "sha256": "b0280f5b6973586c7974c7a214d742a8dbf820745086f57e0578fff842559184"
+    },
+    "build.sh": {
+      "source_path": "tests/fixtures/real-two-deal/build.sh",
+      "sha256": "e3f20f85f8550cdcb3a38c93f160ff5d92aff6cb41758b26ce50f3df898d4d11"
+    },
+    "deal-1.bundle.json": {
+      "source_path": "tests/fixtures/real-two-deal/deal-1.bundle.json",
+      "sha256": "22ee3f9771d8fad6917a50be8ff93894ad24e0a219c220d9d255bfe66327736d"
+    },
+    "deal-1.counterparty.bundle.json": {
+      "source_path": "tests/fixtures/real-two-deal/deal-1.counterparty.bundle.json",
+      "sha256": "b9121ea5ea42251b25ae329af60f93a9bded09fb12e63044b0c10c7af1e82808"
+    },
+    "deal-2.bundle.json": {
+      "source_path": "tests/fixtures/real-two-deal/deal-2.bundle.json",
+      "sha256": "b9a6a26daa75d69f7e608c67abfa93072c2b26680c65660ee8e599cf1a9b7a36"
+    },
+    "deal-2.counterparty.bundle.json": {
+      "source_path": "tests/fixtures/real-two-deal/deal-2.counterparty.bundle.json",
+      "sha256": "810a9d1f4d43f1b55a0db4cd51673e431b5ac169ee3543c293b23963848de298"
+    },
+    "expected_decisions.json": {
+      "source_path": "tests/fixtures/real-two-deal/expected_decisions.json",
+      "sha256": "e5793995b0327a191c8f9040de46b5ebef8606375f36ae94d0955d430643e326"
+    },
+    "inputs/act-pay-2.json": {
+      "source_path": "tests/fixtures/real-two-deal/inputs/act-pay-2.json",
+      "sha256": "8a95fd23c48eda73e57475b3a16fa399907f835b601727d1551a0dc6160854f3"
+    },
+    "inputs/act-pay.json": {
+      "source_path": "tests/fixtures/real-two-deal/inputs/act-pay.json",
+      "sha256": "0eb39dcbe421be170e178b95a4b14ef8281003665331e0bf74b4ad59f0d82314"
+    },
+    "inputs/check-pay.json": {
+      "source_path": "tests/fixtures/real-two-deal/inputs/check-pay.json",
+      "sha256": "b4258a5676d16368125cc0a5ad017731fd57d8dbfa0556eaf77beac4a2f94b75"
+    },
+    "inputs/open.json": {
+      "source_path": "tests/fixtures/real-two-deal/inputs/open.json",
+      "sha256": "db78660ae0386f3b2847b4127c3bc1375e51c552179d9edf15e72c6547fe7e96"
+    },
+    "test_counterparty_seen_before_carried_out.py": {
+      "source_path": "tests/test_counterparty_seen_before_carried_out.py",
+      "sha256": "a9928ba6ee27da985a515299b5ce6e829efd7ecd427d3aea3bfee41ec53e85db"
+    },
+    "test_real_two_deal_bundle.py": {
+      "source_path": "tests/test_real_two_deal_bundle.py",
+      "sha256": "46261587eb3283679836004bae23890c8556c3afba1770fc369c5811f271d8a2"
+    }
+  },
+  "revendored_7339028": "Re-vendored from capsule-engine 7339028ab2117d6c7adec89a26cd5022b8ac7140 (#173, asg/everyday/0.3.7 and asg/seller/0.1.4): expected_decisions.json byte for byte from tests/fixtures there, which #173 changed only in their pack header; every decision is the earlier copy's. The sha256 above is the re-vendored file's."
+}

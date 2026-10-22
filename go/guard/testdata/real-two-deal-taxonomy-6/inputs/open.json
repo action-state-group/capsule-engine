@@ -1,0 +1,12 @@
+{
+  "type": "purchase",
+  "channel": "web",
+  "intent": {
+    "verbatim": "Order one box of synthetic widgets from Example Merchant",
+    "asked": {"item": "synthetic widget box", "quantity": 1},
+    "allowed": ["pay"]
+  },
+  "who": {"name": "Example Merchant", "domain": "example-merchant.test"},
+  "terms": {"item": "synthetic widget box", "quantity": 1, "price_minor": 2000, "currency": "USD"},
+  "recourse": {"rail": "card", "refundable": true}
+}

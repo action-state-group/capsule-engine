@@ -1,0 +1,242 @@
+{
+  "capsule_engine_commit": "b99a0e9fc33391deecdd10583dfa3a067e8f7be8",
+  "corpus_sha256": "99d5c623c2c05bc84433f5145556826d1e4ba681dc5d17e26468b5f593662408",
+  "engine_taxonomy_version": "6",
+  "live": {
+    "typed-no-counterparty": {
+      "ignored_inputs": [],
+      "target": null
+    },
+    "typed-payee": {
+      "ignored_inputs": [],
+      "target": "payee-fp:hmac-sha256-chain-key:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "typed-profile": {
+      "ignored_inputs": [],
+      "target": "payee-fp:hmac-sha256-profile-key:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+    },
+    "typed-profile-malformed": {
+      "ignored_inputs": [
+        "counterparty_profile"
+      ],
+      "target": "payee-fp:hmac-sha256-chain-key:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    }
+  },
+  "pack_definition_digest": "cd98aaec5acf8cea86f91fc21dd7df6b36a67c7b55340489b66e6ce88b85117b",
+  "pack_id": "asg/everyday/0.3.4",
+  "replay": {
+    "typed-companion-profile": [
+      {
+        "decision": "needs_input",
+        "dedupe": {
+          "repeat": null,
+          "result": "pass"
+        },
+        "failing_constraints": [
+          "counterparty_seen_before"
+        ],
+        "failing_rules": [
+          "r02-ordinary-purchase",
+          "r06-new-merchant"
+        ],
+        "ignored_inputs": [],
+        "outcome": "escalate",
+        "r06": {
+          "fold_key": "payee-fp:hmac-sha256-profile-key:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+          "missing_field": null,
+          "result": "fail"
+        },
+        "target": "payee-fp:hmac-sha256-profile-key:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "verdict": "escalate"
+      }
+    ],
+    "typed-no-counterparty": [
+      {
+        "decision": "accept",
+        "dedupe": {
+          "repeat": null,
+          "result": "pass"
+        },
+        "failing_constraints": [],
+        "failing_rules": [],
+        "ignored_inputs": [],
+        "outcome": "allow",
+        "r06": {
+          "fold_key": null,
+          "missing_field": "target",
+          "result": "n/a"
+        },
+        "target": null,
+        "verdict": "allow"
+      }
+    ],
+    "typed-payee": [
+      {
+        "decision": "needs_input",
+        "dedupe": {
+          "repeat": null,
+          "result": "pass"
+        },
+        "failing_constraints": [
+          "counterparty_seen_before"
+        ],
+        "failing_rules": [
+          "r02-ordinary-purchase",
+          "r06-new-merchant"
+        ],
+        "ignored_inputs": [],
+        "outcome": "escalate",
+        "r06": {
+          "fold_key": "payee-fp:hmac-sha256-chain-key:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "missing_field": null,
+          "result": "fail"
+        },
+        "target": "payee-fp:hmac-sha256-chain-key:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "verdict": "escalate"
+      }
+    ],
+    "typed-repeat-same-payee": [
+      {
+        "decision": "needs_input",
+        "dedupe": {
+          "repeat": null,
+          "result": "pass"
+        },
+        "failing_constraints": [
+          "counterparty_seen_before"
+        ],
+        "failing_rules": [
+          "r02-ordinary-purchase",
+          "r06-new-merchant"
+        ],
+        "ignored_inputs": [],
+        "outcome": "escalate",
+        "r06": {
+          "fold_key": "payee-fp:hmac-sha256-chain-key:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "missing_field": null,
+          "result": "fail"
+        },
+        "target": "payee-fp:hmac-sha256-chain-key:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "verdict": "escalate"
+      },
+      {
+        "decision": "reject",
+        "dedupe": {
+          "repeat": null,
+          "result": "fail"
+        },
+        "failing_constraints": [
+          "counterparty_seen_before",
+          "dedupe"
+        ],
+        "failing_rules": [
+          "r02-ordinary-purchase",
+          "r06-new-merchant",
+          "r27-no-commitment-beyond-task-bounds"
+        ],
+        "ignored_inputs": [],
+        "outcome": "deny",
+        "r06": {
+          "fold_key": "payee-fp:hmac-sha256-chain-key:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "missing_field": null,
+          "result": "fail"
+        },
+        "target": "payee-fp:hmac-sha256-chain-key:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "verdict": "deny"
+      }
+    ],
+    "typed-same-payment-two-payees": [
+      {
+        "decision": "needs_input",
+        "dedupe": {
+          "repeat": null,
+          "result": "pass"
+        },
+        "failing_constraints": [
+          "counterparty_seen_before"
+        ],
+        "failing_rules": [
+          "r02-ordinary-purchase",
+          "r06-new-merchant"
+        ],
+        "ignored_inputs": [],
+        "outcome": "escalate",
+        "r06": {
+          "fold_key": "payee-fp:hmac-sha256-chain-key:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "missing_field": null,
+          "result": "fail"
+        },
+        "target": "payee-fp:hmac-sha256-chain-key:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "verdict": "escalate"
+      },
+      {
+        "decision": "needs_input",
+        "dedupe": {
+          "repeat": null,
+          "result": "pass"
+        },
+        "failing_constraints": [
+          "counterparty_seen_before"
+        ],
+        "failing_rules": [
+          "r02-ordinary-purchase",
+          "r06-new-merchant"
+        ],
+        "ignored_inputs": [],
+        "outcome": "escalate",
+        "r06": {
+          "fold_key": "payee-fp:hmac-sha256-chain-key:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "missing_field": null,
+          "result": "fail"
+        },
+        "target": "payee-fp:hmac-sha256-chain-key:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "verdict": "escalate"
+      }
+    ],
+    "untyped-body-counterparty-only": [
+      {
+        "decision": "accept",
+        "dedupe": {
+          "repeat": null,
+          "result": "pass"
+        },
+        "failing_constraints": [],
+        "failing_rules": [],
+        "ignored_inputs": [],
+        "outcome": "allow",
+        "r06": {
+          "fold_key": null,
+          "missing_field": "target",
+          "result": "n/a"
+        },
+        "target": null,
+        "verdict": "allow"
+      }
+    ],
+    "untyped-payee": [
+      {
+        "decision": "needs_input",
+        "dedupe": {
+          "repeat": null,
+          "result": "pass"
+        },
+        "failing_constraints": [
+          "counterparty_seen_before"
+        ],
+        "failing_rules": [
+          "r02-ordinary-purchase",
+          "r06-new-merchant"
+        ],
+        "ignored_inputs": [],
+        "outcome": "escalate",
+        "r06": {
+          "fold_key": "payee-fp:hmac-sha256-deal-key:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "missing_field": null,
+          "result": "fail"
+        },
+        "target": "payee-fp:hmac-sha256-deal-key:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "verdict": "escalate"
+      }
+    ]
+  }
+}

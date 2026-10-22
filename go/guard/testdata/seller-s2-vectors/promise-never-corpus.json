@@ -1,0 +1,156 @@
+{
+ "note": "The engine's seller acceptance scenario (testdata/seller-vectors) runs the seller's rail only on steps that cite a mandate, which the Go port refuses, and reaches few of the promise and disclosure branches. These corpora run each of seller.destination_rail/1.0.0, promise_never/1.0.0, promise_requires_approval/1.0.0 and required_disclosure/1.0.0 (with its fold disclosure.class_seen/1.0.0) through every branch, on the seller pack, with no step citing a mandate.",
+ "pack": "capsule_engine/packs/catalog/seller (asg/seller/0.1.0)",
+ "records": {
+  "authenticity-approval": {
+   "type": "approval/v0",
+   "body": {
+    "representation_class": "authenticity"
+   }
+  },
+  "allows-authenticity": {
+   "type": "task-authority/v0",
+   "body": {
+    "outcome_id": "seller.sell_one_item/1.0.0",
+    "allowed_actions": [
+     "offer",
+     "accept",
+     "sell",
+     "tell"
+    ],
+    "preconditions": [],
+    "authorized_representation_classes": [
+     "authenticity"
+    ]
+   }
+  }
+ },
+ "steps": [
+  {
+   "name": "authenticity",
+   "dry_run": true,
+   "action": {
+    "verb": "tell",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/s2-1",
+    "timestamp": "2026-10-09T11:01:00Z",
+    "equivalence_key": "tell/s2-1",
+    "target": "cp-fp:1111111111111111111111111111111111111111111111111111111111111111",
+    "representation_class": "authenticity"
+   }
+  },
+  {
+   "name": "authenticity-with-a-bound-approval",
+   "dry_run": true,
+   "action": {
+    "verb": "tell",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/s2-2",
+    "timestamp": "2026-10-09T11:02:00Z",
+    "equivalence_key": "tell/s2-2",
+    "target": "cp-fp:1111111111111111111111111111111111111111111111111111111111111111",
+    "representation_class": "authenticity",
+    "authorized_by": "ff478d133a5d4fd45d2aa11f7bd9253cdb411ee0110013642f04ed6137a94aeb"
+   },
+   "authorization_record": "authenticity-approval"
+  },
+  {
+   "name": "authenticity-under-a-task-authority-allowing-it",
+   "dry_run": true,
+   "action": {
+    "verb": "tell",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/s2-3",
+    "timestamp": "2026-10-09T11:03:00Z",
+    "equivalence_key": "tell/s2-3",
+    "target": "cp-fp:1111111111111111111111111111111111111111111111111111111111111111",
+    "representation_class": "authenticity",
+    "task_authority_ref": "8f452b72794d64e05d5b46359e6a5d9284f4e27d135494ceb7d308cc12c7ce97"
+   },
+   "task_authority_record": "allows-authenticity"
+  },
+  {
+   "name": "price",
+   "dry_run": true,
+   "action": {
+    "verb": "tell",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/s2-4",
+    "timestamp": "2026-10-09T11:04:00Z",
+    "equivalence_key": "tell/s2-4",
+    "target": "cp-fp:1111111111111111111111111111111111111111111111111111111111111111",
+    "representation_class": "price"
+   }
+  },
+  {
+   "name": "a-class-outside-the-closed-set",
+   "dry_run": true,
+   "action": {
+    "verb": "tell",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/s2-5",
+    "timestamp": "2026-10-09T11:05:00Z",
+    "equivalence_key": "tell/s2-5",
+    "target": "cp-fp:1111111111111111111111111111111111111111111111111111111111111111",
+    "representation_class": "Authenticity"
+   }
+  },
+  {
+   "name": "no-class",
+   "dry_run": true,
+   "action": {
+    "verb": "tell",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/s2-6",
+    "timestamp": "2026-10-09T11:06:00Z",
+    "equivalence_key": "tell/s2-6",
+    "target": "cp-fp:1111111111111111111111111111111111111111111111111111111111111111"
+   }
+  },
+  {
+   "name": "a-class-on-a-query",
+   "dry_run": true,
+   "action": {
+    "verb": "read",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "info.query",
+    "action_id": "read/s2-7",
+    "timestamp": "2026-10-09T11:07:00Z",
+    "equivalence_key": "read/s2-7",
+    "target": "listing/own",
+    "representation_class": "authenticity"
+   }
+  },
+  {
+   "name": "authenticity-on-a-sale",
+   "dry_run": true,
+   "action": {
+    "verb": "sell",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.sale",
+    "action_id": "sell/s2-8",
+    "timestamp": "2026-10-09T11:08:00Z",
+    "equivalence_key": "sell/s2-8",
+    "target": "cp-fp:1111111111111111111111111111111111111111111111111111111111111111",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "rail": "card",
+    "representation_class": "authenticity"
+   }
+  }
+ ]
+}

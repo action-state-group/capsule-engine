@@ -1,0 +1,108 @@
+{
+ "note": "The engine's seller acceptance scenario (testdata/seller-vectors) runs the seller's rail only on steps that cite a mandate, which the Go port refuses, and reaches few of the promise and disclosure branches. These corpora run each of seller.destination_rail/1.0.0, promise_never/1.0.0, promise_requires_approval/1.0.0 and required_disclosure/1.0.0 (with its fold disclosure.class_seen/1.0.0) through every branch, on the seller pack, with no step citing a mandate.",
+ "pack": "capsule_engine/packs/catalog/seller (asg/seller/0.1.0)",
+ "records": {},
+ "steps": [
+  {
+   "name": "sale-on-card",
+   "dry_run": true,
+   "action": {
+    "verb": "sell",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.sale",
+    "action_id": "sell/s2-1",
+    "timestamp": "2026-10-09T11:01:00Z",
+    "equivalence_key": "sell/s2-1",
+    "target": "cp-fp:1111111111111111111111111111111111111111111111111111111111111111",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "rail": "card"
+   }
+  },
+  {
+   "name": "sale-on-p2p",
+   "dry_run": true,
+   "action": {
+    "verb": "sell",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.sale",
+    "action_id": "sell/s2-2",
+    "timestamp": "2026-10-09T11:02:00Z",
+    "equivalence_key": "sell/s2-2",
+    "target": "cp-fp:1111111111111111111111111111111111111111111111111111111111111111",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "rail": "p2p"
+   }
+  },
+  {
+   "name": "sale-on-cheque",
+   "dry_run": true,
+   "action": {
+    "verb": "sell",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.sale",
+    "action_id": "sell/s2-3",
+    "timestamp": "2026-10-09T11:03:00Z",
+    "equivalence_key": "sell/s2-3",
+    "target": "cp-fp:1111111111111111111111111111111111111111111111111111111111111111",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "rail": "cheque"
+   }
+  },
+  {
+   "name": "sale-on-an-empty-rail",
+   "dry_run": true,
+   "action": {
+    "verb": "sell",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.sale",
+    "action_id": "sell/s2-4",
+    "timestamp": "2026-10-09T11:04:00Z",
+    "equivalence_key": "sell/s2-4",
+    "target": "cp-fp:1111111111111111111111111111111111111111111111111111111111111111",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "rail": ""
+   }
+  },
+  {
+   "name": "sale-with-no-rail",
+   "dry_run": true,
+   "action": {
+    "verb": "sell",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.sale",
+    "action_id": "sell/s2-5",
+    "timestamp": "2026-10-09T11:05:00Z",
+    "equivalence_key": "sell/s2-5",
+    "target": "cp-fp:1111111111111111111111111111111111111111111111111111111111111111",
+    "amount_minor": 180000,
+    "currency": "USD"
+   }
+  },
+  {
+   "name": "offer-on-cheque",
+   "dry_run": true,
+   "action": {
+    "verb": "offer",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/s2-6",
+    "timestamp": "2026-10-09T11:06:00Z",
+    "equivalence_key": "offer/s2-6",
+    "target": "cp-fp:1111111111111111111111111111111111111111111111111111111111111111",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "rail": "cheque"
+   }
+  }
+ ]
+}

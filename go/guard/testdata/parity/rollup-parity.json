@@ -1,0 +1,2742 @@
+{
+  "capsule_engine_commit": "7339028ab2117d6c7adec89a26cd5022b8ac7140",
+  "scenarios": [
+    {
+      "constraints": [
+        {
+          "evidence_digest": "b412295d55edd74e4b19f79bfd1eaaeeb40a57cebeaf1707864a8dfee3627ff1",
+          "id": "dedupe",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "b03c74031232b6fd8432a7a97b93609e2b762b6dde5a7146313d6a0ab1b155a5",
+          "id": "caps",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+          "id": "verify_before_dispatch",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+          "id": "destination_rail",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "870b0a3e1636cab6902013f7742c0b36dfd72f324d1ff9ee3cd0976aa6d19241",
+          "id": "counterparty_identity_change",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827",
+          "id": "credential_pattern",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "ed761a48bede343570feeba08dd105fb225b9caf75b52392ea84550fdcc7b0b2",
+          "id": "recurring_charge",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "93594fc3973062b88c37e6949b10f34f202dc75ada097c69b83d201e0cb51701",
+          "id": "action_class_gate",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "88601b8693c0f74f241cd20deddefdc6b72defdbbaa436cf03657ef06a3cc1c1",
+          "id": "counterparty_seen_before",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+          "id": "recipient_role",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "6ca8fce7ec08407d52d05d853229e4513f4974da697c4a99117cc706fed406a9",
+          "id": "refundability",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "ee7ecf7a7a01b008db9a0a806a45e8528253060b356a38f433ef71556972feb4",
+          "id": "material_fields_changed",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "4103c42dbd4b50f6e026455f61b555262623fd8f8a84d2041a1bba2be90e98ba",
+          "id": "offer_fields_changed",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "c7a84acb724ca272de76e7ed4c699268414ba4327cd140a72c429dd565287d53",
+          "id": "recipient_seen_before",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "f138fc94f2cbf345edc557fda4ff509abd5b74e35d0cb1489d6b882341114541",
+          "id": "channel_change",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "5f3e277b3f338da1fbdd86f7b06c6efbca43bf46ec07c448450eb7459cc76018",
+          "id": "upfront_amount",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "77cb9bdf77d765e5e4ae15860e49f999ab172e07331ea5f80469a9fee733325f",
+          "id": "task_authority",
+          "result": "pass"
+        }
+      ],
+      "outcome": "allow",
+      "record": {
+        "action_id": "deal-a1/3",
+        "action_type": "decide",
+        "agent_input": {
+          "body": {
+            "action": "pay",
+            "action_class": "money.purchase",
+            "amount_minor": 454,
+            "channel": "web",
+            "currency": "USD",
+            "first_contact_channel": "web",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "recourse": {
+              "rail": "card",
+              "refundable": true
+            },
+            "spend_minor": 454,
+            "task_authority_ref": {
+              "digest": "2edcc1dc2db366c671eeef0807c7a1b123dfe42edeacd0e0b7e6a9b7f0156236",
+              "digest_alg": "SHA-256",
+              "type": "record"
+            },
+            "taxonomy_version": "6",
+            "upfront_amount_minor": 0
+          },
+          "x-deal-v0": {
+            "counterparty": {
+              "fp_alg": "hmac-sha256-deal-key",
+              "ids": {
+                "payee": "f55ff16f66f43360266b95db6f8fec01d76031054306ae4a4b380598f6cfd114"
+              }
+            },
+            "deal_id": "deal-a1",
+            "record_type": "check",
+            "seq": 3
+          }
+        },
+        "developer": "capsulectl-a1",
+        "model_attestation": {
+          "compute_attestation": {
+            "agent_input_digest": "b6dd0fda362d3b87d359bb49ea05bbc844af62d4f036f96da25569283d738f05"
+          }
+        },
+        "operator": "household-rollup",
+        "timestamp": "2026-10-08T11:01:00Z"
+      },
+      "scenario": "all-stated",
+      "seed": {
+        "action": {
+          "action_class": "info.query",
+          "action_id": "lookup/rollup-capsulectl-a1",
+          "action_type": "decide",
+          "developer": "assistant-capsulectl-a1",
+          "operator": "household-rollup",
+          "target": "payee-fp:hmac-sha256-deal-key:f55ff16f66f43360266b95db6f8fec01d76031054306ae4a4b380598f6cfd114",
+          "timestamp": "2026-10-08T10:00:00Z",
+          "verb": "lookup"
+        },
+        "constraints": [
+          {
+            "evidence_digest": "ebf07f45d17b7b4cc8565083053edfdcf1c036336fa98e57e7cc283ec937a3e0",
+            "id": "dedupe",
+            "result": "pass"
+          },
+          {
+            "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+            "id": "caps",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+            "id": "verify_before_dispatch",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+            "id": "destination_rail",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "870b0a3e1636cab6902013f7742c0b36dfd72f324d1ff9ee3cd0976aa6d19241",
+            "id": "counterparty_identity_change",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827",
+            "id": "credential_pattern",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "ed761a48bede343570feeba08dd105fb225b9caf75b52392ea84550fdcc7b0b2",
+            "id": "recurring_charge",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "17dcb23b1a22944bd95d23ccd22940f86aa3c46ab23e947ba50b0a1bcca6a6b9",
+            "id": "action_class_gate",
+            "result": "pass"
+          },
+          {
+            "evidence_digest": "029cd64fa2475bae9a0fd960a7a61c5df24d383fdf1683885fafa87ec448486e",
+            "id": "counterparty_seen_before",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+            "id": "recipient_role",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "7471f20fa8882393d42d3d4b38107a7be30b40e2b10ba838b30f7cc58dea0a5c",
+            "id": "refundability",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "e510562f4fe422536148c0153efabe41e40dffbd58bf33a9badc88d6258d49c8",
+            "id": "material_fields_changed",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "5301c7f61cebf5b8c57025b54c441a38f5dab35b558c0896995e00f3ee596629",
+            "id": "offer_fields_changed",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "c7a84acb724ca272de76e7ed4c699268414ba4327cd140a72c429dd565287d53",
+            "id": "recipient_seen_before",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "0ad91372036802d3b0b5b0baedeea673d02aa73cabedfe8f7c1dd774ddeb3e9e",
+            "id": "channel_change",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "0d0e8ae7a25e36254dd52de0a64abd81a2bbaa53230e320b8f73ebba253d54e2",
+            "id": "upfront_amount",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "c41e4b3a2077a40320e10ad50ccbfe5cc0efe57bd2d3dfe235357c61e8d051b9",
+            "id": "task_authority",
+            "result": "n/a"
+          }
+        ],
+        "outcome": "allow"
+      },
+      "task_authority_record": {
+        "at": "2026-09-27T18:00:00Z",
+        "body": {
+          "allowed": [
+            "pay"
+          ],
+          "allowed_actions": [
+            "pay"
+          ],
+          "max_total_minor": 500,
+          "outcome_id": "capsulectl.deal.purchase/1.0.0",
+          "preconditions": [],
+          "verbatim_commitment": "84d87822ef501167cb65f1f483fd3b36888bd7a78fe80b797cffd07b58661894"
+        },
+        "canonicalization": "jcs",
+        "chain_id": "deal-66cb45fb7ccfdf82",
+        "chain_root": {
+          "digest": "2d219920d83fbfa0bba9b1c25d190726b6473c74b1b2886663060a81339d28dc",
+          "digest_alg": "SHA-256",
+          "type": "record"
+        },
+        "commit_alg": "sha256-jcs-nonce256",
+        "prev": {
+          "digest": "2d219920d83fbfa0bba9b1c25d190726b6473c74b1b2886663060a81339d28dc",
+          "digest_alg": "SHA-256",
+          "type": "record"
+        },
+        "producer": {
+          "commit": "unknown",
+          "name": "capsulectl",
+          "version": "0.1.0-dev"
+        },
+        "refs": [
+          {
+            "digest": "2d219920d83fbfa0bba9b1c25d190726b6473c74b1b2886663060a81339d28dc",
+            "digest_alg": "SHA-256",
+            "rel": "source",
+            "type": "record"
+          }
+        ],
+        "seq": 2,
+        "type": "task-authority/v0"
+      }
+    },
+    {
+      "constraints": [
+        {
+          "evidence_digest": "50bc7e959b1f91ec4a7e10431324aa1a1b865be557e52cca262bf321b6790e13",
+          "id": "dedupe",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "b03c74031232b6fd8432a7a97b93609e2b762b6dde5a7146313d6a0ab1b155a5",
+          "id": "caps",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+          "id": "verify_before_dispatch",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+          "id": "destination_rail",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "870b0a3e1636cab6902013f7742c0b36dfd72f324d1ff9ee3cd0976aa6d19241",
+          "id": "counterparty_identity_change",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827",
+          "id": "credential_pattern",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "ed761a48bede343570feeba08dd105fb225b9caf75b52392ea84550fdcc7b0b2",
+          "id": "recurring_charge",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "93594fc3973062b88c37e6949b10f34f202dc75ada097c69b83d201e0cb51701",
+          "id": "action_class_gate",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "28b0cfc994e7403d70a8855c1ff47e492f62b088508c149aa34e2d95ba487092",
+          "id": "counterparty_seen_before",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+          "id": "recipient_role",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "6ca8fce7ec08407d52d05d853229e4513f4974da697c4a99117cc706fed406a9",
+          "id": "refundability",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "ee7ecf7a7a01b008db9a0a806a45e8528253060b356a38f433ef71556972feb4",
+          "id": "material_fields_changed",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "4103c42dbd4b50f6e026455f61b555262623fd8f8a84d2041a1bba2be90e98ba",
+          "id": "offer_fields_changed",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "c7a84acb724ca272de76e7ed4c699268414ba4327cd140a72c429dd565287d53",
+          "id": "recipient_seen_before",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "f138fc94f2cbf345edc557fda4ff509abd5b74e35d0cb1489d6b882341114541",
+          "id": "channel_change",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "6286d6f31789beb7de36237b614325f4a23103d7a4e035b5a23e84972b442123",
+          "id": "upfront_amount",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "77cb9bdf77d765e5e4ae15860e49f999ab172e07331ea5f80469a9fee733325f",
+          "id": "task_authority",
+          "result": "pass"
+        }
+      ],
+      "outcome": "allow",
+      "record": {
+        "action_id": "deal-a2/3",
+        "action_type": "decide",
+        "agent_input": {
+          "body": {
+            "action": "pay",
+            "action_class": "money.purchase",
+            "amount_minor": 454,
+            "channel": "web",
+            "currency": "USD",
+            "first_contact_channel": "web",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "recourse": {
+              "rail": "card",
+              "refundable": true
+            },
+            "spend_minor": 454,
+            "task_authority_ref": {
+              "digest": "2edcc1dc2db366c671eeef0807c7a1b123dfe42edeacd0e0b7e6a9b7f0156236",
+              "digest_alg": "SHA-256",
+              "type": "record"
+            },
+            "taxonomy_version": "6"
+          },
+          "x-deal-v0": {
+            "counterparty": {
+              "fp_alg": "hmac-sha256-deal-key",
+              "ids": {
+                "payee": "2c3a4249d77070058649dbd822dcaf7957586fce428cfb2ca88b94741eda8b07"
+              }
+            },
+            "deal_id": "deal-a2",
+            "record_type": "check",
+            "seq": 3
+          }
+        },
+        "developer": "capsulectl-a2",
+        "model_attestation": {
+          "compute_attestation": {
+            "agent_input_digest": "08856e0e49b4c880f12be711859dc587c308c8bc5764b62c8aeba412b430442d"
+          }
+        },
+        "operator": "household-rollup",
+        "timestamp": "2026-10-08T11:02:00Z"
+      },
+      "scenario": "no-deposit",
+      "seed": {
+        "action": {
+          "action_class": "info.query",
+          "action_id": "lookup/rollup-capsulectl-a2",
+          "action_type": "decide",
+          "developer": "assistant-capsulectl-a2",
+          "operator": "household-rollup",
+          "target": "payee-fp:hmac-sha256-deal-key:2c3a4249d77070058649dbd822dcaf7957586fce428cfb2ca88b94741eda8b07",
+          "timestamp": "2026-10-08T10:01:00Z",
+          "verb": "lookup"
+        },
+        "constraints": [
+          {
+            "evidence_digest": "6607a707d8e49ace086efe4c2a3a5fb5da55d7516e3056562a48943ffe0e5181",
+            "id": "dedupe",
+            "result": "pass"
+          },
+          {
+            "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+            "id": "caps",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+            "id": "verify_before_dispatch",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+            "id": "destination_rail",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "870b0a3e1636cab6902013f7742c0b36dfd72f324d1ff9ee3cd0976aa6d19241",
+            "id": "counterparty_identity_change",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827",
+            "id": "credential_pattern",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "ed761a48bede343570feeba08dd105fb225b9caf75b52392ea84550fdcc7b0b2",
+            "id": "recurring_charge",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "17dcb23b1a22944bd95d23ccd22940f86aa3c46ab23e947ba50b0a1bcca6a6b9",
+            "id": "action_class_gate",
+            "result": "pass"
+          },
+          {
+            "evidence_digest": "029cd64fa2475bae9a0fd960a7a61c5df24d383fdf1683885fafa87ec448486e",
+            "id": "counterparty_seen_before",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+            "id": "recipient_role",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "7471f20fa8882393d42d3d4b38107a7be30b40e2b10ba838b30f7cc58dea0a5c",
+            "id": "refundability",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "e510562f4fe422536148c0153efabe41e40dffbd58bf33a9badc88d6258d49c8",
+            "id": "material_fields_changed",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "5301c7f61cebf5b8c57025b54c441a38f5dab35b558c0896995e00f3ee596629",
+            "id": "offer_fields_changed",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "c7a84acb724ca272de76e7ed4c699268414ba4327cd140a72c429dd565287d53",
+            "id": "recipient_seen_before",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "0ad91372036802d3b0b5b0baedeea673d02aa73cabedfe8f7c1dd774ddeb3e9e",
+            "id": "channel_change",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "0d0e8ae7a25e36254dd52de0a64abd81a2bbaa53230e320b8f73ebba253d54e2",
+            "id": "upfront_amount",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "c41e4b3a2077a40320e10ad50ccbfe5cc0efe57bd2d3dfe235357c61e8d051b9",
+            "id": "task_authority",
+            "result": "n/a"
+          }
+        ],
+        "outcome": "allow"
+      },
+      "task_authority_record": {
+        "at": "2026-09-27T18:00:00Z",
+        "body": {
+          "allowed": [
+            "pay"
+          ],
+          "allowed_actions": [
+            "pay"
+          ],
+          "max_total_minor": 500,
+          "outcome_id": "capsulectl.deal.purchase/1.0.0",
+          "preconditions": [],
+          "verbatim_commitment": "84d87822ef501167cb65f1f483fd3b36888bd7a78fe80b797cffd07b58661894"
+        },
+        "canonicalization": "jcs",
+        "chain_id": "deal-66cb45fb7ccfdf82",
+        "chain_root": {
+          "digest": "2d219920d83fbfa0bba9b1c25d190726b6473c74b1b2886663060a81339d28dc",
+          "digest_alg": "SHA-256",
+          "type": "record"
+        },
+        "commit_alg": "sha256-jcs-nonce256",
+        "prev": {
+          "digest": "2d219920d83fbfa0bba9b1c25d190726b6473c74b1b2886663060a81339d28dc",
+          "digest_alg": "SHA-256",
+          "type": "record"
+        },
+        "producer": {
+          "commit": "unknown",
+          "name": "capsulectl",
+          "version": "0.1.0-dev"
+        },
+        "refs": [
+          {
+            "digest": "2d219920d83fbfa0bba9b1c25d190726b6473c74b1b2886663060a81339d28dc",
+            "digest_alg": "SHA-256",
+            "rel": "source",
+            "type": "record"
+          }
+        ],
+        "seq": 2,
+        "type": "task-authority/v0"
+      }
+    },
+    {
+      "constraints": [
+        {
+          "evidence_digest": "c39577caf751fba0b2e3cba7b32b20da8858057d4b1385d86010ab1ef4604e5f",
+          "id": "dedupe",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "b03c74031232b6fd8432a7a97b93609e2b762b6dde5a7146313d6a0ab1b155a5",
+          "id": "caps",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+          "id": "verify_before_dispatch",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+          "id": "destination_rail",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "870b0a3e1636cab6902013f7742c0b36dfd72f324d1ff9ee3cd0976aa6d19241",
+          "id": "counterparty_identity_change",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827",
+          "id": "credential_pattern",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "ed761a48bede343570feeba08dd105fb225b9caf75b52392ea84550fdcc7b0b2",
+          "id": "recurring_charge",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "93594fc3973062b88c37e6949b10f34f202dc75ada097c69b83d201e0cb51701",
+          "id": "action_class_gate",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "aecae3001791299fa9a2e060def1a242ae072c051db9ba2cdb88f240e7b81cb3",
+          "id": "counterparty_seen_before",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+          "id": "recipient_role",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "6ca8fce7ec08407d52d05d853229e4513f4974da697c4a99117cc706fed406a9",
+          "id": "refundability",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "ee7ecf7a7a01b008db9a0a806a45e8528253060b356a38f433ef71556972feb4",
+          "id": "material_fields_changed",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "1cb0e3e6b77f138625772200c1ad9d3cd608aca57978f80f386bd9a668020bab",
+          "id": "offer_fields_changed",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "c7a84acb724ca272de76e7ed4c699268414ba4327cd140a72c429dd565287d53",
+          "id": "recipient_seen_before",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "f138fc94f2cbf345edc557fda4ff509abd5b74e35d0cb1489d6b882341114541",
+          "id": "channel_change",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "5f3e277b3f338da1fbdd86f7b06c6efbca43bf46ec07c448450eb7459cc76018",
+          "id": "upfront_amount",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "77cb9bdf77d765e5e4ae15860e49f999ab172e07331ea5f80469a9fee733325f",
+          "id": "task_authority",
+          "result": "pass"
+        }
+      ],
+      "outcome": "allow",
+      "record": {
+        "action_id": "deal-a3/3",
+        "action_type": "decide",
+        "agent_input": {
+          "body": {
+            "action": "pay",
+            "action_class": "money.purchase",
+            "amount_minor": 454,
+            "channel": "web",
+            "currency": "USD",
+            "first_contact_channel": "web",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "recourse": {
+              "rail": "card",
+              "refundable": true
+            },
+            "spend_minor": 454,
+            "task_authority_ref": {
+              "digest": "2edcc1dc2db366c671eeef0807c7a1b123dfe42edeacd0e0b7e6a9b7f0156236",
+              "digest_alg": "SHA-256",
+              "type": "record"
+            },
+            "taxonomy_version": "6",
+            "upfront_amount_minor": 0
+          },
+          "x-deal-v0": {
+            "counterparty": {
+              "fp_alg": "hmac-sha256-deal-key",
+              "ids": {
+                "payee": "f46dd28a5499d8efef0b8fb8ee1ec1c5a5e407c9381741d576ba8deb4f59ec3f"
+              }
+            },
+            "deal_id": "deal-a3",
+            "record_type": "check",
+            "seq": 3
+          }
+        },
+        "developer": "capsulectl-a3",
+        "model_attestation": {
+          "compute_attestation": {
+            "agent_input_digest": "57c1783b98ae3522ace3c491bfa8df01298aee568b7bec140e3ac0fd0138fbb5"
+          }
+        },
+        "operator": "household-rollup",
+        "timestamp": "2026-10-08T11:03:00Z"
+      },
+      "scenario": "no-offer-field",
+      "seed": {
+        "action": {
+          "action_class": "info.query",
+          "action_id": "lookup/rollup-capsulectl-a3",
+          "action_type": "decide",
+          "developer": "assistant-capsulectl-a3",
+          "operator": "household-rollup",
+          "target": "payee-fp:hmac-sha256-deal-key:f46dd28a5499d8efef0b8fb8ee1ec1c5a5e407c9381741d576ba8deb4f59ec3f",
+          "timestamp": "2026-10-08T10:02:00Z",
+          "verb": "lookup"
+        },
+        "constraints": [
+          {
+            "evidence_digest": "273711de565e153ea1b007789f02a82a1a202eef29933e3b3f81e4c43ad04872",
+            "id": "dedupe",
+            "result": "pass"
+          },
+          {
+            "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+            "id": "caps",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+            "id": "verify_before_dispatch",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+            "id": "destination_rail",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "870b0a3e1636cab6902013f7742c0b36dfd72f324d1ff9ee3cd0976aa6d19241",
+            "id": "counterparty_identity_change",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827",
+            "id": "credential_pattern",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "ed761a48bede343570feeba08dd105fb225b9caf75b52392ea84550fdcc7b0b2",
+            "id": "recurring_charge",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "17dcb23b1a22944bd95d23ccd22940f86aa3c46ab23e947ba50b0a1bcca6a6b9",
+            "id": "action_class_gate",
+            "result": "pass"
+          },
+          {
+            "evidence_digest": "029cd64fa2475bae9a0fd960a7a61c5df24d383fdf1683885fafa87ec448486e",
+            "id": "counterparty_seen_before",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+            "id": "recipient_role",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "7471f20fa8882393d42d3d4b38107a7be30b40e2b10ba838b30f7cc58dea0a5c",
+            "id": "refundability",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "e510562f4fe422536148c0153efabe41e40dffbd58bf33a9badc88d6258d49c8",
+            "id": "material_fields_changed",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "5301c7f61cebf5b8c57025b54c441a38f5dab35b558c0896995e00f3ee596629",
+            "id": "offer_fields_changed",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "c7a84acb724ca272de76e7ed4c699268414ba4327cd140a72c429dd565287d53",
+            "id": "recipient_seen_before",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "0ad91372036802d3b0b5b0baedeea673d02aa73cabedfe8f7c1dd774ddeb3e9e",
+            "id": "channel_change",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "0d0e8ae7a25e36254dd52de0a64abd81a2bbaa53230e320b8f73ebba253d54e2",
+            "id": "upfront_amount",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "c41e4b3a2077a40320e10ad50ccbfe5cc0efe57bd2d3dfe235357c61e8d051b9",
+            "id": "task_authority",
+            "result": "n/a"
+          }
+        ],
+        "outcome": "allow"
+      },
+      "task_authority_record": {
+        "at": "2026-09-27T18:00:00Z",
+        "body": {
+          "allowed": [
+            "pay"
+          ],
+          "allowed_actions": [
+            "pay"
+          ],
+          "max_total_minor": 500,
+          "outcome_id": "capsulectl.deal.purchase/1.0.0",
+          "preconditions": [],
+          "verbatim_commitment": "84d87822ef501167cb65f1f483fd3b36888bd7a78fe80b797cffd07b58661894"
+        },
+        "canonicalization": "jcs",
+        "chain_id": "deal-66cb45fb7ccfdf82",
+        "chain_root": {
+          "digest": "2d219920d83fbfa0bba9b1c25d190726b6473c74b1b2886663060a81339d28dc",
+          "digest_alg": "SHA-256",
+          "type": "record"
+        },
+        "commit_alg": "sha256-jcs-nonce256",
+        "prev": {
+          "digest": "2d219920d83fbfa0bba9b1c25d190726b6473c74b1b2886663060a81339d28dc",
+          "digest_alg": "SHA-256",
+          "type": "record"
+        },
+        "producer": {
+          "commit": "unknown",
+          "name": "capsulectl",
+          "version": "0.1.0-dev"
+        },
+        "refs": [
+          {
+            "digest": "2d219920d83fbfa0bba9b1c25d190726b6473c74b1b2886663060a81339d28dc",
+            "digest_alg": "SHA-256",
+            "rel": "source",
+            "type": "record"
+          }
+        ],
+        "seq": 2,
+        "type": "task-authority/v0"
+      }
+    },
+    {
+      "constraints": [
+        {
+          "evidence_digest": "3d37ef7267bafea674e789d60fdf5cfda7c77005878ae4d5b296a189440491cd",
+          "id": "dedupe",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "b03c74031232b6fd8432a7a97b93609e2b762b6dde5a7146313d6a0ab1b155a5",
+          "id": "caps",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+          "id": "verify_before_dispatch",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+          "id": "destination_rail",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "870b0a3e1636cab6902013f7742c0b36dfd72f324d1ff9ee3cd0976aa6d19241",
+          "id": "counterparty_identity_change",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827",
+          "id": "credential_pattern",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "ed761a48bede343570feeba08dd105fb225b9caf75b52392ea84550fdcc7b0b2",
+          "id": "recurring_charge",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "93594fc3973062b88c37e6949b10f34f202dc75ada097c69b83d201e0cb51701",
+          "id": "action_class_gate",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "347b30e77f029eef9764b02dead140da9d635204e6d6f511a288f45ecfd69dc7",
+          "id": "counterparty_seen_before",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+          "id": "recipient_role",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "6ca8fce7ec08407d52d05d853229e4513f4974da697c4a99117cc706fed406a9",
+          "id": "refundability",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "ee7ecf7a7a01b008db9a0a806a45e8528253060b356a38f433ef71556972feb4",
+          "id": "material_fields_changed",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "4103c42dbd4b50f6e026455f61b555262623fd8f8a84d2041a1bba2be90e98ba",
+          "id": "offer_fields_changed",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "c7a84acb724ca272de76e7ed4c699268414ba4327cd140a72c429dd565287d53",
+          "id": "recipient_seen_before",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "bef9155d229a6f9868a6f51d37852b3f54a22d43fb3afdfb335a873e5bd30e97",
+          "id": "channel_change",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "5f3e277b3f338da1fbdd86f7b06c6efbca43bf46ec07c448450eb7459cc76018",
+          "id": "upfront_amount",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "77cb9bdf77d765e5e4ae15860e49f999ab172e07331ea5f80469a9fee733325f",
+          "id": "task_authority",
+          "result": "pass"
+        }
+      ],
+      "outcome": "allow",
+      "record": {
+        "action_id": "deal-a4/3",
+        "action_type": "decide",
+        "agent_input": {
+          "body": {
+            "action": "pay",
+            "action_class": "money.purchase",
+            "amount_minor": 454,
+            "currency": "USD",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "recourse": {
+              "rail": "card",
+              "refundable": true
+            },
+            "spend_minor": 454,
+            "task_authority_ref": {
+              "digest": "2edcc1dc2db366c671eeef0807c7a1b123dfe42edeacd0e0b7e6a9b7f0156236",
+              "digest_alg": "SHA-256",
+              "type": "record"
+            },
+            "taxonomy_version": "6",
+            "upfront_amount_minor": 0
+          },
+          "x-deal-v0": {
+            "counterparty": {
+              "fp_alg": "hmac-sha256-deal-key",
+              "ids": {
+                "payee": "4539e4b4889079c2a00afeae0bfc1439840ef2379a1fb81c8ba27361ad476d6b"
+              }
+            },
+            "deal_id": "deal-a4",
+            "record_type": "check",
+            "seq": 3
+          }
+        },
+        "developer": "capsulectl-a4",
+        "model_attestation": {
+          "compute_attestation": {
+            "agent_input_digest": "ce57a8621cde3791eafbc33de24a476cf581a619650f4fc24dcafb4e5cee25e9"
+          }
+        },
+        "operator": "household-rollup",
+        "timestamp": "2026-10-08T11:04:00Z"
+      },
+      "scenario": "no-channel",
+      "seed": {
+        "action": {
+          "action_class": "info.query",
+          "action_id": "lookup/rollup-capsulectl-a4",
+          "action_type": "decide",
+          "developer": "assistant-capsulectl-a4",
+          "operator": "household-rollup",
+          "target": "payee-fp:hmac-sha256-deal-key:4539e4b4889079c2a00afeae0bfc1439840ef2379a1fb81c8ba27361ad476d6b",
+          "timestamp": "2026-10-08T10:03:00Z",
+          "verb": "lookup"
+        },
+        "constraints": [
+          {
+            "evidence_digest": "44de8cb86af0e9bda1ee785d13843551e7172208a9995b66e34aede59e629238",
+            "id": "dedupe",
+            "result": "pass"
+          },
+          {
+            "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+            "id": "caps",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+            "id": "verify_before_dispatch",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+            "id": "destination_rail",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "870b0a3e1636cab6902013f7742c0b36dfd72f324d1ff9ee3cd0976aa6d19241",
+            "id": "counterparty_identity_change",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827",
+            "id": "credential_pattern",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "ed761a48bede343570feeba08dd105fb225b9caf75b52392ea84550fdcc7b0b2",
+            "id": "recurring_charge",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "17dcb23b1a22944bd95d23ccd22940f86aa3c46ab23e947ba50b0a1bcca6a6b9",
+            "id": "action_class_gate",
+            "result": "pass"
+          },
+          {
+            "evidence_digest": "029cd64fa2475bae9a0fd960a7a61c5df24d383fdf1683885fafa87ec448486e",
+            "id": "counterparty_seen_before",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+            "id": "recipient_role",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "7471f20fa8882393d42d3d4b38107a7be30b40e2b10ba838b30f7cc58dea0a5c",
+            "id": "refundability",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "e510562f4fe422536148c0153efabe41e40dffbd58bf33a9badc88d6258d49c8",
+            "id": "material_fields_changed",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "5301c7f61cebf5b8c57025b54c441a38f5dab35b558c0896995e00f3ee596629",
+            "id": "offer_fields_changed",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "c7a84acb724ca272de76e7ed4c699268414ba4327cd140a72c429dd565287d53",
+            "id": "recipient_seen_before",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "0ad91372036802d3b0b5b0baedeea673d02aa73cabedfe8f7c1dd774ddeb3e9e",
+            "id": "channel_change",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "0d0e8ae7a25e36254dd52de0a64abd81a2bbaa53230e320b8f73ebba253d54e2",
+            "id": "upfront_amount",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "c41e4b3a2077a40320e10ad50ccbfe5cc0efe57bd2d3dfe235357c61e8d051b9",
+            "id": "task_authority",
+            "result": "n/a"
+          }
+        ],
+        "outcome": "allow"
+      },
+      "task_authority_record": {
+        "at": "2026-09-27T18:00:00Z",
+        "body": {
+          "allowed": [
+            "pay"
+          ],
+          "allowed_actions": [
+            "pay"
+          ],
+          "max_total_minor": 500,
+          "outcome_id": "capsulectl.deal.purchase/1.0.0",
+          "preconditions": [],
+          "verbatim_commitment": "84d87822ef501167cb65f1f483fd3b36888bd7a78fe80b797cffd07b58661894"
+        },
+        "canonicalization": "jcs",
+        "chain_id": "deal-66cb45fb7ccfdf82",
+        "chain_root": {
+          "digest": "2d219920d83fbfa0bba9b1c25d190726b6473c74b1b2886663060a81339d28dc",
+          "digest_alg": "SHA-256",
+          "type": "record"
+        },
+        "commit_alg": "sha256-jcs-nonce256",
+        "prev": {
+          "digest": "2d219920d83fbfa0bba9b1c25d190726b6473c74b1b2886663060a81339d28dc",
+          "digest_alg": "SHA-256",
+          "type": "record"
+        },
+        "producer": {
+          "commit": "unknown",
+          "name": "capsulectl",
+          "version": "0.1.0-dev"
+        },
+        "refs": [
+          {
+            "digest": "2d219920d83fbfa0bba9b1c25d190726b6473c74b1b2886663060a81339d28dc",
+            "digest_alg": "SHA-256",
+            "rel": "source",
+            "type": "record"
+          }
+        ],
+        "seq": 2,
+        "type": "task-authority/v0"
+      }
+    },
+    {
+      "constraints": [
+        {
+          "evidence_digest": "2136a7daa7d8798bab7fd829db66a90a080c237335875371aa686207d1ef0e64",
+          "id": "dedupe",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "b03c74031232b6fd8432a7a97b93609e2b762b6dde5a7146313d6a0ab1b155a5",
+          "id": "caps",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+          "id": "verify_before_dispatch",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+          "id": "destination_rail",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "870b0a3e1636cab6902013f7742c0b36dfd72f324d1ff9ee3cd0976aa6d19241",
+          "id": "counterparty_identity_change",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827",
+          "id": "credential_pattern",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "ed761a48bede343570feeba08dd105fb225b9caf75b52392ea84550fdcc7b0b2",
+          "id": "recurring_charge",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "93594fc3973062b88c37e6949b10f34f202dc75ada097c69b83d201e0cb51701",
+          "id": "action_class_gate",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "3a3ac7293b91cfeac97d5b436526861c71ac8076ec01103642824d534557c4c6",
+          "id": "counterparty_seen_before",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+          "id": "recipient_role",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "6ca8fce7ec08407d52d05d853229e4513f4974da697c4a99117cc706fed406a9",
+          "id": "refundability",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "ee7ecf7a7a01b008db9a0a806a45e8528253060b356a38f433ef71556972feb4",
+          "id": "material_fields_changed",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "4103c42dbd4b50f6e026455f61b555262623fd8f8a84d2041a1bba2be90e98ba",
+          "id": "offer_fields_changed",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "c7a84acb724ca272de76e7ed4c699268414ba4327cd140a72c429dd565287d53",
+          "id": "recipient_seen_before",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "f138fc94f2cbf345edc557fda4ff509abd5b74e35d0cb1489d6b882341114541",
+          "id": "channel_change",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "5f3e277b3f338da1fbdd86f7b06c6efbca43bf46ec07c448450eb7459cc76018",
+          "id": "upfront_amount",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "3c94a44812b9f227f1da0e8ed27510ad37fccfa3b7c3035fbd75b52901b160fb",
+          "id": "task_authority",
+          "result": "n/a"
+        }
+      ],
+      "outcome": "allow",
+      "record": {
+        "action_id": "deal-a5/3",
+        "action_type": "decide",
+        "agent_input": {
+          "body": {
+            "action": "pay",
+            "action_class": "money.purchase",
+            "amount_minor": 454,
+            "channel": "web",
+            "currency": "USD",
+            "first_contact_channel": "web",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "recourse": {
+              "rail": "card",
+              "refundable": true
+            },
+            "spend_minor": 454,
+            "taxonomy_version": "6",
+            "upfront_amount_minor": 0
+          },
+          "x-deal-v0": {
+            "counterparty": {
+              "fp_alg": "hmac-sha256-deal-key",
+              "ids": {
+                "payee": "66220e71591b2d933c0e935c138ebfd60710b91fe2fb7599eced4430b3dbb3c9"
+              }
+            },
+            "deal_id": "deal-a5",
+            "record_type": "check",
+            "seq": 3
+          }
+        },
+        "developer": "capsulectl-a5",
+        "model_attestation": {
+          "compute_attestation": {
+            "agent_input_digest": "9267bc2c7febd83ae0b58c4e6f7f34d6f22024db306744dbb4ef5b2667c24f74"
+          }
+        },
+        "operator": "household-rollup",
+        "timestamp": "2026-10-08T11:05:00Z"
+      },
+      "scenario": "no-task-authority-untyped",
+      "seed": {
+        "action": {
+          "action_class": "info.query",
+          "action_id": "lookup/rollup-capsulectl-a5",
+          "action_type": "decide",
+          "developer": "assistant-capsulectl-a5",
+          "operator": "household-rollup",
+          "target": "payee-fp:hmac-sha256-deal-key:66220e71591b2d933c0e935c138ebfd60710b91fe2fb7599eced4430b3dbb3c9",
+          "timestamp": "2026-10-08T10:04:00Z",
+          "verb": "lookup"
+        },
+        "constraints": [
+          {
+            "evidence_digest": "8442ebd8662f88c160d084255c6e6fd436516f3e58e3a71ac3e54e1d5f66d802",
+            "id": "dedupe",
+            "result": "pass"
+          },
+          {
+            "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+            "id": "caps",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+            "id": "verify_before_dispatch",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+            "id": "destination_rail",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "870b0a3e1636cab6902013f7742c0b36dfd72f324d1ff9ee3cd0976aa6d19241",
+            "id": "counterparty_identity_change",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827",
+            "id": "credential_pattern",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "ed761a48bede343570feeba08dd105fb225b9caf75b52392ea84550fdcc7b0b2",
+            "id": "recurring_charge",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "17dcb23b1a22944bd95d23ccd22940f86aa3c46ab23e947ba50b0a1bcca6a6b9",
+            "id": "action_class_gate",
+            "result": "pass"
+          },
+          {
+            "evidence_digest": "029cd64fa2475bae9a0fd960a7a61c5df24d383fdf1683885fafa87ec448486e",
+            "id": "counterparty_seen_before",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+            "id": "recipient_role",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "7471f20fa8882393d42d3d4b38107a7be30b40e2b10ba838b30f7cc58dea0a5c",
+            "id": "refundability",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "e510562f4fe422536148c0153efabe41e40dffbd58bf33a9badc88d6258d49c8",
+            "id": "material_fields_changed",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "5301c7f61cebf5b8c57025b54c441a38f5dab35b558c0896995e00f3ee596629",
+            "id": "offer_fields_changed",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "c7a84acb724ca272de76e7ed4c699268414ba4327cd140a72c429dd565287d53",
+            "id": "recipient_seen_before",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "0ad91372036802d3b0b5b0baedeea673d02aa73cabedfe8f7c1dd774ddeb3e9e",
+            "id": "channel_change",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "0d0e8ae7a25e36254dd52de0a64abd81a2bbaa53230e320b8f73ebba253d54e2",
+            "id": "upfront_amount",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "c41e4b3a2077a40320e10ad50ccbfe5cc0efe57bd2d3dfe235357c61e8d051b9",
+            "id": "task_authority",
+            "result": "n/a"
+          }
+        ],
+        "outcome": "allow"
+      }
+    },
+    {
+      "constraints": [
+        {
+          "evidence_digest": "8ce48c0d67ec2141bb809a42d96e58de770ea172598014c7b0568ee252873a6a",
+          "id": "dedupe",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "b03c74031232b6fd8432a7a97b93609e2b762b6dde5a7146313d6a0ab1b155a5",
+          "id": "caps",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+          "id": "verify_before_dispatch",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+          "id": "destination_rail",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "870b0a3e1636cab6902013f7742c0b36dfd72f324d1ff9ee3cd0976aa6d19241",
+          "id": "counterparty_identity_change",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827",
+          "id": "credential_pattern",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "ed761a48bede343570feeba08dd105fb225b9caf75b52392ea84550fdcc7b0b2",
+          "id": "recurring_charge",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "93594fc3973062b88c37e6949b10f34f202dc75ada097c69b83d201e0cb51701",
+          "id": "action_class_gate",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "3aee0a44f5656cd5c538410df90209131da8a1513f9e78e7895c44e16469816f",
+          "id": "counterparty_seen_before",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+          "id": "recipient_role",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "6ca8fce7ec08407d52d05d853229e4513f4974da697c4a99117cc706fed406a9",
+          "id": "refundability",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "ee7ecf7a7a01b008db9a0a806a45e8528253060b356a38f433ef71556972feb4",
+          "id": "material_fields_changed",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "1cb0e3e6b77f138625772200c1ad9d3cd608aca57978f80f386bd9a668020bab",
+          "id": "offer_fields_changed",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "c7a84acb724ca272de76e7ed4c699268414ba4327cd140a72c429dd565287d53",
+          "id": "recipient_seen_before",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "bef9155d229a6f9868a6f51d37852b3f54a22d43fb3afdfb335a873e5bd30e97",
+          "id": "channel_change",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "6286d6f31789beb7de36237b614325f4a23103d7a4e035b5a23e84972b442123",
+          "id": "upfront_amount",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "3c94a44812b9f227f1da0e8ed27510ad37fccfa3b7c3035fbd75b52901b160fb",
+          "id": "task_authority",
+          "result": "n/a"
+        }
+      ],
+      "outcome": "allow",
+      "record": {
+        "action_id": "deal-a6/3",
+        "action_type": "decide",
+        "agent_input": {
+          "body": {
+            "action": "pay",
+            "action_class": "money.purchase",
+            "amount_minor": 454,
+            "currency": "USD",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "recourse": {
+              "rail": "card",
+              "refundable": true
+            },
+            "spend_minor": 454,
+            "taxonomy_version": "6"
+          },
+          "x-deal-v0": {
+            "counterparty": {
+              "fp_alg": "hmac-sha256-deal-key",
+              "ids": {
+                "payee": "730bea4ff16f200fb931b06cae08a5da8e279813775d7ed81e680b4a77946fe1"
+              }
+            },
+            "deal_id": "deal-a6",
+            "record_type": "check",
+            "seq": 3
+          }
+        },
+        "developer": "capsulectl-a6",
+        "model_attestation": {
+          "compute_attestation": {
+            "agent_input_digest": "002f50402ea3a7334cfe7c1bab1b17ebb9da8b8382b7564b4129361d4397b845"
+          }
+        },
+        "operator": "household-rollup",
+        "timestamp": "2026-10-08T11:06:00Z"
+      },
+      "scenario": "as-capsulectl-emits",
+      "seed": {
+        "action": {
+          "action_class": "info.query",
+          "action_id": "lookup/rollup-capsulectl-a6",
+          "action_type": "decide",
+          "developer": "assistant-capsulectl-a6",
+          "operator": "household-rollup",
+          "target": "payee-fp:hmac-sha256-deal-key:730bea4ff16f200fb931b06cae08a5da8e279813775d7ed81e680b4a77946fe1",
+          "timestamp": "2026-10-08T10:05:00Z",
+          "verb": "lookup"
+        },
+        "constraints": [
+          {
+            "evidence_digest": "ec076ed05c5c4357bf507866cdc8a3f96201d97ac324bce0ba8e1fa6909b4fe2",
+            "id": "dedupe",
+            "result": "pass"
+          },
+          {
+            "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+            "id": "caps",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+            "id": "verify_before_dispatch",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+            "id": "destination_rail",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "870b0a3e1636cab6902013f7742c0b36dfd72f324d1ff9ee3cd0976aa6d19241",
+            "id": "counterparty_identity_change",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827",
+            "id": "credential_pattern",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "ed761a48bede343570feeba08dd105fb225b9caf75b52392ea84550fdcc7b0b2",
+            "id": "recurring_charge",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "17dcb23b1a22944bd95d23ccd22940f86aa3c46ab23e947ba50b0a1bcca6a6b9",
+            "id": "action_class_gate",
+            "result": "pass"
+          },
+          {
+            "evidence_digest": "029cd64fa2475bae9a0fd960a7a61c5df24d383fdf1683885fafa87ec448486e",
+            "id": "counterparty_seen_before",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+            "id": "recipient_role",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "7471f20fa8882393d42d3d4b38107a7be30b40e2b10ba838b30f7cc58dea0a5c",
+            "id": "refundability",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "e510562f4fe422536148c0153efabe41e40dffbd58bf33a9badc88d6258d49c8",
+            "id": "material_fields_changed",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "5301c7f61cebf5b8c57025b54c441a38f5dab35b558c0896995e00f3ee596629",
+            "id": "offer_fields_changed",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "c7a84acb724ca272de76e7ed4c699268414ba4327cd140a72c429dd565287d53",
+            "id": "recipient_seen_before",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "0ad91372036802d3b0b5b0baedeea673d02aa73cabedfe8f7c1dd774ddeb3e9e",
+            "id": "channel_change",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "0d0e8ae7a25e36254dd52de0a64abd81a2bbaa53230e320b8f73ebba253d54e2",
+            "id": "upfront_amount",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "c41e4b3a2077a40320e10ad50ccbfe5cc0efe57bd2d3dfe235357c61e8d051b9",
+            "id": "task_authority",
+            "result": "n/a"
+          }
+        ],
+        "outcome": "allow"
+      }
+    },
+    {
+      "constraints": [
+        {
+          "evidence_digest": "f72c5b7e29ef200fb11bae223e230621a971c9a34d07ad2798ad700bf3d81633",
+          "id": "dedupe",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "b03c74031232b6fd8432a7a97b93609e2b762b6dde5a7146313d6a0ab1b155a5",
+          "id": "caps",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+          "id": "verify_before_dispatch",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+          "id": "destination_rail",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "870b0a3e1636cab6902013f7742c0b36dfd72f324d1ff9ee3cd0976aa6d19241",
+          "id": "counterparty_identity_change",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827",
+          "id": "credential_pattern",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "ed761a48bede343570feeba08dd105fb225b9caf75b52392ea84550fdcc7b0b2",
+          "id": "recurring_charge",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "93594fc3973062b88c37e6949b10f34f202dc75ada097c69b83d201e0cb51701",
+          "id": "action_class_gate",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "b83ef314e34d2376aee32319f5e4be52b92755717c9868ed1b0a26af738f2a06",
+          "id": "counterparty_seen_before",
+          "result": "fail"
+        },
+        {
+          "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+          "id": "recipient_role",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "6ca8fce7ec08407d52d05d853229e4513f4974da697c4a99117cc706fed406a9",
+          "id": "refundability",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "ee7ecf7a7a01b008db9a0a806a45e8528253060b356a38f433ef71556972feb4",
+          "id": "material_fields_changed",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "4103c42dbd4b50f6e026455f61b555262623fd8f8a84d2041a1bba2be90e98ba",
+          "id": "offer_fields_changed",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "c7a84acb724ca272de76e7ed4c699268414ba4327cd140a72c429dd565287d53",
+          "id": "recipient_seen_before",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "f138fc94f2cbf345edc557fda4ff509abd5b74e35d0cb1489d6b882341114541",
+          "id": "channel_change",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "5f3e277b3f338da1fbdd86f7b06c6efbca43bf46ec07c448450eb7459cc76018",
+          "id": "upfront_amount",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "77cb9bdf77d765e5e4ae15860e49f999ab172e07331ea5f80469a9fee733325f",
+          "id": "task_authority",
+          "result": "pass"
+        }
+      ],
+      "outcome": "escalate",
+      "record": {
+        "action_id": "deal-a7/3",
+        "action_type": "decide",
+        "agent_input": {
+          "body": {
+            "action": "pay",
+            "action_class": "money.purchase",
+            "amount_minor": 454,
+            "channel": "web",
+            "currency": "USD",
+            "first_contact_channel": "web",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "recourse": {
+              "rail": "card",
+              "refundable": true
+            },
+            "spend_minor": 454,
+            "task_authority_ref": {
+              "digest": "2edcc1dc2db366c671eeef0807c7a1b123dfe42edeacd0e0b7e6a9b7f0156236",
+              "digest_alg": "SHA-256",
+              "type": "record"
+            },
+            "taxonomy_version": "6",
+            "upfront_amount_minor": 0
+          },
+          "x-deal-v0": {
+            "counterparty": {
+              "fp_alg": "hmac-sha256-deal-key",
+              "ids": {
+                "payee": "20377cec9f51f6bf5ba1fa64649f3b1614e4eee833fd0fc5893f24f6e0accbaf"
+              }
+            },
+            "deal_id": "deal-a7",
+            "record_type": "check",
+            "seq": 3
+          }
+        },
+        "developer": "capsulectl-a7",
+        "model_attestation": {
+          "compute_attestation": {
+            "agent_input_digest": "7e4c9d1e56a31a59141d45d48d788204f7e8c7c8c1246a38101a395df6f1d215"
+          }
+        },
+        "operator": "household-rollup",
+        "timestamp": "2026-10-08T11:07:00Z"
+      },
+      "scenario": "unseen-payee",
+      "task_authority_record": {
+        "at": "2026-09-27T18:00:00Z",
+        "body": {
+          "allowed": [
+            "pay"
+          ],
+          "allowed_actions": [
+            "pay"
+          ],
+          "max_total_minor": 500,
+          "outcome_id": "capsulectl.deal.purchase/1.0.0",
+          "preconditions": [],
+          "verbatim_commitment": "84d87822ef501167cb65f1f483fd3b36888bd7a78fe80b797cffd07b58661894"
+        },
+        "canonicalization": "jcs",
+        "chain_id": "deal-66cb45fb7ccfdf82",
+        "chain_root": {
+          "digest": "2d219920d83fbfa0bba9b1c25d190726b6473c74b1b2886663060a81339d28dc",
+          "digest_alg": "SHA-256",
+          "type": "record"
+        },
+        "commit_alg": "sha256-jcs-nonce256",
+        "prev": {
+          "digest": "2d219920d83fbfa0bba9b1c25d190726b6473c74b1b2886663060a81339d28dc",
+          "digest_alg": "SHA-256",
+          "type": "record"
+        },
+        "producer": {
+          "commit": "unknown",
+          "name": "capsulectl",
+          "version": "0.1.0-dev"
+        },
+        "refs": [
+          {
+            "digest": "2d219920d83fbfa0bba9b1c25d190726b6473c74b1b2886663060a81339d28dc",
+            "digest_alg": "SHA-256",
+            "rel": "source",
+            "type": "record"
+          }
+        ],
+        "seq": 2,
+        "type": "task-authority/v0"
+      }
+    },
+    {
+      "constraints": [
+        {
+          "evidence_digest": "e41e76223c24bca2591eafc7e63166947c29721bcadfca95f429dda2bad737dc",
+          "id": "dedupe",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "a44b48581c69f935a5c01037f1247cf90a6d9df26ace40c4f00ee2d4b636d52d",
+          "id": "caps",
+          "result": "fail"
+        },
+        {
+          "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+          "id": "verify_before_dispatch",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+          "id": "destination_rail",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "870b0a3e1636cab6902013f7742c0b36dfd72f324d1ff9ee3cd0976aa6d19241",
+          "id": "counterparty_identity_change",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827",
+          "id": "credential_pattern",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "ed761a48bede343570feeba08dd105fb225b9caf75b52392ea84550fdcc7b0b2",
+          "id": "recurring_charge",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "93594fc3973062b88c37e6949b10f34f202dc75ada097c69b83d201e0cb51701",
+          "id": "action_class_gate",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "49c63afdbf9df9a13f2b54d5c0b34d03377d25f12af07d70417f39ecb2fcd2ef",
+          "id": "counterparty_seen_before",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+          "id": "recipient_role",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "6ca8fce7ec08407d52d05d853229e4513f4974da697c4a99117cc706fed406a9",
+          "id": "refundability",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "ee7ecf7a7a01b008db9a0a806a45e8528253060b356a38f433ef71556972feb4",
+          "id": "material_fields_changed",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "4103c42dbd4b50f6e026455f61b555262623fd8f8a84d2041a1bba2be90e98ba",
+          "id": "offer_fields_changed",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "c7a84acb724ca272de76e7ed4c699268414ba4327cd140a72c429dd565287d53",
+          "id": "recipient_seen_before",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "f138fc94f2cbf345edc557fda4ff509abd5b74e35d0cb1489d6b882341114541",
+          "id": "channel_change",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "15cc29bc055a9948a530d99e10899794ae097e176ebf8d886fca02e95b44ab83",
+          "id": "upfront_amount",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "6e9d343d83a0681a689599d49f20a8f6b08dbdd8c93b51a7fe88cc1f5a2648aa",
+          "id": "task_authority",
+          "result": "n/a"
+        }
+      ],
+      "outcome": "escalate",
+      "record": {
+        "action_id": "deal-a8/3",
+        "action_type": "decide",
+        "agent_input": {
+          "body": {
+            "action": "pay",
+            "action_class": "money.purchase",
+            "amount_minor": 3000,
+            "channel": "web",
+            "currency": "USD",
+            "first_contact_channel": "web",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "recourse": {
+              "rail": "card",
+              "refundable": true
+            },
+            "spend_minor": 3000,
+            "task_authority_ref": {
+              "digest": "2edcc1dc2db366c671eeef0807c7a1b123dfe42edeacd0e0b7e6a9b7f0156236",
+              "digest_alg": "SHA-256",
+              "type": "record"
+            },
+            "taxonomy_version": "6",
+            "upfront_amount_minor": 0
+          },
+          "x-deal-v0": {
+            "counterparty": {
+              "fp_alg": "hmac-sha256-deal-key",
+              "ids": {
+                "payee": "ce609b5bf3b974a84907e237aca3011286182be9b1b87cad7b4e9cf5d0be355f"
+              }
+            },
+            "deal_id": "deal-a8",
+            "record_type": "check",
+            "seq": 3
+          }
+        },
+        "developer": "capsulectl-a8",
+        "model_attestation": {
+          "compute_attestation": {
+            "agent_input_digest": "a17e02150d62fd3f6dd2a3b4e38c02a4b60c5302efe685c14b42d1e8629dd7aa"
+          }
+        },
+        "operator": "household-rollup",
+        "timestamp": "2026-10-08T11:08:00Z"
+      },
+      "scenario": "over-limit",
+      "seed": {
+        "action": {
+          "action_class": "info.query",
+          "action_id": "lookup/rollup-capsulectl-a8",
+          "action_type": "decide",
+          "developer": "assistant-capsulectl-a8",
+          "operator": "household-rollup",
+          "target": "payee-fp:hmac-sha256-deal-key:ce609b5bf3b974a84907e237aca3011286182be9b1b87cad7b4e9cf5d0be355f",
+          "timestamp": "2026-10-08T10:07:00Z",
+          "verb": "lookup"
+        },
+        "constraints": [
+          {
+            "evidence_digest": "e299252a2fffc34bc72079a4a73a5e93ba664f3450806489a73361134334fa6d",
+            "id": "dedupe",
+            "result": "pass"
+          },
+          {
+            "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+            "id": "caps",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+            "id": "verify_before_dispatch",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+            "id": "destination_rail",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "870b0a3e1636cab6902013f7742c0b36dfd72f324d1ff9ee3cd0976aa6d19241",
+            "id": "counterparty_identity_change",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827",
+            "id": "credential_pattern",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "ed761a48bede343570feeba08dd105fb225b9caf75b52392ea84550fdcc7b0b2",
+            "id": "recurring_charge",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "17dcb23b1a22944bd95d23ccd22940f86aa3c46ab23e947ba50b0a1bcca6a6b9",
+            "id": "action_class_gate",
+            "result": "pass"
+          },
+          {
+            "evidence_digest": "029cd64fa2475bae9a0fd960a7a61c5df24d383fdf1683885fafa87ec448486e",
+            "id": "counterparty_seen_before",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+            "id": "recipient_role",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "7471f20fa8882393d42d3d4b38107a7be30b40e2b10ba838b30f7cc58dea0a5c",
+            "id": "refundability",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "e510562f4fe422536148c0153efabe41e40dffbd58bf33a9badc88d6258d49c8",
+            "id": "material_fields_changed",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "5301c7f61cebf5b8c57025b54c441a38f5dab35b558c0896995e00f3ee596629",
+            "id": "offer_fields_changed",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "c7a84acb724ca272de76e7ed4c699268414ba4327cd140a72c429dd565287d53",
+            "id": "recipient_seen_before",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "0ad91372036802d3b0b5b0baedeea673d02aa73cabedfe8f7c1dd774ddeb3e9e",
+            "id": "channel_change",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "0d0e8ae7a25e36254dd52de0a64abd81a2bbaa53230e320b8f73ebba253d54e2",
+            "id": "upfront_amount",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "c41e4b3a2077a40320e10ad50ccbfe5cc0efe57bd2d3dfe235357c61e8d051b9",
+            "id": "task_authority",
+            "result": "n/a"
+          }
+        ],
+        "outcome": "allow"
+      }
+    },
+    {
+      "constraints": [
+        {
+          "evidence_digest": "f099ca1ef06d91d9c4d6101e0e031180260d54b645522a129c1d3e85fd16495a",
+          "id": "dedupe",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "b03c74031232b6fd8432a7a97b93609e2b762b6dde5a7146313d6a0ab1b155a5",
+          "id": "caps",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+          "id": "verify_before_dispatch",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+          "id": "destination_rail",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "870b0a3e1636cab6902013f7742c0b36dfd72f324d1ff9ee3cd0976aa6d19241",
+          "id": "counterparty_identity_change",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827",
+          "id": "credential_pattern",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "ed761a48bede343570feeba08dd105fb225b9caf75b52392ea84550fdcc7b0b2",
+          "id": "recurring_charge",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "93594fc3973062b88c37e6949b10f34f202dc75ada097c69b83d201e0cb51701",
+          "id": "action_class_gate",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "15cb24914116f95cb3557cf50d2eedfd276885e81a29edf454bc45237200cb1f",
+          "id": "counterparty_seen_before",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+          "id": "recipient_role",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "6ca8fce7ec08407d52d05d853229e4513f4974da697c4a99117cc706fed406a9",
+          "id": "refundability",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "ee7ecf7a7a01b008db9a0a806a45e8528253060b356a38f433ef71556972feb4",
+          "id": "material_fields_changed",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "4103c42dbd4b50f6e026455f61b555262623fd8f8a84d2041a1bba2be90e98ba",
+          "id": "offer_fields_changed",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "c7a84acb724ca272de76e7ed4c699268414ba4327cd140a72c429dd565287d53",
+          "id": "recipient_seen_before",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "f138fc94f2cbf345edc557fda4ff509abd5b74e35d0cb1489d6b882341114541",
+          "id": "channel_change",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "5f3e277b3f338da1fbdd86f7b06c6efbca43bf46ec07c448450eb7459cc76018",
+          "id": "upfront_amount",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "6e9d343d83a0681a689599d49f20a8f6b08dbdd8c93b51a7fe88cc1f5a2648aa",
+          "id": "task_authority",
+          "result": "n/a"
+        }
+      ],
+      "outcome": "allow",
+      "record": {
+        "action_id": "deal-a9/3",
+        "action_type": "decide",
+        "agent_input": {
+          "body": {
+            "action": "pay",
+            "action_class": "money.purchase",
+            "amount_minor": 3000,
+            "channel": "web",
+            "currency": "USD",
+            "first_contact_channel": "web",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "recourse": {
+              "rail": "card",
+              "refundable": true
+            },
+            "spend_minor": 454,
+            "task_authority_ref": {
+              "digest": "2edcc1dc2db366c671eeef0807c7a1b123dfe42edeacd0e0b7e6a9b7f0156236",
+              "digest_alg": "SHA-256",
+              "type": "record"
+            },
+            "taxonomy_version": "6",
+            "upfront_amount_minor": 0
+          },
+          "x-deal-v0": {
+            "counterparty": {
+              "fp_alg": "hmac-sha256-deal-key",
+              "ids": {
+                "payee": "2b12242f306cde1c5f3670f1ea20dd4d6390316bd23102f2cb9d640f48b174d7"
+              }
+            },
+            "deal_id": "deal-a9",
+            "record_type": "check",
+            "seq": 3
+          }
+        },
+        "developer": "capsulectl-a9",
+        "model_attestation": {
+          "compute_attestation": {
+            "agent_input_digest": "e090757a25d02e314b7e781f21d349b0dde377885e1be098aa7a77c35c21b85c"
+          }
+        },
+        "operator": "household-rollup",
+        "timestamp": "2026-10-08T11:09:00Z"
+      },
+      "scenario": "spend-under-amount",
+      "seed": {
+        "action": {
+          "action_class": "info.query",
+          "action_id": "lookup/rollup-capsulectl-a9",
+          "action_type": "decide",
+          "developer": "assistant-capsulectl-a9",
+          "operator": "household-rollup",
+          "target": "payee-fp:hmac-sha256-deal-key:2b12242f306cde1c5f3670f1ea20dd4d6390316bd23102f2cb9d640f48b174d7",
+          "timestamp": "2026-10-08T10:08:00Z",
+          "verb": "lookup"
+        },
+        "constraints": [
+          {
+            "evidence_digest": "66ada324eaa84f783f4f2c58640766faf6b1882871cf9211b58bc8642b7f51ac",
+            "id": "dedupe",
+            "result": "pass"
+          },
+          {
+            "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+            "id": "caps",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+            "id": "verify_before_dispatch",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+            "id": "destination_rail",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "870b0a3e1636cab6902013f7742c0b36dfd72f324d1ff9ee3cd0976aa6d19241",
+            "id": "counterparty_identity_change",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827",
+            "id": "credential_pattern",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "ed761a48bede343570feeba08dd105fb225b9caf75b52392ea84550fdcc7b0b2",
+            "id": "recurring_charge",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "17dcb23b1a22944bd95d23ccd22940f86aa3c46ab23e947ba50b0a1bcca6a6b9",
+            "id": "action_class_gate",
+            "result": "pass"
+          },
+          {
+            "evidence_digest": "029cd64fa2475bae9a0fd960a7a61c5df24d383fdf1683885fafa87ec448486e",
+            "id": "counterparty_seen_before",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+            "id": "recipient_role",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "7471f20fa8882393d42d3d4b38107a7be30b40e2b10ba838b30f7cc58dea0a5c",
+            "id": "refundability",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "e510562f4fe422536148c0153efabe41e40dffbd58bf33a9badc88d6258d49c8",
+            "id": "material_fields_changed",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "5301c7f61cebf5b8c57025b54c441a38f5dab35b558c0896995e00f3ee596629",
+            "id": "offer_fields_changed",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "c7a84acb724ca272de76e7ed4c699268414ba4327cd140a72c429dd565287d53",
+            "id": "recipient_seen_before",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "0ad91372036802d3b0b5b0baedeea673d02aa73cabedfe8f7c1dd774ddeb3e9e",
+            "id": "channel_change",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "0d0e8ae7a25e36254dd52de0a64abd81a2bbaa53230e320b8f73ebba253d54e2",
+            "id": "upfront_amount",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "c41e4b3a2077a40320e10ad50ccbfe5cc0efe57bd2d3dfe235357c61e8d051b9",
+            "id": "task_authority",
+            "result": "n/a"
+          }
+        ],
+        "outcome": "allow"
+      }
+    },
+    {
+      "constraints": [
+        {
+          "evidence_digest": "e595f71e26a5dddcf41ce49ca0a642666cab38c9f53fa8fe436a53f18061bf69",
+          "id": "dedupe",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "a44b48581c69f935a5c01037f1247cf90a6d9df26ace40c4f00ee2d4b636d52d",
+          "id": "caps",
+          "result": "fail"
+        },
+        {
+          "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+          "id": "verify_before_dispatch",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+          "id": "destination_rail",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "870b0a3e1636cab6902013f7742c0b36dfd72f324d1ff9ee3cd0976aa6d19241",
+          "id": "counterparty_identity_change",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827",
+          "id": "credential_pattern",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "ed761a48bede343570feeba08dd105fb225b9caf75b52392ea84550fdcc7b0b2",
+          "id": "recurring_charge",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "93594fc3973062b88c37e6949b10f34f202dc75ada097c69b83d201e0cb51701",
+          "id": "action_class_gate",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "b81245723eb768f76882b4b3d4d9570fb62c58c96f2724270b1a5cf9cbbaafc3",
+          "id": "counterparty_seen_before",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+          "id": "recipient_role",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "6ca8fce7ec08407d52d05d853229e4513f4974da697c4a99117cc706fed406a9",
+          "id": "refundability",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "ee7ecf7a7a01b008db9a0a806a45e8528253060b356a38f433ef71556972feb4",
+          "id": "material_fields_changed",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "4103c42dbd4b50f6e026455f61b555262623fd8f8a84d2041a1bba2be90e98ba",
+          "id": "offer_fields_changed",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "c7a84acb724ca272de76e7ed4c699268414ba4327cd140a72c429dd565287d53",
+          "id": "recipient_seen_before",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "f138fc94f2cbf345edc557fda4ff509abd5b74e35d0cb1489d6b882341114541",
+          "id": "channel_change",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "15cc29bc055a9948a530d99e10899794ae097e176ebf8d886fca02e95b44ab83",
+          "id": "upfront_amount",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "6e9d343d83a0681a689599d49f20a8f6b08dbdd8c93b51a7fe88cc1f5a2648aa",
+          "id": "task_authority",
+          "result": "n/a"
+        }
+      ],
+      "outcome": "escalate",
+      "record": {
+        "action_id": "deal-a10/3",
+        "action_type": "decide",
+        "agent_input": {
+          "body": {
+            "action": "pay",
+            "action_class": "money.purchase",
+            "amount_minor": 454,
+            "channel": "web",
+            "currency": "USD",
+            "first_contact_channel": "web",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "recourse": {
+              "rail": "card",
+              "refundable": true
+            },
+            "spend_minor": 3000,
+            "task_authority_ref": {
+              "digest": "2edcc1dc2db366c671eeef0807c7a1b123dfe42edeacd0e0b7e6a9b7f0156236",
+              "digest_alg": "SHA-256",
+              "type": "record"
+            },
+            "taxonomy_version": "6",
+            "upfront_amount_minor": 0
+          },
+          "x-deal-v0": {
+            "counterparty": {
+              "fp_alg": "hmac-sha256-deal-key",
+              "ids": {
+                "payee": "e80fb65ac70384bd8bab0358d60b7cbe96de5b2de7c095e0d8695852e9c673af"
+              }
+            },
+            "deal_id": "deal-a10",
+            "record_type": "check",
+            "seq": 3
+          }
+        },
+        "developer": "capsulectl-a10",
+        "model_attestation": {
+          "compute_attestation": {
+            "agent_input_digest": "86d42df87d3b622250ba7d205e662195f69dbddabe82cef23c1dde84ee77e7ac"
+          }
+        },
+        "operator": "household-rollup",
+        "timestamp": "2026-10-08T11:10:00Z"
+      },
+      "scenario": "spend-over-amount",
+      "seed": {
+        "action": {
+          "action_class": "info.query",
+          "action_id": "lookup/rollup-capsulectl-a10",
+          "action_type": "decide",
+          "developer": "assistant-capsulectl-a10",
+          "operator": "household-rollup",
+          "target": "payee-fp:hmac-sha256-deal-key:e80fb65ac70384bd8bab0358d60b7cbe96de5b2de7c095e0d8695852e9c673af",
+          "timestamp": "2026-10-08T10:09:00Z",
+          "verb": "lookup"
+        },
+        "constraints": [
+          {
+            "evidence_digest": "15b73af6e17b233a913f8b08e248975250392bbe4515ba132e783c476f8efed3",
+            "id": "dedupe",
+            "result": "pass"
+          },
+          {
+            "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+            "id": "caps",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+            "id": "verify_before_dispatch",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+            "id": "destination_rail",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "870b0a3e1636cab6902013f7742c0b36dfd72f324d1ff9ee3cd0976aa6d19241",
+            "id": "counterparty_identity_change",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827",
+            "id": "credential_pattern",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "ed761a48bede343570feeba08dd105fb225b9caf75b52392ea84550fdcc7b0b2",
+            "id": "recurring_charge",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "17dcb23b1a22944bd95d23ccd22940f86aa3c46ab23e947ba50b0a1bcca6a6b9",
+            "id": "action_class_gate",
+            "result": "pass"
+          },
+          {
+            "evidence_digest": "029cd64fa2475bae9a0fd960a7a61c5df24d383fdf1683885fafa87ec448486e",
+            "id": "counterparty_seen_before",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+            "id": "recipient_role",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "7471f20fa8882393d42d3d4b38107a7be30b40e2b10ba838b30f7cc58dea0a5c",
+            "id": "refundability",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "e510562f4fe422536148c0153efabe41e40dffbd58bf33a9badc88d6258d49c8",
+            "id": "material_fields_changed",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "5301c7f61cebf5b8c57025b54c441a38f5dab35b558c0896995e00f3ee596629",
+            "id": "offer_fields_changed",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "c7a84acb724ca272de76e7ed4c699268414ba4327cd140a72c429dd565287d53",
+            "id": "recipient_seen_before",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "0ad91372036802d3b0b5b0baedeea673d02aa73cabedfe8f7c1dd774ddeb3e9e",
+            "id": "channel_change",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "0d0e8ae7a25e36254dd52de0a64abd81a2bbaa53230e320b8f73ebba253d54e2",
+            "id": "upfront_amount",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "c41e4b3a2077a40320e10ad50ccbfe5cc0efe57bd2d3dfe235357c61e8d051b9",
+            "id": "task_authority",
+            "result": "n/a"
+          }
+        ],
+        "outcome": "allow"
+      }
+    },
+    {
+      "constraints": [
+        {
+          "evidence_digest": "d3ac86d8c9b87ea921c6d3e448855088b3d0b1946cf33ace4b582791dd16ef71",
+          "id": "dedupe",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "7201de69f90e03ed9e181867176364be1e7dbaa503f4666f56bc2e78a7da22a9",
+          "id": "caps",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+          "id": "verify_before_dispatch",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+          "id": "destination_rail",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "870b0a3e1636cab6902013f7742c0b36dfd72f324d1ff9ee3cd0976aa6d19241",
+          "id": "counterparty_identity_change",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827",
+          "id": "credential_pattern",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "ed761a48bede343570feeba08dd105fb225b9caf75b52392ea84550fdcc7b0b2",
+          "id": "recurring_charge",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "93594fc3973062b88c37e6949b10f34f202dc75ada097c69b83d201e0cb51701",
+          "id": "action_class_gate",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "d8a5f0560b6aeb41fff8df163407cef176d532802a560374f21fbd2cbeff7833",
+          "id": "counterparty_seen_before",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+          "id": "recipient_role",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "6ca8fce7ec08407d52d05d853229e4513f4974da697c4a99117cc706fed406a9",
+          "id": "refundability",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "ee7ecf7a7a01b008db9a0a806a45e8528253060b356a38f433ef71556972feb4",
+          "id": "material_fields_changed",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "4103c42dbd4b50f6e026455f61b555262623fd8f8a84d2041a1bba2be90e98ba",
+          "id": "offer_fields_changed",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "c7a84acb724ca272de76e7ed4c699268414ba4327cd140a72c429dd565287d53",
+          "id": "recipient_seen_before",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "f138fc94f2cbf345edc557fda4ff509abd5b74e35d0cb1489d6b882341114541",
+          "id": "channel_change",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "398022a1096dc37ea0877c913856e584691e53ac0cd816d9a554cfe377f9ee19",
+          "id": "upfront_amount",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "6e9d343d83a0681a689599d49f20a8f6b08dbdd8c93b51a7fe88cc1f5a2648aa",
+          "id": "task_authority",
+          "result": "n/a"
+        }
+      ],
+      "outcome": "allow",
+      "record": {
+        "action_id": "deal-a11/3",
+        "action_type": "decide",
+        "agent_input": {
+          "body": {
+            "action": "pay",
+            "action_class": "money.purchase",
+            "amount_minor": 3000,
+            "channel": "web",
+            "currency": "USD",
+            "direction": "in",
+            "first_contact_channel": "web",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "recourse": {
+              "rail": "card",
+              "refundable": true
+            },
+            "spend_minor": 3000,
+            "task_authority_ref": {
+              "digest": "2edcc1dc2db366c671eeef0807c7a1b123dfe42edeacd0e0b7e6a9b7f0156236",
+              "digest_alg": "SHA-256",
+              "type": "record"
+            },
+            "taxonomy_version": "6",
+            "upfront_amount_minor": 0
+          },
+          "x-deal-v0": {
+            "counterparty": {
+              "fp_alg": "hmac-sha256-deal-key",
+              "ids": {
+                "payee": "ea1ff066194e9ce5fbc1533b244022f9ab53ef1cf2f4486f35f949fbbc1be3c6"
+              }
+            },
+            "deal_id": "deal-a11",
+            "record_type": "check",
+            "seq": 3
+          }
+        },
+        "developer": "capsulectl-a11",
+        "model_attestation": {
+          "compute_attestation": {
+            "agent_input_digest": "16623b6d7d568304d937581e0e7154652dceac69c9148e9a9e60b191c27c1e01"
+          }
+        },
+        "operator": "household-rollup",
+        "timestamp": "2026-10-08T11:11:00Z"
+      },
+      "scenario": "money-in",
+      "seed": {
+        "action": {
+          "action_class": "info.query",
+          "action_id": "lookup/rollup-capsulectl-a11",
+          "action_type": "decide",
+          "developer": "assistant-capsulectl-a11",
+          "operator": "household-rollup",
+          "target": "payee-fp:hmac-sha256-deal-key:ea1ff066194e9ce5fbc1533b244022f9ab53ef1cf2f4486f35f949fbbc1be3c6",
+          "timestamp": "2026-10-08T10:10:00Z",
+          "verb": "lookup"
+        },
+        "constraints": [
+          {
+            "evidence_digest": "fc70dda1cf415c0d1aa2dd04c4f7487446ed30d8ae9f27384e3fca94755a3aea",
+            "id": "dedupe",
+            "result": "pass"
+          },
+          {
+            "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+            "id": "caps",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+            "id": "verify_before_dispatch",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+            "id": "destination_rail",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "870b0a3e1636cab6902013f7742c0b36dfd72f324d1ff9ee3cd0976aa6d19241",
+            "id": "counterparty_identity_change",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827",
+            "id": "credential_pattern",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "ed761a48bede343570feeba08dd105fb225b9caf75b52392ea84550fdcc7b0b2",
+            "id": "recurring_charge",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "17dcb23b1a22944bd95d23ccd22940f86aa3c46ab23e947ba50b0a1bcca6a6b9",
+            "id": "action_class_gate",
+            "result": "pass"
+          },
+          {
+            "evidence_digest": "029cd64fa2475bae9a0fd960a7a61c5df24d383fdf1683885fafa87ec448486e",
+            "id": "counterparty_seen_before",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+            "id": "recipient_role",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "7471f20fa8882393d42d3d4b38107a7be30b40e2b10ba838b30f7cc58dea0a5c",
+            "id": "refundability",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "e510562f4fe422536148c0153efabe41e40dffbd58bf33a9badc88d6258d49c8",
+            "id": "material_fields_changed",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "5301c7f61cebf5b8c57025b54c441a38f5dab35b558c0896995e00f3ee596629",
+            "id": "offer_fields_changed",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "c7a84acb724ca272de76e7ed4c699268414ba4327cd140a72c429dd565287d53",
+            "id": "recipient_seen_before",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "0ad91372036802d3b0b5b0baedeea673d02aa73cabedfe8f7c1dd774ddeb3e9e",
+            "id": "channel_change",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "0d0e8ae7a25e36254dd52de0a64abd81a2bbaa53230e320b8f73ebba253d54e2",
+            "id": "upfront_amount",
+            "result": "n/a"
+          },
+          {
+            "evidence_digest": "c41e4b3a2077a40320e10ad50ccbfe5cc0efe57bd2d3dfe235357c61e8d051b9",
+            "id": "task_authority",
+            "result": "n/a"
+          }
+        ],
+        "outcome": "allow"
+      }
+    }
+  ],
+  "source": "internal/guard/testdata/parity/generate_rollup_parity.py"
+}

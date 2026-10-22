@@ -1,0 +1,111 @@
+{
+  "capsule_engine_commit": "47c58cd0d7ae68597a2724b55aab572864ed6c38",
+  "fold": "spend.weekly/3.0.0",
+  "fold_digest": "25907741320624a830c5854fc7f2d434bfa17528c8bfc17f4a8a4f84a39f1b18",
+  "totals": {
+    "buy-then-linked-cancel": {
+      "reversals": {
+        "linked_count": 1,
+        "linked_minor": 2000,
+        "unlinked_count": 0
+      },
+      "weekly_spend_minor": 0
+    },
+    "cancel-before-its-charge": {
+      "reversals": {
+        "linked_count": 0,
+        "linked_minor": 0,
+        "unlinked_count": 1
+      },
+      "weekly_spend_minor": 2000
+    },
+    "cancel-citing-another-operators-charge": {
+      "reversals": {
+        "linked_count": 0,
+        "linked_minor": 0,
+        "unlinked_count": 1
+      },
+      "weekly_spend_minor": 2000
+    },
+    "dry-run-excluded": {
+      "reversals": {
+        "linked_count": 0,
+        "linked_minor": 0,
+        "unlinked_count": 0
+      },
+      "weekly_spend_minor": 500
+    },
+    "negative-charge-counts-zero": {
+      "reversals": {
+        "linked_count": 0,
+        "linked_minor": 0,
+        "unlinked_count": 0
+      },
+      "weekly_spend_minor": 1000
+    },
+    "no-amount-skipped": {
+      "reversals": {
+        "linked_count": 0,
+        "linked_minor": 0,
+        "unlinked_count": 0
+      },
+      "weekly_spend_minor": 400
+    },
+    "outside-the-window": {
+      "reversals": {
+        "linked_count": 0,
+        "linked_minor": 0,
+        "unlinked_count": 1
+      },
+      "weekly_spend_minor": 700
+    },
+    "partial-refunds-floor-at-the-charge": {
+      "reversals": {
+        "linked_count": 2,
+        "linked_minor": 1000,
+        "unlinked_count": 0
+      },
+      "weekly_spend_minor": 0
+    },
+    "refund-cannot-reach-other-charges": {
+      "reversals": {
+        "linked_count": 1,
+        "linked_minor": 500,
+        "unlinked_count": 0
+      },
+      "weekly_spend_minor": 1500
+    },
+    "rejected-charge-not-counted": {
+      "reversals": {
+        "linked_count": 0,
+        "linked_minor": 0,
+        "unlinked_count": 1
+      },
+      "weekly_spend_minor": 0
+    },
+    "unlinked-cancel": {
+      "reversals": {
+        "linked_count": 0,
+        "linked_minor": 0,
+        "unlinked_count": 1
+      },
+      "weekly_spend_minor": 2000
+    },
+    "wrong-relation-is-unlinked": {
+      "reversals": {
+        "linked_count": 0,
+        "linked_minor": 0,
+        "unlinked_count": 1
+      },
+      "weekly_spend_minor": 2000
+    },
+    "zero-amount-reversal-unlinked": {
+      "reversals": {
+        "linked_count": 0,
+        "linked_minor": 0,
+        "unlinked_count": 1
+      },
+      "weekly_spend_minor": 2000
+    }
+  }
+}

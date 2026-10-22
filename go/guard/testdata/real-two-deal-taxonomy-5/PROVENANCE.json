@@ -1,0 +1,65 @@
+{
+  "note": "TEST data vendored byte-for-byte from capsule-engine #120, except expected_decisions-0.3.7.json; this sidecar is not part of the vendored bytes. Do not edit the fixtures.",
+  "source_repo": "action-state-group/capsule-engine",
+  "source_commit": "fdf658cfaec6700e817deeb0618c7fd8f015886a",
+  "producer": {
+    "name": "capsulectl",
+    "version": "v0.1.0-rc13",
+    "commit": "7eb05ac1c277f4a7dad1ece8b1a1aec2df7eac11"
+  },
+  "files": {
+    "README.md": {
+      "source_path": "tests/fixtures/real-two-deal/README.md",
+      "sha256": "e0b8e46b0d790d5d74ead82013b66922415876fab31a84a619c38f04e21360bb"
+    },
+    "build.sh": {
+      "source_path": "tests/fixtures/real-two-deal/build.sh",
+      "sha256": "f2dec33ceffd7da8b0839d8a3e3976893caa75449d0af29445a54bf3adc54eb3"
+    },
+    "deal-1.bundle.json": {
+      "source_path": "tests/fixtures/real-two-deal/deal-1.bundle.json",
+      "sha256": "8eaed7e3e6e762d2528c17ee6cf2b1186f6f301c3340f8e91fff1bd0f85f38a3"
+    },
+    "deal-1.counterparty.bundle.json": {
+      "source_path": "tests/fixtures/real-two-deal/deal-1.counterparty.bundle.json",
+      "sha256": "b9576f2cfb1a2d61469ad5f94daa1057788bfb4dae76efff041eb7cd24e200f0"
+    },
+    "deal-2.bundle.json": {
+      "source_path": "tests/fixtures/real-two-deal/deal-2.bundle.json",
+      "sha256": "fe97fde684e8d38a07f51157b8f73fcf609c511c8f29dd50aa6e5025d3797e2b"
+    },
+    "deal-2.counterparty.bundle.json": {
+      "source_path": "tests/fixtures/real-two-deal/deal-2.counterparty.bundle.json",
+      "sha256": "181079ccc08f27eb2cd39af48f5913050d34bfb9b961d7cf7e577eb23d997685"
+    },
+    "expected_decisions-0.3.7.json": {
+      "source_path": null,
+      "generated": "not vendored: the engine's replay of deal-1/deal-2.bundle.json here under asg/everyday/0.3.7 at capsule-engine 7339028ab2117d6c7adec89a26cd5022b8ac7140, by internal/guard/testdata/parity/generate_real_two_deal_expected.py (run there on that commit's own tests/fixtures/real-two-deal, its output equals that expected_decisions.json in every member; it adds only capsule_engine_commit). Every decision equals the 0.3.6 replay at a710636c it replaces (and the 0.3.5 one at c878edf0 and the 0.3.4 one at 97a2aff before it); only the pack id and digest differ. expected_decisions.json beside it is #120's replay under 0.3.3, kept as vendored.",
+      "sha256": "cf3181d3a6b7ed131643989ef5088ddbcdc2b79e72cdbcd976615db147e30306"
+    },
+    "expected_decisions.json": {
+      "source_path": "tests/fixtures/real-two-deal/expected_decisions.json",
+      "sha256": "44bde753130a200f5a4529732612b67582873669179de32c0b41134d9c609bdb"
+    },
+    "inputs/act-pay-2.json": {
+      "source_path": "tests/fixtures/real-two-deal/inputs/act-pay-2.json",
+      "sha256": "8a95fd23c48eda73e57475b3a16fa399907f835b601727d1551a0dc6160854f3"
+    },
+    "inputs/act-pay.json": {
+      "source_path": "tests/fixtures/real-two-deal/inputs/act-pay.json",
+      "sha256": "0eb39dcbe421be170e178b95a4b14ef8281003665331e0bf74b4ad59f0d82314"
+    },
+    "inputs/check-pay.json": {
+      "source_path": "tests/fixtures/real-two-deal/inputs/check-pay.json",
+      "sha256": "b4258a5676d16368125cc0a5ad017731fd57d8dbfa0556eaf77beac4a2f94b75"
+    },
+    "inputs/open.json": {
+      "source_path": "tests/fixtures/real-two-deal/inputs/open.json",
+      "sha256": "db78660ae0386f3b2847b4127c3bc1375e51c552179d9edf15e72c6547fe7e96"
+    },
+    "test_real_two_deal_bundle.py": {
+      "source_path": "tests/test_real_two_deal_bundle.py",
+      "sha256": "c98934bd872edd7af15f0e0a9252e07b9b95d2b9790e4ca553c47425f946b72e"
+    }
+  }
+}

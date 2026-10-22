@@ -1,0 +1,731 @@
+{
+ "definition": "seller.destination_rail/1.1.0",
+ "definition_digest": "a86844bd3b5132ae5fb04e9009c5c6907ea43c1609df713c45055dd04bcdbe0e",
+ "vectors": [
+  {
+   "evidence": {
+    "allowed_rails": [
+     "card",
+     "p2p"
+    ],
+    "counted_as": "card",
+    "handover": "in_person",
+    "in_person_rails": [
+     "cash"
+    ],
+    "rail": "card",
+    "watched_rails": []
+   },
+   "handover": "in_person",
+   "input": "inputs/agreement.accept--card--in_person.json",
+   "reason": "rail 'card' is one of the allowed rails",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "allowed_rails": [
+     "card",
+     "p2p"
+    ],
+    "counted_as": "card",
+    "handover": "shipped",
+    "in_person_rails": [
+     "cash"
+    ],
+    "rail": "card",
+    "watched_rails": []
+   },
+   "handover": "shipped",
+   "input": "inputs/agreement.accept--card--shipped.json",
+   "reason": "rail 'card' is one of the allowed rails",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "allowed_rails": [
+     "card",
+     "p2p"
+    ],
+    "counted_as": "card",
+    "handover": null,
+    "in_person_rails": [
+     "cash"
+    ],
+    "rail": "card",
+    "watched_rails": []
+   },
+   "handover": null,
+   "input": "inputs/agreement.accept--card--no-handover.json",
+   "reason": "rail 'card' is one of the allowed rails",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "allowed_rails": [
+     "card",
+     "p2p"
+    ],
+    "counted_as": "card",
+    "handover": null,
+    "in_person_rails": [
+     "cash"
+    ],
+    "rail": "card",
+    "watched_rails": []
+   },
+   "handover": null,
+   "input": "inputs/agreement.accept--card--drone.json",
+   "reason": "rail 'card' is one of the allowed rails",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "allowed_rails": [
+     "card",
+     "p2p"
+    ],
+    "counted_as": "p2p",
+    "handover": null,
+    "in_person_rails": [
+     "cash"
+    ],
+    "rail": "p2p",
+    "watched_rails": []
+   },
+   "handover": null,
+   "input": "inputs/agreement.accept--p2p--no-handover.json",
+   "reason": "rail 'p2p' is one of the allowed rails",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "allowed_rails": [
+     "card",
+     "p2p"
+    ],
+    "counted_as": "p2p",
+    "handover": null,
+    "in_person_rails": [
+     "cash"
+    ],
+    "rail": "venmo",
+    "watched_rails": []
+   },
+   "handover": null,
+   "input": "inputs/agreement.accept--venmo--no-handover.json",
+   "reason": "rail 'venmo' (counted as 'p2p') is one of the allowed rails",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "allowed_rails": [
+     "card",
+     "p2p"
+    ],
+    "counted_as": "p2p",
+    "handover": null,
+    "in_person_rails": [
+     "cash"
+    ],
+    "rail": "zelle",
+    "watched_rails": []
+   },
+   "handover": null,
+   "input": "inputs/agreement.accept--zelle--no-handover.json",
+   "reason": "rail 'zelle' (counted as 'p2p') is one of the allowed rails",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "allowed_rails": [
+     "card",
+     "p2p"
+    ],
+    "counted_as": "p2p",
+    "handover": null,
+    "in_person_rails": [
+     "cash"
+    ],
+    "rail": "cash_app",
+    "watched_rails": []
+   },
+   "handover": null,
+   "input": "inputs/agreement.accept--cash_app--no-handover.json",
+   "reason": "rail 'cash_app' (counted as 'p2p') is one of the allowed rails",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "allowed_rails": [
+     "card",
+     "p2p"
+    ],
+    "counted_as": "p2p",
+    "handover": null,
+    "in_person_rails": [
+     "cash"
+    ],
+    "rail": "paypal",
+    "watched_rails": []
+   },
+   "handover": null,
+   "input": "inputs/agreement.accept--paypal--no-handover.json",
+   "reason": "rail 'paypal' (counted as 'p2p') is one of the allowed rails",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "allowed_rails": [
+     "card",
+     "p2p"
+    ],
+    "counted_as": "cash",
+    "handover": "in_person",
+    "in_person_rails": [
+     "cash"
+    ],
+    "rail": "cash",
+    "watched_rails": []
+   },
+   "handover": "in_person",
+   "input": "inputs/agreement.accept--cash--in_person.json",
+   "reason": "rail 'cash' is allowed because the item is handed over in person",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "allowed_rails": [
+     "card",
+     "p2p"
+    ],
+    "counted_as": "cash",
+    "handover": "shipped",
+    "in_person_rails": [
+     "cash"
+    ],
+    "rail": "cash",
+    "watched_rails": []
+   },
+   "handover": "shipped",
+   "input": "inputs/agreement.accept--cash--shipped.json",
+   "reason": "rail 'cash' is allowed only when the item is handed over in person; the handover is 'shipped'",
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "allowed_rails": [
+     "card",
+     "p2p"
+    ],
+    "counted_as": "cash",
+    "handover": null,
+    "in_person_rails": [
+     "cash"
+    ],
+    "rail": "cash",
+    "watched_rails": []
+   },
+   "handover": null,
+   "input": "inputs/agreement.accept--cash--no-handover.json",
+   "reason": "rail 'cash' is allowed only when the item is handed over in person; the handover is not stated",
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "allowed_rails": [
+     "card",
+     "p2p"
+    ],
+    "counted_as": "cash",
+    "handover": null,
+    "in_person_rails": [
+     "cash"
+    ],
+    "rail": "cash",
+    "watched_rails": []
+   },
+   "handover": null,
+   "input": "inputs/agreement.accept--cash--drone.json",
+   "reason": "rail 'cash' is allowed only when the item is handed over in person; the handover is not stated",
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "allowed_rails": [
+     "card",
+     "p2p"
+    ],
+    "counted_as": "crypto",
+    "handover": null,
+    "in_person_rails": [
+     "cash"
+    ],
+    "rail": "crypto",
+    "watched_rails": []
+   },
+   "handover": null,
+   "input": "inputs/agreement.accept--crypto--no-handover.json",
+   "reason": "rail 'crypto' is not one of the allowed rails ['card', 'p2p']",
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "allowed_rails": [
+     "card",
+     "p2p"
+    ],
+    "counted_as": null,
+    "handover": "in_person",
+    "in_person_rails": [
+     "cash"
+    ],
+    "missing_field": "rail",
+    "rail": null,
+    "watched_rails": []
+   },
+   "handover": "in_person",
+   "input": "inputs/agreement.accept--none--in_person.json",
+   "reason": "payment method not stated",
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "allowed_rails": [
+     "card",
+     "p2p"
+    ],
+    "counted_as": null,
+    "handover": "shipped",
+    "in_person_rails": [
+     "cash"
+    ],
+    "missing_field": "rail",
+    "rail": null,
+    "watched_rails": []
+   },
+   "handover": "shipped",
+   "input": "inputs/agreement.accept--none--shipped.json",
+   "reason": "payment method not stated",
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "allowed_rails": [
+     "card",
+     "p2p"
+    ],
+    "counted_as": null,
+    "handover": null,
+    "in_person_rails": [
+     "cash"
+    ],
+    "missing_field": "rail",
+    "rail": null,
+    "watched_rails": []
+   },
+   "handover": null,
+   "input": "inputs/agreement.accept--none--no-handover.json",
+   "reason": "payment method not stated",
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "allowed_rails": [
+     "card",
+     "p2p"
+    ],
+    "counted_as": null,
+    "handover": null,
+    "in_person_rails": [
+     "cash"
+    ],
+    "missing_field": "rail",
+    "rail": null,
+    "watched_rails": []
+   },
+   "handover": null,
+   "input": "inputs/agreement.accept--none--drone.json",
+   "reason": "payment method not stated",
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "allowed_rails": [
+     "card",
+     "p2p"
+    ],
+    "counted_as": "card",
+    "handover": "in_person",
+    "in_person_rails": [
+     "cash"
+    ],
+    "rail": "card",
+    "watched_rails": []
+   },
+   "handover": "in_person",
+   "input": "inputs/marketplace.sale--card--in_person.json",
+   "reason": "rail 'card' is one of the allowed rails",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "allowed_rails": [
+     "card",
+     "p2p"
+    ],
+    "counted_as": "card",
+    "handover": "shipped",
+    "in_person_rails": [
+     "cash"
+    ],
+    "rail": "card",
+    "watched_rails": []
+   },
+   "handover": "shipped",
+   "input": "inputs/marketplace.sale--card--shipped.json",
+   "reason": "rail 'card' is one of the allowed rails",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "allowed_rails": [
+     "card",
+     "p2p"
+    ],
+    "counted_as": "card",
+    "handover": null,
+    "in_person_rails": [
+     "cash"
+    ],
+    "rail": "card",
+    "watched_rails": []
+   },
+   "handover": null,
+   "input": "inputs/marketplace.sale--card--no-handover.json",
+   "reason": "rail 'card' is one of the allowed rails",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "allowed_rails": [
+     "card",
+     "p2p"
+    ],
+    "counted_as": "card",
+    "handover": null,
+    "in_person_rails": [
+     "cash"
+    ],
+    "rail": "card",
+    "watched_rails": []
+   },
+   "handover": null,
+   "input": "inputs/marketplace.sale--card--drone.json",
+   "reason": "rail 'card' is one of the allowed rails",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "allowed_rails": [
+     "card",
+     "p2p"
+    ],
+    "counted_as": "p2p",
+    "handover": null,
+    "in_person_rails": [
+     "cash"
+    ],
+    "rail": "p2p",
+    "watched_rails": []
+   },
+   "handover": null,
+   "input": "inputs/marketplace.sale--p2p--no-handover.json",
+   "reason": "rail 'p2p' is one of the allowed rails",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "allowed_rails": [
+     "card",
+     "p2p"
+    ],
+    "counted_as": "p2p",
+    "handover": null,
+    "in_person_rails": [
+     "cash"
+    ],
+    "rail": "venmo",
+    "watched_rails": []
+   },
+   "handover": null,
+   "input": "inputs/marketplace.sale--venmo--no-handover.json",
+   "reason": "rail 'venmo' (counted as 'p2p') is one of the allowed rails",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "allowed_rails": [
+     "card",
+     "p2p"
+    ],
+    "counted_as": "p2p",
+    "handover": null,
+    "in_person_rails": [
+     "cash"
+    ],
+    "rail": "zelle",
+    "watched_rails": []
+   },
+   "handover": null,
+   "input": "inputs/marketplace.sale--zelle--no-handover.json",
+   "reason": "rail 'zelle' (counted as 'p2p') is one of the allowed rails",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "allowed_rails": [
+     "card",
+     "p2p"
+    ],
+    "counted_as": "p2p",
+    "handover": null,
+    "in_person_rails": [
+     "cash"
+    ],
+    "rail": "cash_app",
+    "watched_rails": []
+   },
+   "handover": null,
+   "input": "inputs/marketplace.sale--cash_app--no-handover.json",
+   "reason": "rail 'cash_app' (counted as 'p2p') is one of the allowed rails",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "allowed_rails": [
+     "card",
+     "p2p"
+    ],
+    "counted_as": "p2p",
+    "handover": null,
+    "in_person_rails": [
+     "cash"
+    ],
+    "rail": "paypal",
+    "watched_rails": []
+   },
+   "handover": null,
+   "input": "inputs/marketplace.sale--paypal--no-handover.json",
+   "reason": "rail 'paypal' (counted as 'p2p') is one of the allowed rails",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "allowed_rails": [
+     "card",
+     "p2p"
+    ],
+    "counted_as": "cash",
+    "handover": "in_person",
+    "in_person_rails": [
+     "cash"
+    ],
+    "rail": "cash",
+    "watched_rails": []
+   },
+   "handover": "in_person",
+   "input": "inputs/marketplace.sale--cash--in_person.json",
+   "reason": "rail 'cash' is allowed because the item is handed over in person",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "allowed_rails": [
+     "card",
+     "p2p"
+    ],
+    "counted_as": "cash",
+    "handover": "shipped",
+    "in_person_rails": [
+     "cash"
+    ],
+    "rail": "cash",
+    "watched_rails": []
+   },
+   "handover": "shipped",
+   "input": "inputs/marketplace.sale--cash--shipped.json",
+   "reason": "rail 'cash' is allowed only when the item is handed over in person; the handover is 'shipped'",
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "allowed_rails": [
+     "card",
+     "p2p"
+    ],
+    "counted_as": "cash",
+    "handover": null,
+    "in_person_rails": [
+     "cash"
+    ],
+    "rail": "cash",
+    "watched_rails": []
+   },
+   "handover": null,
+   "input": "inputs/marketplace.sale--cash--no-handover.json",
+   "reason": "rail 'cash' is allowed only when the item is handed over in person; the handover is not stated",
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "allowed_rails": [
+     "card",
+     "p2p"
+    ],
+    "counted_as": "cash",
+    "handover": null,
+    "in_person_rails": [
+     "cash"
+    ],
+    "rail": "cash",
+    "watched_rails": []
+   },
+   "handover": null,
+   "input": "inputs/marketplace.sale--cash--drone.json",
+   "reason": "rail 'cash' is allowed only when the item is handed over in person; the handover is not stated",
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "allowed_rails": [
+     "card",
+     "p2p"
+    ],
+    "counted_as": "crypto",
+    "handover": null,
+    "in_person_rails": [
+     "cash"
+    ],
+    "rail": "crypto",
+    "watched_rails": []
+   },
+   "handover": null,
+   "input": "inputs/marketplace.sale--crypto--no-handover.json",
+   "reason": "rail 'crypto' is not one of the allowed rails ['card', 'p2p']",
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "constraint_id": "destination_rail",
+    "in_scope": true,
+    "missing_field": "rail"
+   },
+   "handover": "in_person",
+   "input": "inputs/marketplace.sale--none--in_person.json",
+   "reason": "the action carries no rail; the destination rail could not be checked",
+   "result": "n/a"
+  },
+  {
+   "evidence": {
+    "constraint_id": "destination_rail",
+    "in_scope": true,
+    "missing_field": "rail"
+   },
+   "handover": "shipped",
+   "input": "inputs/marketplace.sale--none--shipped.json",
+   "reason": "the action carries no rail; the destination rail could not be checked",
+   "result": "n/a"
+  },
+  {
+   "evidence": {
+    "constraint_id": "destination_rail",
+    "in_scope": true,
+    "missing_field": "rail"
+   },
+   "handover": null,
+   "input": "inputs/marketplace.sale--none--no-handover.json",
+   "reason": "the action carries no rail; the destination rail could not be checked",
+   "result": "n/a"
+  },
+  {
+   "evidence": {
+    "constraint_id": "destination_rail",
+    "in_scope": true,
+    "missing_field": "rail"
+   },
+   "handover": null,
+   "input": "inputs/marketplace.sale--none--drone.json",
+   "reason": "the action carries no rail; the destination rail could not be checked",
+   "result": "n/a"
+  },
+  {
+   "evidence": {
+    "allowed_rails": [
+     "card",
+     "p2p"
+    ],
+    "counted_as": "p2p",
+    "handover": null,
+    "in_person_rails": [
+     "cash"
+    ],
+    "rail": "venmo",
+    "watched_rails": []
+   },
+   "handover": null,
+   "input": "inputs/agreement.accept--recourse-venmo--no-handover.json",
+   "reason": "rail 'venmo' (counted as 'p2p') is one of the allowed rails",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "allowed_rails": [
+     "card",
+     "p2p"
+    ],
+    "counted_as": "cash",
+    "handover": "in_person",
+    "in_person_rails": [
+     "cash"
+    ],
+    "rail": "cash",
+    "watched_rails": []
+   },
+   "handover": "in_person",
+   "input": "inputs/agreement.accept--recourse-cash--in_person.json",
+   "reason": "rail 'cash' is allowed because the item is handed over in person",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "allowed_rails": [
+     "card",
+     "p2p"
+    ],
+    "counted_as": null,
+    "handover": "in_person",
+    "in_person_rails": [
+     "cash"
+    ],
+    "missing_field": "rail",
+    "rail": null,
+    "watched_rails": []
+   },
+   "handover": "in_person",
+   "input": "inputs/agreement.accept----in_person.json",
+   "reason": "payment method not stated",
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "constraint_id": "destination_rail",
+    "in_scope": false,
+    "missing_field": null
+   },
+   "handover": null,
+   "input": "inputs/marketplace.offer--cash--no-handover.json",
+   "reason": "the rule is not configured for this action class",
+   "result": "n/a"
+  }
+ ]
+}

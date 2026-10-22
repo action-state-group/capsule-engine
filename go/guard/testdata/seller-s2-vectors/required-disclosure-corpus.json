@@ -1,0 +1,268 @@
+{
+ "note": "The engine's seller acceptance scenario (testdata/seller-vectors) runs the seller's rail only on steps that cite a mandate, which the Go port refuses, and reaches few of the promise and disclosure branches. These corpora run each of seller.destination_rail/1.0.0, promise_never/1.0.0, promise_requires_approval/1.0.0 and required_disclosure/1.0.0 (with its fold disclosure.class_seen/1.0.0) through every branch, on the seller pack, with no step citing a mandate.",
+ "pack": "capsule_engine/packs/catalog/seller (asg/seller/0.1.0)",
+ "records": {},
+ "steps": [
+  {
+   "name": "offer-to-t1-before-any-statement",
+   "dry_run": true,
+   "action": {
+    "verb": "offer",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/s2-1",
+    "timestamp": "2026-10-09T11:01:00Z",
+    "equivalence_key": "offer/s2-1",
+    "target": "cp-fp:1111111111111111111111111111111111111111111111111111111111111111",
+    "amount_minor": 180000,
+    "currency": "USD"
+   }
+  },
+  {
+   "name": "condition-told-to-t1",
+   "dry_run": false,
+   "action": {
+    "verb": "tell",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/s2-2",
+    "timestamp": "2026-10-09T11:02:00Z",
+    "equivalence_key": "tell/s2-2",
+    "target": "cp-fp:1111111111111111111111111111111111111111111111111111111111111111",
+    "representation_class": "condition"
+   }
+  },
+  {
+   "name": "offer-to-t1-after-the-statement",
+   "dry_run": true,
+   "action": {
+    "verb": "offer",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/s2-3",
+    "timestamp": "2026-10-09T11:03:00Z",
+    "equivalence_key": "offer/s2-3",
+    "target": "cp-fp:1111111111111111111111111111111111111111111111111111111111111111",
+    "amount_minor": 180000,
+    "currency": "USD"
+   }
+  },
+  {
+   "name": "accept-in-t1",
+   "dry_run": true,
+   "action": {
+    "verb": "accept",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "agreement.accept",
+    "action_id": "accept/s2-4",
+    "timestamp": "2026-10-09T11:04:00Z",
+    "equivalence_key": "accept/s2-4",
+    "target": "cp-fp:1111111111111111111111111111111111111111111111111111111111111111",
+    "amount_minor": 180000,
+    "currency": "USD"
+   }
+  },
+  {
+   "name": "condition-told-to-t2-as-a-dry-run",
+   "dry_run": true,
+   "action": {
+    "verb": "tell",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/s2-5",
+    "timestamp": "2026-10-09T11:05:00Z",
+    "equivalence_key": "tell/s2-5",
+    "target": "cp-fp:2222222222222222222222222222222222222222222222222222222222222222",
+    "representation_class": "condition"
+   }
+  },
+  {
+   "name": "offer-to-t2-after-a-dry-run-statement",
+   "dry_run": true,
+   "action": {
+    "verb": "offer",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/s2-6",
+    "timestamp": "2026-10-09T11:06:00Z",
+    "equivalence_key": "offer/s2-6",
+    "target": "cp-fp:2222222222222222222222222222222222222222222222222222222222222222",
+    "amount_minor": 180000,
+    "currency": "USD"
+   }
+  },
+  {
+   "name": "condition-told-to-t3-by-another-operator",
+   "dry_run": false,
+   "action": {
+    "verb": "tell",
+    "operator": "another-seller",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/s2-7",
+    "timestamp": "2026-10-09T11:07:00Z",
+    "equivalence_key": "tell/s2-7",
+    "target": "cp-fp:3333333333333333333333333333333333333333333333333333333333333333",
+    "representation_class": "condition"
+   }
+  },
+  {
+   "name": "offer-to-t3-told-by-another-operator",
+   "dry_run": true,
+   "action": {
+    "verb": "offer",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/s2-8",
+    "timestamp": "2026-10-09T11:08:00Z",
+    "equivalence_key": "offer/s2-8",
+    "target": "cp-fp:3333333333333333333333333333333333333333333333333333333333333333",
+    "amount_minor": 180000,
+    "currency": "USD"
+   }
+  },
+  {
+   "name": "condition-told-to-t4-as-a-dry-run",
+   "dry_run": true,
+   "action": {
+    "verb": "tell",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/s2-9",
+    "timestamp": "2026-10-09T11:09:00Z",
+    "target": "cp-fp:4444444444444444444444444444444444444444444444444444444444444444",
+    "representation_class": "condition"
+   }
+  },
+  {
+   "name": "condition-told-to-t4-again-refused",
+   "dry_run": false,
+   "action": {
+    "verb": "tell",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/s2-10",
+    "timestamp": "2026-10-09T11:10:00Z",
+    "target": "cp-fp:4444444444444444444444444444444444444444444444444444444444444444",
+    "representation_class": "condition"
+   }
+  },
+  {
+   "name": "offer-to-t4-after-a-refused-statement",
+   "dry_run": true,
+   "action": {
+    "verb": "offer",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/s2-11",
+    "timestamp": "2026-10-09T11:11:00Z",
+    "equivalence_key": "offer/s2-11",
+    "target": "cp-fp:4444444444444444444444444444444444444444444444444444444444444444",
+    "amount_minor": 180000,
+    "currency": "USD"
+   }
+  },
+  {
+   "name": "price-told-to-t5",
+   "dry_run": false,
+   "action": {
+    "verb": "tell",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/s2-12",
+    "timestamp": "2026-10-09T11:12:00Z",
+    "equivalence_key": "tell/s2-12",
+    "target": "cp-fp:5555555555555555555555555555555555555555555555555555555555555555",
+    "representation_class": "price"
+   }
+  },
+  {
+   "name": "offer-to-t5-told-only-a-price",
+   "dry_run": true,
+   "action": {
+    "verb": "offer",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/s2-13",
+    "timestamp": "2026-10-09T11:13:00Z",
+    "equivalence_key": "offer/s2-13",
+    "target": "cp-fp:5555555555555555555555555555555555555555555555555555555555555555",
+    "amount_minor": 180000,
+    "currency": "USD"
+   }
+  },
+  {
+   "name": "offer-to-no-one",
+   "dry_run": true,
+   "action": {
+    "verb": "offer",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/s2-14",
+    "timestamp": "2026-10-09T11:14:00Z",
+    "equivalence_key": "offer/s2-14",
+    "amount_minor": 180000,
+    "currency": "USD"
+   }
+  },
+  {
+   "name": "condition-told-to-t1-again",
+   "dry_run": false,
+   "action": {
+    "verb": "tell",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/s2-15",
+    "timestamp": "2026-10-09T11:15:00Z",
+    "equivalence_key": "tell/s2-15",
+    "target": "cp-fp:1111111111111111111111111111111111111111111111111111111111111111",
+    "representation_class": "condition"
+   }
+  },
+  {
+   "name": "offer-to-t1-told-twice",
+   "dry_run": true,
+   "action": {
+    "verb": "offer",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/s2-16",
+    "timestamp": "2026-10-09T11:16:00Z",
+    "equivalence_key": "offer/s2-16",
+    "target": "cp-fp:1111111111111111111111111111111111111111111111111111111111111111",
+    "amount_minor": 180000,
+    "currency": "USD"
+   }
+  },
+  {
+   "name": "a-statement-is-out-of-scope",
+   "dry_run": true,
+   "action": {
+    "verb": "tell",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/s2-17",
+    "timestamp": "2026-10-09T11:17:00Z",
+    "equivalence_key": "tell/s2-17",
+    "target": "cp-fp:2222222222222222222222222222222222222222222222222222222222222222",
+    "representation_class": "price"
+   }
+  }
+ ]
+}

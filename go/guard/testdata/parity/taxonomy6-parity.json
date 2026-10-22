@@ -1,0 +1,165 @@
+{
+  "capsule_engine_commit": "7339028ab2117d6c7adec89a26cd5022b8ac7140",
+  "decisions": {
+    "above-floor-allows": {
+      "ask_wickets": [
+        "price_floor"
+      ],
+      "decision": "accept",
+      "failing_constraints": [],
+      "outcome": "allow",
+      "price_floor_result": "pass",
+      "reason": "allow: dedupe=pass, caps=n/a, verify_before_dispatch=n/a, price_floor=pass, single_commitment=pass, promise_never=n/a",
+      "verdict_class": null
+    },
+    "at-floor-allows": {
+      "ask_wickets": [
+        "price_floor"
+      ],
+      "decision": "accept",
+      "failing_constraints": [],
+      "outcome": "allow",
+      "price_floor_result": "pass",
+      "reason": "allow: dedupe=pass, caps=n/a, verify_before_dispatch=n/a, price_floor=pass, single_commitment=pass, promise_never=n/a",
+      "verdict_class": null
+    },
+    "below-floor-accept-asks": {
+      "ask_wickets": [
+        "price_floor"
+      ],
+      "decision": "needs_input",
+      "failing_constraints": [
+        "price_floor"
+      ],
+      "outcome": "escalate",
+      "price_floor_result": "fail",
+      "reason": "escalate: dedupe=pass, caps=n/a, verify_before_dispatch=n/a, price_floor=fail, single_commitment=pass, promise_never=n/a",
+      "verdict_class": "hitl_dispatched"
+    },
+    "below-floor-after-acceptance-in-sale-refuses": {
+      "ask_wickets": [
+        "price_floor"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "price_floor",
+        "single_commitment"
+      ],
+      "outcome": "deny",
+      "price_floor_result": "fail",
+      "reason": "deny: dedupe=pass, caps=n/a, verify_before_dispatch=n/a, price_floor=fail, single_commitment=fail, promise_never=n/a",
+      "verdict_class": "blocked"
+    },
+    "below-floor-never-representation-refuses": {
+      "ask_wickets": [
+        "price_floor"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "price_floor",
+        "promise_never"
+      ],
+      "outcome": "deny",
+      "price_floor_result": "fail",
+      "reason": "deny: dedupe=pass, caps=n/a, verify_before_dispatch=n/a, price_floor=fail, single_commitment=pass, promise_never=fail",
+      "verdict_class": "blocked"
+    },
+    "below-floor-not-declared-ask-refuses": {
+      "ask_wickets": [],
+      "decision": "reject",
+      "failing_constraints": [
+        "price_floor"
+      ],
+      "outcome": "deny",
+      "price_floor_result": "fail",
+      "reason": "deny: dedupe=pass, caps=n/a, verify_before_dispatch=n/a, price_floor=fail, single_commitment=pass, promise_never=n/a",
+      "verdict_class": "blocked"
+    },
+    "below-floor-offer-asks": {
+      "ask_wickets": [
+        "price_floor"
+      ],
+      "decision": "needs_input",
+      "failing_constraints": [
+        "price_floor"
+      ],
+      "outcome": "escalate",
+      "price_floor_result": "fail",
+      "reason": "escalate: dedupe=pass, caps=n/a, verify_before_dispatch=n/a, price_floor=fail, single_commitment=pass, promise_never=n/a",
+      "verdict_class": "hitl_dispatched"
+    },
+    "below-floor-on-a-class-with-no-approver-refuses": {
+      "ask_wickets": [
+        "price_floor"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "price_floor"
+      ],
+      "outcome": "deny",
+      "price_floor_result": "fail",
+      "reason": "deny: dedupe=pass, caps=n/a, verify_before_dispatch=n/a, price_floor=fail, single_commitment=pass, promise_never=n/a; every failure may ask an approver, but action class 'external_commitment.other' names no approver_role, so it is refused",
+      "verdict_class": "blocked"
+    },
+    "below-floor-repeat-same-deal-refuses": {
+      "ask_wickets": [
+        "price_floor"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "dedupe",
+        "price_floor"
+      ],
+      "outcome": "deny",
+      "price_floor_result": "fail",
+      "reason": "deny: dedupe=fail, caps=n/a, verify_before_dispatch=n/a, price_floor=fail, single_commitment=pass, promise_never=n/a",
+      "verdict_class": "blocked"
+    },
+    "below-floor-sale-asks": {
+      "ask_wickets": [
+        "price_floor"
+      ],
+      "decision": "needs_input",
+      "failing_constraints": [
+        "price_floor"
+      ],
+      "outcome": "escalate",
+      "price_floor_result": "fail",
+      "reason": "escalate: dedupe=pass, caps=n/a, verify_before_dispatch=n/a, price_floor=fail, single_commitment=pass, promise_never=n/a",
+      "verdict_class": "hitl_dispatched"
+    },
+    "no-opening-allows-n-a": {
+      "ask_wickets": [
+        "price_floor"
+      ],
+      "decision": "accept",
+      "failing_constraints": [],
+      "outcome": "allow",
+      "price_floor_result": "n/a",
+      "reason": "allow: dedupe=pass, caps=n/a, verify_before_dispatch=n/a, price_floor=n/a, single_commitment=pass, promise_never=n/a",
+      "verdict_class": null
+    },
+    "opening-does-not-open-commitment-asks": {
+      "ask_wickets": [
+        "price_floor"
+      ],
+      "decision": "needs_input",
+      "failing_constraints": [
+        "price_floor"
+      ],
+      "outcome": "escalate",
+      "price_floor_result": "fail",
+      "reason": "escalate: dedupe=pass, caps=n/a, verify_before_dispatch=n/a, price_floor=fail, single_commitment=pass, promise_never=n/a",
+      "verdict_class": "hitl_dispatched"
+    }
+  },
+  "source": "internal/guard/testdata/parity/generate_taxonomy6.py",
+  "taxonomy_file_sha256": "7563fcaeb6c192a27877fae3131bca1021526046c8976475c46eebf4fb374272",
+  "taxonomy_jcs_digest": "fc12eb90bc2b3c85bb49c4d3d7be8f384c6e0b8e189bc3b68a753a4f1af5cd94",
+  "taxonomy_version": "6",
+  "wicket_digests": {
+    "price_floor/2.0.1": "c39f858b52a9697a70450680d90d0bbd0cb4e4eb79925d18e67623d587404977",
+    "promise_never/1.0.0": "836ae58f704a9c8ab8027fee344ca47ddb3de76a7a1973a650f42a3595e649f4",
+    "seller.single_commitment/1.0.0": "91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e"
+  }
+}

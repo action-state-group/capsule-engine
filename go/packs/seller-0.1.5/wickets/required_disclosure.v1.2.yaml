@@ -1,0 +1,42 @@
+# required_disclosure wicket, version 1.2: version 1.1 with one change. A
+# required class also counts as stated when the sale's listings in force
+# state it: the action's listing_classes, the rule input capsulectl seals on
+# each offer and commit check of a sale's thread (the classes every live
+# listing states, the intersection over the latest post per platform when
+# the check was made; capsule-engine#190). A listing is the agent's words to
+# every buyer, so a class it states is stated to this one too. Under version
+# 1.1 a listing counted for nothing, and an offer after a listing that stated
+# the condition asked for it again. The value is read from the check, never
+# recomputed: a later re-post changes later checks only. With no value (no
+# post) or an empty one, the class needs one of 1.1's two paths. Version 1.1
+# (required_disclosure.v1.1.yaml) stays as it was for the packs that pin it.
+#
+# Both `fold_digest` and `statement_fold_digest` are the real
+# definition_digest() of their folds in folds/catalog_defs; the check refuses
+# to run when a catalog fold does not match.
+#
+# Declared disposition: ask.
+wicket_id: required_disclosure/1.2.0
+check: required_disclosure
+semantics: >-
+  For an action in action_classes, each class in required_classes must
+  already have been stated to the counterparty: by an accepted prior action
+  of the operator addressed to the action's target that carried that
+  representation_class, leaving dry runs out; by a claim the operator's
+  agent made in the action's deal before the action with source_kind agent
+  and that class (a sealed delivery_promise reads as delivery_date); or by
+  the sale's listings in force, when the class is in the action's
+  listing_classes as its check sealed them. A class with none of the three
+  fails, and an approval never clears it. A class is never read from a
+  disclosure record's personal-data fields. An action naming neither a
+  target nor a deal is not applicable. Any other action class is out of
+  scope.
+config:
+  action_classes: [marketplace.offer, marketplace.sale, agreement.accept]
+  representation_classes: [price, condition, features, authenticity, availability, delivery_date, service_scope, warranty, refund_terms, payment_methods, pickup, deadline, address, other]
+  required_classes: [condition]
+  fold_id: disclosure.class_seen/1.0.0
+  fold_digest: 5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564
+  statement_fold_id: disclosure.statement_seen/1.0.0
+  statement_fold_digest: 925e7ccd2e29b3f1984f966e968bdef47d0d22d2b85b8e0205a39d6a5a7ff0be
+  count_listing_classes: true

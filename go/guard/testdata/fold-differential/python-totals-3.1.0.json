@@ -1,0 +1,167 @@
+{
+  "capsule_engine_commit": "a710636c29814ce67e838c673026fd2063d913f8",
+  "fold": "spend.weekly/3.1.0",
+  "fold_digest": "f379cd4b2b12284fa5d682845f23bcd7ab1ae8b8d1dd827cd9b5dd7069735997",
+  "totals": {
+    "buy-then-linked-cancel": {
+      "reversals": {
+        "linked_count": 1,
+        "linked_minor": 2000,
+        "unlinked_count": 0
+      },
+      "weekly_spend_minor": 0
+    },
+    "cancel-before-its-charge": {
+      "reversals": {
+        "linked_count": 0,
+        "linked_minor": 0,
+        "unlinked_count": 1
+      },
+      "weekly_spend_minor": 2000
+    },
+    "cancel-citing-another-operators-charge": {
+      "reversals": {
+        "linked_count": 0,
+        "linked_minor": 0,
+        "unlinked_count": 1
+      },
+      "weekly_spend_minor": 2000
+    },
+    "dry-run-excluded": {
+      "reversals": {
+        "linked_count": 0,
+        "linked_minor": 0,
+        "unlinked_count": 0
+      },
+      "weekly_spend_minor": 500
+    },
+    "executed-cancel-unlinked": {
+      "reversals": {
+        "linked_count": 0,
+        "linked_minor": 0,
+        "unlinked_count": 1
+      },
+      "weekly_spend_minor": 2000
+    },
+    "executed-dry-run-left-out": {
+      "reversals": {
+        "linked_count": 0,
+        "linked_minor": 0,
+        "unlinked_count": 0
+      },
+      "weekly_spend_minor": 2000
+    },
+    "executed-record-counted": {
+      "reversals": {
+        "linked_count": 0,
+        "linked_minor": 0,
+        "unlinked_count": 0
+      },
+      "weekly_spend_minor": 3500
+    },
+    "executed-unreadable-skipped": {
+      "reversals": {
+        "linked_count": 0,
+        "linked_minor": 0,
+        "unlinked_count": 0
+      },
+      "weekly_spend_minor": 2000
+    },
+    "live-history-copy-left-out": {
+      "reversals": {
+        "linked_count": 0,
+        "linked_minor": 0,
+        "unlinked_count": 0
+      },
+      "weekly_spend_minor": 1500
+    },
+    "live-history-other-mark-counted": {
+      "reversals": {
+        "linked_count": 0,
+        "linked_minor": 0,
+        "unlinked_count": 0
+      },
+      "weekly_spend_minor": 2000
+    },
+    "negative-charge-counts-zero": {
+      "reversals": {
+        "linked_count": 0,
+        "linked_minor": 0,
+        "unlinked_count": 0
+      },
+      "weekly_spend_minor": 1000
+    },
+    "no-amount-skipped": {
+      "reversals": {
+        "linked_count": 0,
+        "linked_minor": 0,
+        "unlinked_count": 0
+      },
+      "weekly_spend_minor": 400
+    },
+    "outside-the-window": {
+      "reversals": {
+        "linked_count": 0,
+        "linked_minor": 0,
+        "unlinked_count": 1
+      },
+      "weekly_spend_minor": 700
+    },
+    "partial-refunds-floor-at-the-charge": {
+      "reversals": {
+        "linked_count": 2,
+        "linked_minor": 1000,
+        "unlinked_count": 0
+      },
+      "weekly_spend_minor": 0
+    },
+    "refund-cannot-reach-other-charges": {
+      "reversals": {
+        "linked_count": 1,
+        "linked_minor": 500,
+        "unlinked_count": 0
+      },
+      "weekly_spend_minor": 1500
+    },
+    "rejected-charge-not-counted": {
+      "reversals": {
+        "linked_count": 0,
+        "linked_minor": 0,
+        "unlinked_count": 1
+      },
+      "weekly_spend_minor": 0
+    },
+    "rejected-still-left-out": {
+      "reversals": {
+        "linked_count": 0,
+        "linked_minor": 0,
+        "unlinked_count": 0
+      },
+      "weekly_spend_minor": 2000
+    },
+    "unlinked-cancel": {
+      "reversals": {
+        "linked_count": 0,
+        "linked_minor": 0,
+        "unlinked_count": 1
+      },
+      "weekly_spend_minor": 2000
+    },
+    "wrong-relation-is-unlinked": {
+      "reversals": {
+        "linked_count": 0,
+        "linked_minor": 0,
+        "unlinked_count": 1
+      },
+      "weekly_spend_minor": 2000
+    },
+    "zero-amount-reversal-unlinked": {
+      "reversals": {
+        "linked_count": 0,
+        "linked_minor": 0,
+        "unlinked_count": 1
+      },
+      "weekly_spend_minor": 2000
+    }
+  }
+}

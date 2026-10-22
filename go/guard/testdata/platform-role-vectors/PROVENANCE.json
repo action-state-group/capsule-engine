@@ -1,0 +1,16 @@
+{
+  "note": "capsule-engine's decisions on disclosures to a platform recipient (capsule-engine #173): engine-results.json is what generate.py beside it wrote, byte for byte, run from a read-only worktree of capsule-engine at the commit below (cd <checkout> && <venv>/bin/python -P generate.py <commit> > engine-results.json). A second run wrote identical bytes. This sidecar is not part of those bytes.",
+  "capsule_engine_commit": "7339028ab2117d6c7adec89a26cd5022b8ac7140",
+  "packs": {
+    "everyday": "asg/everyday/0.3.7 c1cea374102bba60de82e16663c550a278ee07a399c5faeb285fe1ea1ea27d4d",
+    "seller": "asg/seller/0.1.4 c14c8f8176a933f97c8a04064f6634f8f0e422178f71c4a531ac01631f529e5b"
+  },
+  "files": {
+    "engine-results.json": {
+      "sha256": "a400ee49ae1b345c79f91df7537892c900b8c822310051b75c3bbc11d64cfcc3"
+    },
+    "generate.py": {
+      "sha256": "90a757f88c0a940dbb714e4b5dc5e81d34f9f8408fa715986b7f2eeb6523ab6c"
+    }
+  }
+}

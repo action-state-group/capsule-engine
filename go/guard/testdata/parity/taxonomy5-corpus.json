@@ -1,0 +1,251 @@
+{
+ "note": "Decision-level differential for taxonomy 5's communication.send approver: taxonomy 5 sets approver_role account_holder on communication.send (comms.external is its legacy alias, not a class), so r13 recipient_seen_before (declared ASK, in the #113 ask_wickets set) ESCALATES citing r13 only; NEVER/DO/undeclared re-declarations and NEVER/integrity failures beside it (credential_pattern, dedupe, verify_before_dispatch) still DENY. Each case runs on a fresh ledger under the installed everyday 0.3.2 pack; `redeclare` overrides obligation default_disposition for that case only (test-only pack variant; its digest differs). Steps run in order; the last step's decision is the one compared.",
+ "pack_id": "asg/everyday/0.3.7",
+ "cases": [
+  {
+   "name": "new-recipient-asks-legacy-alias",
+   "expect": "escalate (needs_input/hitl_dispatched): comms.external resolves to communication.send, which names account_holder in taxonomy 5; only recipient_seen_before fails; failing rules r13 only",
+   "steps": [
+    {
+     "action": {
+      "verb": "send_message",
+      "operator": "household-tax5-diff",
+      "developer": "household-assistant-t5@v1",
+      "action_class": "comms.external",
+      "target": "contact/new-friend",
+      "outgoing_content": "See you at noon.",
+      "action_id": "send_message/tax5-diff-1",
+      "timestamp": "2026-08-10T16:01:00Z"
+     },
+     "dry_run": true
+    }
+   ]
+  },
+  {
+   "name": "new-recipient-asks-canonical",
+   "expect": "escalate: same as above under the canonical class name communication.send",
+   "steps": [
+    {
+     "action": {
+      "verb": "send_message",
+      "operator": "household-tax5-diff",
+      "developer": "household-assistant-t5@v1",
+      "action_class": "communication.send",
+      "target": "contact/new-friend",
+      "outgoing_content": "See you at noon.",
+      "action_id": "send_message/tax5-diff-2",
+      "timestamp": "2026-08-10T16:02:00Z"
+     },
+     "dry_run": true
+    }
+   ]
+  },
+  {
+   "name": "new-recipient-r13-never-refuses",
+   "expect": "deny: r13 re-declared NEVER",
+   "steps": [
+    {
+     "action": {
+      "verb": "send_message",
+      "operator": "household-tax5-diff",
+      "developer": "household-assistant-t5@v1",
+      "action_class": "comms.external",
+      "target": "contact/new-friend",
+      "outgoing_content": "See you at noon.",
+      "action_id": "send_message/tax5-diff-3",
+      "timestamp": "2026-08-10T16:03:00Z"
+     },
+     "dry_run": true
+    }
+   ],
+   "redeclare": {
+    "r13-message-to-a-new-recipient": "NEVER"
+   }
+  },
+  {
+   "name": "new-recipient-r13-do-refuses",
+   "expect": "deny: r13 re-declared DO",
+   "steps": [
+    {
+     "action": {
+      "verb": "send_message",
+      "operator": "household-tax5-diff",
+      "developer": "household-assistant-t5@v1",
+      "action_class": "comms.external",
+      "target": "contact/new-friend",
+      "outgoing_content": "See you at noon.",
+      "action_id": "send_message/tax5-diff-4",
+      "timestamp": "2026-08-10T16:04:00Z"
+     },
+     "dry_run": true
+    }
+   ],
+   "redeclare": {
+    "r13-message-to-a-new-recipient": "DO"
+   }
+  },
+  {
+   "name": "new-recipient-r13-undeclared-refuses",
+   "expect": "deny: r13 declares no disposition",
+   "steps": [
+    {
+     "action": {
+      "verb": "send_message",
+      "operator": "household-tax5-diff",
+      "developer": "household-assistant-t5@v1",
+      "action_class": "comms.external",
+      "target": "contact/new-friend",
+      "outgoing_content": "See you at noon.",
+      "action_id": "send_message/tax5-diff-5",
+      "timestamp": "2026-08-10T16:05:00Z"
+     },
+     "dry_run": true
+    }
+   ],
+   "redeclare": {
+    "r13-message-to-a-new-recipient": null
+   }
+  },
+  {
+   "name": "new-recipient-beside-credential-refuses",
+   "expect": "deny: credential_pattern (r23 NEVER) fails beside recipient_seen_before",
+   "steps": [
+    {
+     "action": {
+      "verb": "send_message",
+      "operator": "household-tax5-diff",
+      "developer": "household-assistant-t5@v1",
+      "action_class": "comms.external",
+      "target": "contact/new-friend",
+      "outgoing_content": "Your verification code is 482913",
+      "action_id": "send_message/tax5-diff-6",
+      "timestamp": "2026-08-10T16:06:00Z"
+     },
+     "dry_run": true
+    }
+   ]
+  },
+  {
+   "name": "new-recipient-repeat-refuses-on-dedupe",
+   "expect": "deny: the same message sent (escalated) once, then repeated; dedupe fails beside recipient_seen_before",
+   "steps": [
+    {
+     "action": {
+      "verb": "send_message",
+      "operator": "household-tax5-diff",
+      "developer": "household-assistant-t5@v1",
+      "action_class": "comms.external",
+      "target": "contact/new-friend",
+      "outgoing_content": "See you at noon.",
+      "action_id": "send_message/tax5-diff-13",
+      "timestamp": "2026-08-10T16:13:00Z"
+     },
+     "dry_run": false
+    },
+    {
+     "action": {
+      "verb": "send_message",
+      "operator": "household-tax5-diff",
+      "developer": "household-assistant-t5@v1",
+      "action_class": "comms.external",
+      "target": "contact/new-friend",
+      "outgoing_content": "See you at noon.",
+      "action_id": "send_message/tax5-diff-13",
+      "timestamp": "2026-08-10T16:13:00Z"
+     },
+     "dry_run": true
+    }
+   ]
+  },
+  {
+   "name": "new-recipient-missing-mandate-refuses",
+   "expect": "deny: cites a mandate not on the ledger; verify_before_dispatch fails beside recipient_seen_before",
+   "steps": [
+    {
+     "action": {
+      "verb": "send_message",
+      "operator": "household-tax5-diff",
+      "developer": "household-assistant-t5@v1",
+      "action_class": "comms.external",
+      "target": "contact/new-friend",
+      "outgoing_content": "See you at noon.",
+      "action_id": "send_message/tax5-diff-7",
+      "timestamp": "2026-08-10T16:07:00Z",
+      "cited_mandate_capsule_id": "0000000000000000000000000000000000000000000000000000000000000000"
+     },
+     "dry_run": true
+    }
+   ]
+  },
+  {
+   "name": "known-recipient-after-real-payment",
+   "expect": "recipient_seen_before passes: an accepted payment to the same target precedes the message (decision as measured)",
+   "steps": [
+    {
+     "action": {
+      "verb": "make_payment",
+      "operator": "household-tax5-diff",
+      "developer": "household-assistant-t5@v1",
+      "action_class": "money.transfer",
+      "amount_minor": 700,
+      "currency": "EUR",
+      "rail": "card",
+      "target": "person/landlord",
+      "counterparty_account_ref": "acct-ref-landlord",
+      "recurrence": "one_time",
+      "action_id": "make_payment/tax5-diff-8",
+      "timestamp": "2026-08-10T16:08:00Z"
+     },
+     "dry_run": false
+    },
+    {
+     "action": {
+      "verb": "send_message",
+      "operator": "household-tax5-diff",
+      "developer": "household-assistant-t5@v1",
+      "action_class": "comms.external",
+      "target": "person/landlord",
+      "outgoing_content": "See you at noon.",
+      "action_id": "send_message/tax5-diff-9",
+      "timestamp": "2026-08-10T16:09:00Z"
+     },
+     "dry_run": true
+    }
+   ]
+  },
+  {
+   "name": "communication-publish-still-asks",
+   "expect": "escalate: taxonomy 4 behaviour unchanged; failing rules r15",
+   "steps": [
+    {
+     "action": {
+      "verb": "act",
+      "operator": "household-tax5-diff",
+      "developer": "household-assistant-t5@v1",
+      "action_class": "communication.publish",
+      "action_id": "act/tax5-diff-10",
+      "timestamp": "2026-08-10T16:10:00Z"
+     },
+     "dry_run": true
+    }
+   ]
+  },
+  {
+   "name": "off-taxonomy-refuses",
+   "expect": "deny: no row in the taxonomy, action_class_gate fails closed",
+   "steps": [
+    {
+     "action": {
+      "verb": "act",
+      "operator": "household-tax5-diff",
+      "developer": "household-assistant-t5@v1",
+      "action_class": "connector.unlisted",
+      "action_id": "act/tax5-diff-12",
+      "timestamp": "2026-08-10T16:12:00Z"
+     },
+     "dry_run": true
+    }
+   ]
+  }
+ ]
+}

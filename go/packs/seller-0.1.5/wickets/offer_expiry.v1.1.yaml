@@ -1,0 +1,31 @@
+# offer_expiry/1.1.0: offer_expiry/1.0.1 (offer_expiry.yaml) with an offer
+# that answers no proposal not applicable (capsule-engine#193). The producer
+# seals the rule input no_proposal on an offer when no message from the
+# counterparty was on record before it (capsule-cli#364), so there is no
+# proposal to go stale. A missing proposal_at alone never reads as not
+# applicable: it still fails, and so does no_proposal beside a proposal_at. The
+# bridge reads no_proposal only from a check that names no source ref (the
+# message an offer answers), so a check naming both is decided on that
+# message's age, or fails as missing one.
+# 1.0.1 stays as it was for the records and packs that pin it.
+#
+# Declared disposition: ask. The unverified case is meant to be
+# ASK_UNVERIFIED, which the pack schema's disposition set does not have yet;
+# until it does, the evidence marker tells the two apart.
+wicket_id: offer_expiry/1.1.0
+check: offer_expiry
+semantics: >-
+  For an action in action_classes, the age is the action's timestamp minus
+  its proposal_at, both RFC 3339 UTC, in whole seconds. An age within
+  max_age_seconds passes. An older proposal fails as expired: acting needs a
+  new proposed action. An action in no_proposal_classes that carries
+  no_proposal true and no proposal_at answers no proposal and is not
+  applicable, in scope. An action carrying no_proposal true beside a
+  proposal_at fails with expiry_unverified. If
+  the age cannot be established otherwise (proposal_at or timestamp missing
+  or unreadable, or a proposal later than the action) the rule fails with
+  expiry_unverified. Any other action class is out of scope.
+config:
+  action_classes: [marketplace.offer, marketplace.sale, agreement.accept]
+  max_age_seconds: 86400
+  no_proposal_classes: [marketplace.offer]

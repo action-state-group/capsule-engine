@@ -1,0 +1,22 @@
+{
+  "note": "Provenance sidecar; not part of the vectors. Made on the Go side for the v0.0.11 port of asg/everyday/0.3.6, rebased onto the #139 mirror.",
+  "capsule_engine_commit": "08cd96d03b6b23e0a7b71169dd5c24ea0381ff04",
+  "how": "inputs/ by build.py; engine-results.json by ../g3-executed-acts-vectors/engine_results.py run from capsule-engine 08cd96d0 (#139's merge: the first engine that reads a claim in a live history; its catalog everyday pack is asg/everyday/0.3.6, unchanged since a710636c), a local read-only clone",
+  "files": {
+    "build.py": {
+      "sha256": "842eb74661c7e14f21bfb59c63eae53311087d45ce66dafdf7393b849f668671"
+    },
+    "engine-results.json": {
+      "sha256": "c5efb788b0ccebcadd5f2abffcde521a83861e0dad91f76a5a8aace818bc6653"
+    },
+    "inputs/statement-in-history/step-0.input.json": {
+      "sha256": "b555191961a0c720415dbf525938cee7742d3f4aa7c629d0db88ea1addb7dd41"
+    },
+    "inputs/statement-in-history/step-1.input.json": {
+      "sha256": "443a98669077951cbe7fded60fddca46dc8d511217ee96d778e4f7cbbfa453aa"
+    },
+    "inputs/statement-in-history/step-2.input.json": {
+      "sha256": "98efd7e68e70cb566263cca011965a9ea6090a1702730b95442b47ffe72bfbed"
+    }
+  }
+}

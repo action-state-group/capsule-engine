@@ -1,0 +1,19 @@
+{
+  "action": "commit",
+  "description": "Place the order",
+  "amount_minor": 2000,
+  "who": {
+    "name": "Example Shop",
+    "domain": "shop.example"
+  },
+  "terms": {
+    "item": "example item",
+    "quantity": 1,
+    "price_minor": 2000,
+    "currency": "USD"
+  },
+  "recourse": {
+    "rail": "card",
+    "refundable": true
+  }
+}

@@ -1,0 +1,9 @@
+# recurring_charge wicket: a read of Action.recurrence
+# (guards/checks/recurring_charge.py), for actions in `action_classes`. The
+# check fails when the recurrence is present and not one of
+# `one_time_values`. Both lists are policy data.
+wicket_id: recurring_charge/1.0.0
+check: recurring_charge
+config:
+  action_classes: [money.transfer]
+  one_time_values: [one_time]

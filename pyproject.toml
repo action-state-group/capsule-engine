@@ -95,6 +95,9 @@ testpaths = ["tests"]
 [tool.ruff]
 line-length = 110
 target-version = "py310"
+# The Go guard's vector generators are frozen with the vectors they wrote
+# (each pinned by sha256 in its set's PROVENANCE.json), so they are not linted.
+extend-exclude = ["go/guard/testdata"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP"]

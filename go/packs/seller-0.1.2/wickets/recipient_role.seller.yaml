@@ -1,0 +1,10 @@
+# recipient_role, configured for a seller (guards/checks/recipient_role.py).
+# The same check as recipient_role/1.0.0 with the seller's closed role set:
+# the counterparty is the buyer. recipient_role/1.0.0 (recipient_role.yaml)
+# stays as it was for the records and packs that pin it.
+wicket_id: seller.recipient_role/1.0.0
+check: recipient_role
+config:
+  action_classes: [disclosure.personal]
+  roles: [buyer, third_party, self]
+  allowed_roles: [buyer, self]

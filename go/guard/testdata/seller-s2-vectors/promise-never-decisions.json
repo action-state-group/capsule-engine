@@ -1,0 +1,281 @@
+{
+  "capsule_engine_commit": "ba76a97a0fb5b41333b1b76a489060221e51ea45",
+  "decisions": {
+    "a-class-on-a-query": {
+      "decision": "accept",
+      "evidence_digests": {
+        "action_class_gate": "17dcb23b1a22944bd95d23ccd22940f86aa3c46ab23e947ba50b0a1bcca6a6b9",
+        "caps": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+        "dedupe": "c8a6e3ca3683e294427dbede7fd026a84c3924c88649cd43cd6c9985666042d4",
+        "destination_rail": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+        "offer_expiry": "299fbc9f7e6847eba5f93de60e12976aaef8f28c0cd4a303096c49daa495e0be",
+        "price_floor": "9d548b915de1ff97c046aa15d2f13fae31884894ff36be4ddba1fc9106988bed",
+        "promise_never": "ff0cab0c159ae1d81c52b65a17e63d9b88fe9bd2aab205cbe60102796beaf77b",
+        "promise_requires_approval": "26999f1f990a56334d343c6c31f6f042c162eef0f2c012d019db39d6826b45af",
+        "recipient_role": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+        "required_disclosure": "46a692401917ddcf0644832f8a53756b6b2b04dc87e1d4a4625d428ca911e5b5",
+        "single_commitment": "39ec56c6c92be9834f1042500b15fcf814b928782821ff1879834e29066f65df",
+        "task_authority": "c41e4b3a2077a40320e10ad50ccbfe5cc0efe57bd2d3dfe235357c61e8d051b9",
+        "verify_before_dispatch": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      },
+      "outcome": "allow",
+      "results": {
+        "action_class_gate": "pass",
+        "caps": "n/a",
+        "dedupe": "pass",
+        "destination_rail": "n/a",
+        "offer_expiry": "n/a",
+        "price_floor": "n/a",
+        "promise_never": "n/a",
+        "promise_requires_approval": "n/a",
+        "recipient_role": "n/a",
+        "required_disclosure": "n/a",
+        "single_commitment": "n/a",
+        "task_authority": "n/a",
+        "verify_before_dispatch": "n/a"
+      }
+    },
+    "a-class-outside-the-closed-set": {
+      "decision": "reject",
+      "evidence_digests": {
+        "action_class_gate": "93594fc3973062b88c37e6949b10f34f202dc75ada097c69b83d201e0cb51701",
+        "caps": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+        "dedupe": "a009cbbe16c2ef2af5d2239af19a0a9223863085516c05034bf833e314263889",
+        "destination_rail": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+        "offer_expiry": "299fbc9f7e6847eba5f93de60e12976aaef8f28c0cd4a303096c49daa495e0be",
+        "price_floor": "9d548b915de1ff97c046aa15d2f13fae31884894ff36be4ddba1fc9106988bed",
+        "promise_never": "804fe279955764a10ec43d0bc9aaf8eca0c43c34cecbc1bc5b72efe35e349569",
+        "promise_requires_approval": "d77729caf518041e24a6fba76bd7f8140707e2267259ebf0f05bb3a1f4a7c0b5",
+        "recipient_role": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+        "required_disclosure": "46a692401917ddcf0644832f8a53756b6b2b04dc87e1d4a4625d428ca911e5b5",
+        "single_commitment": "39ec56c6c92be9834f1042500b15fcf814b928782821ff1879834e29066f65df",
+        "task_authority": "c41e4b3a2077a40320e10ad50ccbfe5cc0efe57bd2d3dfe235357c61e8d051b9",
+        "verify_before_dispatch": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      },
+      "outcome": "deny",
+      "results": {
+        "action_class_gate": "n/a",
+        "caps": "n/a",
+        "dedupe": "pass",
+        "destination_rail": "n/a",
+        "offer_expiry": "n/a",
+        "price_floor": "n/a",
+        "promise_never": "fail",
+        "promise_requires_approval": "fail",
+        "recipient_role": "n/a",
+        "required_disclosure": "n/a",
+        "single_commitment": "n/a",
+        "task_authority": "n/a",
+        "verify_before_dispatch": "n/a"
+      }
+    },
+    "authenticity": {
+      "decision": "reject",
+      "evidence_digests": {
+        "action_class_gate": "93594fc3973062b88c37e6949b10f34f202dc75ada097c69b83d201e0cb51701",
+        "caps": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+        "dedupe": "a7a50b23bbd6da7ac2dc13670c67df15718aa8098a8e6136c55aaf304ceb24fe",
+        "destination_rail": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+        "offer_expiry": "299fbc9f7e6847eba5f93de60e12976aaef8f28c0cd4a303096c49daa495e0be",
+        "price_floor": "9d548b915de1ff97c046aa15d2f13fae31884894ff36be4ddba1fc9106988bed",
+        "promise_never": "71740034a2e7d490c77e72fd34465bcc78b218950377b2001a622f21f962b073",
+        "promise_requires_approval": "3f011c7407f354d48eb121d72b4492ac1ad6e3f39ec2a54c1d2f17a6d44713c6",
+        "recipient_role": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+        "required_disclosure": "46a692401917ddcf0644832f8a53756b6b2b04dc87e1d4a4625d428ca911e5b5",
+        "single_commitment": "39ec56c6c92be9834f1042500b15fcf814b928782821ff1879834e29066f65df",
+        "task_authority": "c41e4b3a2077a40320e10ad50ccbfe5cc0efe57bd2d3dfe235357c61e8d051b9",
+        "verify_before_dispatch": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      },
+      "outcome": "deny",
+      "results": {
+        "action_class_gate": "n/a",
+        "caps": "n/a",
+        "dedupe": "pass",
+        "destination_rail": "n/a",
+        "offer_expiry": "n/a",
+        "price_floor": "n/a",
+        "promise_never": "fail",
+        "promise_requires_approval": "pass",
+        "recipient_role": "n/a",
+        "required_disclosure": "n/a",
+        "single_commitment": "n/a",
+        "task_authority": "n/a",
+        "verify_before_dispatch": "n/a"
+      }
+    },
+    "authenticity-on-a-sale": {
+      "decision": "reject",
+      "evidence_digests": {
+        "action_class_gate": "93594fc3973062b88c37e6949b10f34f202dc75ada097c69b83d201e0cb51701",
+        "caps": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+        "dedupe": "eca38eb92d62319538744d5c884305174961dc42f9a0650f4e1845d28c995c43",
+        "destination_rail": "14491f195e7ee8e10199d351bd17fbe82caed86629e68f90f834a7a6a34d111f",
+        "offer_expiry": "7392286ba24565ff03fb9cb5e3e97f8a6cb4b1b4bc38672d31c54f3661cd6fd5",
+        "price_floor": "c3de79752971419f8e6e4c3e24d346a40a163980436114f12c6b045f4f4a9137",
+        "promise_never": "71740034a2e7d490c77e72fd34465bcc78b218950377b2001a622f21f962b073",
+        "promise_requires_approval": "3f011c7407f354d48eb121d72b4492ac1ad6e3f39ec2a54c1d2f17a6d44713c6",
+        "recipient_role": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+        "required_disclosure": "56ab85d6e9851581f931d09a696a8eb61b567a009ae7af654c4e1ff04702bf98",
+        "single_commitment": "1541f8655a86e71acf2683fee46b3cbef82d7cc83da3e89a098549aff0693e2f",
+        "task_authority": "3c94a44812b9f227f1da0e8ed27510ad37fccfa3b7c3035fbd75b52901b160fb",
+        "verify_before_dispatch": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      },
+      "outcome": "deny",
+      "results": {
+        "action_class_gate": "n/a",
+        "caps": "n/a",
+        "dedupe": "pass",
+        "destination_rail": "pass",
+        "offer_expiry": "fail",
+        "price_floor": "n/a",
+        "promise_never": "fail",
+        "promise_requires_approval": "pass",
+        "recipient_role": "n/a",
+        "required_disclosure": "fail",
+        "single_commitment": "n/a",
+        "task_authority": "n/a",
+        "verify_before_dispatch": "n/a"
+      }
+    },
+    "authenticity-under-a-task-authority-allowing-it": {
+      "decision": "reject",
+      "evidence_digests": {
+        "action_class_gate": "93594fc3973062b88c37e6949b10f34f202dc75ada097c69b83d201e0cb51701",
+        "caps": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+        "dedupe": "c4ecf258ed0378466ae4814d7a0804f3f3fb3b322498a29807edb3b73bf483b6",
+        "destination_rail": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+        "offer_expiry": "299fbc9f7e6847eba5f93de60e12976aaef8f28c0cd4a303096c49daa495e0be",
+        "price_floor": "9d548b915de1ff97c046aa15d2f13fae31884894ff36be4ddba1fc9106988bed",
+        "promise_never": "71740034a2e7d490c77e72fd34465bcc78b218950377b2001a622f21f962b073",
+        "promise_requires_approval": "ed6bead8b94351529d8f1740db92046ec10bf830ceaeccc9f693eeb52d7bbf17",
+        "recipient_role": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+        "required_disclosure": "46a692401917ddcf0644832f8a53756b6b2b04dc87e1d4a4625d428ca911e5b5",
+        "single_commitment": "39ec56c6c92be9834f1042500b15fcf814b928782821ff1879834e29066f65df",
+        "task_authority": "c41e4b3a2077a40320e10ad50ccbfe5cc0efe57bd2d3dfe235357c61e8d051b9",
+        "verify_before_dispatch": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      },
+      "outcome": "deny",
+      "results": {
+        "action_class_gate": "n/a",
+        "caps": "n/a",
+        "dedupe": "pass",
+        "destination_rail": "n/a",
+        "offer_expiry": "n/a",
+        "price_floor": "n/a",
+        "promise_never": "fail",
+        "promise_requires_approval": "pass",
+        "recipient_role": "n/a",
+        "required_disclosure": "n/a",
+        "single_commitment": "n/a",
+        "task_authority": "n/a",
+        "verify_before_dispatch": "n/a"
+      }
+    },
+    "authenticity-with-a-bound-approval": {
+      "decision": "reject",
+      "evidence_digests": {
+        "action_class_gate": "93594fc3973062b88c37e6949b10f34f202dc75ada097c69b83d201e0cb51701",
+        "caps": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+        "dedupe": "1ea09541ada58295bf2b6e15187f24d604f7d6f0ed75126fe25d4c24e043a4e5",
+        "destination_rail": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+        "offer_expiry": "299fbc9f7e6847eba5f93de60e12976aaef8f28c0cd4a303096c49daa495e0be",
+        "price_floor": "9d548b915de1ff97c046aa15d2f13fae31884894ff36be4ddba1fc9106988bed",
+        "promise_never": "4fa4ed01c96886e091e69879c988cb392c028e145c70f42b42cd6f25fd9a3fc0",
+        "promise_requires_approval": "b0cc12ad7b7168994822b174e40fe274df0ca4484168f3e884764865a6d06150",
+        "recipient_role": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+        "required_disclosure": "46a692401917ddcf0644832f8a53756b6b2b04dc87e1d4a4625d428ca911e5b5",
+        "single_commitment": "39ec56c6c92be9834f1042500b15fcf814b928782821ff1879834e29066f65df",
+        "task_authority": "c41e4b3a2077a40320e10ad50ccbfe5cc0efe57bd2d3dfe235357c61e8d051b9",
+        "verify_before_dispatch": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      },
+      "outcome": "deny",
+      "results": {
+        "action_class_gate": "n/a",
+        "caps": "n/a",
+        "dedupe": "pass",
+        "destination_rail": "n/a",
+        "offer_expiry": "n/a",
+        "price_floor": "n/a",
+        "promise_never": "fail",
+        "promise_requires_approval": "pass",
+        "recipient_role": "n/a",
+        "required_disclosure": "n/a",
+        "single_commitment": "n/a",
+        "task_authority": "n/a",
+        "verify_before_dispatch": "n/a"
+      }
+    },
+    "no-class": {
+      "decision": "accept",
+      "evidence_digests": {
+        "action_class_gate": "93594fc3973062b88c37e6949b10f34f202dc75ada097c69b83d201e0cb51701",
+        "caps": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+        "dedupe": "77e9d7c23825de6892d3f8829e4235858bfe0155cb1179fb221ebfa2789dbd27",
+        "destination_rail": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+        "offer_expiry": "299fbc9f7e6847eba5f93de60e12976aaef8f28c0cd4a303096c49daa495e0be",
+        "price_floor": "9d548b915de1ff97c046aa15d2f13fae31884894ff36be4ddba1fc9106988bed",
+        "promise_never": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+        "promise_requires_approval": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+        "recipient_role": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+        "required_disclosure": "46a692401917ddcf0644832f8a53756b6b2b04dc87e1d4a4625d428ca911e5b5",
+        "single_commitment": "39ec56c6c92be9834f1042500b15fcf814b928782821ff1879834e29066f65df",
+        "task_authority": "c41e4b3a2077a40320e10ad50ccbfe5cc0efe57bd2d3dfe235357c61e8d051b9",
+        "verify_before_dispatch": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      },
+      "outcome": "allow",
+      "results": {
+        "action_class_gate": "n/a",
+        "caps": "n/a",
+        "dedupe": "pass",
+        "destination_rail": "n/a",
+        "offer_expiry": "n/a",
+        "price_floor": "n/a",
+        "promise_never": "n/a",
+        "promise_requires_approval": "n/a",
+        "recipient_role": "n/a",
+        "required_disclosure": "n/a",
+        "single_commitment": "n/a",
+        "task_authority": "n/a",
+        "verify_before_dispatch": "n/a"
+      }
+    },
+    "price": {
+      "decision": "accept",
+      "evidence_digests": {
+        "action_class_gate": "93594fc3973062b88c37e6949b10f34f202dc75ada097c69b83d201e0cb51701",
+        "caps": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+        "dedupe": "3977398d2ba76d17aed754b3b00099a24e4b420229d590dc19a680e92b96b1fb",
+        "destination_rail": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+        "offer_expiry": "299fbc9f7e6847eba5f93de60e12976aaef8f28c0cd4a303096c49daa495e0be",
+        "price_floor": "9d548b915de1ff97c046aa15d2f13fae31884894ff36be4ddba1fc9106988bed",
+        "promise_never": "aa0f44692c2813e5950fe957c5dc5b3708f64ecc1d6a1f90b7df06550dc3234b",
+        "promise_requires_approval": "b1ec7b09db5f2bdad4f5e4e45e7f8344c62f924fb37263946ddcf1a3fd20c83d",
+        "recipient_role": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+        "required_disclosure": "46a692401917ddcf0644832f8a53756b6b2b04dc87e1d4a4625d428ca911e5b5",
+        "single_commitment": "39ec56c6c92be9834f1042500b15fcf814b928782821ff1879834e29066f65df",
+        "task_authority": "c41e4b3a2077a40320e10ad50ccbfe5cc0efe57bd2d3dfe235357c61e8d051b9",
+        "verify_before_dispatch": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      },
+      "outcome": "allow",
+      "results": {
+        "action_class_gate": "n/a",
+        "caps": "n/a",
+        "dedupe": "pass",
+        "destination_rail": "n/a",
+        "offer_expiry": "n/a",
+        "price_floor": "n/a",
+        "promise_never": "pass",
+        "promise_requires_approval": "pass",
+        "recipient_role": "n/a",
+        "required_disclosure": "n/a",
+        "single_commitment": "n/a",
+        "task_authority": "n/a",
+        "verify_before_dispatch": "n/a"
+      }
+    }
+  },
+  "pack": {
+    "definition_digest": "7b854f0f0feb51381d936ad992bef659234d77a799a2a319585a856f65a19c77",
+    "pack_id": "asg/seller/0.1.0"
+  }
+}
