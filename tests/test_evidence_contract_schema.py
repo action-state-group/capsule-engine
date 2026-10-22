@@ -156,3 +156,66 @@ def test_upper_case_epistemic_types_are_rejected():
     er["accepted_epistemic_types"] = [t.upper() for t in er["accepted_epistemic_types"]]
     with pytest.raises(jsonschema.exceptions.ValidationError):
         validate_evidence_contract(doc)
+
+
+def _native_outcome(**extra) -> dict:
+    return {
+        "id": "C1",
+        "statement": "The remediation was confirmed.",
+        "evidence_rule": "fulfill capsule chained to intent",
+        "forward_verdict": "DETERMINISTIC",
+        "backward_verdict": "MODEL-ASSISTED",
+        **extra,
+    }
+
+
+def test_verdict_vocabulary_carries_out_of_scope():
+    """Evidence Result v0 section 4.2 mirrors this set: the fourth verdict
+    is added here first, then mirrored there."""
+    assert load_schema()["$defs"]["verdict"]["enum"] == ["met", "not_met", "not_evaluable", "out_of_scope"]
+
+
+def test_out_of_scope_switch_on_native_requirements_only():
+    validate_requirement(_native_outcome(out_of_scope_allowed=True))
+    validate_requirement(_native_outcome(
+        profile="obligation",
+        clause={"instrument": "Example Instrument", "article": "Article 1"},
+        out_of_scope_allowed=True,
+    ))
+    # one spelling: true or absent
+    with pytest.raises(jsonschema.exceptions.ValidationError):
+        validate_requirement(_native_outcome(out_of_scope_allowed=False))
+    with pytest.raises(jsonschema.exceptions.ValidationError):
+        validate_requirement(_native_outcome(out_of_scope_allowed="true"))
+    # the abstract shapes are closed to it
+    with pytest.raises(jsonschema.exceptions.ValidationError):
+        validate_requirement({"id": "A1", "profile": "outcome", "statement": "Abstract.", "out_of_scope_allowed": True})
+    with pytest.raises(jsonschema.exceptions.ValidationError):
+        validate_requirement({
+            "id": "O1", "profile": "obligation", "statement": "Abstract.", "clause_ref": "Article 1",
+            "out_of_scope_allowed": True,
+        })
+    # the switch does not stand in for a native obligation's clause
+    with pytest.raises(jsonschema.exceptions.ValidationError):
+        validate_requirement(_native_outcome(profile="obligation", out_of_scope_allowed=True))
+    # an open stub accepts the name as an unlisted member; a reader of the
+    # switch reads it on native shapes only, so there it grants nothing
+    validate_requirement({"id": "P1", "profile": "process", "statement": "A process.", "out_of_scope_allowed": True})
+
+
+@pytest.mark.parametrize("before,after", [(False, True), (True, False)], ids=["switched-on", "switched-off"])
+def test_changing_the_out_of_scope_switch_is_breaking(before, after):
+    """Turning the switch on lets a claim read out_of_scope; turning it off
+    strands every out_of_scope claim made under the earlier version. No
+    contract_diff rule covers the member, so its catch-all calls either a
+    breaking change."""
+    from capsule_engine.packs.contract_diff import BREAKING, diff_contracts
+
+    def contract(version: str, switched: bool) -> dict:
+        extra = {"out_of_scope_allowed": True} if switched else {}
+        return {"id": "X", "version": version, "requirements": [_native_outcome(**extra)]}
+
+    changes = [c for c in diff_contracts(contract("1", before), contract("2", after)).changes
+               if c.path == "requirements[C1]/out_of_scope_allowed"]
+    assert [c.kind for c in changes] == ["changed"]
+    assert changes[0].severity == BREAKING
