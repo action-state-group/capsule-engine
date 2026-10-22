@@ -41,6 +41,7 @@ What changed:
 - **Switch-over (§9).** §9 adds the `Join`-built readers and makes the full test run the check.
 - **Sets kept back (§12).** A set held back by §12 is resolved one by one before the
   switch-over, instead of falling back unconditionally.
+- **vocabgate (§9).** vocabgate walks the pinned module's packs, never a copy (Codex round 3).
 
 ## 0. Problem, and what this note does not do
 
@@ -380,21 +381,24 @@ the switch-over's parent commit (§10), one actionstate-muse PR does the followi
   `copyAudiences` and the schema id `actionstate-check/v1`;
 - deletes `internal/guard`, `internal/pack`, `internal/canon` and `packs/`. A vector set kept back
   by §12 has been resolved by then (§12);
-- copies into Muse-owned testdata (`internal/plugin/testdata`, `internal/rules/testdata`,
-  `internal/vocabgate/testdata`) the fixtures that tests and scripts outside the deleted
+- copies into Muse-owned testdata (`internal/plugin/testdata`, `internal/rules/testdata`) the
+  fixtures that tests and scripts outside the deleted
   directories read by path, and edits only those paths. At 8c9acf3 these readers are:
   - 19 test files in `internal/plugin`, among them `check_test.go`, `sale_replay_test.go`,
     `fyi_act_test.go`, `g3_vectors_test.go` (which also writes in its update mode) and
     `pack_flag_test.go`;
   - in `internal/rules`: `helpers_test.go`, `platform_test.go`, `ready_test.go` and
     `rules27_test.go`. The last two build `../../packs/everyday-0.3.7` with `filepath.Join`;
-  - `internal/vocabgate/page_claims_test.go`, which walks `<repo>/packs`;
+  - `internal/vocabgate/page_claims_test.go`, which walks `<repo>/packs` to scan the pack text
+    the pages actually show. It must not be given a frozen copy, which would go stale at the
+    next pin bump. It walks the pinned module's embedded `packs` file system instead, and that
+    is its one listed adaptation;
   - six e2e scripts: `buyer-exits-e2e.sh`, `clean-machine-test.sh`, `history-e2e.sh`,
     `receipt-e2e.sh`, `seller-sale-e2e.sh` and `tester-install-test.sh`.
 
   A grep can miss paths built from separate `Join` arguments. So the check is the full
-  `go test ./...` and every e2e script, run after the deletion. A vocabgate walk that scans
-  fewer surfaces than before fails on its surface count, which the PR records before and after;
+  `go test ./...` and every e2e script, run after the deletion. The PR also records vocabgate's
+  surface count before and after, and the two must be equal;
 - adds a CI check that fails a PR touching any Go file under the old paths, naming capsule-engine
   `go/` as the owner;
 - keeps every other test outside the deleted directories passing unchanged, including
@@ -406,7 +410,7 @@ deleted directories at the parent commit against the module at `go/v0.1.0`. Impo
 normalized, and what remains is only the documented differences: the §1 parameters, the §2 path
 edits, the §12 rewrites and adaptations, the generated `embed.go` and registry, and the comment
 rewording. Test
-edits outside the deleted directories are fixture path edits only.
+edits outside the deleted directories are fixture path edits, plus the listed vocabgate adaptation.
 
 After the switch, a wicket change is one PR here (Python, Go and vectors), then a tag, then a
 one-line pin bump in Muse.
