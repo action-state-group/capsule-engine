@@ -200,6 +200,26 @@ def test_a_foreign_capsule_with_a_handover_not_in_the_set_reads_none(value):
     assert _run(RAIL_1_1, action).result == "fail"
 
 
+@pytest.mark.parametrize("definition,action_class", [(RAIL_1_0, SALE), (RAIL_1_1, COMMIT), (RAIL_1_1, SALE)],
+                         ids=["1.0.0-sale", "1.1.0-commit", "1.1.0-sale"])
+@pytest.mark.parametrize("rail", [[], {}, ["card"], {"card": True}], ids=["list", "dict", "list-card", "dict-card"])
+def test_a_foreign_capsule_with_a_rail_that_is_not_a_token_fails_closed(definition, action_class, rail):
+    """A rail of another shape passes through from_capsule as it was sealed
+    and fails as not an allowed rail, under both definitions, never a
+    TypeError and never not applicable."""
+    capsule = {"action_id": "commit/x", "asg_payload": {"action_class": action_class, "rail": rail}}
+    action = Action.from_capsule(capsule)
+    assert action.rail == rail
+    assert _run(definition, action).result == "fail"
+
+
+@pytest.mark.parametrize("rail", ["Venmo", "ZELLE", "CASH", "cash ", "p2p ", "Card"])
+def test_a_rail_alias_or_allowed_rail_matches_exactly(rail):
+    """The producer seals a normalized token; another spelling is not an
+    allowed, aliased or in-person rail, so it asks."""
+    assert _run(RAIL_1_1, _action(COMMIT, rail=rail, handover="in_person")).result == "fail"
+
+
 @pytest.mark.parametrize("value", [{}, [], ["in_person"]])
 def test_an_action_refuses_a_handover_container(value):
     with pytest.raises(ValueError):

@@ -83,7 +83,10 @@ def check_destination_rail(
             return _outcome("fail", MISSING_RAIL_REASON, evidence)
         return _outcome("n/a", "the action carries no rail; the destination rail could not be checked",
                         not_applicable_evidence(_CHECK_ID, in_scope=True, missing_field="rail"))
-    counted = (rail_aliases or {}).get(action.rail, action.rail)
+    # Only a token is looked up: a rail of any other shape (a foreign
+    # capsule's list or object) is counted as itself, so it is not an
+    # allowed rail and fails, as under 1.0.0, never a TypeError.
+    counted = (rail_aliases or {}).get(action.rail, action.rail) if isinstance(action.rail, str) else action.rail
     evidence = RailEvidence(rail=action.rail, watched_rails=watched)
     if allowed_rails is not None:
         evidence["allowed_rails"] = sorted(allowed_rails)
