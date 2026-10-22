@@ -190,9 +190,20 @@ def test_the_handover_is_sealed_only_when_set_and_read_back(tmp_path):
     assert act_payload(_action(COMMIT, handover="shipped"))["handover"] == "shipped"
 
 
-def test_a_foreign_capsule_with_an_unknown_handover_reads_none():
-    capsule = {"action_id": "commit/x", "asg_payload": {"action_class": COMMIT, "handover": "drone"}}
-    assert Action.from_capsule(capsule).handover is None
+@pytest.mark.parametrize("value", ["drone", {}, [], ["in_person"], {"in_person": True}, 1, True, None])
+def test_a_foreign_capsule_with_a_handover_not_in_the_set_reads_none(value):
+    """A non-string (an unhashable container included) is missing, never a
+    TypeError, and a cash commit replayed from it then asks."""
+    capsule = {"action_id": "commit/x", "asg_payload": {"action_class": COMMIT, "rail": "cash", "handover": value}}
+    action = Action.from_capsule(capsule)
+    assert action.handover is None
+    assert _run(RAIL_1_1, action).result == "fail"
+
+
+@pytest.mark.parametrize("value", [{}, [], ["in_person"]])
+def test_an_action_refuses_a_handover_container(value):
+    with pytest.raises(ValueError):
+        _action(COMMIT, handover=value)
 
 
 # -- the bridge: terms.handover on the check body --------------------------------
@@ -215,7 +226,8 @@ def test_the_bridge_carries_the_commits_handover(handover):
     assert (action.rail, action.handover) == ("cash", handover)
 
 
-@pytest.mark.parametrize("terms", [None, {"item": "bicycle"}, {"handover": "drone"}, {"handover": 1}, "in_person"])
+@pytest.mark.parametrize("terms", [None, {"item": "bicycle"}, {"handover": "drone"}, {"handover": 1}, "in_person",
+                                   {"handover": {}}, {"handover": []}, {"handover": ["in_person"]}])
 def test_the_bridge_drops_a_handover_not_in_the_closed_set(terms):
     body = {"recourse": {"rail": "cash"}} if terms is None else {"terms": terms, "recourse": {"rail": "cash"}}
     action = _bridged(body)

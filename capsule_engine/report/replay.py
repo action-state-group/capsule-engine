@@ -87,7 +87,7 @@ from cll.ledger.api import LedgerAPI
 from ..folds.definition import FoldDefinition
 from ..folds.duration import parse_duration_seconds
 from ..guards import ALLOW, ESCALATE, Action, GuardDecision, GuardEngine, LocalSigner
-from ..guards.action import HANDOVERS, disclosed_classes_of, repeat_disclosures_of
+from ..guards.action import disclosed_classes_of, handover_of, repeat_disclosures_of
 from ..guards.checks.caps import EXECUTED_DECISION, SPEND_UNREADABLE, counts_executed_acts
 from ..guards.history_state import CHECK_FP_ALGS, RULES_HISTORY_DAYS, well_formed_counterparty
 from ..guards.statements import StatementRecord, claim_of, make_statement_record
@@ -310,11 +310,10 @@ def _flag(value: object) -> bool | None:
 
 def _handover(body: dict) -> str | None:
     """How the item reaches the buyer, as the check's ``terms.handover``
-    states it: carried only as a member of ``HANDOVERS``, and dropped
+    states it: carried only as a member of ``HANDOVERS`` (``handover_of``), and dropped
     otherwise (a rail allowed only in person then fails, as with none)."""
     terms = body.get("terms")
-    value = terms.get("handover") if isinstance(terms, dict) else None
-    return value if isinstance(value, str) and value in HANDOVERS else None
+    return handover_of(terms.get("handover")) if isinstance(terms, dict) else None
 
 
 def _payee_target(counterparty_ids: dict[str, str] | None, fp_alg: str | None) -> str | None:

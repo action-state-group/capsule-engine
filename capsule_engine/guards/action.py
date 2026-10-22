@@ -51,6 +51,13 @@ DISCLOSED_CLASSES = frozenset({
 HANDOVERS = frozenset({"in_person", "shipped"})
 
 
+def handover_of(value: object) -> str | None:
+    """``value`` as ``Action.handover``: a member of ``HANDOVERS``, or ``None``
+    for anything else, a non-string included (a rail allowed only in person
+    then fails, as with none)."""
+    return value if isinstance(value, str) and value in HANDOVERS else None
+
+
 def disclosed_classes_of(value: object) -> tuple[str, ...] | None:
     """``value`` as ``Action.disclosed_classes``: its classes sorted and each
     named once, or ``None`` when it is not a non-empty list of members of
@@ -290,7 +297,7 @@ class Action:
             )
         if self.recipient_told_before is not None and not isinstance(self.recipient_told_before, bool):
             raise ValueError("recipient_told_before must be True, False or None")
-        if self.handover is not None and self.handover not in HANDOVERS:
+        if self.handover is not None and handover_of(self.handover) is None:
             raise ValueError(f"handover must be one of {sorted(HANDOVERS)}")
 
         if self.equivalence_key is not None and self.equivalence_key_digest is not None:
@@ -371,7 +378,7 @@ class Action:
             representation_class=payload.get("representation_class"),
             authorized_by=payload.get("authorized_by"),
             proposal_at=payload.get("proposal_at"),
-            handover=payload.get("handover") if payload.get("handover") in HANDOVERS else None,
+            handover=handover_of(payload.get("handover")),
             item_ref=payload.get("item_ref"),
             returned_minor=payload.get("returned_minor"),
             reverses_ref=payload.get("reverses_ref"),
