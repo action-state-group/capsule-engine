@@ -78,8 +78,17 @@
 # acceptance; a credential, a verification code, a payment card or an ID
 # document goes to no one but the platform (s01 decides that), the accepted
 # buyer included. personal_data.share now requires disclosed_classes and
-# takes deal_id, and no longer requires representation_class. No other rule
-# changes.
+# takes deal_id, and no longer requires representation_class.
+#
+# 0.1.5 also checks the payment rail at the seller's commit
+# (seller.destination_rail/1.1.0, capsule-engine#192), where 0.1.4 checked it
+# only on marketplace.sale, a class no deal record carries, so s07 never ran.
+# A commit (agreement.accept) or a sale passes on card or p2p, with venmo,
+# zelle, cash_app and paypal counted as p2p, and on cash only when the item is
+# handed over in person (the commit's terms.handover, sealed as handover). A
+# commit that states no rail fails ("payment method not stated"); a sale with
+# none is not applicable as before. s07 still asks. offer.accept takes the
+# rail and the handover. No other rule changes.
 pack_id: asg/seller/0.1.5
 
 obligations:
@@ -136,8 +145,11 @@ obligations:
     default_disposition: ASK
   - id: s07-payment-rail-the-user-allows
     statement: >-
-      Flags a sale whose payment rail is not one the user allows (today
-      card and p2p), and records the rail it read.
+      Flags a seller's commit or a sale whose payment rail is not one the
+      user allows (today card, and p2p, which counts Venmo, Zelle, Cash App
+      and PayPal), a cash payment unless the item is handed over in person,
+      and a commit that does not state its payment method. It records the
+      rail it read, what it counted it as, and the handover.
     check: destination_rail
     default_disposition: ASK
   - id: s08-stay-within-task-bounds
@@ -207,12 +219,12 @@ action_semantics:
     optional_fields: [representation_class, authorized_by, equivalence_key, cited_mandate_capsule_id]
   - action_type: offer.accept
     action_class: agreement.accept
-    required_fields: [amount_minor, currency, target, task_authority_ref, item_ref, proposal_at]
-    optional_fields: [representation_class, authorized_by, equivalence_key, cited_mandate_capsule_id]
+    required_fields: [amount_minor, currency, target, rail, task_authority_ref, item_ref, proposal_at]
+    optional_fields: [handover, representation_class, authorized_by, equivalence_key, cited_mandate_capsule_id]
   - action_type: sale.complete
     action_class: marketplace.sale
     required_fields: [amount_minor, currency, target, rail, task_authority_ref, item_ref, proposal_at]
-    optional_fields: [representation_class, authorized_by, equivalence_key, cited_mandate_capsule_id]
+    optional_fields: [handover, representation_class, authorized_by, equivalence_key, cited_mandate_capsule_id]
   - action_type: statement.send
     action_class: communication.send
     required_fields: [target, representation_class]
@@ -245,9 +257,10 @@ constraints:
   # One sale, several buyer threads: one accepted commitment.
   - wicket_ref: seller.single_commitment/1.0.0
     digest: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
-  # The rails a buyer may pay on, as an allow-list.
-  - wicket_ref: seller.destination_rail/1.0.0
-    digest: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
+  # The rails a buyer may pay on, as an allow-list, at the commit and on a
+  # sale: cash only in person, the payment apps counted as p2p.
+  - wicket_ref: seller.destination_rail/1.1.0
+    digest: a86844bd3b5132ae5fb04e9009c5c6907ea43c1609df713c45055dd04bcdbe0e
   - wicket_ref: task_authority/1.1.0
     digest: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   # Contact details reach only the buyer who accepted, in the accepting
@@ -390,6 +403,24 @@ fixtures:
       outcome: deny
     - id: share-credential-to-a-after-acceptance
       outcome: deny
+    - id: commit-cash-in-person
+      outcome: allow
+    - id: commit-cash-shipped
+      outcome: escalate
+    - id: commit-cash-with-no-handover
+      outcome: escalate
+    - id: commit-on-a-rail-not-allowed
+      outcome: escalate
+    - id: commit-by-venmo
+      outcome: allow
+    - id: commit-by-zelle
+      outcome: allow
+    - id: commit-stating-no-rail
+      outcome: escalate
+    - id: sale-to-a-by-venmo
+      outcome: allow
+    - id: sale-to-a-by-zelle
+      outcome: allow
 
 # The action taxonomy this pack was authored against. The taxonomy decides
 # whether a gated class asks or refuses on a failure (its approver_role), so

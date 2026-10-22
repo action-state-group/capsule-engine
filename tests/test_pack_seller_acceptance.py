@@ -70,6 +70,9 @@ ITEM = "item-ref:" + hashlib.sha256(b"seller-fixture/item-1").hexdigest()
 # A second item the same user sells, accepted by buyer B: its acceptance is
 # a sealed acceptance, but of another sale by another buyer.
 ITEM_2 = "item-ref:" + hashlib.sha256(b"seller-fixture/item-2").hexdigest()
+# A third item, which buyer A is offered on the payment rails a commit may
+# state: no acceptance of it is sealed, so each commit is decided on its rail.
+ITEM_3 = "item-ref:" + hashlib.sha256(b"seller-fixture/item-3").hexdigest()
 
 # Each buyer's thread, as a check in it states it: its deal, and the buyer's
 # keyed fingerprints by kind (a marketplace profile id, the name and the
@@ -162,7 +165,7 @@ def _commitment(verb: str, action_class: str, name: str, minute: int, target: st
     return Action(verb=verb, operator=OPERATOR, developer=DEVELOPER, action_class=action_class, target=target,
                   amount_minor=amount_minor, currency="USD", task_authority_ref=TASK_REF,
                   equivalence_key=f"{verb}/{name}", action_id=f"{verb}/seller-fixture-{name}",
-                  timestamp=_at(minute), **fields)
+                  timestamp=fields.pop("timestamp", _at(minute)), **fields)
 
 
 def _offer(name: str, minute: int, target: str, amount_minor: int, **fields) -> Action:
@@ -273,13 +276,15 @@ def _scenarios() -> list[tuple[str, Action, str]]:
         ("share-pickup-area-and-phone-to-a-before-acceptance",
          _share("pickup-area-and-phone-a-before", 18, ("pickup_area", "phone"), second=9), DENY),
         # -- buyer A accepts --------------------------------------------------
-        ("acceptance-in-a", _commitment("accept", "agreement.accept", "accept-a", 19, BUYER_A, 175_000), ALLOW),
+        # The commit states its rail, which 0.1.5 checks there (s07).
+        ("acceptance-in-a", _commitment("accept", "agreement.accept", "accept-a", 19, BUYER_A, 175_000,
+                                        rail="card"), ALLOW),
         # -- after the acceptance ---------------------------------------------
         # Any commitment for the same sale in thread B is refused.
         ("second-commitment-in-b", _offer("after-accept-b", 20, BUYER_B, 180_000), DENY),
         # Buyer B accepts the other item: a sealed acceptance of another sale.
         ("acceptance-in-b-of-item-2", _commitment("accept", "agreement.accept", "accept-b-item-2", 21, BUYER_B,
-                                                  175_000, item_ref=ITEM_2), ALLOW),
+                                                  175_000, item_ref=ITEM_2, rail="card"), ALLOW),
         # The address to buyer A, citing A's acceptance: released.
         # recipient_role passes for the buyer and the acceptance re-verifies.
         ("address-to-a-after-acceptance", _address("a-after", 22, BUYER_A, "buyer",
@@ -366,12 +371,35 @@ def _scenarios() -> list[tuple[str, Action, str]]:
                                                   thread={"deal_id": THREAD_A["deal_id"]}), DENY),
         # A class s13 never releases, to the buyer who accepted.
         ("share-credential-to-a-after-acceptance", _share("credential-a-after", 53, ("credential",)), DENY),
+        # The payment rail at the seller's commit (0.1.5, s07 on agreement.accept):
+        # cash passes only in person, the payment apps count as p2p, and a
+        # commit that states no rail asks. Each commits buyer A to ITEM_3,
+        # which no sealed acceptance holds.
+        ("commit-cash-in-person", _rail_commit("cash-in-person", 54, 0, rail="cash", handover="in_person"), ALLOW),
+        ("commit-cash-shipped", _rail_commit("cash-shipped", 54, 1, rail="cash", handover="shipped"), ESCALATE),
+        ("commit-cash-with-no-handover", _rail_commit("cash-no-handover", 54, 2, rail="cash"), ESCALATE),
+        ("commit-on-a-rail-not-allowed", _rail_commit("cheque", 54, 3, rail="cheque"), ESCALATE),
+        ("commit-by-venmo", _rail_commit("venmo", 54, 4, rail="venmo"), ALLOW),
+        ("commit-by-zelle", _rail_commit("zelle", 54, 5, rail="zelle"), ALLOW),
+        ("commit-stating-no-rail", _rail_commit("no-rail", 54, 6), ESCALATE),
+        # The same payment apps on the sale to buyer A, following its acceptance.
+        ("sale-to-a-by-venmo", _commitment("sell", "marketplace.sale", "sale-a-venmo", 55, BUYER_A, 175_000,
+                                           rail="venmo", cited_mandate_capsule_id=CITES_ACCEPTANCE), ALLOW),
+        ("sale-to-a-by-zelle", _commitment("sell", "marketplace.sale", "sale-a-zelle", 56, BUYER_A, 175_000,
+                                           rail="zelle", cited_mandate_capsule_id=CITES_ACCEPTANCE), ALLOW),
     ]
+
+
+def _rail_commit(name: str, minute: int, second: int, **fields) -> Action:
+    """Buyer A's commit to ``ITEM_3`` on the rail and handover ``fields`` state."""
+    return _commitment("accept", "agreement.accept", f"rail-{name}", minute, BUYER_A, 175_000, item_ref=ITEM_3,
+                       timestamp=_at(minute, second), **fields)
 
 
 # The scenarios that decide otherwise under an earlier pack. Before 0.1.4
 # there is no platform role, so an email to the platform is refused; before
-# 0.1.5 a platform may be given only email, so the pickup area is refused. A
+# 0.1.5 a platform may be given only email, so the pickup area is refused,
+# and the payment rail is not checked at the commit (BEFORE_COMMIT_RAIL). A
 # comparison with an earlier pack (test_pack_seller.py) sets
 # EXPECTED_OVERRIDES to these.
 # s13 before 0.1.5 reads the statement class and a citation, which a share
@@ -386,8 +414,13 @@ BEFORE_RELEASE_FROM_HISTORY = {
     "share-phone-to-a-under-another-name": DENY,
     "address-to-a-citing-b-acceptance": DENY,
 }
+# Before 0.1.5 s07 does not run at the commit and counts no payment app as
+# p2p, so the commits it asks on are allowed and the sales by Venmo or Zelle ask.
+BEFORE_COMMIT_RAIL = {"commit-cash-shipped": ALLOW, "commit-cash-with-no-handover": ALLOW,
+                      "commit-on-a-rail-not-allowed": ALLOW, "commit-stating-no-rail": ALLOW,
+                      "sale-to-a-by-venmo": ESCALATE, "sale-to-a-by-zelle": ESCALATE}
 BEFORE_PICKUP_AREA = {"pickup-area-to-the-platform": DENY, "email-and-pickup-area-to-the-platform": DENY,
-                      **BEFORE_RELEASE_FROM_HISTORY}
+                      **BEFORE_RELEASE_FROM_HISTORY, **BEFORE_COMMIT_RAIL}
 BEFORE_PLATFORM = {"email-to-the-platform": DENY, **BEFORE_PICKUP_AREA}
 EXPECTED_OVERRIDES: dict[str, str] = {}
 
@@ -728,6 +761,31 @@ def test_the_sale_following_its_own_acceptance_passes(run):
     assert _constraint(capsule, "single_commitment")["result"] == "pass"
     assert _constraint(capsule, "destination_rail")["result"] == "pass"
     assert _failing(capsule) == []
+
+
+@pytest.mark.parametrize("name", ["commit-cash-in-person", "commit-by-venmo", "commit-by-zelle",
+                                  "sale-to-a-by-venmo", "sale-to-a-by-zelle", "acceptance-in-a"])
+def test_a_commit_or_sale_on_an_allowed_rail_passes_s07(run, name):
+    capsule = run[2][name]
+    assert _constraint(capsule, "destination_rail")["result"] == "pass"
+    assert _failing(capsule) == []
+    assert capsule["disposition"]["decision"] == "accept"
+
+
+@pytest.mark.parametrize("name", ["commit-cash-shipped", "commit-cash-with-no-handover",
+                                  "commit-on-a-rail-not-allowed", "commit-stating-no-rail"])
+def test_a_commit_on_a_rail_the_user_does_not_allow_asks_on_s07_alone(run, name):
+    capsule = run[2][name]
+    assert _failing(capsule) == ["destination_rail"]
+    assert capsule["disposition"]["decision"] == "needs_input"
+
+
+def test_the_handover_is_sealed_and_a_commit_with_no_rail_names_the_gap(run):
+    assert run[2]["commit-cash-in-person"]["asg_payload"]["handover"] == "in_person"
+    assert run[2]["commit-cash-shipped"]["asg_payload"]["handover"] == "shipped"
+    assert "handover" not in run[2]["commit-cash-with-no-handover"]["asg_payload"]
+    (outcome,) = [c for c in run[5]["commit-stating-no-rail"].constraints if c.id == "destination_rail"]
+    assert (outcome.reason, outcome.evidence["missing_field"]) == ("payment method not stated", "rail")
 
 
 def test_an_offer_before_the_required_statement_asks_and_is_not_cleared(run):

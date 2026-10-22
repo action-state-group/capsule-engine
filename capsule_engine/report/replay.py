@@ -87,7 +87,7 @@ from cll.ledger.api import LedgerAPI
 from ..folds.definition import FoldDefinition
 from ..folds.duration import parse_duration_seconds
 from ..guards import ALLOW, ESCALATE, Action, GuardDecision, GuardEngine, LocalSigner
-from ..guards.action import disclosed_classes_of, repeat_disclosures_of
+from ..guards.action import HANDOVERS, disclosed_classes_of, repeat_disclosures_of
 from ..guards.checks.caps import EXECUTED_DECISION, SPEND_UNREADABLE, counts_executed_acts
 from ..guards.history_state import CHECK_FP_ALGS, RULES_HISTORY_DAYS, well_formed_counterparty
 from ..guards.statements import StatementRecord, claim_of, make_statement_record
@@ -308,6 +308,15 @@ def _flag(value: object) -> bool | None:
     return value if isinstance(value, bool) else None
 
 
+def _handover(body: dict) -> str | None:
+    """How the item reaches the buyer, as the check's ``terms.handover``
+    states it: carried only as a member of ``HANDOVERS``, and dropped
+    otherwise (a rail allowed only in person then fails, as with none)."""
+    terms = body.get("terms")
+    value = terms.get("handover") if isinstance(terms, dict) else None
+    return value if isinstance(value, str) and value in HANDOVERS else None
+
+
 def _payee_target(counterparty_ids: dict[str, str] | None, fp_alg: str | None) -> str | None:
     """The payee's sealed fingerprint as an opaque target,
     ``payee-fp:<fp_alg>:<hex>``. Prefixed so it never compares equal to a
@@ -464,7 +473,8 @@ def _bridge_deal_check(
     payment, and counting both would count it twice.
     The rail and ``refundable`` come from the body's ``recourse`` block, where
     the producer writes them (a top-level ``rail`` is read when there is no
-    recourse rail). The target is the payee's sealed fingerprint
+    recourse rail). The handover comes from the body's ``terms`` block
+    (``_handover``), as a seller's commit or sale states it. The target is the payee's sealed fingerprint
     (``_payee_target``) from the counterparty block the check seals
     (``_checked_body``), typed or not, so a check sealing none has no target;
     or ``counterparty_profile``'s when it is given in
@@ -545,6 +555,7 @@ def _bridge_deal_check(
         counterparty_ids=counterparty_ids,
         counterparty_fp_alg=fp_alg,
         refundable=_flag(recourse.get("refundable")),
+        handover=_handover(body),
         recipient_role=_text(body.get("recipient_role")),
         disclosed_classes=disclosed_classes_of(body.get("disclosing")),
         repeat_disclosures=repeat_disclosures_of(body.get("repeat_disclosures")),

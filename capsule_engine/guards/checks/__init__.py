@@ -67,6 +67,9 @@ CONFIGURED_CHECKS: dict[str, Callable[[Action, LedgerAPI, dict], CheckOutcome]] 
         watched_rails=config.get("watched_rails", []),
         allowed_rails=config.get("allowed_rails"),
         action_classes=config["action_classes"],
+        in_person_rails=config.get("in_person_rails"),
+        rail_aliases=config.get("rail_aliases"),
+        missing_rail=config.get("missing_rail"),
     ),
     "counterparty_identity_change": lambda action, ledger, config: check_counterparty_identity_change(
         action, ledger, action_classes=config["action_classes"]

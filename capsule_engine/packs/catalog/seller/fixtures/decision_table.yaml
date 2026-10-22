@@ -58,6 +58,13 @@
 # naming no deal or two, one with no fingerprint and a credential fail it.
 # Under 0.1.5, address-to-a-citing-b-acceptance is in A's own accepted deal
 # and s13 reads no citation, so it passes.
+#
+# The commit-* rows (0.1.5) commit buyer A to a third item on each payment
+# rail a commit may state; destination_rail (s07) now runs at the commit. Cash
+# in person, Venmo and Zelle (counted as p2p) pass; cash shipped, cash with no
+# handover, a rail not allowed and a commit stating no rail fail it alone and
+# escalate. sale-to-a-by-venmo and sale-to-a-by-zelle pass it on the sale. The
+# two acceptances state card, so destination_rail passes on them.
 
 rows:
   - scenario: condition-told-to-a
@@ -428,14 +435,13 @@ rows:
     verdict: deny
   - scenario: acceptance-in-a
     action_id: accept/seller-fixture-accept-a
-    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: n/a, price_floor: pass, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: pass, offer_expiry: pass, single_commitment: pass, destination_rail: n/a, task_authority: pass, release_on_acceptance: n/a}
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: n/a, price_floor: pass, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: pass, offer_expiry: pass, single_commitment: pass, destination_rail: pass, task_authority: pass, release_on_acceptance: n/a}
     n_a:
       caps: {population: c}
       verify_before_dispatch: {population: c}
       recipient_role: {population: c}
       promise_requires_approval: {population: a, missing_field: representation_class}
       promise_never: {population: a, missing_field: representation_class}
-      destination_rail: {population: c}
       release_on_acceptance: {population: c}
     verdict: allow
   - scenario: second-commitment-in-b
@@ -452,14 +458,13 @@ rows:
     verdict: deny
   - scenario: acceptance-in-b-of-item-2
     action_id: accept/seller-fixture-accept-b-item-2
-    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: n/a, price_floor: pass, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: pass, offer_expiry: pass, single_commitment: pass, destination_rail: n/a, task_authority: pass, release_on_acceptance: n/a}
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: n/a, price_floor: pass, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: pass, offer_expiry: pass, single_commitment: pass, destination_rail: pass, task_authority: pass, release_on_acceptance: n/a}
     n_a:
       caps: {population: c}
       verify_before_dispatch: {population: c}
       recipient_role: {population: c}
       promise_requires_approval: {population: a, missing_field: representation_class}
       promise_never: {population: a, missing_field: representation_class}
-      destination_rail: {population: c}
       release_on_acceptance: {population: c}
     verdict: allow
   - scenario: address-to-a-after-acceptance
@@ -906,3 +911,100 @@ rows:
       destination_rail: {population: c}
       task_authority: {population: c}
     verdict: deny
+  - scenario: commit-cash-in-person
+    action_id: accept/seller-fixture-rail-cash-in-person
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: n/a, price_floor: pass, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: pass, offer_expiry: pass, single_commitment: pass, destination_rail: pass, task_authority: pass, release_on_acceptance: n/a}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      recipient_role: {population: c}
+      promise_requires_approval: {population: a, missing_field: representation_class}
+      promise_never: {population: a, missing_field: representation_class}
+      release_on_acceptance: {population: c}
+    verdict: allow
+  - scenario: commit-cash-shipped
+    action_id: accept/seller-fixture-rail-cash-shipped
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: n/a, price_floor: pass, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: pass, offer_expiry: pass, single_commitment: pass, destination_rail: fail, task_authority: pass, release_on_acceptance: n/a}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      recipient_role: {population: c}
+      promise_requires_approval: {population: a, missing_field: representation_class}
+      promise_never: {population: a, missing_field: representation_class}
+      release_on_acceptance: {population: c}
+    verdict: escalate
+  - scenario: commit-cash-with-no-handover
+    action_id: accept/seller-fixture-rail-cash-no-handover
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: n/a, price_floor: pass, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: pass, offer_expiry: pass, single_commitment: pass, destination_rail: fail, task_authority: pass, release_on_acceptance: n/a}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      recipient_role: {population: c}
+      promise_requires_approval: {population: a, missing_field: representation_class}
+      promise_never: {population: a, missing_field: representation_class}
+      release_on_acceptance: {population: c}
+    verdict: escalate
+  - scenario: commit-on-a-rail-not-allowed
+    action_id: accept/seller-fixture-rail-cheque
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: n/a, price_floor: pass, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: pass, offer_expiry: pass, single_commitment: pass, destination_rail: fail, task_authority: pass, release_on_acceptance: n/a}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      recipient_role: {population: c}
+      promise_requires_approval: {population: a, missing_field: representation_class}
+      promise_never: {population: a, missing_field: representation_class}
+      release_on_acceptance: {population: c}
+    verdict: escalate
+  - scenario: commit-by-venmo
+    action_id: accept/seller-fixture-rail-venmo
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: n/a, price_floor: pass, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: pass, offer_expiry: pass, single_commitment: pass, destination_rail: pass, task_authority: pass, release_on_acceptance: n/a}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      recipient_role: {population: c}
+      promise_requires_approval: {population: a, missing_field: representation_class}
+      promise_never: {population: a, missing_field: representation_class}
+      release_on_acceptance: {population: c}
+    verdict: allow
+  - scenario: commit-by-zelle
+    action_id: accept/seller-fixture-rail-zelle
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: n/a, price_floor: pass, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: pass, offer_expiry: pass, single_commitment: pass, destination_rail: pass, task_authority: pass, release_on_acceptance: n/a}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      recipient_role: {population: c}
+      promise_requires_approval: {population: a, missing_field: representation_class}
+      promise_never: {population: a, missing_field: representation_class}
+      release_on_acceptance: {population: c}
+    verdict: allow
+  - scenario: commit-stating-no-rail
+    action_id: accept/seller-fixture-rail-no-rail
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: n/a, price_floor: pass, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: pass, offer_expiry: pass, single_commitment: pass, destination_rail: fail, task_authority: pass, release_on_acceptance: n/a}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      recipient_role: {population: c}
+      promise_requires_approval: {population: a, missing_field: representation_class}
+      promise_never: {population: a, missing_field: representation_class}
+      release_on_acceptance: {population: c}
+    verdict: escalate
+  - scenario: sale-to-a-by-venmo
+    action_id: sell/seller-fixture-sale-a-venmo
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: pass, recipient_role: n/a, price_floor: pass, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: pass, offer_expiry: pass, single_commitment: pass, destination_rail: pass, task_authority: pass, release_on_acceptance: n/a}
+    n_a:
+      caps: {population: c}
+      recipient_role: {population: c}
+      promise_requires_approval: {population: a, missing_field: representation_class}
+      promise_never: {population: a, missing_field: representation_class}
+      release_on_acceptance: {population: c}
+    verdict: allow
+  - scenario: sale-to-a-by-zelle
+    action_id: sell/seller-fixture-sale-a-zelle
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: pass, recipient_role: n/a, price_floor: pass, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: pass, offer_expiry: pass, single_commitment: pass, destination_rail: pass, task_authority: pass, release_on_acceptance: n/a}
+    n_a:
+      caps: {population: c}
+      recipient_role: {population: c}
+      promise_requires_approval: {population: a, missing_field: representation_class}
+      promise_never: {population: a, missing_field: representation_class}
+      release_on_acceptance: {population: c}
+    verdict: allow

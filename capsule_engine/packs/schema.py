@@ -140,6 +140,7 @@ NORMALIZED_ACTION_FIELDS = frozenset(
         "representation_class",
         "authorized_by",
         "proposal_at",
+        "handover",
         "item_ref",
         "deal_id",
     }

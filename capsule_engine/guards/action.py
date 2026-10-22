@@ -45,6 +45,12 @@ DISCLOSED_CLASSES = frozenset({
 })
 
 
+# How a sold item reaches the buyer, as the producer seals it
+# (x-deal-v0 ``terms.handover``): handed over in person (at a pickup) or
+# shipped. Closed, so the sealed value is a token and never a place.
+HANDOVERS = frozenset({"in_person", "shipped"})
+
+
 def disclosed_classes_of(value: object) -> tuple[str, ...] | None:
     """``value`` as ``Action.disclosed_classes``: its classes sorted and each
     named once, or ``None`` when it is not a non-empty list of members of
@@ -160,6 +166,10 @@ class Action:
     the decision (``promise_never`` records it and ignores it).
     ``proposal_at`` is the RFC 3339 UTC timestamp of the proposal the action
     acts on, read by ``offer_expiry``.
+    ``handover`` is how a sold item reaches the buyer, one member of
+    ``HANDOVERS`` (``in_person`` or ``shipped``), as a seller's commit or
+    sale states it (``terms.handover``), read by ``destination_rail`` for a
+    rail allowed only in person (cash at a pickup).
     ``item_ref`` is an opaque reference to the item a sale is about, stable
     across every buyer thread of that sale, compared for equality and never
     opened, read by ``single_commitment``.
@@ -239,6 +249,7 @@ class Action:
     representation_class: str | None = None
     authorized_by: str | None = None
     proposal_at: str | None = None
+    handover: str | None = None
     item_ref: str | None = None
     returned_minor: int | None = None
     reverses_ref: str | None = None
@@ -279,6 +290,8 @@ class Action:
             )
         if self.recipient_told_before is not None and not isinstance(self.recipient_told_before, bool):
             raise ValueError("recipient_told_before must be True, False or None")
+        if self.handover is not None and self.handover not in HANDOVERS:
+            raise ValueError(f"handover must be one of {sorted(HANDOVERS)}")
 
         if self.equivalence_key is not None and self.equivalence_key_digest is not None:
             raise ValueError(
@@ -358,6 +371,7 @@ class Action:
             representation_class=payload.get("representation_class"),
             authorized_by=payload.get("authorized_by"),
             proposal_at=payload.get("proposal_at"),
+            handover=payload.get("handover") if payload.get("handover") in HANDOVERS else None,
             item_ref=payload.get("item_ref"),
             returned_minor=payload.get("returned_minor"),
             reverses_ref=payload.get("reverses_ref"),

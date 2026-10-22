@@ -12,9 +12,13 @@ else to it, and s13 does not apply to it; only the email-to-the-platform
 scenario decides differently. 0.1.5 is 0.1.4 with the listing's public pickup
 area (pickup_area) also passing to a platform (seller.recipient_role/1.2.0),
 and with s13 reading the classes of data a share gives and binding the
-acceptance from the history (seller.release_on_acceptance/1.2.0): the
-scenarios giving a platform the pickup area, and the shares to a buyer the
-new s13 releases, decide differently.
+acceptance from the history (seller.release_on_acceptance/1.2.0), and with
+the payment rail checked at the seller's commit too
+(seller.destination_rail/1.1.0: cash only in person, the payment apps
+counted as p2p, a commit stating no rail asks): the scenarios giving a
+platform the pickup area, the shares to a buyer the new s13 releases, and
+the rows s07 now checks at a commit or counts a payment app on decide
+differently.
 
 The scenarios are in ``test_pack_seller_acceptance.py``; this file pins the
 pack's own content, so a definition cited at another digest or a rule
@@ -74,7 +78,7 @@ CITED = [
     "required_disclosure/1.1.0",
     "offer_expiry/1.0.1",
     "seller.single_commitment/1.0.0",
-    "seller.destination_rail/1.0.0",
+    "seller.destination_rail/1.1.0",
     "task_authority/1.1.0",
     "seller.release_on_acceptance/1.2.0",
 ]
@@ -202,25 +206,38 @@ def test_0_1_4_changes_only_s01_and_s13():
     assert release.config["except_recipient_roles"] == ["platform"]
 
 
-def test_0_1_5_changes_only_s01_and_s13():
+def test_0_1_5_changes_only_s01_s07_and_s13():
     """0.1.5 cites seller.recipient_role/1.2.0 and
-    seller.release_on_acceptance/1.2.0 where 0.1.4 cited 1.1.0, and changes
-    nothing else it cites or declares; only those two rules' statements and
-    the share's action semantics change."""
+    seller.release_on_acceptance/1.2.0 where 0.1.4 cited 1.1.0, and
+    seller.destination_rail/1.1.0 where it cited 1.0.0, and changes nothing
+    else it cites or declares; only those three rules' statements and the
+    share's, the acceptance's and the sale's action semantics change. s07
+    still asks; offer.accept requires the rail and takes the handover, and a
+    sale takes the handover."""
     old = load_pack_dir(FROZEN_0_1_4_DIR)
     swapped = [w.wicket_id for w in old.constraints]
     for wicket_id in ("seller.recipient_role", "seller.release_on_acceptance"):
         swapped[swapped.index(f"{wicket_id}/1.1.0")] = f"{wicket_id}/1.2.0"
+    swapped[swapped.index("seller.destination_rail/1.0.0")] = "seller.destination_rail/1.1.0"
     assert [w.wicket_id for w in PACK.constraints] == swapped
     assert [f.fold_id for f in PACK.folds] == [f.fold_id for f in old.folds]
     assert [(o.id, o.check, o.default_disposition) for o in PACK.obligations] == [
         (o.id, o.check, o.default_disposition) for o in old.obligations]
     changed = [o.id for o, was in zip(PACK.obligations, old.obligations, strict=True) if o.statement != was.statement]
-    assert changed == ["s01-personal-data-to-the-buyer-or-the-user", "s13-personal-data-only-to-the-buyer-who-accepted"]
+    assert changed == ["s01-personal-data-to-the-buyer-or-the-user", "s07-payment-rail-the-user-allows",
+                       "s13-personal-data-only-to-the-buyer-who-accepted"]
     semantics = [a.action_type for a, was in zip(PACK.action_semantics, old.action_semantics, strict=True) if a != was]
-    assert semantics == ["personal_data.share"]
+    assert semantics == ["offer.accept", "sale.complete", "personal_data.share"]
+    by_type = {a.action_type: a for a in PACK.action_semantics}
+    was = {a.action_type: a for a in old.action_semantics}
+    assert set(by_type["offer.accept"].required_fields) - set(was["offer.accept"].required_fields) == {"rail"}
+    assert "handover" in by_type["offer.accept"].optional_fields
+    assert "handover" in by_type["sale.complete"].optional_fields
     (role,) = [w for w in PACK.constraints if w.check == "recipient_role"]
     assert role.config["role_classes"] == {"platform": ["email", "pickup_area"]}
+    (rail,) = [w for w in PACK.constraints if w.check == "destination_rail"]
+    assert rail.config["action_classes"] == ["agreement.accept", "marketplace.sale"]
+    assert rail.config["missing_rail"] == {"agreement.accept": "fail"}
 
 
 def test_it_cites_no_spending_limit_and_no_rule_is_measured_by_one():
@@ -330,23 +347,31 @@ def test_0_1_4_decides_every_scenario_as_0_1_3_did_but_the_email_to_the_platform
                 assert record.get("evidence_digest") == before[check_id].get("evidence_digest"), (name, check_id)
 
 
-def test_0_1_5_decides_every_scenario_as_0_1_4_did_but_the_pickup_area_and_the_released_shares(tmp_path):
-    """Two kinds of scenario decide differently. The two giving the platform
+def test_0_1_5_decides_every_scenario_as_0_1_4_did_but_the_pickup_area_the_released_shares_and_the_rail(
+        tmp_path):
+    """Three kinds of scenario decide differently. The two giving the platform
     the listing's pickup area: 0.1.4 refused them on s01, 0.1.5 allows them.
     The shares to a buyer s13 1.2.0 releases (the pickup area before
     acceptance, each class to the buyer who accepted in the accepting deal):
     0.1.4's s13 read a statement class and a citation they do not carry, or
-    refused the citation, and 0.1.5's passes them. Every other scenario has
-    the same disposition and every constraint the same result, with the same
-    evidence except recipient_role's (it records the platform's classes),
-    s13's (it records the classes of data read) and the checks naming an
-    earlier capsule."""
+    refused the citation, and 0.1.5's passes them. And the rows s07 now
+    checks at the commit or counts a payment app on: 0.1.4 held s07 out of
+    scope at every commit, 0.1.5 passes a commit on an allowed rail and asks
+    on the others, and passes a sale by Venmo or Zelle that 0.1.4 asked on.
+    Every other scenario has the same disposition and every constraint the
+    same result, with the same evidence except recipient_role's (it records
+    the platform's classes), s13's (it records the classes of data read),
+    destination_rail's (it records how the rail was counted and the handover)
+    and the checks naming an earlier capsule."""
     acceptance = _acceptance_module()
     old = _scenario_run(FROZEN_0_1_4_DIR, tmp_path / "0.1.4")
     new = _scenario_run(PACK_DIR, tmp_path / "0.1.5")
     assert list(old) == list(new) and len(new) == len(PACK.fixtures.scenarios)
     pickup_area = {"pickup-area-to-the-platform", "email-and-pickup-area-to-the-platform"}
     released = set(acceptance.BEFORE_RELEASE_FROM_HISTORY)
+    commits = {name for name in new if new[name]["asg_payload"].get("action_class") == "agreement.accept"}
+    assert {"acceptance-in-a", "acceptance-in-b-of-item-2", "commit-stating-no-rail"} <= commits
+    by_app = {"sale-to-a-by-venmo", "sale-to-a-by-zelle"}
     for name in new:
         before, after = _constraints(old[name]), _constraints(new[name])
         assert list(after) == list(before), name
@@ -356,10 +381,18 @@ def test_0_1_5_decides_every_scenario_as_0_1_4_did_but_the_pickup_area_and_the_r
             assert (old[name]["disposition"]["decision"], new[name]["disposition"]["decision"]) == (
                 "reject", "accept"), name
             continue
+        if name in commits | by_app:
+            assert before["destination_rail"]["result"] == ("n/a" if name in commits else "fail"), name
+            moved = "fail" if acceptance.BEFORE_COMMIT_RAIL.get(name) == ALLOW else "pass"
+            assert after["destination_rail"]["result"] == moved, name
+            for check_id, record in after.items():
+                if check_id != "destination_rail":
+                    assert record["result"] == before[check_id]["result"], (name, check_id)
+            continue
         assert new[name]["disposition"] == old[name]["disposition"], name
         for check_id, record in after.items():
             assert record["result"] == before[check_id]["result"], (name, check_id)
-            if check_id not in NAMES_A_CAPSULE_ID | {"recipient_role", "release_on_acceptance"}:
+            if check_id not in NAMES_A_CAPSULE_ID | {"recipient_role", "release_on_acceptance", "destination_rail"}:
                 assert record.get("evidence_digest") == before[check_id].get("evidence_digest"), (name, check_id)
 
 
