@@ -37,8 +37,10 @@ def _looks_like_raw_account_number(value: str) -> bool:
 # The classes of personal data a disclosure may name, as the producer names
 # them (capsule-cli plugins/internal/plugin/deal_rules.go disclosureClasses).
 # Closed, so a value sealed as one is a class name and never the data.
+# pickup_area is the public area a listing shows (a ZIP or region), apart
+# from pickup_location, the exact spot; it is not an address class.
 DISCLOSED_CLASSES = frozenset({
-    "name", "phone", "email", "home_address", "address", "pickup_location", "other_contact",
+    "name", "phone", "email", "home_address", "address", "pickup_location", "pickup_area", "other_contact",
     "credential", "verification_code", "payment_card", "id_document",
 })
 
