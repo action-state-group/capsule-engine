@@ -88,7 +88,13 @@
 # handed over in person (the commit's terms.handover, sealed as handover). A
 # commit that states no rail fails ("payment method not stated"); a sale with
 # none is not applicable as before. s07 still asks. offer.accept takes the
-# rail and the handover. No other rule changes.
+# rail and the handover.
+# s06 (offer_expiry/1.1.0) holds an offer that answers no proposal not
+# applicable: the producer seals no_proposal on an offer when no buyer message
+# was on record before it (capsule-engine#193), and an offer that answers a
+# buyer's message is held to that message's time. A missing proposal time
+# still asks, and so does no_proposal beside a proposal time. No other rule
+# changes.
 pack_id: asg/seller/0.1.5
 
 obligations:
@@ -140,7 +146,11 @@ obligations:
       Flags an offer, an acceptance or a sale acting on a proposal older
       than the configured limit (24 hours), and one whose age cannot be
       established, and records both timestamps or the field it could not
-      read.
+      read. s06 does not apply to an offer made before any buyer message
+      was noted in the deal. A buyer message's time is the sent time the platform showed,
+      when the agent noted one, and otherwise when the agent noted the
+      message. So a message noted late without a sent time reads as newer
+      than it is.
     check: offer_expiry
     default_disposition: ASK
   - id: s07-payment-rail-the-user-allows
@@ -215,8 +225,8 @@ obligations:
 action_semantics:
   - action_type: offer.make
     action_class: marketplace.offer
-    required_fields: [amount_minor, currency, target, task_authority_ref, item_ref, proposal_at]
-    optional_fields: [representation_class, authorized_by, equivalence_key, cited_mandate_capsule_id]
+    required_fields: [amount_minor, currency, target, task_authority_ref, item_ref]
+    optional_fields: [proposal_at, no_proposal, representation_class, authorized_by, equivalence_key, cited_mandate_capsule_id]
   - action_type: offer.accept
     action_class: agreement.accept
     required_fields: [amount_minor, currency, target, rail, task_authority_ref, item_ref, proposal_at]
@@ -252,8 +262,9 @@ constraints:
     digest: 836ae58f704a9c8ab8027fee344ca47ddb3de76a7a1973a650f42a3595e649f4
   - wicket_ref: required_disclosure/1.1.0
     digest: 80f3af6e428f2331f6ab458997d996e172b9fc2e721b55fcf473f4e31d1492c0
-  - wicket_ref: offer_expiry/1.0.1
-    digest: 7bcd363b28475e3fac123fe2b8925f60f36bdaa3d22ebd5004ffe5290c4f2597
+  # An offer that answers no proposal (no_proposal) is not applicable.
+  - wicket_ref: offer_expiry/1.1.0
+    digest: e55083b32ffe5e9415d3ef6455398b42187d9de76aba9f6cc735f3ea71f590f1
   # One sale, several buyer threads: one accepted commitment.
   - wicket_ref: seller.single_commitment/1.0.0
     digest: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
@@ -421,6 +432,12 @@ fixtures:
       outcome: allow
     - id: sale-to-a-by-zelle
       outcome: allow
+    - id: first-offer-answering-no-proposal
+      outcome: allow
+    - id: offer-answering-an-unnamed-message
+      outcome: escalate
+    - id: no-proposal-beside-a-proposal-time
+      outcome: escalate
 
 # The action taxonomy this pack was authored against. The taxonomy decides
 # whether a gated class asks or refuses on a failure (its approver_role), so

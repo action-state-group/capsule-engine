@@ -138,7 +138,10 @@ CONFIGURED_CHECKS: dict[str, Callable[[Action, LedgerAPI, dict], CheckOutcome]] 
         ),
     ),
     "offer_expiry": lambda action, ledger, config: check_offer_expiry(
-        action, max_age_seconds=config["max_age_seconds"], action_classes=config["action_classes"]
+        action,
+        max_age_seconds=config["max_age_seconds"],
+        action_classes=config["action_classes"],
+        no_proposal_classes=config.get("no_proposal_classes"),
     ),
     "promise_never": lambda action, ledger, config: check_promise_never(
         action,

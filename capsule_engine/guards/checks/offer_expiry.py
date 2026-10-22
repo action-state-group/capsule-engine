@@ -11,6 +11,17 @@ proposal later than the action) the check also fails, with
 ``expiry_unverified`` and the field it could not read: an offer whose
 expiry is unknown is never let through as current. Applies only to the
 configured ``action_classes``.
+
+With ``no_proposal_classes`` configured (``offer_expiry/1.1.0``), an action
+in one of those classes that carries ``Action.no_proposal`` (the sealed rule
+input: the offer answers no proposal) with no ``proposal_at`` is not
+applicable: there is no proposal to go stale. ``no_proposal`` beside a
+``proposal_at`` contradicts itself and fails, with ``expiry_unverified``.
+The bridge never sets ``no_proposal`` from a check that names a ``source``
+ref (``report/replay.py``), so such a check is decided on its proposal's
+age, or fails as missing one. Without
+``no_proposal_classes`` (``offer_expiry/1.0.1``) ``no_proposal`` is not
+read, so those decisions are unchanged.
 """
 from __future__ import annotations
 
@@ -43,8 +54,15 @@ class UnverifiedEvidence(TypedDict):
     missing_field: str
 
 
+class ContradictionEvidence(TypedDict):
+    expiry_unverified: bool
+    no_proposal_beside: str  # always "proposal_at"
+
+
 def _outcome(
-    result: str, reason: str, evidence: ExpiryEvidence | UnverifiedEvidence | NotApplicableEvidence
+    result: str,
+    reason: str,
+    evidence: ExpiryEvidence | UnverifiedEvidence | ContradictionEvidence | NotApplicableEvidence,
 ) -> CheckOutcome:
     return CheckOutcome(
         constraint=ConstraintOutcome(
@@ -74,10 +92,23 @@ def _utc(value: str) -> datetime | None:
         return None
 
 
-def check_offer_expiry(action: Action, *, max_age_seconds: int, action_classes: list[str]) -> CheckOutcome:
+def check_offer_expiry(
+    action: Action, *, max_age_seconds: int, action_classes: list[str], no_proposal_classes: list[str] | None = None
+) -> CheckOutcome:
     if action.action_class not in action_classes:
         return _outcome("n/a", "the rule is not configured for this action class",
                         not_applicable_evidence(_CHECK_ID, in_scope=False))
+    if no_proposal_classes is not None and action.no_proposal is True:
+        if action.proposal_at is not None:
+            return _outcome(
+                "fail",
+                "the action says it answers no proposal (no_proposal) but also carries a proposal_at, "
+                "so the offer's expiry could not be established",
+                ContradictionEvidence(expiry_unverified=True, no_proposal_beside="proposal_at"),
+            )
+        if action.action_class in no_proposal_classes:
+            return _outcome("n/a", "the action answers no proposal (no_proposal), so there is none to go stale",
+                            not_applicable_evidence(_CHECK_ID, in_scope=True))
     if action.proposal_at is None:
         return _unverified("the action carries no proposal_at", "proposal_at")
     if action.timestamp is None:

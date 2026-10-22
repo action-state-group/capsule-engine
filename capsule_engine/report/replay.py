@@ -267,6 +267,46 @@ def _checked_body(disclosed: dict, *, history: bool = False) -> tuple[dict, obje
     return (body, counterparty) if isinstance(body, dict) else None
 
 
+# The sealed rule input on an offer that answers no proposal (capsule-cli
+# deal_proposal.go), and the ref an offer names the message it answers by.
+_NO_PROPOSAL = "no_proposal"
+_SOURCE = "source"
+
+
+def _is_check(disclosed: dict) -> bool:
+    """Whether ``disclosed`` is a deal check: an ``x-deal-v0`` check record
+    or a typed ``proposed-action/v0``."""
+    block = disclosed.get("x-deal-v0")
+    if isinstance(block, dict):
+        return block.get("record_type") == "check"
+    return disclosed.get("type") == _PROPOSED_TYPE
+
+
+def _refs(disclosed: dict) -> list:
+    """A deal record's refs: an ``x-deal-v0`` record's block refs, else a
+    typed record's own; ``[]`` when it has none in a list."""
+    block = disclosed.get("x-deal-v0")
+    refs = block.get("refs") if isinstance(block, dict) else disclosed.get("refs")
+    return refs if isinstance(refs, list) else []
+
+
+def _names_source(disclosed: dict) -> bool:
+    """Whether a deal record names any ``source`` ref, in whatever shape:
+    a check that does names a proposal it answers, resolved or not."""
+    return any(isinstance(r, dict) and r.get("rel") == _SOURCE for r in _refs(disclosed))
+
+
+def _no_proposal(disclosed: dict, body: dict) -> bool | None:
+    """``True`` when ``disclosed`` is a check whose body seals
+    ``no_proposal: true`` and which names no ``source`` ref; else ``None``. A
+    check naming both says it answers a message, so it is decided on that
+    message's age (``_accepted_offer_at``), or fails as missing one: never
+    as answering no proposal."""
+    if _is_check(disclosed) and body.get(_NO_PROPOSAL) is True and not _names_source(disclosed):
+        return True
+    return None
+
+
 def _is_action_step(disclosed: dict) -> bool:
     """Whether ``disclosed`` is an ``x-deal-v0`` action step: an act carried
     out, as a deal seals it."""
@@ -487,6 +527,9 @@ def _bridge_deal_check(
     ``repeat_disclosures`` is carried the same way, possibly empty, and
     ``recipient_told_before`` only as a boolean (capsule-engine#188); neither
     is sealed on the decision.
+    A check's sealed ``no_proposal`` is carried only when it is ``true`` and
+    the check names no ``source`` ref (``_no_proposal``); it is never read
+    off an act a history entry records.
     ``taxonomy_version`` makes it an act stated against a pinned taxonomy, so
     ``dedupe`` keys it on the act, never on this record's type or id. The
     deal is the one the record names (``_deal_id``), never the ``action_id``
@@ -567,6 +610,7 @@ def _bridge_deal_check(
         offer_fields_changed=_minor(body.get("offer_fields_changed")),
         offer_fields_basis=_text(body.get("offer_fields_basis")),
         task_authority_ref=_basis_task_authority(body) if history else _typed_ref_digest(body.get("task_authority_ref")),
+        no_proposal=_no_proposal(disclosed, body),
         returned_minor=returned,
         reverses_ref=reverses,
         deal_id=deal.value,
@@ -905,9 +949,19 @@ def _accepted_offer_at(records: list[dict], disclosed: dict[str, dict]) -> dict[
     (``_changes_details``), as capsule-cli's offerAccepted reads it. A later
     offer supersedes an earlier one and its acceptance. Every record is read
     within the deal it names (``_deal_id``), in ledger order. A commit with
-    no such offer is left out, so its proposal's age stays unestablished."""
+    no such offer is left out, so its proposal's age stays unestablished.
+
+    A typed offer that names the counterparty's message it answers by its one
+    ``source`` ref gets that message's time (the value capsulectl sends live
+    on the offer): the message record's sealed ``sent_at``, else its sealed
+    ``at``, only when ``sent_at`` is absent (``_message_time``). The message
+    must be a bound ``x-deal-v0`` ``message`` from the
+    counterparty, earlier in ledger order and in the same deal. A withheld,
+    unbound or unresolved message, or more than one ``source`` ref, leaves
+    the offer out, so its proposal's age stays unestablished."""
     latest: dict[str, tuple[str, str | None]] = {}
     accepted: dict[str, str | None] = {}
+    messages: dict[str, tuple[str, str | None]] = {}
     found: dict[str, str] = {}
     for record in records:
         shown = disclosed.get(record.get("capsule_id", ""))
@@ -918,9 +972,15 @@ def _accepted_offer_at(records: list[dict], disclosed: dict[str, dict]) -> dict[
             continue
         body = shown.get("body") if isinstance(shown.get("body"), dict) else {}
         block = shown.get("x-deal-v0")
+        if isinstance(block, dict) and block.get("record_type") == _MESSAGE and body.get("from") == _COUNTERPARTY:
+            messages[json_digest(shown)] = (deal, _message_time(block, body))
         if shown.get("type") == _PROPOSED_TYPE and body.get("action") == _OFFER:
-            latest[deal] = (json_digest(shown), _text(shown.get("at")))
+            digest = json_digest(shown)
+            latest[deal] = (digest, _text(shown.get("at")))
             accepted.pop(deal, None)
+            answered = messages.get(_answered_message(shown) or "")
+            if answered is not None and answered[0] == deal and answered[1] is not None:
+                found[digest] = answered[1]
         elif shown.get("type") == _PROPOSED_TYPE and body.get("action") == _COMMIT:
             at = accepted.get(deal)
             if at is not None:
@@ -932,6 +992,46 @@ def _accepted_offer_at(records: list[dict], disclosed: dict[str, dict]) -> dict[
         elif isinstance(block, dict) and _changes_details(block):
             accepted.pop(deal, None)
     return found
+
+
+# A deal's message record, and who sent it, as capsulectl seals it.
+_MESSAGE, _COUNTERPARTY = "message", "counterparty"
+
+
+# A sealed time as capsulectl writes it: RFC 3339 UTC, whole seconds.
+_SEALED_TIME = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
+
+
+def _sealed_time(value: object) -> datetime | None:
+    if not isinstance(value, str) or not _SEALED_TIME.match(value):
+        return None
+    try:
+        return datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        # The shape matched but the date does not exist: no time.
+        return None
+
+
+def _message_time(block: dict, body: dict) -> str | None:
+    """When a counterparty's message was sent: its sealed ``sent_at`` when the
+    member is present, else its sealed ``at`` (when it was noted). A present
+    ``sent_at`` that is not a real UTC time, or that is later than the
+    message's own ``at``, gives no time: it is never replaced by ``at``."""
+    at = _sealed_time(block.get("at"))
+    if "sent_at" not in body:
+        return block["at"] if at is not None else None
+    sent = _sealed_time(body["sent_at"])
+    if sent is None or at is None or sent > at:
+        return None
+    return body["sent_at"]
+
+
+def _answered_message(shown: dict) -> str | None:
+    """The digest a typed offer's one ``source`` ref names, when it has
+    exactly one and it is a SHA-256 typed ref; else ``None``."""
+    refs = shown.get("refs")
+    found = [r for r in refs if isinstance(r, dict) and r.get("rel") == _SOURCE] if isinstance(refs, list) else []
+    return _typed_ref_digest(found[0]) if len(found) == 1 else None
 
 
 def _record_type(shown: dict) -> str | None:
@@ -1293,8 +1393,9 @@ def replay(
     later check in the same deal finds it made first. A claim the sources
     give more than once is written once.
     A seller's typed commit is decided with ``proposal_at`` the sealed time
-    of the accepted offer it rests on (``_accepted_offer_at``), so
-    ``offer_expiry`` reads that offer's age.
+    of the accepted offer it rests on, and a typed offer with the time of the
+    counterparty's message it answers by its ``source`` ref
+    (``_accepted_offer_at``), so ``offer_expiry`` reads that proposal's age.
     Each record is evaluated under the action taxonomy it was sealed with,
     where the engine carries that version, so history at a carried version is
     never refused for its version. A record naming one it does not carry

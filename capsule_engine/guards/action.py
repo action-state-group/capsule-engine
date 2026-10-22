@@ -177,6 +177,10 @@ class Action:
     ``HANDOVERS`` (``in_person`` or ``shipped``), as a seller's commit or
     sale states it (``terms.handover``), read by ``destination_rail`` for a
     rail allowed only in person (cash at a pickup).
+    ``no_proposal`` is ``True`` on an offer whose producer sealed that it
+    answers no proposal (no message from the counterparty was on record
+    before it) and which names no ``source`` ref, read by ``offer_expiry/1.1.0``, which fails it beside a
+    ``proposal_at``. A flag only, sealed when set.
     ``item_ref`` is an opaque reference to the item a sale is about, stable
     across every buyer thread of that sale, compared for equality and never
     opened, read by ``single_commitment``.
@@ -257,6 +261,7 @@ class Action:
     authorized_by: str | None = None
     proposal_at: str | None = None
     handover: str | None = None
+    no_proposal: bool | None = None
     item_ref: str | None = None
     returned_minor: int | None = None
     reverses_ref: str | None = None
@@ -379,6 +384,7 @@ class Action:
             authorized_by=payload.get("authorized_by"),
             proposal_at=payload.get("proposal_at"),
             handover=handover_of(payload.get("handover")),
+            no_proposal=payload.get("no_proposal"),
             item_ref=payload.get("item_ref"),
             returned_minor=payload.get("returned_minor"),
             reverses_ref=payload.get("reverses_ref"),

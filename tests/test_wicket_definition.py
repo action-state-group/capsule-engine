@@ -86,6 +86,8 @@ EXPECTED_DIGESTS = {
     "promise_never/1.0.0": "836ae58f704a9c8ab8027fee344ca47ddb3de76a7a1973a650f42a3595e649f4",
     # Replaces offer_expiry/1.0.0, retired at its digest (RETIRED_DIGESTS below).
     "offer_expiry/1.0.1": "7bcd363b28475e3fac123fe2b8925f60f36bdaa3d22ebd5004ffe5290c4f2597",
+    # An offer that answers no proposal (no_proposal) is not applicable; seller 0.1.5 cites it.
+    "offer_expiry/1.1.0": "e55083b32ffe5e9415d3ef6455398b42187d9de76aba9f6cc735f3ea71f590f1",
     "seller.recipient_role/1.0.0": "001d4d4198921ffec5f492f88286765a075eece1418d15b68576d4fceec7826b",
     # The same platform role for a seller; seller 0.1.4 cites it.
     "seller.recipient_role/1.1.0": "8ea4cc45972a840a56af5f0fefbd6092dee3797696a8cd3303940a98b7b7b35d",
@@ -134,6 +136,7 @@ WITHOUT_SEMANTICS = frozenset(EXPECTED_DIGESTS) - {
     "seller.release_on_acceptance/1.2.0",
     "action_class_gate/1.2.0",
     "seller.destination_rail/1.1.0",
+    "offer_expiry/1.1.0",
 }
 
 
