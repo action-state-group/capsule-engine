@@ -41,7 +41,8 @@ What changed:
 - **Switch-over (§9).** §9 adds the `Join`-built readers and makes the full test run the check.
 - **Sets kept back (§12).** A set held back by §12 is resolved one by one before the
   switch-over, instead of falling back unconditionally.
-- **vocabgate (§9).** vocabgate walks the pinned module's packs, never a copy (Codex round 3).
+- **vocabgate (§3, §9).** vocabgate walks the pinned module's `packs.All`, never a copy (Codex
+  round 3, `claude -p` round 4).
 
 ## 0. Problem, and what this note does not do
 
@@ -111,8 +112,8 @@ the caller passes. Muse passes today's values, so Muse's behavior does not chang
 - `catalogFor` (`source.go`) resolves a source that holds only a pack.yaml against
   `packs.Everyday` / `packs.EverydayDir`, which is everyday 0.3.7 in Muse's hand-written
   `embed.go` today. In the module, `LoadFrom` / `LoadPath` take that fallback catalog as an
-  argument, and `go/packs` exports only versioned names (`Everyday037`, `Seller015`, ...), with
-  no un-versioned alias. Muse keeps its aliases in its own code and passes the same catalog, so a
+  argument. `go/packs` exports only versioned names (`Everyday037`, `Seller015`, ...), plus
+  `All`, the whole tree as one `embed.FS`, and no un-versioned alias. Muse keeps its aliases in its own code and passes the same catalog, so a
   bare `--pack` resolves exactly as it does today.
 
 **Comments, strings and the check.** Comment text that names Muse or a Muse verb is rewritten at
@@ -162,7 +163,8 @@ Go `embed` cannot read outside the module directory, so the module cannot embed 
 directly. Instead, `go/packs/` is a generated tree in Muse's current layout: one
 `<pack>-<version>/` directory per pack version (pack.yaml, the wicket and fold definitions it
 cites, PROVENANCE.json), plus `engine/action_taxonomy.json`. `go run ./internal/gen` writes it,
-together with `packs/embed.go` and the pack registry that `go/pack` reads (the `LoadXxx`
+together with `packs/embed.go` (one `embed.FS` per version, and `All` over the whole tree,
+`engine/PROVENANCE.json` included) and the pack registry that `go/pack` reads (the `LoadXxx`
 functions and `source.go`'s pack list, which are hand-written in Muse today).
 
 The generator has four sources and nothing else:
@@ -391,8 +393,9 @@ the switch-over's parent commit (§10), one actionstate-muse PR does the followi
     `rules27_test.go`. The last two build `../../packs/everyday-0.3.7` with `filepath.Join`;
   - `internal/vocabgate/page_claims_test.go`, which walks `<repo>/packs` to scan the pack text
     the pages actually show. It must not be given a frozen copy, which would go stale at the
-    next pin bump. It walks the pinned module's embedded `packs` file system instead, and that
-    is its one listed adaptation;
+    next pin bump. It walks the pinned module's `packs.All` instead, which holds every file
+    of the tree it walks today, `engine/PROVENANCE.json` included. That is its one listed
+    adaptation;
   - six e2e scripts: `buyer-exits-e2e.sh`, `clean-machine-test.sh`, `history-e2e.sh`,
     `receipt-e2e.sh`, `seller-sale-e2e.sh` and `tester-install-test.sh`.
 
