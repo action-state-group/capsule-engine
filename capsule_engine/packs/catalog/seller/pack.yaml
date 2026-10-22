@@ -141,9 +141,9 @@ obligations:
       Flags an offer, an acceptance or a sale to a counterparty that has
       not first received a statement in each required class (today
       condition): an accepted earlier statement to that counterparty, a
-      claim the agent made in the same deal before it, or the sale's
-      listings in force when it was checked, when every live listing states
-      the class. It records which class is missing. It checks that a statement of the class was
+      claim the agent made in the same deal before it, or, on a sale, the
+      listings in force when the action was checked, if every live listing
+      states the class. It records which class is missing. It checks that a statement of the class was
       recorded, never what it said. An approval does not clear it: the
       action cannot proceed as constructed until the statement is made or
       the task authority changes.

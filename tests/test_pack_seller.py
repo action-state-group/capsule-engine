@@ -264,8 +264,9 @@ def test_it_cites_no_spending_limit_and_no_rule_is_measured_by_one():
     assert load_pack_dir(PACK_DIR).definition_digest() != PACK_0_1_1_DIGEST
 
 
-def _scenario_run(pack_dir: Path, tmp_path: Path):
-    """The fixture's scenarios under ``pack_dir``: each step's capsule, by name."""
+def _scenario_run(pack_dir: Path, tmp_path: Path, decisions: dict | None = None):
+    """The fixture's scenarios under ``pack_dir``: each step's capsule, by
+    name; ``decisions``, when given, collects each step's ``GuardDecision``."""
     acceptance = _acceptance_module()
     acceptance.PACK_DIR = pack_dir
     if pack_dir == FROZEN_0_1_4_DIR:
@@ -274,7 +275,7 @@ def _scenario_run(pack_dir: Path, tmp_path: Path):
         acceptance.EXPECTED_OVERRIDES = acceptance.BEFORE_PLATFORM
     store = LedgerStore(tmp_path / "ledger")
     try:
-        _, _, capsules, _ = acceptance._run_scenarios(store, project_dir=tmp_path / "project")
+        _, _, capsules, _ = acceptance._run_scenarios(store, project_dir=tmp_path / "project", decisions=decisions)
     finally:
         store.close()
     return capsules
@@ -387,8 +388,10 @@ def test_0_1_5_decides_every_scenario_as_0_1_4_did_but_the_pickup_area_shares_ra
     And the offer whose listing stated the condition asked on s05 under 0.1.4
     and passes under 0.1.5."""
     acceptance = _acceptance_module()
-    old = _scenario_run(FROZEN_0_1_4_DIR, tmp_path / "0.1.4")
-    new = _scenario_run(PACK_DIR, tmp_path / "0.1.5")
+    old_decisions: dict = {}
+    new_decisions: dict = {}
+    old = _scenario_run(FROZEN_0_1_4_DIR, tmp_path / "0.1.4", old_decisions)
+    new = _scenario_run(PACK_DIR, tmp_path / "0.1.5", new_decisions)
     assert list(old) == list(new) and len(new) == len(PACK.fixtures.scenarios)
     pickup_area = {"pickup-area-to-the-platform", "email-and-pickup-area-to-the-platform"}
     released = set(acceptance.BEFORE_RELEASE_FROM_HISTORY)
@@ -398,6 +401,21 @@ def test_0_1_5_decides_every_scenario_as_0_1_4_did_but_the_pickup_area_shares_ra
     # s06 under 1.1.0 reads no_proposal; 1.0.1 never did.
     no_proposal = {"first-offer-answering-no-proposal": (("fail", "n/a"), ("needs_input", "accept")),
                    "no-proposal-beside-a-proposal-time": (("pass", "fail"), ("accept", "needs_input"))}
+    # s05's evidence is 1.1.0's plus the listing's classes, absent on every
+    # scenario but the three listing offers.
+    for name in new:
+        (was,) = [c for c in old_decisions[name].constraints if c.id == "required_disclosure"]
+        (now,) = [c for c in new_decisions[name].constraints if c.id == "required_disclosure"]
+        if now.result == "n/a":
+            assert now.evidence == was.evidence, name
+            continue
+        evidence, before_listing = dict(now.evidence), dict(was.evidence)
+        listing = evidence.pop("listing_classes")
+        if name in acceptance.BEFORE_LISTING:
+            # The listing states the condition: nothing is missing now.
+            assert (before_listing.pop("missing_classes"), evidence.pop("missing_classes")) == (["condition"], []), name
+        assert evidence == before_listing, name
+        assert (listing is None) == (not name.startswith("offer-after-")), name
     for name in new:
         before, after = _constraints(old[name]), _constraints(new[name])
         assert list(after) == list(before), name
