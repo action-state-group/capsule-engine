@@ -1,6 +1,6 @@
 # Design note: the Go guard moves into this repo as a `go/` module
 
-Status: v2, for review, 2026-10-22. Ethan's agent (session engine-go-210). Reviewers: Codex, a
+Status: v3, for review, 2026-10-22. Ethan's agent (session engine-go-210). Reviewers: Codex, a
 `claude -p --permission-mode plan` stand-in for Kimi (Kimi is out of quota), and Sherlock2 (this
 note moves code ownership between ASG repositories).
 
@@ -28,6 +28,19 @@ What changed:
 - **Sequencing and review (§10).** §10 names the source commit, carries the double-maintenance
   rule into Muse, and asks Sherlock2 to review PR A.
 - **Local-only boundary (§13).** New: the AGENTS.md local-only boundary for Go.
+
+**v3.** This version takes round 2 from Codex and the `claude -p` stand-in. What changed:
+
+- **Coverage gate (§7).** The gate has an exemption list with a reason for each entry, starting
+  with `verify_before_dispatch/1.0.0`, and a Go error can be pinned.
+- **Go runners (§2, §5).** The runners sit in `package guard`, so they read the unexported reason
+  fields with no API change. Each kind's input keeps the side inputs its tests pass today
+  (§5).
+- **Pack defaults (§1, §3).** The un-versioned pack aliases and the built-in catalog default
+  become caller-side, like `partyPacks`.
+- **Switch-over (§9).** §9 adds the `Join`-built readers and makes the full test run the check.
+- **Sets kept back (§12).** A set held back by §12 is resolved one by one before the
+  switch-over, instead of falling back unconditionally.
 
 ## 0. Problem, and what this note does not do
 
@@ -73,7 +86,7 @@ moves. Whatever names Muse, or exists for one Muse verb or one Muse release deci
 |---|---|---|
 | `internal/canon` (JCS values, `json.go`) | `go/canon` | a canonical JSON port, used by every digest |
 | `internal/pack` (loader, digests, fold definitions, pack source) | `go/pack` | the pack runtime: the Go half of `capsule_engine/packs`, `guards/wickets/loader.py` and `folds/` |
-| `internal/pack` `partyPacks` / `ForPartyRole` / `KnownPartyRole` (which pack version serves which party role) | stays in Muse, as a caller-supplied map | which pack a product serves is that product's release decision (Muse #248 switches it for rc21) |
+| `internal/pack` `partyPacks` / `ForPartyRole` / `KnownPartyRole` (which pack version serves which party role), and `packs`' un-versioned aliases (`Everyday`, `EverydayDir`, `Seller`, ...) with `catalogFor`'s built-in catalog default | stay in Muse, as caller-supplied values | which pack a product serves, and which catalog a bare `--pack` resolves against, are that product's release decisions (Muse #248 switches them for rc21) |
 | `packs/` (embedded byte-for-byte pack copies, `engine/action_taxonomy.json`) | `go/packs`, generated (§3) | copies of this repo's own catalog |
 | `internal/guard`: the engine, gate, checks, fold, record, history, taxonomy and every wicket check (dedupe, caps and operator limits, seen_before, price_floor, offer_expiry, release, single_commitment, promise and statements, task_authority, change checks, party_role, deal_id, commitment) | `go/guard` | a port of `guards/engine.py`, `guards/checks/*` and `folds/engine.py`. Each file's header already names its Python source |
 | `internal/guard`: `check_input.go` (external-check-input/v0), `sale_bundle.go`, `sale_history.go`, `standalone_report.go`, `bundle_replay.go`, `seller_records.go` | `go/guard` | they read neutral formats (agent-action-capsule and capsulectl), mirroring `report/replay.py`, `report/live_history.py` and `report/sale_bundle.py` |
@@ -81,7 +94,7 @@ moves. Whatever names Muse, or exists for one Muse verb or one Muse release deci
 | `internal/guard` tests and `testdata/` (44 vector sets, 47 Python generators) | `go/guard`, after the §12 gate | the parity evidence goes where the code goes. A set that fails §12 stays in Muse (§9) |
 | `internal/plugin` (including `limits_say.go`, approval cards and narration), `internal/limits`, `internal/rules`, `internal/rulesresult`, `internal/presentation`, `internal/checkup`, `internal/vocabgate`, the normalizer and the disposition resolver | stay in Muse | Muse verbs, Muse wording, Muse state |
 
-**Caller-side parameters.** Three Muse-shaped details inside the moving files become parameters
+**Caller-side parameters.** Four Muse-shaped details inside the moving files become parameters
 the caller passes. Muse passes today's values, so Muse's behavior does not change:
 
 - `standalone_report.go`'s `copyAudiences` (`counterparty`, `keep`: "the audiences Muse reads")
@@ -94,6 +107,12 @@ the caller passes. Muse passes today's values, so Muse's behavior does not chang
   today (`action.go`, `party_role.go`). The module keeps the loaders (`pack.LoadSeller015`, ...)
   and has no default map. `UnknownPartyRoleError`'s text ("not one this plugin knows") moves to
   Muse with the map.
+- `catalogFor` (`source.go`) resolves a source that holds only a pack.yaml against
+  `packs.Everyday` / `packs.EverydayDir`, which is everyday 0.3.7 in Muse's hand-written
+  `embed.go` today. In the module, `LoadFrom` / `LoadPath` take that fallback catalog as an
+  argument, and `go/packs` exports only versioned names (`Everyday037`, `Seller015`, ...), with
+  no un-versioned alias. Muse keeps its aliases in its own code and passes the same catalog, so a
+  bare `--pack` resolves exactly as it does today.
 
 **Comments, strings and the check.** Comment text that names Muse or a Muse verb is rewritten at
 the move. No identifier or string literal that reaches output changes. One such string stays as
@@ -120,10 +139,9 @@ go/
   packs/                generated pack tree, embed.go and registry (§3)
   guard/                from internal/guard
   guard/testdata/       the moved vector sets that pass §12
-  conformance/          the Go runners for conformance-vectors/guard/v0 (§5)
   internal/gen/         `go run ./internal/gen` writes packs/ from the catalog
 conformance-vectors/
-  guard/v0/             shared vectors (§5), read by tests/ and by go/conformance
+  guard/v0/             shared vectors (§5), read by tests/ and by go/guard's conformance_test.go
 .github/workflows/conformance.yml
 ```
 
@@ -198,8 +216,11 @@ none of it:
 | kind | input | Go entry point | Python entry point (new, in the library, not in tests) |
 |---|---|---|---|
 | `check-input` | one external-check-input/v0 envelope | `DecodeCheckInput`, then `CheckWithHistory`, with `WithPartyRole` as Go does today | `capsule_engine.report.live_history.decide_check_input(pack_dir, envelope)` |
-| `action-ledger` | an action and its prior decision ledger, run step by step, with each decision appended | `Check(a, ledger)` | `capsule_engine.guards.engine.decide_steps(pack_dir, steps)` |
-| `sale-bundle` | a sale bundle and the action replayed against it | `ReadSaleBundle`, then `CheckSale` / `CheckReplay` | `capsule_engine.report.sale_bundle.decide_sale_bundle(pack_dir, bundle, action)` |
+| `action-ledger` | steps, each an action with its optional task-authority and approval records, run in order, with each decision appended to the next step's ledger | `CheckWithTaskAuthority` / `CheckWithRecords`, as `fixtures_test.go` calls them today | `capsule_engine.guards.engine.decide_steps(pack_dir, steps)` |
+| `sale-bundle` | a sale bundle, its `SaleVerification` (the sale, record and thread verification states the caller supplies) and the action replayed against it | `ReadSaleBundle(raw, v)`, then `CheckSale` / `CheckReplay` | `capsule_engine.report.sale_bundle.decide_sale_bundle(pack_dir, bundle, verification, action)` |
+
+Each kind's input carries every side input its existing tests pass, so a converted case still
+reaches the same authorization and verification-failure branches.
 
 The new Python functions configure the engine the way the Go guard runs: observe mode, the
 runnable checks, the ask sets, the record taxonomy, and the task-authority, floor and
@@ -238,6 +259,14 @@ for each constraint: `result`, `method`, the exact `reason` string, the sealed `
 `blocking` and `check_type`, and the JCS-SHA256 of its evidence. Python keeps `reason` apart from
 `evidence` (`ConstraintOutcome`), and so does Go (`failNote` / `scopeNote`), so the reason is
 compared on its own. A case may also carry the evidence itself, for readable diffs.
+
+`failNote`, `scopeNote` and the other per-constraint fields are unexported. So the Go runner is a
+test in `package guard` (`go/guard/conformance_test.go`), as `promise_11_test.go`'s `goReason`
+is today, and the API does not change.
+
+When a case's Go entry point refuses with an error instead of deciding, such as `ErrCitedMandate`
+for an action that cites a mandate, the case pins the Go side as `{"error": "<sentinel name>"}`
+in `KNOWN-DIFFERENCES.json` beside Python's decision.
 
 **Python writes, Go checks.** Only Python writes `expected`:
 `python -m tools.conformance_vectors --write` runs each case through its kind's Python entry
@@ -295,8 +324,14 @@ no path filter, because a Python-only change can diverge from Go as easily as a 
      reproduces every committed `expected`;
    - run the Go v0 runners over the same files;
    - check `KNOWN-DIFFERENCES.json` pin by pin;
-   - run the coverage gate: for each current pack, every (id, digest) it cites has at least one v0
-     case whose result for it is not n/a.
+   - run the coverage gate. For each current pack, every wicket (id, digest) it cites has at
+     least one v0 case whose result for it is not n/a, and every fold it cites is read by at
+     least one case. The exceptions are listed in `conformance-vectors/guard/v0/COVERAGE-EXEMPT.json`,
+     each with a reason and an issue. The first entry is `verify_before_dispatch/1.0.0`: Go has
+     no capsule verifier, so `checkVerifyBeforeDispatch` always returns n/a and a cited mandate
+     is refused with `ErrCitedMandate`. Its cases pin exactly that. An exemption is never
+     added in the PR that would otherwise fail the gate, unless the pair is new and Go refuses it
+     by design.
 
    A failure prints both sides' outcome, constraint table and evidence.
 3. **`packs`**: `go run ./internal/gen --check`, plus the byte and digest checks of §3 and the
@@ -340,19 +375,26 @@ the switch-over's parent commit (§10), one actionstate-muse PR does the followi
 
 - adds `require github.com/action-state-group/capsule-engine/go v0.1.0`;
 - rewrites the imports of `internal/{guard,pack,canon}` and `packs` to the module paths;
-- moves `partyPacks` (with `ForPartyRole`, `KnownPartyRole` and `UnknownPartyRoleError`) into
-  `internal/plugin`, and passes it, `copyAudiences` and the schema id `actionstate-check/v1`;
-- deletes `internal/guard`, `internal/pack`, `internal/canon` and `packs/`, except that a vector
-  set kept back by §12 moves to `internal/guardparity/` with its Go tests, which then run against
-  the imported module;
-- copies into Muse-owned testdata (`internal/plugin/testdata`, `internal/rules/testdata`) the
-  fixtures that tests and scripts outside the deleted directories read by path, and edits only
-  those paths. At 8c9acf3 these readers are 19 test files in `internal/plugin` (among them
-  `check_test.go`, `sale_replay_test.go`, `fyi_act_test.go`, `g3_vectors_test.go`, which also
-  writes in its update mode, and `pack_flag_test.go`), `internal/rules/helpers_test.go` and
-  `platform_test.go`, and six e2e scripts (`buyer-exits-e2e.sh`, `clean-machine-test.sh`,
-  `history-e2e.sh`, `receipt-e2e.sh`, `seller-sale-e2e.sh`, `tester-install-test.sh`). The PR
-  re-greps for every `guard/testdata`, `pack/testdata` and `packs/` path before deleting;
+- moves `partyPacks` (with `ForPartyRole`, `KnownPartyRole` and `UnknownPartyRoleError`) and
+  the un-versioned pack aliases into `internal/plugin`, and passes them, the fallback catalog,
+  `copyAudiences` and the schema id `actionstate-check/v1`;
+- deletes `internal/guard`, `internal/pack`, `internal/canon` and `packs/`. A vector set kept back
+  by §12 has been resolved by then (§12);
+- copies into Muse-owned testdata (`internal/plugin/testdata`, `internal/rules/testdata`,
+  `internal/vocabgate/testdata`) the fixtures that tests and scripts outside the deleted
+  directories read by path, and edits only those paths. At 8c9acf3 these readers are:
+  - 19 test files in `internal/plugin`, among them `check_test.go`, `sale_replay_test.go`,
+    `fyi_act_test.go`, `g3_vectors_test.go` (which also writes in its update mode) and
+    `pack_flag_test.go`;
+  - in `internal/rules`: `helpers_test.go`, `platform_test.go`, `ready_test.go` and
+    `rules27_test.go`. The last two build `../../packs/everyday-0.3.7` with `filepath.Join`;
+  - `internal/vocabgate/page_claims_test.go`, which walks `<repo>/packs`;
+  - six e2e scripts: `buyer-exits-e2e.sh`, `clean-machine-test.sh`, `history-e2e.sh`,
+    `receipt-e2e.sh`, `seller-sale-e2e.sh` and `tester-install-test.sh`.
+
+  A grep can miss paths built from separate `Join` arguments. So the check is the full
+  `go test ./...` and every e2e script, run after the deletion. A vocabgate walk that scans
+  fewer surfaces than before fails on its surface count, which the PR records before and after;
 - adds a CI check that fails a PR touching any Go file under the old paths, naming capsule-engine
   `go/` as the owner;
 - keeps every other test outside the deleted directories passing unchanged, including
@@ -362,7 +404,8 @@ the switch-over's parent commit (§10), one actionstate-muse PR does the followi
 **The evidence of "no behavior change".** The PR description includes a mechanical diff of Muse's
 deleted directories at the parent commit against the module at `go/v0.1.0`. Import paths are
 normalized, and what remains is only the documented differences: the §1 parameters, the §2 path
-edits, the §12 rewrites, the generated `embed.go` and registry, and the comment rewording. Test
+edits, the §12 rewrites and adaptations, the generated `embed.go` and registry, and the comment
+rewording. Test
 edits outside the deleted directories are fixture path edits only.
 
 After the switch, a wicket change is one PR here (Python, Go and vectors), then a tag, then a
@@ -389,8 +432,9 @@ one-line pin bump in Muse.
 4. **Catch-up.** Muse guard commits between PR A's source commit and the rc21 cut are ported here
    in one catch-up PR, with the same checksum and test evidence, before the tag. Of the rc21 work
    in flight, #265 and #261 are merged, and #261 does not touch the guard. Issue #248 (switching
-   the default packs) edits `partyPacks`, which stays in Muse under §1, and Muse's
-   `packs/embed.go`. Issue #260 does not touch the guard.
+   the default packs) edits `partyPacks` and the un-versioned aliases in Muse's `packs/embed.go`.
+   Both stay in Muse under §1, so its port here is only whichever versioned pack it adds, written
+   by the generator. Issue #260 does not touch the guard.
 
    From PR A's merge until the switch-over, a guard change made in Muse also lands here. The
    coordinator routes it, and the window stays short, because the catch-up and the switch-over
@@ -435,8 +479,18 @@ therefore gates each moved set, and lists the result set by set in the PR:
 
 A sealed fixture byte (one a decision reads, such as a capsule's `developer` member) cannot be
 rewritten without changing digests and expected decisions. A set that fails 1 or 3 inside sealed
-bytes therefore stays in Muse, at `internal/guardparity/`, under §9, running against the imported
-module. It joins this repo only after it has been regenerated synthetically in its own PR.
+bytes does not move in PR A. Before the switch-over, each such set is resolved one by one, in
+one of two ways, and PR A's list records which:
+
+- **regenerated synthetically** in its own PR here, and then moved; or
+- **kept in Muse** as an external test package (`internal/guardparity`) that runs against the
+  imported module. A test kept this way must reach the module only through exported API. Those
+  tests read unexported members today (for example `real_seller_test.go` reads
+  `a.statesNoAct`, and the promise tests read `c.failsClosed` and `c.failNote`), so the
+  adaptation is listed per test, and it changes assertions only by reading the same values
+  through `Report` or the decision's exported fields.
+
+A set that fits neither blocks the switch-over until it is regenerated.
 
 ## 13. The local-only payload boundary, for Go
 
