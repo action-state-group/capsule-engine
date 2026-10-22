@@ -20,7 +20,9 @@ platform the pickup area, the shares to a buyer the new s13 releases, and
 the rows s07 now checks at a commit or counts a payment app on decide
 differently. s06 (offer_expiry/1.1.0) holds an offer that answers no
 proposal (no_proposal) not applicable, so two of the proposal scenarios
-decide differently too.
+decide differently too. And s05 also counts the sale's listings in force
+(the check's listing_classes, required_disclosure/1.2.0), so the offer
+whose listing stated the condition decides differently too.
 
 The scenarios are in ``test_pack_seller_acceptance.py``; this file pins the
 pack's own content, so a definition cited at another digest or a rule
@@ -77,7 +79,7 @@ CITED = [
     "price_floor/2.0.1",
     "promise_requires_approval/1.0.0",
     "promise_never/1.0.0",
-    "required_disclosure/1.1.0",
+    "required_disclosure/1.2.0",
     "offer_expiry/1.1.0",
     "seller.single_commitment/1.0.0",
     "seller.destination_rail/1.1.0",
@@ -208,19 +210,19 @@ def test_0_1_4_changes_only_s01_and_s13():
     assert release.config["except_recipient_roles"] == ["platform"]
 
 
-def test_0_1_5_changes_only_s01_s06_s07_and_s13():
-    """0.1.5 cites seller.recipient_role/1.2.0 and
-    seller.release_on_acceptance/1.2.0 where 0.1.4 cited 1.1.0,
-    seller.destination_rail/1.1.0 where it cited 1.0.0, and
-    offer_expiry/1.1.0 where it cited 1.0.1, and changes nothing else it
-    cites or declares; only those four rules' statements and the offer's,
+def test_0_1_5_changes_only_s01_s05_s06_s07_and_s13():
+    """0.1.5 cites seller.recipient_role/1.2.0,
+    seller.release_on_acceptance/1.2.0 and required_disclosure/1.2.0 where
+    0.1.4 cited 1.1.0, seller.destination_rail/1.1.0 where it cited 1.0.0,
+    and offer_expiry/1.1.0 where it cited 1.0.1, and changes nothing else it
+    cites or declares; only those five rules' statements and the offer's,
     the share's, the acceptance's and the sale's action semantics change.
     s07 still asks; offer.accept requires the rail and takes the handover, a
-    sale takes the handover, and offer.make takes proposal_at or
-    no_proposal."""
+    sale takes the handover, offer.make takes proposal_at or no_proposal,
+    and the offer and its acceptance take listing_classes (s05)."""
     old = load_pack_dir(FROZEN_0_1_4_DIR)
     swapped = [w.wicket_id for w in old.constraints]
-    for wicket_id in ("seller.recipient_role", "seller.release_on_acceptance"):
+    for wicket_id in ("seller.recipient_role", "seller.release_on_acceptance", "required_disclosure"):
         swapped[swapped.index(f"{wicket_id}/1.1.0")] = f"{wicket_id}/1.2.0"
     swapped[swapped.index("seller.destination_rail/1.0.0")] = "seller.destination_rail/1.1.0"
     swapped[swapped.index("offer_expiry/1.0.1")] = "offer_expiry/1.1.0"
@@ -229,8 +231,8 @@ def test_0_1_5_changes_only_s01_s06_s07_and_s13():
     assert [(o.id, o.check, o.default_disposition) for o in PACK.obligations] == [
         (o.id, o.check, o.default_disposition) for o in old.obligations]
     changed = [o.id for o, was in zip(PACK.obligations, old.obligations, strict=True) if o.statement != was.statement]
-    assert changed == ["s01-personal-data-to-the-buyer-or-the-user", "s06-proposal-still-current",
-                       "s07-payment-rail-the-user-allows",
+    assert changed == ["s01-personal-data-to-the-buyer-or-the-user", "s05-required-statement-made-first",
+                       "s06-proposal-still-current", "s07-payment-rail-the-user-allows",
                        "s13-personal-data-only-to-the-buyer-who-accepted"]
     semantics = [a.action_type for a, was in zip(PACK.action_semantics, old.action_semantics, strict=True) if a != was]
     assert semantics == ["offer.make", "offer.accept", "sale.complete", "personal_data.share"]
@@ -248,6 +250,11 @@ def test_0_1_5_changes_only_s01_s06_s07_and_s13():
     assert {"proposal_at", "no_proposal"} <= set(by_type["offer.make"].optional_fields)
     (expiry,) = [w for w in PACK.constraints if w.check == "offer_expiry"]
     assert expiry.config["no_proposal_classes"] == ["marketplace.offer"]
+    (required,) = [w for w in PACK.constraints if w.check == "required_disclosure"]
+    assert required.config["count_listing_classes"] is True
+    listing = {a.action_type for a in PACK.action_semantics if "listing_classes" in a.optional_fields}
+    assert listing == {"offer.make", "offer.accept"}
+    assert not [a for a in PACK.action_semantics if "listing_classes" in a.required_fields]
 
 
 def test_it_cites_no_spending_limit_and_no_rule_is_measured_by_one():
@@ -357,8 +364,9 @@ def test_0_1_4_decides_every_scenario_as_0_1_3_did_but_the_email_to_the_platform
                 assert record.get("evidence_digest") == before[check_id].get("evidence_digest"), (name, check_id)
 
 
-def test_0_1_5_decides_every_scenario_as_0_1_4_did_but_the_pickup_area_shares_rail_and_no_proposal(tmp_path):
-    """Four kinds of scenario decide differently. The two giving the platform
+def test_0_1_5_decides_every_scenario_as_0_1_4_did_but_the_pickup_area_shares_rail_no_proposal_and_listing(
+        tmp_path):
+    """Five kinds of scenario decide differently. The two giving the platform
     the listing's pickup area: 0.1.4 refused them on s01, 0.1.5 allows them.
     The shares to a buyer s13 1.2.0 releases (the pickup area before
     acceptance, each class to the buyer who accepted in the accepting deal):
@@ -370,12 +378,14 @@ def test_0_1_5_decides_every_scenario_as_0_1_4_did_but_the_pickup_area_shares_ra
     Every other scenario has the same disposition and every constraint the
     same result, with the same evidence except recipient_role's (it records
     the platform's classes), s13's (it records the classes of data read),
-    destination_rail's (it records how the rail was counted and the handover)
-    and the checks naming an earlier capsule. And two on s06, which only
-    offer_expiry/1.1.0 reads no_proposal for: the first offer answering no
-    proposal (0.1.4 asked for a missing proposal time, 0.1.5 holds s06 not
-    applicable and allows it), and no_proposal beside a proposal time (0.1.4
-    passed it on age, 0.1.5 asks)."""
+    destination_rail's (it records how the rail was counted and the handover),
+    s05's (1.2.0 also records the listing's classes) and the checks naming an
+    earlier capsule. And two on s06, which only offer_expiry/1.1.0 reads
+    no_proposal for: the first offer answering no proposal (0.1.4 asked for a
+    missing proposal time, 0.1.5 holds s06 not applicable and allows it), and
+    no_proposal beside a proposal time (0.1.4 passed it on age, 0.1.5 asks).
+    And the offer whose listing stated the condition asked on s05 under 0.1.4
+    and passes under 0.1.5."""
     acceptance = _acceptance_module()
     old = _scenario_run(FROZEN_0_1_4_DIR, tmp_path / "0.1.4")
     new = _scenario_run(PACK_DIR, tmp_path / "0.1.5")
@@ -410,10 +420,17 @@ def test_0_1_5_decides_every_scenario_as_0_1_4_did_but_the_pickup_area_shares_ra
             assert (before["offer_expiry"]["result"], after["offer_expiry"]["result"]) == results, name
             assert (old[name]["disposition"]["decision"], new[name]["disposition"]["decision"]) == decisions, name
             continue
+        if name in acceptance.BEFORE_LISTING:
+            assert (before["required_disclosure"]["result"], after["required_disclosure"]["result"]) == (
+                "fail", "pass"), name
+            assert (old[name]["disposition"]["decision"], new[name]["disposition"]["decision"]) == (
+                "needs_input", "accept"), name
+            continue
         assert new[name]["disposition"] == old[name]["disposition"], name
         for check_id, record in after.items():
             assert record["result"] == before[check_id]["result"], (name, check_id)
-            if check_id not in NAMES_A_CAPSULE_ID | {"recipient_role", "release_on_acceptance", "destination_rail"}:
+            if check_id not in NAMES_A_CAPSULE_ID | {"recipient_role", "release_on_acceptance", "destination_rail",
+                                                     "required_disclosure"}:
                 assert record.get("evidence_digest") == before[check_id].get("evidence_digest"), (name, check_id)
 
 

@@ -72,8 +72,11 @@ ITEM = "item-ref:" + hashlib.sha256(b"seller-fixture/item-1").hexdigest()
 ITEM_2 = "item-ref:" + hashlib.sha256(b"seller-fixture/item-2").hexdigest()
 # A third item, which buyer A is offered on the payment rails a commit may
 # state: no acceptance of it is sealed, so each commit is decided on its rail.
-# The offers on the proposal they answer (capsule-engine#193) use it too.
+# The offers on the proposal they answer (capsule-engine#193) use it too. It
+# is listed too: buyer D is told nothing in chat, so only the listing can
+# have stated its condition (0.1.5).
 ITEM_3 = "item-ref:" + hashlib.sha256(b"seller-fixture/item-3").hexdigest()
+BUYER_D = _fingerprint("buyer-d")
 
 # Each buyer's thread, as a check in it states it: its deal, and the buyer's
 # keyed fingerprints by kind (a marketplace profile id, the name and the
@@ -400,6 +403,21 @@ def _scenarios() -> list[tuple[str, Action, str]]:
                                                       proposal_at=None), ESCALATE),
         ("no-proposal-beside-a-proposal-time", _offer("no-proposal-and-time-a", 59, BUYER_A, 180_000,
                                                       item_ref=ITEM_3, no_proposal=True), ESCALATE),
+        # The sale's listings in force, as each check's listing_classes seals
+        # them (0.1.5, required_disclosure/1.2.0), each a second after the
+        # last minute's step. Buyer D was told nothing in
+        # chat: a listing stating the condition is the statement; one that
+        # dropped it, or listings sharing no class, are none, so s05 asks.
+        ("offer-after-a-listing-stating-the-condition", _offer("listing-d", 59, BUYER_D, 180_000, item_ref=ITEM_3,
+                                                               listing_classes=("condition", "price"),
+                                                               timestamp=_at(59, 1)), ALLOW),
+        ("offer-after-a-listing-without-the-condition", _offer("listing-no-condition-d", 59, BUYER_D, 180_000,
+                                                               item_ref=ITEM_3, listing_classes=("price",),
+                                                               timestamp=_at(59, 2)),
+         ESCALATE),
+        ("offer-after-listings-sharing-no-class", _offer("listings-no-class-d", 59, BUYER_D, 180_000,
+                                                         item_ref=ITEM_3, listing_classes=(),
+                                                         timestamp=_at(59, 3)), ESCALATE),
     ]
 
 
@@ -435,8 +453,12 @@ BEFORE_COMMIT_RAIL = {"commit-cash-shipped": ALLOW, "commit-cash-with-no-handove
 # Before 0.1.5, s06 (offer_expiry/1.0.1) does not read no_proposal: an offer
 # with no proposal time asks, and one with a fresh time passes.
 BEFORE_NO_PROPOSAL = {"first-offer-answering-no-proposal": ESCALATE, "no-proposal-beside-a-proposal-time": ALLOW}
+# Before 0.1.5 a listing counts for nothing on s05, so an offer whose
+# listing stated the condition still asks.
+BEFORE_LISTING = {"offer-after-a-listing-stating-the-condition": ESCALATE}
 BEFORE_PICKUP_AREA = {"pickup-area-to-the-platform": DENY, "email-and-pickup-area-to-the-platform": DENY,
-                      **BEFORE_RELEASE_FROM_HISTORY, **BEFORE_COMMIT_RAIL, **BEFORE_NO_PROPOSAL}
+                      **BEFORE_RELEASE_FROM_HISTORY, **BEFORE_COMMIT_RAIL, **BEFORE_NO_PROPOSAL,
+                      **BEFORE_LISTING}
 BEFORE_PLATFORM = {"email-to-the-platform": DENY, **BEFORE_PICKUP_AREA}
 EXPECTED_OVERRIDES: dict[str, str] = {}
 

@@ -93,8 +93,15 @@
 # applicable: the producer seals no_proposal on an offer when no buyer message
 # was on record before it (capsule-engine#193), and an offer that answers a
 # buyer's message is held to that message's time. A missing proposal time
-# still asks, and so does no_proposal beside a proposal time. No other rule
-# changes.
+# still asks, and so does no_proposal beside a proposal time.
+#
+# 0.1.5 also counts the sale's listing as a statement for s05
+# (required_disclosure/1.2.0, capsule-engine#190): an offer or commit whose
+# check carries listing_classes naming the condition (every live listing of
+# the sale states it) passes s05 with no chat claim. A listing that drops it,
+# no listing, or listings on two platforms that do not both state it count
+# for nothing, and s05 asks as in 0.1.4 unless chat stated it. offer.make and
+# offer.accept take listing_classes. No other rule changes.
 pack_id: asg/seller/0.1.5
 
 obligations:
@@ -133,9 +140,10 @@ obligations:
     statement: >-
       Flags an offer, an acceptance or a sale to a counterparty that has
       not first received a statement in each required class (today
-      condition): an accepted earlier statement to that counterparty, or a
-      claim the agent made in the same deal before it. It records which
-      class is missing. It checks that a statement of the class was
+      condition): an accepted earlier statement to that counterparty, a
+      claim the agent made in the same deal before it, or the sale's
+      listings in force when it was checked, when every live listing states
+      the class. It records which class is missing. It checks that a statement of the class was
       recorded, never what it said. An approval does not clear it: the
       action cannot proceed as constructed until the statement is made or
       the task authority changes.
@@ -226,11 +234,11 @@ action_semantics:
   - action_type: offer.make
     action_class: marketplace.offer
     required_fields: [amount_minor, currency, target, task_authority_ref, item_ref]
-    optional_fields: [proposal_at, no_proposal, representation_class, authorized_by, equivalence_key, cited_mandate_capsule_id]
+    optional_fields: [proposal_at, no_proposal, representation_class, authorized_by, equivalence_key, cited_mandate_capsule_id, listing_classes]
   - action_type: offer.accept
     action_class: agreement.accept
     required_fields: [amount_minor, currency, target, rail, task_authority_ref, item_ref, proposal_at]
-    optional_fields: [handover, representation_class, authorized_by, equivalence_key, cited_mandate_capsule_id]
+    optional_fields: [handover, representation_class, authorized_by, equivalence_key, cited_mandate_capsule_id, listing_classes]
   - action_type: sale.complete
     action_class: marketplace.sale
     required_fields: [amount_minor, currency, target, rail, task_authority_ref, item_ref, proposal_at]
@@ -260,8 +268,9 @@ constraints:
     digest: b29e29e0a31ef764b282fa5754992b49b5ffc4f3fc261fb821987ae6c2e1c9b2
   - wicket_ref: promise_never/1.0.0
     digest: 836ae58f704a9c8ab8027fee344ca47ddb3de76a7a1973a650f42a3595e649f4
-  - wicket_ref: required_disclosure/1.1.0
-    digest: 80f3af6e428f2331f6ab458997d996e172b9fc2e721b55fcf473f4e31d1492c0
+  # A class stated to the buyer, in the deal, or by the sale's listings in force.
+  - wicket_ref: required_disclosure/1.2.0
+    digest: cae962303066286b3c391a6c1a2f5f5db6742865fb84e1932ad68515a423224f
   # An offer that answers no proposal (no_proposal) is not applicable.
   - wicket_ref: offer_expiry/1.1.0
     digest: e55083b32ffe5e9415d3ef6455398b42187d9de76aba9f6cc735f3ea71f590f1
@@ -437,6 +446,12 @@ fixtures:
     - id: offer-answering-an-unnamed-message
       outcome: escalate
     - id: no-proposal-beside-a-proposal-time
+      outcome: escalate
+    - id: offer-after-a-listing-stating-the-condition
+      outcome: allow
+    - id: offer-after-a-listing-without-the-condition
+      outcome: escalate
+    - id: offer-after-listings-sharing-no-class
       outcome: escalate
 
 # The action taxonomy this pack was authored against. The taxonomy decides

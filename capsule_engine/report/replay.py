@@ -87,7 +87,7 @@ from cll.ledger.api import LedgerAPI
 from ..folds.definition import FoldDefinition
 from ..folds.duration import parse_duration_seconds
 from ..guards import ALLOW, ESCALATE, Action, GuardDecision, GuardEngine, LocalSigner
-from ..guards.action import disclosed_classes_of, handover_of, repeat_disclosures_of
+from ..guards.action import disclosed_classes_of, handover_of, listing_classes_of, repeat_disclosures_of
 from ..guards.checks.caps import EXECUTED_DECISION, SPEND_UNREADABLE, counts_executed_acts
 from ..guards.history_state import CHECK_FP_ALGS, RULES_HISTORY_DAYS, well_formed_counterparty
 from ..guards.statements import StatementRecord, claim_of, make_statement_record
@@ -526,7 +526,10 @@ def _bridge_deal_check(
     (``DISCLOSED_CLASSES``); with any other member it is dropped whole.
     ``repeat_disclosures`` is carried the same way, possibly empty, and
     ``recipient_told_before`` only as a boolean (capsule-engine#188); neither
-    is sealed on the decision.
+    is sealed on the decision. A sale thread's ``listing_classes`` (the
+    classes every live listing stated when the check was made) is carried as
+    one only as a list of class names, and dropped whole otherwise; it is read
+    here and never sealed on the decision.
     A check's sealed ``no_proposal`` is carried only when it is ``true`` and
     the check names no ``source`` ref (``_no_proposal``); it is never read
     off an act a history entry records.
@@ -602,6 +605,7 @@ def _bridge_deal_check(
         disclosed_classes=disclosed_classes_of(body.get("disclosing")),
         repeat_disclosures=repeat_disclosures_of(body.get("repeat_disclosures")),
         recipient_told_before=_flag(body.get("recipient_told_before")),
+        listing_classes=listing_classes_of(body.get("listing_classes")),
         channel=_text(body.get("channel")),
         first_contact_channel=_text(body.get("first_contact_channel")),
         upfront_amount_minor=_minor(body.get("upfront_amount_minor")),

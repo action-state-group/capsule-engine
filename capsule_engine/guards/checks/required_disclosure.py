@@ -31,6 +31,16 @@ target nor a deal is not applicable, as one with no target is without it;
 one with a target and no deal counts the counterparty's statements only, and
 one with a deal and no target the deal's only.
 
+With ``count_listing_classes`` (``required_disclosure/1.2.0``), a class also
+counts as stated when it is in ``Action.listing_classes``: the classes every
+live listing of the sale stated when the check was made, as capsulectl sealed
+them in the check's body (the intersection over the latest post per platform).
+A listing is the agent's words to every buyer, so a class it states is stated
+to this one too. The value is read from the check, never recomputed: a re-post
+changes later checks only. With no value (no post) or an empty one, a listing
+counts for nothing, and the class needs one of the other two paths. The
+evidence lists the value beside the two counts.
+
 ``required_classes`` must come from the closed set ``representation_classes``;
 a class outside it is a configuration error and raises ``ValueError``.
 """
@@ -82,6 +92,13 @@ class StatementEvidence(TypedDict):
     missing_classes: list[str]
 
 
+class ListingEvidence(StatementEvidence):
+    """``required_disclosure/1.2.0``'s evidence: 1.1.0's, and the listing's
+    classes the action carried (``None`` with no post)."""
+
+    listing_classes: list[str] | None
+
+
 def require_known_classes(classes: list[str], representation_classes: list[str], *, what: str) -> None:
     unknown = [c for c in classes if c not in representation_classes]
     if unknown:
@@ -109,14 +126,18 @@ def check_required_disclosure(
     required_classes: list[str],
     action_classes: list[str],
     statement_definition: FoldDefinition | None = None,
+    count_listing_classes: bool = False,
 ) -> CheckOutcome:
     require_known_classes(required_classes, representation_classes, what="required_classes")
+    if count_listing_classes and statement_definition is None:
+        raise ValueError("count_listing_classes goes with statement_fold_id: required_disclosure/1.2.0 builds on 1.1.0")
     method = definition.fold_id
     if action.action_class not in action_classes:
         return _outcome("n/a", "the rule is not configured for this action class",
                         not_applicable_evidence(_CHECK_ID, in_scope=False), method)
     if statement_definition is not None:
-        return _check_with_statements(action, ledger, definition, statement_definition, required_classes)
+        return _check_with_statements(action, ledger, definition, statement_definition, required_classes,
+                                      listing=count_listing_classes)
     target = action.target
     if target is None:
         return _outcome("n/a", "the action names no target; the counterparty could not be identified",
@@ -161,7 +182,7 @@ def _counts(traces: tuple[EvaluationTrace, ...], classes: list[str]) -> dict[str
 
 
 def _decided(
-    missing: list[str], evidence: DisclosureEvidence | StatementEvidence, method: str,
+    missing: list[str], evidence: DisclosureEvidence | StatementEvidence | ListingEvidence, method: str,
     traces: tuple[EvaluationTrace, ...],
 ) -> CheckOutcome:
     if missing:
@@ -173,10 +194,11 @@ def _decided(
 
 def _check_with_statements(
     action: Action, ledger: LedgerAPI, definition: FoldDefinition, statement_definition: FoldDefinition,
-    required_classes: list[str],
+    required_classes: list[str], *, listing: bool = False,
 ) -> CheckOutcome:
     """``required_disclosure/1.1.0``: a class counts as stated to the
-    counterparty's target or in the action's deal (module docstring)."""
+    counterparty's target or in the action's deal; with ``listing`` (1.2.0),
+    also when the sale's listings in force state it (module docstring)."""
     method = definition.fold_id
     target, deal_id = action.target, action.deal_id
     if target is None and deal_id is None:
@@ -186,13 +208,26 @@ def _check_with_statements(
     stated = _counted(statement_definition, _in_deal(action, ledger, deal_id) if deal_id is not None else [],
                       required_classes)
     prior, in_deal = _counts(told, required_classes), _counts(stated, required_classes)
-    missing = [cls for cls in required_classes if prior[cls] == 0 and in_deal[cls] == 0]
-    evidence = StatementEvidence(
-        fold=definition.definition_digest(),
-        statement_fold=statement_definition.definition_digest(),
-        scope=StatementScope(operator=action.operator, target=target, deal_id=deal_id),
-        prior_counts=prior,
-        stated_counts=in_deal,
-        missing_classes=missing,
-    )
+    listed = action.listing_classes if listing and action.listing_classes is not None else ()
+    missing = [cls for cls in required_classes if prior[cls] == 0 and in_deal[cls] == 0 and cls not in listed]
+    scope = StatementScope(operator=action.operator, target=target, deal_id=deal_id)
+    if listing:
+        evidence: StatementEvidence = ListingEvidence(
+            fold=definition.definition_digest(),
+            statement_fold=statement_definition.definition_digest(),
+            scope=scope,
+            prior_counts=prior,
+            stated_counts=in_deal,
+            missing_classes=missing,
+            listing_classes=None if action.listing_classes is None else list(action.listing_classes),
+        )
+    else:
+        evidence = StatementEvidence(
+            fold=definition.definition_digest(),
+            statement_fold=statement_definition.definition_digest(),
+            scope=scope,
+            prior_counts=prior,
+            stated_counts=in_deal,
+            missing_classes=missing,
+        )
     return _decided(missing, evidence, method, told + stated)
