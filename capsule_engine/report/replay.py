@@ -47,9 +47,19 @@ reads its history's acts through ``action_for_history_entry``
 (``report/live_history.py``). A replay of a sale bundle keys the sale on
 the digest of the sale's own task authority instead, and gives
 ``single_commitment`` each check's history of the sale's threads, read by the
-reader a live check's history is read by (``report/sale_bundle.py``). Only
-``single_commitment`` reads it: ``release_on_acceptance`` still reads the
-replay's own view, where no acceptance is sealed, so it releases nothing.
+reader a live check's history is read by (``report/sale_bundle.py``).
+``single_commitment`` reads it whole; a ``release_on_acceptance`` that binds
+the acceptance from the history (1.2.0) reads it cut to the live window
+(``RULES_HISTORY_DAYS``). A cited ``release_on_acceptance`` (1.0.0, 1.1.0)
+still reads the replay's own view, where no acceptance is sealed, so it
+releases nothing. Outside a sale replay (a dry-run report of a deal's own
+records, say) a 1.2.0 ``release_on_acceptance`` reads the replay's own view
+too: its records carry no ``thread_counterparty``, so every share that needs
+the acceptance refuses there, which fails closed. A sale replay is as close
+to live as a bundle of one sale can get, not exact: a live history is
+profile-wide and capped at 1,000 acts, and past the cap it reads
+incomplete, so the acceptance is unknown. A share refused live for a
+truncated history may therefore pass on replay of a complete bundle.
 
 ``_bridge_transfer_funds`` is the other non-default action mapping, and it
 mirrors the pattern already established by ``tests/test_guard_dry_run.py``
@@ -79,6 +89,7 @@ from ..folds.duration import parse_duration_seconds
 from ..guards import ALLOW, ESCALATE, Action, GuardDecision, GuardEngine, LocalSigner
 from ..guards.action import disclosed_classes_of
 from ..guards.checks.caps import EXECUTED_DECISION, SPEND_UNREADABLE, counts_executed_acts
+from ..guards.history_state import CHECK_FP_ALGS, RULES_HISTORY_DAYS, well_formed_counterparty
 from ..guards.statements import StatementRecord, claim_of, make_statement_record
 from ..guards.wickets.definition import WicketDefinition
 from ..packs.install import engine_ask_sets
@@ -320,7 +331,6 @@ _PROPOSAL_INPUT = "proposal_at"
 # counterparty block the act's check sealed, exactly as sealed, and the
 # fp_algs a check seals it under (an x-deal-v0 check's, a typed check's).
 _COUNTERPARTY_INPUT = "counterparty"
-_CHECK_FP_ALGS = frozenset({"hmac-sha256-deal-key", "hmac-sha256-chain-key"})
 # The deal's earlier claims the user's agent made, on the checked record entry
 # beside its capsule (AMENDMENT 9): each the sealed claim record's own values.
 _CLAIMS_INPUT = "deal_claims"
@@ -341,8 +351,15 @@ def _profile_target(block: object) -> str | None:
 def _check_counterparty(block: object) -> bool:
     """Whether ``block`` is a check's counterparty block in its agreed shape,
     ``{fp_alg: <a check's fp_alg>, ids: {<kind>: <64 lowercase hex>}}``, so
-    ``_sealed_counterparty`` may read it as the check's own."""
-    if not isinstance(block, dict) or block.get("fp_alg") not in _CHECK_FP_ALGS:
+    ``_sealed_counterparty`` may read it as the check's own.
+
+    Looser than ``history_state.well_formed_counterparty`` on purpose: it
+    decides only whether the act gets its check's target, as it has since
+    the act counterparty was added, so it does not check the kinds or refuse
+    an empty block, and tightening it would move other checks' decisions.
+    ``release_on_acceptance`` 1.2.0 reads the strict rule through
+    ``Action.counterparty_malformed``."""
+    if not isinstance(block, dict) or block.get("fp_alg") not in CHECK_FP_ALGS:
         return False
     ids = block.get("ids")
     return isinstance(ids, dict) and all(isinstance(v, str) and _HEX64.fullmatch(v) for v in ids.values())
@@ -496,6 +513,9 @@ def _bridge_deal_check(
         else:
             ignored.append(_COUNTERPARTY_INPUT)
     counterparty_ids, fp_alg = _sealed_counterparty(sealed_counterparty)
+    malformed = sealed_counterparty is not None and not (
+        isinstance(sealed_counterparty, dict)
+        and well_formed_counterparty(sealed_counterparty.get("fp_alg"), sealed_counterparty.get("ids")))
     target = _payee_target(counterparty_ids, fp_alg)
     if counterparty_profile is not None:
         profile_target = _profile_target(counterparty_profile)
@@ -536,6 +556,7 @@ def _bridge_deal_check(
         reverses_ref=reverses,
         deal_id=deal.value,
         deal_id_conflict=_DEAL_ID_FIELDS if deal.conflict else (),
+        counterparty_malformed=malformed,
         ignored_inputs=tuple(ignored),
     )
 
@@ -1194,8 +1215,10 @@ class SaleCheck:
 
 
 # Writes the history of the sale a replayed record is a check of into the
-# ledger it is given, and says so; ``None`` for a record of no such sale.
-SaleHistory = Callable[[str, LedgerAPI], "SaleCheck | None"]
+# ledger it is given, and says so; ``None`` for a record of no such sale. The
+# third argument, when not ``None``, cuts the history to the acts sealed in
+# that many days before the check, as a live check's history is cut.
+SaleHistory = Callable[[str, LedgerAPI, "int | None"], "SaleCheck | None"]
 
 
 @dataclass(frozen=True)
@@ -1268,7 +1291,11 @@ def replay(
     sale's is decided with the sale's key as ``item_ref``, and
     ``single_commitment`` reads the sale's acceptance from a fresh ledger it
     writes for that check alone (``GuardEngine.check``'s ``sale_history``),
-    never from the replay's own view."""
+    never from the replay's own view. A ``release_on_acceptance`` that binds
+    the acceptance from the history (1.2.0) reads it too, cut to the acts of
+    the last ``RULES_HISTORY_DAYS`` days before the check, as live
+    (``GuardEngine.check``'s ``release_history``); within that window the
+    same completeness rule holds."""
     if not records:
         return ReplayResult(decisions=(), record_range=(0, -1))
 
@@ -1348,8 +1375,13 @@ def _decide(engine: GuardEngine, action: Action, record: dict,
     if sale_history is None or capsule_id is None:
         return action, engine.check(action, dry_run=True)
     with tempfile.TemporaryDirectory() as tmp, LedgerStore(tmp) as sale_ledger:
-        sale = sale_history(capsule_id, sale_ledger)
+        sale = sale_history(capsule_id, sale_ledger, None)
         if sale is None:
             return action, engine.check(action, dry_run=True)
         action = replace(action, item_ref=sale.item_ref)
-        return action, engine.check(action, dry_run=True, sale_history=sale_ledger)
+        if not engine.uses_release_history:
+            return action, engine.check(action, dry_run=True, sale_history=sale_ledger)
+        with tempfile.TemporaryDirectory() as window_tmp, LedgerStore(window_tmp) as window_ledger:
+            sale_history(capsule_id, window_ledger, RULES_HISTORY_DAYS)
+            return action, engine.check(action, dry_run=True, sale_history=sale_ledger,
+                                        release_history=window_ledger)

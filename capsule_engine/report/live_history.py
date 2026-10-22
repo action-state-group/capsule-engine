@@ -29,7 +29,9 @@ claim given twice is written once. The claims capsulectl passes beside the
 checked record as ``deal_claims`` (AMENDMENT 9) are written the same way,
 after the history's records, as ``deal_claim_statements`` reads them.
 
-Each record states what is known about it (``guards/history_state.py``). Its
+Each record states what is known about it (``guards/history_state.py``),
+and an act read carries, beside ``act_payload``, the counterparty its check
+sealed (``thread_counterparty``), which no decision seals. Its
 ``disposition`` is the one the act's capsule seals, and nothing else: an act
 sealed with none is written as ``no_disposition``, never as accepted and
 never as declined, and no decision is inferred from its ``authority_basis``.
@@ -62,9 +64,19 @@ from agent_action_capsule import json_digest
 from cll.ledger.api import LedgerAPI
 
 from ..folds.definition import FoldDefinition
+from ..guards.action import Action
 from ..guards.capsule import act_payload
 from ..guards.checks.caps import counts_executed_acts
-from ..guards.history_state import DISPOSITION, INCOMPLETE, LIVE_HISTORY, NO_DISPOSITION, STATEMENT, UNREAD
+from ..guards.history_state import (
+    DISPOSITION,
+    INCOMPLETE,
+    LIVE_HISTORY,
+    NO_DISPOSITION,
+    STATEMENT,
+    THREAD_COUNTERPARTY,
+    UNREAD,
+    ThreadCounterparty,
+)
 from ..guards.statements import StatementRecord, claim_of
 from .replay import (
     ExecutedActs,
@@ -74,7 +86,8 @@ from .replay import (
     statement_for_history_entry,
 )
 
-__all__ = ["HistoryLedger", "history_ledger"]
+__all__ = ["HistoryLedger", "history_act_payload", "history_ledger"]
+
 
 _HEX64 = re.compile(r"^[0-9a-f]{64}$")
 
@@ -223,7 +236,7 @@ def _act_record(entry: dict) -> _HistoryRecord:
         if _is_item_ref(item_ref):
             payload["item_ref"] = item_ref
     else:
-        payload = {**act_payload(action), LIVE_HISTORY: DISPOSITION if decision is not None else NO_DISPOSITION}
+        payload = history_act_payload(action, sealed_disposition=decision is not None)
     capsule_id = entry.get("capsule_id")
     record = _HistoryRecord(
         capsule_id=capsule_id if isinstance(capsule_id, str) and capsule_id else json_digest(entry),
@@ -237,6 +250,21 @@ def _act_record(entry: dict) -> _HistoryRecord:
     if decision is not None:
         record["disposition"] = _Disposition(decision=decision)
     return record
+
+
+def history_act_payload(action: Action, *, sealed_disposition: bool) -> dict[str, object]:
+    """The ``asg_payload`` ``history_ledger`` writes for a history act it
+    read: what a decision on ``action`` seals about the act (``act_payload``),
+    its state (``disposition`` when its capsule seals one), and, beside them,
+    the counterparty its check sealed as ``thread_counterparty`` when the
+    action carries one, whole (``Action.counterparty_malformed``). That member is this ledger's own state: it is never in
+    ``act_payload``, so no decision seals it (``guards/history_state.py``)."""
+    payload: dict[str, object] = {**act_payload(action),
+                                  LIVE_HISTORY: DISPOSITION if sealed_disposition else NO_DISPOSITION}
+    if action.counterparty_ids and action.counterparty_fp_alg and not action.counterparty_malformed:
+        payload[THREAD_COUNTERPARTY] = ThreadCounterparty(fp_alg=action.counterparty_fp_alg,
+                                                          ids=dict(action.counterparty_ids))
+    return payload
 
 
 def _incomplete_record(checked: object) -> dict:

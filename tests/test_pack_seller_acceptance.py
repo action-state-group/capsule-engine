@@ -15,11 +15,23 @@ required statement, the acceptance and the single commitment are read from
 the history the earlier steps sealed.
 
 Every assertion names the field on the named record.
+
+A share to a buyer carries what capsulectl's share check gives the engine:
+the classes of data it gives (``disclosed_classes``), the deal it is in
+(``deal_id``) and the buyer's keyed fingerprints its check sealed
+(``counterparty_ids`` under ``counterparty_fp_alg``). The rows from before
+0.1.5 also keep their ``representation_class`` and their citation, so the
+earlier packs decide them as they did. Under 0.1.5, s13 reads the sale's
+acceptance from the history a live check is given; each share is decided
+with that history (``release_history``): the acceptances sealed so far,
+each written as ``history_ledger`` writes a history act, with the
+counterparty its check sealed beside it (``history_act_payload``).
 """
 from __future__ import annotations
 
 import hashlib
 import json
+import tempfile
 from pathlib import Path
 
 import pytest
@@ -35,6 +47,7 @@ from capsule_engine.guards.checks import (
     task_authority_record_digest,
 )
 from capsule_engine.packs import build_engine, install_pack, load_pack_dir, record_pack_activation
+from capsule_engine.report.live_history import history_act_payload
 
 PACK_DIR = Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog" / "seller"
 FIXTURE_PATH = PACK_DIR / "fixtures" / "mini_ledger.jsonl"
@@ -57,6 +70,29 @@ ITEM = "item-ref:" + hashlib.sha256(b"seller-fixture/item-1").hexdigest()
 # A second item the same user sells, accepted by buyer B: its acceptance is
 # a sealed acceptance, but of another sale by another buyer.
 ITEM_2 = "item-ref:" + hashlib.sha256(b"seller-fixture/item-2").hexdigest()
+
+# Each buyer's thread, as a check in it states it: its deal, and the buyer's
+# keyed fingerprints by kind (a marketplace profile id, the name and the
+# payee capsulectl seals beside it) under the thread's key.
+FP_ALG = "hmac-sha256-chain-key"
+
+
+def _ids(buyer: str, *, name: str | None = None) -> dict[str, str]:
+    def fp(kind: str, value: str) -> str:
+        return hashlib.sha256(f"seller-fixture/{kind}/{value}".encode()).hexdigest()
+
+    shown = name or f"name of {buyer}"
+    return {"profile_id": fp("profile_id", buyer), "name": fp("name", shown), "payee": fp("payee", shown)}
+
+
+def _thread(buyer: str) -> dict:
+    return {"deal_id": f"deal-{buyer}", "counterparty_ids": _ids(buyer), "counterparty_fp_alg": FP_ALG}
+
+
+THREAD_A, THREAD_B, THREAD_C = _thread("buyer-a"), _thread("buyer-b"), _thread("buyer-c")
+THREADS = {BUYER_A: THREAD_A, BUYER_B: THREAD_B, BUYER_C: THREAD_C}
+# The class of data each pre-0.1.5 row's statement class stands for.
+DATA_CLASS = {"address": "address", "pickup": "pickup_location", "other": "other_contact"}
 
 # The user's private floor, 1,700.00: the record seals only its salted
 # commitment, and the opening is supplied beside each decision. This is
@@ -99,8 +135,8 @@ def _signer() -> LocalSigner:
     return LocalSigner(key_id="seller-fixture-key", secret=SIGNER_SECRET)
 
 
-def _at(minute: int) -> str:
-    return f"2026-10-09T10:{minute:02d}:00Z"
+def _at(minute: int, second: int = 0) -> str:
+    return f"2026-10-09T10:{minute:02d}:{second:02d}Z"
 
 
 # Every other step gives dedupe its own equivalence_key, so no two steps are
@@ -121,6 +157,8 @@ def _commitment(verb: str, action_class: str, name: str, minute: int, target: st
                 **fields) -> Action:
     fields.setdefault("proposal_at", _at(minute - 1))
     fields.setdefault("item_ref", ITEM)
+    for name_, value in THREADS.get(target, {}).items():
+        fields.setdefault(name_, value)
     return Action(verb=verb, operator=OPERATOR, developer=DEVELOPER, action_class=action_class, target=target,
                   amount_minor=amount_minor, currency="USD", task_authority_ref=TASK_REF,
                   equivalence_key=f"{verb}/{name}", action_id=f"{verb}/seller-fixture-{name}",
@@ -138,11 +176,34 @@ def _address(name: str, minute: int, target: str, role: str, **fields) -> Action
     fields.setdefault("item_ref", ITEM)
     fields.setdefault("action_class", "disclosure.personal")
     fields.setdefault("representation_class", "address")
+    if role == "buyer":
+        # What capsulectl gives for the same share (0.1.5 reads it).
+        fields.setdefault("disclosed_classes", (DATA_CLASS[fields["representation_class"]],))
+        for name_, value in THREADS.get(target, {}).items():
+            fields.setdefault(name_, value)
     verb = "share_address" if fields["representation_class"] == "address" else "share_personal"
     return Action(verb=verb, operator=OPERATOR, developer=DEVELOPER,
                   target=target, recipient_role=role, task_authority_ref=TASK_REF,
                   equivalence_key=f"{verb}/{name}", action_id=f"{verb}/seller-fixture-{name}",
                   timestamp=_at(minute), **fields)
+
+
+def _share(name: str, minute: int, classes: tuple[str, ...], *, second: int = 0, target: str = BUYER_A,
+           thread: dict | None = None, **fields) -> Action:
+    """A share to a buyer as capsulectl's share check states it: the classes
+    of data, the item, the deal and the buyer's fingerprints, no statement
+    class and no citation. ``thread`` replaces the target's own thread."""
+    for name_, value in (THREADS[target] if thread is None else thread).items():
+        fields.setdefault(name_, value)
+    return Action(verb="share_contact", operator=OPERATOR, developer=DEVELOPER, action_class="disclosure.personal",
+                  target=target, recipient_role="buyer", disclosed_classes=tuple(sorted(classes)), item_ref=ITEM,
+                  task_authority_ref=TASK_REF, equivalence_key=f"share_contact/{name}",
+                  action_id=f"share_contact/seller-fixture-{name}", timestamp=_at(minute, second), **fields)
+
+
+# The contact classes s13 releases to the buyer who accepted (the public
+# pickup area aside).
+CONTACT_CLASSES = ("pickup_location", "phone", "email", "name", "home_address", "address")
 
 
 # A step that cites an acceptance names it by a marker; the runner replaces
@@ -203,6 +264,14 @@ def _scenarios() -> list[tuple[str, Action, str]]:
                                       action_class="info.query", target="listing/own",
                                       equivalence_key="read_listing_views/1",
                                       action_id="read_listing_views/seller-fixture-1", timestamp=_at(18)), ALLOW),
+        # Shares as capsulectl states them (0.1.5). The public pickup area
+        # goes to a buyer before acceptance; every contact class waits for
+        # it, and so does the area beside a phone.
+        ("share-pickup-area-to-a-before-acceptance", _share("pickup-area-a-before", 18, ("pickup_area",), second=1), ALLOW),
+        *[(f"share-{cls.replace('_', '-')}-to-a-before-acceptance",
+           _share(f"{cls}-a-before", 18, (cls,), second=2 + n), DENY) for n, cls in enumerate(CONTACT_CLASSES)],
+        ("share-pickup-area-and-phone-to-a-before-acceptance",
+         _share("pickup-area-and-phone-a-before", 18, ("pickup_area", "phone"), second=9), DENY),
         # -- buyer A accepts --------------------------------------------------
         ("acceptance-in-a", _commitment("accept", "agreement.accept", "accept-a", 19, BUYER_A, 175_000), ALLOW),
         # -- after the acceptance ---------------------------------------------
@@ -226,9 +295,11 @@ def _scenarios() -> list[tuple[str, Action, str]]:
         # not accept, so it is refused though recipient_role passes.
         ("address-to-c-after-acceptance", _address("c-after", 25, BUYER_C, "buyer",
                                                    cited_mandate_capsule_id=CITES_ACCEPTANCE), DENY),
-        # The address in A's thread citing B's acceptance (of the other item).
+        # The address in A's thread citing B's acceptance (of the other item):
+        # refused on the citation before 0.1.5; 0.1.5 reads no citation, and
+        # the share is in A's own accepted deal, so it is released.
         ("address-to-a-citing-b-acceptance", _address("a-cites-b", 26, BUYER_A, "buyer",
-                                                      cited_mandate_capsule_id=CITES_ACCEPTANCE_B), DENY),
+                                                      cited_mandate_capsule_id=CITES_ACCEPTANCE_B), ALLOW),
         # The address to buyer C with its action class left out: nothing can
         # show it is out of scope, so it is refused rather than passed as n/a.
         ("address-with-no-action-class", _address("c-no-class", 27, BUYER_C, "buyer", action_class=None,
@@ -269,6 +340,32 @@ def _scenarios() -> list[tuple[str, Action, str]]:
                                                            _fingerprint("platform-h"), "platform",
                                                            representation_class="other",
                                                            disclosed_classes=("email", "pickup_area")), ALLOW),
+        # -- shares as capsulectl states them, after A accepted (0.1.5) --------
+        # Each contact class, and the area, to A in A's thread: released.
+        *[(f"share-{cls.replace('_', '-')}-to-a-after-acceptance", _share(f"{cls}-a-after", 39 + n, (cls,)), ALLOW)
+          for n, cls in enumerate((*CONTACT_CLASSES, "pickup_area"))],
+        # To buyer B, in B's own thread: B did not accept; the area is public.
+        ("share-phone-to-b-after-acceptance", _share("phone-b-after", 46, ("phone",), target=BUYER_B), DENY),
+        ("share-pickup-area-to-b-after-acceptance", _share("pickup-area-b-after", 47, ("pickup_area",), target=BUYER_B),
+         ALLOW),
+        # In A's deal, but the check names another buyer (B's fingerprints).
+        ("share-phone-in-a-to-another-buyer", _share("phone-a-other-buyer", 48, ("phone",),
+                                               thread={**THREAD_A, "counterparty_ids": _ids("buyer-b")}), DENY),
+        # In A's deal, A's profile id under another spelling of A's name.
+        ("share-phone-to-a-under-another-name", _share("phone-a-other-name", 49, ("phone",),
+                                                 thread={**THREAD_A,
+                                                         "counterparty_ids": _ids("buyer-a", name="Buyer A.")}),
+         ALLOW),
+        # A's buyer, but no deal; a deal stated twice; no fingerprints.
+        ("share-phone-to-a-naming-no-deal", _share("phone-a-no-deal", 50, ("phone",), thread={**THREAD_A, "deal_id": None}),
+         DENY),
+        ("share-phone-to-a-naming-two-deals", _share("phone-a-two-deals", 51, ("phone",),
+                                               thread={**THREAD_A, "deal_id": None},
+                                               deal_id_conflict=("chain_id", "deal_id")), DENY),
+        ("share-phone-to-a-with-no-fingerprint", _share("phone-a-no-fingerprint", 52, ("phone",),
+                                                  thread={"deal_id": THREAD_A["deal_id"]}), DENY),
+        # A class s13 never releases, to the buyer who accepted.
+        ("share-credential-to-a-after-acceptance", _share("credential-a-after", 53, ("credential",)), DENY),
     ]
 
 
@@ -277,7 +374,20 @@ def _scenarios() -> list[tuple[str, Action, str]]:
 # 0.1.5 a platform may be given only email, so the pickup area is refused. A
 # comparison with an earlier pack (test_pack_seller.py) sets
 # EXPECTED_OVERRIDES to these.
-BEFORE_PICKUP_AREA = {"pickup-area-to-the-platform": DENY, "email-and-pickup-area-to-the-platform": DENY}
+# s13 before 0.1.5 reads the statement class and a citation, which a share
+# as capsulectl states it carries neither of, so every such share to a buyer
+# refuses; and the address in A's thread citing B's acceptance refuses on
+# the citation, where 0.1.5 reads no citation and releases it in A's own
+# accepted deal.
+BEFORE_RELEASE_FROM_HISTORY = {
+    "share-pickup-area-to-a-before-acceptance": DENY,
+    **{f"share-{cls.replace('_', '-')}-to-a-after-acceptance": DENY for cls in (*CONTACT_CLASSES, "pickup_area")},
+    "share-pickup-area-to-b-after-acceptance": DENY,
+    "share-phone-to-a-under-another-name": DENY,
+    "address-to-a-citing-b-acceptance": DENY,
+}
+BEFORE_PICKUP_AREA = {"pickup-area-to-the-platform": DENY, "email-and-pickup-area-to-the-platform": DENY,
+                      **BEFORE_RELEASE_FROM_HISTORY}
 BEFORE_PLATFORM = {"email-to-the-platform": DENY, **BEFORE_PICKUP_AREA}
 EXPECTED_OVERRIDES: dict[str, str] = {}
 
@@ -300,24 +410,41 @@ def _run_scenarios(ledger, *, project_dir, decisions: dict[str, GuardDecision] |
         action_id="policy_manifest_activated/seller-fixture-install",
     )
     capsules: dict[str, dict] = {}
+    history: list[dict] = []
     for name, action, expected in _scenarios():
         expected = EXPECTED_OVERRIDES.get(name, expected)
         if action.cited_mandate_capsule_id in CITED:
             cited = capsules[CITED[action.cited_mandate_capsule_id]]["capsule_id"]
             action = dataclasses.replace(action, cited_mandate_capsule_id=cited)
-        decision = engine.check(
-            action,
-            dry_run=name not in REAL_RUN,
-            task_authority_record=TASK,
-            authorization_record=APPROVALS.get(name),
-            commercial_bounds_opening=OPENING,
-        )
+        with tempfile.TemporaryDirectory() as tmp, LedgerStore(tmp) as release_history:
+            for record in history:
+                release_history.append(dict(record), consequential=False)
+            decision = engine.check(
+                action,
+                dry_run=name not in REAL_RUN,
+                task_authority_record=TASK,
+                authorization_record=APPROVALS.get(name),
+                commercial_bounds_opening=OPENING,
+                release_history=release_history,
+            )
+        if name in REAL_RUN and decision.outcome == ALLOW and action.action_class == "agreement.accept":
+            history.append(_history_act(action, decision.capsule))
         if decision.outcome != expected:
             raise AssertionError(f"scenario {name!r}: expected {expected!r}, got {decision.outcome!r} ({decision.reason})")
         capsules[name] = decision.capsule
         if decisions is not None:
             decisions[name] = decision
     return installed, activation, capsules, list(ledger.scan())
+
+
+def _history_act(action: Action, capsule: dict) -> dict:
+    """The record ``history_ledger`` writes for a sealed acceptance when a
+    live check's history gives it: the act as a decision seals it, its
+    disposition, and the counterparty its check sealed beside it."""
+    return {"capsule_id": capsule["capsule_id"], "operator": capsule["operator"], "developer": capsule["developer"],
+            "action_type": capsule["action_type"], "action_id": capsule["action_id"],
+            "timestamp": capsule["timestamp"], "disposition": {"decision": "accept"},
+            "asg_payload": history_act_payload(action, sealed_disposition=True)}
 
 
 @pytest.fixture(scope="module")
@@ -367,11 +494,16 @@ def test_records_are_pack_attributed_and_observe_mode(run):
 # -- the acceptance criteria, each on its named record ---------------------------
 
 
-# release_on_acceptance's own reasons: fixed sentences, never a value.
+# release_on_acceptance's own reasons (1.2.0): fixed sentences, never a value.
+NOT_ACCEPTED = "the history given shows no acceptance of this sale by this buyer in this deal"
 RELEASE_REASONS = {
-    "the disclosure cites no acceptance",
-    "the disclosure does not cite this sale's sealed acceptance by this recipient",
-    "the disclosure cites this sale's sealed acceptance by this recipient",
+    NOT_ACCEPTED,
+    "the history given shows this buyer accepted this sale in this deal",
+    "every class the disclosure names may go to a buyer before acceptance",
+    "a credential, a verification code, a payment card or an ID document is never shared with anyone",
+    "the share names no class of data",
+    "the disclosure has no deal_id; it cannot be bound to an acceptance",
+    "the disclosure has no counterparty; it cannot be bound to an acceptance",
     "the action class has no taxonomy row; it cannot be shown to be outside the rule",
 }
 
@@ -393,7 +525,7 @@ def _refused_on_release_alone(run, name: str) -> None:
 
 def test_the_address_before_acceptance_is_refused_by_the_release_rule(run):
     _refused_on_release_alone(run, "address-to-a-before-acceptance")
-    assert _release(run, "address-to-a-before-acceptance").reason == "the disclosure cites no acceptance"
+    assert _release(run, "address-to-a-before-acceptance").reason == NOT_ACCEPTED
 
 
 def test_a_one_shot_approval_does_not_release_the_address(run):
@@ -421,13 +553,15 @@ def test_the_address_to_another_buyer_citing_the_acceptance_is_refused(run):
     _refused_on_release_alone(run, name)
 
 
-def test_the_address_citing_another_buyers_acceptance_is_refused(run):
+def test_the_address_in_the_accepting_deal_is_released_whatever_it_cites(run):
+    """0.1.5 reads no citation: the address in A's own accepted deal, citing
+    B's real acceptance of the other item, is released to A."""
     capsules = run[2]
     capsule = capsules["address-to-a-citing-b-acceptance"]
-    # B's acceptance is a real, re-verifying record; it is just not this sale's by A.
     assert capsules[ACCEPTANCE_B]["disposition"]["decision"] == "accept"
     assert _constraint(capsule, "verify_before_dispatch")["result"] == "pass"
-    _refused_on_release_alone(run, "address-to-a-citing-b-acceptance")
+    assert _constraint(capsule, "release_on_acceptance")["result"] == "pass"
+    assert capsule["disposition"]["decision"] == "accept"
 
 
 def test_the_release_rule_names_no_value(run):
@@ -436,7 +570,8 @@ def test_the_release_rule_names_no_value(run):
     the fixed sentences."""
     capsules = run[2]
     values = [BUYER_A, BUYER_B, BUYER_C, _fingerprint("someone-else"), ITEM, ITEM_2, TASK_REF,
-              capsules[ACCEPTANCE]["capsule_id"], capsules[ACCEPTANCE_B]["capsule_id"]]
+              capsules[ACCEPTANCE]["capsule_id"], capsules[ACCEPTANCE_B]["capsule_id"],
+              *(v for t in (THREAD_A, THREAD_B, THREAD_C) for v in (t["deal_id"], *t["counterparty_ids"].values()))]
     measured = 0
     for name in capsules:
         outcome = _release(run, name)
@@ -444,12 +579,12 @@ def test_the_release_rule_names_no_value(run):
             continue
         measured += 1
         assert outcome.reason in RELEASE_REASONS, name
-        assert set(outcome.evidence) == {"constraint_id", "representation_class", "bound_to_acceptance",
+        assert set(outcome.evidence) == {"constraint_id", "disclosed_classes", "bound_to_acceptance",
                                          "missing_field"}, name
         serialised = json.dumps({"reason": outcome.reason, "evidence": outcome.evidence})
         for value in values:
             assert value not in serialised, (name, value)
-    assert measured == 12
+    assert measured == 35
 
 
 @pytest.mark.parametrize("cls", ["pickup", "other"])
@@ -460,6 +595,67 @@ def test_personal_data_of_another_class_is_held_until_the_buyer_accepts(run, cls
     assert _failing(after) == []
     assert after["disposition"]["decision"] == "accept"
     assert _constraint(after, "release_on_acceptance")["result"] == "pass"
+
+
+# -- shares as capsulectl states them (0.1.5) ------------------------------------
+
+
+def test_the_public_pickup_area_goes_to_a_buyer_before_acceptance(run):
+    outcome = _release(run, "share-pickup-area-to-a-before-acceptance")
+    assert (outcome.result, outcome.evidence) == ("pass", {
+        "constraint_id": "release_on_acceptance", "disclosed_classes": ["pickup_area"], "bound_to_acceptance": False,
+        "missing_field": None})
+    assert run[2]["share-pickup-area-to-a-before-acceptance"]["disposition"]["decision"] == "accept"
+
+
+@pytest.mark.parametrize("cls", ["pickup_location", "phone", "email", "name", "home_address", "address"])
+def test_each_contact_class_waits_for_the_acceptance_then_goes_to_the_buyer_who_accepted(run, cls):
+    slug = cls.replace("_", "-")
+    _refused_on_release_alone(run, f"share-{slug}-to-a-before-acceptance")
+    assert _release(run, f"share-{slug}-to-a-before-acceptance").reason == NOT_ACCEPTED
+    after = run[2][f"share-{slug}-to-a-after-acceptance"]
+    assert _failing(after) == []
+    assert after["disposition"]["decision"] == "accept"
+    outcome = _release(run, f"share-{slug}-to-a-after-acceptance")
+    assert (outcome.evidence["disclosed_classes"], outcome.evidence["bound_to_acceptance"]) == ([cls], True)
+
+
+def test_the_area_beside_a_contact_class_waits_for_the_acceptance(run):
+    _refused_on_release_alone(run, "share-pickup-area-and-phone-to-a-before-acceptance")
+    assert _release(run, "share-pickup-area-and-phone-to-a-before-acceptance").evidence["disclosed_classes"] == [
+        "phone", "pickup_area"]
+
+
+@pytest.mark.parametrize("name", ["share-phone-to-b-after-acceptance", "share-phone-in-a-to-another-buyer"])
+def test_a_buyer_who_did_not_accept_is_refused_with_the_same_reason(run, name):
+    """Another thread's buyer, and another buyer named in the accepting
+    deal: one reason, as for no acceptance, so neither learns A accepted."""
+    _refused_on_release_alone(run, name)
+    assert _release(run, name).reason == NOT_ACCEPTED
+
+
+def test_the_public_pickup_area_goes_to_another_threads_buyer_too(run):
+    assert _release(run, "share-pickup-area-to-b-after-acceptance").result == "pass"
+    assert run[2]["share-pickup-area-to-b-after-acceptance"]["disposition"]["decision"] == "accept"
+
+
+def test_the_buyer_is_matched_on_the_profile_id_not_the_name(run):
+    assert _release(run, "share-phone-to-a-under-another-name").result == "pass"
+
+
+@pytest.mark.parametrize(("name", "field"), [("share-phone-to-a-naming-no-deal", "deal_id"),
+                                             ("share-phone-to-a-naming-two-deals", "deal_id"),
+                                             ("share-phone-to-a-with-no-fingerprint", "counterparty")])
+def test_a_share_missing_its_deal_or_its_buyer_is_refused(run, name, field):
+    outcome = _release(run, name)
+    assert (outcome.result, outcome.evidence["missing_field"]) == ("fail", field)
+    assert run[2][name]["disposition"]["decision"] == "reject"
+
+
+def test_a_credential_never_goes_to_the_buyer_who_accepted(run):
+    _refused_on_release_alone(run, "share-credential-to-a-after-acceptance")
+    assert _release(run, "share-credential-to-a-after-acceptance").reason == (
+        "a credential, a verification code, a payment card or an ID document is never shared with anyone")
 
 
 def test_an_address_with_no_action_class_is_refused(run):
@@ -554,8 +750,6 @@ def test_fixture_is_reproducible_byte_for_byte(run):
 
 
 def _regenerate_fixture() -> None:
-    import tempfile
-
     with tempfile.TemporaryDirectory() as tmp:
         tmp = Path(tmp)
         store = LedgerStore(tmp / "ledger")

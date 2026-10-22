@@ -55,11 +55,19 @@ from cll.ledger.api import LedgerAPI, ScanQuery
 
 from ..action import Action
 from ..capsule import ConstraintOutcome, NotApplicableEvidence, not_applicable_evidence
-from ..history_state import DISPOSITION, INCOMPLETE, NO_DISPOSITION, UNREAD, history_state
+from ..history_state import (
+    DISPOSITION,
+    INCOMPLETE,
+    NO_DISPOSITION,
+    UNREAD,
+    ThreadCounterparty,
+    history_state,
+    thread_counterparty,
+)
 from .base import CheckOutcome
 
-__all__ = ["SaleAcceptance", "SealedAcceptance", "check_single_commitment", "first_sealed_acceptance",
-           "sale_acceptance"]
+__all__ = ["SaleAcceptance", "SealedAcceptance", "ThreadCounterparty", "check_single_commitment",
+           "first_sealed_acceptance", "sale_acceptance"]
 
 _CHECK_ID = "single_commitment"
 _METHOD = "first_sealed_acceptance_v1"
@@ -78,9 +86,15 @@ class CommitmentEvidence(TypedDict):
 
 
 class SealedAcceptance(TypedDict):
+    """The sale's acceptance: its record, the ``target`` and ``deal_id`` it
+    seals, and, on a record from a live or replayed history, the counterparty
+    its check sealed (``history_state.thread_counterparty``; ``None``
+    otherwise), which is never sealed on a decision."""
+
     capsule_id: str
     counterparty: str | None
     deal_id: str | None
+    thread_counterparty: ThreadCounterparty | None
 
 
 @dataclass(frozen=True)
@@ -147,7 +161,7 @@ def sale_acceptance(operator: str, ledger: LedgerAPI, acceptance_classes: list[s
         if not _accepted_commitment(capsule, acceptance_classes):
             continue
         found = SealedAcceptance(capsule_id=record.capsule_id, counterparty=payload.get("target"),
-                                 deal_id=payload.get("deal_id"))
+                                 deal_id=payload.get("deal_id"), thread_counterparty=thread_counterparty(capsule))
     return SaleAcceptance(acceptance=found, unknown=unknown)
 
 

@@ -153,6 +153,8 @@ CONFIGURED_CHECKS: dict[str, Callable[[Action, LedgerAPI, dict], CheckOutcome]] 
         acceptance_classes=config["acceptance_classes"],
         action_classes=config["action_classes"],
         except_recipient_roles=config.get("except_recipient_roles"),
+        binding=config.get("binding"),
+        pre_acceptance_classes=config.get("pre_acceptance_classes"),
     ),
 }
 

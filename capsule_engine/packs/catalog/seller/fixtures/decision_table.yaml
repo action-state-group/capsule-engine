@@ -30,7 +30,8 @@
 # sale-to-a-on-a-rail-not-allowed (s07) each fail one such check alone.
 # statement-authenticity (promise_never), pickup-told-to-a-again (dedupe in
 # one deal), second-commitment-in-b (single_commitment) and every address
-# row but address-to-a-after-acceptance (release_on_acceptance, s13; the
+# row but address-to-a-after-acceptance and address-to-a-citing-b-acceptance
+# (release_on_acceptance, s13; the
 # unknown mandate also fails verify_before_dispatch; the row with no action
 # class fails it closed) are integrity failures and deny, the approved one
 # included. The pickup and other-class details deny before acceptance and
@@ -46,6 +47,17 @@
 # The three pickup rows (0.1.5) give the platform the listing's public pickup
 # area (pickup_area), alone or beside an email, and the exact spot
 # (pickup_location). recipient_role passes the first two and fails the third.
+#
+# The share-* rows (0.1.5) are shares as capsulectl states them: the classes
+# of data, the deal and the buyer's fingerprints, no statement class and no
+# citation (so promise_requires_approval and promise_never are n/a, naming
+# representation_class). s13 (seller.release_on_acceptance/1.2.0) reads the
+# sale's acceptance from the history each share is given: the public pickup
+# area passes before acceptance and to another thread's buyer; each contact
+# class passes only to A in A's deal after A accepted; another buyer, a share
+# naming no deal or two, one with no fingerprint and a credential fail it.
+# Under 0.1.5, address-to-a-citing-b-acceptance is in A's own accepted deal
+# and s13 reads no citation, so it passes.
 
 rows:
   - scenario: condition-told-to-a
@@ -294,6 +306,126 @@ rows:
       task_authority: {population: c}
       release_on_acceptance: {population: c}
     verdict: allow
+  - scenario: share-pickup-area-to-a-before-acceptance
+    action_id: share_contact/seller-fixture-pickup-area-a-before
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: pass, price_floor: n/a, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: pass}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      price_floor: {population: c}
+      promise_requires_approval: {population: a, missing_field: representation_class}
+      promise_never: {population: a, missing_field: representation_class}
+      required_disclosure: {population: c}
+      offer_expiry: {population: c}
+      single_commitment: {population: c}
+      destination_rail: {population: c}
+      task_authority: {population: c}
+    verdict: allow
+  - scenario: share-pickup-location-to-a-before-acceptance
+    action_id: share_contact/seller-fixture-pickup_location-a-before
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: pass, price_floor: n/a, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: fail}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      price_floor: {population: c}
+      promise_requires_approval: {population: a, missing_field: representation_class}
+      promise_never: {population: a, missing_field: representation_class}
+      required_disclosure: {population: c}
+      offer_expiry: {population: c}
+      single_commitment: {population: c}
+      destination_rail: {population: c}
+      task_authority: {population: c}
+    verdict: deny
+  - scenario: share-phone-to-a-before-acceptance
+    action_id: share_contact/seller-fixture-phone-a-before
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: pass, price_floor: n/a, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: fail}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      price_floor: {population: c}
+      promise_requires_approval: {population: a, missing_field: representation_class}
+      promise_never: {population: a, missing_field: representation_class}
+      required_disclosure: {population: c}
+      offer_expiry: {population: c}
+      single_commitment: {population: c}
+      destination_rail: {population: c}
+      task_authority: {population: c}
+    verdict: deny
+  - scenario: share-email-to-a-before-acceptance
+    action_id: share_contact/seller-fixture-email-a-before
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: pass, price_floor: n/a, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: fail}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      price_floor: {population: c}
+      promise_requires_approval: {population: a, missing_field: representation_class}
+      promise_never: {population: a, missing_field: representation_class}
+      required_disclosure: {population: c}
+      offer_expiry: {population: c}
+      single_commitment: {population: c}
+      destination_rail: {population: c}
+      task_authority: {population: c}
+    verdict: deny
+  - scenario: share-name-to-a-before-acceptance
+    action_id: share_contact/seller-fixture-name-a-before
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: pass, price_floor: n/a, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: fail}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      price_floor: {population: c}
+      promise_requires_approval: {population: a, missing_field: representation_class}
+      promise_never: {population: a, missing_field: representation_class}
+      required_disclosure: {population: c}
+      offer_expiry: {population: c}
+      single_commitment: {population: c}
+      destination_rail: {population: c}
+      task_authority: {population: c}
+    verdict: deny
+  - scenario: share-home-address-to-a-before-acceptance
+    action_id: share_contact/seller-fixture-home_address-a-before
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: pass, price_floor: n/a, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: fail}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      price_floor: {population: c}
+      promise_requires_approval: {population: a, missing_field: representation_class}
+      promise_never: {population: a, missing_field: representation_class}
+      required_disclosure: {population: c}
+      offer_expiry: {population: c}
+      single_commitment: {population: c}
+      destination_rail: {population: c}
+      task_authority: {population: c}
+    verdict: deny
+  - scenario: share-address-to-a-before-acceptance
+    action_id: share_contact/seller-fixture-address-a-before
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: pass, price_floor: n/a, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: fail}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      price_floor: {population: c}
+      promise_requires_approval: {population: a, missing_field: representation_class}
+      promise_never: {population: a, missing_field: representation_class}
+      required_disclosure: {population: c}
+      offer_expiry: {population: c}
+      single_commitment: {population: c}
+      destination_rail: {population: c}
+      task_authority: {population: c}
+    verdict: deny
+  - scenario: share-pickup-area-and-phone-to-a-before-acceptance
+    action_id: share_contact/seller-fixture-pickup-area-and-phone-a-before
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: pass, price_floor: n/a, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: fail}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      price_floor: {population: c}
+      promise_requires_approval: {population: a, missing_field: representation_class}
+      promise_never: {population: a, missing_field: representation_class}
+      required_disclosure: {population: c}
+      offer_expiry: {population: c}
+      single_commitment: {population: c}
+      destination_rail: {population: c}
+      task_authority: {population: c}
+    verdict: deny
   - scenario: acceptance-in-a
     action_id: accept/seller-fixture-accept-a
     checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: n/a, price_floor: pass, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: pass, offer_expiry: pass, single_commitment: pass, destination_rail: n/a, task_authority: pass, release_on_acceptance: n/a}
@@ -380,7 +512,7 @@ rows:
     verdict: deny
   - scenario: address-to-a-citing-b-acceptance
     action_id: share_address/seller-fixture-a-cites-b
-    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: pass, recipient_role: pass, price_floor: n/a, promise_requires_approval: pass, promise_never: pass, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: fail}
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: pass, recipient_role: pass, price_floor: n/a, promise_requires_approval: pass, promise_never: pass, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: pass}
     n_a:
       caps: {population: c}
       price_floor: {population: c}
@@ -389,7 +521,7 @@ rows:
       single_commitment: {population: c}
       destination_rail: {population: c}
       task_authority: {population: c}
-    verdict: deny
+    verdict: allow
   - scenario: address-with-no-action-class
     action_id: share_address/seller-fixture-c-no-class
     checks: {dedupe: pass, caps: n/a, verify_before_dispatch: pass, recipient_role: n/a, price_floor: n/a, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: fail}
@@ -437,7 +569,6 @@ rows:
       promise_never: {population: a, missing_field: representation_class}
       release_on_acceptance: {population: c}
     verdict: escalate
-
   - scenario: email-to-the-platform
     action_id: share_personal/seller-fixture-platform-email
     checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: pass, price_floor: n/a, promise_requires_approval: pass, promise_never: pass, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: n/a}
@@ -550,3 +681,228 @@ rows:
       task_authority: {population: c}
       release_on_acceptance: {population: c}
     verdict: allow
+  - scenario: share-pickup-location-to-a-after-acceptance
+    action_id: share_contact/seller-fixture-pickup_location-a-after
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: pass, price_floor: n/a, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: pass}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      price_floor: {population: c}
+      promise_requires_approval: {population: a, missing_field: representation_class}
+      promise_never: {population: a, missing_field: representation_class}
+      required_disclosure: {population: c}
+      offer_expiry: {population: c}
+      single_commitment: {population: c}
+      destination_rail: {population: c}
+      task_authority: {population: c}
+    verdict: allow
+  - scenario: share-phone-to-a-after-acceptance
+    action_id: share_contact/seller-fixture-phone-a-after
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: pass, price_floor: n/a, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: pass}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      price_floor: {population: c}
+      promise_requires_approval: {population: a, missing_field: representation_class}
+      promise_never: {population: a, missing_field: representation_class}
+      required_disclosure: {population: c}
+      offer_expiry: {population: c}
+      single_commitment: {population: c}
+      destination_rail: {population: c}
+      task_authority: {population: c}
+    verdict: allow
+  - scenario: share-email-to-a-after-acceptance
+    action_id: share_contact/seller-fixture-email-a-after
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: pass, price_floor: n/a, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: pass}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      price_floor: {population: c}
+      promise_requires_approval: {population: a, missing_field: representation_class}
+      promise_never: {population: a, missing_field: representation_class}
+      required_disclosure: {population: c}
+      offer_expiry: {population: c}
+      single_commitment: {population: c}
+      destination_rail: {population: c}
+      task_authority: {population: c}
+    verdict: allow
+  - scenario: share-name-to-a-after-acceptance
+    action_id: share_contact/seller-fixture-name-a-after
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: pass, price_floor: n/a, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: pass}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      price_floor: {population: c}
+      promise_requires_approval: {population: a, missing_field: representation_class}
+      promise_never: {population: a, missing_field: representation_class}
+      required_disclosure: {population: c}
+      offer_expiry: {population: c}
+      single_commitment: {population: c}
+      destination_rail: {population: c}
+      task_authority: {population: c}
+    verdict: allow
+  - scenario: share-home-address-to-a-after-acceptance
+    action_id: share_contact/seller-fixture-home_address-a-after
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: pass, price_floor: n/a, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: pass}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      price_floor: {population: c}
+      promise_requires_approval: {population: a, missing_field: representation_class}
+      promise_never: {population: a, missing_field: representation_class}
+      required_disclosure: {population: c}
+      offer_expiry: {population: c}
+      single_commitment: {population: c}
+      destination_rail: {population: c}
+      task_authority: {population: c}
+    verdict: allow
+  - scenario: share-address-to-a-after-acceptance
+    action_id: share_contact/seller-fixture-address-a-after
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: pass, price_floor: n/a, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: pass}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      price_floor: {population: c}
+      promise_requires_approval: {population: a, missing_field: representation_class}
+      promise_never: {population: a, missing_field: representation_class}
+      required_disclosure: {population: c}
+      offer_expiry: {population: c}
+      single_commitment: {population: c}
+      destination_rail: {population: c}
+      task_authority: {population: c}
+    verdict: allow
+  - scenario: share-pickup-area-to-a-after-acceptance
+    action_id: share_contact/seller-fixture-pickup_area-a-after
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: pass, price_floor: n/a, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: pass}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      price_floor: {population: c}
+      promise_requires_approval: {population: a, missing_field: representation_class}
+      promise_never: {population: a, missing_field: representation_class}
+      required_disclosure: {population: c}
+      offer_expiry: {population: c}
+      single_commitment: {population: c}
+      destination_rail: {population: c}
+      task_authority: {population: c}
+    verdict: allow
+  - scenario: share-phone-to-b-after-acceptance
+    action_id: share_contact/seller-fixture-phone-b-after
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: pass, price_floor: n/a, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: fail}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      price_floor: {population: c}
+      promise_requires_approval: {population: a, missing_field: representation_class}
+      promise_never: {population: a, missing_field: representation_class}
+      required_disclosure: {population: c}
+      offer_expiry: {population: c}
+      single_commitment: {population: c}
+      destination_rail: {population: c}
+      task_authority: {population: c}
+    verdict: deny
+  - scenario: share-pickup-area-to-b-after-acceptance
+    action_id: share_contact/seller-fixture-pickup-area-b-after
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: pass, price_floor: n/a, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: pass}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      price_floor: {population: c}
+      promise_requires_approval: {population: a, missing_field: representation_class}
+      promise_never: {population: a, missing_field: representation_class}
+      required_disclosure: {population: c}
+      offer_expiry: {population: c}
+      single_commitment: {population: c}
+      destination_rail: {population: c}
+      task_authority: {population: c}
+    verdict: allow
+  - scenario: share-phone-in-a-to-another-buyer
+    action_id: share_contact/seller-fixture-phone-a-other-buyer
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: pass, price_floor: n/a, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: fail}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      price_floor: {population: c}
+      promise_requires_approval: {population: a, missing_field: representation_class}
+      promise_never: {population: a, missing_field: representation_class}
+      required_disclosure: {population: c}
+      offer_expiry: {population: c}
+      single_commitment: {population: c}
+      destination_rail: {population: c}
+      task_authority: {population: c}
+    verdict: deny
+  - scenario: share-phone-to-a-under-another-name
+    action_id: share_contact/seller-fixture-phone-a-other-name
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: pass, price_floor: n/a, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: pass}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      price_floor: {population: c}
+      promise_requires_approval: {population: a, missing_field: representation_class}
+      promise_never: {population: a, missing_field: representation_class}
+      required_disclosure: {population: c}
+      offer_expiry: {population: c}
+      single_commitment: {population: c}
+      destination_rail: {population: c}
+      task_authority: {population: c}
+    verdict: allow
+  - scenario: share-phone-to-a-naming-no-deal
+    action_id: share_contact/seller-fixture-phone-a-no-deal
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: pass, price_floor: n/a, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: fail}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      price_floor: {population: c}
+      promise_requires_approval: {population: a, missing_field: representation_class}
+      promise_never: {population: a, missing_field: representation_class}
+      required_disclosure: {population: c}
+      offer_expiry: {population: c}
+      single_commitment: {population: c}
+      destination_rail: {population: c}
+      task_authority: {population: c}
+    verdict: deny
+  - scenario: share-phone-to-a-naming-two-deals
+    action_id: share_contact/seller-fixture-phone-a-two-deals
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: pass, price_floor: n/a, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: fail}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      price_floor: {population: c}
+      promise_requires_approval: {population: a, missing_field: representation_class}
+      promise_never: {population: a, missing_field: representation_class}
+      required_disclosure: {population: c}
+      offer_expiry: {population: c}
+      single_commitment: {population: c}
+      destination_rail: {population: c}
+      task_authority: {population: c}
+    verdict: deny
+  - scenario: share-phone-to-a-with-no-fingerprint
+    action_id: share_contact/seller-fixture-phone-a-no-fingerprint
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: pass, price_floor: n/a, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: fail}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      price_floor: {population: c}
+      promise_requires_approval: {population: a, missing_field: representation_class}
+      promise_never: {population: a, missing_field: representation_class}
+      required_disclosure: {population: c}
+      offer_expiry: {population: c}
+      single_commitment: {population: c}
+      destination_rail: {population: c}
+      task_authority: {population: c}
+    verdict: deny
+  - scenario: share-credential-to-a-after-acceptance
+    action_id: share_contact/seller-fixture-credential-a-after
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: pass, price_floor: n/a, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: fail}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      price_floor: {population: c}
+      promise_requires_approval: {population: a, missing_field: representation_class}
+      promise_never: {population: a, missing_field: representation_class}
+      required_disclosure: {population: c}
+      offer_expiry: {population: c}
+      single_commitment: {population: c}
+      destination_rail: {population: c}
+      task_authority: {population: c}
+    verdict: deny

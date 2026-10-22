@@ -66,7 +66,20 @@
 # the exact spot, which is pickup_location), as a listing needs it
 # (seller.recipient_role/1.2.0, capsule-engine#181). pickup_area is not an
 # address class. A phone, an address, pickup_location or any other class to a
-# platform still refuses. No other rule changes.
+# platform still refuses.
+#
+# 0.1.5 also fixes s13 (seller.release_on_acceptance/1.2.0, capsule-engine
+# #179, #186). 1.1.0 read a statement class no share carries and needed a
+# cited acceptance no producer sends, so no share to a buyer ever passed.
+# s13 now reads the classes of data a share gives (disclosed_classes) and
+# finds the sale's acceptance in the history: the same record as before, in
+# the share's own deal and by the same buyer, by the counterparty
+# fingerprint each check seals. The public pickup area goes to a buyer before
+# acceptance; a credential, a verification code, a payment card or an ID
+# document goes to no one but the platform (s01 decides that), the accepted
+# buyer included. personal_data.share now requires disclosed_classes and
+# takes deal_id, and no longer requires representation_class. No other rule
+# changes.
 pack_id: asg/seller/0.1.5
 
 obligations:
@@ -167,15 +180,23 @@ obligations:
     default_disposition: NEVER
   - id: s13-personal-data-only-to-the-buyer-who-accepted
     statement: >-
-      Detects a disclosure of the user's personal data (disclosure.personal,
-      of any class, the address included) that does not cite the sale's
-      sealed acceptance, or whose recipient is not the buyer that accepted,
-      and records the class, whether the disclosure was bound to the
-      acceptance and the name of a missing field -- never the data, the
-      item, the task authority or a counterparty. An action whose class is
-      missing or unknown, and a disclosure that declares no known class,
-      are detected too. A disclosure to a platform reaches no buyer and is
-      left to s01. No approval clears it.
+      Checks the user's personal data the agent shares
+      (disclosure.personal) with anyone but the platform. The listing's
+      public pickup area (not the exact spot) may go to any buyer at any
+      time. Contact details
+      (a name, a phone, an email, an address, the pickup spot or other
+      contact) go only to the buyer who
+      accepted the sale, in that buyer's own thread. The acceptance is the
+      sale's one acceptance: the first accepted commitment for the item in
+      the history. It refuses a
+      share before that acceptance, to another buyer, or in another thread.
+      It refuses when the history cannot show the acceptance. It refuses a
+      credential, a verification code, a payment card or an ID document to
+      anyone but the platform, the accepted buyer included. It refuses a share that names no
+      class of data. A share to the platform is left to s01. It records the
+      class names and whether the share was bound to an acceptance, never
+      the data, the item or who the buyer is. The user's approval does not
+      override it.
     check: release_on_acceptance
     default_disposition: NEVER
 
@@ -198,8 +219,8 @@ action_semantics:
     optional_fields: [task_authority_ref, authorized_by, equivalence_key]
   - action_type: personal_data.share
     action_class: disclosure.personal
-    required_fields: [target, recipient_role, representation_class]
-    optional_fields: [task_authority_ref, item_ref, authorized_by, cited_mandate_capsule_id, equivalence_key]
+    required_fields: [target, recipient_role, disclosed_classes]
+    optional_fields: [task_authority_ref, item_ref, deal_id, authorized_by, cited_mandate_capsule_id, equivalence_key]
 
 constraints:
   - wicket_ref: dedupe/1.0.0
@@ -229,10 +250,11 @@ constraints:
     digest: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
   - wicket_ref: task_authority/1.1.0
     digest: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-  # The address reaches only the buyer whose acceptance it cites; a
-  # disclosure to a platform reaches no buyer and is left to s01.
-  - wicket_ref: seller.release_on_acceptance/1.1.0
-    digest: 933d72ab36863cb67ef2f0333b424fb4d559fa77bfeb1f5b63a61dee6307e28b
+  # Contact details reach only the buyer who accepted, in the accepting
+  # deal; the public pickup area reaches any buyer; a disclosure to a
+  # platform reaches no buyer and is left to s01.
+  - wicket_ref: seller.release_on_acceptance/1.2.0
+    digest: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
 
 folds:
   # Read by required_disclosure, which pins these same digests in its config.
@@ -282,6 +304,22 @@ fixtures:
       outcome: deny
     - id: listing-views-read
       outcome: allow
+    - id: share-pickup-area-to-a-before-acceptance
+      outcome: allow
+    - id: share-pickup-location-to-a-before-acceptance
+      outcome: deny
+    - id: share-phone-to-a-before-acceptance
+      outcome: deny
+    - id: share-email-to-a-before-acceptance
+      outcome: deny
+    - id: share-name-to-a-before-acceptance
+      outcome: deny
+    - id: share-home-address-to-a-before-acceptance
+      outcome: deny
+    - id: share-address-to-a-before-acceptance
+      outcome: deny
+    - id: share-pickup-area-and-phone-to-a-before-acceptance
+      outcome: deny
     - id: acceptance-in-a
       outcome: allow
     - id: second-commitment-in-b
@@ -297,7 +335,7 @@ fixtures:
     - id: address-to-c-after-acceptance
       outcome: deny
     - id: address-to-a-citing-b-acceptance
-      outcome: deny
+      outcome: allow
     - id: address-with-no-action-class
       outcome: deny
     - id: address-to-a-third-party
@@ -322,6 +360,36 @@ fixtures:
       outcome: deny
     - id: email-and-pickup-area-to-the-platform
       outcome: allow
+    - id: share-pickup-location-to-a-after-acceptance
+      outcome: allow
+    - id: share-phone-to-a-after-acceptance
+      outcome: allow
+    - id: share-email-to-a-after-acceptance
+      outcome: allow
+    - id: share-name-to-a-after-acceptance
+      outcome: allow
+    - id: share-home-address-to-a-after-acceptance
+      outcome: allow
+    - id: share-address-to-a-after-acceptance
+      outcome: allow
+    - id: share-pickup-area-to-a-after-acceptance
+      outcome: allow
+    - id: share-phone-to-b-after-acceptance
+      outcome: deny
+    - id: share-pickup-area-to-b-after-acceptance
+      outcome: allow
+    - id: share-phone-in-a-to-another-buyer
+      outcome: deny
+    - id: share-phone-to-a-under-another-name
+      outcome: allow
+    - id: share-phone-to-a-naming-no-deal
+      outcome: deny
+    - id: share-phone-to-a-naming-two-deals
+      outcome: deny
+    - id: share-phone-to-a-with-no-fingerprint
+      outcome: deny
+    - id: share-credential-to-a-after-acceptance
+      outcome: deny
 
 # The action taxonomy this pack was authored against. The taxonomy decides
 # whether a gated class asks or refuses on a failure (its approver_role), so

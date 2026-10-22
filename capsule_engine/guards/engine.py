@@ -97,6 +97,7 @@ __all__ = [
     "GuardDecision",
     "GuardEngine",
     "TaxonomyMismatch",
+    "reads_release_history",
 ]
 
 NOT_EVALUABLE = "not_evaluable"
@@ -324,6 +325,13 @@ class GuardEngine:
 
     # -- the public API -------------------------------------------------
 
+    @property
+    def uses_release_history(self) -> bool:
+        """Whether a wicket of this engine reads ``check``'s
+        ``release_history`` (``reads_release_history``), so a replay builds
+        that window only when it is read."""
+        return any(reads_release_history(w) for w in self._wickets)
+
     def check(
         self,
         action: Action,
@@ -335,6 +343,7 @@ class GuardEngine:
         authorization_record: AuthorizationRecord | None = None,
         commercial_bounds_opening: CommercialBoundsOpening | None = None,
         sale_history: LedgerAPI | None = None,
+        release_history: LedgerAPI | None = None,
     ) -> GuardDecision:
         """``task_authority_record`` is the whole sealed task-authority record
         ``action.task_authority_ref`` names, read only by a
@@ -351,7 +360,12 @@ class GuardEngine:
         record seals (``guards/checks/price_floor.py``). It is never sealed.
         ``sale_history`` is the ledger a replay builds for this check from a
         sale bundle (``report/sale_bundle.py``): given, ``single_commitment``
-        reads the sale's acceptance from it instead of the engine's ledger."""
+        reads the sale's acceptance from it instead of the engine's ledger.
+        ``release_history`` is the same history cut to the window a live
+        check is given (``history_state.RULES_HISTORY_DAYS``): given, a
+        ``release_on_acceptance`` wicket that binds the acceptance from the
+        history (``reads_release_history``) reads it instead of the engine's
+        ledger. A cited ``release_on_acceptance`` (1.0.0, 1.1.0) never does."""
         table, mismatch, mismatch_reason = self._taxonomy_for(action)
         ac = table.classify(action.action_class)
         consequential = ac.consequential
@@ -496,7 +510,12 @@ class GuardEngine:
             elif wicket.check == _GATE:
                 out = check_action_class_gate(action, selectors=wicket.config["selectors"], table=table)
             else:
-                reads = sale_history if sale_history is not None and wicket.check == _SALE_HISTORY_CHECK else self._ledger
+                if sale_history is not None and wicket.check == _SALE_HISTORY_CHECK:
+                    reads = sale_history
+                elif release_history is not None and reads_release_history(wicket):
+                    reads = release_history
+                else:
+                    reads = self._ledger
                 out = CONFIGURED_CHECKS[wicket.check](action, reads, wicket.config)
             constraint = held(out.constraint)
             constraints = (*constraints, constraint)
@@ -775,8 +794,18 @@ def _caps_out_of_scope(reason: str, *, method: str | None) -> CheckOutcome:
 # a first-time counterparty. These two ask whatever a pack declares for them.
 _ESCALATABLE = frozenset({"caps", "counterparty_seen_before"})
 _GATE = "action_class_gate"
-# The one check that reads a replayed sale's history when a check is given one.
+# The one check that reads a replayed sale's whole history when a check is given one.
 _SALE_HISTORY_CHECK = "single_commitment"
+
+
+def reads_release_history(wicket: WicketDefinition) -> bool:
+    """Whether ``wicket`` reads a replayed sale's history in the live window
+    (``GuardEngine.check``'s ``release_history``): a ``release_on_acceptance``
+    that binds the acceptance from the history (seller.release_on_acceptance/
+    1.2.0's ``binding``)."""
+    return wicket.check == "release_on_acceptance" and wicket.config.get("binding") is not None
+
+
 # Integrity checks: a failure is refused whatever a pack declares (a dedupe hit
 # on the same act in another deal asks through ``CheckOutcome.asks_approver``).
 _INTEGRITY_CHECKS = frozenset(

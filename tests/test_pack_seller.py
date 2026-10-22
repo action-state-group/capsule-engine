@@ -10,8 +10,11 @@ one decides the same under both. 0.1.4 is 0.1.3 with a platform recipient:
 s01 passes an email to the platform a sale is listed on and refuses anything
 else to it, and s13 does not apply to it; only the email-to-the-platform
 scenario decides differently. 0.1.5 is 0.1.4 with the listing's public pickup
-area (pickup_area) also passing to a platform (seller.recipient_role/1.2.0);
-only the scenarios giving a platform the pickup area decide differently.
+area (pickup_area) also passing to a platform (seller.recipient_role/1.2.0),
+and with s13 reading the classes of data a share gives and binding the
+acceptance from the history (seller.release_on_acceptance/1.2.0): the
+scenarios giving a platform the pickup area, and the shares to a buyer the
+new s13 releases, decide differently.
 
 The scenarios are in ``test_pack_seller_acceptance.py``; this file pins the
 pack's own content, so a definition cited at another digest or a rule
@@ -73,7 +76,7 @@ CITED = [
     "seller.single_commitment/1.0.0",
     "seller.destination_rail/1.0.0",
     "task_authority/1.1.0",
-    "seller.release_on_acceptance/1.1.0",
+    "seller.release_on_acceptance/1.2.0",
 ]
 
 # check -> the disposition its one rule declares.
@@ -116,10 +119,13 @@ def test_the_address_is_measured_by_the_release_rule_not_the_gate():
     assert not [o for o in PACK.obligations if o.check == "action_class_gate" or o.selector is not None]
     assert "action_class_gate" not in {w.check for w in PACK.constraints}
     (release,) = [w for w in PACK.constraints if w.check == "release_on_acceptance"]
-    assert release.config["release_classes"] == CATALOG.get("promise_never/1.0.0").definition.config["representation_classes"]
+    assert release.config["release_classes"] == [
+        "name", "phone", "email", "home_address", "address", "pickup_location", "other_contact", "pickup_area"]
+    assert release.config["pre_acceptance_classes"] == ["pickup_area"]
     (share,) = [s for s in PACK.action_semantics if s.action_class == "disclosure.personal"]
-    assert "representation_class" in share.required_fields
-    assert "item_ref" in share.optional_fields
+    assert share.required_fields == ("target", "recipient_role", "disclosed_classes")
+    assert "representation_class" not in (*share.required_fields, *share.optional_fields)
+    assert {"item_ref", "deal_id"} <= set(share.optional_fields)
 
 
 def test_0_1_0_is_kept_byte_for_byte_and_still_loads_at_its_digest():
@@ -196,20 +202,23 @@ def test_0_1_4_changes_only_s01_and_s13():
     assert release.config["except_recipient_roles"] == ["platform"]
 
 
-def test_0_1_5_changes_only_s01():
-    """0.1.5 cites seller.recipient_role/1.2.0 where 0.1.4 cited 1.1.0, and
-    changes nothing else it cites or declares; only s01's statement changes.
-    s13 is unchanged: it still holds every share to a buyer until acceptance,
-    the pickup area included (#186 changes that in its 1.2.0)."""
+def test_0_1_5_changes_only_s01_and_s13():
+    """0.1.5 cites seller.recipient_role/1.2.0 and
+    seller.release_on_acceptance/1.2.0 where 0.1.4 cited 1.1.0, and changes
+    nothing else it cites or declares; only those two rules' statements and
+    the share's action semantics change."""
     old = load_pack_dir(FROZEN_0_1_4_DIR)
     swapped = [w.wicket_id for w in old.constraints]
-    swapped[swapped.index("seller.recipient_role/1.1.0")] = "seller.recipient_role/1.2.0"
+    for wicket_id in ("seller.recipient_role", "seller.release_on_acceptance"):
+        swapped[swapped.index(f"{wicket_id}/1.1.0")] = f"{wicket_id}/1.2.0"
     assert [w.wicket_id for w in PACK.constraints] == swapped
     assert [f.fold_id for f in PACK.folds] == [f.fold_id for f in old.folds]
     assert [(o.id, o.check, o.default_disposition) for o in PACK.obligations] == [
         (o.id, o.check, o.default_disposition) for o in old.obligations]
     changed = [o.id for o, was in zip(PACK.obligations, old.obligations, strict=True) if o.statement != was.statement]
-    assert changed == ["s01-personal-data-to-the-buyer-or-the-user"]
+    assert changed == ["s01-personal-data-to-the-buyer-or-the-user", "s13-personal-data-only-to-the-buyer-who-accepted"]
+    semantics = [a.action_type for a, was in zip(PACK.action_semantics, old.action_semantics, strict=True) if a != was]
+    assert semantics == ["personal_data.share"]
     (role,) = [w for w in PACK.constraints if w.check == "recipient_role"]
     assert role.config["role_classes"] == {"platform": ["email", "pickup_area"]}
 
@@ -321,28 +330,36 @@ def test_0_1_4_decides_every_scenario_as_0_1_3_did_but_the_email_to_the_platform
                 assert record.get("evidence_digest") == before[check_id].get("evidence_digest"), (name, check_id)
 
 
-def test_0_1_5_decides_every_scenario_as_0_1_4_did_but_the_pickup_area_to_the_platform(tmp_path):
-    """Only the two scenarios giving the platform the listing's pickup area
-    decide differently: 0.1.4 refused them on s01, 0.1.5 allows them. Every
-    other scenario has the same disposition and every constraint the same
-    result, with the same evidence except recipient_role's (it records the
-    platform's classes) and the checks naming an earlier capsule."""
+def test_0_1_5_decides_every_scenario_as_0_1_4_did_but_the_pickup_area_and_the_released_shares(tmp_path):
+    """Two kinds of scenario decide differently. The two giving the platform
+    the listing's pickup area: 0.1.4 refused them on s01, 0.1.5 allows them.
+    The shares to a buyer s13 1.2.0 releases (the pickup area before
+    acceptance, each class to the buyer who accepted in the accepting deal):
+    0.1.4's s13 read a statement class and a citation they do not carry, or
+    refused the citation, and 0.1.5's passes them. Every other scenario has
+    the same disposition and every constraint the same result, with the same
+    evidence except recipient_role's (it records the platform's classes),
+    s13's (it records the classes of data read) and the checks naming an
+    earlier capsule."""
+    acceptance = _acceptance_module()
     old = _scenario_run(FROZEN_0_1_4_DIR, tmp_path / "0.1.4")
     new = _scenario_run(PACK_DIR, tmp_path / "0.1.5")
     assert list(old) == list(new) and len(new) == len(PACK.fixtures.scenarios)
     pickup_area = {"pickup-area-to-the-platform", "email-and-pickup-area-to-the-platform"}
+    released = set(acceptance.BEFORE_RELEASE_FROM_HISTORY)
     for name in new:
         before, after = _constraints(old[name]), _constraints(new[name])
         assert list(after) == list(before), name
-        if name in pickup_area:
-            assert (before["recipient_role"]["result"], after["recipient_role"]["result"]) == ("fail", "pass"), name
+        if name in pickup_area | released:
+            check_id = "recipient_role" if name in pickup_area else "release_on_acceptance"
+            assert (before[check_id]["result"], after[check_id]["result"]) == ("fail", "pass"), name
             assert (old[name]["disposition"]["decision"], new[name]["disposition"]["decision"]) == (
                 "reject", "accept"), name
             continue
         assert new[name]["disposition"] == old[name]["disposition"], name
         for check_id, record in after.items():
             assert record["result"] == before[check_id]["result"], (name, check_id)
-            if check_id not in NAMES_A_CAPSULE_ID | {"recipient_role"}:
+            if check_id not in NAMES_A_CAPSULE_ID | {"recipient_role", "release_on_acceptance"}:
                 assert record.get("evidence_digest") == before[check_id].get("evidence_digest"), (name, check_id)
 
 
@@ -364,7 +381,9 @@ def test_a_definition_cited_at_another_digest_is_refused_at_load(tmp_path, wicke
         load_pack_dir(pack_dir)
 
 
-# -- 0.1.1 to 0.1.5 are no looser than 0.1.0 on personal data to anyone but a platform --
+# -- 0.1.1 to 0.1.5 are no looser than 0.1.0 on personal data, without an
+# acceptance, to anyone but a platform (0.1.5 also passes the public pickup
+# area to a buyer, a class 0.1.0 could not name) --
 
 
 def _acceptance_module():
