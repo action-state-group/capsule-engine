@@ -181,8 +181,10 @@ has no verifier and ends `not_evaluable`. So no share to a buyer ever passes.
   share in that thread ask: capsulectl adds its own `acceptance_called_off` difference ("the
   buyer's acceptance was called off"). No pack change. A buyer who backs out in chat
   ("never mind") without a close leaves the acceptance live, so the deal skill has the agent
-  record the seller's `cancel` (or close the thread) when the buyer withdraws (Sherlock2); the
-  seller e2e has that case.
+  record the seller's `cancel` when the buyer withdraws (Sherlock2); the seller e2e has that
+  case. Not a close: after an offer or commit act, `deal close` refuses `called_off` and
+  `not_selected`, and a typed seller thread allows only completed, mismatch, open or
+  not_selected outcomes (deal-skill-208 lane).
 - Its inputs are `disclosed_classes`, `item_ref`, `deal_id`, the thread-keyed fingerprint and a
   known acceptance in the history; unlike s11 (`single_commitment.py` L178-180), not
   `task_authority_ref`. (A sale is always typed: `deal sale new` forces typed records.)
@@ -427,9 +429,11 @@ sale, its task authority, thread records, cuts and the close. No check runs at s
 **Listings and authenticity.** A listing is the agent's words to every buyer, so it can't carry
 the agent's own authenticity claim, which no approval clears (s10; `promise_never.py` L62).
 `posting.classes` is the agent's label, so capsulectl also reads the words: it holds
-`posting.text` before committing it, and refuses a post whose text says "authentic", "genuine",
-"legit", "original" or "counterfeit" (whole words, any case) outside the §2 template, whatever the
-labels say, with the same refusal.
+`posting.text` before committing it, and refuses a post whose text says, outside the §2
+template, a word from the authenticity list, whatever the labels say. The list matches stems, any
+case (Sherlock2): authentic*, genuine*, legit*, counterfeit*, replica*, fake*, knockoff,
+knock-off, certified, original. The refusal names the word that matched and offers both ways
+out: the template, or rewording ("comes with its original box" becomes "comes with its box").
 capsulectl refuses a `post` whose `posting.classes` include `authenticity` unless the text
 carries it in the §2 template ("The seller says … (unverified)"), and the refusal quotes the
 template so the agent can fix the text and retry (Sherlock2, Q12); and then the post's
@@ -534,9 +538,12 @@ Q12 yes, the refusal quotes the template; Q13 yes, the post card shows the label
 covers only those; Q14 yes, failing closed with a reason that says what to do; Q15 a stated limit,
 fixed with `sent_at` where the platform shows the time.
 
-Pending: Q16 (§5), two live listings on two platforms: `listing_classes` is what every live
-listing states (the intersection over the latest post per platform), so a buyer is never
-counted as told by a listing they may not have seen.
+Q16 is answered too:
+buzz://message?channel=0d760ea3-529d-4dec-b309-24184967f8e0&id=35045a9a987130ccfca447232d3e79ee16911d5b4a1cb0864aaf98f96c3a050b.
+The intersection is right; a listing taken down keeps counting until replaced, which fails closed
+(a stale listing can only remove classes). Recording a takedown (an `unpost` act) is a follow-up
+item, not in this batch; if a thread later records its platform, that platform's latest post
+replaces the intersection.
 
 ## 8. One-way doors
 
