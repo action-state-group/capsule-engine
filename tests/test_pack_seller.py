@@ -1,15 +1,17 @@
 # SPDX-License-Identifier: Apache-2.0
-"""The seller pack, asg/seller/0.1.4: what it cites, at which digest, and
-what each rule declares. 0.1.0, 0.1.1, 0.1.2 and 0.1.3 are kept byte for byte
-under ``tests/fixtures/packs/seller-0.1.0``, ``seller-0.1.1``, ``seller-0.1.2``
-and ``seller-0.1.3`` and still load at their digests. 0.1.2 is 0.1.1 without the spending limit
+"""The seller pack, asg/seller/0.1.5: what it cites, at which digest, and
+what each rule declares. 0.1.0 to 0.1.4 are kept byte for byte under
+``tests/fixtures/packs/seller-0.1.0`` to ``seller-0.1.4`` and still load at
+their digests. 0.1.2 is 0.1.1 without the spending limit
 it cited only so the engine would run; every scenario decides the same under
 both. 0.1.3 is 0.1.2 with s05 also counting a claim the agent made in the
 deal (required_disclosure/1.1.0); no scenario here holds a claim, so every
 one decides the same under both. 0.1.4 is 0.1.3 with a platform recipient:
 s01 passes an email to the platform a sale is listed on and refuses anything
 else to it, and s13 does not apply to it; only the email-to-the-platform
-scenario decides differently.
+scenario decides differently. 0.1.5 is 0.1.4 with the listing's public pickup
+area (pickup_area) also passing to a platform (seller.recipient_role/1.2.0);
+only the scenarios giving a platform the pickup area decide differently.
 
 The scenarios are in ``test_pack_seller_acceptance.py``; this file pins the
 pack's own content, so a definition cited at another digest or a rule
@@ -51,6 +53,9 @@ PACK_0_1_2_FILE_SHA256 = "6174f336f929bfce8bc64bbe34ddab71d57de2951766561796d868
 FROZEN_0_1_3_DIR = Path(__file__).parent / "fixtures" / "packs" / "seller-0.1.3"
 PACK_0_1_3_DIGEST = "f0068688317b0cae3c40e839d7cff0137991aca466a878f9b558356f1808321a"
 PACK_0_1_3_FILE_SHA256 = "4fc21dd877f8858786aad3bd219f1b8b6d5bc328e7447ae2d20a38137616917e"
+FROZEN_0_1_4_DIR = Path(__file__).parent / "fixtures" / "packs" / "seller-0.1.4"
+PACK_0_1_4_DIGEST = "c14c8f8176a933f97c8a04064f6634f8f0e422178f71c4a531ac01631f529e5b"
+PACK_0_1_4_FILE_SHA256 = "c45e7a7d31c1910dd487137056a6fb6564be1664ad267aeb20d8f6c43cb58e72"
 CATALOG = Catalog(ROOT / "guards" / "wickets" / "catalog_defs")
 
 PACK = load_pack_dir(PACK_DIR)
@@ -59,7 +64,7 @@ PACK = load_pack_dir(PACK_DIR)
 CITED = [
     "dedupe/1.0.0",
     "verify_before_dispatch/1.0.0",
-    "seller.recipient_role/1.1.0",
+    "seller.recipient_role/1.2.0",
     "price_floor/2.0.1",
     "promise_requires_approval/1.0.0",
     "promise_never/1.0.0",
@@ -89,7 +94,7 @@ DECLARED = {
 
 
 def test_the_pack_id_and_taxonomy_pin():
-    assert PACK.pack_id == "asg/seller/0.1.4"
+    assert PACK.pack_id == "asg/seller/0.1.5"
     assert PACK.taxonomy.taxonomy_version == TAXONOMY_VERSION == "6"
 
 
@@ -149,6 +154,14 @@ def test_0_1_3_is_kept_byte_for_byte_and_still_loads_at_its_digest():
     assert pack.definition_digest() == PACK_0_1_3_DIGEST
 
 
+def test_0_1_4_is_kept_byte_for_byte_and_still_loads_at_its_digest():
+    frozen = FROZEN_0_1_4_DIR / "pack.yaml"
+    assert hashlib.sha256(frozen.read_bytes()).hexdigest() == PACK_0_1_4_FILE_SHA256
+    pack = load_pack_dir(FROZEN_0_1_4_DIR)
+    assert pack.pack_id == "asg/seller/0.1.4"
+    assert pack.definition_digest() == PACK_0_1_4_DIGEST
+
+
 def test_0_1_3_changes_only_s05_and_its_folds():
     """0.1.3 cites required_disclosure/1.1.0 where 0.1.2 cited 1.0.0, adds the
     statement fold, and changes nothing else it cites or declares."""
@@ -167,20 +180,38 @@ def test_0_1_4_changes_only_s01_and_s13():
     """0.1.4 cites the 1.1.0 seller.recipient_role and
     seller.release_on_acceptance where 0.1.3 cited 1.0.0, and changes nothing
     else it cites or declares; only those two rules' statements change."""
-    old = load_pack_dir(FROZEN_0_1_3_DIR)
+    old, new = load_pack_dir(FROZEN_0_1_3_DIR), load_pack_dir(FROZEN_0_1_4_DIR)
     swapped = [w.wicket_id for w in old.constraints]
     for wicket_id in ("seller.recipient_role", "seller.release_on_acceptance"):
         swapped[swapped.index(f"{wicket_id}/1.0.0")] = f"{wicket_id}/1.1.0"
+    assert [w.wicket_id for w in new.constraints] == swapped
+    assert [f.fold_id for f in new.folds] == [f.fold_id for f in old.folds]
+    assert [(o.id, o.check, o.default_disposition) for o in new.obligations] == [
+        (o.id, o.check, o.default_disposition) for o in old.obligations]
+    changed = [o.id for o, was in zip(new.obligations, old.obligations, strict=True) if o.statement != was.statement]
+    assert changed == ["s01-personal-data-to-the-buyer-or-the-user", "s13-personal-data-only-to-the-buyer-who-accepted"]
+    (role,) = [w for w in new.constraints if w.check == "recipient_role"]
+    assert role.config["role_classes"] == {"platform": ["email"]}
+    (release,) = [w for w in new.constraints if w.check == "release_on_acceptance"]
+    assert release.config["except_recipient_roles"] == ["platform"]
+
+
+def test_0_1_5_changes_only_s01():
+    """0.1.5 cites seller.recipient_role/1.2.0 where 0.1.4 cited 1.1.0, and
+    changes nothing else it cites or declares; only s01's statement changes.
+    s13 is unchanged: it still holds every share to a buyer until acceptance,
+    the pickup area included (#186 changes that in its 1.2.0)."""
+    old = load_pack_dir(FROZEN_0_1_4_DIR)
+    swapped = [w.wicket_id for w in old.constraints]
+    swapped[swapped.index("seller.recipient_role/1.1.0")] = "seller.recipient_role/1.2.0"
     assert [w.wicket_id for w in PACK.constraints] == swapped
     assert [f.fold_id for f in PACK.folds] == [f.fold_id for f in old.folds]
     assert [(o.id, o.check, o.default_disposition) for o in PACK.obligations] == [
         (o.id, o.check, o.default_disposition) for o in old.obligations]
     changed = [o.id for o, was in zip(PACK.obligations, old.obligations, strict=True) if o.statement != was.statement]
-    assert changed == ["s01-personal-data-to-the-buyer-or-the-user", "s13-personal-data-only-to-the-buyer-who-accepted"]
+    assert changed == ["s01-personal-data-to-the-buyer-or-the-user"]
     (role,) = [w for w in PACK.constraints if w.check == "recipient_role"]
-    assert role.config["role_classes"] == {"platform": ["email"]}
-    (release,) = [w for w in PACK.constraints if w.check == "release_on_acceptance"]
-    assert release.config["except_recipient_roles"] == ["platform"]
+    assert role.config["role_classes"] == {"platform": ["email", "pickup_area"]}
 
 
 def test_it_cites_no_spending_limit_and_no_rule_is_measured_by_one():
@@ -194,7 +225,9 @@ def _scenario_run(pack_dir: Path, tmp_path: Path):
     """The fixture's scenarios under ``pack_dir``: each step's capsule, by name."""
     acceptance = _acceptance_module()
     acceptance.PACK_DIR = pack_dir
-    if pack_dir != PACK_DIR:
+    if pack_dir == FROZEN_0_1_4_DIR:
+        acceptance.EXPECTED_OVERRIDES = acceptance.BEFORE_PICKUP_AREA
+    elif pack_dir != PACK_DIR:
         acceptance.EXPECTED_OVERRIDES = acceptance.BEFORE_PLATFORM
     store = LedgerStore(tmp_path / "ledger")
     try:
@@ -265,10 +298,12 @@ def test_0_1_4_decides_every_scenario_as_0_1_3_did_but_the_email_to_the_platform
     records the classes read, and of the checks naming an earlier capsule
     differ."""
     old = _scenario_run(FROZEN_0_1_3_DIR, tmp_path / "0.1.3")
-    new = _scenario_run(PACK_DIR, tmp_path / "0.1.4")
+    new = _scenario_run(FROZEN_0_1_4_DIR, tmp_path / "0.1.4")
     assert list(old) == list(new) and len(new) == len(PACK.fixtures.scenarios)
     platform = {"email-to-the-platform", "phone-to-the-platform", "address-to-the-platform",
-                "platform-disclosure-naming-no-class", "email-and-phone-to-the-platform"}
+                "platform-disclosure-naming-no-class", "email-and-phone-to-the-platform",
+                "pickup-area-to-the-platform", "pickup-location-to-the-platform",
+                "email-and-pickup-area-to-the-platform"}
     for name in new:
         before, after = _constraints(old[name]), _constraints(new[name])
         assert list(after) == list(before), name
@@ -286,13 +321,38 @@ def test_0_1_4_decides_every_scenario_as_0_1_3_did_but_the_email_to_the_platform
                 assert record.get("evidence_digest") == before[check_id].get("evidence_digest"), (name, check_id)
 
 
+def test_0_1_5_decides_every_scenario_as_0_1_4_did_but_the_pickup_area_to_the_platform(tmp_path):
+    """Only the two scenarios giving the platform the listing's pickup area
+    decide differently: 0.1.4 refused them on s01, 0.1.5 allows them. Every
+    other scenario has the same disposition and every constraint the same
+    result, with the same evidence except recipient_role's (it records the
+    platform's classes) and the checks naming an earlier capsule."""
+    old = _scenario_run(FROZEN_0_1_4_DIR, tmp_path / "0.1.4")
+    new = _scenario_run(PACK_DIR, tmp_path / "0.1.5")
+    assert list(old) == list(new) and len(new) == len(PACK.fixtures.scenarios)
+    pickup_area = {"pickup-area-to-the-platform", "email-and-pickup-area-to-the-platform"}
+    for name in new:
+        before, after = _constraints(old[name]), _constraints(new[name])
+        assert list(after) == list(before), name
+        if name in pickup_area:
+            assert (before["recipient_role"]["result"], after["recipient_role"]["result"]) == ("fail", "pass"), name
+            assert (old[name]["disposition"]["decision"], new[name]["disposition"]["decision"]) == (
+                "reject", "accept"), name
+            continue
+        assert new[name]["disposition"] == old[name]["disposition"], name
+        for check_id, record in after.items():
+            assert record["result"] == before[check_id]["result"], (name, check_id)
+            if check_id not in NAMES_A_CAPSULE_ID | {"recipient_role"}:
+                assert record.get("evidence_digest") == before[check_id].get("evidence_digest"), (name, check_id)
+
+
 def _copy(tmp_path: Path) -> Path:
     target = tmp_path / "seller"
     shutil.copytree(PACK_DIR, target)
     return target
 
 
-@pytest.mark.parametrize("wicket_id", ["seller.recipient_role/1.1.0", "seller.single_commitment/1.0.0",
+@pytest.mark.parametrize("wicket_id", ["seller.recipient_role/1.2.0", "seller.single_commitment/1.0.0",
                                        "price_floor/2.0.1"])
 def test_a_definition_cited_at_another_digest_is_refused_at_load(tmp_path, wicket_id):
     pack_dir = _copy(tmp_path)
@@ -304,7 +364,7 @@ def test_a_definition_cited_at_another_digest_is_refused_at_load(tmp_path, wicke
         load_pack_dir(pack_dir)
 
 
-# -- 0.1.1 to 0.1.4 are no looser than 0.1.0 on personal data to anyone but a platform --
+# -- 0.1.1 to 0.1.5 are no looser than 0.1.0 on personal data to anyone but a platform --
 
 
 def _acceptance_module():
@@ -320,7 +380,7 @@ def _engines(tmp_path: Path):
     """One observe-mode engine per pack version, each on its own ledger."""
     signer = LocalSigner(key_id="seller-strictness-key", secret=b"seller-strictness-fixed-key")
     for version, pack_dir in (("0.1.0", FROZEN_0_1_0_DIR), ("0.1.1", FROZEN_0_1_1_DIR), ("0.1.2", FROZEN_0_1_2_DIR),
-                              ("0.1.3", FROZEN_0_1_3_DIR), ("0.1.4", PACK_DIR)):
+                              ("0.1.3", FROZEN_0_1_3_DIR), ("0.1.4", FROZEN_0_1_4_DIR), ("0.1.5", PACK_DIR)):
         store = LedgerStore(tmp_path / version / "ledger")
         installed = install_pack(load_pack_dir(pack_dir), project_dir=tmp_path / version / "project", mode="observe")
         yield version, store, build_engine(installed, ledger=store, signer_provider=lambda: signer)
@@ -330,7 +390,7 @@ def test_no_personal_disclosure_0_1_0_asked_on_is_allowed_by_a_later_version_wit
     """Every class a disclosure may declare, none, and one outside the set;
     to the buyer, the user and a third party; with and without a one-shot
     approval of the class. No acceptance is sealed. Where 0.1.0 did not
-    allow, 0.1.1 to 0.1.4 must not either -- and each refuses every one."""
+    allow, 0.1.1 to 0.1.5 must not either -- and each refuses every one."""
     acceptance = _acceptance_module()
     classes = [*CATALOG.get("promise_never/1.0.0").definition.config["representation_classes"], None, "phone"]
     cases = [(cls, role, approved) for cls in classes for role in ("buyer", "self", "third_party")
@@ -354,8 +414,8 @@ def test_no_personal_disclosure_0_1_0_asked_on_is_allowed_by_a_later_version_wit
                 outcomes.setdefault(version, []).append(decision.outcome)
         finally:
             store.close()
-    later = ("0.1.1", "0.1.2", "0.1.3", "0.1.4")
+    later = ("0.1.1", "0.1.2", "0.1.3", "0.1.4", "0.1.5")
     assert {len(outcomes[v]) for v in ("0.1.0", *later)} == {len(cases)} and len(cases) == 96
     for n, case in enumerate(cases):
         assert outcomes["0.1.0"][n] != ALLOW, case  # 0.1.0 asked on (or refused) every personal disclosure
-        assert [outcomes[v][n] for v in later] == [DENY, DENY, DENY, DENY], case
+        assert [outcomes[v][n] for v in later] == [DENY] * len(later), case

@@ -257,13 +257,28 @@ def _scenarios() -> list[tuple[str, Action, str]]:
         ("email-and-phone-to-the-platform", _address("platform-email-and-phone", 35, _fingerprint("platform-e"),
                                                      "platform", representation_class="other",
                                                      disclosed_classes=("email", "phone")), DENY),
+        # The listing's public pickup area to the platform (0.1.5): s01 passes
+        # it beside an email; the exact spot still refuses.
+        ("pickup-area-to-the-platform", _address("platform-pickup-area", 36, _fingerprint("platform-f"), "platform",
+                                                 representation_class="other", disclosed_classes=("pickup_area",)),
+         ALLOW),
+        ("pickup-location-to-the-platform", _address("platform-pickup-location", 37, _fingerprint("platform-g"),
+                                                     "platform", representation_class="other",
+                                                     disclosed_classes=("pickup_location",)), DENY),
+        ("email-and-pickup-area-to-the-platform", _address("platform-email-and-pickup-area", 38,
+                                                           _fingerprint("platform-h"), "platform",
+                                                           representation_class="other",
+                                                           disclosed_classes=("email", "pickup_area")), ALLOW),
     ]
 
 
-# The scenarios that decide otherwise under a pack before 0.1.4, which has no
-# platform role: an email to the platform is refused there. A comparison with
-# an earlier pack (test_pack_seller.py) sets EXPECTED_OVERRIDES to these.
-BEFORE_PLATFORM = {"email-to-the-platform": DENY}
+# The scenarios that decide otherwise under an earlier pack. Before 0.1.4
+# there is no platform role, so an email to the platform is refused; before
+# 0.1.5 a platform may be given only email, so the pickup area is refused. A
+# comparison with an earlier pack (test_pack_seller.py) sets
+# EXPECTED_OVERRIDES to these.
+BEFORE_PICKUP_AREA = {"pickup-area-to-the-platform": DENY, "email-and-pickup-area-to-the-platform": DENY}
+BEFORE_PLATFORM = {"email-to-the-platform": DENY, **BEFORE_PICKUP_AREA}
 EXPECTED_OVERRIDES: dict[str, str] = {}
 
 
@@ -345,7 +360,7 @@ def test_records_are_pack_attributed_and_observe_mode(run):
         assert capsule["asg_payload"]["manifest_digest"] == installed.resolved.manifest_digest, name
         assert capsule["asg_payload"]["checkpoint"].get("dry_run") is (True if name not in REAL_RUN else None), name
     assert activation["asg_payload"]["detail"]["packs"] == [
-        {"pack_id": "asg/seller/0.1.4", "digest": installed.pack.definition_digest(), "mode": "observe"}
+        {"pack_id": "asg/seller/0.1.5", "digest": installed.pack.definition_digest(), "mode": "observe"}
     ]
 
 
@@ -467,9 +482,18 @@ def test_an_email_to_the_platform_passes_without_an_acceptance(run):
     assert capsule["disposition"]["decision"] == "accept"
 
 
+@pytest.mark.parametrize("name", ["pickup-area-to-the-platform", "email-and-pickup-area-to-the-platform"])
+def test_the_listing_pickup_area_to_the_platform_passes_without_an_acceptance(run, name):
+    capsule = run[2][name]
+    assert _constraint(capsule, "recipient_role")["result"] == "pass"
+    assert _constraint(capsule, "release_on_acceptance")["result"] == "n/a"
+    assert capsule["disposition"]["decision"] == "accept"
+
+
 @pytest.mark.parametrize("name", ["phone-to-the-platform", "address-to-the-platform",
-                                  "platform-disclosure-naming-no-class", "email-and-phone-to-the-platform"])
-def test_anything_but_an_email_to_the_platform_is_refused(run, name):
+                                  "platform-disclosure-naming-no-class", "email-and-phone-to-the-platform",
+                                  "pickup-location-to-the-platform"])
+def test_anything_but_an_email_or_the_pickup_area_to_the_platform_is_refused(run, name):
     capsule = run[2][name]
     assert _failing(capsule) == ["recipient_role"]
     assert capsule["disposition"]["decision"] == "reject"

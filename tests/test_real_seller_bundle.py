@@ -60,7 +60,7 @@ FIXTURE_SHA256 = {
     "check-inputs/c-offer-1600.json": "24e0879b98f0d89655e98fc4b4dcf6a0a78fdde5f98029c4e8917850ccb10977",
 }
 PACK = load_pack_dir(Path(capsule_engine.__file__).parent / "packs" / "catalog" / "seller")
-PACK_ID = "asg/seller/0.1.4"
+PACK_ID = "asg/seller/0.1.5"
 PRODUCER = {"commit": "831afeeb9fd76b7196486a9af38ca455b1230791", "name": "capsulectl", "version": "v0.1.0-rc13-6-g831afee"}
 FLOOR = 170000
 S03 = "s03-price-below-the-floor"
