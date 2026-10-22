@@ -1,6 +1,6 @@
 # Design note: the seller 0.1.5 / everyday 0.3.8 batch
 
-Status: draft v7, 2026-10-22, Ethan's agent (session local_f0ad46ac). Reviewers: Codex, a
+Status: draft v8, 2026-10-22, Ethan's agent (session local_f0ad46ac). Reviewers: Codex, a
 `claude -p` stand-in for Kimi, Sherlock2 (product rules and wording).
 
 Code read: capsule-engine 8e2f887, capsule-cli 3acdeee (rc19), actionstate-muse 69c759d.
@@ -52,9 +52,11 @@ capsule-cli#382); and nits.
 
 **v7.** Takes Codex's round 4: the buyer match is `sameParty`'s own rule, a per-person identifier
 on both sides (§1); replay parity is narrowed to what a sale bundle can show (§1); D9 seals the
-version that selects the adoption rule (§7, §8); summaries aligned (§0, §2, §3). The `claude -p`
-stand-in hit its weekly limit before round 4 (resets 2026-10-24); its gate is open until it runs
-again or Ethan waives it.
+version that selects the adoption rule (§7, §8); summaries aligned (§0, §2, §3). (The `claude -p`
+stand-in's quota ran out briefly; Ethan restored it and it ran round 4 on v7.1.)
+
+**v8.** Takes the `claude -p` round 4: the buyer match compares identity kinds only, never a name
+or payee (§1); D3 and D9 name the typed record schemas (§8); nits.
 
 
 Items: capsule-engine #179, #180, #181, #186, #187, #188, #189, #190, #191, #192, #193 and
@@ -87,9 +89,9 @@ engine issues stay open until they land.
 
 - `action_semantics`: `personal_data.share` requires `target`, `recipient_role` and
   `disclosed_classes` and takes `item_ref` and `deal_id` (no `representation_class`);
-  `offer.make` takes `proposal_at` or `no_proposal`, `offer.accept` takes `proposal_at` (the
-  accepted seller offer's time); `offer.accept` (the
-  seller's commit, `agreement.accept`) takes `rail` and `handover`; `statement.send` takes
+  `offer.make` takes `proposal_at` or `no_proposal`; `offer.accept` (the seller's commit,
+  `agreement.accept`) takes `proposal_at` (the accepted seller offer's time), `rail` and
+  `handover`; `statement.send` takes
   `statement_attributed_to`; `offer.make` and `offer.accept` take `listing_classes` (no deal
   record carries `marketplace.sale`, `deal_action_class.go` L30).
 - Statements rewritten: s04 (ordered classes read from the task authority), s05 (the listing in
@@ -182,7 +184,11 @@ has no verifier and ends `not_evaluable`. So no share to a buyer ever passes.
   the thread default seals the opening's (L262-266), so the match is `sameParty`'s per-person
   requirement (`deal_counterparty.go` L72-83) plus a rejection of any conflict: a per-person kind (email, phone, profile id, relay address)
   must match on both sides whenever either side has one; a shared marketplace domain or a name
-  is never enough (L20-24); and any kind on both sides that differs fails. A missing
+  is never enough (L20-24); and any identity kind on both sides that differs fails. Identity
+  kinds are email, phone, profile id, relay address, and domain where `sameParty` counts it;
+  `name` and `payee` are fingerprinted too but are not identities ("one seller can write it many
+  ways"), so they are left out of the comparison, and the thread default's `payee := name`
+  (`deal_profile.go` L262-266) never refuses the right buyer. A missing
   fingerprint on either side fails. On replay the sale history is rebuilt from the bundle's
   check records, which seal the same block.
 - **Only while the deal is live** (Sherlock2, Q7). A closed thread already takes no check
@@ -243,7 +249,9 @@ of the class, first or repeat. A value reads as a street address when it holds a
 whole-word street type (St, Ave, Rd, Blvd, Ln, Dr, Ct, Way, Pl, Hwy, Pkwy, Cir, Ter, Trl, Sq and
 their long forms, with or without a period), or a numbered unit (Apt, Unit, Suite, Ste, #). A ZIP
 alone is no street address because no street type follows it; a number after the street word
-("St. Louis, Ward 3") doesn't count; "1600 Broadway" with no type is a stated limit (Sherlock2). "Oak Lane neighborhood", "Austin, TX 78701" and "78701" pass. It is a guard against a
+("St. Louis, Ward 3") doesn't count; "1600 Broadway" with no type is a stated limit (Sherlock2),
+and so is a numbered street used as an area ("near 6th St", "5th Ave district"): it is refused,
+which fails closed, and the skill steers the agent to a neighborhood or "downtown" instead. "Oak Lane neighborhood", "Austin, TX 78701" and "78701" pass. It is a guard against a
 mislabel, not a proof: the skill's definition carries the rest.
 
 **To verify while building.** The live-history fixtures carry commit acts with no disposition
@@ -264,8 +272,10 @@ there too: it is public); a share in the accepting thread that names another rec
 a share naming an unknown class or a credential class refuses; an acceptance older than the
 31-day history window reads as none, so a share refuses with the reason above, live and on
 replay; a commit naming the buyer explicitly then a share using the thread default pass through
-the reconstructed history, not only on a direct check; a commit whose `who` names a subset of the
-opening's kinds matches; one that shares no kind with the share refuses; `{domain, email A}` at
+the reconstructed history, not only on a direct check; the same `profile_id` with a different
+`name` passes; a commit whose `who` names a subset of the
+opening's kinds that includes a per-person kind matches (a subset of only `domain` or `name`
+refuses); one that shares no kind with the share refuses; `{domain, email A}` at
 the commit and `{domain, phone B}` on the share refuses, live and on replay; a platform share is left to s01;
 a replayed sale bundle decides each as live (within the completeness limit); capsulectl refuses to record "12 Oak St" or
 "4 Elm Dr., Austin" as a pickup_area and records "Oak Lane neighborhood".
@@ -475,7 +485,8 @@ in the deal). Because the value is sealed per check:
 - **No linkage**: the value is class names only, never a commitment or a reference to the post,
   so nothing equal and identifying crosses a sale's threads.
 - **Checkable**: in the user's own copy, `check_profile.py` recomputes it from the sale's log
-  (the latest post act before the check) only when the order is unambiguous: a post act and a
+  (the intersection over the latest post act per platform before the check) only when the order
+  is unambiguous: a post act and a
   thread check in the same second, or a sale log that isn't complete, sit in different logs with
   no ordering reference (`sale_bundle.py` L545), so the value is reported as not independently
   established, never as a match or a mismatch. A thread exported alone reports it as a producer
@@ -494,7 +505,9 @@ independently established; a re-post that states no class, then an offer, asks; 
 one listing without the condition, then an offer, asks; text saying "genuine" labelled
 `[condition]` is refused at the post; "before the check" across the sale log and the thread log
 is by sealed `at`, and a tie is not established;
-`check_profile.py` flags a `listing_classes` that doesn't match the sale's latest post act.
+`check_profile.py` flags a `listing_classes` that doesn't match the intersection over the sale's
+latest post act per platform; a typed post check and post act, and a typed check sealed at
+`rule_inputs_version` 3, each validate against their schemas.
 
 ## 6. #188: a repeat of the same detail to the same party passes (everyday)
 
@@ -572,12 +585,12 @@ Doors close when published (a pack or capsulectl release), which the coordinator
 |---|---|---|---|
 | D1 | `pickup_area` disclosure class in x-deal-v0, outside the address classes | #181, #186 | ruled yes (Steven, 10-22) |
 | D2 | x-deal-v0 and typed `proposed-action-v0`: an **offer** check may carry a `source` ref to the buyer `message` it answers, or the sealed rule input `no_proposal: true` (refused on any other action); a `message` note may carry `sent_at`; `external-check-input/v0`: `proposal_at` on an offer check answering a message. Commits keep the accepted seller offer's time | #364, #193 | to flag |
-| D3 | x-deal-v0: a `post` check action (`communication.publish`) with a sealed `posting {text_commitment, classes, platform}`; a sale's log admits check/verdict/approval/action for `post`; a verdict rules status `not_applicable` | #187 | to flag |
+| D3 | x-deal-v0, and the typed records a sale uses (`record-common-v0` `check_action` and `action` enums gain `post`; `proposed-action-v0` body gains `posting`): a `post` check action (`communication.publish`) with a sealed `posting {text_commitment, classes, platform}`; a sale's log admits check/verdict/approval/action for `post`; a verdict rules status `not_applicable` | #187 | to flag |
 | D4 | x-deal-v0 and typed `proposed-action-v0` rule input `listing_classes` on a sale thread's offer and commit checks: the classes every live listing states; `posting.platform` on a post | #190 | to flag |
 | D5 | x-deal-v0 and typed `proposed-action-v0`: `representing.attributed_to: "user"` on authenticity, words in the template "The seller says … (unverified)"; every attributed claim asks the user | #189 | to flag |
 | D6 | x-deal-v0: `terms.handover: in_person \| shipped` | #192 (#184 reuses it) | to flag |
 | D7 | x-deal-v0 and typed `proposed-action-v0` rule inputs `repeat_disclosures` and `recipient_told_before` | #188 | to flag |
-| D9 | PROFILE §6 rule 13 / §8: an approval agrees only to the terms its card named; an approval with no card agrees to no changed term. A new sealed check member `rule_inputs_version` (3) selects the rule; checks without it re-derive unchanged | capsule-cli#380 | to flag |
+| D9 | PROFILE §6 rule 13 / §8: an approval agrees only to the terms its card named; an approval with no card agrees to no changed term. A new sealed check member `rule_inputs_version` (3), in the x-deal-v0 check body and the typed `proposed-action-v0` body, selects the rule; checks without it re-derive unchanged | capsule-cli#380 | to flag |
 | D8 | New wicket versions: `seller.recipient_role/1.2.0`, `seller.release_on_acceptance/1.2.0`, `promise_requires_approval/1.1.0`, `promise_never/1.1.0`, `offer_expiry/1.1.0`, `seller.destination_rail/1.1.0`, `action_class_gate/1.2.0`, `required_disclosure/1.2.0`; pack digests seller 0.1.5 and everyday 0.3.8 | all | to flag; each implements a ruled or confirmed what |
 
 Not a door: #179 needs no `external-check-input/v0` member (option b); #191 is a test (#380, its
