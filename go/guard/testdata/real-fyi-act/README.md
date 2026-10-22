@@ -21,3 +21,6 @@ Until v0.0.10 that left the 7-day window uncounted (r05#7d `not_evaluable`,
 Under the engine-side G3 ruling (2026-10-09) the window counts it at its sealed
 `spend_minor`: r05#7d now passes at 9000 (2000 + 3000 paid, the 2000
 commit, and this 2000) against 10000. The envelope is unchanged.
+
+The rulings named here (ruling (a), ruling (b), the G3 ruling) are defined in the package doc of
+`go/guard` (`action.go`).

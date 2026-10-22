@@ -48,7 +48,7 @@ def _step(step):
 def main(sha):
     corpus = json.loads((HERE / "dedupe-refund-cross-deal-corpus.json").read_text())
     pack = load_pack_dir(PACK_DIR)
-    out = {"capsule_engine_commit": sha, "source": "internal/guard/testdata/parity/generate_dedupe_refund_cross_deal.py",
+    out = {"capsule_engine_commit": sha, "source": "go/guard/testdata/parity/generate_dedupe_refund_cross_deal.py",
            "pack_id": pack.pack_id, "pack_definition_digest": pack.definition_digest(), "cases": {}}
     for case in corpus["cases"]:
         with tempfile.TemporaryDirectory() as tmp, LedgerStore(Path(tmp) / "ledger") as store:

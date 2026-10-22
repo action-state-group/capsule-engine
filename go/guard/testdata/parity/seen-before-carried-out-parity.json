@@ -5443,5 +5443,5 @@
   "definition_digest": "8a8e0a7e1ca4319b6e45f2037f4af49e6592919f373e59874ce1ead7249b073d",
   "pack_id": "asg/everyday/0.3.6"
  },
- "source": "internal/guard/testdata/parity/generate_seen_before_carried_out.py"
+ "source": "go/guard/testdata/parity/generate_seen_before_carried_out.py"
 }

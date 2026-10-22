@@ -37,3 +37,6 @@ accepted decisions only, so the second check saw `weekly_spend_minor` 0, where t
 acts as spend. capsule-engine #138 (`a710636c`,
 asg/everyday/0.3.6, spend.weekly/3.1.0) counts it: `engine-replay.json` regenerated there gives 2000, and
 `TestTheEngineReplayCountsTheUncheckedSpendAsThisPortDoes` holds the engine's window to this plugin's.
+
+The rulings named here (ruling (a), ruling (b), the G3 ruling) are defined in the package doc of
+`go/guard` (`action.go`).

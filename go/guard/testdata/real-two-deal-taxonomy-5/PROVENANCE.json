@@ -34,7 +34,7 @@
     },
     "expected_decisions-0.3.7.json": {
       "source_path": null,
-      "generated": "not vendored: the engine's replay of deal-1/deal-2.bundle.json here under asg/everyday/0.3.7 at capsule-engine 7339028ab2117d6c7adec89a26cd5022b8ac7140, by internal/guard/testdata/parity/generate_real_two_deal_expected.py (run there on that commit's own tests/fixtures/real-two-deal, its output equals that expected_decisions.json in every member; it adds only capsule_engine_commit). Every decision equals the 0.3.6 replay at a710636c it replaces (and the 0.3.5 one at c878edf0 and the 0.3.4 one at 97a2aff before it); only the pack id and digest differ. expected_decisions.json beside it is #120's replay under 0.3.3, kept as vendored.",
+      "generated": "not vendored: the engine's replay of deal-1/deal-2.bundle.json here under asg/everyday/0.3.7 at capsule-engine 7339028ab2117d6c7adec89a26cd5022b8ac7140, by go/guard/testdata/parity/generate_real_two_deal_expected.py (run there on that commit's own tests/fixtures/real-two-deal, its output equals that expected_decisions.json in every member; it adds only capsule_engine_commit). Every decision equals the 0.3.6 replay at a710636c it replaces (and the 0.3.5 one at c878edf0 and the 0.3.4 one at 97a2aff before it); only the pack id and digest differ. expected_decisions.json beside it is #120's replay under 0.3.3, kept as vendored.",
       "sha256": "cf3181d3a6b7ed131643989ef5088ddbcdc2b79e72cdbcd976615db147e30306"
     },
     "expected_decisions.json": {

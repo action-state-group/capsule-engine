@@ -77,3 +77,16 @@ def test_an_edited_definition_is_found(gen_copy):
 def test_a_hand_edited_registry_is_found(gen_copy):
     gen_copy.REGISTRY_GO.write_text(gen_copy.REGISTRY_GO.read_text() + "\n// edited\n")
     assert gen_copy.main(["--check"]) == 1
+
+
+def test_the_taxonomy_is_written_from_the_engines(gen_copy):
+    vendored = gen_copy.PACKS / "engine" / "action_taxonomy.json"
+    vendored.write_bytes(vendored.read_bytes() + b"\n")
+    (gen_copy.PACKS / "engine" / "PROVENANCE.json").unlink()
+    assert gen_copy.main(["--check"]) == 1
+    assert gen_copy.main([]) == 0
+    assert vendored.read_bytes() == gen_copy.TAXONOMY.read_bytes()
+    provenance = json.loads((gen_copy.PACKS / "engine" / "PROVENANCE.json").read_text())
+    assert provenance["taxonomy_version"] == gen_copy.TAXONOMY_VERSION
+    assert provenance["jcs_digest"] == gen_copy.TAXONOMY_DIGEST
+    assert gen_copy.main(["--check"]) == 0

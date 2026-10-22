@@ -16,4 +16,4 @@ Re-sealed at taxonomy 6 it is a plain **allow**: only the taxonomy holds it.
   "this check was recorded by an older capsulectl; update capsulectl to check it", and capsulectl shows
   "Not allowed by your rules: …" with no way to go ahead.
 
-Held by `internal/plugin/old_taxonomy_refused_test.go`.
+Held by the consuming plugin's old-taxonomy test.

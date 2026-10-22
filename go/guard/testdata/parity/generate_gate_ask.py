@@ -42,7 +42,7 @@ def _pack(redeclare):
 
 def main(sha):
     corpus = json.loads((HERE / "gate-ask-corpus.json").read_text())
-    out = {"capsule_engine_commit": sha, "source": "internal/guard/testdata/parity/generate_gate_ask.py",
+    out = {"capsule_engine_commit": sha, "source": "go/guard/testdata/parity/generate_gate_ask.py",
            "pack_id": load_pack_dir(PACK_DIR).pack_id, "pack_definition_digest": load_pack_dir(PACK_DIR).definition_digest(),
            "decisions": {}}
     for case in corpus["cases"]:

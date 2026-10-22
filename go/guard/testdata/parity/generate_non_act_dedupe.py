@@ -34,7 +34,7 @@ SPEND_WEEKLY = Path("capsule_engine/folds/catalog_defs/spend.weekly.yaml")
 
 
 def main(sha):
-    out = {"capsule_engine_commit": sha, "source": "internal/guard/testdata/parity/generate_non_act_dedupe.py",
+    out = {"capsule_engine_commit": sha, "source": "go/guard/testdata/parity/generate_non_act_dedupe.py",
            "bundles": {}}
     for name in ("deal-purchase-then-partial-cancel", "deal-purchase-then-refund"):
         path = [HERE / "deal-bundles" / f"{name}.bundle.json"]

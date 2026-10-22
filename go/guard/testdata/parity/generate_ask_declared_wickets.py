@@ -51,7 +51,7 @@ def _pack(case):
 
 def main(sha):
     corpus = json.loads((HERE / "ask-declared-wickets-corpus.json").read_text())
-    out = {"capsule_engine_commit": sha, "source": "internal/guard/testdata/parity/generate_ask_declared_wickets.py",
+    out = {"capsule_engine_commit": sha, "source": "go/guard/testdata/parity/generate_ask_declared_wickets.py",
            "pack_id": load_pack_dir(PACK_DIR).pack_id, "pack_definition_digest": load_pack_dir(PACK_DIR).definition_digest(),
            "decisions": {}}
     for case in corpus["cases"]:

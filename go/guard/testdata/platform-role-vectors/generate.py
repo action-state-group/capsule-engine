@@ -139,7 +139,7 @@ def run(pack_name, allowed, sha, tmp):
 
 
 def main(sha):
-    out = {"capsule_engine_commit": sha, "source": "internal/guard/testdata/platform-role-vectors/generate.py",
+    out = {"capsule_engine_commit": sha, "source": "go/guard/testdata/platform-role-vectors/generate.py",
            "packs": {}}
     with tempfile.TemporaryDirectory() as tmp:
         out["packs"]["everyday"] = run("everyday", "fulfilling_merchant", sha, tmp)

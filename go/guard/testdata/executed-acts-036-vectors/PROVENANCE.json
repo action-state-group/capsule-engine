@@ -4,13 +4,13 @@
   "how": "inputs/ by build.py; engine-results.json, ledger-results.json and scope-results.json by the engine scripts named in README.md, run from capsule-engine a710636c (a local read-only clone, checked out at the commit) with agent-action-capsule 0.7.0, PyYAML 6.0.3, Python 3.13.7",
   "files": {
     "README.md": {
-      "sha256": "2396f0782ef7d8ec3305169e179b66603e918178347f7df4c08b5f026dc2dc37"
+      "sha256": "d652894600285a00b7fd2dabc1d838e69bb8c894abea31f546ec58394c886290"
     },
     "build.py": {
       "sha256": "d268da8d1aefbe5f972fa722b36fec0a81e19adbf57e824631ab78ea2afc3043"
     },
     "corpus.json": {
-      "sha256": "fa6fed43fb135e06a1619dcd2e7710ecb7b6f9b5292c72b257f34fbfc03b696b"
+      "sha256": "41ce2f538d905625e8fc352e7ab23529dafbf05b8d39d20278bd1e696051370a"
     },
     "engine-results.json": {
       "sha256": "a31fc553134f933d2ee44b7a97fd593c1f13adde4c4dd7b26954ae58e7cd7a57"
@@ -127,13 +127,13 @@
       "sha256": "430d0971cca2bec654fc76d410897c6204f7b251b1f2c083a9ee2347c36b0a1f"
     },
     "ledger_cases.py": {
-      "sha256": "5971e1ab5228bd28c7a9d129cb51bf6be573c881bb6f36cb6f9166618a6ff487"
+      "sha256": "e189a08709e727f1fbf47dc8e7c12af0affd5ea2c25a85fc90359ddce4ed863e"
     },
     "scope-results.json": {
       "sha256": "a4c4cb72e5d48c652c658c11aad6f706bcbc04b297bf5ec60d4cdce1c15b5ec0"
     },
     "scope_cases.py": {
-      "sha256": "369fac1f7afa5d765ee42b7a93327efd9b9fc1412603e1f70e54a6148491d0a2"
+      "sha256": "787a3b44b74b6b67af62dd93c04bacd4190abbaa006ac98b165c30a3d043a68c"
     }
   }
 }

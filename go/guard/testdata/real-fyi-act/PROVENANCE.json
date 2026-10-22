@@ -10,7 +10,7 @@
   "source": "the 2026-10-09 fyi buyer-acts probe run (scenarios/sensitivity.sh line s4; acc-s4-purchase-commit-repeat.json)",
   "files": {
     "README.md": {
-      "sha256": "e7bd41e77fec53fd605c38a4449c397c507c8627ba29b4a8f631168a57b1db03"
+      "sha256": "cde26f1dc0c1ed2c0f99c092850b212c7ac1f74047a634d22190e8ee48ed530d"
     },
     "inputs/act-commit.json": {
       "sha256": "2a2546f5b2d32c964f2288f88f66607c9dd37654192c444c6a10330b79965caf"

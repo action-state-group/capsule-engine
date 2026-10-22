@@ -2910,5 +2910,5 @@
       "scenario": "offer-and-material"
     }
   ],
-  "source": "internal/guard/testdata/parity/generate_change_checks.py"
+  "source": "go/guard/testdata/parity/generate_change_checks.py"
 }

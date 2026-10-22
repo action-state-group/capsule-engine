@@ -179,7 +179,7 @@ def _chain_case(build) -> dict:
 def main(sha: str) -> None:
     out = {
         "capsule_engine_commit": sha,
-        "source": "internal/guard/testdata/parity/generate_seen_before_carried_out.py",
+        "source": "go/guard/testdata/parity/generate_seen_before_carried_out.py",
         "pack": {"pack_id": PACK.pack_id, "definition_digest": PACK.definition_digest()},
         "fold_digests": {fid: load_fold(FOLDS / name).definition_digest() for fid, name in {**SEEN, **SPEND}.items()},
         "fold": {name: {"records": records, "counts": _counts(records)} for name, records in FOLD_CASES.items()},

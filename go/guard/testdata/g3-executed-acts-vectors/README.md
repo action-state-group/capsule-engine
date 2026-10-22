@@ -37,8 +37,8 @@ Only acts inside the window `[check timestamp - 7d, check timestamp]` with the c
   `agent_input_digest`, and drops `signature` (these are re-sealed test records, not signed ones).
 - `inputs/<sequence>/step-<k>.input.json`: the external-check-input/v0 envelope at step k (history newest first).
 - `go-results.json`: per step, the binary's r05#7d verdict, value, limit, reason.
-- Held by `internal/plugin/g3_vectors_test.go` (Go == expect == go-results.json; `G3_VECTORS_WRITE=1`
-  regenerates results and `MANIFEST.sha256`), and by `internal/guard/g3_engine_test.go` (engine-results.json).
+- Held by the consuming plugin's G3 vector test (Go == expect == go-results.json; `G3_VECTORS_WRITE=1`
+  regenerates results and `MANIFEST.sha256`), and by `go/guard/g3_engine_test.go` (engine-results.json).
 
 ## The engine half: closed by capsule-engine #138 (a710636c, asg/everyday/0.3.6)
 The replay used to count spend from accepted decisions only, adding 0 for every executed act above, and
@@ -50,6 +50,9 @@ every executed act once, as above; its own fixture (`tests/fixtures/executed-act
   engine's `tests/test_executed_acts_window.py` decides a live check (everyday 0.3.6) and writes
   `engine-results.json`: the card halves above plus the outcome, verdict, caps' result and sealed
   evidence digest, and each rule's result. At `a710636c` its card halves equal `go-results.json` on all
-  76 steps, and `internal/guard/g3_engine_test.go` holds the plugin's caps evidence digest, outcome and
+  76 steps, and `go/guard/g3_engine_test.go` holds the plugin's caps evidence digest, outcome and
   every rule to the rest.
 - The shapes these sequences do not reach are in `../executed-acts-036-vectors`.
+
+The rulings named here (ruling (a), ruling (b), the G3 ruling) are defined in the package doc of
+`go/guard` (`action.go`).

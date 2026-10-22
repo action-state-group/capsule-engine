@@ -1,5 +1,5 @@
 {
- "about": "Executed acts in the 7-day window that the G3 sequences do not reach, each decided by capsule-engine a710636c under asg/everyday/0.3.6 (engine-results.json) and held to it by internal/guard/g3_engine_test.go. Every act is one of ../g3-executed-acts-vectors/templates with the named edits (build.py).",
+ "about": "Executed acts in the 7-day window that the G3 sequences do not reach, each decided by capsule-engine a710636c under asg/everyday/0.3.6 (engine-results.json) and held to it by go/guard/g3_engine_test.go. Every act is one of ../g3-executed-acts-vectors/templates with the named edits (build.py).",
  "sequences": [
   {
    "name": "pay-escalate",

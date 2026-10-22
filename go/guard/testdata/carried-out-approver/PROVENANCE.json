@@ -7,7 +7,7 @@
   "fixture": "the real two-deal fixture, vendored at ../real-two-deal-taxonomy-6 (capsule-engine tests/fixtures/real-two-deal at a710636c, PR #138's merge; bundles unchanged since #126)",
   "files": {
     "MANIFEST.sha256": {
-      "sha256": "7108dd0a8ab45612758acd18d553fde35767939df9b329f06d9890fae734b10a"
+      "sha256": "365698d731cf97bd691c00f8600ada9496cd5940960903554ba62c8391444e17"
     },
     "corpus.json": {
       "sha256": "41599c014e3ad96a88110d9974b379282cb081e0a4171e6e3b7178fb5bbb71ae"

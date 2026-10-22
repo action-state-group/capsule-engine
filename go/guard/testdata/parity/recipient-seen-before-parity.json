@@ -1134,5 +1134,5 @@
       "scenario": "message-other-operators-recipient"
     }
   ],
-  "source": "internal/guard/testdata/parity/generate_recipient_seen_before.py"
+  "source": "go/guard/testdata/parity/generate_recipient_seen_before.py"
 }

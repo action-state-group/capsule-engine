@@ -18,8 +18,8 @@ import (
 // engine's live check path (engine_results.py, engine-results.json) and by
 // this port on the same envelope, as the plugin decodes it. Per step: caps'
 // result and sealed evidence digest, the decision's outcome, and every
-// rule's own result. internal/plugin/g3_vectors_test.go holds the card
-// halves (go-results.json) to the same file.
+// rule's own result. The consuming plugin's tests hold its card halves
+// (go-results.json) to the same file.
 func TestG3VectorsMatchTheEngine(t *testing.T) {
 	testExecutedActsMatchTheEngine(t, "g3-executed-acts-vectors", 17, 76)
 }

@@ -6,6 +6,17 @@
 // implementation (capsule_engine/guards/...) was read and is cited at the
 // point it decides. The pack is the authority: an engine is built from a
 // loaded pack and refuses one whose definitions are not the ones ported.
+//
+// Comments cite four rulings by name. All are on buyer acts that are not a
+// pay, from 2026-10-09:
+//   - ruling (a): an unchecked act (one capsulectl sealed as taken without a
+//     sealed approval) is unauthorized but real, so it counts as spend;
+//   - ruling (b): an act in history with no recorded decision could be
+//     uncounted spend, so it leaves the caps window not evaluable;
+//   - the G3 ruling: an executed act with no recorded decision but a sealed
+//     spend counts at that spend instead, superseding ruling (b) for it;
+//   - the ruling on F1 (capsule-engine #130): an act that states money moved
+//     in can never add to the window, so ruling (b) does not reach it.
 package guard
 
 import (

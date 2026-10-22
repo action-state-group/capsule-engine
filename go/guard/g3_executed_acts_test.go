@@ -9,8 +9,7 @@ import (
 )
 
 // AN EXECUTED ACT COUNTS AT ITS SEALED SPEND (the G3 ruling, 2026-10-09,
-// the findings on buyer non-pay acts;
-// supersedes ruling (b) for the plugin): an act in history that carries no
+// which supersedes ruling (b) for such acts): an act in history that carries no
 // recorded decision but does carry a spend (spend_minor) is counted in the
 // 7-day total at that spend and does not leave the window unevaluated. Money
 // in counts 0 (#130). An act whose spend cannot be read (none, or one in the

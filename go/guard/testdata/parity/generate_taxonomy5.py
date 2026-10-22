@@ -45,7 +45,7 @@ def _pack(redeclare):
 
 def main(sha):
     corpus = json.loads((HERE / "taxonomy5-corpus.json").read_text())
-    out = {"capsule_engine_commit": sha, "source": "internal/guard/testdata/parity/generate_taxonomy5.py",
+    out = {"capsule_engine_commit": sha, "source": "go/guard/testdata/parity/generate_taxonomy5.py",
            "pack_id": load_pack_dir(PACK_DIR).pack_id, "pack_definition_digest": load_pack_dir(PACK_DIR).definition_digest(),
            "taxonomy_version": TAXONOMY_VERSION, "taxonomy_jcs_digest": TAXONOMY_DIGEST,
            "taxonomy_file_sha256": hashlib.sha256(Path("capsule_engine/guards/action_taxonomy.json").read_bytes()).hexdigest(),

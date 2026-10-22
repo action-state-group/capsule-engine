@@ -131,8 +131,9 @@ the caller passes. Muse passes today's values, so Muse's behavior does not chang
   stays in the module (v4).
 - `catalogFor` (`source.go`) resolves a source that holds only a pack.yaml against
   `packs.Everyday` / `packs.EverydayDir`, which is everyday 0.3.7 in Muse's hand-written
-  `embed.go` today. In the module, `LoadFrom` / `LoadPath` take that fallback catalog as an
-  argument. `go/packs` exports only versioned names (`Everyday037`, `Seller015`, ...), plus
+  `embed.go` today. In the module, `LoadPath` takes that fallback catalog as an argument,
+  and `LoadFrom` resolves only against the source's own definitions. Every caller in Muse that
+  loads a pack.yaml-only source goes through `LoadPath`. `go/packs` exports only versioned names (`Everyday037`, `Seller015`, ...), plus
   `All`, the whole tree as one `embed.FS`, and no un-versioned alias. Muse keeps its aliases in its own code and passes the same catalog, so a
   bare `--pack` resolves exactly as it does today.
 
@@ -172,8 +173,11 @@ imports each of them outside the guard. Their only non-standard dependency is
 these packages. The module is public, so Muse needs no `GOPRIVATE` entry for it.
 
 One moved test reads `../../packs/...` today. In `go/guard` that resolves outside the module, so
-PR A rewrites those paths to `../packs/...`. That is the only test edit PR A makes besides the
-§12 rewrites. The Python package and its wheel do not change: nothing under `go/` or
+PR A rewrites the path to `../packs/...`. Another, `seller_pack_test.go`, read a fixture of the
+plugin's (`../plugin/testdata/seller-bundle/bundle.json`, a byte copy of capsule-cli's public
+fixture). PR A copies that fixture to `go/guard/testdata/seller-bundle/` and points the test at
+it. Besides the §12 rewrites, the removal of the kept-back tests (v4), and the tests the caller-side
+parameters needed, those are the only test edits PR A makes. The Python package and its wheel do not change: nothing under `go/` or
 `conformance-vectors/` ships in the wheel.
 
 ## 3. Packs inside the module
@@ -192,7 +196,7 @@ The generator has four sources and nothing else:
 - `capsule_engine/guards/wickets/catalog_defs/`;
 - `capsule_engine/folds/catalog_defs/` (spend.weekly, counterparty.seen_before,
   disclosure.\*);
-- `capsule_engine/guards/action_taxonomy*.json`.
+- `capsule_engine/guards/action_taxonomy.json`.
 
 Two kinds of pack version go into the tree:
 
@@ -421,6 +425,10 @@ the switch-over's parent commit (§10), one actionstate-muse PR does the followi
   A grep can miss paths built from separate `Join` arguments. So the check is the full
   `go test ./...` and every e2e script, run after the deletion. The PR also records vocabgate's
   surface count before and after, and the two must be equal;
+- builds every `guard.SaleVerification` through one Muse helper that sets `CopyAudiences` to Muse's
+  two audiences. A nil value reads the engine's three, so a site that is missed would accept an
+  adjudicator copy and nothing would fail. At 93bf526 the sites are `internal/plugin/sale.go`'s
+  two constructions and its `SaleVerification{}` returns;
 - adds a CI check that fails a PR touching any Go file under the old paths, naming capsule-engine
   `go/` as the owner;
 - keeps every other test outside the deleted directories passing unchanged, including

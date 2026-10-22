@@ -115,7 +115,7 @@ def constraints(decision):
 
 
 def main(sha):
-    out = {"capsule_engine_commit": sha, "source": "internal/guard/testdata/parity/generate_rollup_parity.py",
+    out = {"capsule_engine_commit": sha, "source": "go/guard/testdata/parity/generate_rollup_parity.py",
            "scenarios": []}
     with tempfile.TemporaryDirectory() as tmp:
         pack_dir = Path(tmp) / "pack"

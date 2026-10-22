@@ -118,7 +118,7 @@
     "counterparty.seen_before/3.0.0": "73dbf8cd8a36fadca0ac823d2b17592fdc457c24081bc44667f032601e914033"
   },
   "catalog_only": {
-    "note": "Definitions vendored from the same commit but not cited by this pack: caps/1.0.0 and spend.weekly/1.0.0 keep the 25-rule test fixture (internal/pack/testdata/everyday-25-test-fixture) resolvable against the vendored catalog; counterparty.seen_before/2.0.0 is the fold recipient_seen_before/1.0.0 names in its config, which the engine reads from its core fold catalog by id and digest (guards/checks seen_before_fold), not from the pack's folds.",
+    "note": "Definitions vendored from the same commit but not cited by this pack: caps/1.0.0 and spend.weekly/1.0.0 keep the 25-rule test fixture (go/pack/testdata/everyday-25-test-fixture) resolvable against the vendored catalog; counterparty.seen_before/2.0.0 is the fold recipient_seen_before/1.0.0 names in its config, which the engine reads from its core fold catalog by id and digest (guards/checks seen_before_fold), not from the pack's folds.",
     "wicket_digests": {
       "caps/1.0.0": "906a75a0b908d38fa7b05823ba11f229c3d593516119ad757b541cee7083f54b"
     },

@@ -33,7 +33,8 @@ The module holds no product's choices. The caller passes:
 ## The embedded packs
 
 `packs/` is generated: `python scripts/generate_go_packs.py` writes it from
-the catalog, together with `packs/embed.go`, `pack/registry_gen.go` and
+the catalog, together with `packs/embed.go`, `pack/registry_gen.go`,
+`packs/engine/` (the action taxonomy and its PROVENANCE.json) and
 `guard/testdata/engine-definitions.json`. Do not edit them by hand. A pack
 version directory, once written, is frozen, so an older pinned pack keeps
 loading at its digest. When the catalog cuts a new version of a served pack,

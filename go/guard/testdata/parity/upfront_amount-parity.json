@@ -2025,5 +2025,5 @@
       "scenario": "upfront-out-of-scope"
     }
   ],
-  "source": "internal/guard/testdata/parity/generate_scalar_ports.py"
+  "source": "go/guard/testdata/parity/generate_scalar_ports.py"
 }

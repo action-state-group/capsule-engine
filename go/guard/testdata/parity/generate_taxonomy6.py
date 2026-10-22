@@ -48,7 +48,7 @@ def main(sha):
     openings = {True: golden, False: None, "bad_nonce": {**golden, "nonce": corpus["bad_nonce"]}}
     out = {
         "capsule_engine_commit": sha,
-        "source": "internal/guard/testdata/parity/generate_taxonomy6.py",
+        "source": "go/guard/testdata/parity/generate_taxonomy6.py",
         "taxonomy_version": TAXONOMY_VERSION,
         "taxonomy_jcs_digest": TAXONOMY_DIGEST,
         "taxonomy_file_sha256": hashlib.sha256((root / "guards" / "action_taxonomy.json").read_bytes()).hexdigest(),

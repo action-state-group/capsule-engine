@@ -7,7 +7,7 @@ Each case appends its records to a fresh ledger and checks one money.purchase ac
 GuardEngine built from the catalog everyday pack's limits as tests/test_executed_acts_window.py
 builds it (no activated policy, so no limit_sources). Writes ledger-results.json: per case the
 records, the action, and caps' result, reason and sealed evidence digest.
-internal/guard/g3_engine_test.go reads the same records through ReadLedger and holds Go to it.
+go/guard/g3_engine_test.go reads the same records through ReadLedger and holds Go to it.
 """
 import json
 import sys

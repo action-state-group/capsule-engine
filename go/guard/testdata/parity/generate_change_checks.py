@@ -114,7 +114,7 @@ def record(name, action, decision):
 
 
 def main(sha):
-    out = {"capsule_engine_commit": sha, "source": "internal/guard/testdata/parity/generate_change_checks.py", "scenarios": []}
+    out = {"capsule_engine_commit": sha, "source": "go/guard/testdata/parity/generate_change_checks.py", "scenarios": []}
     with tempfile.TemporaryDirectory() as tmp:
         pack_dir = Path(tmp) / "pack"
         shutil.copytree(PACK_DIR, pack_dir)

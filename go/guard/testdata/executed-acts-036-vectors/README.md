@@ -22,7 +22,7 @@ the plugin on the same input. Nothing here is hand-computed: every expected valu
   declare an incomplete history (`../emit/pay-history-incomplete.json`,
   `../emit/pay-history-empty-incomplete.json`). caps.py does not read `history_scope`; the plugin
   leaves the window not evaluable. A pinned known difference (an open engine-side follow-up).
-- Held by `internal/guard/g3_engine_test.go`.
+- Held by `go/guard/g3_engine_test.go`.
 
 ## What the engine decides here, and the plugin now does too (0.3.6 only)
 - A history act sealed with a decision other than `accept` (`escalate`, `reject`) is an act carried

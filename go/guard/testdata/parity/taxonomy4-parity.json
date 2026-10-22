@@ -387,7 +387,7 @@
   },
   "pack_definition_digest": "c1cea374102bba60de82e16663c550a278ee07a399c5faeb285fe1ea1ea27d4d",
   "pack_id": "asg/everyday/0.3.7",
-  "source": "internal/guard/testdata/parity/generate_taxonomy4.py",
+  "source": "go/guard/testdata/parity/generate_taxonomy4.py",
   "taxonomy_file_sha256": "7563fcaeb6c192a27877fae3131bca1021526046c8976475c46eebf4fb374272",
   "taxonomy_jcs_digest": "fc12eb90bc2b3c85bb49c4d3d7be8f384c6e0b8e189bc3b68a753a4f1af5cd94",
   "taxonomy_version": "6"

@@ -9986,5 +9986,5 @@
       ]
     }
   },
-  "source": "internal/guard/testdata/platform-role-vectors/generate.py"
+  "source": "go/guard/testdata/platform-role-vectors/generate.py"
 }

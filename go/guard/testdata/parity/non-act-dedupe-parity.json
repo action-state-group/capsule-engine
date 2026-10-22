@@ -146,5 +146,5 @@
     ]
   },
   "capsule_engine_commit": "7339028ab2117d6c7adec89a26cd5022b8ac7140",
-  "source": "internal/guard/testdata/parity/generate_non_act_dedupe.py"
+  "source": "go/guard/testdata/parity/generate_non_act_dedupe.py"
 }

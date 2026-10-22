@@ -7,7 +7,7 @@ Decides ../emit/pay-history-incomplete.json and ../emit/pay-history-empty-incomp
 plugin's own envelopes, history_scope.complete false) as tests/test_executed_acts_window.py
 decides a live check, and writes scope-results.json: the 7-day half of r05 as that test reads it.
 caps.py does not read history_scope, so the engine evaluates the window where this plugin leaves
-it not_evaluable (an open engine-side follow-up); internal/guard/g3_engine_test.go pins the difference.
+it not_evaluable (an open engine-side follow-up); go/guard/g3_engine_test.go pins the difference.
 """
 import json
 import sys

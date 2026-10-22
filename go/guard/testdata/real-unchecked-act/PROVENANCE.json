@@ -14,7 +14,7 @@
   "known_difference_source": "an unpublished engine-side note of 2026-10-09 on unchecked-act spend (sha256 b58780de6740395837d29252e3b2bdf277cb75a141e3161a58815cc4d662be78)",
   "files": {
     "README.md": {
-      "sha256": "71bc964c0d7e4f4322104097134cb553e9356559851ea18ba1f17aac55b3b9b9"
+      "sha256": "939eec00eb76c2eef9f560954b4e33d73ee288e44cedc4b2713013bd10b99dd9"
     },
     "build.sh": {
       "sha256": "38be1cba114be01fb92a6882e21d6d3942a0a5ed086a002f0f426ad9a6691a4a"

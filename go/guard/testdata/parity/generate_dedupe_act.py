@@ -55,7 +55,7 @@ def _step(step):
 def main(sha):
     corpus = json.loads((HERE / "dedupe-act-corpus.json").read_text())
     pack = load_pack_dir(PACK_DIR)
-    out = {"capsule_engine_commit": sha, "source": "internal/guard/testdata/parity/generate_dedupe_act.py",
+    out = {"capsule_engine_commit": sha, "source": "go/guard/testdata/parity/generate_dedupe_act.py",
            "pack_id": pack.pack_id, "pack_definition_digest": pack.definition_digest(),
            "decisions": {}, "key_vectors": []}
     for case in corpus["cases"]:

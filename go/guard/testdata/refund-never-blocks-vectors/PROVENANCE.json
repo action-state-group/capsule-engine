@@ -4,7 +4,7 @@
   "engine_commit": "62d7a92726366f1c39d324854256fc80fd1a51e8",
   "files": {
     "README.md": {
-      "sha256": "3776d28dfe1849aafb7b071d4c094b74c87e77a51b75c584d8abd53777fecebd"
+      "sha256": "bae7ad62e93f196a6ca9941410b4df23a2cc6083ecf31f785d061890ac6e4292"
     },
     "python-decisions.json": {
       "sha256": "d410ba06b7ce3b3a6cddb4492f53d1e74838999f67878e7befb0ecd1489c5d0e"
@@ -13,7 +13,7 @@
       "sha256": "52a4a7f0c82f43fda384f16c8436f08aea23618c79b42e779bd53a43ea4fe5de"
     },
     "MANIFEST.sha256": {
-      "sha256": "653dcfc4bfadfc0a1343c4bb980b5f253783fabb1e0c87d1177523b6c4364a0a"
+      "sha256": "c8a4ba13a556c79b062e3a5e3d1ba951c378033cc3d8402f2543d42bf80bd098"
     }
   },
   "real": {

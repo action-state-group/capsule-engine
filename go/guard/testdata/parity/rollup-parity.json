@@ -2738,5 +2738,5 @@
       }
     }
   ],
-  "source": "internal/guard/testdata/parity/generate_rollup_parity.py"
+  "source": "go/guard/testdata/parity/generate_rollup_parity.py"
 }

@@ -153,7 +153,7 @@
       "verdict_class": "hitl_dispatched"
     }
   },
-  "source": "internal/guard/testdata/parity/generate_taxonomy6.py",
+  "source": "go/guard/testdata/parity/generate_taxonomy6.py",
   "taxonomy_file_sha256": "7563fcaeb6c192a27877fae3131bca1021526046c8976475c46eebf4fb374272",
   "taxonomy_jcs_digest": "fc12eb90bc2b3c85bb49c4d3d7be8f384c6e0b8e189bc3b68a753a4f1af5cd94",
   "taxonomy_version": "6",

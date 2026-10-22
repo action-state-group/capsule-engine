@@ -32,3 +32,6 @@ external_commitment.other all capped:
 - over-limit (499):  pass/allow, pass/allow (weekly 300), FAIL/ESCALATE (weekly 300, projected 500)
 Go acceptance: the same sequence through CheckWithHistory with the money-in act in history WITHOUT a
 decision gives the third step the same caps result (pass or fail), never not_evaluable, and weekly 300.
+
+The rulings named here (ruling (a), ruling (b), the G3 ruling) are defined in the package doc of
+`go/guard` (`action.go`).

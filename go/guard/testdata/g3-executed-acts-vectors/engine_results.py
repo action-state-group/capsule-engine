@@ -10,8 +10,8 @@ engine under the catalog everyday pack whose ledger is the envelope's history
 r05-spending-limits is read off the caps constraint exactly as that test reads
 it, beside the decision's outcome and verdict, caps' result and sealed evidence
 digest, and each rule's own result. The Go plugin's results are go-results.json;
-internal/plugin/g3_vectors_test.go holds the card halves equal, and
-internal/guard/g3_engine_test.go the rest.
+the consuming plugin's tests hold the card halves equal, and
+go/guard/g3_engine_test.go the rest.
 """
 import json
 import sys

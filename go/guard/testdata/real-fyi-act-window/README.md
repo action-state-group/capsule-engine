@@ -11,4 +11,7 @@ byte for byte) sent its rules checker in the fyi buyer-acts probe run (2026-10-0
 | l1-commit-default | 2 paid purchases (2000, 3000) + booking commit 2000 (fyi) | the same commit 2000 | not_evaluable | pass, 9000 / 10000 |
 
 The fyi commits are counted at their sealed `spend_minor`, as the pay controls (l4-pay-x3: 8000,
-l4-pay-x5: 12000) are counted at their accepted amounts. Held by `internal/plugin/g3_vectors_test.go`.
+l4-pay-x5: 12000) are counted at their accepted amounts. Held by the consuming plugin's G3 vector test.
+
+The rulings named here (ruling (a), ruling (b), the G3 ruling) are defined in the package doc of
+`go/guard` (`action.go`).

@@ -73,7 +73,7 @@ def scenarios():
 
 
 def main(sha):
-    out = {"capsule_engine_commit": sha, "source": "internal/guard/testdata/parity/generate_recipient_seen_before.py",
+    out = {"capsule_engine_commit": sha, "source": "go/guard/testdata/parity/generate_recipient_seen_before.py",
            "scenarios": []}
     with tempfile.TemporaryDirectory() as tmp:
         store = LedgerStore(Path(tmp) / "ledger")

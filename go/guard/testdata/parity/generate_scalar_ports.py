@@ -285,7 +285,7 @@ def constraints(decision):
 def main(check, sha):
     table = SCENARIOS[check]
     out = {"capsule_engine_commit": sha, "check": check, "compare": table["compare"],
-           "source": "internal/guard/testdata/parity/generate_scalar_ports.py", "scenarios": [], "records": []}
+           "source": "go/guard/testdata/parity/generate_scalar_ports.py", "scenarios": [], "records": []}
     with tempfile.TemporaryDirectory() as tmp:
         pack_dir = Path(tmp) / "pack"
         shutil.copytree(PACK_DIR, pack_dir)

@@ -38,7 +38,7 @@ func seller015Engine(t *testing.T) (*Engine, pack.Pack) {
 
 // promiseReason is a promise check's reason as this plugin words it: the
 // engine's, except for the agent's own statement of a never class, which
-// names the class first as 1.0.0's reason does (Sherlock2's ruling on #258).
+// names the class first as 1.0.0's reason does (as ruled for asg/seller/0.1.5).
 func promiseReason(cell promiseCell) string {
 	if m := ownClaimReason.FindStringSubmatch(cell.Reason); m != nil {
 		return m[1] + " is a class of statement the agent never makes as its own; no approval clears it, only a change to the rule set"

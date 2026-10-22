@@ -2,7 +2,7 @@
 # capsule-cli v0.1.0-rc9 pay record (the capsule header with its disclosed
 # agent_input), and the variants the --record tests read. Every
 # agent_input_digest is sha256 over the JCS form, as capsulectl writes it.
-#   python3 generate.py internal/guard/testdata/records
+#   python3 generate.py go/guard/testdata/records
 import json, hashlib, sys
 out = sys.argv[1]
 def h(c, n=64): return (c * n)[:n]
