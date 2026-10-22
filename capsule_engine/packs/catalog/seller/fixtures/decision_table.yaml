@@ -65,6 +65,14 @@
 # handover, a rail not allowed and a commit stating no rail fail it alone and
 # escalate. sale-to-a-by-venmo and sale-to-a-by-zelle pass it on the sale. The
 # two acceptances state card, so destination_rail passes on them.
+#
+# The three proposal rows (0.1.5) are offers for a third item, never accepted.
+# first-offer-answering-no-proposal carries the sealed no_proposal and no
+# proposal_at: offer_expiry applied and found no proposal to age, so it is
+# n/a in scope with no field missing (population a, missing_field null), and
+# the offer is allowed. offer-answering-an-unnamed-message carries neither,
+# and no-proposal-beside-a-proposal-time carries no_proposal beside a proposal
+# time: each fails offer_expiry alone and escalates.
 
 rows:
   - scenario: condition-told-to-a
@@ -1008,3 +1016,40 @@ rows:
       promise_never: {population: a, missing_field: representation_class}
       release_on_acceptance: {population: c}
     verdict: allow
+  - scenario: first-offer-answering-no-proposal
+    action_id: offer/seller-fixture-no-proposal-a
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: n/a, price_floor: pass, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: pass, offer_expiry: n/a, single_commitment: pass, destination_rail: n/a, task_authority: pass, release_on_acceptance: n/a}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      recipient_role: {population: c}
+      promise_requires_approval: {population: a, missing_field: representation_class}
+      promise_never: {population: a, missing_field: representation_class}
+      offer_expiry: {population: a, missing_field: null}
+      destination_rail: {population: c}
+      release_on_acceptance: {population: c}
+    verdict: allow
+  - scenario: offer-answering-an-unnamed-message
+    action_id: offer/seller-fixture-unnamed-message-a
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: n/a, price_floor: pass, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: pass, offer_expiry: fail, single_commitment: pass, destination_rail: n/a, task_authority: pass, release_on_acceptance: n/a}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      recipient_role: {population: c}
+      promise_requires_approval: {population: a, missing_field: representation_class}
+      promise_never: {population: a, missing_field: representation_class}
+      destination_rail: {population: c}
+      release_on_acceptance: {population: c}
+    verdict: escalate
+  - scenario: no-proposal-beside-a-proposal-time
+    action_id: offer/seller-fixture-no-proposal-and-time-a
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: n/a, price_floor: pass, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: pass, offer_expiry: fail, single_commitment: pass, destination_rail: n/a, task_authority: pass, release_on_acceptance: n/a}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      recipient_role: {population: c}
+      promise_requires_approval: {population: a, missing_field: representation_class}
+      promise_never: {population: a, missing_field: representation_class}
+      destination_rail: {population: c}
+      release_on_acceptance: {population: c}
+    verdict: escalate

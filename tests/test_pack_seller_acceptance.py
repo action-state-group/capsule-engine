@@ -72,6 +72,7 @@ ITEM = "item-ref:" + hashlib.sha256(b"seller-fixture/item-1").hexdigest()
 ITEM_2 = "item-ref:" + hashlib.sha256(b"seller-fixture/item-2").hexdigest()
 # A third item, which buyer A is offered on the payment rails a commit may
 # state: no acceptance of it is sealed, so each commit is decided on its rail.
+# The offers on the proposal they answer (capsule-engine#193) use it too.
 ITEM_3 = "item-ref:" + hashlib.sha256(b"seller-fixture/item-3").hexdigest()
 
 # Each buyer's thread, as a check in it states it: its deal, and the buyer's
@@ -387,6 +388,18 @@ def _scenarios() -> list[tuple[str, Action, str]]:
                                            rail="venmo", cited_mandate_capsule_id=CITES_ACCEPTANCE), ALLOW),
         ("sale-to-a-by-zelle", _commitment("sell", "marketplace.sale", "sale-a-zelle", 56, BUYER_A, 175_000,
                                            rail="zelle", cited_mandate_capsule_id=CITES_ACCEPTANCE), ALLOW),
+        # The proposal an offer answers (0.1.5): a first offer before any
+        # buyer message carries the sealed no_proposal and no proposal time,
+        # so s06 does not apply. With neither, the age is unknown and it asks;
+        # no_proposal beside a proposal time contradicts itself and asks. (A
+        # check naming both no_proposal and a source message never bridges
+        # no_proposal: tests/test_offer_expiry_no_proposal.py.)
+        ("first-offer-answering-no-proposal", _offer("no-proposal-a", 57, BUYER_A, 180_000, item_ref=ITEM_3,
+                                                     proposal_at=None, no_proposal=True), ALLOW),
+        ("offer-answering-an-unnamed-message", _offer("unnamed-message-a", 58, BUYER_A, 180_000, item_ref=ITEM_3,
+                                                      proposal_at=None), ESCALATE),
+        ("no-proposal-beside-a-proposal-time", _offer("no-proposal-and-time-a", 59, BUYER_A, 180_000,
+                                                      item_ref=ITEM_3, no_proposal=True), ESCALATE),
     ]
 
 
@@ -419,8 +432,11 @@ BEFORE_RELEASE_FROM_HISTORY = {
 BEFORE_COMMIT_RAIL = {"commit-cash-shipped": ALLOW, "commit-cash-with-no-handover": ALLOW,
                       "commit-on-a-rail-not-allowed": ALLOW, "commit-stating-no-rail": ALLOW,
                       "sale-to-a-by-venmo": ESCALATE, "sale-to-a-by-zelle": ESCALATE}
+# Before 0.1.5, s06 (offer_expiry/1.0.1) does not read no_proposal: an offer
+# with no proposal time asks, and one with a fresh time passes.
+BEFORE_NO_PROPOSAL = {"first-offer-answering-no-proposal": ESCALATE, "no-proposal-beside-a-proposal-time": ALLOW}
 BEFORE_PICKUP_AREA = {"pickup-area-to-the-platform": DENY, "email-and-pickup-area-to-the-platform": DENY,
-                      **BEFORE_RELEASE_FROM_HISTORY, **BEFORE_COMMIT_RAIL}
+                      **BEFORE_RELEASE_FROM_HISTORY, **BEFORE_COMMIT_RAIL, **BEFORE_NO_PROPOSAL}
 BEFORE_PLATFORM = {"email-to-the-platform": DENY, **BEFORE_PICKUP_AREA}
 EXPECTED_OVERRIDES: dict[str, str] = {}
 
@@ -726,6 +742,33 @@ def test_anything_but_an_email_or_the_pickup_area_to_the_platform_is_refused(run
     capsule = run[2][name]
     assert _failing(capsule) == ["recipient_role"]
     assert capsule["disposition"]["decision"] == "reject"
+
+
+def test_a_first_offer_answering_no_proposal_is_not_applicable_to_s06(run):
+    capsule = run[2]["first-offer-answering-no-proposal"]
+    assert capsule["asg_payload"]["no_proposal"] is True
+    assert "proposal_at" not in capsule["asg_payload"]
+    assert _constraint(capsule, "offer_expiry")["result"] == "n/a"
+    assert _failing(capsule) == []
+    assert capsule["disposition"]["decision"] == "accept"
+
+
+def test_no_proposal_beside_a_proposal_time_asks_on_s06_alone(run):
+    name = "no-proposal-beside-a-proposal-time"
+    capsule = run[2][name]
+    assert _failing(capsule) == ["offer_expiry"]
+    assert capsule["disposition"]["decision"] == "needs_input"
+    (outcome,) = [c for c in run[5][name].constraints if c.id == "offer_expiry"]
+    assert outcome.evidence == {"expiry_unverified": True, "no_proposal_beside": "proposal_at"}
+
+
+def test_an_offer_naming_no_proposal_and_no_time_still_asks(run):
+    """No proposal time and no no_proposal: the age is unknown, never read
+    as not applicable."""
+    name = "offer-answering-an-unnamed-message"
+    assert _failing(run[2][name]) == ["offer_expiry"]
+    (outcome,) = [c for c in run[5][name].constraints if c.id == "offer_expiry"]
+    assert outcome.evidence == {"expiry_unverified": True, "missing_field": "proposal_at"}
 
 
 def test_a_below_floor_offer_asks_on_price_floor_alone(run):
