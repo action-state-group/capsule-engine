@@ -8,9 +8,8 @@ Issue: capsule-engine#210. How ack: capsule-engine#210 issuecomment-6352734012.
 
 Code read: capsule-engine a489e49, actionstate-muse 8c9acf3 and 783fb94.
 
-**v2.** This version takes round 1 from Codex, the `claude -p` stand-in and Sherlock2
-(buzz://message?channel=0d760ea3-529d-4dec-b309-24184967f8e0&id=0480f78e31a7e43bde7b6331cd6ceccac5462256fabb510b3433c278eb27a9b9).
-What changed:
+**v2.** This version takes round 1 from Codex, the `claude -p` stand-in and Sherlock2. The
+review links are in the PR's review record. What changed:
 
 - **Shared vectors (§5).** Cases now come in kinds, with one runner per kind on each side, and
   each kind replays the input its existing tests replay. The reason string and the sealed
@@ -41,7 +40,7 @@ What changed:
 - **Sets kept back (§12).** A set held back by §12 is resolved one by one before the
   switch-over, instead of falling back unconditionally.
 - **Public text (§1, §11, §12).** The note itself drops internal document paths, section ids,
-  tool paths and the session name, which Sherlock2 flagged in round 2.
+  tool paths, chat links and the session name, which Sherlock2 flagged in round 2.
 - **vocabgate (§3, §9).** vocabgate walks the pinned module's `packs.All`, never a copy (Codex
   round 3, `claude -p` round 4).
 
