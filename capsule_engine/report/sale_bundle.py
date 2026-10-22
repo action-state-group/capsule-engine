@@ -67,7 +67,10 @@ every carried thread sealed before the check, oldest first, with the sale's
 key beside it as ``item_ref`` and, from the check the act rests on, the
 counterparty that check sealed and its ``counterparty_profile`` companion.
 ``history_scope`` says whether that history is complete, so
-``history_ledger`` reads it as it reads a live one. It is complete only when
+``history_ledger`` reads it as it reads a live one. Cut to a number of days
+(``days``), it leaves out the acts sealed earlier, as a live check's history
+is cut (``history_state.RULES_HISTORY_DAYS``), and is complete when nothing
+in that window is missing. It is complete only when
 the sale is complete, and the check's whole second falls before
 ``certified_until``. Records are ordered by the whole second they name, and
 two threads are two logs, so records of two threads are ordered only when
@@ -505,10 +508,11 @@ def sale_checks(sale: SaleBundle) -> SaleHistory:
     """The ``sale_history`` a replay of ``sale`` is given: for a record of a
     carried thread, it writes the history ``sale_history`` builds for that
     check into the ledger through ``history_ledger``, the reader a live check
-    uses, and gives the sale's key."""
+    uses, and gives the sale's key. ``days`` cuts that history to the acts
+    sealed in that many days before the check (``sale_history``)."""
 
-    def write(capsule_id: str, ledger: LedgerAPI) -> SaleCheck | None:
-        envelope = sale_history(sale, capsule_id)
+    def write(capsule_id: str, ledger: LedgerAPI, days: int | None = None) -> SaleCheck | None:
+        envelope = sale_history(sale, capsule_id, days=days)
         if envelope is None:
             return None
         history_ledger(envelope, ledger)
@@ -517,11 +521,14 @@ def sale_checks(sale: SaleBundle) -> SaleHistory:
     return write
 
 
-def sale_history(sale: SaleBundle, capsule_id: str) -> dict | None:
+def sale_history(sale: SaleBundle, capsule_id: str, *, days: int | None = None) -> dict | None:
     """The external-check-input/v0 envelope of the check ``capsule_id`` in a
     carried thread, as a live check of it is given (module docstring): its
     ``record``, its ``history`` and ``history_scope.complete``. ``None`` when
-    no carried thread holds that record."""
+    no carried thread holds that record. With ``days``, an act sealed more
+    than that many days before the check is left out, as capsulectl leaves it
+    out of a live check's history (``live_history.RULES_HISTORY_DAYS``); the
+    history is still complete when nothing in the window is missing."""
     found = next(((t, i) for t, thread in enumerate(sale.threads)
                   for i, r in enumerate(thread.records) if r.get("capsule_id") == capsule_id), None)
     if found is None:
@@ -541,6 +548,9 @@ def sale_history(sale: SaleBundle, capsule_id: str) -> dict | None:
             sealed = _second(record.get("timestamp"))
             if sealed is None or at is None:
                 complete = False
+                continue
+            if days is not None and at is not None and sealed < at - timedelta(days=days):
+                # Outside the live window: not in a live check's history.
                 continue
             if t != own and sealed == at:
                 # Another thread's act in the check's second: before or after it is not sealed.

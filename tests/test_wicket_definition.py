@@ -95,6 +95,8 @@ EXPECTED_DIGESTS = {
     "seller.release_on_acceptance/1.0.0": "6a8487fb059f171765810bdc4a248edfdaf6489ddac409b978f03aaa0fec5583",
     # Not applicable to a disclosure to a platform; seller 0.1.4 cites it.
     "seller.release_on_acceptance/1.1.0": "933d72ab36863cb67ef2f0333b424fb4d559fa77bfeb1f5b63a61dee6307e28b",
+    # Reads the classes of data and binds the acceptance from the history; seller 0.1.5 cites it.
+    "seller.release_on_acceptance/1.2.0": "8a9709ec0332598aef7c3c6073c5ed5448fdf225040d83aa73080b9178634cde",
     # Replaces price_floor/2.0.0 and 1.0.0, retired at their digests
     # (RETIRED_DIGESTS below): the floor is opened from a commitment, never
     # read in clear, and a record committing to none puts the action out of scope.
@@ -123,6 +125,7 @@ WITHOUT_SEMANTICS = frozenset(EXPECTED_DIGESTS) - {
     "action_class_gate/1.1.0", "recipient_role/1.1.0", "seller.recipient_role/1.1.0",
     "seller.release_on_acceptance/1.1.0",
     "seller.recipient_role/1.2.0",
+    "seller.release_on_acceptance/1.2.0",
 }
 
 

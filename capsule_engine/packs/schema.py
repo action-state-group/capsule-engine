@@ -141,6 +141,7 @@ NORMALIZED_ACTION_FIELDS = frozenset(
         "authorized_by",
         "proposal_at",
         "item_ref",
+        "deal_id",
     }
 )
 

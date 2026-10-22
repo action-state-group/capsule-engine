@@ -1,0 +1,57 @@
+# seller.release_on_acceptance/1.2.0: seller.release_on_acceptance/1.1.0
+# (release_on_acceptance.seller.v1.1.yaml) reading what a share gives and
+# binding the acceptance from the history (capsule-engine#179, #186).
+#
+# 1.1.0 keyed on representation_class, a statement class no share carries,
+# and needed a cited, re-verified acceptance no producer sends, so no share
+# to a buyer ever passed. 1.2.0 reads the share's classes of data
+# (disclosed_classes). release_classes are the contact classes of
+# DISCLOSED_CLASSES (guards/action.py); a credential, a verification code, a
+# payment card and an id document are left out, so they still refuse. The
+# listing's public pickup area (pre_acceptance_classes) goes to any buyer
+# before acceptance. Anything else needs the sale's acceptance, the same
+# record as before (the first accepted, non-dry-run agreement.accept of the
+# item), in the share's own deal and by the same buyer: the counterparty
+# fingerprint each check seals, compared on the per-person identity kinds
+# only. binding selects this reading in the check (guards/checks/
+# release_on_acceptance.py); 1.0.0 and 1.1.0 have none and decide as they
+# always did. The rule itself is the `semantics` field below: it is inside
+# the digested body, so rewording it moves the digest. A failure refuses; it
+# never asks, and an approval does not clear it.
+wicket_id: seller.release_on_acceptance/1.2.0
+check: release_on_acceptance
+semantics: >-
+  A disclosure in action_classes passes only when it names at least one
+  class of data (disclosed_classes), every class it names is in
+  release_classes, and either every class it names is in
+  pre_acceptance_classes, or the sale has a known acceptance in the same
+  deal by the same buyer. The sale's acceptance is the first record in
+  ledger order, among the operator's, whose action_class is in
+  acceptance_classes, whose decision was accept, which was not a dry run,
+  and which carries the disclosure's item_ref; a history that may be missing
+  acts, an act of the sale that could not be read, or an earlier act of an
+  acceptance class with no disposition leave it unknown, which is none. The
+  same deal is an equal deal_id, both set. The same buyer is the
+  counterparty the acceptance's check sealed, carried beside it in the
+  history, and the one the disclosure's check sealed, under the same
+  fingerprint algorithm, with at least one per-person identity (email,
+  phone, profile_id, relay_address) on both sides and every one on both
+  sides equal; a name, a payee or a domain is never compared. Every other
+  such disclosure fails: no class or a class outside release_classes, no
+  item_ref, deal_id or counterparty fingerprint, no known acceptance, or one
+  in another deal or by another buyer. An action whose action_class is
+  missing or has no row in the action taxonomy fails too, since it cannot
+  be shown to be out of scope. Any other known action class is not
+  applicable, and so is a disclosure whose recipient_role is in
+  except_recipient_roles: it reaches no buyer. A failure is refused and no
+  approval clears it. The reason and evidence carry no disclosed value,
+  reference, deal, counterparty or capsule id: only the class names read,
+  whether the disclosure was bound to an acceptance, and a missing field's
+  name.
+config:
+  binding: same_deal_same_buyer
+  release_classes: [name, phone, email, home_address, address, pickup_location, other_contact, pickup_area]
+  pre_acceptance_classes: [pickup_area]
+  acceptance_classes: [agreement.accept]
+  action_classes: [disclosure.personal]
+  except_recipient_roles: [platform]

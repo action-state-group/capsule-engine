@@ -47,9 +47,12 @@ reads its history's acts through ``action_for_history_entry``
 (``report/live_history.py``). A replay of a sale bundle keys the sale on
 the digest of the sale's own task authority instead, and gives
 ``single_commitment`` each check's history of the sale's threads, read by the
-reader a live check's history is read by (``report/sale_bundle.py``). Only
-``single_commitment`` reads it: ``release_on_acceptance`` still reads the
-replay's own view, where no acceptance is sealed, so it releases nothing.
+reader a live check's history is read by (``report/sale_bundle.py``).
+``single_commitment`` reads it whole; a ``release_on_acceptance`` that binds
+the acceptance from the history (1.2.0) reads it cut to the live window
+(``RULES_HISTORY_DAYS``). A cited ``release_on_acceptance`` (1.0.0, 1.1.0)
+still reads the replay's own view, where no acceptance is sealed, so it
+releases nothing.
 
 ``_bridge_transfer_funds`` is the other non-default action mapping, and it
 mirrors the pattern already established by ``tests/test_guard_dry_run.py``
@@ -79,6 +82,7 @@ from ..folds.duration import parse_duration_seconds
 from ..guards import ALLOW, ESCALATE, Action, GuardDecision, GuardEngine, LocalSigner
 from ..guards.action import disclosed_classes_of
 from ..guards.checks.caps import EXECUTED_DECISION, SPEND_UNREADABLE, counts_executed_acts
+from ..guards.history_state import RULES_HISTORY_DAYS
 from ..guards.statements import StatementRecord, claim_of, make_statement_record
 from ..guards.wickets.definition import WicketDefinition
 from ..packs.install import engine_ask_sets
@@ -1194,8 +1198,10 @@ class SaleCheck:
 
 
 # Writes the history of the sale a replayed record is a check of into the
-# ledger it is given, and says so; ``None`` for a record of no such sale.
-SaleHistory = Callable[[str, LedgerAPI], "SaleCheck | None"]
+# ledger it is given, and says so; ``None`` for a record of no such sale. The
+# third argument, when not ``None``, cuts the history to the acts sealed in
+# that many days before the check, as a live check's history is cut.
+SaleHistory = Callable[[str, LedgerAPI, "int | None"], "SaleCheck | None"]
 
 
 @dataclass(frozen=True)
@@ -1268,7 +1274,11 @@ def replay(
     sale's is decided with the sale's key as ``item_ref``, and
     ``single_commitment`` reads the sale's acceptance from a fresh ledger it
     writes for that check alone (``GuardEngine.check``'s ``sale_history``),
-    never from the replay's own view."""
+    never from the replay's own view. A ``release_on_acceptance`` that binds
+    the acceptance from the history (1.2.0) reads it too, cut to the acts of
+    the last ``RULES_HISTORY_DAYS`` days before the check, as live
+    (``GuardEngine.check``'s ``release_history``); within that window the
+    same completeness rule holds."""
     if not records:
         return ReplayResult(decisions=(), record_range=(0, -1))
 
@@ -1348,8 +1358,13 @@ def _decide(engine: GuardEngine, action: Action, record: dict,
     if sale_history is None or capsule_id is None:
         return action, engine.check(action, dry_run=True)
     with tempfile.TemporaryDirectory() as tmp, LedgerStore(tmp) as sale_ledger:
-        sale = sale_history(capsule_id, sale_ledger)
+        sale = sale_history(capsule_id, sale_ledger, None)
         if sale is None:
             return action, engine.check(action, dry_run=True)
         action = replace(action, item_ref=sale.item_ref)
-        return action, engine.check(action, dry_run=True, sale_history=sale_ledger)
+        if not engine.uses_release_history:
+            return action, engine.check(action, dry_run=True, sale_history=sale_ledger)
+        with tempfile.TemporaryDirectory() as window_tmp, LedgerStore(window_tmp) as window_ledger:
+            sale_history(capsule_id, window_ledger, RULES_HISTORY_DAYS)
+            return action, engine.check(action, dry_run=True, sale_history=sale_ledger,
+                                        release_history=window_ledger)
