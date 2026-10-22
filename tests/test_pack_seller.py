@@ -199,8 +199,8 @@ def test_0_1_4_changes_only_s01_and_s13():
 def test_0_1_5_changes_only_s01():
     """0.1.5 cites seller.recipient_role/1.2.0 where 0.1.4 cited 1.1.0, and
     changes nothing else it cites or declares; only s01's statement changes.
-    pickup_area is not an address class, so s13 keeps it from a buyer as
-    before."""
+    s13 is unchanged: it still holds every share to a buyer until acceptance,
+    the pickup area included (#186 changes that in its 1.2.0)."""
     old = load_pack_dir(FROZEN_0_1_4_DIR)
     swapped = [w.wicket_id for w in old.constraints]
     swapped[swapped.index("seller.recipient_role/1.1.0")] = "seller.recipient_role/1.2.0"

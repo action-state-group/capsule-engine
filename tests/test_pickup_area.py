@@ -12,11 +12,13 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
+from agent_action_capsule import json_digest
 
 from capsule_engine.guards import Action
 from capsule_engine.guards.action import DISCLOSED_CLASSES, disclosed_classes_of
 from capsule_engine.guards.checks import check_recipient_role
 from capsule_engine.guards.wickets import load_definition_file
+from capsule_engine.report.replay import action_for_record
 
 CATALOG = Path(__file__).parent.parent / "capsule_engine" / "guards" / "wickets" / "catalog_defs"
 SELLER_ROLE_1_1 = load_definition_file(CATALOG / "recipient_role.seller.v1.1.yaml")
@@ -79,3 +81,16 @@ def test_1_2_differs_from_1_1_only_in_what_a_platform_may_be_given():
 def test_the_buyer_and_the_user_still_pass_whatever_they_are_given():
     assert _role(SELLER_ROLE_1_2, _share(("pickup_location",), role="buyer")).result == "pass"
     assert _role(SELLER_ROLE_1_2, _share(None, role="self")).result == "pass"
+
+
+def test_a_deal_check_bridges_the_pickup_area_class():
+    """The capsulectl bridge reads a share's ``disclosing`` through the same
+    closed set, so a check naming pickup_area carries it."""
+    disclosed = {"x-deal-v0": {"record_type": "check"},
+                 "body": {"action": "share_contact", "action_class": "disclosure.personal", "taxonomy_version": "6",
+                          "disclosing": ["pickup_area"], "recipient_role": "platform"}}
+    record = {"operator": "deal", "developer": "capsulectl-deal", "action_id": "deal/1",
+              "model_attestation": {"compute_attestation": {"agent_input_digest": json_digest(disclosed)}}}
+    action = action_for_record(record, disclosed)
+    assert (action.recipient_role, action.disclosed_classes) == ("platform", ("pickup_area",))
+    assert _role(SELLER_ROLE_1_2, action).result == "pass"
