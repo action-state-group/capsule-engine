@@ -102,7 +102,7 @@ def check_destination_rail(
     if not extended:
         return _outcome("pass", f"rail {named} is not a watched rail", evidence)
     if in_person_rails is not None and counted in in_person_rails:
-        return _outcome("pass", f"rail {named} is allowed: the item is handed over in person", evidence)
+        return _outcome("pass", f"rail {named} is allowed because the item is handed over in person", evidence)
     return _outcome("pass", f"rail {named} is one of the allowed rails", evidence)
 
 

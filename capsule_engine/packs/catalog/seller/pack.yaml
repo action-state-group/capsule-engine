@@ -145,11 +145,11 @@ obligations:
     default_disposition: ASK
   - id: s07-payment-rail-the-user-allows
     statement: >-
-      Flags a seller's commit or a sale whose payment rail is not one the
-      user allows (today card, and p2p, which counts Venmo, Zelle, Cash App
-      and PayPal), a cash payment unless the item is handed over in person,
-      and a commit that does not state its payment method. It records the
-      rail it read, what it counted it as, and the handover.
+      Flags a seller's commit or a sale when its payment rail is not one the
+      user allows (today card, and person-to-person apps, p2p: Venmo, Zelle,
+      Cash App and PayPal); when it pays in cash and the item is not handed
+      over in person; or, for a commit, when it states no payment method. It
+      records the rail it read, what it counted it as, and the handover.
     check: destination_rail
     default_disposition: ASK
   - id: s08-stay-within-task-bounds

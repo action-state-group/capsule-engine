@@ -115,7 +115,7 @@ def test_cash_not_in_person_says_why(handover, reason):
 
 def test_cash_in_person_records_the_handover():
     out = _run(RAIL_1_1, _action(COMMIT, rail="cash", handover="in_person"))
-    assert out.reason == "rail 'cash' is allowed: the item is handed over in person"
+    assert out.reason == "rail 'cash' is allowed because the item is handed over in person"
     assert out.evidence == {"rail": "cash", "watched_rails": [], "allowed_rails": ["card", "p2p"],
                             "counted_as": "cash", "in_person_rails": ["cash"], "handover": "in_person"}
 
