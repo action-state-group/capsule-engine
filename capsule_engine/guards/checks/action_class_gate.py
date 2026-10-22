@@ -11,6 +11,14 @@ set ``except_recipient_roles``: it then does not match an action whose
 ``recipient_role`` is one of them (action_class_gate/1.1.0 leaves a
 disclosure to a ``platform`` to ``recipient_role``, which measures it). That
 is the one other field it reads, and only for such a selector.
+action_class_gate/1.2.0 adds two narrowing keys, each ``true`` or absent
+(capsule-engine#188): ``except_repeat_disclosures`` does not match an action
+every one of whose ``disclosed_classes`` is in its ``repeat_disclosures``,
+the classes already told to this recipient; ``except_recipient_told_before``
+does not match an action whose ``recipient_told_before`` is ``True``. A
+missing input is no exception, so such a selector matches as it would
+without the key. Neither input is sealed on the decision, and neither reason
+nor evidence repeats them.
 A replay passes the table the record was sealed under (``table``), and the
 evidence names that table's version; otherwise it is the engine's.
 
@@ -39,6 +47,11 @@ _METHOD = "taxonomy_selector_v0"
 _MATCH_KEYS = frozenset({"action_classes", "trigger_classes", "consequential"})
 # Narrows a selector; it selects nothing on its own.
 _EXCEPT_ROLES = "except_recipient_roles"
+# Narrow a selector by what the producer's telling memory says (1.2.0); each
+# is ``true`` when set.
+_EXCEPT_REPEAT = "except_repeat_disclosures"
+_EXCEPT_TOLD = "except_recipient_told_before"
+_EXCEPT_FLAGS = (_EXCEPT_REPEAT, _EXCEPT_TOLD)
 _ON_MATCH = frozenset({"fail", "pass"})
 # Trigger classes a taxonomy row may declare; CHANGE is derived from state.
 _DECLARED_TRIGGERS = frozenset(ac.trigger_class for ac in TAXONOMY.values() if ac.trigger_class is not None)
@@ -51,6 +64,8 @@ class Selector(TypedDict, total=False):
     trigger_classes: list[str]
     consequential: bool
     except_recipient_roles: list[str]
+    except_repeat_disclosures: bool
+    except_recipient_told_before: bool
     on_match: str
 
 
@@ -88,7 +103,7 @@ def parse_selectors(selectors: object) -> dict[str, Selector]:
             raise ValueError(f"selector id {sid!r} must be a non-empty string")
         if not isinstance(sel, dict):
             raise ValueError(f"selector {sid!r} must be a mapping")
-        unknown = sel.keys() - _MATCH_KEYS - {"on_match", _EXCEPT_ROLES}
+        unknown = sel.keys() - _MATCH_KEYS - {"on_match", _EXCEPT_ROLES, *_EXCEPT_FLAGS}
         if unknown:
             raise ValueError(f"selector {sid!r} carries unknown keys {sorted(unknown)}")
         if not sel.keys() & _MATCH_KEYS:
@@ -111,6 +126,9 @@ def parse_selectors(selectors: object) -> dict[str, Selector]:
                 )
         if "consequential" in sel and not isinstance(sel["consequential"], bool):
             raise ValueError(f"selector {sid!r} consequential must be true or false")
+        for key in _EXCEPT_FLAGS:
+            if key in sel and sel[key] is not True:
+                raise ValueError(f"selector {sid!r} {key} must be true when set")
     return selectors
 
 
@@ -121,6 +139,28 @@ def _matches(sel: Selector, action_class: str, trigger_class: str | None, conseq
     if "trigger_classes" in sel and trigger_class not in sel["trigger_classes"]:
         return False
     return "consequential" not in sel or sel["consequential"] == consequential
+
+
+def _excepted(sel: Selector, action: Action) -> str | None:
+    """Why ``sel`` does not match ``action`` although its class keys do, or
+    ``None``: a fixed phrase, never a value the action carries."""
+    if action.recipient_role in sel.get(_EXCEPT_ROLES, ()):
+        return "role"
+    if sel.get(_EXCEPT_REPEAT) and _all_repeated(action):
+        return "every class it discloses was told to this recipient before"
+    if sel.get(_EXCEPT_TOLD) and action.recipient_told_before is True:
+        return "this recipient was told something before"
+    return None
+
+
+def _all_repeated(action: Action) -> bool:
+    """Every class the action discloses is one already told to its
+    recipient. An action naming no class, or carrying no repeat list, is not
+    a repeat."""
+    disclosed, repeated = action.disclosed_classes, action.repeat_disclosures
+    if not disclosed or repeated is None:
+        return False
+    return set(disclosed) <= set(repeated)
 
 
 def check_action_class_gate(
@@ -135,12 +175,17 @@ def check_action_class_gate(
             UnmappedClassEvidence(action_class=action.action_class, in_taxonomy=False, taxonomy_version=table.version),
         )
     named = [sid for sid, sel in selectors.items() if _matches(sel, ac.name, ac.trigger_class, ac.consequential)]
-    matched = sorted(sid for sid in named if action.recipient_role not in selectors[sid].get(_EXCEPT_ROLES, ()))
+    why = {sid: _excepted(selectors[sid], action) for sid in named}
+    matched = sorted(sid for sid in named if why[sid] is None)
     if not matched:
         reason = "no selector names this action class"
-        if named:
+        if named and all(w == "role" for w in why.values()):
+            # 1.1.0's reason, byte for byte.
             reason = (f"the selectors naming action class {ac.name!r} leave out recipient_role "
                       f"{action.recipient_role!r}")
+        elif named:
+            phrases = sorted({f"recipient_role {action.recipient_role!r}" if w == "role" else w for w in why.values()})
+            reason = f"the selectors naming action class {ac.name!r} leave this action out: {'; '.join(phrases)}"
         return _outcome("n/a", reason, not_applicable_evidence(_CHECK_ID, in_scope=False))
     evidence = GateEvidence(
         action_class=ac.name,

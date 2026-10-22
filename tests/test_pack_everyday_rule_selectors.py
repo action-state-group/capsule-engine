@@ -28,13 +28,13 @@ from capsule_engine.packs import (
 
 PACK_DIR = Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog" / "everyday"
 PACK = load_pack_dir(PACK_DIR)
-PACK_DIGEST = "c1cea374102bba60de82e16663c550a278ee07a399c5faeb285fe1ea1ea27d4d"
+PACK_DIGEST = "ac7697061fd1c50177000648e2458f6236068679fc67ae924870ee8fb1cd8488"
 
 SELECTOR = {
     "r01-research-and-prepare": "non_consequential",
     "r04-prepare-without-committing": "non_consequential",
-    "r11-home-address-to-an-individual": "personal_disclosure",
-    "r12-personal-contact-to-a-new-party": "personal_disclosure",
+    "r11-home-address-to-an-individual": "personal_disclosure_new_class",
+    "r12-personal-contact-to-a-new-party": "personal_disclosure_new_party",
     "r15-public-posting": "public_posting",
     "r16-booking-with-a-commitment": "booking_create",
     "r17-cancellation": "booking_cancel",
@@ -46,6 +46,8 @@ GATE_RULES = tuple(SELECTOR)
 APPLIES = {
     "info.query": {"r01-research-and-prepare": "pass", "r04-prepare-without-committing": "pass"},
     "disclosure.personal": {"r11-home-address-to-an-individual": "fail", "r12-personal-contact-to-a-new-party": "fail"},
+    # 0.3.8: a new class to a party told something before fails rule 11 alone.
+    "disclosure.personal/told-before": {"r11-home-address-to-an-individual": "fail"},
     "communication.publish": {"r15-public-posting": "fail"},
     "booking.create": {"r16-booking-with-a-commitment": "fail"},
     "booking.cancel": {"r17-cancellation": "fail"},
@@ -70,6 +72,9 @@ def _action(n: int, action_class: str, **fields) -> Action:
 ACTIONS = {
     "info.query": _action(1, "info.query"),
     "disclosure.personal": _action(2, "disclosure.personal", recipient_role="fulfilling_merchant"),
+    "disclosure.personal/told-before": _action(9, "disclosure.personal", recipient_role="fulfilling_merchant",
+                                               disclosed_classes=("phone",), repeat_disclosures=(),
+                                               recipient_told_before=True),
     "communication.publish": _action(3, "communication.publish"),
     # A booking with an amount, in the shape a household assistant records one.
     "booking.create": _action(4, "booking.create", amount_minor=2_000, currency="EUR", target="venue/restaurant"),
@@ -107,7 +112,7 @@ def _gate_table(pack, decisions) -> dict[str, dict[str, str]]:
 
 
 def test_each_gate_rule_names_its_selector_and_the_digest_is_recorded():
-    assert PACK.pack_id == "asg/everyday/0.3.7"
+    assert PACK.pack_id == "asg/everyday/0.3.8"
     assert {o.id: o.selector for o in PACK.obligations if o.check == "action_class_gate"} == SELECTOR
     assert all(o.selector is None for o in PACK.obligations if o.check != "action_class_gate")
     assert PACK.definition_digest() == PACK_DIGEST

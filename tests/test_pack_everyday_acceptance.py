@@ -309,6 +309,20 @@ def _scenarios() -> list[tuple[str, Action, str]]:
          recipient_role="platform", disclosed_classes=("email", "phone")), DENY),
         ("platform-disclosure-naming-no-class", _disclosure("platform-no-class", 40, target="platform/listings-e",
          recipient_role="platform"), DENY),
+        # What the producer's telling memory reports (0.3.8). The email to a
+        # merchant told nothing before fails action_class_gate on r11 and r12
+        # and escalates; the same email to a merchant already told it matches
+        # neither, so it is allowed; a phone to a merchant told the email
+        # before fails r11 alone and escalates. Each names its own merchant.
+        ("first-telling-to-a-merchant", _disclosure("first-telling", 41, target="shop/florist",
+         recipient_role="fulfilling_merchant", disclosed_classes=("email",), repeat_disclosures=(),
+         recipient_told_before=False), ESCALATE),
+        ("repeat-telling-to-a-merchant", _disclosure("repeat-telling", 42, target="shop/florist-b",
+         recipient_role="fulfilling_merchant", disclosed_classes=("email",), repeat_disclosures=("email",),
+         recipient_told_before=True), ALLOW),
+        ("new-class-to-a-merchant-told-before", _disclosure("new-class-told-before", 43, target="shop/florist-c",
+         recipient_role="fulfilling_merchant", disclosed_classes=("phone",), repeat_disclosures=(),
+         recipient_told_before=True), ESCALATE),
     ]
 
 
@@ -367,7 +381,7 @@ def test_records_are_pack_attributed_and_observe_mode(run):
         assert capsule["asg_payload"]["manifest_digest"] == installed.resolved.manifest_digest, name
         assert capsule["asg_payload"]["checkpoint"].get("dry_run") is (True if name not in REAL_RUN else None), name
     assert activation["asg_payload"]["detail"]["packs"] == [
-        {"pack_id": "asg/everyday/0.3.7", "digest": installed.pack.definition_digest(), "mode": "observe"}
+        {"pack_id": "asg/everyday/0.3.8", "digest": installed.pack.definition_digest(), "mode": "observe"}
     ]
 
 

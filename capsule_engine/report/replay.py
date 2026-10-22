@@ -87,7 +87,7 @@ from cll.ledger.api import LedgerAPI
 from ..folds.definition import FoldDefinition
 from ..folds.duration import parse_duration_seconds
 from ..guards import ALLOW, ESCALATE, Action, GuardDecision, GuardEngine, LocalSigner
-from ..guards.action import disclosed_classes_of
+from ..guards.action import disclosed_classes_of, repeat_disclosures_of
 from ..guards.checks.caps import EXECUTED_DECISION, SPEND_UNREADABLE, counts_executed_acts
 from ..guards.history_state import CHECK_FP_ALGS, RULES_HISTORY_DAYS, well_formed_counterparty
 from ..guards.statements import StatementRecord, claim_of, make_statement_record
@@ -475,6 +475,9 @@ def _bridge_deal_check(
     ``disclosing``, the classes of data it gives, is carried as
     ``disclosed_classes`` only as a non-empty list of known class names
     (``DISCLOSED_CLASSES``); with any other member it is dropped whole.
+    ``repeat_disclosures`` is carried the same way, possibly empty, and
+    ``recipient_told_before`` only as a boolean (capsule-engine#188); neither
+    is sealed on the decision.
     ``taxonomy_version`` makes it an act stated against a pinned taxonomy, so
     ``dedupe`` keys it on the act, never on this record's type or id. The
     deal is the one the record names (``_deal_id``), never the ``action_id``
@@ -544,6 +547,8 @@ def _bridge_deal_check(
         refundable=_flag(recourse.get("refundable")),
         recipient_role=_text(body.get("recipient_role")),
         disclosed_classes=disclosed_classes_of(body.get("disclosing")),
+        repeat_disclosures=repeat_disclosures_of(body.get("repeat_disclosures")),
+        recipient_told_before=_flag(body.get("recipient_told_before")),
         channel=_text(body.get("channel")),
         first_contact_channel=_text(body.get("first_contact_channel")),
         upfront_amount_minor=_minor(body.get("upfront_amount_minor")),

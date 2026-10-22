@@ -25,7 +25,7 @@ invent others):
 | `amount_minor` | `caps` | the amount in minor currency units (cents), always an integer: the amount the payment is expected to take |
 | `spend_authorized_minor` | `caps` | optional: the most the payment may take, in minor units, when that is more than `amount_minor` (a card pre-authorisation or a buffer); leave it unset when there is none |
 | `currency` | -- | ISO 4217 code, e.g. `"EUR"` |
-| `action_class` | `action_class_gate` | the guard class the action is declared in; the gate reads nothing else |
+| `action_class` | `action_class_gate` | the guard class the action is declared in; beyond it, the gate reads only the recipient's role and the two telling inputs below, on a disclosure |
 | `target` (pack-facing name: **payee_ref**, or **merchant_ref** on a purchase) | `dedupe`, `counterparty_identity_change`, `counterparty_seen_before` | a stable reference for who is paid, bought from or messaged |
 | `rail` | `destination_rail` | the payment rail, e.g. `"card"`, `"bank_transfer"`, `"p2p"`, `"gift_card"`, `"crypto"` |
 | `counterparty_account_ref` | `counterparty_identity_change` | an opaque reference to the account the payee is paid into -- a token or digest that is stable per account, never the account, card or IBAN number, because it is recorded on the capsule. A value shaped like a raw number is refused |
@@ -33,6 +33,9 @@ invent others):
 | `recurrence` | `recurring_charge` | whether the payment repeats: `"one_time"`, or e.g. `"monthly"` for a subscription |
 | `equivalence_key` | `dedupe` | optional: your own idempotency key, if two payments to one payee are genuinely different payments (two monthly bills) |
 | `recipient_role` | `recipient_role` | on a personal-data disclosure: the receiver's role, exactly one of `"fulfilling_merchant"`, `"third_party"`, `"self"`; a role, never a name |
+| `disclosed_classes` | `recipient_role`, `action_class_gate` | on a personal-data disclosure: the classes of the user's data it gives, from `name`, `phone`, `email`, `home_address`, `address`, `pickup_location`, `pickup_area`, `other_contact`, `credential`, `verification_code`, `payment_card`, `id_document`; names only, never the values |
+| `repeat_disclosures` | `action_class_gate` | optional, on a personal-data disclosure: the classes of `disclosed_classes` you already told this same recipient, from your own record of what you told whom, e.g. `["email"]`, or `[]` when none; class names, never the data or who it went to. Leave it unset when you keep no such record |
+| `recipient_told_before` | `action_class_gate` | optional, on a personal-data disclosure: `true` when you told this recipient any class of the user's data before, in this task or another; having dealt with them without telling them anything is `false`. Leave it unset when you keep no such record |
 | `refundable` | `refundability` | `true` or `false`: whether the payment can be refunded |
 | `material_fields_changed`, `material_fields_basis` | `material_fields_changed` | an integer count of the fields on the check's pinned list that differ from what the user approved, and the SHA-256 (over JCS bytes) of that list; the count is read only when the digest matches |
 | `offer_fields_changed`, `offer_fields_basis` | `offer_fields_changed` | the same, over the offer list, against what the user stated |
@@ -74,13 +77,17 @@ catalog):
    matched against one-time-code, password and card-security-code patterns.
 6. `recurring_charge` (`recurring_charge/1.0.0`) -- a payment whose
    declared recurrence is not one-time is flagged.
-7. `action_class_gate` (`action_class_gate/1.1.0`) -- named selectors over
+7. `action_class_gate` (`action_class_gate/1.2.0`) -- named selectors over
    the action taxonomy: a class with no consequential effect passes (today,
    `info.query` alone); public posting, creating or cancelling a booking,
    deleting stored data, and disclosing personal data are flagged, except a
-   disclosure to a platform, which `recipient_role` decides. It reads the
-   declared class, and the recipient's role for that one exception, never
-   what the action contains. Eight rules
+   disclosure to a platform, which `recipient_role` decides. A disclosure is
+   flagged twice over: as a class new to its recipient (rule 11), unless
+   every class in `disclosed_classes` is in `repeat_disclosures`, and as a
+   new recipient (rule 12), unless `recipient_told_before` is `true`. Either
+   input left unset flags its rule. It reads the declared class, the
+   recipient's role and those two inputs, never what the action contains.
+   Eight rules
    cite this check, and each names the one selector it is measured by
    (`selector:` in `pack.yaml`): a rule fails or passes only when its
    selector matched the action's class, and does not apply otherwise, so a

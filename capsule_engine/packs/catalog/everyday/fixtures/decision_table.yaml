@@ -66,9 +66,14 @@
 # channel_change and upfront_amount; each of the five rows after it fails
 # exactly one of them, and escalates.
 # The five *-platform rows (0.3.7) disclose to a platform, which
-# action_class_gate/1.1.0 leaves out of r11 and r12 (n/a). email-to-a-platform
+# action_class_gate leaves out of r11 and r12 (n/a). email-to-a-platform
 # passes recipient_role and is allowed; a phone, a home address, an email
 # beside a phone, or a disclosure naming no class fails it and denies.
+# The three *-to-a-merchant rows (0.3.8) carry what the producer's telling
+# memory reports. first-telling-to-a-merchant fails action_class_gate on r11
+# and r12 and escalates; repeat-telling-to-a-merchant gives only classes told
+# to a merchant told before, matches neither (n/a) and is allowed;
+# new-class-to-a-merchant-told-before fails it on r11 alone and escalates.
 # task-inside-authority passes task_authority against the record supplied
 # with the decision; task-outside-authority names a payee that record's plan
 # does not bind, fails it, and escalates (r26 declares ASK).
@@ -793,3 +798,61 @@ rows:
       upfront_amount: {population: c}
       task_authority: {population: c}
     verdict: deny
+  - scenario: first-telling-to-a-merchant
+    action_id: share_address/everyday-fixture-first-telling
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, destination_rail: n/a, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: n/a, action_class_gate: fail, counterparty_seen_before: n/a, recipient_role: pass, refundability: n/a, material_fields_changed: n/a, offer_fields_changed: n/a, recipient_seen_before: n/a, channel_change: n/a, upfront_amount: n/a, task_authority: n/a}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      destination_rail: {population: c}
+      counterparty_identity_change: {population: c}
+      credential_pattern: {population: c}
+      recurring_charge: {population: c}
+      counterparty_seen_before: {population: c}
+      refundability: {population: c}
+      material_fields_changed: {population: c}
+      offer_fields_changed: {population: c}
+      recipient_seen_before: {population: c}
+      channel_change: {population: c}
+      upfront_amount: {population: c}
+      task_authority: {population: c}
+    verdict: escalate
+  - scenario: repeat-telling-to-a-merchant
+    action_id: share_address/everyday-fixture-repeat-telling
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, destination_rail: n/a, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: n/a, action_class_gate: n/a, counterparty_seen_before: n/a, recipient_role: pass, refundability: n/a, material_fields_changed: n/a, offer_fields_changed: n/a, recipient_seen_before: n/a, channel_change: n/a, upfront_amount: n/a, task_authority: n/a}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      destination_rail: {population: c}
+      counterparty_identity_change: {population: c}
+      credential_pattern: {population: c}
+      recurring_charge: {population: c}
+      action_class_gate: {population: c}
+      counterparty_seen_before: {population: c}
+      refundability: {population: c}
+      material_fields_changed: {population: c}
+      offer_fields_changed: {population: c}
+      recipient_seen_before: {population: c}
+      channel_change: {population: c}
+      upfront_amount: {population: c}
+      task_authority: {population: c}
+    verdict: allow
+  - scenario: new-class-to-a-merchant-told-before
+    action_id: share_address/everyday-fixture-new-class-told-before
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, destination_rail: n/a, counterparty_identity_change: n/a, credential_pattern: n/a, recurring_charge: n/a, action_class_gate: fail, counterparty_seen_before: n/a, recipient_role: pass, refundability: n/a, material_fields_changed: n/a, offer_fields_changed: n/a, recipient_seen_before: n/a, channel_change: n/a, upfront_amount: n/a, task_authority: n/a}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      destination_rail: {population: c}
+      counterparty_identity_change: {population: c}
+      credential_pattern: {population: c}
+      recurring_charge: {population: c}
+      counterparty_seen_before: {population: c}
+      refundability: {population: c}
+      material_fields_changed: {population: c}
+      offer_fields_changed: {population: c}
+      recipient_seen_before: {population: c}
+      channel_change: {population: c}
+      upfront_amount: {population: c}
+      task_authority: {population: c}
+    verdict: escalate

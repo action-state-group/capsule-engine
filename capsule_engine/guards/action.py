@@ -57,6 +57,18 @@ def disclosed_classes_of(value: object) -> tuple[str, ...] | None:
     return tuple(sorted(set(value)))
 
 
+def repeat_disclosures_of(value: object) -> tuple[str, ...] | None:
+    """``value`` as ``Action.repeat_disclosures``: its classes sorted and
+    each named once, possibly none, or ``None`` when it is not a list of
+    members of ``DISCLOSED_CLASSES``. One unknown member drops the whole
+    value, as for ``disclosed_classes_of``."""
+    if not isinstance(value, (list, tuple)):
+        return None
+    if any(not isinstance(c, str) or c not in DISCLOSED_CLASSES for c in value):
+        return None
+    return tuple(sorted(set(value)))
+
+
 @dataclass(frozen=True)
 class Action:
     """One candidate action, as presented to the guard for a decision.
@@ -116,6 +128,14 @@ class Action:
     the values. They are the one field here that is a
     list, of members of a closed set, and are sealed as one when set; read by
     ``recipient_role`` for a role a pack allows only some classes.
+    ``repeat_disclosures`` and ``recipient_told_before`` are what the
+    producer's telling memory says about a disclosure's recipient
+    (capsule-engine#188): the classes of ``disclosed_classes`` already told
+    to this same recipient (a tuple like ``disclosed_classes``, possibly
+    empty), and whether this recipient was told any class before, in this
+    deal or another. Read by ``action_class_gate`` (1.2.0) and, like
+    ``spend_authorized_minor``, never sealed on the capsule: the check that
+    states them already holds them.
     ``refundable`` is whether the payment can be refunded,
     read by ``refundability``. ``material_fields_changed`` and
     ``offer_fields_changed`` count how many fields on a list pinned in the
@@ -205,6 +225,8 @@ class Action:
     counterparty_fp_alg: str | None = None
     recipient_role: str | None = None
     disclosed_classes: tuple[str, ...] | None = None
+    repeat_disclosures: tuple[str, ...] | None = None
+    recipient_told_before: bool | None = None
     refundable: bool | None = None
     material_fields_changed: int | None = None
     material_fields_basis: str | None = None
@@ -245,6 +267,18 @@ class Action:
                 "disclosed_classes must be a non-empty tuple of DISCLOSED_CLASSES names, sorted and each named "
                 "once (disclosed_classes_of builds one)"
             )
+
+        if self.repeat_disclosures is not None and (
+            not isinstance(self.repeat_disclosures, tuple)
+            or any(not isinstance(c, str) or c not in DISCLOSED_CLASSES for c in self.repeat_disclosures)
+            or list(self.repeat_disclosures) != sorted(set(self.repeat_disclosures))
+        ):
+            raise ValueError(
+                "repeat_disclosures must be a tuple of DISCLOSED_CLASSES names, sorted and each named once "
+                "(repeat_disclosures_of builds one)"
+            )
+        if self.recipient_told_before is not None and not isinstance(self.recipient_told_before, bool):
+            raise ValueError("recipient_told_before must be True, False or None")
 
         if self.equivalence_key is not None and self.equivalence_key_digest is not None:
             raise ValueError(
