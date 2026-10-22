@@ -144,6 +144,8 @@ NORMALIZED_ACTION_FIELDS = frozenset(
         "no_proposal",
         "item_ref",
         "deal_id",
+        # Read from the check's sealed body, never sealed on the decision.
+        "listing_classes",
     }
 )
 

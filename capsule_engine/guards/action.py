@@ -82,6 +82,21 @@ def repeat_disclosures_of(value: object) -> tuple[str, ...] | None:
     return tuple(sorted(set(value)))
 
 
+_CLASS_TOKEN = re.compile(r"[a-z][a-z0-9_]{0,63}")
+
+
+def listing_classes_of(value: object) -> tuple[str, ...] | None:
+    """``value`` as ``Action.listing_classes``: the class names sorted and each
+    named once (empty when the listings in force state none in common), or
+    ``None`` when it is not a list of class-name tokens. A value out of shape is
+    dropped whole: with none, a listing counts for nothing."""
+    if not isinstance(value, (list, tuple)):
+        return None
+    if any(not isinstance(c, str) or not _CLASS_TOKEN.fullmatch(c) for c in value):
+        return None
+    return tuple(sorted(set(value)))
+
+
 @dataclass(frozen=True)
 class Action:
     """One candidate action, as presented to the guard for a decision.
@@ -184,6 +199,15 @@ class Action:
     ``item_ref`` is an opaque reference to the item a sale is about, stable
     across every buyer thread of that sale, compared for equality and never
     opened, read by ``single_commitment``.
+    ``listing_classes`` are, on an offer or a commit of a sale's thread, the
+    representation classes every live listing of the sale states when the
+    check was made (capsulectl's rule input of that name: the intersection
+    over the latest post per platform), sorted and each named once; empty
+    when the listings state none in common, ``None`` when the sale has no
+    post. Class names only. It is read from the check's own sealed body
+    (``report/replay.py``) and counted by ``required_disclosure``
+    from 1.2.0; like ``spend_authorized_minor`` it is never sealed on the
+    capsule, so the decision carries no second copy of it.
     ``taxonomy_version`` (normally ``classes.TAXONOMY_VERSION``) is sealed
     beside ``action_class`` when set, so a count over trigger classes can be
     recomputed against the table that was live; unset, the record keeps its
@@ -263,6 +287,7 @@ class Action:
     handover: str | None = None
     no_proposal: bool | None = None
     item_ref: str | None = None
+    listing_classes: tuple[str, ...] | None = None
     returned_minor: int | None = None
     reverses_ref: str | None = None
     deal_id: str | None = None
@@ -304,6 +329,13 @@ class Action:
             raise ValueError("recipient_told_before must be True, False or None")
         if self.handover is not None and handover_of(self.handover) is None:
             raise ValueError(f"handover must be one of {sorted(HANDOVERS)}")
+        if self.listing_classes is not None and (
+            not isinstance(self.listing_classes, tuple)
+            or list(self.listing_classes) != sorted(set(self.listing_classes))
+            or any(not isinstance(c, str) or not _CLASS_TOKEN.fullmatch(c) for c in self.listing_classes)
+        ):
+            raise ValueError("listing_classes must be a tuple of class names, sorted and each named once "
+                             "(listing_classes_of builds one)")
 
         if self.equivalence_key is not None and self.equivalence_key_digest is not None:
             raise ValueError(

@@ -136,6 +136,7 @@ CONFIGURED_CHECKS: dict[str, Callable[[Action, LedgerAPI, dict], CheckOutcome]] 
             seen_before_fold(config["statement_fold_id"], config["statement_fold_digest"])
             if "statement_fold_id" in config else None
         ),
+        count_listing_classes=config.get("count_listing_classes", False),
     ),
     "offer_expiry": lambda action, ledger, config: check_offer_expiry(
         action,

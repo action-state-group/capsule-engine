@@ -48,6 +48,11 @@
 # area (pickup_area), alone or beside an email, and the exact spot
 # (pickup_location). recipient_role passes the first two and fails the third.
 #
+# The three listing rows (0.1.5) are offers to a fourth buyer (d), told
+# nothing in chat, of a third item, each carrying the listing_classes its
+# check sealed. required_disclosure passes when the listings in force state
+# the condition, and fails, asking, when they do not or share no class.
+#
 # The share-* rows (0.1.5) are shares as capsulectl states them: the classes
 # of data, the deal and the buyer's fingerprints, no statement class and no
 # citation (so promise_requires_approval and promise_never are n/a, naming
@@ -1044,6 +1049,42 @@ rows:
   - scenario: no-proposal-beside-a-proposal-time
     action_id: offer/seller-fixture-no-proposal-and-time-a
     checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: n/a, price_floor: pass, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: pass, offer_expiry: fail, single_commitment: pass, destination_rail: n/a, task_authority: pass, release_on_acceptance: n/a}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      recipient_role: {population: c}
+      promise_requires_approval: {population: a, missing_field: representation_class}
+      promise_never: {population: a, missing_field: representation_class}
+      destination_rail: {population: c}
+      release_on_acceptance: {population: c}
+    verdict: escalate
+  - scenario: offer-after-a-listing-stating-the-condition
+    action_id: offer/seller-fixture-listing-d
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: n/a, price_floor: pass, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: pass, offer_expiry: pass, single_commitment: pass, destination_rail: n/a, task_authority: pass, release_on_acceptance: n/a}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      recipient_role: {population: c}
+      promise_requires_approval: {population: a, missing_field: representation_class}
+      promise_never: {population: a, missing_field: representation_class}
+      destination_rail: {population: c}
+      release_on_acceptance: {population: c}
+    verdict: allow
+  - scenario: offer-after-a-listing-without-the-condition
+    action_id: offer/seller-fixture-listing-no-condition-d
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: n/a, price_floor: pass, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: fail, offer_expiry: pass, single_commitment: pass, destination_rail: n/a, task_authority: pass, release_on_acceptance: n/a}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      recipient_role: {population: c}
+      promise_requires_approval: {population: a, missing_field: representation_class}
+      promise_never: {population: a, missing_field: representation_class}
+      destination_rail: {population: c}
+      release_on_acceptance: {population: c}
+    verdict: escalate
+  - scenario: offer-after-listings-sharing-no-class
+    action_id: offer/seller-fixture-listings-no-class-d
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: n/a, price_floor: pass, promise_requires_approval: n/a, promise_never: n/a, required_disclosure: fail, offer_expiry: pass, single_commitment: pass, destination_rail: n/a, task_authority: pass, release_on_acceptance: n/a}
     n_a:
       caps: {population: c}
       verify_before_dispatch: {population: c}
