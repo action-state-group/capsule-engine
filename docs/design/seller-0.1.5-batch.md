@@ -1,6 +1,6 @@
 # Design note: the seller 0.1.5 / everyday 0.3.8 batch
 
-Status: converged v8.1, 2026-10-22 (Codex v8, `claude -p` v8, Sherlock2 on every what-point), Ethan's agent (session local_f0ad46ac). Reviewers: Codex, a
+Status: converged v8.2, 2026-10-22 (Codex v8, `claude -p` v8, Sherlock2 on every what-point), Ethan's agent (session local_f0ad46ac). Reviewers: Codex, a
 `claude -p` stand-in for Kimi, Sherlock2 (product rules and wording).
 
 Code read: capsule-engine 8e2f887, capsule-cli 3acdeee (rc19), actionstate-muse 69c759d.
@@ -188,7 +188,13 @@ has no verifier and ends `not_evaluable`. So no share to a buyer ever passes.
   kinds are the per-person kinds: email, phone, profile id, relay address;
   `name` and `payee` are fingerprinted too but are not identities ("one seller can write it many
   ways"), so they are left out of the comparison, and the thread default's `payee := name`
-  (`deal_profile.go` L262-266) never refuses the right buyer. A missing
+    (`deal_profile.go` L262-266) never refuses the right buyer. Fallback (v8.2, found while
+  building #197): a thread opened on a marketplace may seal only `{domain, name}` for its buyer
+  (the skill asks for every identifier the agent can see, and that can be all of them). When
+  neither side seals any per-person kind, the identity part passes only if both seal `name`
+  and `domain` and both are equal; `deal_id` equality still binds the thread. When either side
+  has a per-person kind the rule above applies unchanged, so a per-person kind on one side only,
+  or a name-only or domain-only pair, refuses. A missing
   fingerprint on either side fails. On replay the sale history is rebuilt from the bundle's
   check records, which seal the same block.
 - **Only while the deal is live** (Sherlock2, Q7). A closed thread already takes no check
