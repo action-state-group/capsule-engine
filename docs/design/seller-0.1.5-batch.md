@@ -622,7 +622,8 @@ As built (capsule-cli#398): the words are spotted on a skeleton of the text: esc
 (`decodeEscapes`), format characters removed, NFKD, every mark (`\p{M}`) dropped, each non-ASCII letter or digit read as its
 Unicode TR39 confusable prototype, then lower case; i, l and 1 read as one letter and o and 0 as
 one; a vertical stroke (`|` and the non-ASCII characters whose TR39 prototype is l, such as `｜`,
-`ǀ` and `│`) is read both as the letter i and as a word boundary, so "AUTHENT|C" and "used|GENU|NE" match;
+`ǀ` and `│`, except those whose NFKD form is `l`, `I` or `1`, which stay letters so "Originaℓℓy"
+passes) is read both as the letter i and as a word boundary, so "AUTHENT|C" and "used|GENU|NE" match;
 styled letters ("𝐎𝐫𝐢𝐠𝐢𝐧𝐚𝐥𝐥𝐲") read as their plain forms, so "Originally" passes. Words are whole
 words; `knock` and `off` match with any space, dash, math sign, control or underscore between.
 The skeleton never grants the exception: the template is matched exactly, case-sensitive, on the
