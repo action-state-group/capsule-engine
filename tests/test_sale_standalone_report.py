@@ -119,10 +119,12 @@ def _sign(record: dict, signer) -> dict:
     return record
 
 
-def _reseal_log(bundle: dict, signer, log_signer, move=None) -> None:
+def _reseal_log(bundle: dict, signer, log_signer, move=None, signer_of=None) -> None:
     """Every record of ``bundle``'s log re-signed under ``signer`` (``move``
-    may give a record a new time first), and its certificate and checkpoint
-    rebuilt over them, the checkpoint at its own time under ``log_signer``."""
+    may give a record a new time first; ``signer_of``, given a record by its
+    id before re-sealing, may name another key for it), and its certificate
+    and checkpoint rebuilt over them, the checkpoint at its own time under
+    ``log_signer``."""
     certificate = bundle["completeness_certificate"]
     log_id = certificate["log_id"]
     seq = {cid: m["log_coordinates"]["seq"] for cid, m in certificate["memberships"].items()}
@@ -136,7 +138,7 @@ def _reseal_log(bundle: dict, signer, log_signer, move=None) -> None:
             record["timestamp"] = at
             if isinstance(record.get("evidence_record_header"), dict):
                 record["evidence_record_header"]["committed_at"] = at
-        record = _sign(record, signer)
+        record = _sign(record, (signer_of(old) if signer_of is not None else None) or signer)
         renamed[old] = record["capsule_id"]
         records.append(record)
     bundle["records"] = records
@@ -185,16 +187,17 @@ def _reseal_report(thread: dict, signer, edit=None) -> None:
     thread["extensions"]["x-deal-v0"]["sealed_report"] = carried["record"]["capsule_id"]
 
 
-def _relog(bundle: dict, keys, *, move=None, edit=None, report_signer=None) -> dict:
+def _relog(bundle: dict, keys, *, move=None, edit=None, report_signer=None, signer_of=None) -> dict:
     """``bundle`` re-sealed under the test ``keys`` (module docstring).
     ``move`` gives a thread record a new time; ``edit`` changes the first
     thread's report payload before it is sealed; ``report_signer`` signs
-    that report instead of the producer key."""
+    that report instead of the producer key; ``signer_of`` may name another
+    key for a record of any log, by its id before re-sealing."""
     signer, log_signer = keys
     out = copy.deepcopy(bundle)
-    _reseal_log(out, signer, log_signer)
+    _reseal_log(out, signer, log_signer, signer_of=signer_of)
     for n, thread in enumerate(_threads(out).values()):
-        _reseal_log(thread, signer, log_signer, move=move)
+        _reseal_log(thread, signer, log_signer, move=move, signer_of=signer_of)
         first = n == 0
         _reseal_report(thread, (report_signer or signer) if first else signer, edit if first else None)
     return out
@@ -287,6 +290,18 @@ RESEALED = {
     "another profile": lambda p: p.update(profile="x-deal-v1"),
     "another deal": lambda p: p.update(deal_id="deal-0000000000000000"),
     "another audience": lambda p: p.update(audience="public"),
+    "an audience that is a list": lambda p: p.update(audience=[]),
+    "an audience that is an object": lambda p: p.update(audience={}),
+    "a type that is a list": lambda p: p.update(type=[]),
+    "a profile that is an object": lambda p: p.update(profile={}),
+    "a deal that is a list": lambda p: p.update(deal_id=[]),
+    "a checkpoint size that is a list": lambda p: p["deal_checkpoint"].update(mmr_size=[]),
+    "a checkpoint root that is an object": lambda p: p["deal_checkpoint"].update(root={}),
+    "a deal_checkpoint that is a list": lambda p: p.update(deal_checkpoint=[]),
+    "an as_of that is a list": lambda p: _report(p)["lifecycle"].update(as_of=[]),
+    # A datetime keeps microseconds only; Go compares the nanosecond.
+    "an as_of a nanosecond later": lambda p: _report(p)["lifecycle"].update(
+        as_of=_report(p)["lifecycle"]["as_of"].replace("Z", ".000000001Z")),
 }
 
 
@@ -297,9 +312,97 @@ def test_a_signed_report_that_does_not_hold_opens_nothing(keys, edit):
     assert _findings(_relog(_produced(), keys, edit=edit)) == UNVERIFIED
 
 
+@pytest.mark.parametrize("as_of", [".0Z", ".000000000Z", ".0000000001Z", "+00:00"])
+def test_an_as_of_at_the_checkpoints_very_instant_holds(keys, as_of):
+    """The same instant written otherwise; a tenth fractional digit is
+    dropped, as Go's parser drops it."""
+    edit = lambda p: _report(p)["lifecycle"].update(as_of=_report(p)["lifecycle"]["as_of"].replace("Z", as_of))  # noqa: E731
+    assert _findings(_relog(_produced(), keys, edit=edit)) == set()
+
+
+UNSEALED_TYPES = {
+    "a pointer that is a list": _set(("x-deal-v0", "sealed_report"), []),
+    "an action_id that is an object": _set((REPORT, "record", "action_id"), {}),
+    "a record that is a list": _set((REPORT, "record"), []),
+    "an agent_input that is a string": _set((REPORT, "agent_input"), "x"),
+}
+
+
+@pytest.mark.parametrize("edit", UNSEALED_TYPES.values(), ids=UNSEALED_TYPES.keys())
+def test_a_member_of_the_wrong_type_opens_nothing(edit):
+    bundle = _produced()
+    edit(bundle)
+    assert UNVERIFIED <= _findings(bundle)
+
+
+def test_a_step_whose_record_type_is_not_a_string_is_not_a_step(keys):
+    """The last step's header type made a list: it is no step, so the step
+    before it is the last (as capsulectl's lastStepRecord reads it), signed
+    by the same key, and the copy reads complete."""
+    bundle = _produced()
+    thread = _first(bundle)
+    seq = {cid: m["log_coordinates"]["seq"] for cid, m in thread["completeness_certificate"]["memberships"].items()}
+    last = max(thread["records"], key=lambda r: seq[r["capsule_id"]])
+    last["evidence_record_header"]["record_type"] = []
+    assert _findings(_relog(bundle, keys)) == set()
+
+
 def test_a_report_signed_by_another_key_than_the_last_steps_opens_nothing(keys, tmp_path):
     other = LocalKeypairSigner(tmp_path / "other.pem")
     assert _findings(_relog(_produced(), keys, report_signer=other)) == UNVERIFIED
+
+
+def _by_seq(thread: dict) -> list[dict]:
+    seq = {cid: m["log_coordinates"]["seq"] for cid, m in thread["completeness_certificate"]["memberships"].items()}
+    return sorted(thread["records"], key=lambda r: seq[r["capsule_id"]])
+
+
+@pytest.mark.parametrize(("report_by_second_key", "findings"), [
+    (False, UNVERIFIED),  # signed by an earlier step's key
+    (True, set()),  # signed by the last step's key
+])
+def test_the_report_key_is_the_last_steps(keys, tmp_path, report_by_second_key, findings):
+    """Only the first thread's last step is signed by a second key (one of
+    the sale's records too, so the sale names it): the report must be
+    signed by that key, not by the key of the steps before it."""
+    second = LocalKeypairSigner(tmp_path / "second.pem")
+    bundle = _produced()
+    named = {_by_seq(_first(bundle))[-1]["capsule_id"], bundle["records"][-1]["capsule_id"]}
+    resealed = _relog(bundle, keys, signer_of=lambda cid: second if cid in named else None,
+                      report_signer=second if report_by_second_key else None)
+    assert _findings(resealed) == findings
+
+
+@pytest.mark.parametrize(("report_by_second_key", "findings"), [
+    (True, UNVERIFIED),  # signed by the key of a record that is no step
+    (False, set()),  # signed by the last step's key
+])
+def test_a_record_after_the_last_step_that_is_no_step_does_not_name_the_key(
+        keys, tmp_path, report_by_second_key, findings):
+    """The first thread's last record made a non-step (another header type)
+    and signed by a second key the sale names: the last step is the one
+    before it, and only its key signs the report."""
+    second = LocalKeypairSigner(tmp_path / "second.pem")
+    bundle = _produced()
+    last = _by_seq(_first(bundle))[-1]
+    last["evidence_record_header"]["record_type"] = "deal_note"
+    named = {last["capsule_id"], bundle["records"][-1]["capsule_id"]}
+    resealed = _relog(bundle, keys, signer_of=lambda cid: second if cid in named else None,
+                      report_signer=second if report_by_second_key else None)
+    assert _findings(resealed) == findings
+
+
+def test_a_report_signed_over_its_content_but_carrying_another_id_opens_nothing(keys):
+    """Its signature checks over the id its content gives, but it carries
+    another id, and the pointer names that one: the Capsule does not verify
+    (``verify_disclosure_envelope``), so it opens nothing."""
+    resealed = _relog(_produced(), keys)
+    thread = _first(resealed)
+    record = thread["extensions"][REPORT]["record"]
+    assert compute_capsule_id(record) == record["capsule_id"]
+    record["capsule_id"] = "ab" * 32
+    thread["extensions"]["x-deal-v0"]["sealed_report"] = record["capsule_id"]
+    assert _findings(resealed) == UNVERIFIED
 
 
 def test_a_copy_that_also_seals_a_report_in_its_log_opens_nothing(keys):

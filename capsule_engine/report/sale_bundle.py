@@ -182,7 +182,7 @@ _REPORT_ACTION_ID = "capsulectl-deal-report"
 # capsulectl's dealStepRecordTypes and dealCopyAudiences.
 _STEP_RECORD_TYPES = frozenset({"deal_step", "step_completed", "step_failed"})
 _COPY_AUDIENCES = frozenset({"counterparty", "adjudicator", "keep"})
-_RFC3339 = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})$")
+_RFC3339 = re.compile(r"^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})(?:\.(\d+))?(Z|[+-]\d{2}:\d{2})$")
 _DEAL_ID = re.compile(r"^deal-[0-9a-f]{16}$")
 _SALE_ID = re.compile(r"^sale-[0-9a-f]{16}$")
 _SECOND = timedelta(seconds=1)
@@ -581,7 +581,8 @@ def _standalone_report(thread_bundle: dict, extensions: dict, records: tuple[dic
     log_id = certificate.get("log_id") if isinstance(certificate, dict) else None
     deal_id = log_id.removeprefix("deal/") if isinstance(log_id, str) and log_id.startswith("deal/") else None
     if (payload.get("type") != "deal_report" or payload.get("profile") != _PROFILE or deal_id is None
-            or payload.get("deal_id") != deal_id or payload.get("audience") not in _COPY_AUDIENCES):
+            or payload.get("deal_id") != deal_id or not isinstance(payload.get("audience"), str)
+            or payload["audience"] not in _COPY_AUDIENCES):
         return None
     # 5. Its deal_checkpoint is the bundle's checkpoint: log id, MMR size and root.
     checkpoint = checked.checkpoint
@@ -616,9 +617,10 @@ def _last_step_key(thread_bundle: dict, checked: EvidenceFileCheck) -> str | Non
         if not isinstance(record, dict):
             continue
         header = record.get("evidence_record_header")
-        if not isinstance(header, dict) or header.get("record_type") not in _STEP_RECORD_TYPES:
+        if (not isinstance(header, dict) or not isinstance(header.get("record_type"), str)
+                or header["record_type"] not in _STEP_RECORD_TYPES or not isinstance(record.get("capsule_id"), str)):
             continue
-        membership = memberships.get(record.get("capsule_id"))
+        membership = memberships.get(record["capsule_id"])
         coordinates = membership.get("log_coordinates") if isinstance(membership, dict) else None
         seq = _minor(coordinates.get("seq")) if isinstance(coordinates, dict) else None
         if seq is not None and seq > last_seq:
@@ -631,10 +633,17 @@ def _last_step_key(thread_bundle: dict, checked: EvidenceFileCheck) -> str | Non
     return verified.key_id
 
 
-def _rfc3339(value: object) -> datetime | None:
+def _rfc3339(value: object) -> tuple[datetime, int] | None:
     """``value`` as an instant when it is an RFC 3339 time, as Go's
-    ``time.RFC3339Nano`` reads one; ``None`` otherwise."""
-    return _aware(value) if isinstance(value, str) and _RFC3339.fullmatch(value) else None
+    ``time.RFC3339Nano`` reads one: its whole second in UTC and its
+    nanoseconds, so two times compare at Go's precision (a ``datetime``
+    keeps only microseconds). Digits past the ninth are dropped, as Go drops
+    them. ``None`` otherwise."""
+    match = _RFC3339.fullmatch(value) if isinstance(value, str) else None
+    whole = _aware(match[1] + match[3]) if match is not None else None
+    if whole is None:
+        return None
+    return whole.astimezone(timezone.utc), int((match[2] or "")[:9].ljust(9, "0"))
 
 
 def replay_sale(sale: SaleBundle, **options: object) -> ReplayResult:
