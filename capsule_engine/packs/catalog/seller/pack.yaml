@@ -73,14 +73,14 @@ obligations:
   # -- DO ------------------------------------------------------------------
   - id: s01-personal-data-to-the-buyer-or-the-user
     statement: >-
-      Checks the role of whoever receives a personal-data disclosure
-      (disclosure.personal), from the closed set buyer, platform,
-      third_party or self, and records the role it read. It passes for the
-      buyer or the user, and for a platform (the marketplace, booking site
-      or mail relay the sale is listed on) only when every class of data the
-      disclosure names is email or the listing's public pickup area
-      (pickup_area, never the exact spot); it records those class names,
-      never who the recipient is or what the disclosure contains.
+      Checks who receives a personal-data disclosure (disclosure.personal):
+      buyer, platform, third_party or self (the user). It passes for a buyer
+      or self; other rules decide which data a buyer may get. For a platform
+      (the marketplace, booking site or mail relay the sale is listed on), it
+      passes only when every class the disclosure names is email or
+      pickup_area, the listing's public area and never the exact spot.
+      Otherwise it refuses. It records the role and the class names, never
+      who the recipient is or what the disclosure says.
     check: recipient_role
     default_disposition: DO
   # -- ASK -----------------------------------------------------------------
