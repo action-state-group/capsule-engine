@@ -89,9 +89,10 @@ PRODUCER = {"commit": "9691acadf137a92735f128ae5c3ecc27bc7d9390", "name": "capsu
 SALE_ID = "sale-c7b4c07ced894df9"
 THREAD_A, THREAD_B = "deal-ae1582c2fe995822", "deal-73bb7fe1c1462a86"
 S11 = "s11-one-commitment-per-sale"
-# Rules that read an input only a live check is given (the floor's opening,
-# the task-authority record), so a replay holds them n/a on every check.
-LIVE_INPUT_RULES = ("s03-price-below-the-floor", "s08-stay-within-task-bounds")
+# Rules that read an input only a live check is given (the floor's opening),
+# so a replay holds them n/a on every check. A replay reads the task-authority
+# record from the bundle (capsule-engine#180), so s08 decides as live does.
+LIVE_INPUT_RULES = ("s03-price-below-the-floor",)
 
 AS_SEALED, DISPOSED = "as-sealed", "disposition-accept"
 HISTORIES = (AS_SEALED, DISPOSED)

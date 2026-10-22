@@ -74,13 +74,14 @@ from __future__ import annotations
 import json
 import re
 import tempfile
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, replace
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import TypedDict
 
 from agent_action_capsule import json_digest
+from agent_action_capsule.canonical import FloatInDigestError, UnsafeIntegerError
 from cll.ledger import LedgerStore
 from cll.ledger.api import LedgerAPI
 
@@ -89,6 +90,8 @@ from ..folds.duration import parse_duration_seconds
 from ..guards import ALLOW, ESCALATE, Action, GuardDecision, GuardEngine, LocalSigner
 from ..guards.action import disclosed_classes_of, handover_of, listing_classes_of, repeat_disclosures_of
 from ..guards.checks.caps import EXECUTED_DECISION, SPEND_UNREADABLE, counts_executed_acts
+from ..guards.checks.commitment import text_commitment
+from ..guards.checks.promise_never import ATTRIBUTED_TO_USER, WORDS_NOT_IN_BUNDLE
 from ..guards.history_state import CHECK_FP_ALGS, RULES_HISTORY_DAYS, well_formed_counterparty
 from ..guards.statements import StatementRecord, claim_of, make_statement_record
 from ..guards.wickets.definition import WicketDefinition
@@ -105,6 +108,8 @@ __all__ = [
     "SaleHistory",
     "load_records",
     "load_disclosed",
+    "load_representing_openings",
+    "representing_openings",
     "load_withheld",
     "filter_since",
     "action_for_record",
@@ -178,6 +183,71 @@ def load_disclosed(paths: Sequence[str | Path]) -> dict[str, dict]:
             if isinstance(agent_input, dict):
                 disclosed[capsule_id] = agent_input
     return disclosed
+
+
+# Where capsulectl puts a deal's report in a bundle (capsule-cli
+# internal/cli/deal_sealed_report.go, DealSealedReport): inline as the
+# x-deal-v0 extension itself, standalone in the x-deal-report/v0 extension,
+# or in the log as the record the extension's sealed_report names.
+_DEAL_EXTENSION = "x-deal-v0"
+_REPORT_EXTENSION = "x-deal-report/v0"
+_REPORT_POINTER = "sealed_report"
+
+
+def _bundle_reports(bundle: dict) -> list[dict]:
+    """Every deal report ``bundle`` carries, in any of capsulectl's three
+    forms; nothing about them is trusted here (``representing_openings``)."""
+    extensions = bundle.get("extensions") if isinstance(bundle.get("extensions"), dict) else {}
+    reports: list[object] = []
+    deal = extensions.get(_DEAL_EXTENSION)
+    if isinstance(deal, dict):
+        reports.append(deal)
+        pointer = deal.get(_REPORT_POINTER)
+        disclosures = bundle.get("disclosures") if isinstance(bundle.get("disclosures"), dict) else {}
+        shown = disclosures.get(pointer) if isinstance(pointer, str) else None
+        agent_input = shown.get("agent_input") if isinstance(shown, dict) else None
+        if isinstance(agent_input, dict):
+            reports.append(agent_input.get("report"))
+    standalone = extensions.get(_REPORT_EXTENSION)
+    agent_input = standalone.get("agent_input") if isinstance(standalone, dict) else None
+    if isinstance(agent_input, dict):
+        reports.append(agent_input.get("report"))
+    return [r for r in reports if isinstance(r, dict)]
+
+
+def representing_openings(bundle: object) -> dict[str, dict]:
+    """The openings of the agent's statements a bundle's deal report carries
+    (its ``representations``, each ``{nonce, text}``), by the commitment each
+    recomputes to (``commitment.text_commitment``). An opening proves itself:
+    the words that recompute a represent check's sealed ``text_commitment``
+    are the words that check sealed, so the report's own binding is not
+    needed to read them (capsulectl seals a claim under its check's nonce,
+    so a claim's opening is its check's). An entry whose nonce is not 64
+    lowercase hex or whose text is not a string, or that has no JCS bytes,
+    is skipped."""
+    openings: dict[str, dict] = {}
+    if not isinstance(bundle, dict):
+        return openings
+    for report in _bundle_reports(bundle):
+        said = report.get("representations")
+        for entry in said if isinstance(said, list) else []:
+            nonce, text = (entry.get("nonce"), entry.get("text")) if isinstance(entry, dict) else (None, None)
+            if not isinstance(nonce, str) or not _HEX64.fullmatch(nonce) or not isinstance(text, str):
+                continue
+            try:
+                openings.setdefault(text_commitment(nonce, text), {"nonce": nonce, "text": text})
+            except UnicodeEncodeError:
+                continue
+    return openings
+
+
+def load_representing_openings(paths: Sequence[str | Path]) -> dict[str, dict]:
+    """``representing_openings`` of every capsule bundle among ``paths``."""
+    openings: dict[str, dict] = {}
+    for path in paths:
+        for commitment, opening in representing_openings(_bundle(Path(path))).items():
+            openings.setdefault(commitment, opening)
+    return openings
 
 
 def load_withheld(paths: Sequence[str | Path]) -> frozenset[str]:
@@ -344,6 +414,25 @@ def _text(value: object) -> str | None:
     return value if isinstance(value, str) and value else None
 
 
+# A represent check (capsule-cli deal_representations.go), and the class the
+# bridge gives one whose sealed class is not a non-empty string: no
+# representation class, so promise_requires_approval and promise_never both
+# fail it as not recognised. A closed token, never a stated value.
+_REPRESENT = "represent"
+MALFORMED_REPRESENTATION_CLASS = "malformed_representing"
+
+
+def _attributed_to(value: object) -> str | None:
+    """A statement's attribution in its closed set (``user``), or ``None``:
+    any other value is read as the agent's own statement, which s10 refuses,
+    and is never sealed."""
+    return ATTRIBUTED_TO_USER if value == ATTRIBUTED_TO_USER else None
+
+
+def _hex64(value: object) -> str | None:
+    return value if isinstance(value, str) and _HEX64.fullmatch(value) else None
+
+
 def _flag(value: object) -> bool | None:
     return value if isinstance(value, bool) else None
 
@@ -427,6 +516,7 @@ def _typed_ref_digest(value: object) -> str | None:
 # ``authority_basis`` entry type that names the task authority it was taken
 # under (action_records.go): an act record has no ``task_authority_ref``.
 _ACT_RECORD_TYPE = "action-record/v0"
+_TASK_AUTHORITY = "task-authority/v0"
 _TASK_AUTHORITY_BASIS = "task_authority"
 
 
@@ -533,6 +623,12 @@ def _bridge_deal_check(
     A check's sealed ``no_proposal`` is carried only when it is ``true`` and
     the check names no ``source`` ref (``_no_proposal``); it is never read
     off an act a history entry records.
+    A represent check's ``representing`` gives the class of the statement
+    (``representation_class``), whose claim it is (``attributed_to``, as
+    ``statement_attributed_to``, its closed set only) and the commitment to its words
+    (``text_commitment``, 64 lowercase hex, as
+    ``representation_text_commitment``), so ``promise_requires_approval``
+    and ``promise_never`` decide it (capsule-engine#180).
     ``taxonomy_version`` makes it an act stated against a pinned taxonomy, so
     ``dedupe`` keys it on the act, never on this record's type or id. The
     deal is the one the record names (``_deal_id``), never the ``action_id``
@@ -582,6 +678,13 @@ def _bridge_deal_check(
         else:
             target = profile_target
     recourse = body.get("recourse") if isinstance(body.get("recourse"), dict) else {}
+    representing = body.get("representing") if isinstance(body.get("representing"), dict) else {}
+    stated_class = _text(representing.get("class"))
+    if stated_class is None and body.get("action") == _REPRESENT:
+        # A represent check whose class cannot be read (no representing, or
+        # one out of shape): a class no rule recognises, so s04 and s10 fail
+        # it rather than read it as n/a.
+        stated_class = MALFORMED_REPRESENTATION_CLASS
     return Action(
         verb=str(body.get("action") or "unknown"),
         operator=record.get("operator", ""),
@@ -606,6 +709,9 @@ def _bridge_deal_check(
         repeat_disclosures=repeat_disclosures_of(body.get("repeat_disclosures")),
         recipient_told_before=_flag(body.get("recipient_told_before")),
         listing_classes=listing_classes_of(body.get("listing_classes")),
+        representation_class=stated_class,
+        statement_attributed_to=_attributed_to(representing.get("attributed_to")),
+        representation_text_commitment=_hex64(representing.get("text_commitment")),
         channel=_text(body.get("channel")),
         first_contact_channel=_text(body.get("first_contact_channel")),
         upfront_amount_minor=_minor(body.get("upfront_amount_minor")),
@@ -1364,6 +1470,7 @@ def replay(
     wickets: tuple[WicketDefinition, ...] = (),
     pack: PackDefinition | None = None,
     sale_history: SaleHistory | None = None,
+    representing_openings: Mapping[str, dict] | None = None,
 ) -> ReplayResult:
     """Feed every record through a fresh ``GuardEngine`` in dry-run mode, in
     order. Never blocks (``dry_run=True``) -- see ``engine.py``'s own
@@ -1396,6 +1503,13 @@ def replay(
     as a statement (``statement_record``) when the replay reaches it, so a
     later check in the same deal finds it made first. A claim the sources
     give more than once is written once.
+    ``representing_openings`` are the openings of represent checks' words
+    the bundles' deal reports carry, by commitment
+    (``load_representing_openings``); a check whose sealed commitment one
+    recomputes is decided with it, as a live check is with its words.
+    A check citing a task authority (``task_authority_ref``) is decided with
+    the task-authority record the bundle discloses under that digest, when
+    it discloses one (``_decide``), as a live check gets it beside its input.
     A seller's typed commit is decided with ``proposal_at`` the sealed time
     of the accepted offer it rests on, and a typed offer with the time of the
     counterparty's message it answers by its ``source`` ref
@@ -1441,6 +1555,7 @@ def replay(
         profiles = _companion_profiles(records, disclosed or {})
         deal = _deal_records(records, disclosed or {})
         offered_at = _accepted_offer_at(records, disclosed or {})
+        authorities = _task_authorities(disclosed or {})
         decided_checks: dict[str, SourcedDecision] = {}
         counts_spend = counts_executed_acts(caps_fold)
         executed_acts = ExecutedActs(records)
@@ -1468,7 +1583,9 @@ def replay(
             action = action_for_record(record, shown, counterparty_profile=profile)
             if digest in offered_at:
                 action = replace(action, proposal_at=offered_at[digest])
-            action, decision = _decide(engine, action, record, sale_history)
+            authority = authorities.get(action.task_authority_ref) if action.task_authority_ref else None
+            opening = (representing_openings or {}).get(action.representation_text_commitment or "")
+            action, decision = _decide(engine, action, record, sale_history, authority, opening)
             cited_capsule = None
             for constraint in decision.constraints:
                 cited_id = (constraint.evidence or {}).get("matched_capsule_id") or (
@@ -1486,22 +1603,52 @@ def replay(
     return ReplayResult(decisions=tuple(sourced), record_range=(1, len(records)), undecided=tuple(undecided))
 
 
-def _decide(engine: GuardEngine, action: Action, record: dict,
-            sale_history: SaleHistory | None) -> tuple[Action, GuardDecision]:
+def _task_authorities(disclosed: dict[str, dict]) -> dict[str, dict]:
+    """The task-authority records a bundle discloses (``task-authority/v0``),
+    by the SHA-256 digest of each, the digest a check's
+    ``task_authority_ref`` names. A record with no digest (a float, an
+    unsafe integer) is left out: no reference can name it."""
+    found: dict[str, dict] = {}
+    for shown in disclosed.values():
+        if isinstance(shown, dict) and shown.get("type") == _TASK_AUTHORITY:
+            try:
+                found[json_digest(shown)] = shown
+            except (FloatInDigestError, UnsafeIntegerError, UnicodeEncodeError):
+                continue
+    return found
+
+
+def _decide(engine: GuardEngine, action: Action, record: dict, sale_history: SaleHistory | None,
+            task_authority: dict | None = None, opening: dict | None = None) -> tuple[Action, GuardDecision]:
     """The dry-run decision on ``action``, and the action decided: with the
     sale's key and the sale's history for a check of a replayed sale
-    (``replay``), as given otherwise."""
+    (``replay``), as given otherwise. ``task_authority`` is the record the
+    bundle discloses under the digest the action's ``task_authority_ref``
+    names (``_task_authorities``); the engine reads it only once its own
+    digest of it equals that reference, as live, so a missing record leaves
+    it unread (capsule-engine#180). ``opening`` is the opening of the
+    represent check's words the bundle's deal report carries
+    (``representing_openings``), passed as ``representing_opening`` so
+    ``promise_never`` judges them as live; with none,
+    ``WORDS_NOT_IN_BUNDLE``: a claim attributed to the user is then not
+    evaluable ("the words for this attributed claim are not in the bundle"),
+    never a failure (``guards/checks/promise_never.py``)."""
     capsule_id = _text(record.get("capsule_id"))
+
+    def check(decided: Action, **ledgers: LedgerAPI) -> GuardDecision:
+        return engine.check(decided, dry_run=True, task_authority_record=task_authority,
+                            representing_opening=opening if opening is not None else WORDS_NOT_IN_BUNDLE,
+                            **ledgers)
+
     if sale_history is None or capsule_id is None:
-        return action, engine.check(action, dry_run=True)
+        return action, check(action)
     with tempfile.TemporaryDirectory() as tmp, LedgerStore(tmp) as sale_ledger:
         sale = sale_history(capsule_id, sale_ledger, None)
         if sale is None:
-            return action, engine.check(action, dry_run=True)
+            return action, check(action)
         action = replace(action, item_ref=sale.item_ref)
         if not engine.uses_release_history:
-            return action, engine.check(action, dry_run=True, sale_history=sale_ledger)
+            return action, check(action, sale_history=sale_ledger)
         with tempfile.TemporaryDirectory() as window_tmp, LedgerStore(window_tmp) as window_ledger:
             sale_history(capsule_id, window_ledger, RULES_HISTORY_DAYS)
-            return action, engine.check(action, dry_run=True, sale_history=sale_ledger,
-                                        release_history=window_ledger)
+            return action, check(action, sale_history=sale_ledger, release_history=window_ledger)

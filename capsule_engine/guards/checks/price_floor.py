@@ -38,11 +38,12 @@ from __future__ import annotations
 import re
 from typing import TypedDict
 
-from agent_action_capsule.canonical import FloatInDigestError, UnsafeIntegerError, jcs, json_digest
+from agent_action_capsule.canonical import FloatInDigestError, UnsafeIntegerError, jcs
 
 from ..action import Action
 from ..capsule import ConstraintOutcome, NotApplicableEvidence, not_applicable_evidence
 from .base import CheckOutcome
+from .commitment import opens_commitment, text_commitment
 from .task_authority import TaskAuthorityRecord, UnboundRecord, bind_task_authority_record
 
 __all__ = [
@@ -100,9 +101,9 @@ class MalformedCommitmentEvidence(TypedDict):
 
 
 def bounds_commitment(nonce: str, document: CommercialBoundsDocument) -> str:
-    """commit_alg ``sha256-jcs-nonce256``: SHA-256 over the JCS bytes of
-    ``{"nonce", "text"}``, with ``text`` the document's JCS bytes."""
-    return json_digest({"nonce": nonce, "text": jcs(document).decode("utf-8")})
+    """commit_alg ``sha256-jcs-nonce256`` (``commitment.text_commitment``),
+    with the document's JCS bytes as the text."""
+    return text_commitment(nonce, jcs(document).decode("utf-8"))
 
 
 def _outcome(
@@ -146,15 +147,16 @@ def _opened_floor(opening: object, sealed: str) -> int | None:
     if not isinstance(opening, dict) or opening.get(_COMMITMENT) != sealed:
         return None
     nonce, document = opening.get("nonce"), opening.get("document")
-    if not isinstance(nonce, str) or not _HEX64.fullmatch(nonce) or not isinstance(document, dict):
+    if not isinstance(document, dict):
         return None
     try:
-        if bounds_commitment(nonce, document) != sealed:
-            return None
+        text = jcs(document).decode("utf-8")
     # A document holding a float, an unsafe integer or a lone surrogate has
-    # no JCS digest, so it opens no commitment: that is the mismatch the
+    # no JCS bytes, so it opens no commitment: that is the mismatch the
     # caller fails, not an error to raise.
     except (FloatInDigestError, UnsafeIntegerError, UnicodeEncodeError):
+        return None
+    if not opens_commitment(nonce, text, sealed):
         return None
     floor = document.get(_FLOOR)
     # bool is an int subclass; true is not a floor.

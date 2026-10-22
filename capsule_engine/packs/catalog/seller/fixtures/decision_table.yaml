@@ -78,6 +78,13 @@
 # the offer is allowed. offer-answering-an-unnamed-message carries neither,
 # and no-proposal-beside-a-proposal-time carries no_proposal beside a proposal
 # time: each fails offer_expiry alone and escalates.
+#
+# The six statement rows at the end (0.1.5) let s04 and s10 decide. An
+# ordered warranty passes s04 on the order the task authority seals, and
+# asks when that record is not supplied. The user's own authenticity claim,
+# attributed, with its words opened and in the template, passes s10; off
+# the template, with words that do not open the checked commitment, or
+# ordered but not attributed, it fails s10 and denies.
 
 rows:
   - scenario: condition-told-to-a
@@ -1094,3 +1101,93 @@ rows:
       destination_rail: {population: c}
       release_on_acceptance: {population: c}
     verdict: escalate
+  - scenario: statement-warranty-ordered
+    action_id: tell/seller-fixture-warranty-ordered
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: n/a, price_floor: n/a, promise_requires_approval: pass, promise_never: pass, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: n/a}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      recipient_role: {population: c}
+      price_floor: {population: c}
+      required_disclosure: {population: c}
+      offer_expiry: {population: c}
+      single_commitment: {population: c}
+      destination_rail: {population: c}
+      task_authority: {population: c}
+      release_on_acceptance: {population: c}
+    verdict: allow
+  - scenario: statement-warranty-ordered-record-missing
+    action_id: tell/seller-fixture-warranty-ordered-missing
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: n/a, price_floor: n/a, promise_requires_approval: fail, promise_never: pass, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: n/a}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      recipient_role: {population: c}
+      price_floor: {population: c}
+      required_disclosure: {population: c}
+      offer_expiry: {population: c}
+      single_commitment: {population: c}
+      destination_rail: {population: c}
+      task_authority: {population: c}
+      release_on_acceptance: {population: c}
+    verdict: escalate
+  - scenario: statement-authenticity-attributed
+    action_id: tell/seller-fixture-authenticity-attributed
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: n/a, price_floor: n/a, promise_requires_approval: pass, promise_never: pass, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: n/a}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      recipient_role: {population: c}
+      price_floor: {population: c}
+      required_disclosure: {population: c}
+      offer_expiry: {population: c}
+      single_commitment: {population: c}
+      destination_rail: {population: c}
+      task_authority: {population: c}
+      release_on_acceptance: {population: c}
+    verdict: allow
+  - scenario: statement-authenticity-attributed-off-template
+    action_id: tell/seller-fixture-authenticity-off-template
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: n/a, price_floor: n/a, promise_requires_approval: pass, promise_never: fail, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: n/a}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      recipient_role: {population: c}
+      price_floor: {population: c}
+      required_disclosure: {population: c}
+      offer_expiry: {population: c}
+      single_commitment: {population: c}
+      destination_rail: {population: c}
+      task_authority: {population: c}
+      release_on_acceptance: {population: c}
+    verdict: deny
+  - scenario: statement-authenticity-attributed-words-not-checked
+    action_id: tell/seller-fixture-authenticity-words-not-checked
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: n/a, price_floor: n/a, promise_requires_approval: pass, promise_never: fail, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: n/a}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      recipient_role: {population: c}
+      price_floor: {population: c}
+      required_disclosure: {population: c}
+      offer_expiry: {population: c}
+      single_commitment: {population: c}
+      destination_rail: {population: c}
+      task_authority: {population: c}
+      release_on_acceptance: {population: c}
+    verdict: deny
+  - scenario: statement-authenticity-ordered-not-attributed
+    action_id: tell/seller-fixture-authenticity-ordered
+    checks: {dedupe: pass, caps: n/a, verify_before_dispatch: n/a, recipient_role: n/a, price_floor: n/a, promise_requires_approval: pass, promise_never: fail, required_disclosure: n/a, offer_expiry: n/a, single_commitment: n/a, destination_rail: n/a, task_authority: n/a, release_on_acceptance: n/a}
+    n_a:
+      caps: {population: c}
+      verify_before_dispatch: {population: c}
+      recipient_role: {population: c}
+      price_floor: {population: c}
+      required_disclosure: {population: c}
+      offer_expiry: {population: c}
+      single_commitment: {population: c}
+      destination_rail: {population: c}
+      task_authority: {population: c}
+      release_on_acceptance: {population: c}
+    verdict: deny

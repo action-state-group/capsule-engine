@@ -275,6 +275,7 @@ def _payload_extension(action: Action, checkpoint: dict, manifest_digest: str | 
         ("upfront_amount_minor", action.upfront_amount_minor),
         ("task_authority_ref", action.task_authority_ref),
         ("representation_class", action.representation_class),
+        ("statement_attributed_to", action.statement_attributed_to),
         ("authorized_by", action.authorized_by),
         ("proposal_at", action.proposal_at),
         ("handover", action.handover),

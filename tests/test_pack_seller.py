@@ -23,6 +23,10 @@ proposal (no_proposal) not applicable, so two of the proposal scenarios
 decide differently too. And s05 also counts the sale's listings in force
 (the check's listing_classes, required_disclosure/1.2.0), so the offer
 whose listing stated the condition decides differently too.
+And s04 reads the classes the user ordered where capsulectl seals them
+(promise_requires_approval/1.1.0) and s10 passes the user's own
+authenticity claim (promise_never/1.1.0), so an ordered warranty and the
+user's own authenticity claim decide differently too.
 
 The scenarios are in ``test_pack_seller_acceptance.py``; this file pins the
 pack's own content, so a definition cited at another digest or a rule
@@ -77,8 +81,8 @@ CITED = [
     "verify_before_dispatch/1.0.0",
     "seller.recipient_role/1.2.0",
     "price_floor/2.0.1",
-    "promise_requires_approval/1.0.0",
-    "promise_never/1.0.0",
+    "promise_requires_approval/1.1.0",
+    "promise_never/1.1.0",
     "required_disclosure/1.2.0",
     "offer_expiry/1.1.0",
     "seller.single_commitment/1.0.0",
@@ -210,13 +214,15 @@ def test_0_1_4_changes_only_s01_and_s13():
     assert release.config["except_recipient_roles"] == ["platform"]
 
 
-def test_0_1_5_changes_only_s01_s05_s06_s07_and_s13():
+def test_0_1_5_changes_only_s01_s04_s05_s06_s07_s10_and_s13():
     """0.1.5 cites seller.recipient_role/1.2.0,
     seller.release_on_acceptance/1.2.0 and required_disclosure/1.2.0 where
     0.1.4 cited 1.1.0, seller.destination_rail/1.1.0 where it cited 1.0.0,
-    and offer_expiry/1.1.0 where it cited 1.0.1, and changes nothing else it
-    cites or declares; only those five rules' statements and the offer's,
-    the share's, the acceptance's and the sale's action semantics change.
+    offer_expiry/1.1.0 where it cited 1.0.1, and promise_requires_approval/1.1.0
+    and promise_never/1.1.0 where it cited 1.0.0, and changes nothing else it
+    cites or declares; only those seven rules' statements and the offer's,
+    the acceptance's, the sale's, statement.send's (statement_attributed_to)
+    and the share's action semantics change.
     s07 still asks; offer.accept requires the rail and takes the handover, a
     sale takes the handover, offer.make takes proposal_at or no_proposal,
     and the offer and its acceptance take listing_classes (s05)."""
@@ -226,16 +232,19 @@ def test_0_1_5_changes_only_s01_s05_s06_s07_and_s13():
         swapped[swapped.index(f"{wicket_id}/1.1.0")] = f"{wicket_id}/1.2.0"
     swapped[swapped.index("seller.destination_rail/1.0.0")] = "seller.destination_rail/1.1.0"
     swapped[swapped.index("offer_expiry/1.0.1")] = "offer_expiry/1.1.0"
+    for wicket_id in ("promise_requires_approval", "promise_never"):
+        swapped[swapped.index(f"{wicket_id}/1.0.0")] = f"{wicket_id}/1.1.0"
     assert [w.wicket_id for w in PACK.constraints] == swapped
     assert [f.fold_id for f in PACK.folds] == [f.fold_id for f in old.folds]
     assert [(o.id, o.check, o.default_disposition) for o in PACK.obligations] == [
         (o.id, o.check, o.default_disposition) for o in old.obligations]
     changed = [o.id for o, was in zip(PACK.obligations, old.obligations, strict=True) if o.statement != was.statement]
-    assert changed == ["s01-personal-data-to-the-buyer-or-the-user", "s05-required-statement-made-first",
-                       "s06-proposal-still-current", "s07-payment-rail-the-user-allows",
+    assert changed == ["s01-personal-data-to-the-buyer-or-the-user", "s04-statement-that-needs-the-users-word",
+                       "s05-required-statement-made-first", "s06-proposal-still-current",
+                       "s07-payment-rail-the-user-allows", "s10-statement-never-made",
                        "s13-personal-data-only-to-the-buyer-who-accepted"]
     semantics = [a.action_type for a, was in zip(PACK.action_semantics, old.action_semantics, strict=True) if a != was]
-    assert semantics == ["offer.make", "offer.accept", "sale.complete", "personal_data.share"]
+    assert semantics == ["offer.make", "offer.accept", "sale.complete", "statement.send", "personal_data.share"]
     by_type = {a.action_type: a for a in PACK.action_semantics}
     was = {a.action_type: a for a in old.action_semantics}
     assert set(by_type["offer.accept"].required_fields) - set(was["offer.accept"].required_fields) == {"rail"}
@@ -255,6 +264,16 @@ def test_0_1_5_changes_only_s01_s05_s06_s07_and_s13():
     listing = {a.action_type for a in PACK.action_semantics if "listing_classes" in a.optional_fields}
     assert listing == {"offer.make", "offer.accept"}
     assert not [a for a in PACK.action_semantics if "listing_classes" in a.required_fields]
+    (statement,) = [a for a in PACK.action_semantics if a.action_type == "statement.send"]
+    assert "statement_attributed_to" in statement.optional_fields
+    (ask,) = [w for w in PACK.constraints if w.check == "promise_requires_approval"]
+    assert ask.config["authorized_path"] == ["body", "ordered_representations"]
+    (never,) = [w for w in PACK.constraints if w.check == "promise_never"]
+    assert never.config["never"] == never.config["attributed_never"] == ["authenticity"]
+    template = never.config["attributed_template"]
+    assert (template["prefix"], template["suffix"]) == ("The seller says ", " (unverified)")
+    # The marks are the shared fixture (test_representing_bridge.py).
+    assert len(template["sentence_marks"]) == 181
 
 
 def test_it_cites_no_spending_limit_and_no_rule_is_measured_by_one():
@@ -386,7 +405,11 @@ def test_0_1_5_decides_every_scenario_as_0_1_4_did_but_the_pickup_area_shares_ra
     missing proposal time, 0.1.5 holds s06 not applicable and allows it), and
     no_proposal beside a proposal time (0.1.4 passed it on age, 0.1.5 asks).
     And the offer whose listing stated the condition asked on s05 under 0.1.4
-    and passes under 0.1.5."""
+    and passes under 0.1.5.
+    And the ordered warranty (0.1.4's s04 read a member no task authority
+    seals and asked; 0.1.5's reads the order and passes) and the user's own
+    authenticity claim (0.1.4's s10 refused it; 0.1.5's passes it); their
+    promise_never evidence also records the attribution and the words' check."""
     acceptance = _acceptance_module()
     old_decisions: dict = {}
     new_decisions: dict = {}
@@ -416,6 +439,8 @@ def test_0_1_5_decides_every_scenario_as_0_1_4_did_but_the_pickup_area_shares_ra
             assert (before_listing.pop("missing_classes"), evidence.pop("missing_classes")) == (["condition"], []), name
         assert evidence == before_listing, name
         assert (listing is None) == (not name.startswith("offer-after-")), name
+    statements = {"statement-warranty-ordered": ("promise_requires_approval", "needs_input"),
+                  "statement-authenticity-attributed": ("promise_never", "reject")}
     for name in new:
         before, after = _constraints(old[name]), _constraints(new[name])
         assert list(after) == list(before), name
@@ -444,11 +469,17 @@ def test_0_1_5_decides_every_scenario_as_0_1_4_did_but_the_pickup_area_shares_ra
             assert (old[name]["disposition"]["decision"], new[name]["disposition"]["decision"]) == (
                 "needs_input", "accept"), name
             continue
+        if name in statements:
+            check_id, was = statements[name]
+            assert (before[check_id]["result"], after[check_id]["result"]) == ("fail", "pass"), name
+            assert (old[name]["disposition"]["decision"], new[name]["disposition"]["decision"]) == (
+                was, "accept"), name
+            continue
         assert new[name]["disposition"] == old[name]["disposition"], name
         for check_id, record in after.items():
             assert record["result"] == before[check_id]["result"], (name, check_id)
             if check_id not in NAMES_A_CAPSULE_ID | {"recipient_role", "release_on_acceptance", "destination_rail",
-                                                     "required_disclosure"}:
+                                                     "required_disclosure", "promise_never"}:
                 assert record.get("evidence_digest") == before[check_id].get("evidence_digest"), (name, check_id)
 
 

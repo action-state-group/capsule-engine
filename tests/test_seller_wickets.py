@@ -21,6 +21,7 @@ from capsule_engine.guards.checks import (
     AUTHORIZATION_CHECKS,
     COMMERCIAL_BOUNDS_CHECKS,
     CONFIGURED_CHECKS,
+    STATEMENT_OPENING_CHECKS,
     TASK_AUTHORITY_CHECKS,
     AuthorizationRecord,
     CommercialBoundsOpening,
@@ -29,6 +30,8 @@ from capsule_engine.guards.checks import (
     check_destination_rail,
     task_authority_record_digest,
 )
+from capsule_engine.guards.checks.commitment import text_commitment
+from capsule_engine.guards.checks.promise_never import WORDS_NOT_IN_BUNDLE
 from capsule_engine.guards.wickets import Catalog, WicketDefinition, load_definition_file
 from capsule_engine.packs.errors import PackDefinitionError
 from capsule_engine.packs.loader import load_pack_dir
@@ -45,11 +48,16 @@ FLOOR = load_definition_file(CATALOG / "price_floor.yaml")
 DISCLOSURE = load_definition_file(CATALOG / "required_disclosure.yaml")
 PROMISE_ASK = load_definition_file(CATALOG / "promise_requires_approval.yaml")
 PROMISE_NEVER = load_definition_file(CATALOG / "promise_never.yaml")
+# 1.1.0: s04 reads the order where capsulectl seals it; s10 passes the user's
+# own claim (capsule-engine#180, #189).
+PROMISE_ASK_1_1 = load_definition_file(CATALOG / "promise_requires_approval.v1.1.yaml")
+PROMISE_NEVER_1_1 = load_definition_file(CATALOG / "promise_never.v1.1.yaml")
 EXPIRY = load_definition_file(CATALOG / "offer_expiry.yaml")
 SELLER_ROLE = load_definition_file(CATALOG / "recipient_role.seller.yaml")
 SELLER_RAIL = load_definition_file(CATALOG / "destination_rail.seller.yaml")
 SPEND = load_fold(FOLDS / "spend.weekly.v3.yaml")
-SELLER_DEFINITIONS = (FLOOR, DISCLOSURE, PROMISE_ASK, PROMISE_NEVER, EXPIRY, SELLER_ROLE, SELLER_RAIL)
+SELLER_DEFINITIONS = (FLOOR, DISCLOSURE, PROMISE_ASK, PROMISE_NEVER, EXPIRY, SELLER_ROLE, SELLER_RAIL,
+                      PROMISE_ASK_1_1, PROMISE_NEVER_1_1)
 
 # The closed set of representation classes, in this order.
 REPRESENTATION_CLASSES = [
@@ -124,6 +132,8 @@ def _run(definition: WicketDefinition, action: Action, *, ledger=None, record=No
         return TASK_AUTHORITY_CHECKS[definition.check](action, record, definition.config).constraint
     if definition.check in AUTHORIZATION_CHECKS:
         return AUTHORIZATION_CHECKS[definition.check](action, record, approval, definition.config).constraint
+    if definition.check in STATEMENT_OPENING_CHECKS:
+        return STATEMENT_OPENING_CHECKS[definition.check](action, opening, definition.config).constraint
     return CONFIGURED_CHECKS[definition.check](action, ledger, definition.config).constraint
 
 
@@ -527,6 +537,139 @@ def test_promise_rules_refuse_a_class_outside_the_set(definition, field):
         _run(mutant, _action(action_class="communication.send", representation_class="price"))
 
 
+# -- 1.1.0: the order where capsulectl seals it, and the user's own claim -------
+
+# The bicycle's task authority as capsulectl seals one where the user ordered
+# the warranty stated.
+ORDERED_TASK: TaskAuthorityRecord = {
+    "type": "task-authority/v0",
+    "body": {**BICYCLE["body"], "ordered_representations": ["warranty"]},
+}
+ORDERED_TASK_REF = task_authority_record_digest(ORDERED_TASK)
+WORDS_NONCE = "4" * 64
+IN_TEMPLATE = "The seller says it's authentic (unverified)"
+
+
+def _send(**overrides) -> Action:
+    return _action(action_class="communication.send", amount_minor=None, **overrides)
+
+
+@pytest.mark.parametrize("definition,record,ref,result", [
+    (PROMISE_ASK, ORDERED_TASK, ORDERED_TASK_REF, "fail"),
+    (PROMISE_ASK, WARRANTY_TASK, WARRANTY_TASK_REF, "pass"),
+    (PROMISE_ASK_1_1, ORDERED_TASK, ORDERED_TASK_REF, "pass"),
+    (PROMISE_ASK_1_1, WARRANTY_TASK, WARRANTY_TASK_REF, "fail"),
+])
+def test_each_version_reads_the_task_authority_at_its_own_path(definition, record, ref, result):
+    """1.0.0 reads body.authorized_representation_classes, which no producer
+    seals, and decides as it always did; 1.1.0 reads authorized_path."""
+    out = _run(definition, _send(representation_class="warranty", task_authority_ref=ref), record=record)
+    assert out.result == result
+    assert out.evidence["authority_basis"] == ("task_authority_ref" if result == "pass" else None)
+
+
+@pytest.mark.parametrize("ordered", [["warranty", 17], ["warranty", {}], ["warranty", None], ["warranty", "mood"]])
+def test_1_1_0_counts_an_ordered_list_only_when_every_member_is_a_class(ordered):
+    """1.1.0 validates the whole list; frozen 1.0.0 reads its own path as it
+    always did, so the same list there still allows."""
+    record: TaskAuthorityRecord = {"type": "task-authority/v0",
+                                   "body": {**BICYCLE["body"], "ordered_representations": ordered}}
+    ref = task_authority_record_digest(record)
+    assert _run(PROMISE_ASK_1_1, _send(representation_class="warranty", task_authority_ref=ref),
+                record=record).result == "fail"
+    old: TaskAuthorityRecord = {"type": "task-authority/v0",
+                                "body": {**BICYCLE["body"], "authorized_representation_classes": ordered}}
+    assert _run(PROMISE_ASK, _send(representation_class="warranty", task_authority_ref=task_authority_record_digest(old)),
+                record=old).result == "pass"
+
+
+def test_1_1_0_says_no_order_covers_a_promise_citing_no_task_authority():
+    assert _run(PROMISE_ASK_1_1, _send(representation_class="warranty")).reason == (
+        "no task authority order or approval of yours covers this promise")
+    # 1.0.0 keeps its reason; a 1.1.0 failure under a cited authority keeps it too.
+    assert _run(PROMISE_ASK, _send(representation_class="warranty")).reason.startswith(
+        "a warranty statement is outside the task authority")
+    cited = _run(PROMISE_ASK_1_1, _send(representation_class="warranty", task_authority_ref=BICYCLE_REF),
+                 record=BICYCLE)
+    assert cited.reason.startswith("a warranty statement is outside the task authority")
+
+
+def test_1_1_0_still_clears_with_a_bound_approval():
+    out = _run(PROMISE_ASK_1_1, _send(representation_class="warranty", authorized_by=APPROVAL_REF),
+               approval=WARRANTY_APPROVAL)
+    assert (out.result, out.evidence["authority_basis"]) == ("pass", "authorized_by")
+
+
+def _attributed(text: str, *, attributed_to: str | None = "user", nonce: str = WORDS_NONCE) -> Action:
+    return _send(representation_class="authenticity", statement_attributed_to=attributed_to,
+                 representation_text_commitment=text_commitment(nonce, text))
+
+
+def test_1_0_0_reads_neither_the_attribution_nor_the_words():
+    out = _run(PROMISE_NEVER, _attributed(IN_TEMPLATE), opening={"nonce": WORDS_NONCE, "text": IN_TEMPLATE})
+    assert out.result == "fail"
+    assert out.evidence == {"representation_class": "authenticity", "recognised": True, "never": True,
+                            "authorized_by": None}
+    assert out.reason == ("the agent never makes a authenticity statement; no approval clears it, only a change "
+                          "to the rule set")
+
+
+@pytest.mark.parametrize("attributed_to,opening,result,opened,fits", [
+    ("user", {"nonce": WORDS_NONCE, "text": IN_TEMPLATE}, "pass", True, True),
+    # A never rule does not rest on the producer: no words, no pass.
+    ("user", None, "fail", None, None),
+    ("user", {"nonce": "3" * 64, "text": IN_TEMPLATE}, "fail", False, None),
+    ("user", {"nonce": WORDS_NONCE}, "fail", False, None),
+    ("user", "not an opening", "fail", False, None),
+    (None, {"nonce": WORDS_NONCE, "text": IN_TEMPLATE}, "fail", None, None),
+])
+def test_1_1_0_passes_only_the_users_own_claim_in_the_template(attributed_to, opening, result, opened, fits):
+    out = _run(PROMISE_NEVER_1_1, _attributed(IN_TEMPLATE, attributed_to=attributed_to), opening=opening)
+    assert out.result == result
+    assert (out.evidence["attributed_to"], out.evidence["words_opened"], out.evidence["fits_template"]) == (
+        attributed_to, opened, fits)
+
+
+def test_a_replay_without_the_words_holds_an_attributed_claim_not_evaluable():
+    """WORDS_NOT_IN_BUNDLE: n/a in scope and failing closed, never a fail,
+    for the user's claim; the agent's own still fails; 1.0.0 ignores it."""
+    out = STATEMENT_OPENING_CHECKS["promise_never"](_attributed(IN_TEMPLATE), WORDS_NOT_IN_BUNDLE,
+                                                    PROMISE_NEVER_1_1.config)
+    assert (out.constraint.result, out.fails_closed) == ("n/a", True)
+    assert out.constraint.reason == "the words for this attributed claim are not in the bundle"
+    assert out.constraint.evidence == _missing("promise_never", "representing_opening")
+    own = _run(PROMISE_NEVER_1_1, _attributed(IN_TEMPLATE, attributed_to=None), opening=WORDS_NOT_IN_BUNDLE)
+    assert own.result == "fail"
+    assert _run(PROMISE_NEVER, _attributed(IN_TEMPLATE), opening=WORDS_NOT_IN_BUNDLE).result == "fail"
+
+
+def test_1_1_0_reads_attributed_never_from_its_config():
+    action, opening = _attributed(IN_TEMPLATE), {"nonce": WORDS_NONCE, "text": IN_TEMPLATE}
+    assert _run(PROMISE_NEVER_1_1, action, opening=opening).result == "pass"
+    mutant = dataclasses.replace(PROMISE_NEVER_1_1, config={**PROMISE_NEVER_1_1.config, "attributed_never": []})
+    assert _run(mutant, action, opening=opening).result == "fail"
+
+
+def test_1_1_0_reads_its_template_from_its_config():
+    words = "Le vendeur dit authentique (non vérifié)"
+    action, opening = _attributed(words), {"nonce": WORDS_NONCE, "text": words}
+    assert _run(PROMISE_NEVER_1_1, action, opening=opening).result == "fail"
+    mutant = dataclasses.replace(PROMISE_NEVER_1_1, config={**PROMISE_NEVER_1_1.config, "attributed_template": {
+        "prefix": "Le vendeur dit ", "suffix": " (non vérifié)", "sentence_marks": ["."]}})
+    assert _run(mutant, action, opening=opening).result == "pass"
+
+
+def test_1_1_0_a_class_outside_never_passes_whoever_it_is_attributed_to():
+    assert _run(PROMISE_NEVER_1_1, _send(representation_class="price", statement_attributed_to="user")).result == "pass"
+
+
+def test_attributed_never_must_name_never_classes_and_a_template():
+    for config in ({**PROMISE_NEVER_1_1.config, "attributed_never": ["warranty"]},
+                   {k: v for k, v in PROMISE_NEVER_1_1.config.items() if k != "attributed_template"}):
+        with pytest.raises(ValueError):
+            _run(dataclasses.replace(PROMISE_NEVER_1_1, config=config), _send(representation_class="price"))
+
+
 # -- offer_expiry ---------------------------------------------------------------
 
 
@@ -641,6 +784,22 @@ MUTANTS = [
      ["warranty"], "fail", "pass"),
     (PROMISE_NEVER, "representation_classes", dict(action_class="communication.send", representation_class="price"),
      [c for c in REPRESENTATION_CLASSES if c != "price"], "pass", "fail"),
+    (PROMISE_ASK_1_1, "action_classes", dict(action_class="communication.send", representation_class="warranty"),
+     ["marketplace.sale"], "fail", "n/a"),
+    (PROMISE_ASK_1_1, "requires_approval", dict(action_class="communication.send", representation_class="warranty"),
+     ["delivery_date"], "fail", "pass"),
+    (PROMISE_ASK_1_1, "representation_classes",
+     dict(action_class="communication.send", representation_class="condition"),
+     [c for c in REPRESENTATION_CLASSES if c != "condition"], "pass", "fail"),
+    (PROMISE_NEVER_1_1, "action_classes",
+     dict(action_class="communication.send", representation_class="authenticity"), ["marketplace.sale"], "fail",
+     "n/a"),
+    # attributed_never stays inside never, so the mutant adds a class.
+    (PROMISE_NEVER_1_1, "never", dict(action_class="communication.send", representation_class="warranty"),
+     ["authenticity", "warranty"], "pass", "fail"),
+    (PROMISE_NEVER_1_1, "representation_classes",
+     dict(action_class="communication.send", representation_class="price"),
+     [c for c in REPRESENTATION_CLASSES if c != "price"], "pass", "fail"),
     (EXPIRY, "action_classes", dict(proposal_at="2026-10-07T09:00:00Z"), ["agreement.accept"], "pass", "n/a"),
     (EXPIRY, "max_age_seconds", dict(proposal_at="2026-10-07T09:00:00Z"), 86_399, "pass", "fail"),
     (SELLER_ROLE, "action_classes", dict(action_class="disclosure.personal", recipient_role="third_party"),
@@ -685,6 +844,9 @@ def test_every_config_field_has_a_mutant():
     covered = {(m[0].wicket_id, m[1]) for m in MUTANTS}
     covered |= {(DISCLOSURE.wicket_id, f) for f in
                 ("action_classes", "required_classes", "representation_classes", "fold_digest", "fold_id")}
+    # Read with a task authority or an opening of their own, below.
+    covered |= {(PROMISE_ASK_1_1.wicket_id, "authorized_path"), (PROMISE_NEVER_1_1.wicket_id, "attributed_template"),
+                (PROMISE_NEVER_1_1.wicket_id, "attributed_never")}
     declared = {(d.wicket_id, f) for d in SELLER_DEFINITIONS for f in d.config}
     assert declared == covered
 
