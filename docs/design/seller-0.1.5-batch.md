@@ -718,7 +718,7 @@ schemas.
   change.
 - The seller side has no r11: capsulectl's first telling asks there, and a repeat never unlocks
   what s13 refuses (Sherlock2). A seller e2e fixture (phone to the accepted buyer asks, then
-  passes) lands with the Muse port (future work, Muse lane).
+  passes) lands with the Muse port (future work, actionstate-muse#240).
 
 **Cases.** email to merchant M asks (r11 and r12); again passes, also within the first deal
 with M; phone to M asks on r11 alone; email to N asks (r11 and r12); an earlier deal with N that
