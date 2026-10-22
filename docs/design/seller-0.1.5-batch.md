@@ -1,6 +1,6 @@
 # Design note: the seller 0.1.5 / everyday 0.3.8 batch
 
-Status: draft v8, 2026-10-22, Ethan's agent (session local_f0ad46ac). Reviewers: Codex, a
+Status: converged v8.1, 2026-10-22 (Codex v8, `claude -p` v8, Sherlock2 on every what-point), Ethan's agent (session local_f0ad46ac). Reviewers: Codex, a
 `claude -p` stand-in for Kimi, Sherlock2 (product rules and wording).
 
 Code read: capsule-engine 8e2f887, capsule-cli 3acdeee (rc19), actionstate-muse 69c759d.
@@ -182,10 +182,10 @@ has no verifier and ends `not_evaluable`. So no share to a buyer ever passes.
   (typed) or `hmac-sha256-deal-key` (x-deal-v0), and both sides must name the same algorithm.
   An explicit `who` seals only the kinds it names (`deal_profile.go` L254-256, L297-307) while
   the thread default seals the opening's (L262-266), so the match is `sameParty`'s per-person
-  requirement (`deal_counterparty.go` L72-83) plus a rejection of any conflict: a per-person kind (email, phone, profile id, relay address)
-  must match on both sides whenever either side has one; a shared marketplace domain or a name
+  requirement (`deal_counterparty.go` L72-83) plus a rejection of any conflict: at least one per-person kind (email, phone, profile id,
+  relay address) present on both sides must match; a shared marketplace domain or a name
   is never enough (L20-24); and any identity kind on both sides that differs fails. Identity
-  kinds are email, phone, profile id, relay address, and domain where `sameParty` counts it;
+  kinds are the per-person kinds: email, phone, profile id, relay address;
   `name` and `payee` are fingerprinted too but are not identities ("one seller can write it many
   ways"), so they are left out of the comparison, and the thread default's `payee := name`
   (`deal_profile.go` L262-266) never refuses the right buyer. A missing
@@ -506,8 +506,8 @@ one listing without the condition, then an offer, asks; text saying "genuine" la
 `[condition]` is refused at the post; "before the check" across the sale log and the thread log
 is by sealed `at`, and a tie is not established;
 `check_profile.py` flags a `listing_classes` that doesn't match the intersection over the sale's
-latest post act per platform; a typed post check and post act, and a typed check sealed at
-`rule_inputs_version` 3, each validate against their schemas.
+latest post act per platform; a typed post check and post act validate against their
+schemas.
 
 ## 6. #188: a repeat of the same detail to the same party passes (everyday)
 
@@ -554,7 +554,8 @@ metadata, `deal_rules.go` L686-690, and the body seals only the counts and the b
 `deal_rule_inputs.go` L207-216). A check without it re-derives and verifies as before. In a
 deal that mixes versions, each approval adopts by its own check's rule. Tests: an old approval
 then a new check; a new `standing_intent` approval then a pay check; both through an exported
-`check_profile.py` run. Which terms a card named is recomputed from the check and the agreement in
+`check_profile.py` run; a typed check sealed at `rule_inputs_version` 3 validates against its
+schema. Which terms a card named is recomputed from the check and the agreement in
 force, because the card is rendered deterministically from them and the approval commits to that
 exact card (`card_commitment`). Tests run share → approval → pay for a user approval and a
 `standing_intent`, with a term change and with a recourse change.
