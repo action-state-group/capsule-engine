@@ -62,6 +62,5 @@ and names no rule.
   flag or environment override, so the commit cannot be sealed more than 31 days before the share
   without patching the producer. The window is tested on moved records instead.
 - **The copy's thread reports are standalone** (`x-deal-report/v0`, capsule-cli#299): the engine's
-  sale reader looks for the report on the thread's log, so it reads this copy as not under its sale
-  (`thread_is_not_under_this_sale`) and a replay gets no sale history. The replay test is an expected
-  failure until the reader reads the standalone report.
+  sale reader reads each one as capsulectl's verifier does (capsule-engine#200), so the copy reads
+  complete and a replay decides the shares as live.

@@ -20,8 +20,8 @@ Three layers, each against the same rule:
   the history through ``history_ledger`` too, cut to the live window.
 - capsulectl's own shares, unedited (``fixtures/release-on-acceptance/``,
   capsule-cli main after rc19): A's commit act and the shares with A and B,
-  decided live. Its sale bundle cannot be replayed yet (an expected failure:
-  the engine does not read a standalone thread report).
+  decided live, and the same shares replayed from its sale bundle, whose
+  thread reports are standalone (``x-deal-report/v0``, capsule-cli#299).
 
 1.0.0 and 1.1.0 (no ``binding``) decide as they always did; the last tests
 pin that they read none of this.
@@ -764,9 +764,6 @@ def test_live_capsulectls_own_shares_decide_by_the_acceptance_in_their_history(n
         _refused(s13)
 
 
-@pytest.mark.xfail(strict=True, reason=(
-    "capsulectl seals a thread copy's report off its log (x-deal-report/v0, capsule-cli#299); the "
-    "engine's sale reader reads only an in-log report, so it finds the threads not under the sale"))
 def test_replay_of_capsulectls_sale_bundle_decides_the_shares_as_live():
     sale = load_sale_bundle(PRODUCED / "sale.bundle.json")
     assert sale.complete, sale.findings
@@ -781,7 +778,19 @@ def test_replay_of_capsulectls_sale_bundle_decides_the_shares_as_live():
         assert _s13(by_id[_produced(name)["record"]["capsule_id"]]).result == _s13(live(_produced(name))).result
 
 
-def test_capsulectls_sale_bundle_reads_incomplete_for_its_standalone_reports():
-    """Pins the gap the expected failure above names, so a reader fix shows."""
+def test_capsulectls_sale_bundle_reads_complete_through_its_standalone_reports():
+    """Each thread's report is off its log, and the sale reads complete;
+    every share replayed from it is given A's acceptance. B's shares are
+    sealed after A's copy's checkpoint, the earliest the sale certifies, so
+    their history is not complete (the module docstring of
+    ``report/sale_bundle.py``)."""
     sale = load_sale_bundle(PRODUCED / "sale.bundle.json")
-    assert not sale.complete and "thread_is_not_under_this_sale" in sale.findings
+    bundle = json.loads((PRODUCED / "sale.bundle.json").read_text(encoding="utf-8"))
+    threads = bundle["extensions"]["x-deal-sale/v0"]["threads"].values()
+    assert all("x-deal-report/v0" in t["extensions"] for t in threads)
+    assert sale.complete and sale.findings == ()
+    for name in ("a-share-phone", "a-share-pickup-area", "b-share-phone", "b-share-pickup-area"):
+        envelope = sale_history(sale, _produced(name)["record"]["capsule_id"])
+        (accepted,) = [e for e in envelope["history"] if e["agent_input"]["body"]["action_class"] == "agreement.accept"]
+        assert envelope["history_scope"]["complete"] is name.startswith("a-")
+        assert accepted["disposition"]["decision"] == "accept"

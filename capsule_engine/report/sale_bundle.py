@@ -17,6 +17,16 @@ report, then a ``sale_cut`` (a ``head_commitment`` per opened thread, by
 registration), then the sale's checkpoint. A ``present`` entry carries
 ``opened: {nonce}`` and ``head: {nonce, record_digest}`` (AMENDMENT 11).
 
+A thread's report is sealed in one of two ways. Before capsule-cli#299 it is
+a record of the thread's own log that the thread's ``x-deal-v0`` section
+names as ``sealed_report``, and the cut's head is that report. A deal whose
+log holds no report (capsule-cli#299 onward) seals it off its log: the
+section is ``{"sealed_report": <capsule id>}`` alone, and the report rides
+in ``x-deal-report/v0`` as ``{"record": <its signed Capsule>,
+"agent_input": <its payload>}``, bound to the thread's checkpoint by its
+payload's ``deal_checkpoint``. The cut's head is then the thread's last
+step.
+
 ``read_sale_bundle`` verifies it. It decides whether the replay holds every
 thread of the sale, and the sale's key: the digest of the sale's own task
 authority, which each thread's sealed report opens as
@@ -47,6 +57,22 @@ is skipped:
   ``sale_authority_opening`` opens that task authority's
   ``sale_authority_commitment`` to the sale's key and names that task
   authority by digest;
+- a standalone report is read only when it holds as capsulectl's
+  ``verify --bundle`` holds it (``DealReportEntry`` and
+  ``standaloneReportEntry``, capsule-cli ``internal/cli``, at 6210b93): the
+  thread's ``x-deal-v0`` section is the pointer alone, and
+  ``x-deal-report/v0`` holds ``record`` and ``agent_input`` alone; the
+  record is the pointer's Capsule and a deal report (``action_id``
+  ``capsulectl-deal-report``), signed under its own ``key_id``, which is
+  the verified key of the thread's last step; ``agent_input`` is the
+  payload the Capsule commits to, and the Capsule verifies; the payload is
+  a ``deal_report`` of ``x-deal-v0`` for this thread's deal, for a copy
+  audience; its ``deal_checkpoint`` is exactly the thread's signed
+  checkpoint (``log_id``, ``mmr_size``, ``root``); the thread's log holds no
+  report record; and the report's ``lifecycle.as_of`` is the checkpoint's
+  signed time. One that does not hold is named
+  (``sealed_report_unverified``) and opens nothing, so its thread is not
+  under the sale;
 - the sale's log shows each carried thread opened and whole: exactly one
   ``thread_opened`` names its registration, and ``opened.nonce`` opens it
   to the digest of the thread's task authority; the latest ``sale_cut``
@@ -92,6 +118,9 @@ What this does not establish:
   the first point. The absence of ``threads_predate_registration`` is the
   producer's word, but such a copy has no ``thread_opened`` or ``sale_cut``
   for its present threads and is not complete.
+- A standalone report is on no log and rests on the step-signing key
+  alone: it is the producer's word at the checkpoint it names. The opening
+  it carries is held to the commitment the thread's own log seals.
 - The history holds the sale's registered threads only. A live check is
   given every act of every deal on the profile from its last 31 days, and
   holds a sale's acceptance unknown when an accepted commitment of another
@@ -108,7 +137,9 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from agent_action_capsule import json_digest
-from capsule_emit.evidence_file import check_evidence_file
+from agent_action_capsule.disclosure_envelope import verify_disclosure_envelope
+from agent_action_capsule.producer_envelope import verify_record_signature
+from capsule_emit.evidence_file import EvidenceFileCheck, check_evidence_file
 from cll.ledger.api import LedgerAPI
 
 from .live_history import history_ledger
@@ -145,6 +176,15 @@ _EVALUATION = "action-evaluation/v0"
 _APPROVAL = "action-approval/v0"
 _PROPOSED = "proposed-action/v0"
 _SEALED_REPORT = "sealed_report"
+# A copy's standalone report (capsule-cli#299, capsulectl's DealReportExtension).
+_STANDALONE_REPORT = "x-deal-report/v0"
+_REPORT_ACTION_ID = "capsulectl-deal-report"
+# capsulectl's dealStepRecordTypes and dealCopyAudiences.
+_STEP_RECORD_TYPES = frozenset({"deal_step", "step_completed", "step_failed"})
+_COPY_AUDIENCES = frozenset({"counterparty", "adjudicator", "keep"})
+# ASCII digits only, as Go reads them; the offset's hour and minute are checked apart.
+_RFC3339 = re.compile(
+    r"^([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2})(?:\.([0-9]+))?(Z|[+-]([0-9]{2}):([0-9]{2}))$", re.ASCII)
 _DEAL_ID = re.compile(r"^deal-[0-9a-f]{16}$")
 _SALE_ID = re.compile(r"^sale-[0-9a-f]{16}$")
 _SECOND = timedelta(seconds=1)
@@ -269,7 +309,10 @@ def read_sale_bundle(bundle: dict) -> SaleBundle:
         times.append(_checkpoint_time(checked.checkpoint))
         shown = _disclosed(thread_bundle)
         held = tuple(r for r in thread_bundle.get("records") or [] if isinstance(r, dict))
-        why, authority = _thread_binding(held, shown, thread_bundle, thread_id, registration, key)
+        report, unverified = _thread_report(thread_bundle, held, shown, checked)
+        if unverified:
+            findings.append("sealed_report_unverified")
+        why, authority = _thread_binding(held, shown, report, thread_id, registration, key)
         if why is not None:
             findings.append(why)
         elif authority is not None:
@@ -351,11 +394,12 @@ def _present(listed: list, registrations: list[dict], opened: dict[str, list[str
     return present
 
 
-def _thread_binding(records: tuple[dict, ...], shown: dict[str, dict], thread_bundle: dict, thread_id: str,
+def _thread_binding(records: tuple[dict, ...], shown: dict[str, dict], report: dict, thread_id: str,
                     registration: str, key: str | None) -> tuple[str | None, str | None]:
     """Why a carried thread is not the registered thread of this sale
     (module docstring), or ``None`` when it is, with the digest of its task
-    authority when it is."""
+    authority when it is. ``report`` is the thread's report
+    (``_thread_report``)."""
     bound = [shown[r["capsule_id"]] for r in records if r.get("capsule_id") in shown and _bound(r, shown[r["capsule_id"]])]
     authorities = [s for s in bound if s.get("type") == _TASK_AUTHORITY and s.get("chain_id") == thread_id]
     if len(authorities) != 1:
@@ -365,7 +409,7 @@ def _thread_binding(records: tuple[dict, ...], shown: dict[str, dict], thread_bu
     named = [r for r in refs if isinstance(r, dict) and r.get("rel") == "registration"]
     if len(named) != 1 or _typed_ref_digest(named[0]) != registration:
         return "thread_does_not_name_its_registration", None
-    opening = _sale_authority_opening(thread_bundle, records, shown)
+    opening = report.get("sale_authority_opening") if isinstance(report.get("sale_authority_opening"), dict) else {}
     body = authority.get("body") if isinstance(authority.get("body"), dict) else {}
     nonce, text = _text(opening.get("nonce")), _text(opening.get("text"))
     digest = json_digest(authority)
@@ -476,11 +520,25 @@ def _last_record_digest(thread_bundle: dict) -> str | None:
     return _text(attestation.get("agent_input_digest"))
 
 
-def _sale_authority_opening(thread_bundle: dict, records: tuple[dict, ...], shown: dict[str, dict]) -> dict:
-    """The ``sale_authority_opening`` of the report a thread's copy seals:
-    the bound record its ``x-deal-v0`` extension names as ``sealed_report``.
-    ``{}`` when there is none."""
+def _thread_report(thread_bundle: dict, records: tuple[dict, ...], shown: dict[str, dict],
+                   checked: EvidenceFileCheck) -> tuple[dict, bool]:
+    """The report a thread's copy carries, as capsulectl's ``DealSealedReport``
+    finds it, and whether it is a standalone report that does not verify. A
+    copy that carries ``x-deal-report/v0`` is read through it alone
+    (``_standalone_report``); any other copy through the record of its own
+    log that its ``x-deal-v0`` section names as ``sealed_report``. ``{}``
+    when there is no report to read."""
     extensions = thread_bundle.get("extensions") if isinstance(thread_bundle.get("extensions"), dict) else {}
+    if _STANDALONE_REPORT in extensions:
+        report = _standalone_report(thread_bundle, extensions, records, checked)
+        return (report, False) if report is not None else ({}, True)
+    return _in_log_report(extensions, records, shown), False
+
+
+def _in_log_report(extensions: dict, records: tuple[dict, ...], shown: dict[str, dict]) -> dict:
+    """The report a thread's copy seals in its own log: the bound record its
+    ``x-deal-v0`` extension names as ``sealed_report``. ``{}`` when there is
+    none."""
     section = extensions.get(_PROFILE) if isinstance(extensions.get(_PROFILE), dict) else {}
     pointer = section.get(_SEALED_REPORT)
     sealed = next((r for r in records if r.get("capsule_id") == pointer), None)
@@ -488,8 +546,115 @@ def _sale_authority_opening(thread_bundle: dict, records: tuple[dict, ...], show
     if sealed is None or report_record is None or not _bound(sealed, report_record):
         return {}
     report = report_record.get("report")
-    opening = report.get("sale_authority_opening") if isinstance(report, dict) else None
-    return opening if isinstance(opening, dict) else {}
+    return report if isinstance(report, dict) else {}
+
+
+def _standalone_report(thread_bundle: dict, extensions: dict, records: tuple[dict, ...],
+                       checked: EvidenceFileCheck) -> dict | None:
+    """A copy's standalone report (capsule-cli#299), or ``None`` when it does
+    not hold as capsulectl's ``verify --bundle`` holds it. Each check below
+    is one of ``DealReportEntry``'s (the sections) or
+    ``standaloneReportEntry``'s (its seven steps), capsule-cli
+    ``internal/cli`` at 6210b93; none is left out or loosened. The thread's
+    checkpoint is the one ``check_evidence_file`` verified, whose fields a
+    file's copy cannot differ from."""
+    section = extensions.get(_PROFILE)
+    carried = extensions.get(_STANDALONE_REPORT)
+    if (not isinstance(section, dict) or set(section) != {_SEALED_REPORT}
+            or not isinstance(section[_SEALED_REPORT], str) or not isinstance(carried, dict)):
+        return None
+    pointer = section[_SEALED_REPORT]
+    record, payload = carried.get("record"), carried.get("agent_input")
+    # 1. Its record is the pointer's deal report.
+    if (set(carried) != {"record", "agent_input"} or not isinstance(record, dict) or not isinstance(payload, dict)
+            or record.get("capsule_id") != pointer or record.get("action_id") != _REPORT_ACTION_ID):
+        return None
+    # 2. Its producer signature verifies under its key_id, the key of the deal's last step.
+    verdict, _ = verify_record_signature(record)
+    if verdict != "authored" or record.get("key_id") != _last_step_key(thread_bundle, checked):
+        return None
+    # 3. Its agent_input is what the Capsule commits to, and the Capsule verifies.
+    capsule = {k: v for k, v in record.items() if k not in ("signature", "key_id")}
+    disclosed = verify_disclosure_envelope({"capsule": capsule, "disclosures": {"agent_input": payload}})
+    if not disclosed.ok or disclosed.disclosures_matched != 1:
+        return None
+    # 4. It is a deal_report of the bundle's deal, for a copy audience.
+    certificate = thread_bundle.get("completeness_certificate")
+    log_id = certificate.get("log_id") if isinstance(certificate, dict) else None
+    deal_id = log_id.removeprefix("deal/") if isinstance(log_id, str) and log_id.startswith("deal/") else None
+    if (payload.get("type") != "deal_report" or payload.get("profile") != _PROFILE or deal_id is None
+            or payload.get("deal_id") != deal_id or not isinstance(payload.get("audience"), str)
+            or payload["audience"] not in _COPY_AUDIENCES):
+        return None
+    # 5. Its deal_checkpoint is the bundle's checkpoint: log id, MMR size and root.
+    checkpoint = checked.checkpoint
+    bound = payload.get("deal_checkpoint")
+    size, signed_size = (_minor(bound.get("mmr_size")) if isinstance(bound, dict) else None), _minor(checkpoint.get("mmr_size"))
+    if (not isinstance(bound, dict) or set(bound) != {"log_id", "mmr_size", "root"} or bound["log_id"] != log_id
+            or size is None or size < 0 or size != signed_size or bound["root"] != checkpoint.get("root")):
+        return None
+    # 6. The bundle holds no deal_report record.
+    if any(r.get("action_id") == _REPORT_ACTION_ID for r in records):
+        return None
+    # 7. Its lifecycle's as_of is the checkpoint's signed time.
+    report = payload.get("report")
+    lifecycle = report.get("lifecycle") if isinstance(report, dict) else None
+    as_of = _rfc3339(lifecycle.get("as_of")) if isinstance(lifecycle, dict) else None
+    signed = _rfc3339(checkpoint.get("timestamp"))
+    if as_of is None or signed is None or as_of != signed:
+        return None
+    return report
+
+
+def _last_step_key(thread_bundle: dict, checked: EvidenceFileCheck) -> str | None:
+    """The verified producer key of a deal's last step in its bundle
+    (capsulectl's ``DealLastStepKey``): the record at the highest log
+    ``seq`` whose evidence record header is a step's, when its signature
+    checks. ``None`` when there is none."""
+    certificate = thread_bundle.get("completeness_certificate")
+    memberships = certificate.get("memberships") if isinstance(certificate, dict) else None
+    memberships = memberships if isinstance(memberships, dict) else {}
+    last, last_seq = None, 0
+    for record in thread_bundle.get("records") or []:
+        if not isinstance(record, dict):
+            continue
+        header = record.get("evidence_record_header")
+        if (not isinstance(header, dict) or not isinstance(header.get("record_type"), str)
+                or header["record_type"] not in _STEP_RECORD_TYPES or not isinstance(record.get("capsule_id"), str)):
+            continue
+        membership = memberships.get(record["capsule_id"])
+        coordinates = membership.get("log_coordinates") if isinstance(membership, dict) else None
+        seq = _minor(coordinates.get("seq")) if isinstance(coordinates, dict) else None
+        if seq is not None and seq > last_seq:
+            last, last_seq = record, seq
+    if last is None:
+        return None
+    verified = next((c for c in checked.records if c.capsule_id == last.get("capsule_id")), None)
+    if verified is None or not verified.identity_ok or verified.signature != "authored":
+        return None
+    return verified.key_id
+
+
+def _rfc3339(value: object) -> tuple[datetime, int] | None:
+    """``value`` as an instant when it is an RFC 3339 time, as Go's
+    ``time.RFC3339Nano`` reads one: its whole second in UTC and its
+    nanoseconds, so two times compare at Go's precision (a ``datetime``
+    keeps only microseconds). Digits past the ninth are dropped, as Go drops
+    them. An offset past 23 hours or 59 minutes is refused (Go refuses one
+    past 24 or 60, so this fails closed), and so is a time that leaves the
+    years a ``datetime`` holds once moved to UTC. ``None`` otherwise."""
+    match = _RFC3339.fullmatch(value) if isinstance(value, str) else None
+    if match is None or (match[4] is not None and (int(match[4]) > 23 or int(match[5]) > 59)):
+        return None
+    try:
+        whole = _aware(match[1] + match[3])
+        at = whole.astimezone(timezone.utc) if whole is not None else None
+    except OverflowError:
+        # Moved to UTC, it is before year 1 or after year 9999.
+        return None
+    if at is None:
+        return None
+    return at, int((match[2] or "")[:9].ljust(9, "0"))
 
 
 def replay_sale(sale: SaleBundle, **options: object) -> ReplayResult:
