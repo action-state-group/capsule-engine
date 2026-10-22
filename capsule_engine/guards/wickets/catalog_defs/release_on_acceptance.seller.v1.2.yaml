@@ -30,8 +30,9 @@ semantics: >-
   ledger order, among the operator's, whose action_class is in
   acceptance_classes, whose decision was accept, which was not a dry run,
   and which carries the disclosure's item_ref; a history that may be missing
-  acts, an act of the sale that could not be read, or an earlier act of an
-  acceptance class with no disposition leave it unknown, which is none. The
+  acts, an act of the sale that could not be read, an earlier act of an
+  acceptance class with no disposition, or an earlier accepted commitment in
+  the history that names no item leave it unknown, which is none. The
   same deal is an equal deal_id, both set. The same buyer is the
   counterparty the acceptance's check sealed, carried beside it in the
   history, and the one the disclosure's check sealed, under the same
@@ -40,7 +41,8 @@ semantics: >-
   sides equal; or, when neither side has any per-person identity, with a
   name and a domain on both sides and both equal. A payee is never
   compared, and a name or a domain is compared only when neither side has a
-  per-person identity. Every other
+  per-person identity. A counterparty block on either side with any member
+  of another kind or shape, or another algorithm, is no buyer. Every other
   such disclosure fails: no class or a class outside release_classes, no
   item_ref, deal_id or counterparty fingerprint, no known acceptance, or one
   in another deal or by another buyer. An action whose action_class is

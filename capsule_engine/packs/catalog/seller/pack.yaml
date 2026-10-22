@@ -75,8 +75,8 @@
 # finds the sale's acceptance in the history: the same record as before, in
 # the share's own deal and by the same buyer, by the counterparty
 # fingerprint each check seals. The public pickup area goes to a buyer before
-# acceptance; a credential, a verification code, a payment card or an id
-# document never goes. personal_data.share now requires disclosed_classes and
+# acceptance; a credential, a verification code, a payment card or an ID
+# document never goes to a buyer. personal_data.share now requires disclosed_classes and
 # takes deal_id, and no longer requires representation_class. No other rule
 # changes.
 pack_id: asg/seller/0.1.5
@@ -181,18 +181,21 @@ obligations:
     statement: >-
       Checks the user's personal data the agent shares
       (disclosure.personal) with anyone but the platform. The listing's
-      public pickup area may go to any buyer at any time. Contact details
+      public pickup area (not the exact spot) may go to any buyer at any
+      time. Contact details
       (a name, a phone, an email, an address, the pickup spot or other
       contact) go only to the buyer who
       accepted the sale, in that buyer's own thread. The acceptance is the
-      first accepted commitment for the item in the history. It refuses a
+      sale's one acceptance: the first accepted commitment for the item in
+      the history. It refuses a
       share before that acceptance, to another buyer, or in another thread.
       It refuses when the history cannot show the acceptance. It refuses a
-      credential, a verification code, a payment card or an id document to
-      anyone. It refuses a share that names no class of data. A share to
-      the platform is left to s01. It records the class names and whether
-      the share was bound to an acceptance, never the data, the item or who
-      the buyer is. No approval clears it.
+      credential, a verification code, a payment card or an ID document to
+      any buyer, the accepted one included. It refuses a share that names no
+      class of data. A share to the platform is left to s01. It records the
+      class names and whether the share was bound to an acceptance, never
+      the data, the item or who the buyer is. The user's approval does not
+      override it.
     check: release_on_acceptance
     default_disposition: NEVER
 
@@ -250,7 +253,7 @@ constraints:
   # deal; the public pickup area reaches any buyer; a disclosure to a
   # platform reaches no buyer and is left to s01.
   - wicket_ref: seller.release_on_acceptance/1.2.0
-    digest: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+    digest: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
 
 folds:
   # Read by required_disclosure, which pins these same digests in its config.

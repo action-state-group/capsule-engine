@@ -25,9 +25,11 @@ pin that they read none of this.
 from __future__ import annotations
 
 import copy
+import dataclasses
 import hashlib
 import json
 import tempfile
+from datetime import datetime, timedelta, timezone
 from functools import cache
 from pathlib import Path
 
@@ -60,6 +62,13 @@ ITEM = "c" * 64
 DEAL_A, DEAL_B = "deal-a", "deal-b"
 FP_ALG = "hmac-sha256-chain-key"
 NOT_ACCEPTED = "the history given shows no acceptance of this sale by this buyer in this deal"
+NEVER_SHARED = "a credential, a verification code, a payment card or an ID document is never shared with a buyer"
+MALFORMED = "the counterparty input was not in its agreed shape; it cannot be bound to an acceptance"
+
+
+def _refused(outcome) -> None:
+    """The one refusal every acceptance case gives, bound to nothing."""
+    assert (outcome.result, outcome.reason, outcome.evidence["bound_to_acceptance"]) == ("fail", NOT_ACCEPTED, False)
 
 
 def _fp(value: str) -> str:
@@ -164,13 +173,15 @@ def test_a_contact_class_before_acceptance_fails(store, classes):
 def test_a_class_never_released_fails_even_after_acceptance(store, cls):
     _history(store, _commit())
     outcome = _check(_share((cls, "phone")), store)
-    assert (outcome.result, outcome.evidence["disclosed_classes"]) == ("fail", sorted([cls, "phone"]))
+    assert (outcome.result, outcome.reason, outcome.evidence["disclosed_classes"]) == (
+        "fail", NEVER_SHARED, sorted([cls, "phone"]))
 
 
 def test_a_share_naming_no_class_fails(store):
     _history(store, _commit())
     outcome = _check(_share(representation_class="address", disclosed_classes=None), store)
-    assert (outcome.result, outcome.evidence["missing_field"]) == ("fail", "disclosed_classes")
+    assert (outcome.result, outcome.reason, outcome.evidence["missing_field"]) == (
+        "fail", "the share names no class of data", "disclosed_classes")
 
 
 @pytest.mark.parametrize(("overrides", "field"), [
@@ -188,34 +199,39 @@ def test_a_share_missing_an_input_fails_naming_it(store, overrides, field):
 
 def test_a_share_in_another_deal_fails(store):
     _history(store, _commit())
-    assert _check(_share(deal_id=DEAL_B), store).reason == NOT_ACCEPTED
+    _refused(_check(_share(deal_id=DEAL_B), store))
 
 
 def test_an_acceptance_with_no_deal_binds_no_share(store):
     _history(store, _commit(deal=None))
-    assert _check(_share(), store).result == "fail"
+    _refused(_check(_share(), store))
 
 
 def test_an_acceptance_of_another_item_binds_no_share(store):
     _history(store, _commit(item="d" * 64))
-    assert _check(_share(), store).result == "fail"
+    _refused(_check(_share(), store))
 
 
 def test_an_incomplete_history_fails(store):
     _history(store, _commit(), complete=False)
-    assert _check(_share(), store).reason == NOT_ACCEPTED
+    _refused(_check(_share(), store))
 
 
 def test_a_commit_act_with_no_disposition_fails(store):
     """An agent_card approval seals no disposition: whether it was accepted
     is not known, which is no acceptance."""
     _history(store, _commit(), disposition=None)
-    assert _check(_share(), store).reason == NOT_ACCEPTED
+    _refused(_check(_share(), store))
 
 
 def test_a_declined_commit_is_no_acceptance(store):
     _history(store, _commit(), disposition="reject")
-    assert _check(_share(), store).result == "fail"
+    _refused(_check(_share(), store))
+
+
+def test_an_accepted_commitment_naming_no_item_leaves_the_acceptance_unknown(store):
+    _history(store, _commit(item=None), _commit())
+    _refused(_check(_share(), store))
 
 
 # The buyer match: per-person identity kinds only.
@@ -251,12 +267,39 @@ def test_a_declined_commit_is_no_acceptance(store):
 ])
 def test_the_buyer_is_one_person_by_the_per_person_kinds(store, accepted, shared, result):
     _history(store, _commit(ids=accepted))
-    assert _check(_share(counterparty_ids=shared), store).result == result
+    outcome = _check(_share(counterparty_ids=shared), store)
+    if result == "fail":
+        _refused(outcome)
+    else:
+        assert outcome.result == "pass"
 
 
 def test_both_sides_must_name_one_fingerprint_algorithm(store):
     _history(store, _commit(fp_alg="hmac-sha256-deal-key"))
-    assert _check(_share(), store).result == "fail"
+    _refused(_check(_share(), store))
+
+
+@pytest.mark.parametrize("ids", [
+    {**NAME_DOMAIN_A, "profile_id": "A" * 64},  # not lowercase hex
+    {**NAME_DOMAIN_A, "nickname": _fp("a")},  # a kind no check seals
+])
+def test_a_share_whose_block_is_not_whole_fails_naming_it(store, ids):
+    _history(store, _commit(ids=NAME_DOMAIN_A))
+    outcome = _check(_share(counterparty_ids=ids), store)
+    assert (outcome.result, outcome.reason, outcome.evidence["missing_field"]) == ("fail", MALFORMED, "counterparty")
+
+
+def test_a_share_with_a_member_dropped_for_its_shape_fails_naming_the_block(store):
+    """The bridge drops a member it cannot read and says so: the rest must
+    not open the name-and-domain reading."""
+    _history(store, _commit(ids=NAME_DOMAIN_A))
+    outcome = _check(_share(counterparty_ids=NAME_DOMAIN_A, counterparty_malformed=True), store)
+    assert (outcome.reason, outcome.evidence["missing_field"]) == (MALFORMED, "counterparty")
+
+
+def test_an_acceptance_whose_block_is_not_whole_binds_no_share(store):
+    _history(store, _commit(ids={**NAME_DOMAIN_A, "profile_id": "A" * 64}))
+    _refused(_check(_share(counterparty_ids=NAME_DOMAIN_A), store))
 
 
 def test_a_platform_share_is_left_to_recipient_role(store):
@@ -271,7 +314,7 @@ def test_an_acceptance_with_no_thread_counterparty_binds_no_share(store, signer)
     spend = load_fold(ROOT / "folds" / "catalog_defs" / "spend.weekly.v3.yaml")
     engine = GuardEngine(ledger=store, caps_fold=spend, signer_provider=lambda: signer)
     engine.check(_commit(), dry_run=False)
-    assert _check(_share(), store).reason == NOT_ACCEPTED
+    _refused(_check(_share(), store))
 
 
 # -- 1.0.0 and 1.1.0 read none of it ----------------------------------------------
@@ -486,6 +529,76 @@ def test_live_a_per_person_kind_on_one_side_only_refuses():
     assert _both(envelope) == ("fail", "fail")
 
 
+@pytest.mark.parametrize("bad", [None, 7, "A" * 64, "short"])
+def test_live_a_malformed_member_on_the_share_fails_closed_and_never_opens_the_name_reading(bad):
+    """``profile_id: null`` (or any member of another shape) on an rc14-shaped
+    share whose name and domain match A's: the bridge drops the member, so
+    without the whole-block rule the name-and-domain reading would pass."""
+    sealed = _check_input(_BASE["a"])["record"]["agent_input"]["body"]["counterparty"]["ids"]
+    envelope = share_input("a", ("phone",), profile=False, share_ids={**sealed, "profile_id": bad})
+    action = action_for_check_input(envelope["record"], item_ref=envelope["item_ref"])
+    assert action.counterparty_malformed
+    for decision in (live(envelope), replayed(envelope)):
+        outcome = _s13(decision)
+        assert (outcome.result, outcome.evidence["missing_field"]) == ("fail", "counterparty")
+        assert decision.outcome == "deny"
+
+
+def test_live_a_share_in_another_algorithm_fails_closed():
+    envelope = share_input("a", ("phone",), profile=False)
+    body = envelope["record"]["agent_input"]["body"]
+    body["counterparty"]["fp_alg"] = "hmac-sha256-profile-key"
+    envelope["record"]["model_attestation"]["compute_attestation"]["agent_input_digest"] = json_digest(
+        envelope["record"]["agent_input"])
+    assert _s13(live(envelope)).evidence["missing_field"] == "counterparty"
+
+
+def test_live_a_well_formed_share_is_not_marked_malformed():
+    envelope = share_input("a", ("phone",), profile=False)
+    assert not action_for_check_input(envelope["record"], item_ref=envelope["item_ref"]).counterparty_malformed
+
+
+def _windowed(envelope: dict, *, shown_when) -> tuple:
+    """The share replayed with a ``sale_history`` that writes the acceptance
+    only when ``shown_when(days)``: s13's decision and s11's view."""
+    record = envelope["record"]
+    shown = record["agent_input"]
+    bare = {k: v for k, v in record.items() if k != "agent_input"}
+    without = {**envelope, "history": [e for e in envelope["history"]
+                                       if e["agent_input"]["body"]["action_class"] != "agreement.accept"]}
+    seen: dict = {}
+
+    def write(capsule_id: str, ledger, days):
+        given = envelope if shown_when(days) else without
+        history_ledger({**given, "record": bare}, ledger)
+        seen[days] = [r.capsule["asg_payload"].get("action_class") for r in ledger.scan()]
+        return SaleCheck(item_ref=envelope["item_ref"])
+
+    with tempfile.TemporaryDirectory() as tmp:
+        installed = install_pack(PACK, project_dir=Path(tmp) / "project", mode="observe")
+        resolved = installed.resolved
+        result = replay([bare], disclosed={bare["capsule_id"]: shown}, caps_fold=resolved.caps_fold(),
+                        caps_minor=resolved.caps_minor(), manifest_digest=resolved.manifest_digest,
+                        wickets=resolved.configured_wickets(RUNNABLE_CHECKS), pack=installed.pack,
+                        sale_history=write)
+    (decision,) = result.decisions
+    return decision.decision, seen
+
+
+def test_replay_an_acceptance_outside_the_window_is_none_for_s13_though_s11_sees_it():
+    decision, seen = _windowed(share_input("a", ("phone",)), shown_when=lambda days: days is None)
+    _refused(_s13(decision))
+    assert decision.outcome == "deny"
+    assert "agreement.accept" in seen[None] and "agreement.accept" not in seen[RULES_HISTORY_DAYS]
+
+
+def test_replay_s13_reads_only_the_window():
+    """The converse: the acceptance only in the window still binds."""
+    decision, seen = _windowed(share_input("a", ("phone",)), shown_when=lambda days: days == RULES_HISTORY_DAYS)
+    assert _s13(decision).result == "pass"
+    assert decision.outcome == "allow"
+
+
 def test_replay_gives_s13_the_live_window_and_s11_the_whole_history():
     seen: list = []
     replayed(share_input("a", ("phone",)), seen)
@@ -493,6 +606,49 @@ def test_replay_gives_s13_the_live_window_and_s11_the_whole_history():
 
 
 # -- the replayed sale history is cut to the live window ------------------------------
+
+
+def _shifted(sale, keep: str, by: timedelta):
+    """``sale`` with every record but ``keep`` sealed ``by`` earlier, on the
+    whole second. Read as given (``sale_history`` verifies nothing)."""
+    def move(record: dict) -> dict:
+        if record.get("capsule_id") == keep:
+            return record
+        at = datetime.fromisoformat(record["timestamp"].replace("Z", "+00:00")) - by
+        return {**record, "timestamp": at.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}
+
+    threads = tuple(dataclasses.replace(t, records=tuple(move(r) for r in t.records)) for t in sale.threads)
+    return dataclasses.replace(sale, threads=threads)
+
+
+def _at(value: str) -> datetime:
+    return datetime.fromisoformat(value.replace("Z", "+00:00"))
+
+
+@pytest.mark.parametrize(("margin", "newest_kept"), [
+    (timedelta(days=-1), True),
+    (timedelta(0), True),  # the boundary: sealed exactly 31 days before the check is in
+    (timedelta(seconds=1), False),
+    (timedelta(days=9), False),
+])
+def test_a_sale_bundles_acts_older_than_the_window_leave_s13s_history(margin, newest_kept):
+    """On the real sale bundle, every act moved back so the newest one before
+    the checked commit lands ``margin`` past 31 days before it: the 31-day
+    history keeps exactly the acts at or after that bound, the whole history
+    keeps them all, and both stay complete."""
+    sale = load_sale_bundle(SALE_FIXTURE / "sale.bundle.json")
+    checked = json.loads((SALE_FIXTURE / "check-inputs" / "a-commit-again-1900.json").read_text())["record"]
+    at = _at(checked["timestamp"])
+    newest = max(_at(e["timestamp"]) for e in sale_history(sale, checked["capsule_id"])["history"])
+    by = timedelta(days=RULES_HISTORY_DAYS) - (at - newest) + margin
+    moved = _shifted(sale, checked["capsule_id"], by)
+    whole = sale_history(moved, checked["capsule_id"])
+    window = sale_history(moved, checked["capsule_id"], days=RULES_HISTORY_DAYS)
+    bound = at - timedelta(days=RULES_HISTORY_DAYS)
+    assert whole["history"]
+    assert window["history"] == [e for e in whole["history"] if _at(e["timestamp"]) >= bound]
+    assert any(_at(e["timestamp"]) == newest - by for e in window["history"]) is newest_kept
+    assert window["history_scope"] == whole["history_scope"]
 
 
 def test_a_sale_history_cut_to_a_window_leaves_older_acts_out_and_stays_complete():

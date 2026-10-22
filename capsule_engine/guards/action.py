@@ -161,6 +161,12 @@ class Action:
     twice, with different values; ``deal_id`` is then unset, and the engine
     never allows the action (``GuardDecision.deal_id_conflict``). Names
     only, never the values; it is never sealed in ``asg_payload``.
+    ``counterparty_malformed`` is ``True`` when the record seals a
+    counterparty block that is not a check's, whole
+    (``history_state.well_formed_counterparty``): a member of another kind or
+    shape, or another ``fp_alg``. ``counterparty_ids`` still holds the members
+    that could be read, as other checks read them; a check that must know the
+    buyer reads the block as unusable. It is never sealed in ``asg_payload``.
     ``states_act`` is ``False`` for a record that states no act of its own
     (a deal's baseline, verdict or approval; see ``report/replay.py``), read
     by ``dedupe``, which does not apply to it; it is never sealed.
@@ -216,6 +222,7 @@ class Action:
     reverses_ref: str | None = None
     deal_id: str | None = None
     deal_id_conflict: tuple[str, ...] = ()
+    counterparty_malformed: bool = False
     states_act: bool = True
     ignored_inputs: tuple[str, ...] = ()
 

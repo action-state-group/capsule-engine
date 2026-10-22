@@ -550,7 +550,8 @@ def sale_history(sale: SaleBundle, capsule_id: str, *, days: int | None = None) 
                 complete = False
                 continue
             if days is not None and at is not None and sealed < at - timedelta(days=days):
-                # Outside the live window: not in a live check's history.
+                # Outside the live window (history_state.RULES_HISTORY_DAYS): not
+                # in a live check's history.
                 continue
             if t != own and sealed == at:
                 # Another thread's act in the check's second: before or after it is not sealed.

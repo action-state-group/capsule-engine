@@ -52,7 +52,10 @@ reader a live check's history is read by (``report/sale_bundle.py``).
 the acceptance from the history (1.2.0) reads it cut to the live window
 (``RULES_HISTORY_DAYS``). A cited ``release_on_acceptance`` (1.0.0, 1.1.0)
 still reads the replay's own view, where no acceptance is sealed, so it
-releases nothing.
+releases nothing. Outside a sale replay (a dry-run report of a deal's own
+records, say) a 1.2.0 ``release_on_acceptance`` reads the replay's own view
+too: its records carry no ``thread_counterparty``, so every share that needs
+the acceptance refuses there, which fails closed.
 
 ``_bridge_transfer_funds`` is the other non-default action mapping, and it
 mirrors the pattern already established by ``tests/test_guard_dry_run.py``
@@ -82,7 +85,7 @@ from ..folds.duration import parse_duration_seconds
 from ..guards import ALLOW, ESCALATE, Action, GuardDecision, GuardEngine, LocalSigner
 from ..guards.action import disclosed_classes_of
 from ..guards.checks.caps import EXECUTED_DECISION, SPEND_UNREADABLE, counts_executed_acts
-from ..guards.history_state import RULES_HISTORY_DAYS
+from ..guards.history_state import RULES_HISTORY_DAYS, well_formed_counterparty
 from ..guards.statements import StatementRecord, claim_of, make_statement_record
 from ..guards.wickets.definition import WicketDefinition
 from ..packs.install import engine_ask_sets
@@ -500,6 +503,9 @@ def _bridge_deal_check(
         else:
             ignored.append(_COUNTERPARTY_INPUT)
     counterparty_ids, fp_alg = _sealed_counterparty(sealed_counterparty)
+    malformed = sealed_counterparty is not None and not (
+        isinstance(sealed_counterparty, dict)
+        and well_formed_counterparty(sealed_counterparty.get("fp_alg"), sealed_counterparty.get("ids")))
     target = _payee_target(counterparty_ids, fp_alg)
     if counterparty_profile is not None:
         profile_target = _profile_target(counterparty_profile)
@@ -540,6 +546,7 @@ def _bridge_deal_check(
         reverses_ref=reverses,
         deal_id=deal.value,
         deal_id_conflict=_DEAL_ID_FIELDS if deal.conflict else (),
+        counterparty_malformed=malformed,
         ignored_inputs=tuple(ignored),
     )
 

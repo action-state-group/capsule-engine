@@ -10,11 +10,11 @@
 # across a window, not checkable by a stranger from the receipt.
 rows:
 - action_id: tell/seller-fixture-condition-a
-  capsule_id: 3d9380278a9f6bbfbb0a24c25b2984901395cb83496c6f2c38275f58c8f74dd6
+  capsule_id: bf8bd82a998f30980ed02eeb5fc31df1fcd822b7f8df1808c74bc66ae388d40a
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -27,17 +27,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: tell/seller-fixture-condition-b
-  capsule_id: c6b15645bb181a991c37daf20cb772af240b66c9feeb2b7b9fa99eab59fd9c9f
+  capsule_id: c84b690f83af4640bf342405bc3ac1c6385a39176c94b791599e11aa6424ccb8
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -50,17 +50,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: offer/seller-fixture-counter-a
-  capsule_id: 04d45b426e2b395689e9b2510bcbaea90d3ff0cf0318164a0119d44be07ad54b
+  capsule_id: 73c19eb57cef59b107e784937cc72cdab7aa9adc3c7350677f2c0dfa387c3660
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -73,17 +73,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: offer/seller-fixture-below-floor-b
-  capsule_id: 7681278ed3ea9fb86f7ad3a03a06dd74d1998f26f27b30cd71d25474145af6d7
+  capsule_id: f07875822e86eb00e8f0d4df97e5446cd0191a1e13803faafe8064b9e406ac21
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -96,17 +96,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: offer/seller-fixture-no-condition-c
-  capsule_id: 0dd5ce71674a8cb0995b344a2457b96d4d6b9568f4ac2dda1ea7cd120f983d10
+  capsule_id: c50f53877286d0741229c11b6012a0c62023598dba94a08b73c5d3c89e006c72
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -119,17 +119,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: offer/seller-fixture-stale-a
-  capsule_id: 222bb0a6d2a90a3914cd42d03c965087a519c8f39cdc43ce7cad966d3e4713f3
+  capsule_id: 388c4d9e6c8837e86d0096c23c26719fe2251d31225063dabca1edc3fe2d4a64
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -142,17 +142,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: offer_bundle/seller-fixture-bundle-a
-  capsule_id: 2f3d1980df34e4e1c0dff1abfe74b0491eb8e7f888ce9d9244eab456a8c78105
+  capsule_id: 7b82a45d4ed31d0c9a2a80fc5cd77cd68ad246a57d1e7874d835e0c47d04f47a
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -165,17 +165,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: tell/seller-fixture-warranty-unapproved
-  capsule_id: b82ae4afc34a51ec25738879500ba8ee3bb64cf83e7e292b97be95d4e9732386
+  capsule_id: 6fc0f746dc9286b1af1564b7c62514782b072284580faae0f569158442bd2f74
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -188,17 +188,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: tell/seller-fixture-warranty-approved
-  capsule_id: 3cc4601a5df05e09375bac9a6b45bd55f20ce2da0286a706420904381108cc2b
+  capsule_id: 8e8db72727035d259e012e757c079645f46d2ef655e228c2839c82455285635c
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -211,17 +211,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: tell/seller-fixture-authenticity
-  capsule_id: bab9fe8934aa0358ee630f9ab2150eedffc9323b820958a44b2141efa22219ad
+  capsule_id: b5b0454493338a54416fe6a57bca296af797987056ba942c7d9d4e6e2feef3e4
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -234,17 +234,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: tell/seller-fixture-pickup-a
-  capsule_id: 01081babc77680a0b0e2adaf33356ce9ddba6b2ec9f2aa1ae34b83743966c1f3
+  capsule_id: 72ccd99e083742bfe4b4720aa98b16373ff165c2c68d028a06fd3441206e1273
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -257,17 +257,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: tell/seller-fixture-pickup-a-again
-  capsule_id: e0c87596b883537d5885b94011cf7ea9bc4d4f08e838eb8da3729f2d00eb36f4
+  capsule_id: ca3ac9452f34c11207af1e37378a408d3af9357e09ff71826698c556510a9bcc
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -280,17 +280,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: share_address/seller-fixture-a-before
-  capsule_id: a95868c93f851690eab7d09c187cb6e93b9e4413c0d5775f930c821297b463b5
+  capsule_id: 1ee56525ef4ce479d2ef28a4acc281a94e46d73223211f2b41d6f36fac4297f9
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -303,17 +303,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: share_address/seller-fixture-a-before-approved
-  capsule_id: c59a0e55cb93c7d036ab8f6d77d77892f723506ee4fb4a782fe03e0b317dcb0d
+  capsule_id: de2d92f3e3287d5db3b9d25f2d5df6cfb7d3d9df4149419bf166a8485db1f1d4
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -326,17 +326,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: share_personal/seller-fixture-pickup-a-before
-  capsule_id: f40418db6a6880e36d3e833f2418528bbce0d3b06840517a9e7518906210d8a2
+  capsule_id: f1e1b0c1e2d6fe3fd617b1de7a06f4d1e39afb697cedffd37dd28e42f55f1ebb
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -349,17 +349,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: share_personal/seller-fixture-other-a-before
-  capsule_id: b934e4d22b15c5696b2d0a12f9c98e1b6b183192b19cfb7bea37048a18e19300
+  capsule_id: f61903be6be0aec3defe03d6d9ad450a8c47063bae7ed5ab537bc3efba32fb5f
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -372,17 +372,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: share_address/seller-fixture-a-unknown-mandate
-  capsule_id: a794ca9ae982874396e04f5d7bd42b94b1a88d6c8ba0ff2fea84f37f0cf738dd
+  capsule_id: b2b42755e95c4bee1ba434ecd653c1a6b4580158f8518c6ff4a5a286d6411633
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -395,17 +395,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: read_listing_views/seller-fixture-1
-  capsule_id: 5d32aec44f22b83257db412e0be1bf5205ef85ce3b94478980b7bdca18769a7d
+  capsule_id: f19ca7a08043657ae120bd6d51436eea927f7af2c6a03dfe57c109b2b3a09e09
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -418,17 +418,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: share_contact/seller-fixture-pickup-area-a-before
-  capsule_id: 934275e563443d0dd8a32ef68971ba2f77f5d4eb474aeb8a62c3fb3bfa9dca06
+  capsule_id: 4cb232ff91591634e1555cbad9097da7dc8075c496edfabde33f599091227417
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -441,17 +441,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: share_contact/seller-fixture-pickup_location-a-before
-  capsule_id: a6e427c00a8e0814b6ac62ab0577839dc9b2b5ac3c964537fb7eeb6dbd644756
+  capsule_id: e368ac280420f6b516bdd10d93c78db13f17a560d2d6bc35e88d3b03afa5cca6
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -464,17 +464,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: share_contact/seller-fixture-phone-a-before
-  capsule_id: 43131e2ffb4a9848e090219301e71eef8abed9f984d2a4492852c9227988626f
+  capsule_id: 28b1254f0c4d3bd07c9612a33258ffe26e59c85357de6c830e6bf426c762e0a0
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -487,17 +487,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: share_contact/seller-fixture-email-a-before
-  capsule_id: 908b05a1d156c76ba6d5fe7ae529f90a0a757ba62f4439c2cb0f35eb888fbc40
+  capsule_id: af2764516bca2ac0fb73df8bc76a331bb69b6fe57ae59ac8e4d198064f6dcf45
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -510,17 +510,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: share_contact/seller-fixture-name-a-before
-  capsule_id: 4fb027124bd5802e305915a6ccd44e54fea51e91f784c3d8b41c834056ca77e9
+  capsule_id: a1b1084369f6219bd0c7aa5360dcd18bb3a7f58871aa96db68bd9317147aba72
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -533,17 +533,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: share_contact/seller-fixture-home_address-a-before
-  capsule_id: 5cb5b0aaeabc0bf1f914c6033731217f01b7dd17908f5b948d3ac5b108a73c4e
+  capsule_id: 1cd00847a06b66e625ea21cc14c4450fae7c82f61a13372940a80debbed236a9
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -556,17 +556,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: share_contact/seller-fixture-address-a-before
-  capsule_id: 5a9b6396a9cf9e6313a0199998053be11f3f0cb3efca69610c210ec169f6fb1f
+  capsule_id: a3d37d9459fa500e192e99f5e42a2e9ecdf2a643706463a614e8e2847d1a64a2
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -579,17 +579,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: share_contact/seller-fixture-pickup-area-and-phone-a-before
-  capsule_id: 7c61d7efef4d54b3d8e9a457d2a835b76cb139de970d2f0534d1fcb08157079d
+  capsule_id: 7fb7711a07edd464837a77ec19acfa2668c9c333d36e749316d75e2228a3d411
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -602,17 +602,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: accept/seller-fixture-accept-a
-  capsule_id: 9c4138559f251a14d5a99c88152e602a857c2deb2a1638235a2f0dc3d5d69a93
+  capsule_id: 499c2835e16b31c6f87b6483ed06945f362fce55449e2fb21788b103fc5dba25
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -625,17 +625,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: offer/seller-fixture-after-accept-b
-  capsule_id: a72b08d90b1c776e0d60d526e66a4b22290a1334a9ddd6547bc606bf0e36e536
+  capsule_id: daff3128924e6cc3798457fabae848d90e27fd2a70d7004782c3825f7db48907
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -648,17 +648,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: accept/seller-fixture-accept-b-item-2
-  capsule_id: 87c6ab5fcef865033a8cf9edef6d263c98c784d19a52321bc9d8eef6a7b9c871
+  capsule_id: 657b99f5fe68db9775ea07ae43163a847bd645baf2d2603b0c41cb95e45ee5d1
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -671,17 +671,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: share_address/seller-fixture-a-after
-  capsule_id: dc5ba20344cf561e219a56cfe96e18166eff25a6c625738fc2f5b37954c61af3
+  capsule_id: 3de6ef52385422307173ba4a4a8b1e0378023e5d0148dd11074dd502fd0c0e30
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -694,17 +694,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: share_personal/seller-fixture-pickup-a-after
-  capsule_id: a1af80183728d1f1464ca0184290cd660606961a4e2115bbff03618bf8294068
+  capsule_id: a58d782b4de5d496073f9801101240b65f7c97604adc30ad8060e86e4550d3aa
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -717,17 +717,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: share_personal/seller-fixture-other-a-after
-  capsule_id: 9bf06cd0a8df364a64e63dd7a05048f98053b6e9efeecc7a12e0dcf034dfdf5b
+  capsule_id: a3ce09ce4399a09d316bfce5652a12610724960b38172598f0b869dd787c6ece
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -740,17 +740,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: share_address/seller-fixture-c-after
-  capsule_id: 4ecfb22f1b7fd91253dd1695aec2f4a11cf3a92844373f9351ecdf7bc698f159
+  capsule_id: 5c33319727daa411ee0de4c2d36827327a5e44a1696e95771d8355e70690bcba
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -763,17 +763,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: share_address/seller-fixture-a-cites-b
-  capsule_id: 49b02f88f6fc74d55dc1073ceb3c972b9580447c2d2c0a0726d3e9e3395f084d
+  capsule_id: 5a972d3ddab72b24747225a95955e74584b6b1d3d77477003da9b4504098ad5b
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -786,17 +786,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: share_address/seller-fixture-c-no-class
-  capsule_id: c6d810dbca2b532832891ae731357471544153c7befdfa75ba60b083b8deac0f
+  capsule_id: fa6e9711faf085b1478605ed1e7b71dabec9573e0cf8ea9fa4f4f4d811421376
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -809,17 +809,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: share_address/seller-fixture-third-party
-  capsule_id: 7f6a65b5f2ebb8b0238d6254d997de74fef85de0c558a8d2e2d23b24912df587
+  capsule_id: db6d7d33dbc1c8677131f2347df08e2b0619331e5784884738edbfc05258bbd4
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -832,17 +832,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: sell/seller-fixture-sale-a
-  capsule_id: 0ef1409d0cb212c0f4590492aa5e00086273c1a9d8ffc1de501f5f519808dd10
+  capsule_id: fb1fe3e36744b55ca56cebb7d4b811a678ea0078c2b0952de73322e363e70419
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -855,17 +855,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: sell/seller-fixture-sale-a-cheque
-  capsule_id: d04b15bdc94597439888c9021d01c4699d4e8231a74956a4c944fee57cf09cab
+  capsule_id: 749bd46fe0e542580ee9892ceb4bf5627d456cfc474271ce9da6b061a88973ed
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -878,17 +878,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: share_personal/seller-fixture-platform-email
-  capsule_id: 4323bad6213a4485707c6cae068862336a36f0b4d13fe7305ae3ea98cfa726f6
+  capsule_id: 7cac0eaac96c80a2d06929eb867d5b83330da4b2d8aacd1e3ca6323ff9d0e206
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -901,17 +901,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: share_personal/seller-fixture-platform-phone
-  capsule_id: f156d34617f014514c1c87e9bb122a008f767538c42681212c4735f35d37d97c
+  capsule_id: 7701edbe6cfa6558689221b4b1dc0d0786ebec9807f21874579336ec4352f57a
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -924,17 +924,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: share_address/seller-fixture-platform-address
-  capsule_id: 57ae083eea7ea6c3a5ff10183db57c764ff501b098c43d1a2ed18a03e56d4fd5
+  capsule_id: cabc4c098a37f0b34056ae291efdba44c1b479f7f2f39b6bdef7dbcd833b502f
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -947,17 +947,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: share_personal/seller-fixture-platform-no-class
-  capsule_id: c56a81b9ecceefa61938142bdd302c2d019792538b3b83fead965729e8dfa463
+  capsule_id: d10c0f45d3878c43d03f1b8fa17718c71089751e8858a9931e1645e787bfb71f
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -970,17 +970,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: share_personal/seller-fixture-platform-email-and-phone
-  capsule_id: 7a8f2e1275cfd4aede65ef9adfa5d5f983b33b8f3a00592937f52a3b2dc407fd
+  capsule_id: 14ab9532a5ad03e8326414afe217d643e77f80b78929cd87fe28d4584a5c17ba
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -993,17 +993,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: share_personal/seller-fixture-platform-pickup-area
-  capsule_id: c34de23d1044171c13da432d1b5a0ea809cb06e9f5423b81374161c7438e1dc3
+  capsule_id: d972e490b283eb61286dbe37708c5851467de5c66e319d9087c2b287ccc0622d
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -1016,17 +1016,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: share_personal/seller-fixture-platform-pickup-location
-  capsule_id: 54ce7aa86e6450611d99f0d0f5bf156e35335813b643de7deb980448a352cf9a
+  capsule_id: fa8d9e37ddc064a51dd7a4b44248002ef6c1c24c7f7ab91a4985956bffe652b8
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -1039,17 +1039,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: share_personal/seller-fixture-platform-email-and-pickup-area
-  capsule_id: bfd7f4f037b40ebc43c6d711092a83bd23f13a3fc8bdefb05d648890000aafdd
+  capsule_id: 70e8c3fba46bbee68868940b60cf983cb7217733f29bfffb5804e2fb30a059d4
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -1062,17 +1062,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: share_contact/seller-fixture-pickup_location-a-after
-  capsule_id: 9c1f1921c6327cbd7f77704a36b4847335648f4f5121765b71d290d1bdc9ce39
+  capsule_id: c1438e13aeaa737893725f75bad876b55c3851e84424969d6bc38ff820bf0550
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -1085,17 +1085,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: share_contact/seller-fixture-phone-a-after
-  capsule_id: 4eeb406171d65be7b41ea0d070e9adafa7fa5dbd431b6334f8f74cff40d0eaeb
+  capsule_id: 514ed6615cafc7ce289b76bf5588ad988f06f3e4f483788558577cf487b8984d
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -1108,17 +1108,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: share_contact/seller-fixture-email-a-after
-  capsule_id: dfe409fb85d45ee492499a5803047c8ffa6ce52003b506fc23f1e3dadae4a9a3
+  capsule_id: 155f7d8b21db206ad2e801c8525eb5328b4538b9468fa6026b6c9e917e913525
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -1131,17 +1131,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: share_contact/seller-fixture-name-a-after
-  capsule_id: aabd363bdcc15f968582a4ac2c8477ca98342ce655a8873b067df5e4a42fd268
+  capsule_id: befefcb24f7a70ff52732976498fa8303bcdc29892cdb2f736585f43e84b8628
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -1154,17 +1154,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: share_contact/seller-fixture-home_address-a-after
-  capsule_id: 9ea020adea6ce40efe1b390b2b333498725668463e29fab610a3ddb6fce76606
+  capsule_id: 1d36c2826c5989b49eda11f392f1f28c08b0177b77f817c929b4b2d9bc3cb1a8
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -1177,17 +1177,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: share_contact/seller-fixture-address-a-after
-  capsule_id: 98451fc13c982f5a6013389136758fce225eeae8b9002ec84ebd03e608a6d155
+  capsule_id: a9fba538f83cc877e5a4433b05dc29d71f50d22a8cb8f6a476803958e47a47fb
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -1200,17 +1200,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: share_contact/seller-fixture-pickup_area-a-after
-  capsule_id: 86569d2dbd5ab2ba0616270b77f61a7a58764d008bdcd19c5ee37653ff627f69
+  capsule_id: c092c3c305a916e74fc89ab7d84ed192131655360f086d810ef83988961b5d6b
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -1223,17 +1223,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: share_contact/seller-fixture-phone-b-after
-  capsule_id: df74988aab3deb346fc58b9595f42037dc71352e3bae3625fe49b96813db2bfb
+  capsule_id: 80bf260a414b3d88978b12cf7a6a1dc2baefdca5cd4a05efdd7d365a69b20c16
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -1246,17 +1246,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: share_contact/seller-fixture-pickup-area-b-after
-  capsule_id: bd8e51d92ff65c7edcfe89d36617d268c487ed5c9b880e3dbf4dbf05db144215
+  capsule_id: 9df4988d0269c0c3d8b1226b9c2bacafc0e64e33e26f03ed1d5af93c7c064752
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -1269,17 +1269,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: share_contact/seller-fixture-phone-a-other-buyer
-  capsule_id: a5c57dff1e2f5a2e2e6e98ed6832d0ce64c118013013468575ccb16fe08fb9ba
+  capsule_id: 3bccad03697f66a996860a8231f70303e80f6ecfc822f7031f7a335cf8c20b46
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -1292,17 +1292,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: share_contact/seller-fixture-phone-a-other-name
-  capsule_id: 928aa6038e8d21fbc04277137feb233ec2a08a5dee239dfdeb1644cf163c6b9a
+  capsule_id: 20703e4d37c5e0e84425ef59b7b6a8668de9d9a01959b6fe0d22917123004832
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -1315,17 +1315,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: share_contact/seller-fixture-phone-a-no-deal
-  capsule_id: fc39be58489e74b77dd65038e85bca941934bcb59cdb79d6872bea1f625f89b5
+  capsule_id: 87163385b97e768254c54f8b856f372a43e850fdf53867989c95433f365c4aa1
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -1338,17 +1338,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: share_contact/seller-fixture-phone-a-two-deals
-  capsule_id: b1b1ed6f771b70c9d206f837f27c47434e7a8d8b2be86318db052a0a9a217d93
+  capsule_id: f9cc054c2658c56cedbbf2bd387cdd477a5bd099c0c697c74abd0f49b356191d
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -1361,17 +1361,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: share_contact/seller-fixture-phone-a-no-fingerprint
-  capsule_id: 5522d77642de4f38ef3595b94a7b9c26b9b27d9c98a13a6444a4bd0bb6bea00e
+  capsule_id: 5456556264cc17ea5c241f34aa13177a2b226ca52ff0c8a4c6ef8f6f9176ddb9
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -1384,17 +1384,17 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested
 - action_id: share_contact/seller-fixture-credential-a-after
-  capsule_id: 493c478de827c51dbf59777f71a84d4d7fc897db540ce853496a5917d527476c
+  capsule_id: 186c6f7ff876e9cc16e05042ff6d37decfc73da8b74908e0e7946d26e821ff94
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/seller/0.1.5
-    pack_digest: 95d829bb8b99bf2f602d5c5ab9d92af6072b4c73328d29c49ae6f08213e40000
+    pack_digest: fe09aa466eb8ca6778d445575e524772e11f591c4d2ec9bf8b19f6b132879dc0
     wickets:
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
       verify_before_dispatch/1.0.0: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
@@ -1407,8 +1407,8 @@ rows:
       seller.single_commitment/1.0.0: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
       seller.destination_rail/1.0.0: fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
-      seller.release_on_acceptance/1.2.0: a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f
+      seller.release_on_acceptance/1.2.0: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
   code_identity:
     kind: source_tree_sha256
-    value: 93d4db50ea476443ec40043f53caae90149fc8d0018a7020d9ec600f0beca2e7
+    value: 892ee5770dc0a05e5d1befc38776f1c573bb99735e2ccc85dfacc45a8f842bf6
     assurance: self-attested

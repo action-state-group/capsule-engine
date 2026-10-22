@@ -96,7 +96,7 @@ EXPECTED_DIGESTS = {
     # Not applicable to a disclosure to a platform; seller 0.1.4 cites it.
     "seller.release_on_acceptance/1.1.0": "933d72ab36863cb67ef2f0333b424fb4d559fa77bfeb1f5b63a61dee6307e28b",
     # Reads the classes of data and binds the acceptance from the history; seller 0.1.5 cites it.
-    "seller.release_on_acceptance/1.2.0": "a70ba5351cba6f76b6d3213d762962d717122017fc69abab142340311673681f",
+    "seller.release_on_acceptance/1.2.0": "854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832",
     # Replaces price_floor/2.0.0 and 1.0.0, retired at their digests
     # (RETIRED_DIGESTS below): the floor is opened from a commitment, never
     # read in clear, and a record committing to none puts the action out of scope.

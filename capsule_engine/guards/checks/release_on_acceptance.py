@@ -54,10 +54,18 @@ alone is no buyer. The ``payee`` is never compared. The acceptance is not
 cited and not re-verified: the history entries are the producer's own
 sealed records on the user's device, the trust ``single_commitment`` places
 in them. A history that may be missing acts, an act of this sale that could
-not be read, or an acceptance-class act with no disposition, leave the
-acceptance unknown, which is none here. No acceptance, an unknown one, and
+not be read, an acceptance-class act with no disposition, or an earlier
+accepted commitment in the history that names no item, leave the
+acceptance unknown, which is none here. The counterparty block must be a
+check's, whole (``history_state.well_formed_counterparty``) on both sides: a
+share whose block holds any member of another kind or shape fails naming
+``counterparty``, so a member dropped for its shape never reads as absent
+(and never opens the name-and-domain reading), and an acceptance whose
+block is not whole carries none, so it binds no share. No acceptance, an unknown one, and
 one in another deal or by another buyer fail with one reason, so a buyer
-cannot learn whether someone else accepted.
+cannot learn whether someone else accepted. A share naming no class, or a
+class outside ``release_classes`` (the credential, verification-code, card
+and ID classes), has its own reason: it says nothing about other buyers.
 
 Under either binding two inputs fail closed: an ``action_class`` that is
 missing or has no row in the action taxonomy (it is resolved there, so a
@@ -86,6 +94,7 @@ from cll.ledger.api import LedgerAPI
 from ..action import Action
 from ..capsule import ConstraintOutcome, NotApplicableEvidence, not_applicable_evidence
 from ..classes import resolve
+from ..history_state import well_formed_counterparty
 from .base import CheckOutcome
 from .single_commitment import ThreadCounterparty, first_sealed_acceptance, sale_acceptance
 
@@ -241,10 +250,11 @@ def _release_from_history(
     """The same-deal, same-buyer binding (1.2.0) for a disclosure in scope."""
     classes = action.disclosed_classes
     if classes is None:
-        return _outcome("fail", "the disclosure names no class of data this rule knows; it is not released",
+        return _outcome("fail", "the share names no class of data",
                         _classes_evidence(None, False, missing_field="disclosed_classes"), _HISTORY_METHOD)
     if any(c not in release_classes for c in classes):
-        return _outcome("fail", "the disclosure names a class of data this rule never releases",
+        return _outcome("fail", "a credential, a verification code, a payment card or an ID document is never shared "
+                        "with a buyer",
                         _classes_evidence(classes, False), _HISTORY_METHOD)
     if all(c in pre_acceptance_classes for c in classes):
         return _outcome("pass", "every class the disclosure names may go to a buyer before acceptance",
@@ -254,6 +264,13 @@ def _release_from_history(
         if not present:
             return _outcome("fail", f"the disclosure has {_missing_shape(action, field)}; it cannot be bound to an "
                             "acceptance", _classes_evidence(classes, False, missing_field=field), _HISTORY_METHOD)
+    if action.counterparty_malformed or not well_formed_counterparty(action.counterparty_fp_alg,
+                                                                      action.counterparty_ids):
+        # A member dropped for its shape must not read as absent: the whole
+        # block is unusable.
+        return _outcome("fail", "the counterparty input was not in its agreed shape; it cannot be bound to an "
+                        "acceptance", _classes_evidence(classes, False, missing_field="counterparty"),
+                        _HISTORY_METHOD)
     sale = sale_acceptance(action.operator, ledger, acceptance_classes, action.item_ref)
     acceptance = sale.acceptance if sale.unknown is None else None
     if (

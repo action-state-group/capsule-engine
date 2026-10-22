@@ -257,11 +257,11 @@ def history_act_payload(action: Action, *, sealed_disposition: bool) -> dict[str
     read: what a decision on ``action`` seals about the act (``act_payload``),
     its state (``disposition`` when its capsule seals one), and, beside them,
     the counterparty its check sealed as ``thread_counterparty`` when the
-    action carries one. That member is this ledger's own state: it is never in
+    action carries one, whole (``Action.counterparty_malformed``). That member is this ledger's own state: it is never in
     ``act_payload``, so no decision seals it (``guards/history_state.py``)."""
     payload: dict[str, object] = {**act_payload(action),
                                   LIVE_HISTORY: DISPOSITION if sealed_disposition else NO_DISPOSITION}
-    if action.counterparty_ids and action.counterparty_fp_alg:
+    if action.counterparty_ids and action.counterparty_fp_alg and not action.counterparty_malformed:
         payload[THREAD_COUNTERPARTY] = ThreadCounterparty(fp_alg=action.counterparty_fp_alg,
                                                           ids=dict(action.counterparty_ids))
     return payload
