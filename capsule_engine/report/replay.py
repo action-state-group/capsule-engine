@@ -429,6 +429,21 @@ def _attributed_to(value: object) -> str | None:
     return ATTRIBUTED_TO_USER if value == ATTRIBUTED_TO_USER else None
 
 
+# The commitment the bridge gives a represent check whose sealed
+# ``text_commitment`` is present but out of shape: not 64 lowercase hex, so
+# ``promise_never`` fails it, never reading it as absent.
+MALFORMED_TEXT_COMMITMENT = "malformed_text_commitment"
+
+
+def _text_commitment(representing: dict) -> str | None:
+    """A represent check's sealed ``text_commitment``: the digest when it is
+    64 lowercase hex, ``None`` when it is absent, and
+    ``MALFORMED_TEXT_COMMITMENT`` otherwise."""
+    if "text_commitment" not in representing:
+        return None
+    return _hex64(representing["text_commitment"]) or MALFORMED_TEXT_COMMITMENT
+
+
 def _hex64(value: object) -> str | None:
     return value if isinstance(value, str) and _HEX64.fullmatch(value) else None
 
@@ -626,8 +641,9 @@ def _bridge_deal_check(
     A represent check's ``representing`` gives the class of the statement
     (``representation_class``), whose claim it is (``attributed_to``, as
     ``statement_attributed_to``, its closed set only) and the commitment to its words
-    (``text_commitment``, 64 lowercase hex, as
-    ``representation_text_commitment``), so ``promise_requires_approval``
+    (``text_commitment``, as ``representation_text_commitment``: the digest
+    when it is 64 lowercase hex, ``MALFORMED_TEXT_COMMITMENT`` when it is out
+    of shape, ``None`` when absent), so ``promise_requires_approval``
     and ``promise_never`` decide it (capsule-engine#180).
     ``taxonomy_version`` makes it an act stated against a pinned taxonomy, so
     ``dedupe`` keys it on the act, never on this record's type or id. The
@@ -711,7 +727,7 @@ def _bridge_deal_check(
         listing_classes=listing_classes_of(body.get("listing_classes")),
         representation_class=stated_class,
         statement_attributed_to=_attributed_to(representing.get("attributed_to")),
-        representation_text_commitment=_hex64(representing.get("text_commitment")),
+        representation_text_commitment=_text_commitment(representing),
         channel=_text(body.get("channel")),
         first_contact_channel=_text(body.get("first_contact_channel")),
         upfront_amount_minor=_minor(body.get("upfront_amount_minor")),

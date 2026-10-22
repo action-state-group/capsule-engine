@@ -34,7 +34,10 @@ is then not applicable, in scope, naming ``representing_opening``, and
 fails closed (``CheckOutcome.fails_closed``: refused, verdict
 ``not_evaluable``): "the words for this attributed claim are not in the
 bundle". It is never recorded as a failure, which would say the agent broke
-the rule over a claim the user made. A live check given no words still
+the rule over a claim the user made. A replayed decision capsule, which seals the
+attribution but not the commitment to the words, is not evaluable the same
+way. A check whose commitment is out of shape fails, live and on replay; a
+live check sealing none fails. A live check given no words still
 fails. 1.0.0, which configures no ``attributed_never``, reads neither the
 attribution nor an opening, and decides and records as it always did.
 
@@ -190,9 +193,16 @@ def _decide_attributed(
                                 "only a change to the rule set", _attributed(base, action))
     passed = f"a {cls} statement said as the user's own claim, marked unverified, is not the agent's own"
     sealed = action.representation_text_commitment
+    if sealed is None and opening is WORDS_NOT_IN_BUNDLE:
+        # A replay of a decision capsule: the decision seals the attribution
+        # but never the commitment to the words (``guards/capsule.py``), so
+        # the replay lacks the evidence, as it lacks words it cannot find.
+        return _outcome("n/a", "the words for this attributed claim are not in the bundle",
+                        not_applicable_evidence(_CHECK_ID, in_scope=True, missing_field="representing_opening"),
+                        fails_closed=True)
     if not isinstance(sealed, str) or not _HEX64.fullmatch(sealed):
-        # A record with no commitment to its words is malformed, not short of
-        # words: nothing could ever open it.
+        # A check that seals no commitment to its words, live, or one sealed
+        # out of shape: nothing could ever open it.
         return _outcome("fail", "the check seals no commitment to the words of this attributed claim",
                         _attributed(base, action, opened=False))
     if opening is WORDS_NOT_IN_BUNDLE:

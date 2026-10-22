@@ -40,6 +40,7 @@ from capsule_engine.packs.install import engine_ask_sets
 from capsule_engine.packs.obligation_results import obligation_results
 from capsule_engine.report.replay import (
     MALFORMED_REPRESENTATION_CLASS,
+    MALFORMED_TEXT_COMMITMENT,
     action_for_check_input,
     action_for_record,
     load_representing_openings,
@@ -154,9 +155,18 @@ def test_an_attribution_outside_its_closed_set_is_the_agents_own(attributed_to):
     assert action_for_record(_capsule(record, 2), record).statement_attributed_to is None
 
 
-def test_a_commitment_out_of_shape_is_not_carried():
+@pytest.mark.parametrize("value", ["A" * 64, 17, None, "", ["a" * 64]])
+def test_a_commitment_out_of_shape_is_carried_as_malformed(value):
+    """Present but out of shape is never read as absent."""
     record = _represent(2, "authenticity", IN_TEMPLATE, attributed_to="user")
-    record["body"]["representing"]["text_commitment"] = "A" * 64
+    record["body"]["representing"]["text_commitment"] = value
+    action = action_for_record(_capsule(record, 2), record)
+    assert action.representation_text_commitment == MALFORMED_TEXT_COMMITMENT
+
+
+def test_an_absent_commitment_is_carried_as_none():
+    record = _represent(2, "authenticity", IN_TEMPLATE, attributed_to="user")
+    del record["body"]["representing"]["text_commitment"]
     assert action_for_record(_capsule(record, 2), record).representation_text_commitment is None
 
 
@@ -333,22 +343,55 @@ def test_a_line_break_or_a_non_ascii_sentence_end_breaks_the_template(text):
     assert _constraint(decision, "promise_never").evidence["fits_template"] is False
 
 
-@pytest.mark.parametrize("commitment", ["absent", "A" * 64, 17, None, ""])
-def test_an_attributed_check_sealing_no_commitment_fails_live_and_on_replay(commitment):
+NO_COMMITMENT = "the check seals no commitment to the words of this attributed claim"
+
+
+@pytest.mark.parametrize("commitment", ["A" * 64, 17, None, ""])
+def test_an_attributed_check_sealing_a_malformed_commitment_fails_live_and_on_replay(commitment):
     """A malformed record is not missing words: s10 fails, before the
     replay's not-in-bundle case."""
     record = _represent(2, "authenticity", IN_TEMPLATE, attributed_to="user")
-    if commitment == "absent":
-        del record["body"]["representing"]["text_commitment"]
-    else:
-        record["body"]["representing"]["text_commitment"] = commitment
+    record["body"]["representing"]["text_commitment"] = commitment
     live = _live(_entry(record, 2, IN_TEMPLATE))
     (replayed,) = _replayed(ORDERED, record)
     for decision in (live, replayed):
         s10 = _constraint(decision, "promise_never")
-        assert (s10.result, s10.reason) == ("fail", "the check seals no commitment to the words of this attributed "
-                                                    "claim")
+        assert (s10.result, s10.reason) == ("fail", NO_COMMITMENT)
         assert decision.outcome == DENY and decision.verdict == DENY
+
+
+def test_an_attributed_check_sealing_no_commitment_fails_live_and_is_not_evaluable_on_replay():
+    record = _represent(2, "authenticity", IN_TEMPLATE, attributed_to="user")
+    del record["body"]["representing"]["text_commitment"]
+    live = _live(_entry(record, 2, IN_TEMPLATE))
+    assert (_constraint(live, "promise_never").result, _constraint(live, "promise_never").reason) == (
+        "fail", NO_COMMITMENT)
+    (replayed,) = _replayed(ORDERED, record)
+    s10 = _constraint(replayed, "promise_never")
+    assert (s10.result, s10.reason) == ("n/a", "the words for this attributed claim are not in the bundle")
+    assert replayed.verdict == NOT_EVALUABLE
+
+
+def test_a_replayed_decision_capsule_of_a_passing_attributed_claim_is_not_evaluable_never_failed():
+    """Round trip: a signed decision capsule seals the attribution but never
+    the commitment to the words, so replaying it through
+    Action.from_capsule cannot confirm the claim, and never refuses it as a
+    broken rule."""
+    entry = _entry(_represent(2, "authenticity", IN_TEMPLATE, attributed_to="user"), 2, IN_TEMPLATE)
+    live = _live(entry)
+    assert live.outcome == ALLOW
+    capsule = live.capsule
+    assert capsule["asg_payload"]["statement_attributed_to"] == "user"
+    assert "representation_text_commitment" not in capsule["asg_payload"]
+    assert Action.from_capsule(capsule).representation_text_commitment is None
+    with tempfile.TemporaryDirectory() as tmp:
+        resolved = install_pack(PACK, project_dir=Path(tmp) / "project", mode="observe").resolved
+        (sourced,) = replay([capsule], caps_fold=resolved.caps_fold(), caps_minor=resolved.caps_minor(),
+                            manifest_digest=resolved.manifest_digest,
+                            wickets=resolved.configured_wickets(RUNNABLE_CHECKS), pack=PACK).decisions
+    s10 = _constraint(sourced.decision, "promise_never")
+    assert (s10.result, s10.reason) == ("n/a", "the words for this attributed claim are not in the bundle")
+    assert sourced.decision.verdict == NOT_EVALUABLE
 
 
 def test_the_engine_commits_as_capsulectl_does():
