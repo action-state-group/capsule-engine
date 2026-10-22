@@ -76,7 +76,8 @@
 # the share's own deal and by the same buyer, by the counterparty
 # fingerprint each check seals. The public pickup area goes to a buyer before
 # acceptance; a credential, a verification code, a payment card or an ID
-# document never goes to a buyer. personal_data.share now requires disclosed_classes and
+# document goes to no one but the platform (s01 decides that), the accepted
+# buyer included. personal_data.share now requires disclosed_classes and
 # takes deal_id, and no longer requires representation_class. No other rule
 # changes.
 pack_id: asg/seller/0.1.5
@@ -191,7 +192,7 @@ obligations:
       share before that acceptance, to another buyer, or in another thread.
       It refuses when the history cannot show the acceptance. It refuses a
       credential, a verification code, a payment card or an ID document to
-      any buyer, the accepted one included. It refuses a share that names no
+      anyone but the platform, the accepted buyer included. It refuses a share that names no
       class of data. A share to the platform is left to s01. It records the
       class names and whether the share was bound to an acceptance, never
       the data, the item or who the buyer is. The user's approval does not

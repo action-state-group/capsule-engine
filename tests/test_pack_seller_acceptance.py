@@ -500,7 +500,7 @@ RELEASE_REASONS = {
     NOT_ACCEPTED,
     "the history given shows this buyer accepted this sale in this deal",
     "every class the disclosure names may go to a buyer before acceptance",
-    "a credential, a verification code, a payment card or an ID document is never shared with a buyer",
+    "a credential, a verification code, a payment card or an ID document is never shared with anyone",
     "the share names no class of data",
     "the disclosure has no deal_id; it cannot be bound to an acceptance",
     "the disclosure has no counterparty; it cannot be bound to an acceptance",
@@ -655,7 +655,7 @@ def test_a_share_missing_its_deal_or_its_buyer_is_refused(run, name, field):
 def test_a_credential_never_goes_to_the_buyer_who_accepted(run):
     _refused_on_release_alone(run, "share-credential-to-a-after-acceptance")
     assert _release(run, "share-credential-to-a-after-acceptance").reason == (
-        "a credential, a verification code, a payment card or an ID document is never shared with a buyer")
+        "a credential, a verification code, a payment card or an ID document is never shared with anyone")
 
 
 def test_an_address_with_no_action_class_is_refused(run):

@@ -18,6 +18,10 @@ Three layers, each against the same rule:
   marketplace profile; the rc14-shaped tests keep the blocks as sealed;
 - the same check replayed (``replay`` with a ``sale_history``), which writes
   the history through ``history_ledger`` too, cut to the live window.
+- capsulectl's own shares, unedited (``fixtures/release-on-acceptance/``,
+  capsule-cli main after rc19): A's commit act and the shares with A and B,
+  decided live. Its sale bundle cannot be replayed yet (an expected failure:
+  the engine does not read a standalone thread report).
 
 1.0.0 and 1.1.0 (no ``binding``) decide as they always did; the last tests
 pin that they read none of this.
@@ -46,7 +50,7 @@ from capsule_engine.packs import install_pack, load_pack_dir
 from capsule_engine.packs.install import engine_ask_sets
 from capsule_engine.report.live_history import history_act_payload, history_ledger
 from capsule_engine.report.replay import SaleCheck, action_for_check_input, replay
-from capsule_engine.report.sale_bundle import load_sale_bundle, sale_history
+from capsule_engine.report.sale_bundle import load_sale_bundle, replay_sale, sale_history
 
 ROOT = Path(capsule_engine.__file__).parent
 DEFS = ROOT / "guards" / "wickets" / "catalog_defs"
@@ -62,7 +66,7 @@ ITEM = "c" * 64
 DEAL_A, DEAL_B = "deal-a", "deal-b"
 FP_ALG = "hmac-sha256-chain-key"
 NOT_ACCEPTED = "the history given shows no acceptance of this sale by this buyer in this deal"
-NEVER_SHARED = "a credential, a verification code, a payment card or an ID document is never shared with a buyer"
+NEVER_SHARED = "a credential, a verification code, a payment card or an ID document is never shared with anyone"
 MALFORMED = "the counterparty input was not in its agreed shape; it cannot be bound to an acceptance"
 
 
@@ -295,6 +299,35 @@ def test_a_share_with_a_member_dropped_for_its_shape_fails_naming_the_block(stor
     _history(store, _commit(ids=NAME_DOMAIN_A))
     outcome = _check(_share(counterparty_ids=NAME_DOMAIN_A, counterparty_malformed=True), store)
     assert (outcome.reason, outcome.evidence["missing_field"]) == (MALFORMED, "counterparty")
+
+
+def test_an_acceptance_the_bridge_marked_malformed_binds_no_share(store):
+    """The history side of the guard: an act whose check sealed a block the
+    bridge could not read whole is written with no thread_counterparty."""
+    act = dataclasses.replace(_commit(ids=NAME_DOMAIN_A), counterparty_malformed=True)
+    assert "thread_counterparty" not in history_act_payload(act, sealed_disposition=True)
+    _history(store, act)
+    _refused(_check(_share(counterparty_ids=NAME_DOMAIN_A), store))
+
+
+@pytest.mark.parametrize("cls", ["credential", "verification_code", "payment_card", "id_document"])
+@pytest.mark.parametrize("role", ["third_party", "self"])
+def test_the_rule_reaches_every_recipient_but_the_platform(store, cls, role):
+    """Only the platform is excepted: a never-shared class to a third party or
+    the user is refused here too, and a contact class needs the acceptance."""
+    _history(store, _commit())
+    outcome = _check(_share((cls,), recipient_role=role), store)
+    assert (outcome.result, outcome.reason) == ("fail", NEVER_SHARED)
+    assert _check(_share(("phone",), recipient_role=role, counterparty_ids=IDS_B), store).reason == NOT_ACCEPTED
+
+
+def test_a_third_party_share_is_refused_by_s13_through_the_pack(tmp_path):
+    """Through the seller pack's engine: s13 runs on a third party, not n/a."""
+    with LedgerStore(tmp_path / "ledger") as store:
+        engine = _engine(store, str(tmp_path))
+        decision = engine.check(_share(("credential",), recipient_role="third_party"), dry_run=True)
+    outcome = _s13(decision)
+    assert (outcome.result, outcome.reason, decision.outcome) == ("fail", NEVER_SHARED, "deny")
 
 
 def test_an_acceptance_whose_block_is_not_whole_binds_no_share(store):
@@ -544,6 +577,18 @@ def test_live_a_malformed_member_on_the_share_fails_closed_and_never_opens_the_n
         assert decision.outcome == "deny"
 
 
+def test_live_a_history_act_whose_check_sealed_profile_id_null_binds_no_share():
+    """The block beside A's commit act seals ``profile_id: null``: the act is
+    read without it, carries no thread_counterparty, and the rc14-shaped share
+    whose name and domain match is refused with the one reason, live and on
+    replay."""
+    sealed = _check_input(_BASE["a"])["record"]["agent_input"]["body"]["counterparty"]["ids"]
+    envelope = share_input("a", ("phone",), profile=False, act_ids={**sealed, "profile_id": None})
+    for decision in (live(envelope), replayed(envelope)):
+        _refused(_s13(decision))
+        assert decision.outcome == "deny"
+
+
 def test_live_a_share_in_another_algorithm_fails_closed():
     envelope = share_input("a", ("phone",), profile=False)
     body = envelope["record"]["agent_input"]["body"]
@@ -662,3 +707,81 @@ def test_a_sale_history_cut_to_a_window_leaves_older_acts_out_and_stays_complete
     assert [e for e in whole["history"] if e["timestamp"] >= at] == none["history"]
     assert len(none["history"]) < len(whole["history"])
     assert none["history_scope"] == whole["history_scope"]
+
+
+# -- capsulectl's own shares after a seller's acceptance --------------------------------
+
+PRODUCED = Path(__file__).parent / "fixtures" / "release-on-acceptance"
+PRODUCED_SHA256 = {
+    "sale.bundle.json": "62138839fbd2c76285e8a80a714383621ebea7627d12adf59acb573a36e9dc10",
+    "check-inputs/a-commit-1900.json": "f04d5cd9a1101e61f1510b345e008cdfe1c2f63e46023ba383eac94a16d15f39",
+    "check-inputs/a-share-phone.json": "38df4e2be992c62b3a26aad81170983c20fc8a60968f574068f0f07584bc3c22",
+    "check-inputs/a-share-pickup-area.json": "7df78e5bdbe5ecec58784c6d2b9ae1f19cbe8b5106e84be4ced75910a5a6cdf9",
+    "check-inputs/b-share-phone.json": "a5c9c527b31be17876ab8b8a1ed35c4846d5f6c57e57a5f79096932f9a6c6e98",
+    "check-inputs/b-share-pickup-area.json": "26cb338177e3e7384e922124a6be222d0430525d6bcc2e9cf8a7c70a47e4f3cc",
+}
+PRODUCED_BY = {"commit": "6210b9345fd9ecc6d6ed3590cba78fc813770292", "name": "capsulectl",
+               "version": "v0.1.0-rc19-6-g6210b93"}
+
+
+# Reads the vendored fixture: the test's decoding boundary.
+def _produced(name: str) -> dict:
+    return json.loads((PRODUCED / "check-inputs" / f"{name}.json").read_text(encoding="utf-8"))
+
+
+def test_the_produced_fixture_is_the_bytes_capsulectl_wrote():
+    for name, digest in PRODUCED_SHA256.items():
+        assert hashlib.sha256((PRODUCED / name).read_bytes()).hexdigest() == digest, name
+    for name in PRODUCED_SHA256:
+        if name.startswith("check-inputs/"):
+            envelope = _produced(Path(name).stem)
+            assert {e["agent_input"]["producer"]["commit"] for e in (envelope["record"], *envelope["history"])} == {
+                PRODUCED_BY["commit"]}
+
+
+def test_capsulectl_seals_the_commit_act_with_a_disposition_and_its_buyers_block():
+    (commit,) = [e for e in _produced("a-share-phone")["history"]
+                 if e["agent_input"]["body"]["action_class"] == "agreement.accept"]
+    assert commit["disposition"]["decision"] == "accept"
+    assert commit["counterparty"]["fp_alg"] == "hmac-sha256-chain-key"
+    assert set(commit["counterparty"]["ids"]) == {"name", "payee", "profile_id"}
+
+
+@pytest.mark.parametrize(("name", "result", "outcome"), [
+    ("a-share-phone", "pass", "allow"),
+    ("a-share-pickup-area", "pass", "allow"),
+    ("b-share-phone", "fail", "deny"),
+    ("b-share-pickup-area", "pass", "allow"),
+])
+def test_live_capsulectls_own_shares_decide_by_the_acceptance_in_their_history(name, result, outcome):
+    """No edit: the share checks and the commit act are what capsulectl wrote."""
+    decision = live(_produced(name))
+    s13 = _s13(decision)
+    assert (s13.result, decision.outcome) == (result, outcome), s13.reason
+    if name == "a-share-phone":
+        assert s13.evidence["bound_to_acceptance"] is True
+    if name == "b-share-phone":
+        _refused(s13)
+
+
+@pytest.mark.xfail(strict=True, reason=(
+    "capsulectl seals a thread copy's report off its log (x-deal-report/v0, capsule-cli#299); the "
+    "engine's sale reader reads only an in-log report, so it finds the threads not under the sale"))
+def test_replay_of_capsulectls_sale_bundle_decides_the_shares_as_live():
+    sale = load_sale_bundle(PRODUCED / "sale.bundle.json")
+    assert sale.complete, sale.findings
+    with tempfile.TemporaryDirectory() as tmp:
+        installed = install_pack(PACK, project_dir=Path(tmp) / "project", mode="observe")
+        resolved = installed.resolved
+        result = replay_sale(sale, caps_fold=resolved.caps_fold(), caps_minor=resolved.caps_minor(),
+                             manifest_digest=resolved.manifest_digest,
+                             wickets=resolved.configured_wickets(RUNNABLE_CHECKS), pack=installed.pack)
+    by_id = {d.record["capsule_id"]: d.decision for d in result.decisions}
+    for name in ("a-share-phone", "a-share-pickup-area", "b-share-phone", "b-share-pickup-area"):
+        assert _s13(by_id[_produced(name)["record"]["capsule_id"]]).result == _s13(live(_produced(name))).result
+
+
+def test_capsulectls_sale_bundle_reads_incomplete_for_its_standalone_reports():
+    """Pins the gap the expected failure above names, so a reader fix shows."""
+    sale = load_sale_bundle(PRODUCED / "sale.bundle.json")
+    assert not sale.complete and "thread_is_not_under_this_sale" in sale.findings

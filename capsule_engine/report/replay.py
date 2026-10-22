@@ -55,7 +55,11 @@ still reads the replay's own view, where no acceptance is sealed, so it
 releases nothing. Outside a sale replay (a dry-run report of a deal's own
 records, say) a 1.2.0 ``release_on_acceptance`` reads the replay's own view
 too: its records carry no ``thread_counterparty``, so every share that needs
-the acceptance refuses there, which fails closed.
+the acceptance refuses there, which fails closed. A sale replay is as close
+to live as a bundle of one sale can get, not exact: a live history is
+profile-wide and capped at 1,000 acts, and past the cap it reads
+incomplete, so the acceptance is unknown. A share refused live for a
+truncated history may therefore pass on replay of a complete bundle.
 
 ``_bridge_transfer_funds`` is the other non-default action mapping, and it
 mirrors the pattern already established by ``tests/test_guard_dry_run.py``
@@ -85,7 +89,7 @@ from ..folds.duration import parse_duration_seconds
 from ..guards import ALLOW, ESCALATE, Action, GuardDecision, GuardEngine, LocalSigner
 from ..guards.action import disclosed_classes_of
 from ..guards.checks.caps import EXECUTED_DECISION, SPEND_UNREADABLE, counts_executed_acts
-from ..guards.history_state import RULES_HISTORY_DAYS, well_formed_counterparty
+from ..guards.history_state import CHECK_FP_ALGS, RULES_HISTORY_DAYS, well_formed_counterparty
 from ..guards.statements import StatementRecord, claim_of, make_statement_record
 from ..guards.wickets.definition import WicketDefinition
 from ..packs.install import engine_ask_sets
@@ -327,7 +331,6 @@ _PROPOSAL_INPUT = "proposal_at"
 # counterparty block the act's check sealed, exactly as sealed, and the
 # fp_algs a check seals it under (an x-deal-v0 check's, a typed check's).
 _COUNTERPARTY_INPUT = "counterparty"
-_CHECK_FP_ALGS = frozenset({"hmac-sha256-deal-key", "hmac-sha256-chain-key"})
 # The deal's earlier claims the user's agent made, on the checked record entry
 # beside its capsule (AMENDMENT 9): each the sealed claim record's own values.
 _CLAIMS_INPUT = "deal_claims"
@@ -348,8 +351,15 @@ def _profile_target(block: object) -> str | None:
 def _check_counterparty(block: object) -> bool:
     """Whether ``block`` is a check's counterparty block in its agreed shape,
     ``{fp_alg: <a check's fp_alg>, ids: {<kind>: <64 lowercase hex>}}``, so
-    ``_sealed_counterparty`` may read it as the check's own."""
-    if not isinstance(block, dict) or block.get("fp_alg") not in _CHECK_FP_ALGS:
+    ``_sealed_counterparty`` may read it as the check's own.
+
+    Looser than ``history_state.well_formed_counterparty`` on purpose: it
+    decides only whether the act gets its check's target, as it has since
+    the act counterparty was added, so it does not check the kinds or refuse
+    an empty block, and tightening it would move other checks' decisions.
+    ``release_on_acceptance`` 1.2.0 reads the strict rule through
+    ``Action.counterparty_malformed``."""
+    if not isinstance(block, dict) or block.get("fp_alg") not in CHECK_FP_ALGS:
         return False
     ids = block.get("ids")
     return isinstance(ids, dict) and all(isinstance(v, str) and _HEX64.fullmatch(v) for v in ids.values())

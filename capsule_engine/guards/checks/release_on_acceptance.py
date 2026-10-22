@@ -66,6 +66,9 @@ one in another deal or by another buyer fail with one reason, so a buyer
 cannot learn whether someone else accepted. A share naming no class, or a
 class outside ``release_classes`` (the credential, verification-code, card
 and ID classes), has its own reason: it says nothing about other buyers.
+The rule applies to every recipient but ``except_recipient_roles`` (a
+buyer, a third party, the user), so those classes go to no one but the
+platform.
 
 Under either binding two inputs fail closed: an ``action_class`` that is
 missing or has no row in the action taxonomy (it is resolved there, so a
@@ -254,7 +257,7 @@ def _release_from_history(
                         _classes_evidence(None, False, missing_field="disclosed_classes"), _HISTORY_METHOD)
     if any(c not in release_classes for c in classes):
         return _outcome("fail", "a credential, a verification code, a payment card or an ID document is never shared "
-                        "with a buyer",
+                        "with anyone",
                         _classes_evidence(classes, False), _HISTORY_METHOD)
     if all(c in pre_acceptance_classes for c in classes):
         return _outcome("pass", "every class the disclosure names may go to a buyer before acceptance",

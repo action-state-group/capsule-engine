@@ -527,7 +527,7 @@ def sale_history(sale: SaleBundle, capsule_id: str, *, days: int | None = None) 
     ``record``, its ``history`` and ``history_scope.complete``. ``None`` when
     no carried thread holds that record. With ``days``, an act sealed more
     than that many days before the check is left out, as capsulectl leaves it
-    out of a live check's history (``live_history.RULES_HISTORY_DAYS``); the
+    out of a live check's history (``history_state.RULES_HISTORY_DAYS``); the
     history is still complete when nothing in the window is missing."""
     found = next(((t, i) for t, thread in enumerate(sale.threads)
                   for i, r in enumerate(thread.records) if r.get("capsule_id") == capsule_id), None)
