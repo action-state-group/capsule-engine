@@ -1,13 +1,12 @@
 # Design note: the Go guard moves into this repo as a `go/` module
 
-Status: v3, for review, 2026-10-22. Ethan's agent (session engine-go-210). Reviewers: Codex, a
+Status: v3, for review, 2026-10-22. Ethan's agent. Reviewers: Codex, a
 `claude -p --permission-mode plan` stand-in for Kimi (Kimi is out of quota), and Sherlock2 (this
 note moves code ownership between ASG repositories).
 
 Issue: capsule-engine#210. How ack: capsule-engine#210 issuecomment-6352734012.
 
-Code read: capsule-engine a489e49, actionstate-muse 8c9acf3 and 783fb94, company-internal-all
-63489eb.
+Code read: capsule-engine a489e49, actionstate-muse 8c9acf3 and 783fb94.
 
 **v2.** This version takes round 1 from Codex, the `claude -p` stand-in and Sherlock2
 (buzz://message?channel=0d760ea3-529d-4dec-b309-24184967f8e0&id=0480f78e31a7e43bde7b6331cd6ceccac5462256fabb510b3433c278eb27a9b9).
@@ -41,6 +40,8 @@ What changed:
 - **Switch-over (§9).** §9 adds the `Join`-built readers and makes the full test run the check.
 - **Sets kept back (§12).** A set held back by §12 is resolved one by one before the
   switch-over, instead of falling back unconditionally.
+- **Public text (§1, §11, §12).** The note itself drops internal document paths, section ids,
+  tool paths and the session name, which Sherlock2 flagged in round 2.
 - **vocabgate (§3, §9).** vocabgate walks the pinned module's `packs.All`, never a copy (Codex
   round 3, `claude -p` round 4).
 
@@ -74,11 +75,8 @@ This note does not:
 
 ## 1. Boundary: what moves and what stays
 
-**The ruling.** The licensing doc (company-internal-all
-`business-model/licensing-and-packaging-2026-08-12.md`) records Steven's ruling of 2026-08-22,
-Amendment F.1.2: capsule-engine holds the "guard and closed checks", under Apache-2.0, whole.
-"Closed checks" means closed-form checks, not closed source. J.2 puts pack policy modules beside
-their packs here, and J.6/J.7 list the guard among this repo's contents.
+**The ruling.** Steven ruled on 2026-08-22 that the guard and its checks are published here
+under Apache-2.0, whole, with the pack policy modules beside the packs they check.
 
 **The test.** Muse's README says a second platform should need only a second plugin and a
 second normalizer. So whatever a second platform's plugin would need unchanged is generic, and it
@@ -459,7 +457,7 @@ product rule) and a review-record comment.
 ## 11. One-way doors
 
 - **Publication.** The generic guard code and its moved vectors become public Apache-2.0 here.
-  Steven ruled this on 2026-08-22 (licensing doc, Amendment F.1.2), and the move needs no new ask.
+  Steven ruled this on 2026-08-22 (§1), and the move needs no new ask.
   Ethan confirmed on 2026-10-22 that no separate flag is needed. What goes public is bounded by
   §12.
 - **Module path and tags.** The module path `github.com/action-state-group/capsule-engine/go` and
@@ -468,9 +466,9 @@ product rule) and a review-record comment.
 
 ## 12. Public readiness of the moved testdata
 
-Muse is private and this repo is public. The `real-*` sets were made by real capsulectl runs, and
-their sidecars name internal workspace paths (`/Users/.../dev/asg/_work/...`,
-`_work/priv-v0010-acceptance/...`), internal handoff files and internal ruling names. PR A
+This repo is public and the source repo is not. The `real-*` sets were made by real capsulectl
+runs, and some of their sidecars name internal workspace paths, handoff files and ruling names.
+PR A
 therefore gates each moved set, and lists the result set by set in the PR:
 
 1. **No real personal or account data.** The deal data is synthetic or from a throwaway profile:
@@ -481,8 +479,8 @@ therefore gates each moved set, and lists the result set by set in the PR:
 2. **Sidecars, READMEs and generators rewritten** to drop internal paths, lane and agent names,
    handoff file names and ruling ids. Commits and hashes stay. These files are listed apart from
    the byte-identical fixtures.
-3. **`action-state-ops/_ops/security_sweep.py`** with the terms list, run over `go/` and
-   `conformance-vectors/`, plus the repo's `neutrality` job.
+3. **The ASG security sweep** with the reserved-terms list, run over `go/`,
+   `conformance-vectors/` and `docs/design/`, plus the repo's `neutrality` job.
 
 A sealed fixture byte (one a decision reads, such as a capsule's `developer` member) cannot be
 rewritten without changing digests and expected decisions. A set that fails 1 or 3 inside sealed
