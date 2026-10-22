@@ -110,8 +110,7 @@
 # classes the user ordered where capsulectl's task authority seals them,
 # body.ordered_representations; 1.0.0 read a member no producer seals. A
 # promise with no task authority to cover it (an x-deal-v0 deal has none)
-# asks, saying "no task authority order or approval of yours covers this
-# promise". s10 (promise_never/1.1.0) still refuses the agent's own
+# asks, saying "no order or approval of yours covers this promise". s10 (promise_never/1.1.0) still refuses the agent's own
 # authenticity claim, and passes the user's own, said as theirs and marked
 # unverified: a statement attributed to the user (representing.attributed_to,
 # statement_attributed_to here) whose words, given beside the check, open
@@ -293,7 +292,7 @@ constraints:
     digest: c39f858b52a9697a70450680d90d0bbd0cb4e4eb79925d18e67623d587404977
   # The classes the user ordered, where capsulectl's task authority seals them.
   - wicket_ref: promise_requires_approval/1.1.0
-    digest: 66d1e62d9c809e8a8a133b0e4c9bf23d334ed99d2f285493a6b6e3c40726d5d5
+    digest: 52514fb625b208f2f04d900d115468b526c01ec34c5630fe3ae68ed86eefe386
   # The user's own authenticity claim, attributed and marked unverified, passes.
   - wicket_ref: promise_never/1.1.0
     digest: ed9e02ed17cbd08a0f846023e7091e7636d504ba1f18c6b9173e0a2443d92b8b

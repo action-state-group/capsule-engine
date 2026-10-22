@@ -87,7 +87,7 @@ EXPECTED_DIGESTS = {
     "promise_requires_approval/1.0.0": "b29e29e0a31ef764b282fa5754992b49b5ffc4f3fc261fb821987ae6c2e1c9b2",
     "promise_never/1.0.0": "836ae58f704a9c8ab8027fee344ca47ddb3de76a7a1973a650f42a3595e649f4",
     # Reads the ordered classes at a configured path (body.ordered_representations); seller 0.1.5 cites it.
-    "promise_requires_approval/1.1.0": "66d1e62d9c809e8a8a133b0e4c9bf23d334ed99d2f285493a6b6e3c40726d5d5",
+    "promise_requires_approval/1.1.0": "52514fb625b208f2f04d900d115468b526c01ec34c5630fe3ae68ed86eefe386",
     # Passes the user's own authenticity claim, attributed and marked unverified; seller 0.1.5 cites it.
     "promise_never/1.1.0": "ed9e02ed17cbd08a0f846023e7091e7636d504ba1f18c6b9173e0a2443d92b8b",
     # Replaces offer_expiry/1.0.0, retired at its digest (RETIRED_DIGESTS below).

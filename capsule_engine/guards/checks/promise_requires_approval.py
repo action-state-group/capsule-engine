@@ -30,8 +30,9 @@ Anything less fails: no reference, no record, a record the reference does
 not bind, a record with no digest, or an approval for another class. Never
 ``n/a``: an unreadable approval is no approval. Under 1.1.0 a failure on an
 action that cites no task authority (an x-deal-v0 deal has none) reads
-"no task authority order or approval of yours covers this promise". 1.0.0
-keeps its reasons. A class no approval may
+"no order or approval of yours covers this promise"; 1.0.0 keeps its
+own reasons for that failure. Both name a class after its article ("an
+authenticity statement"). A class no approval may
 clear belongs to ``promise_never``, not here.
 
 A class outside the closed set fails closed. Applies only to the configured
@@ -47,6 +48,7 @@ from agent_action_capsule.canonical import FloatInDigestError, UnsafeIntegerErro
 from ..action import Action
 from ..capsule import ConstraintOutcome, NotApplicableEvidence, not_applicable_evidence
 from .base import CheckOutcome
+from .promise_never import with_article
 from .required_disclosure import require_known_classes
 from .task_authority import TaskAuthorityRecord, UnboundRecord, bind_task_authority_record
 
@@ -190,11 +192,11 @@ def check_promise_requires_approval(
     if not recognised:
         return _outcome("fail", f"representation_class {cls!r} is not in {representation_classes}", evidence(None))
     if not needs:
-        return _outcome("pass", f"a {cls} statement needs no approval", evidence(None))
+        return _outcome("pass", f"{with_article(cls)} statement needs no approval", evidence(None))
     path = AUTHORIZED_PATH if authorized_path is None else tuple(authorized_path)
     known = representation_classes if authorized_path is not None else None
     if _authority_allows(action, task_authority_record, cls, path, known):
-        return _outcome("pass", f"the task authority allows a {cls} statement", evidence("task_authority_ref"))
+        return _outcome("pass", f"the task authority allows {with_article(cls)} statement", evidence("task_authority_ref"))
     try:
         approved = _approved_class(action, authorization_record)
     except _Unapproved as exc:
@@ -204,9 +206,9 @@ def check_promise_requires_approval(
             return _outcome("pass", f"the {cls} statement cites a bound approval for {cls}",
                             evidence("authorized_by"))
         why = f"the approval is for {approved}, not {cls}"
-    reason = f"a {cls} statement is outside the task authority and needs a bound approval: {why}"
+    reason = f"{with_article(cls)} statement is outside the task authority and needs a bound approval: {why}"
     if authorized_path is not None and action.task_authority_ref is None:
         # What the user's card says (design note capsule-engine#194 §2): the
         # evidence still records the class and what was cited.
-        reason = "no task authority order or approval of yours covers this promise"
+        reason = "no order or approval of yours covers this promise"
     return _outcome("fail", reason, evidence(None))
