@@ -48,9 +48,9 @@ SIGNER = LocalSigner(key_id="operator-limits-test-key", secret=b"operator-limits
 OTHER_KEY = LocalSigner(key_id="operator-limits-test-key", secret=b"not-this-node-secret")
 OPERATOR = "household-limits-fixture"
 
-# The everyday pack (0.3.7) and its caps wicket as released: an operator
+# The everyday pack (0.3.8) and its caps wicket as released: an operator
 # limit must not move either.
-EVERYDAY_PACK_DIGEST = "c1cea374102bba60de82e16663c550a278ee07a399c5faeb285fe1ea1ea27d4d"
+EVERYDAY_PACK_DIGEST = "365c61bc0406b76b63b31226565aee70affe4dfccd4a7939f86b30c465d434e5"
 CAPS_V5_WICKET_DIGEST = "7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8"
 CAPS_V5_FILE_SHA256 = "0588eebe725ae317e89234def7adce0010441e476a1031325a396964cb8bb7fe"
 

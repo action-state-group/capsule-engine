@@ -54,6 +54,9 @@ EXPECTED_DIGESTS = {
     "action_class_gate/1.0.0": "fcc352838832e13f5e87662f0194ec4a7065bc989bbe624b43ac5d9d1b638ae2",
     # personal_disclosure leaves out a disclosure to a platform; everyday 0.3.7 cites it.
     "action_class_gate/1.1.0": "817a3d537b024689e7fcc20d37e5253f77075274c5b7d863dcc25eac39bc8f2b",
+    # personal_disclosure split into a new class and a new party, each excepting a
+    # repeat the producer's telling memory reports (#188); everyday 0.3.8 cites it.
+    "action_class_gate/1.2.0": "39a7c5b94173a4c8496b338028b8680ba20ac65543802c67e419577acce097bf",
     # An empty deny list; the user's list rides in a policy profile. No pack cites it yet.
     "counterparty_list/1.0.0": "d95162931a6c1f88c763f2fd221d63b238888c1bdd7c6d594123ee5671e18f65",
     # The everyday pack 0.3.1 checks that each read one number, one member of
@@ -126,6 +129,7 @@ WITHOUT_SEMANTICS = frozenset(EXPECTED_DIGESTS) - {
     "seller.release_on_acceptance/1.1.0",
     "seller.recipient_role/1.2.0",
     "seller.release_on_acceptance/1.2.0",
+    "action_class_gate/1.2.0",
 }
 
 
