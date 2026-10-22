@@ -28,7 +28,7 @@ from capsule_engine.packs import (
 
 PACK_DIR = Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog" / "everyday"
 PACK = load_pack_dir(PACK_DIR)
-PACK_DIGEST = "365c61bc0406b76b63b31226565aee70affe4dfccd4a7939f86b30c465d434e5"
+PACK_DIGEST = "ac7697061fd1c50177000648e2458f6236068679fc67ae924870ee8fb1cd8488"
 
 SELECTOR = {
     "r01-research-and-prepare": "non_consequential",

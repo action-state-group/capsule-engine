@@ -147,9 +147,9 @@ def _excepted(sel: Selector, action: Action) -> str | None:
     if action.recipient_role in sel.get(_EXCEPT_ROLES, ()):
         return "role"
     if sel.get(_EXCEPT_REPEAT) and _all_repeated(action):
-        return "every class disclosed was told to this recipient before"
+        return "every class it discloses was told to this recipient before"
     if sel.get(_EXCEPT_TOLD) and action.recipient_told_before is True:
-        return "this recipient was told before"
+        return "this recipient was told something before"
     return None
 
 

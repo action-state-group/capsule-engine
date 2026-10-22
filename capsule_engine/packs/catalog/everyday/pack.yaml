@@ -42,10 +42,10 @@
 #
 # 0.3.8 no longer flags a repeat of what the user already told the same party
 # (#188). Rules 11 and 12 (action_class_gate/1.2.0) each read one input the
-# producer reports from its telling memory, never sealed again on the
-# decision: rule 11 does not flag a disclosure whose every class was told to
-# this recipient before (repeat_disclosures), and rule 12 does not flag one
-# to a recipient told any class before, in this deal or another
+# producer reports from its record of what it told whom, not sealed again
+# with the verdict: rule 11 does not flag a disclosure whose every class was
+# told to this recipient before (repeat_disclosures), and rule 12 does not
+# flag one to a recipient told any class before, in this deal or another
 # (recipient_told_before). With either input missing or malformed, its rule
 # flags as in 0.3.7. The pack binds one gate version, so rules 1, 4 and 15-18
 # cite 1.2.0 too, with the same selectors and outcomes.
@@ -150,13 +150,13 @@ obligations:
     statement: >-
       Flags an action declared as disclosing personal data
       (disclosure.personal) unless every class of data it names is one the
-      producer reports as already told to this same recipient, or it goes to
-      a platform, which rule 3 decides, and records the class. It reads the
-      class, that role, the classes disclosed and the classes reported as
-      told before, so it flags a class new to this recipient whatever it
-      contains; telling a home address sent to an individual apart from one
-      sent to a fulfilling merchant is not measured yet. With no report of
-      what was told before, it flags.
+      producer reports as already told to this same recipient, or unless it
+      goes to a platform, which rule 3 decides. It records the class. It
+      reads the class, the recipient's role, the classes disclosed and the
+      classes reported as told before, so it flags a class new to this
+      recipient whatever it contains. It does not yet tell a home address
+      sent to an individual from one sent to a merchant fulfilling an order.
+      With no report of what was told before, it flags.
     check: action_class_gate
     selector: personal_disclosure_new_class
     default_disposition: ASK
@@ -165,11 +165,11 @@ obligations:
       Flags an action declared as disclosing personal data
       (disclosure.personal) to a recipient the producer does not report as
       told any class of data before, in this deal or another, unless it goes
-      to a platform, which rule 3 decides, and records the class. It reads
-      the class, that role and that report only; a party the user dealt with
-      but never told anything is new. Whether the disclosure carries a
-      personal phone number or email is not measured yet. With no report, it
-      flags.
+      to a platform, which rule 3 decides. It records the class. It reads the
+      class, the recipient's role and that report only; a party the user
+      dealt with but never told anything is new. A recipient told anything
+      before is not flagged again here, even for a new phone number or
+      email; rule 11 flags the new class. With no report, it flags.
     check: action_class_gate
     selector: personal_disclosure_new_party
     default_disposition: ASK

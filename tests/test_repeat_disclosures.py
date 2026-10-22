@@ -93,7 +93,7 @@ def test_gate_1_2_leaves_a_platform_to_recipient_role_with_1_1_s_reason():
 def test_gate_1_2_says_why_a_repeat_is_left_out_without_naming_a_value():
     out = _gate(GATE_1_2, _share(("email",), ("email",), True))
     assert out.reason == ("the selectors naming action class 'disclosure.personal' leave this action out: "
-                          "every class disclosed was told to this recipient before; this recipient was told before")
+                          "every class it discloses was told to this recipient before; this recipient was told something before")
     assert "email" not in out.reason
 
 
