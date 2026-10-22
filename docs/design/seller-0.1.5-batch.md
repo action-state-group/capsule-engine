@@ -1,6 +1,6 @@
 # Design note: the seller 0.1.5 / everyday 0.3.8 batch
 
-Status: v9, as built, 2026-10-22. Converged as v8.4 before the code was built (Codex v8, `claude -p` v8, Sherlock2 on every
+Status: v9.1, as built, 2026-10-22. Converged as v8.4 before the code was built (Codex v8, `claude -p` v8, Sherlock2 on every
 what-point), Ethan's agent (session local_f0ad46ac). Reviewers: Codex, a `claude -p` stand-in for Kimi, Sherlock2 (product
 rules and wording).
 
@@ -66,6 +66,12 @@ commits). Each section now says what was built; "(as built: …)" marks where th
 converged design, and "Future work" marks what the design proposed and the batch did not build. §9
 collects the follow-ups.
 
+**v9.1.** Takes review round 1 of v9 (Codex, `claude -p`): every future-work item names an open
+issue (actionstate-muse#238, #240; capsule-cli#407); the rules-page line's owner is left to
+actionstate-muse#233; s13's malformed-block cases and the 31-day card conditions are exact (§1);
+the post card copy, `plan_action` and the skeleton wording (§5); the share question's both/all
+(§6); the #400 provenance (§9).
+
 
 Items: capsule-engine #179, #180, #181, #186, #187, #188, #189, #190, #191, #192, #193 and
 capsule-cli#364, plus capsule-cli#379 (#191's test) and capsule-cli#380 (its consent fix). Each has a How ack, and Sherlock2 confirmed the what
@@ -89,9 +95,11 @@ v0.1.0-rc20 (capsule-cli#395, 401f39b) was cut during the batch and already carr
 Muse (actionstate-muse) is the rules checker users run. Every engine change below needs its Go
 port, and Muse vendors the packs only once they are released. This lane lands engine and
 capsule-cli on `main`; the Muse ports are their own lane once the 0.1.5 / 0.3.8 digests are
-fixed (actionstate-muse#215, #216, #231; #228 ported #206 and is closed). Future work: the ports
-not yet filed (`pickup_area`, `offer_expiry/1.1.0`, `seller.destination_rail/1.1.0`,
-`required_disclosure/1.2.0`, `action_class_gate/1.2.0`) and vendoring the released packs.
+fixed (actionstate-muse#215, #216, #231; #228, which ported #206 in actionstate-muse#237, merged
+as 3fab90b, is closed). Future work: `pickup_area` in Muse, actionstate-muse#238; and, tracked in
+actionstate-muse#240, the ports `offer_expiry/1.1.0`, `seller.destination_rail/1.1.0`,
+`required_disclosure/1.2.0`, `action_class_gate/1.2.0` and the two promise 1.1.0 wickets if #215
+doesn't cover them, vendoring the released packs, and the release e2e.
 
 **Release gate.** Merging to `main` changes no user's rules, because nothing is released. The
 release that ships seller 0.1.5 / everyday 0.3.8 must ship together: the capsulectl rc that emits
@@ -102,7 +110,7 @@ without C2's attribution would refuse the user's own claim. The batch is done wh
 e2e on the release candidate passes every case in §1-§6. The Muse ports block the release. (As
 built: the engine issues closed when their engine and capsule-cli halves merged, so the Muse issues
 above carry the release blocker. C1 already shipped in rc20, so a Muse without the `pickup_area` port
-meets it now: Muse `main` at 3fab90b does not know the class.)
+meets it now: Muse `main` at 3fab90b does not know the class; future work: actionstate-muse#238.)
 
 ### What seller 0.1.5 changes besides the wickets
 
@@ -223,8 +231,10 @@ has no verifier and ends `not_evaluable`. So no share to a buyer ever passes.
   or a name-only or domain-only pair, refuses. A missing
   fingerprint on either side fails. On replay the sale history is rebuilt from the bundle's
   check records, which seal the same block. (As built, #197: a counterparty block out of shape on
-  either side, such as `profile_id: null`, fails the share naming `counterparty`, so a dropped member
-  never opens the name-and-domain reading. No acceptance, an unknown one, and another deal's or
+  the current share, such as `profile_id: null`, fails the share naming `counterparty`, so a dropped
+  member never opens the name-and-domain reading. A malformed block on the historical acceptance
+  instead loses its buyer block, binds nothing and gets the generic reason below
+  (`release_on_acceptance.py` L270-284, and the historical-malformation test). No acceptance, an unknown one, and another deal's or
   buyer's all fail with one reason, "the history given shows no acceptance of this sale by this
   buyer in this deal", so a buyer can't learn that someone else accepted; a share naming no class
   and a never-shared class have their own reasons.)
@@ -261,13 +271,15 @@ commit act in `history` with `item_ref`, its deal and its check's counterparty.
 refusal says why and what to do (Sherlock2): "the buyer's acceptance is older than 31 days; ask
 them to accept again". capsulectl can tell this case from no acceptance at all, because it
 holds the whole thread; it adds that reason to the card. (As built, capsule-cli#390: card text
-only, no new difference, and only for s13's own refusal: a share to the thread's buyer naming a
-class other than `pickup_area`, rules that returned deny or not evaluable with a failing or
-not-evaluable s13 finding, and every accepted commit sealed before the cutoff of the history the
-checker was given, never on an escalation or another rule's finding. Under a deny the card says
-"your rules don't allow this, because the buyer's acceptance is older than 31 days. Ask them to
-accept again"; without one, "the buyer's acceptance is older than 31 days; ask them to accept
-again".) Replay reproduces the live window for
+only, no new difference, and only for s13's own finding: a share to the thread's buyer naming a
+class other than `pickup_area`, with every accepted commit sealed before the cutoff of the
+history the checker was given, never on an escalation or another rule's finding. With
+`rules_deny` and an s13 `fail`, the card gives `card.why.rules_deny.acceptance_too_old`, "your
+rules don't allow this, because the buyer's acceptance is older than {days} days. Ask them to
+accept again", shown as "Why I stopped: …". With `rules_not_evaluable`, no deny and an s13 `fail`
+or not-evaluable finding, it gives `card.why.acceptance_too_old`, "the buyer's acceptance is older
+than {days} days; ask them to accept again". A deny where s13 is only not evaluable gets the
+generic deny reason, "your rules don't allow this". `{days}` is 31.) Replay reproduces the live window for
 s13: it reads the sale history from the 31 days before the share. That is as close to live as a
 sale bundle can get, not exact: live history is profile-wide and capped at 1,000 acts, and past
 the cap it reads incomplete and the acceptance unknown (`rules_checker.go` L758-795,
@@ -395,7 +407,7 @@ unverified; never Muse's own.
   them is not blank. As built (#205, capsule-cli#391), the marks are an explicit, frozen list of
   181 code points: every Unicode 17.0 Sentence_Terminal code point, every line terminator
   Python's `str.splitlines` uses, and U+2026. Both repositories hold it in a byte-identical
-  fixture (engine `tests/fixtures/sentence-marks.txt`, capsule-cli `testdata/sentence-marks.txt`,
+  fixture (engine `tests/fixtures/sentence-marks.txt`, capsule-cli `plugins/internal/plugin/testdata/sentence-marks.txt`,
   sha256 `8869f15b…b9aa`), and each side's test compares its list with the fixture code point for
   code point. A blank claim is judged as Python's `str.strip` judges it on both sides.
 - Engine (E2): when the envelope gives `representing_opening` and it opens the commitment,
@@ -437,8 +449,9 @@ authority order or approval of yours covers this promise".)
 As built, capsulectl's side ([capsule-cli#391](https://github.com/action-state-group/capsule-cli/pull/391)):
 the card asks `Tell {buyer}, as your own claim: "{text}"?` with the reason "these words go out as your
 claim, so only you can OK them"; the claim record gains no member, since it binds to the check
-through its words; and `check_profile.py` refuses an attributed representation without the user's
-own approval, a passing verdict on an attributed check, and `attributed_to` on any other class.
+through its words; `check_profile.py` refuses an attributed representation without the user's own
+approval and a passing verdict on an attributed check; and `attributed_to` on any other class is
+refused at the schema stage.
 
 ## 3. capsule-cli#364 and #193: the proposal an offer answers
 
@@ -566,13 +579,22 @@ sale, its task authority, thread records, cuts and the close. No check runs at s
   every earlier post check, even one whose check never sealed, so an answer sealed after it, and the
   act on it, are refused, by capsulectl and by `check_profile.py`. A closed sale takes no post. The
   post act is sealed `fyi`; no AAC effect type is proposed for it. `posting.platform` is the site's
-  registrable domain.)
+  registrable domain. The post is classed `communication.publish` with spend 0. A task authority's
+  `allowed`, `allowed_actions` and `preconditions` can never name `post` (`record-common-v0`
+  `plan_action`). The card copy, from the wording pack at capsule-cli 8eff953: the question
+  `Post this listing on {platform}: "{text}"?` with a "Post it" button beside "Hold"; the facts
+  line "This listing states the item's {classes}", or, with no class, "This listing doesn't state
+  the item's condition, price or anything else your rules track"; and the `public_post` reason
+  "posting a listing always asks you first".)
 - No seller pack rule. Citing `action_class_gate/1.1.0` would bring back its
   `personal_disclosure` selector, which refuses every share (why 0.1.1 dropped the gate). A
   seller-only gate would add a second mechanism for an ask that is already unconditional.
 - The rules page can't be silent about it (Sherlock2): Muse's rules page shows one fixed line
   outside the pack rules, "Posting a listing always asks you first (built into capsulectl)."
-  That line is Muse presentation, in the Muse lane. Future work: actionstate-muse#233.
+  That line is Muse presentation, in the Muse lane. (As built: not built, and its owner is not
+  settled. Per actionstate-muse#233, Muse owns its closing `ready.md` message, while the rules page
+  itself is built by capsulectl's presentation build, so where the line goes is decided in that
+  issue's How ack. Future work: actionstate-muse#233.)
 - A sale-level `post` check calls no rules checker: no pack rule reads it, and `rulesInput`
   assumes a thread's opening (`events[0].Event.Open.ItemRef`). Its verdict carries a new rules
   status `not_applicable` (no checker runs on a post, pinned or not), not `not_configured`,
@@ -596,19 +618,20 @@ template so the agent can fix the text and retry (Sherlock2, Q12); and then the 
 unconditional ask is the user's approval of exactly those words. The same check the represent
 path makes on attributed words applies to the template there.
 
-As built (capsule-cli#398): the words are spotted on a skeleton of the text: escapes and format
-characters removed, NFKD, every combining mark dropped, each non-ASCII letter or digit read as its
+As built (capsule-cli#398): the words are spotted on a skeleton of the text: escapes decoded
+(`decodeEscapes`), format characters removed, NFKD, every mark (`\p{M}`) dropped, each non-ASCII letter or digit read as its
 Unicode TR39 confusable prototype, then lower case; i, l and 1 read as one letter and o and 0 as
-one; a vertical stroke (`|` and the 72 characters whose TR39 prototype is l, such as `｜`, `ǀ` and
-`│`) is read both as the letter i and as a word boundary, so "AUTHENT|C" and "used|GENU|NE" match;
+one; a vertical stroke (`|` and the non-ASCII characters whose TR39 prototype is l, such as `｜`,
+`ǀ` and `│`) is read both as the letter i and as a word boundary, so "AUTHENT|C" and "used|GENU|NE" match;
 styled letters ("𝐎𝐫𝐢𝐠𝐢𝐧𝐚𝐥𝐥𝐲") read as their plain forms, so "Originally" passes. Words are whole
 words; `knock` and `off` match with any space, dash, math sign, control or underscore between.
 The skeleton never grants the exception: the template is matched exactly, case-sensitive, on the
 folded text only, with the 181 sentence marks of §2 (one shared variable with the represent path).
 `authenticity` is in `posting.classes` exactly when a template sentence claims it: a template
 sentence without the label is refused too ("add authenticity to classes and check again"). The
-refusal quotes the matched word as written and offers both fixes, the template "in one sentence,
-exactly" or rewording. Dictionary sweeps of about 236k words found no false positive.
+refusal quotes the matched word as written (folded) and offers both fixes, the template "in one
+sentence, exactly" or rewording. (In review, not shipped behavior: the reviewers' dictionary
+sweeps of about 236k words found no false positive, per capsule-cli#398's review record.)
 
 **Design (#190, A8).** s05 already runs on every offer, acceptance and sale; the listing just
 has to count. A post names its platform (`posting.platform`, the site's domain, as a share check
@@ -680,7 +703,8 @@ schemas.
   `<recipient>` without your OK. Share it again?" with the reason "it went out without your OK, so I
   can't count `<recipient>` as already told". When the share gives other classes too, the question
   names every one ("This also shares your email, which they already have, and your name, which
-  would be new to them. Share all of them?"). A held disclosure note says "You haven't OK'd telling
+  would be new to them. Share all of them?"): "Share both?" when the share gives two classes, and
+  "Share all of them?" for three or more. A held disclosure note says "You haven't OK'd telling
   `<recipient>` your `<class>` before." and then "This also shares …" with the same clauses; a held
   first telling names the other classes the same way.
 - Engine (E5): `action_class_gate/1.2.0` splits `personal_disclosure` into two selectors with
@@ -794,11 +818,13 @@ Future work found or left by the build, each still open unless marked:
 
 - The release itself: seller 0.1.5, everyday 0.3.8 and the capsulectl rc that carries the rest of
   C1-C8, shipped with the Muse plugin and passing the Muse seller e2e on the release candidate
-  (§0), including the "never mind" cancel case (§1) and the #188 phone fixture (§6).
+  (§0), including the "never mind" cancel case (§1) and the #188 phone fixture (§6): tracked in
+  actionstate-muse#240.
 - Muse ports: actionstate-muse#215 (the `representing` bridge, s04 and s10), #216 (reasons),
-  #231 (s13 1.2.0); the other ports listed in §0 are not filed yet.
+  #231 (s13 1.2.0), #238 (`pickup_area`, which rc20 already emits); the rest, and vendoring, are
+  tracked in actionstate-muse#240 (§0).
 - actionstate-muse#233: the rules-page line "Posting a listing always asks you first (built into
-  capsulectl)." (§5).
+  capsulectl)." (§5); its owner is decided in that issue's How ack.
 - capsule-engine#199: re-open a sale after the accepted buyer backs out; a recorded cancel does
   not reopen the item to other buyers (§1).
 - capsule-engine#207: `destination_rail` with only `watched_rails` passes a non-string rail (§4;
@@ -806,8 +832,8 @@ Future work found or left by the build, each still open unless marked:
 - capsule-engine#152 (tracked as #158): rebase `offer_expiry/1.0.2`'s semantics onto 1.1.0 (§3).
 - capsule-cli#384: record a listing taken down (`unpost`) (§5, Q16).
 - capsule-cli#399: the `pickup_area` guard's Unicode hardening, as the listing word guard has (§1).
-- capsule-cli#400: `TestDealRemoteCheckerOnlyAddsAndFallsBack` asserts wall-clock time and may be
-  behind two unreproduced local plugin-run failures under load (found in capsule-cli#393).
-- CI headroom (capsule-cli#403, closed by #404): the slowest race shards run about 13.5-14 minutes
-  against `go test`'s 15-minute limit; more shards or splitting the slowest tests is the next step
-  if they creep up.
+- capsule-cli#400: two uncaptured local plugin-run failures under load, one each in the
+  attribution and proposal lanes (capsule-cli#391, #392). Every rerun passed. The suspected cause,
+  `TestDealRemoteCheckerOnlyAddsAndFallsBack` asserting wall-clock time, is unproven.
+- capsule-cli#407: CI headroom. The slowest race shards run about 14 of their 15 minutes after
+  capsule-cli#404, which split the shards and closed #403.
