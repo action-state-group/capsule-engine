@@ -39,7 +39,9 @@ attribution but not the commitment to the words, is not evaluable the same
 way. A check whose commitment is out of shape fails, live and on replay; a
 live check sealing none fails. A live check given no words still
 fails. 1.0.0, which configures no ``attributed_never``, reads neither the
-attribution nor an opening, and decides and records as it always did.
+attribution nor an opening, and decides as it always did; both versions
+name a class after its article (``with_article``: "an authenticity
+statement").
 
 A class outside the closed set fails closed. Applies only to the configured
 ``action_classes``.

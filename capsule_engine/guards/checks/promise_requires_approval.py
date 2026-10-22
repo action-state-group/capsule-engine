@@ -30,8 +30,9 @@ Anything less fails: no reference, no record, a record the reference does
 not bind, a record with no digest, or an approval for another class. Never
 ``n/a``: an unreadable approval is no approval. Under 1.1.0 a failure on an
 action that cites no task authority (an x-deal-v0 deal has none) reads
-"no order or approval of yours covers this promise". 1.0.0
-keeps its reasons. A class no approval may
+"no order or approval of yours covers this promise"; 1.0.0 keeps its
+own reasons for that failure. Both name a class after its article ("an
+authenticity statement"). A class no approval may
 clear belongs to ``promise_never``, not here.
 
 A class outside the closed set fails closed. Applies only to the configured

@@ -87,7 +87,7 @@ freezes the released one under `tests/fixtures/packs/` as #173 did.
 
 As built: no pack release was cut. #195 froze seller 0.1.4 (`c14c8f81…9e5b`) and #203 froze everyday
 0.3.7 (`c1cea374…7d4d`). On engine `main` the unreleased packs are seller 0.1.5 at
-`81013aedbc3d930dcb9a4871d932373eca9de6968e5cff9fb450158d1fcc576a` (after #205, the last to amend it) and
+`81013aedbc3d930dcb9a4871d932373eca9de6968e5cff9fb450158d1fcc576a` (after #209, the last to amend it, which reworded s04's reason in promise_requires_approval/1.1.0's semantics) and
 everyday 0.3.8 at `ac7697061fd1c50177000648e2458f6236068679fc67ae924870ee8fb1cd8488` (#203). capsulectl
 v0.1.0-rc20 (capsule-cli#395, 401f39b) was cut during the batch and already carries #379 and #382
 (`pickup_area`, its guard and its skill text); every later capsule-cli PR here is under Unreleased.
@@ -801,7 +801,7 @@ As built, D1 is already published in capsulectl v0.1.0-rc20 (#382 is in it); the
 
 Set C (D2-D8) was confirmed by Ethan on 2026-10-22; the ruling line is on this PR. As-built wicket
 digests: `seller.recipient_role/1.2.0` `6216addf…89d1`, `seller.release_on_acceptance/1.2.0`
-`854718b6…a832`, `promise_requires_approval/1.1.0` `66d1e62d…d5d5`, `promise_never/1.1.0`
+`854718b6…a832`, `promise_requires_approval/1.1.0` `52514fb6…e386` (#209; `66d1e62d…d5d5` at #205), `promise_never/1.1.0`
 `ed9e02ed…2b8b`, `offer_expiry/1.1.0` `e55083b3…90f1`, `seller.destination_rail/1.1.0`
 `a86844bd…be0e`, `action_class_gate/1.2.0` `39a7c5b9…97bf`, `required_disclosure/1.2.0`
 `cae96230…224f` (engine `tests/test_wicket_definition.py`).
