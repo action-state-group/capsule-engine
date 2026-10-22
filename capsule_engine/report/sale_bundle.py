@@ -182,7 +182,9 @@ _REPORT_ACTION_ID = "capsulectl-deal-report"
 # capsulectl's dealStepRecordTypes and dealCopyAudiences.
 _STEP_RECORD_TYPES = frozenset({"deal_step", "step_completed", "step_failed"})
 _COPY_AUDIENCES = frozenset({"counterparty", "adjudicator", "keep"})
-_RFC3339 = re.compile(r"^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})(?:\.(\d+))?(Z|[+-]\d{2}:\d{2})$")
+# ASCII digits only, as Go reads them; the offset's hour and minute are checked apart.
+_RFC3339 = re.compile(
+    r"^([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2})(?:\.([0-9]+))?(Z|[+-]([0-9]{2}):([0-9]{2}))$", re.ASCII)
 _DEAL_ID = re.compile(r"^deal-[0-9a-f]{16}$")
 _SALE_ID = re.compile(r"^sale-[0-9a-f]{16}$")
 _SECOND = timedelta(seconds=1)
@@ -638,12 +640,21 @@ def _rfc3339(value: object) -> tuple[datetime, int] | None:
     ``time.RFC3339Nano`` reads one: its whole second in UTC and its
     nanoseconds, so two times compare at Go's precision (a ``datetime``
     keeps only microseconds). Digits past the ninth are dropped, as Go drops
-    them. ``None`` otherwise."""
+    them. An offset past 23 hours or 59 minutes is refused (Go refuses one
+    past 24 or 60, so this fails closed), and so is a time that leaves the
+    years a ``datetime`` holds once moved to UTC. ``None`` otherwise."""
     match = _RFC3339.fullmatch(value) if isinstance(value, str) else None
-    whole = _aware(match[1] + match[3]) if match is not None else None
-    if whole is None:
+    if match is None or (match[4] is not None and (int(match[4]) > 23 or int(match[5]) > 59)):
         return None
-    return whole.astimezone(timezone.utc), int((match[2] or "")[:9].ljust(9, "0"))
+    try:
+        whole = _aware(match[1] + match[3])
+        at = whole.astimezone(timezone.utc) if whole is not None else None
+    except OverflowError:
+        # Moved to UTC, it is before year 1 or after year 9999.
+        return None
+    if at is None:
+        return None
+    return at, int((match[2] or "")[:9].ljust(9, "0"))
 
 
 def replay_sale(sale: SaleBundle, **options: object) -> ReplayResult:

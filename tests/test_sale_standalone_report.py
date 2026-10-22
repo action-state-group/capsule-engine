@@ -275,6 +275,11 @@ def _report(payload: dict) -> dict:
     return payload["report"]
 
 
+def _as_of(payload: dict, old: str, new: str) -> None:
+    lifecycle = _report(payload)["lifecycle"]
+    lifecycle["as_of"] = lifecycle["as_of"].replace(old, new)
+
+
 RESEALED = {
     "a checkpoint of another root": lambda p: p["deal_checkpoint"].update(root="0" * 64),
     "a checkpoint of another size": lambda p: p["deal_checkpoint"].update(mmr_size=p["deal_checkpoint"]["mmr_size"] - 1),
@@ -302,6 +307,18 @@ RESEALED = {
     # A datetime keeps microseconds only; Go compares the nanosecond.
     "an as_of a nanosecond later": lambda p: _report(p)["lifecycle"].update(
         as_of=_report(p)["lifecycle"]["as_of"].replace("Z", ".000000001Z")),
+    # Go reads ASCII digits only: each of these is the checkpoint's instant
+    # to a reader of Unicode digits.
+    "an as_of with a non-ASCII digit in its fraction": lambda p: _as_of(p, "Z", ".\u0660Z"),
+    "an as_of with a non-ASCII digit in its seconds": lambda p: _report(p)["lifecycle"].update(
+        as_of=_report(p)["lifecycle"]["as_of"][:-2] + chr(0x0660 + int(_report(p)["lifecycle"]["as_of"][-2])) + "Z"),
+    "an as_of with non-ASCII digits in its offset": lambda p: _as_of(p, "Z", "+\u0660\u0660:\u0660\u0660"),
+    # The checkpoint's instant written at an offset of 99 minutes.
+    "an as_of whose offset minute is past 59": lambda p: _report(p)["lifecycle"].update(
+        as_of=_stamp(_at(_report(p)["lifecycle"]["as_of"]) + timedelta(minutes=99)).replace("Z", "+00:99")),
+    "an as_of whose offset hour is past 23": lambda p: _as_of(p, "Z", "+24:00"),
+    "an as_of before year 1 in UTC": lambda p: _report(p)["lifecycle"].update(as_of="0001-01-01T00:00:00+01:00"),
+    "an as_of after year 9999 in UTC": lambda p: _report(p)["lifecycle"].update(as_of="9999-12-31T23:59:59-01:00"),
 }
 
 
