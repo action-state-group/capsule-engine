@@ -87,7 +87,7 @@ freezes the released one under `tests/fixtures/packs/` as #173 did.
 
 As built: no pack release was cut. #195 froze seller 0.1.4 (`c14c8f81…9e5b`) and #203 froze everyday
 0.3.7 (`c1cea374…7d4d`). On engine `main` the unreleased packs are seller 0.1.5 at
-`ddcb2901c301a8584f0c8e3d4f35eff50fc2ef7cdddc095e4ae0176c9e0f75c3` (after #205, the last to amend it) and
+`81013aedbc3d930dcb9a4871d932373eca9de6968e5cff9fb450158d1fcc576a` (after #205, the last to amend it) and
 everyday 0.3.8 at `ac7697061fd1c50177000648e2458f6236068679fc67ae924870ee8fb1cd8488` (#203). capsulectl
 v0.1.0-rc20 (capsule-cli#395, 401f39b) was cut during the batch and already carries #379 and #382
 (`pickup_area`, its guard and its skill text); every later capsule-cli PR here is under Unreleased.

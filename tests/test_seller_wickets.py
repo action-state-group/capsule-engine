@@ -585,7 +585,7 @@ def test_1_1_0_counts_an_ordered_list_only_when_every_member_is_a_class(ordered)
 
 def test_1_1_0_says_no_order_covers_a_promise_citing_no_task_authority():
     assert _run(PROMISE_ASK_1_1, _send(representation_class="warranty")).reason == (
-        "no task authority order or approval of yours covers this promise")
+        "no order or approval of yours covers this promise")
     # 1.0.0 keeps its reason; a 1.1.0 failure under a cited authority keeps it too.
     assert _run(PROMISE_ASK, _send(representation_class="warranty")).reason.startswith(
         "a warranty statement is outside the task authority")
@@ -610,7 +610,7 @@ def test_1_0_0_reads_neither_the_attribution_nor_the_words():
     assert out.result == "fail"
     assert out.evidence == {"representation_class": "authenticity", "recognised": True, "never": True,
                             "authorized_by": None}
-    assert out.reason == ("the agent never makes a authenticity statement; no approval clears it, only a change "
+    assert out.reason == ("the agent never makes an authenticity statement; no approval clears it, only a change "
                           "to the rule set")
 
 
@@ -942,3 +942,11 @@ def test_a_seller_pack_inlining_the_retired_offer_expiry_is_refused(tmp_path):
         load_pack_dir(tmp_path)
     assert exc_info.value.reason == "invalid_constraint"
     assert "retired_definition" in str(exc_info.value)
+
+
+@pytest.mark.parametrize(("cls", "named"), [("authenticity", "an authenticity"), ("availability", "an availability"),
+                                            ("address", "an address"), ("other", "an other"), ("warranty", "a warranty"),
+                                            ("price", "a price")])
+def test_a_reason_names_a_class_after_its_article(cls, named):
+    from capsule_engine.guards.checks.promise_never import with_article
+    assert with_article(cls) == named

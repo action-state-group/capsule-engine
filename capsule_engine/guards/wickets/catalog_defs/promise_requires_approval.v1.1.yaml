@@ -15,8 +15,8 @@ semantics: >-
   authorized_path, or when its authorized_by is the digest of the approval
   record supplied with the decision and that record's
   body.representation_class is the class. Anything else fails; a failure on
-  an action that cites no task authority reads "no task authority order or
-  approval of yours covers this promise". An action that carries no representation_class is not
+  an action that cites no task authority reads "no order or approval of
+  yours covers this promise". An action that carries no representation_class is not
   applicable, in scope; any other action class is not applicable. The
   evidence records the class and what was cited, never the statement.
 config:

@@ -905,7 +905,7 @@ def test_a_warranty_citing_no_task_authority_says_no_order_covers_it(run):
     """An x-deal-v0 deal seals no task authority: a warranty asks, and the
     reason the card shows says why."""
     s04 = _decided(run, "statement-warranty-unapproved", "promise_requires_approval")
-    assert (s04.result, s04.reason) == ("fail", "no task authority order or approval of yours covers this promise")
+    assert (s04.result, s04.reason) == ("fail", "no order or approval of yours covers this promise")
     assert s04.evidence["task_authority_ref"] is None
     # An approval still clears it.
     assert _decided(run, "statement-warranty-approved", "promise_requires_approval").result == "pass"
@@ -933,7 +933,7 @@ def test_an_attributed_claim_off_the_template_or_not_the_checked_words_is_refuse
     s10 = _decided(run, name, "promise_never")
     assert s10.evidence["words_opened"] is opened
     if opened:
-        assert s10.reason == ('the user\'s claim must read "The seller says … (unverified)", one sentence, so the '
+        assert s10.reason == ('your claim must read "The seller says … (unverified)", one sentence, so the '
                               "buyer sees whose claim it is and that it is unverified")
         assert s10.evidence["fits_template"] is False
 

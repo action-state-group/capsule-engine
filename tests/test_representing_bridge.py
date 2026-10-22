@@ -417,7 +417,9 @@ def test_words_that_do_not_open_the_checked_commitment_fail_s10():
     entry["representing_opening"]["nonce"] = "6" * 64
     decision = _live(entry)
     assert decision.outcome == DENY
-    assert _constraint(decision, "promise_never").evidence["words_opened"] is False
+    s10 = _constraint(decision, "promise_never")
+    assert s10.evidence["words_opened"] is False
+    assert s10.reason == "the words given with the check don't match the words sealed for this claim"
 
 
 def test_an_ordered_authenticity_claim_not_attributed_still_refuses():
@@ -434,7 +436,7 @@ def test_an_x_deal_v0_warranty_with_no_task_authority_asks_saying_why():
     record = _represent(2, "warranty", "Covered for a year", authority=None)
     decision = _live(_entry(record, 2), authority=None)
     assert decision.outcome == ESCALATE
-    assert _constraint(decision, "promise_requires_approval").reason == "no task authority order or approval of yours covers this promise"
+    assert _constraint(decision, "promise_requires_approval").reason == "no order or approval of yours covers this promise"
 
 
 def test_under_seller_0_1_4_the_bridge_makes_s10_refuse_the_users_claim():

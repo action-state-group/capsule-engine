@@ -65,6 +65,12 @@ __all__ = [
 ]
 
 _CHECK_ID = "promise_never"
+
+
+def with_article(cls: str) -> str:
+    """``cls`` after its indefinite article, as a reason names a class:
+    "an authenticity", "a warranty"."""
+    return f"{'an' if cls[:1] in 'aeiou' else 'a'} {cls}"
 _HEX64 = re.compile(r"[0-9a-f]{64}")
 _METHOD = "class_membership_v0"
 
@@ -163,9 +169,9 @@ def check_promise_never(
                         _attributed(evidence, action) if attributed_never is not None else evidence)
     if attributed_never is None:
         if is_never:
-            return _outcome("fail", f"the agent never makes a {cls} statement; no approval clears it, only a "
+            return _outcome("fail", f"the agent never makes {with_article(cls)} statement; no approval clears it, only a "
                                     "change to the rule set", evidence)
-        return _outcome("pass", f"a {cls} statement is not one the agent never makes", evidence)
+        return _outcome("pass", f"{with_article(cls)} statement is not one the agent never makes", evidence)
     assert attributed_template is not None  # checked above
     return _decide_attributed(action, opening, cls, is_never, evidence, attributed_never, attributed_template)
 
@@ -187,11 +193,11 @@ def _decide_attributed(
 ) -> CheckOutcome:
     """1.1.0 on a recognised class (module docstring)."""
     if not is_never:
-        return _outcome("pass", f"a {cls} statement is not one the agent never makes", _attributed(base, action))
+        return _outcome("pass", f"{with_article(cls)} statement is not one the agent never makes", _attributed(base, action))
     if action.statement_attributed_to != ATTRIBUTED_TO_USER or cls not in attributed_never:
-        return _outcome("fail", f"the agent never makes a {cls} statement of its own; no approval clears it, "
+        return _outcome("fail", f"the agent never makes {with_article(cls)} statement of its own; no approval clears it, "
                                 "only a change to the rule set", _attributed(base, action))
-    passed = f"a {cls} statement said as the user's own claim, marked unverified, is not the agent's own"
+    passed = f"{with_article(cls)} statement said as the user's own claim, marked unverified, is not the agent's own"
     sealed = action.representation_text_commitment
     if sealed is None and opening is WORDS_NOT_IN_BUNDLE:
         # A replay of a decision capsule: the decision seals the attribution
@@ -215,13 +221,13 @@ def _decide_attributed(
     # Decoded JSON from the checker input: each member is checked before it is read.
     nonce, text = (opening.get("nonce"), opening.get("text")) if isinstance(opening, dict) else (None, None)
     if not opens_commitment(nonce, text, sealed):
-        return _outcome("fail", "the words given with the check don't match the words it sealed",
+        return _outcome("fail", "the words given with the check don't match the words sealed for this claim",
                         _attributed(base, action, opened=False))
     assert isinstance(text, str)  # opens_commitment checked it
     if not fits_attributed_template(text, template):
         return _outcome(
             "fail",
-            f'the user\'s claim must read "{template["prefix"]}… {template["suffix"].strip()}", one sentence, so '
+            f'your claim must read "{template["prefix"]}… {template["suffix"].strip()}", one sentence, so '
             "the buyer sees whose claim it is and that it is unverified",
             _attributed(base, action, opened=True, fits=False),
         )
