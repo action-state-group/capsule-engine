@@ -364,13 +364,21 @@ def test_a_claim_given_twice_is_one_statement_in_the_replay():
 
 def test_0_1_3_replays_the_fixture_as_0_1_2_except_s05():
     """The statement records move nothing but s05: every other constraint of
-    every decision has the same result under both versions."""
+    every decision has the same result under both versions, but s07 on a
+    commit. The catalog pack (0.1.5) checks the payment rail at the commit
+    (seller.destination_rail/1.1.0), and these commits, sealed before it,
+    state none, so it fails where 0.1.2 held it out of scope."""
     old, new = _replay(*_bundle_records(), pack=FROZEN_0_1_2), _as_bundled()
     assert list(old) == list(new)
     for action_id in new:
         before = {c.id: c.result for c in old[action_id].constraints}
         after = {c.id: c.result for c in new[action_id].constraints}
-        assert {k for k in after if after[k] != before[k]} <= {"required_disclosure"}, action_id
+        moved = {k for k in after if after[k] != before[k]}
+        if new[action_id].capsule is not None and new[action_id].capsule["asg_payload"].get(
+                "action_class") == "agreement.accept":
+            assert (before["destination_rail"], after["destination_rail"]) == ("n/a", "fail"), action_id
+            moved.discard("destination_rail")
+        assert moved <= {"required_disclosure"}, action_id
     moved = {k for k in new if _s05(new[k]).result != _s05(old[k]).result}
     assert moved == set(_offers_and_commits(new))
 

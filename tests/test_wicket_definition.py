@@ -92,6 +92,9 @@ EXPECTED_DIGESTS = {
     # Also passes the listing's public pickup area to a platform; seller 0.1.5 cites it.
     "seller.recipient_role/1.2.0": "6216addfa4e53b746dd72ec6dd4986758e064d2885e007b0fa546e2d42d189d1",
     "seller.destination_rail/1.0.0": "fab02cc2b39b2f45a5ac2a260eff7544814a2fb82de5524d91b00fd0b8d19800",
+    # Also runs at the seller's commit, cash only in person, the payment apps counted as p2p, and a
+    # commit stating no rail fails; seller 0.1.5 cites it.
+    "seller.destination_rail/1.1.0": "a86844bd3b5132ae5fb04e9009c5c6907ea43c1609df713c45055dd04bcdbe0e",
     # One accepted commitment per sale and item, across buyer threads. No pack cites it yet.
     "seller.single_commitment/1.0.0": "91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e",
     # An address reaches only the buyer whose sealed acceptance of the sale it cites.
@@ -130,6 +133,7 @@ WITHOUT_SEMANTICS = frozenset(EXPECTED_DIGESTS) - {
     "seller.recipient_role/1.2.0",
     "seller.release_on_acceptance/1.2.0",
     "action_class_gate/1.2.0",
+    "seller.destination_rail/1.1.0",
 }
 
 
