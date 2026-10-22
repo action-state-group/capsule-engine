@@ -174,13 +174,13 @@ has no verifier and ends `not_evaluable`. So no share to a buyer ever passes.
   (`counterparty_ids` + `counterparty_fp_alg`, `replay.py` L498-522) on the Action; the history
   record built for a live check (`live_history.py` `_act_record`) and the replayed sale history
   carry it in their `live_history` block beside `act_payload`, as `thread_counterparty`
-  (`{fp_alg, payee}`); and `sale_acceptance` returns it. It is internal history state only: it
+  (`{fp_alg, ids}`); and `sale_acceptance` returns it. It is internal history state only: it
   never enters `act_payload` (`capsule.py` L248), so no decision seals it and no export changes.
   The identifier is the whole sealed block, `{fp_alg, ids}`, under `hmac-sha256-chain-key`
   (typed) or `hmac-sha256-deal-key` (x-deal-v0), and both sides must name the same algorithm.
   An explicit `who` seals only the kinds it names (`deal_profile.go` L254-256, L297-307) while
-  the thread default seals the opening's (L262-266), so the match is `sameParty`'s own rule
-  (`deal_counterparty.go` L72-83): a per-person kind (email, phone, profile id, relay address)
+  the thread default seals the opening's (L262-266), so the match is `sameParty`'s per-person
+  requirement (`deal_counterparty.go` L72-83) plus a rejection of any conflict: a per-person kind (email, phone, profile id, relay address)
   must match on both sides whenever either side has one; a shared marketplace domain or a name
   is never enough (L20-24); and any kind on both sides that differs fails. A missing
   fingerprint on either side fails. On replay the sale history is rebuilt from the bundle's
@@ -222,7 +222,7 @@ tested, not hidden. s11's replay is unchanged.
 **Replay.** The engine gives the replayed sale's history only to s11 today
 (`engine.py` `_SALE_HISTORY_CHECK`, L499 and L779). s13 reads it too, with the same
 completeness rule (an incomplete or unreadable history is no acceptance), so a replayed share
-after acceptance decides as it did live.
+after acceptance decides as it did live, within the completeness limit stated above.
 
 **#181's class.** `pickup_area` joins `DISCLOSED_CLASSES` (engine `guards/action.py`), and
 `seller.recipient_role/1.2.0` adds it to `role_classes.platform: [email, pickup_area]`. It is
@@ -267,7 +267,7 @@ replay; a commit naming the buyer explicitly then a share using the thread defau
 the reconstructed history, not only on a direct check; a commit whose `who` names a subset of the
 opening's kinds matches; one that shares no kind with the share refuses; `{domain, email A}` at
 the commit and `{domain, phone B}` on the share refuses, live and on replay; a platform share is left to s01;
-a replayed sale bundle decides each as live; capsulectl refuses to record "12 Oak St" or
+a replayed sale bundle decides each as live (within the completeness limit); capsulectl refuses to record "12 Oak St" or
 "4 Elm Dr., Austin" as a pickup_area and records "Oak Lane neighborhood".
 
 ## 2. #180 and #189: s04 and s10 decide, and the user's own authenticity claim passes
