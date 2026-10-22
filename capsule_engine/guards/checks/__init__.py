@@ -34,7 +34,7 @@ from .field_change_count import check_material_fields_changed, check_offer_field
 from .offer_expiry import check_offer_expiry
 from .plan_containment import check_plan_containment
 from .price_floor import COMMITMENT_PATH, CommercialBoundsOpening, bounds_commitment, check_price_floor
-from .promise_never import check_promise_never
+from .promise_never import RepresentingOpening, check_promise_never
 from .promise_requires_approval import (
     AUTHORIZED_PATH,
     CLASS_PATH,
@@ -144,12 +144,6 @@ CONFIGURED_CHECKS: dict[str, Callable[[Action, LedgerAPI, dict], CheckOutcome]] 
         action_classes=config["action_classes"],
         no_proposal_classes=config.get("no_proposal_classes"),
     ),
-    "promise_never": lambda action, ledger, config: check_promise_never(
-        action,
-        representation_classes=config["representation_classes"],
-        never=config["never"],
-        action_classes=config["action_classes"],
-    ),
     "single_commitment": lambda action, ledger, config: check_single_commitment(
         action, ledger, acceptance_classes=config["acceptance_classes"], commit_classes=config["commit_classes"]
     ),
@@ -189,6 +183,21 @@ AUTHORIZATION_CHECKS: dict[
         representation_classes=config["representation_classes"],
         requires_approval=config["requires_approval"],
         action_classes=config["action_classes"],
+        authorized_path=config.get("authorized_path"),
+    ),
+}
+
+# Checks that read the words a represent check passes beside it
+# (external-check-input/v0 ``representing_opening``).
+STATEMENT_OPENING_CHECKS: dict[str, Callable[[Action, RepresentingOpening | None, dict], CheckOutcome]] = {
+    "promise_never": lambda action, opening, config: check_promise_never(
+        action,
+        opening,
+        representation_classes=config["representation_classes"],
+        never=config["never"],
+        action_classes=config["action_classes"],
+        attributed_never=config.get("attributed_never"),
+        attributed_template=config.get("attributed_template"),
     ),
 }
 
@@ -197,6 +206,7 @@ RUNNABLE_CHECKS = (
     | frozenset(TASK_AUTHORITY_CHECKS)
     | frozenset(AUTHORIZATION_CHECKS)
     | frozenset(COMMERCIAL_BOUNDS_CHECKS)
+    | frozenset(STATEMENT_OPENING_CHECKS)
 )
 
 __all__ = [
@@ -209,6 +219,8 @@ __all__ = [
     "AuthorizationRecord",
     "CONFIGURED_CHECKS",
     "RUNNABLE_CHECKS",
+    "RepresentingOpening",
+    "STATEMENT_OPENING_CHECKS",
     "TASK_AUTHORITY_CHECKS",
     "PLAN_PATH",
     "TaskAuthorityBody",

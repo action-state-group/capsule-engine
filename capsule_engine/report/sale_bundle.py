@@ -132,7 +132,7 @@ from __future__ import annotations
 
 import json
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -154,6 +154,7 @@ from .replay import (
     _text,
     _typed_ref_digest,
     replay,
+    representing_openings,
 )
 
 __all__ = [
@@ -199,6 +200,9 @@ class SaleThread:
     thread_id: str
     records: tuple[dict, ...]
     disclosed: dict[str, dict]
+    # The openings of represent checks' words the thread copy's deal report
+    # carries (``replay.representing_openings``), by commitment.
+    openings: dict[str, dict] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -317,7 +321,8 @@ def read_sale_bundle(bundle: dict) -> SaleBundle:
             findings.append(why)
         elif authority is not None:
             findings.extend(_opened_and_whole(entry, registration, authority, thread_bundle, opened, cut))
-        threads.append(SaleThread(thread_id=thread_id, records=held, disclosed=shown))
+        threads.append(SaleThread(thread_id=thread_id, records=held, disclosed=shown,
+                                  openings=representing_openings(thread_bundle)))
     certified = None if any(t is None for t in times) else min(t for t in times if t is not None)
     if certified is None:
         findings.append("checkpoint_time_not_read")
@@ -661,12 +666,18 @@ def replay_sale(sale: SaleBundle, **options: object) -> ReplayResult:
     """``replay`` of every carried thread's records in seal order
     (``SaleBundle.records``), with their disclosures, the records carried
     without disclosing withheld, and each check's history of the sale
-    (``sale_checks``). ``options`` are ``replay``'s other keyword
-    arguments."""
+    (``sale_checks``), and the openings of represent checks' words the
+    threads' deal reports carry (``SaleThread.openings``). ``options`` are
+    ``replay``'s other keyword arguments."""
     records = sale.records()
     disclosed = sale.disclosed()
     withheld = frozenset(r["capsule_id"] for r in records if isinstance(r.get("capsule_id"), str)) - disclosed.keys()
-    return replay(records, disclosed=disclosed, withheld=withheld, sale_history=sale_checks(sale), **options)
+    openings: dict[str, dict] = {}
+    for thread in sale.threads:
+        for commitment, opening in thread.openings.items():
+            openings.setdefault(commitment, opening)
+    return replay(records, disclosed=disclosed, withheld=withheld, sale_history=sale_checks(sale),
+                  representing_openings=openings, **options)
 
 
 def sale_checks(sale: SaleBundle) -> SaleHistory:

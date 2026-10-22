@@ -221,6 +221,7 @@ def _decide(envelope: dict, *, with_history: bool = True) -> Live:
             action,
             task_authority_record=envelope.get("task_authority_record"),
             commercial_bounds_opening=envelope.get("commercial_bounds_opening"),
+            representing_opening=envelope["record"].get("representing_opening"),
         )
         return Live(decision=decision, ledger=ledger, written=written)
 
@@ -567,9 +568,10 @@ def _replayed() -> dict[str, GuardDecision]:
     return {s.record["action_id"]: s.decision for s in result.decisions}
 
 
-# Rules that read an input only a live check is given (the floor's opening,
-# the task-authority record), so a replay holds them n/a on every check.
-LIVE_INPUT_RULES = ("s03-price-below-the-floor", "s08-stay-within-task-bounds")
+# Rules that read an input only a live check is given (the floor's opening),
+# so a replay holds them n/a on every check. A replay reads the task-authority
+# record from the bundle (capsule-engine#180), so s08 decides as live does.
+LIVE_INPUT_RULES = ("s03-price-below-the-floor",)
 # Where else the replay and the live check, on histories with their
 # disposition sealed, decide a rule differently, and why. Every other rule of
 # every check is decided the same.

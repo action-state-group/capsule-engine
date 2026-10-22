@@ -101,7 +101,29 @@
 # the sale states it) passes s05 with no chat claim. A listing that drops it,
 # no listing, or listings on two platforms that do not both state it count
 # for nothing, and s05 asks as in 0.1.4 unless chat stated it. offer.make and
-# offer.accept take listing_classes. No other rule changes.
+# offer.accept take listing_classes.
+#
+# 0.1.5 also lets s04 and s10 decide (capsule-engine#180, #189). The checker
+# bridge now carries a represent check's class (representing.class), which
+# it dropped, so both read a missing class as not applicable and every
+# statement passed them. s04 (promise_requires_approval/1.1.0) reads the
+# classes the user ordered where capsulectl's task authority seals them,
+# body.ordered_representations; 1.0.0 read a member no producer seals. A
+# promise with no task authority to cover it (an x-deal-v0 deal has none)
+# asks, saying "no task authority order or approval of yours covers this
+# promise". s10 (promise_never/1.1.0) still refuses the agent's own
+# authenticity claim, and passes the user's own, said as theirs and marked
+# unverified: a statement attributed to the user (representing.attributed_to,
+# statement_attributed_to here) whose words, given beside the check, open
+# the commitment it seals and read as one sentence "The seller says ...
+# (unverified)". A live check given no words fails. A replay reads the words
+# from the bundle's deal report, whose openings capsulectl seals, and
+# decides as live. When the bundle does not carry them (a counterparty copy,
+# a claim never made), a replay cannot confirm the attributed claim: s10 is
+# not evaluable there ("the words for this attributed claim are not in the
+# bundle"), refused but never recorded as a failure. The sentence marks
+# are every Unicode 17.0 sentence terminator and every line break.
+# capsulectl asks the user before every such claim. No other rule changes.
 pack_id: asg/seller/0.1.5
 
 obligations:
@@ -131,9 +153,11 @@ obligations:
   - id: s04-statement-that-needs-the-users-word
     statement: >-
       Flags a statement in a class the user must approve (today warranty
-      and delivery date) that neither the cited task authority already
-      names nor a sealed approval for that class, cited by digest, covers,
-      and records the class.
+      and delivery date), and records the class, unless the cited task
+      authority orders that class (it seals them in
+      ordered_representations) or a sealed approval for that class, cited
+      by digest, covers it. A statement that cites no task authority needs
+      that approval.
     check: promise_requires_approval
     default_disposition: ASK
   - id: s05-required-statement-made-first
@@ -190,7 +214,10 @@ obligations:
     statement: >-
       Detects a statement in a class the user never allows the agent to
       make (today authenticity), and records the class. No approval and no
-      task authority clears it; only a change to this rule set does.
+      task authority clears it; only a change to this rule set does. A
+      statement attributed to the user passes only when its words are one
+      sentence reading "The seller says … (unverified)", so the buyer sees
+      whose claim it is and that it is unverified.
     check: promise_never
     default_disposition: NEVER
   - id: s11-one-commitment-per-sale
@@ -246,7 +273,7 @@ action_semantics:
   - action_type: statement.send
     action_class: communication.send
     required_fields: [target, representation_class]
-    optional_fields: [task_authority_ref, authorized_by, equivalence_key]
+    optional_fields: [task_authority_ref, statement_attributed_to, authorized_by, equivalence_key]
   - action_type: personal_data.share
     action_class: disclosure.personal
     required_fields: [target, recipient_role, disclosed_classes]
@@ -264,10 +291,12 @@ constraints:
     digest: 6216addfa4e53b746dd72ec6dd4986758e064d2885e007b0fa546e2d42d189d1
   - wicket_ref: price_floor/2.0.1
     digest: c39f858b52a9697a70450680d90d0bbd0cb4e4eb79925d18e67623d587404977
-  - wicket_ref: promise_requires_approval/1.0.0
-    digest: b29e29e0a31ef764b282fa5754992b49b5ffc4f3fc261fb821987ae6c2e1c9b2
-  - wicket_ref: promise_never/1.0.0
-    digest: 836ae58f704a9c8ab8027fee344ca47ddb3de76a7a1973a650f42a3595e649f4
+  # The classes the user ordered, where capsulectl's task authority seals them.
+  - wicket_ref: promise_requires_approval/1.1.0
+    digest: 66d1e62d9c809e8a8a133b0e4c9bf23d334ed99d2f285493a6b6e3c40726d5d5
+  # The user's own authenticity claim, attributed and marked unverified, passes.
+  - wicket_ref: promise_never/1.1.0
+    digest: ed9e02ed17cbd08a0f846023e7091e7636d504ba1f18c6b9173e0a2443d92b8b
   # A class stated to the buyer, in the deal, or by the sale's listings in force.
   - wicket_ref: required_disclosure/1.2.0
     digest: cae962303066286b3c391a6c1a2f5f5db6742865fb84e1932ad68515a423224f
@@ -453,6 +482,18 @@ fixtures:
       outcome: escalate
     - id: offer-after-listings-sharing-no-class
       outcome: escalate
+    - id: statement-warranty-ordered
+      outcome: allow
+    - id: statement-warranty-ordered-record-missing
+      outcome: escalate
+    - id: statement-authenticity-attributed
+      outcome: allow
+    - id: statement-authenticity-attributed-off-template
+      outcome: deny
+    - id: statement-authenticity-attributed-words-not-checked
+      outcome: deny
+    - id: statement-authenticity-ordered-not-attributed
+      outcome: deny
 
 # The action taxonomy this pack was authored against. The taxonomy decides
 # whether a gated class asks or refuses on a failure (its approver_role), so

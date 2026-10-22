@@ -138,6 +138,7 @@ NORMALIZED_ACTION_FIELDS = frozenset(
         "upfront_amount_minor",
         "task_authority_ref",
         "representation_class",
+        "statement_attributed_to",
         "authorized_by",
         "proposal_at",
         "handover",

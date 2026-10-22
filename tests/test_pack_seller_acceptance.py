@@ -42,10 +42,12 @@ from capsule_engine.guards.capsule import ALLOW, DENY, ESCALATE
 from capsule_engine.guards.checks import (
     AuthorizationRecord,
     CommercialBoundsOpening,
+    RepresentingOpening,
     TaskAuthorityRecord,
     authorization_record_digest,
     task_authority_record_digest,
 )
+from capsule_engine.guards.checks.commitment import text_commitment
 from capsule_engine.packs import build_engine, install_pack, load_pack_dir, record_pack_activation
 from capsule_engine.report.live_history import history_act_payload
 
@@ -125,6 +127,35 @@ ADDRESS_APPROVAL: AuthorizationRecord = {"type": "approval/v0", "body": {"repres
 ADDRESS_APPROVAL_REF = authorization_record_digest(ADDRESS_APPROVAL)
 APPROVALS = {"statement-warranty-approved": WARRANTY_APPROVAL,
              "address-to-a-before-acceptance-approved": ADDRESS_APPROVAL}
+# The same task, as capsulectl seals one where the user ordered the agent to
+# state the warranty and the authenticity (0.1.5's s04 reads
+# body.ordered_representations). Supplied only to the steps that cite it.
+ORDERED_TASK: TaskAuthorityRecord = {
+    "type": "task-authority/v0",
+    "body": {**TASK["body"], "ordered_representations": ["authenticity", "warranty"]},
+}
+ORDERED_TASK_REF = task_authority_record_digest(ORDERED_TASK)
+TASK_RECORDS = {"statement-warranty-ordered": ORDERED_TASK,
+                "statement-authenticity-ordered-not-attributed": ORDERED_TASK}
+
+# The words of a represent check, opened beside it as capsulectl passes them
+# (external-check-input/v0 representing_opening), and the commitment the
+# check seals to them (representing.text_commitment).
+WORDS_NONCE = "9" * 64
+IN_TEMPLATE = "The seller says it's authentic (unverified)"
+TWO_SENTENCES = "The seller says it's used. I guarantee it's authentic (unverified)"
+
+
+def _opening(text: str, nonce: str = WORDS_NONCE) -> RepresentingOpening:
+    return {"nonce": nonce, "text": text}
+
+
+OPENINGS = {
+    "statement-authenticity-attributed": _opening(IN_TEMPLATE),
+    "statement-authenticity-attributed-off-template": _opening(TWO_SENTENCES),
+    # Words that do not open the commitment the check seals.
+    "statement-authenticity-attributed-words-not-checked": _opening(IN_TEMPLATE, "8" * 64),
+}
 
 # Steps recorded as real decisions rather than dry runs: only a real
 # accepted statement counts as made, and only a real accepted acceptance
@@ -157,7 +188,7 @@ def _statement(name: str, minute: int, target: str, cls: str, **fields) -> Actio
     fields.setdefault("developer", DEVELOPER)
     return Action(verb="tell", operator=OPERATOR, action_class="communication.send",
                   target=target, representation_class=cls, action_id=f"tell/seller-fixture-{name}",
-                  timestamp=_at(minute), **fields)
+                  timestamp=fields.pop("timestamp", _at(minute)), **fields)
 
 
 def _commitment(verb: str, action_class: str, name: str, minute: int, target: str, amount_minor: int,
@@ -418,6 +449,36 @@ def _scenarios() -> list[tuple[str, Action, str]]:
         ("offer-after-listings-sharing-no-class", _offer("listings-no-class-d", 59, BUYER_D, 180_000,
                                                          item_ref=ITEM_3, listing_classes=(),
                                                          timestamp=_at(59, 3)), ESCALATE),
+        # The statements s04 and s10 decide (0.1.5), each a second after
+        # the last listing row, in minute 59.
+        # A warranty the user ordered: s04 reads the order where
+        # capsulectl's task authority seals it, so it passes without asking.
+        ("statement-warranty-ordered", _statement("warranty-ordered", 59, BUYER_A, "warranty",
+                                                  task_authority_ref=ORDERED_TASK_REF, timestamp=_at(59, 4)), ALLOW),
+        # The same, citing a task authority that is not supplied (the one
+        # supplied has another digest): no order or approval covers it, so it asks.
+        ("statement-warranty-ordered-record-missing", _statement("warranty-ordered-missing", 59, BUYER_A,
+                                                                 "warranty", task_authority_ref=ORDERED_TASK_REF,
+                                                                 timestamp=_at(59, 5)),
+         ESCALATE),
+        # The user's own authenticity claim, said as theirs and marked
+        # unverified (0.1.5): s10 passes it. capsulectl asked the user first.
+        ("statement-authenticity-attributed", _statement(
+            "authenticity-attributed", 59, BUYER_A, "authenticity", statement_attributed_to="user",
+            representation_text_commitment=text_commitment(WORDS_NONCE, IN_TEMPLATE), timestamp=_at(59, 6)), ALLOW),
+        # Attributed, but two sentences: the second is the agent's own claim.
+        ("statement-authenticity-attributed-off-template", _statement(
+            "authenticity-off-template", 59, BUYER_A, "authenticity", statement_attributed_to="user",
+            representation_text_commitment=text_commitment(WORDS_NONCE, TWO_SENTENCES), timestamp=_at(59, 7)), DENY),
+        # Attributed, with words that are not the words the check seals.
+        ("statement-authenticity-attributed-words-not-checked", _statement(
+            "authenticity-words-not-checked", 59, BUYER_A, "authenticity", statement_attributed_to="user",
+            representation_text_commitment=text_commitment(WORDS_NONCE, IN_TEMPLATE), timestamp=_at(59, 8)), DENY),
+        # Ordered by the user, but not attributed to them: still the agent's
+        # own authenticity claim, refused.
+        ("statement-authenticity-ordered-not-attributed", _statement(
+            "authenticity-ordered", 59, BUYER_A, "authenticity", task_authority_ref=ORDERED_TASK_REF,
+            timestamp=_at(59, 9)), DENY),
     ]
 
 
@@ -445,6 +506,10 @@ BEFORE_RELEASE_FROM_HISTORY = {
     "share-phone-to-a-under-another-name": DENY,
     "address-to-a-citing-b-acceptance": DENY,
 }
+# Before 0.1.5, too, s04 reads a task-authority member capsulectl never
+# seals, so an ordered warranty asks, and s10 refuses the user's own
+# authenticity claim.
+BEFORE_REPRESENTING = {"statement-warranty-ordered": ESCALATE, "statement-authenticity-attributed": DENY}
 # Before 0.1.5 s07 does not run at the commit and counts no payment app as
 # p2p, so the commits it asks on are allowed and the sales by Venmo or Zelle ask.
 BEFORE_COMMIT_RAIL = {"commit-cash-shipped": ALLOW, "commit-cash-with-no-handover": ALLOW,
@@ -458,7 +523,7 @@ BEFORE_NO_PROPOSAL = {"first-offer-answering-no-proposal": ESCALATE, "no-proposa
 BEFORE_LISTING = {"offer-after-a-listing-stating-the-condition": ESCALATE}
 BEFORE_PICKUP_AREA = {"pickup-area-to-the-platform": DENY, "email-and-pickup-area-to-the-platform": DENY,
                       **BEFORE_RELEASE_FROM_HISTORY, **BEFORE_COMMIT_RAIL, **BEFORE_NO_PROPOSAL,
-                      **BEFORE_LISTING}
+                      **BEFORE_LISTING, **BEFORE_REPRESENTING}
 BEFORE_PLATFORM = {"email-to-the-platform": DENY, **BEFORE_PICKUP_AREA}
 EXPECTED_OVERRIDES: dict[str, str] = {}
 
@@ -493,9 +558,10 @@ def _run_scenarios(ledger, *, project_dir, decisions: dict[str, GuardDecision] |
             decision = engine.check(
                 action,
                 dry_run=name not in REAL_RUN,
-                task_authority_record=TASK,
+                task_authority_record=TASK_RECORDS.get(name, TASK),
                 authorization_record=APPROVALS.get(name),
                 commercial_bounds_opening=OPENING,
+                representing_opening=OPENINGS.get(name),
                 release_history=release_history,
             )
         if name in REAL_RUN and decision.outcome == ALLOW and action.action_class == "agreement.accept":
@@ -811,6 +877,81 @@ def test_a_statement_never_made_is_refused_even_with_an_approval(run):
     capsule = run[2]["statement-authenticity"]
     assert _failing(capsule) == ["promise_never"]
     assert capsule["disposition"]["decision"] == "reject"
+
+
+# -- s04 and s10 decide (0.1.5, capsule-engine#180 and #189) -----------------------
+
+
+def _decided(run, name: str, check_id: str):
+    (outcome,) = [c for c in run[5][name].constraints if c.id == check_id]
+    return outcome
+
+
+def test_an_ordered_warranty_passes_on_the_order_capsulectl_seals(run):
+    name = "statement-warranty-ordered"
+    s04 = _decided(run, name, "promise_requires_approval")
+    assert (s04.result, s04.evidence["authority_basis"]) == ("pass", "task_authority_ref")
+    assert s04.evidence["task_authority_ref"] == ORDERED_TASK_REF
+    assert _failing(run[2][name]) == []
+
+
+def test_an_ordered_warranty_whose_task_authority_is_not_supplied_asks(run):
+    name = "statement-warranty-ordered-record-missing"
+    assert _failing(run[2][name]) == ["promise_requires_approval"]
+    assert run[5][name].outcome == ESCALATE
+
+
+def test_a_warranty_citing_no_task_authority_says_no_order_covers_it(run):
+    """An x-deal-v0 deal seals no task authority: a warranty asks, and the
+    reason the card shows says why."""
+    s04 = _decided(run, "statement-warranty-unapproved", "promise_requires_approval")
+    assert (s04.result, s04.reason) == ("fail", "no task authority order or approval of yours covers this promise")
+    assert s04.evidence["task_authority_ref"] is None
+    # An approval still clears it.
+    assert _decided(run, "statement-warranty-approved", "promise_requires_approval").result == "pass"
+
+
+def test_the_users_own_authenticity_claim_passes_s10_as_theirs(run):
+    name = "statement-authenticity-attributed"
+    capsule = run[2][name]
+    assert _failing(capsule) == []
+    assert capsule["disposition"]["decision"] == "accept"
+    s10 = _decided(run, name, "promise_never")
+    assert s10.result == "pass"
+    assert (s10.evidence["attributed_to"], s10.evidence["words_opened"], s10.evidence["fits_template"]) == (
+        "user", True, True)
+    # The attribution is sealed; the commitment to the words is not.
+    assert capsule["asg_payload"]["statement_attributed_to"] == "user"
+    assert "representation_text_commitment" not in capsule["asg_payload"]
+
+
+@pytest.mark.parametrize("name,opened", [("statement-authenticity-attributed-off-template", True),
+                                         ("statement-authenticity-attributed-words-not-checked", False)])
+def test_an_attributed_claim_off_the_template_or_not_the_checked_words_is_refused(run, name, opened):
+    assert _failing(run[2][name]) == ["promise_never"]
+    assert run[5][name].outcome == DENY
+    s10 = _decided(run, name, "promise_never")
+    assert s10.evidence["words_opened"] is opened
+    if opened:
+        assert s10.reason == ('the user\'s claim must read "The seller says … (unverified)", one sentence, so the '
+                              "buyer sees whose claim it is and that it is unverified")
+        assert s10.evidence["fits_template"] is False
+
+
+def test_an_ordered_authenticity_claim_not_attributed_to_the_user_is_refused(run):
+    """An order says what may be said, not that the user made the claim."""
+    name = "statement-authenticity-ordered-not-attributed"
+    assert _failing(run[2][name]) == ["promise_never"]
+    assert _decided(run, name, "promise_never").evidence["attributed_to"] is None
+
+
+def test_the_words_never_reach_a_record(run):
+    for name in OPENINGS:
+        sealed = json.dumps(run[2][name], ensure_ascii=False)
+        decided = json.dumps([(c.reason, c.evidence) for c in run[5][name].constraints], default=str,
+                             ensure_ascii=False)
+        for text in (IN_TEMPLATE, TWO_SENTENCES, "authentic (unverified)"):
+            assert text not in sealed and text not in decided, name
 
 
 def test_a_second_commitment_in_another_thread_is_refused(run):

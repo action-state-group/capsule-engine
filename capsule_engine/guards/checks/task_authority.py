@@ -66,7 +66,11 @@ class TaskAuthorityBody(TypedDict):
     binding: NotRequired[dict[str, str]]
     window: NotRequired[str]
     bounds_commitment: NotRequired[str]
+    # Read by promise_requires_approval/1.0.0; capsulectl seals none.
     authorized_representation_classes: NotRequired[list[str]]
+    # The classes the user ordered the agent to state, as capsulectl seals
+    # them; read by promise_requires_approval/1.1.0 (its authorized_path).
+    ordered_representations: NotRequired[list[str]]
 
 
 class TaskAuthorityRecord(TypedDict):

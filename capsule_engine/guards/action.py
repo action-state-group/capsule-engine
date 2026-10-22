@@ -23,6 +23,10 @@ def _utc_now() -> str:
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
+# The one value ``Action.statement_attributed_to`` takes: the statement is
+# the user's own claim (capsulectl's closed set).
+ATTRIBUTED_TO_USER = "user"
+
 # All digits once spaces, hyphens and dots are removed, six or more of them
 # (card, account and routing numbers), or IBAN-shaped.
 _RAW_DIGITS = re.compile(r"^\d{6,}$")
@@ -186,6 +190,16 @@ class Action:
     SHA-256 digest of the whole sealed approval record the action cites,
     read by ``promise_requires_approval`` against the record supplied with
     the decision (``promise_never`` records it and ignores it).
+    ``statement_attributed_to`` says whose claim the statement is: ``user``
+    when it goes out as the user's own claim, marked unverified
+    (capsulectl's ``representing.attributed_to``), unset for the agent's
+    own; read by ``promise_never`` from 1.1.0. A closed token about the
+    statement, never party data, sealed when set: any other value, given or
+    read back from a capsule, is dropped when the action is built.
+    ``representation_text_commitment`` is the salted commitment a represent
+    check seals to its words (``representing.text_commitment``), so
+    ``promise_never`` can open the words passed beside the check
+    (``representing_opening``). It is never sealed in ``asg_payload``.
     ``proposal_at`` is the RFC 3339 UTC timestamp of the proposal the action
     acts on, read by ``offer_expiry``.
     ``handover`` is how a sold item reaches the buyer, one member of
@@ -282,6 +296,8 @@ class Action:
     upfront_amount_minor: int | None = None
     task_authority_ref: str | None = None
     representation_class: str | None = None
+    statement_attributed_to: str | None = None
+    representation_text_commitment: str | None = None
     authorized_by: str | None = None
     proposal_at: str | None = None
     handover: str | None = None
@@ -297,6 +313,10 @@ class Action:
     ignored_inputs: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
+        if self.statement_attributed_to not in (None, ATTRIBUTED_TO_USER):
+            # A closed token: any other value is the agent's own statement,
+            # and is never sealed (``statement_attributed_to``).
+            object.__setattr__(self, "statement_attributed_to", None)
         if self.counterparty_account_ref is not None and _looks_like_raw_account_number(
             self.counterparty_account_ref
         ):
@@ -413,6 +433,7 @@ class Action:
             upfront_amount_minor=payload.get("upfront_amount_minor"),
             task_authority_ref=payload.get("task_authority_ref"),
             representation_class=payload.get("representation_class"),
+            statement_attributed_to=payload.get("statement_attributed_to"),
             authorized_by=payload.get("authorized_by"),
             proposal_at=payload.get("proposal_at"),
             handover=handover_of(payload.get("handover")),

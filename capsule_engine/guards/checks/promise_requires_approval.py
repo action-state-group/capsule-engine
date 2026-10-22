@@ -12,7 +12,12 @@ class inside it passes on either of two bases, named in the evidence's
   equals ``Action.task_authority_ref``
   (``task_authority.bind_task_authority_record``), and its
   ``body.authorized_representation_classes`` (``AUTHORIZED_PATH``) lists the
-  class. No approval event is needed.
+  class. No approval event is needed. From 1.1.0 the wicket config names
+  the path (``authorized_path``): capsulectl's task authority seals the
+  classes the user ordered at ``body.ordered_representations``, and the
+  list counts only when every member is a class in
+  ``representation_classes``; a malformed list allows nothing. 1.0.0 names
+  none and reads ``AUTHORIZED_PATH`` as it always did.
 - ``authorized_by``: a bound approval for a statement outside the task
   authority. ``Action.authorized_by`` is the SHA-256 digest of the WHOLE
   sealed approval record, that record is supplied beside the action for one
@@ -23,7 +28,10 @@ class inside it passes on either of two bases, named in the evidence's
 
 Anything less fails: no reference, no record, a record the reference does
 not bind, a record with no digest, or an approval for another class. Never
-``n/a``: an unreadable approval is no approval. A class no approval may
+``n/a``: an unreadable approval is no approval. Under 1.1.0 a failure on an
+action that cites no task authority (an x-deal-v0 deal has none) reads
+"no task authority order or approval of yours covers this promise". 1.0.0
+keeps its reasons. A class no approval may
 clear belongs to ``promise_never``, not here.
 
 A class outside the closed set fails closed. Applies only to the configured
@@ -119,9 +127,13 @@ def _approved_class(action: Action, record: AuthorizationRecord | None) -> str:
     return node
 
 
-def _authority_allows(action: Action, record: TaskAuthorityRecord | None, cls: str) -> bool:
-    """Whether the bound task authority lists ``cls``. An unbound or silent
-    record allows nothing; the approval is then the only basis left."""
+def _authority_allows(action: Action, record: TaskAuthorityRecord | None, cls: str,
+                      path: tuple[str, ...], known: list[str] | None = None) -> bool:
+    """Whether the bound task authority lists ``cls`` at ``path``. An unbound
+    or silent record allows nothing; the approval is then the only basis
+    left. With ``known`` (1.1.0), the list counts only when every member is
+    one of those class names: a list holding anything else is malformed and
+    allows nothing."""
     try:
         _, bound = bind_task_authority_record(action, record)
     except UnboundRecord:
@@ -129,12 +141,16 @@ def _authority_allows(action: Action, record: TaskAuthorityRecord | None, cls: s
         # only basis, and a failure's reason names what the approval lacked.
         return False
     node: object = bound
-    for name in AUTHORIZED_PATH:
+    for name in path:
         # Decoded JSON: each level is checked before it is read.
         if not isinstance(node, dict) or name not in node:
             return False
         node = node[name]
-    return isinstance(node, list) and cls in node
+    if not isinstance(node, list):
+        return False
+    if known is not None and not all(isinstance(c, str) and c in known for c in node):
+        return False
+    return cls in node
 
 
 def _outcome(result: str, reason: str, evidence: PromiseEvidence | NotApplicableEvidence) -> CheckOutcome:
@@ -153,6 +169,7 @@ def check_promise_requires_approval(
     representation_classes: list[str],
     requires_approval: list[str],
     action_classes: list[str],
+    authorized_path: list[str] | None = None,
 ) -> CheckOutcome:
     require_known_classes(requires_approval, representation_classes, what="requires_approval")
     if action.action_class not in action_classes:
@@ -174,7 +191,9 @@ def check_promise_requires_approval(
         return _outcome("fail", f"representation_class {cls!r} is not in {representation_classes}", evidence(None))
     if not needs:
         return _outcome("pass", f"a {cls} statement needs no approval", evidence(None))
-    if _authority_allows(action, task_authority_record, cls):
+    path = AUTHORIZED_PATH if authorized_path is None else tuple(authorized_path)
+    known = representation_classes if authorized_path is not None else None
+    if _authority_allows(action, task_authority_record, cls, path, known):
         return _outcome("pass", f"the task authority allows a {cls} statement", evidence("task_authority_ref"))
     try:
         approved = _approved_class(action, authorization_record)
@@ -185,5 +204,9 @@ def check_promise_requires_approval(
             return _outcome("pass", f"the {cls} statement cites a bound approval for {cls}",
                             evidence("authorized_by"))
         why = f"the approval is for {approved}, not {cls}"
-    return _outcome("fail", f"a {cls} statement is outside the task authority and needs a bound approval: {why}",
-                    evidence(None))
+    reason = f"a {cls} statement is outside the task authority and needs a bound approval: {why}"
+    if authorized_path is not None and action.task_authority_ref is None:
+        # What the user's card says (design note capsule-engine#194 §2): the
+        # evidence still records the class and what was cited.
+        reason = "no task authority order or approval of yours covers this promise"
+    return _outcome("fail", reason, evidence(None))

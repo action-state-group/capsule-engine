@@ -1,0 +1,7 @@
+{
+  "producer": "capsule-cli internal/cli/deal_ids.go CommitText, at capsule-cli 71aad04",
+  "vectors": [
+    {"nonce": "1f2e3d4c5b6a79881f2e3d4c5b6a79881f2e3d4c5b6a79881f2e3d4c5b6a7988", "text": "The seller says it's authentic (unverified)", "commitment": "fa390bb998e127b2b330c2d85d28c0051db6c9f85d4189c871eed098924c497c"},
+    {"nonce": "1f2e3d4c5b6a79881f2e3d4c5b6a79881f2e3d4c5b6a79881f2e3d4c5b6a7988", "text": "The seller says it’s authentic — not a replica (unverified)", "commitment": "4ce2477a00d3827ea28124bc160c4474c066c503f8ddac12ffcf1839aa76fd10"}
+  ]
+}

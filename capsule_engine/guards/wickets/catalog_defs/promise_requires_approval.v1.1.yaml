@@ -1,0 +1,26 @@
+# promise_requires_approval/1.1.0: promise_requires_approval/1.0.0
+# (promise_requires_approval.yaml) reading the classes the task authority
+# allows at the path its config names, authorized_path: capsulectl's
+# task-authority/v0 seals the classes the user ordered at
+# body.ordered_representations (capsule-engine#180). 1.0.0 stays as it was
+# for the records and packs that pin it, reading
+# body.authorized_representation_classes.
+wicket_id: promise_requires_approval/1.1.0
+check: promise_requires_approval
+semantics: >-
+  An action in action_classes whose representation_class is outside
+  representation_classes fails as not recognised; one outside
+  requires_approval passes. One inside it passes when the task-authority
+  record bound by digest to its task_authority_ref lists the class at
+  authorized_path, or when its authorized_by is the digest of the approval
+  record supplied with the decision and that record's
+  body.representation_class is the class. Anything else fails; a failure on
+  an action that cites no task authority reads "no task authority order or
+  approval of yours covers this promise". An action that carries no representation_class is not
+  applicable, in scope; any other action class is not applicable. The
+  evidence records the class and what was cited, never the statement.
+config:
+  action_classes: [communication.send, disclosure.personal, marketplace.offer, marketplace.sale, agreement.accept]
+  representation_classes: [price, condition, features, authenticity, availability, delivery_date, service_scope, warranty, refund_terms, payment_methods, pickup, deadline, address, other]
+  requires_approval: [warranty, delivery_date]
+  authorized_path: [body, ordered_representations]

@@ -58,11 +58,13 @@ from .checks import (
     COMMERCIAL_BOUNDS_CHECKS,
     CONFIGURED_CHECKS,
     RUNNABLE_CHECKS,
+    STATEMENT_OPENING_CHECKS,
     TASK_AUTHORITY_CHECKS,
     AuthorizationRecord,
     CheckOutcome,
     CommercialBoundsOpening,
     LimitSources,
+    RepresentingOpening,
     TaskAuthorityRecord,
     cap_for,
     check_caps,
@@ -342,6 +344,7 @@ class GuardEngine:
         task_authority_record: TaskAuthorityRecord | None = None,
         authorization_record: AuthorizationRecord | None = None,
         commercial_bounds_opening: CommercialBoundsOpening | None = None,
+        representing_opening: RepresentingOpening | None = None,
         sale_history: LedgerAPI | None = None,
         release_history: LedgerAPI | None = None,
     ) -> GuardDecision:
@@ -358,6 +361,11 @@ class GuardEngine:
         user's private floor, read only by a ``price_floor`` wicket and only
         when it opens the ``bounds_commitment`` the bound task-authority
         record seals (``guards/checks/price_floor.py``). It is never sealed.
+        ``representing_opening`` is the checker input's opening of a
+        represent check's words, read only by a ``promise_never`` wicket
+        that judges an attributed claim's words, and only when it opens the
+        commitment the action carries (``guards/checks/promise_never.py``).
+        It is never sealed.
         ``sale_history`` is the ledger a replay builds for this check from a
         sale bundle (``report/sale_bundle.py``): given, ``single_commitment``
         reads the sale's acceptance from it instead of the engine's ledger.
@@ -503,6 +511,8 @@ class GuardEngine:
                 out = COMMERCIAL_BOUNDS_CHECKS[wicket.check](
                     action, task_authority_record, commercial_bounds_opening, wicket.config
                 )
+            elif wicket.check in STATEMENT_OPENING_CHECKS:
+                out = STATEMENT_OPENING_CHECKS[wicket.check](action, representing_opening, wicket.config)
             elif wicket.check in AUTHORIZATION_CHECKS:
                 out = AUTHORIZATION_CHECKS[wicket.check](
                     action, task_authority_record, authorization_record, wicket.config
