@@ -1,6 +1,6 @@
 # Design note: the seller 0.1.5 / everyday 0.3.8 batch
 
-Status: draft v5, 2026-10-22, Ethan's agent (session local_f0ad46ac). Reviewers: Codex, a
+Status: draft v6, 2026-10-22, Ethan's agent (session local_f0ad46ac). Reviewers: Codex, a
 `claude -p` stand-in for Kimi, Sherlock2 (product rules and wording).
 
 Code read: capsule-engine 8e2f887, capsule-cli 3acdeee (rc19), actionstate-muse 69c759d.
@@ -44,9 +44,15 @@ covers offers only, and a buyer message may carry the platform's own send time (
 refusal texts Sherlock2 asked for (§1, §5); a skill line and an e2e case for a buyer who backs
 out in chat (§1).
 
+**v6.** Takes the `claude -p` round 3: the fingerprint match rule (§1); the typed
+`proposed-action-v0` members in D4, D5 and D7 (§8); a listing per platform, so two live listings
+don't stand in for each other (§5, Q16); a word guard on the listing text, so a mislabel can't
+carry an authenticity claim (§5); the area guard's 5-digit and Unicode holes (§1, in
+capsule-cli#382); and nits.
+
 
 Items: capsule-engine #179, #180, #181, #186, #187, #188, #189, #190, #191, #192, #193 and
-capsule-cli#364. Each has a How ack, and Sherlock2 confirmed the what
+capsule-cli#364, plus capsule-cli#379 (#191's test) and capsule-cli#380 (its consent fix). Each has a How ack, and Sherlock2 confirmed the what
 (buzz://message?channel=0d760ea3-529d-4dec-b309-24184967f8e0&id=5b7d03a0409cbea1240a832db50b82976f68207840c54db00caf75f75809362d).
 Steven ruled #186-#192 (2026-10-22 03:27 UTC) and #181 (2026-10-22).
 
@@ -77,8 +83,8 @@ engine issues stay open until they land.
   `disclosed_classes` and takes `item_ref` and `deal_id` (no `representation_class`);
   `offer.make` and `offer.accept` take `proposal_at` or `no_proposal`; `offer.accept` (the
   seller's commit, `agreement.accept`) takes `rail` and `handover`; `statement.send` takes
-  `statement_attributed_to`; `offer.make`, `offer.accept` and `sale.complete` take
-  `listing_classes`.
+  `statement_attributed_to`; `offer.make` and `offer.accept` take `listing_classes` (no deal
+  record carries `marketplace.sale`, `deal_action_class.go` L30).
 - Statements rewritten: s04 (ordered classes read from the task authority), s05 (the listing in
   force counts as stated), s06 (a first offer
   answering no buyer message is not applicable), s07 (runs at commit; cash in person; a missing
@@ -94,13 +100,14 @@ engine issues stay open until they land.
 | `handover` | yes: a closed token | no |
 | `no_proposal` | yes: a flag | no |
 | `listing_classes` | **no**: read from the check body, never re-sealed on the decision. Class names only, equal across a sale's threads like `recipient_role`, never an identifier | n/a |
+| `repeat_disclosures`, `recipient_told_before` | **no**: read from the check body, never re-sealed on the decision, like `spend_authorized_minor` | n/a |
+| `thread_counterparty` (§1) | **no**: internal history state beside `act_payload`, never in it | n/a |
 
 The four rule inputs (`repeat_disclosures`, `recipient_told_before`, `listing_classes`,
 `no_proposal`) are sealed in the check body, which is in the deal's own exports, as every rule
 input is (PROFILE §8). That is acceptable because each is class names or a flag, never an
 identifier, and the two telling inputs are only about the party the check names, who was the
 one told. Keeping them off the decision payload only avoids a second copy.
-| `repeat_disclosures`, `recipient_told_before` | **no**: read from the check body and never re-sealed on the decision, like `spend_authorized_minor`. They describe past tellings to a party, possibly across deals, so they stay off any decision a buyer's copy could carry | n/a |
 
 No field joins `LOCAL_ONLY_PAYLOAD_FIELDS`, and no export path changes.
 
@@ -108,7 +115,7 @@ No field joins `LOCAL_ONLY_PAYLOAD_FIELDS`, and no export path changes.
 
 | PR | Repo | Items | Depends on |
 |---|---|---|---|
-| E1a | capsule-engine | #181: `pickup_area`, `seller.recipient_role/1.2.0`, seller 0.1.5 opened (capsule-engine#195) | none (ruled) |
+| E1a | capsule-engine | #181: `pickup_area`, `seller.recipient_role/1.2.0`, seller 0.1.5 opened (capsule-engine#195) | D1 ruled; its D8 wicket implements that ruling |
 | E1b | capsule-engine | #179, #186: `seller.release_on_acceptance/1.2.0`, s13's `action_semantics` | D8 |
 | C1 | capsule-cli | #181: emit `pickup_area` | the release gate (capsule-cli owns the class name) |
 | E2 | capsule-engine | #180 + #189 together: the `representing` bridge, `promise_requires_approval/1.1.0`, `promise_never/1.1.0` | E1a (pack open); Steven on door D5 |
@@ -118,7 +125,7 @@ No field joins `LOCAL_ONLY_PAYLOAD_FIELDS`, and no export path changes.
 | E4 | capsule-engine | #192: `seller.destination_rail/1.1.0`, the `handover` bridge | door D6 |
 | C4 | capsule-cli | #192: `terms.handover` | door D6 |
 | C5 | capsule-cli | #187 + #190: the listing post on the sale log, `listing_classes` on each thread's offer and commit | doors D3, D4 |
-| E6 | capsule-engine | #190: `required_disclosure/1.2.0` reads `listing_classes` | door D4 |
+| E6 | capsule-engine | #190: `required_disclosure/1.2.0` reads `listing_classes` | E1a; door D4 |
 | E5 / C6 | both | #188: `repeat_disclosures`, `action_class_gate/1.2.0`, everyday 0.3.8 | door D7 |
 | C7 | capsule-cli | #191: a pinning test (capsule-cli#379) | none |
 | C8 | capsule-cli | capsule-cli#380: a card names every term a check changes; an approval adopts only what its card named | door D9; blocks the release |
@@ -162,9 +169,13 @@ has no verifier and ends `not_evaluable`. So no share to a buyer ever passes.
   carry it in their `live_history` block beside `act_payload`, as `thread_counterparty`
   (`{fp_alg, payee}`); and `sale_acceptance` returns it. It is internal history state only: it
   never enters `act_payload` (`capsule.py` L248), so no decision seals it and no export changes.
-  The identifier is the payee fingerprint under `hmac-sha256-chain-key` (typed) or
-  `hmac-sha256-deal-key` (x-deal-v0); both sides must name the same algorithm. A missing
-  fingerprint on either side fails.
+  The identifier is the sealed `ids` map under `hmac-sha256-chain-key` (typed) or
+  `hmac-sha256-deal-key` (x-deal-v0), and both sides must name the same algorithm. An explicit
+  `who` seals only the kinds it names (`deal_profile.go` L254-256, L297-307) while the thread
+  default seals the opening's (L262-266), so the match is `sameParty`'s (`deal_counterparty.go`
+  L77-83): at least one kind on both sides, and every kind on both sides equal. A missing
+  fingerprint on either side fails. On replay the sale history is rebuilt from the bundle's
+  check records, which seal the same block.
 - **Only while the deal is live** (Sherlock2, Q7). A closed thread already takes no check
   (`deal.go` L1947). A seller's `cancel` act in a thread whose buyer accepted makes every later
   share in that thread ask: capsulectl adds its own `acceptance_called_off` difference ("the
@@ -213,9 +224,11 @@ class `pickup_location` instead. A share check carries class names only (`deal_r
 L248), so the guard sits where the value exists: the disclosure note the agent seals before it
 sends (`dealDisclosure.Fields`, `deal_rules.go` ~L2480; `deal.go` ~L1663), on every disclosure
 of the class, first or repeat. A value reads as a street address when it holds a house number
-(1-6 digits that aren't a ZIP or ZIP+4) and a whole-word street type (St, Street, Ave, Avenue,
-Rd, Road, Blvd, Boulevard, Ln, Lane, Dr, Drive, Ct, Court, Way, Pl, Place, with or without a
-period). "Oak Lane neighborhood", "Austin, TX 78701" and "78701" pass. It is a guard against a
+(any run of Unicode digits, a 5-digit one included) followed within four words by a
+whole-word street type (St, Ave, Rd, Blvd, Ln, Dr, Ct, Way, Pl, Hwy, Pkwy, Cir, Ter, Trl, Sq and
+their long forms, with or without a period), or a numbered unit (Apt, Unit, Suite, Ste, #). A ZIP
+alone is no street address because no street type follows it; a number after the street word
+("St. Louis, Ward 3") doesn't count; "1600 Broadway" with no type is a stated limit (Sherlock2). "Oak Lane neighborhood", "Austin, TX 78701" and "78701" pass. It is a guard against a
 mislabel, not a proof: the skill's definition carries the rest.
 
 **To verify while building.** The live-history fixtures carry commit acts with no disposition
@@ -236,7 +249,8 @@ there too: it is public); a share in the accepting thread that names another rec
 a share naming an unknown class or a credential class refuses; an acceptance older than the
 31-day history window reads as none, so a share refuses with the reason above, live and on
 replay; a commit naming the buyer explicitly then a share using the thread default pass through
-the reconstructed history, not only on a direct check; a platform share is left to s01;
+the reconstructed history, not only on a direct check; a commit whose `who` names a subset of the
+opening's kinds matches; one that shares no kind with the share refuses; a platform share is left to s01;
 a replayed sale bundle decides each as live; capsulectl refuses to record "12 Oak St" or
 "4 Elm Dr., Austin" as a pickup_area and records "Oak Lane neighborhood".
 
@@ -327,7 +341,7 @@ a `message` record has no refs, and an offer check's only ref is `supersedes`.
   when the agent can read it, sealed beside the note's `at`, and `proposal_at` is `sent_at` when
   present, else the noted `at`. The deal skill has the agent note each buyer message as it
   arrives.
-- A first offer on a thread that has no counterparty message sealed before it carries the sealed
+- An offer (the first or a later one) on a thread that has no counterparty message sealed before it carries the sealed
   rule input `no_proposal: true` instead: capsulectl decides it from its own whole log and seals
   it on the check, so a reader never derives it from what a bundle happens to show (a bundle may
   withhold a message's disclosure, `sale_bundle.py` L494). An offer naming no `answering` on a
@@ -412,6 +426,10 @@ sale, its task authority, thread records, cuts and the close. No check runs at s
 
 **Listings and authenticity.** A listing is the agent's words to every buyer, so it can't carry
 the agent's own authenticity claim, which no approval clears (s10; `promise_never.py` L62).
+`posting.classes` is the agent's label, so capsulectl also reads the words: it holds
+`posting.text` before committing it, and refuses a post whose text says "authentic", "genuine",
+"legit", "original" or "counterfeit" (whole words, any case) outside the §2 template, whatever the
+labels say, with the same refusal.
 capsulectl refuses a `post` whose `posting.classes` include `authenticity` unless the text
 carries it in the §2 template ("The seller says … (unverified)"), and the refusal quotes the
 template so the agent can fix the text and retry (Sherlock2, Q12); and then the post's
@@ -419,16 +437,20 @@ unconditional ask is the user's approval of exactly those words. The same check 
 path makes on attributed words applies to the template there.
 
 **Design (#190, A8).** s05 already runs on every offer, acceptance and sale; the listing just
-has to count. Each offer and commit check on a sale's thread carries the sealed rule input
-`listing_classes`: the classes in `posting.classes` of the latest `post` act on the thread's
-sale at the moment of the check, `[]` when the sale has a post act whose listing states none,
-and absent when the sale has no post act. capsulectl reads it from the sale's log, which it holds
+has to count. A post names its platform (`posting.platform`, the site's domain, as a share check
+names a platform recipient), and a later post on the same platform replaces the earlier one there.
+Each offer and commit check on a sale's thread carries the sealed rule input `listing_classes`:
+the classes every live listing states, the intersection over the latest `post` act per platform
+at the moment of the check. So two listings on two sites never stand in for each other: a buyer
+from the site whose listing omits the condition is never counted as told it (Q16 below). It is
+`[]` when the listings in force state no class in common, and absent when the sale has no post
+act. capsulectl reads it from the sale's log, which it holds
 locally. `required_disclosure/1.2.0` counts a required class as stated when it is in
 `listing_classes`, beside today's two paths (an earlier statement to the target, an agent claim
 in the deal). Because the value is sealed per check:
 
-- **A re-post replaces** (Sherlock2): a later post that drops `condition` makes later checks
-  carry `listing_classes` without it, so s05 asks unless chat stated it. Checks before the
+- **A re-post replaces** (Sherlock2): a later post on the same platform that drops `condition`
+  makes later checks carry `listing_classes` without it, so s05 asks unless chat stated it. Checks before the
   re-post keep what they sealed. A chat claim still counts on its own.
 - **Replay** reads the sealed value. Nothing is derived from what a bundle shows, and a withheld
   sale log changes nothing.
@@ -450,7 +472,10 @@ offer on a thread whose listing stated condition passes s05, live and on replay;
 re-post without the condition a later offer asks and an earlier one keeps its decision;
 condition stated in chat passes; neither asks; `listing_classes` absent (no post) adds nothing;
 a re-post and a thread offer in the same second, in both orders, are reported as not
-independently established;
+independently established; a re-post that states no class, then an offer, asks; two platforms,
+one listing without the condition, then an offer, asks; text saying "genuine" labelled
+`[condition]` is refused at the post; "before the check" across the sale log and the thread log
+is by sealed `at`, and a tie is not established;
 `check_profile.py` flags a `listing_classes` that doesn't match the sale's latest post act.
 
 ## 6. #188: a repeat of the same detail to the same party passes (everyday)
@@ -509,6 +534,10 @@ Q12 yes, the refusal quotes the template; Q13 yes, the post card shows the label
 covers only those; Q14 yes, failing closed with a reason that says what to do; Q15 a stated limit,
 fixed with `sent_at` where the platform shows the time.
 
+Pending: Q16 (§5), two live listings on two platforms: `listing_classes` is what every live
+listing states (the intersection over the latest post per platform), so a buyer is never
+counted as told by a listing they may not have seen.
+
 ## 8. One-way doors
 
 Doors close when published (a pack or capsulectl release), which the coordinator schedules.
@@ -517,11 +546,11 @@ Doors close when published (a pack or capsulectl release), which the coordinator
 |---|---|---|---|
 | D1 | `pickup_area` disclosure class in x-deal-v0, outside the address classes | #181, #186 | ruled yes (Steven, 10-22) |
 | D2 | x-deal-v0 and typed `proposed-action-v0`: an **offer** check may carry a `source` ref to the buyer `message` it answers, or the sealed rule input `no_proposal: true` (refused on any other action); a `message` note may carry `sent_at`; `external-check-input/v0`: `proposal_at` on an offer check answering a message. Commits keep the accepted seller offer's time | #364, #193 | to flag |
-| D3 | x-deal-v0: a `post` check action (`communication.publish`) with a sealed `posting {text_commitment, classes}`; a sale's log admits check/verdict/approval/action for `post`; a verdict rules status `not_applicable` | #187 | to flag |
-| D4 | x-deal-v0 rule input `listing_classes` on a sale thread's offer and commit checks: the classes the latest posted listing states | #190 | to flag |
-| D5 | x-deal-v0: `representing.attributed_to: "user"` on authenticity, words in the template "The seller says … (unverified)"; every attributed claim asks the user | #189 | to flag |
+| D3 | x-deal-v0: a `post` check action (`communication.publish`) with a sealed `posting {text_commitment, classes, platform}`; a sale's log admits check/verdict/approval/action for `post`; a verdict rules status `not_applicable` | #187 | to flag |
+| D4 | x-deal-v0 and typed `proposed-action-v0` rule input `listing_classes` on a sale thread's offer and commit checks: the classes every live listing states; `posting.platform` on a post | #190 | to flag |
+| D5 | x-deal-v0 and typed `proposed-action-v0`: `representing.attributed_to: "user"` on authenticity, words in the template "The seller says … (unverified)"; every attributed claim asks the user | #189 | to flag |
 | D6 | x-deal-v0: `terms.handover: in_person \| shipped` | #192 (#184 reuses it) | to flag |
-| D7 | x-deal-v0 rule inputs `repeat_disclosures` and `recipient_told_before` | #188 | to flag |
+| D7 | x-deal-v0 and typed `proposed-action-v0` rule inputs `repeat_disclosures` and `recipient_told_before` | #188 | to flag |
 | D9 | PROFILE §6 rule 13 / §8: an approval agrees only to the terms its card named; an approval with no card agrees to no changed term (new rule-inputs version; older checks re-derive unchanged) | capsule-cli#380 | to flag |
 | D8 | New wicket versions: `seller.recipient_role/1.2.0`, `seller.release_on_acceptance/1.2.0`, `promise_requires_approval/1.1.0`, `promise_never/1.1.0`, `offer_expiry/1.1.0`, `seller.destination_rail/1.1.0`, `action_class_gate/1.2.0`, `required_disclosure/1.2.0`; pack digests seller 0.1.5 and everyday 0.3.8 | all | to flag; each implements a ruled or confirmed what |
 
@@ -530,6 +559,6 @@ consequence, is D9).
 
 ## 9. What is not in this batch
 
-- The Muse ports and vendoring (follow-up lane after the release digests).
+- The Muse ports and vendoring: not in this lane, but in the batch's release gate (§0).
 - #184's payment-received rule (it only reuses D6).
 - The authorization-record input for s04 (capsule-cli#252).
