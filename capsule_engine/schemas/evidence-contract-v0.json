@@ -209,7 +209,7 @@
         "clause": { "$ref": "#/$defs/clauseSpec" },
         "epistemic_type": { "$ref": "#/$defs/epistemicType" },
         "out_of_scope_allowed": {
-          "description": "The requirement allows the out_of_scope verdict (Evidence Result v0 section 4.2): a pack's switch compiled per requirement, absent on a requirement marked never out of scope. One spelling: present and true, or absent. Only the two native shapes carry it; the abstract shapes are closed to it, and on an open stub the same name grants nothing.",
+          "description": "The requirement allows the out_of_scope verdict (Evidence Result v0, the out_of_scope verdict): a pack's switch compiled per requirement, absent on a requirement marked never out of scope. One spelling: present and true, or absent. Only the two native shapes carry it; the abstract shapes are closed to it, and on an open stub the same name grants nothing.",
           "const": true
         }
       }
