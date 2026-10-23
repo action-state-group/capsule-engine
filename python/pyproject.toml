@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "capsule-engine"
-version = "0.1.0"
+version = "0.2.0"
 description = "The thin single-node engine: guard, append-only fold compute, packs, policy activation, and the local console/report/bundle-viewer runtime for AI agent actions."
 readme = "README.md"
 # typing.NotRequired (PEP 655) is 3.11 and later.
