@@ -105,7 +105,9 @@ record-query verbs; the default is `full`. Run any command with `--help`.
 | `airline-engagement/` | `asg/airline-engagement/1.0.1` | An airline-engagement starter pack, used at judge and report time (its `outcomes[]`). |
 | `eu-ai-act/` | `asg/eu-ai-act-obligations/0.1.1` | EU AI Act obligations, backward-only: its outcomes are the sample compiler's output from `register.yaml`. |
 | `eu-ai-act-deterministic/` | `asg/eu-ai-act-deterministic/0.1.0` | EU AI Act obligations, backward-only, produced from `../eu-ai-act/obligations-register.yaml` (26 contracts). |
+| `everyday/` | `asg/everyday/0.3.6` | The rules for an assistant that buys, pays, books and sends messages for a household: 27 rules, 24 measured by a deterministic check and 3 declared not measured, each naming the input it still lacks. |
 | `payments-safety/` | `asg/payments-safety/1.0.0` | Caps per scope and window, dedupe, and verify-before-dispatch on money movement, plus the spend fold. |
+| `seller/` | `asg/seller/0.1.3` | The rules for an assistant that sells one item for its user to one of several buyers, one buyer per thread: 12 rules, each measured by a deterministic check. |
 | `standard-vendor/` | `asg/standard-vendor/1.0.1` | The standard outcome catalog over the general capsule vocabulary: one pack that grades any vendor's ledger. |
 
 ### The Go guard (`go/`)
