@@ -5,12 +5,8 @@ import (
 )
 
 // capsule-engine #173 (7339028): asg/everyday/0.3.7 and asg/seller/0.1.4
-// add a platform recipient that may be given the user's email. The rc21
-// pack cut (0c93a58, seller re-vendored at a489e49) gives asg/everyday/0.3.8
-// and asg/seller/0.1.5, the defaults.
+// add a platform recipient that may be given the user's email.
 const (
-	everyday038     = "ac7697061fd1c50177000648e2458f6236068679fc67ae924870ee8fb1cd8488"
-	seller015Digest = "81013aedbc3d930dcb9a4871d932373eca9de6968e5cff9fb450158d1fcc576a"
 	everyday037     = "c1cea374102bba60de82e16663c550a278ee07a399c5faeb285fe1ea1ea27d4d"
 	everyday036     = "8a8e0a7e1ca4319b6e45f2037f4af49e6592919f373e59874ce1ead7249b073d"
 	seller014Digest = "c14c8f8176a933f97c8a04064f6634f8f0e422178f71c4a531ac01631f529e5b"
