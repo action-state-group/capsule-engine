@@ -60,21 +60,21 @@ func TestSaleCoverageMatchesTheEngine(t *testing.T) {
 	if err := json.Unmarshal(readFile(t, "testdata", "parity", "sale-coverage-parity.json"), &py); err != nil {
 		t.Fatal(err)
 	}
-	e, shippedPack := everydayEngine(t)
+	e, vectorPack := everyday037Engine(t)
 	info := py.Packs["0.3.6"]
-	if py.CapsuleEngineCommit != parity(t, shipped).CapsuleEngineCommit || info.PackID != shippedPack.ID || info.DefinitionDigest != shippedPack.DefinitionDigest {
-		t.Fatalf("vectors at %s for %s %s; the shipped pack is %s %s", py.CapsuleEngineCommit, info.PackID, info.DefinitionDigest,
-			shippedPack.ID, shippedPack.DefinitionDigest)
+	if py.CapsuleEngineCommit != parity(t, fixtures037).CapsuleEngineCommit || info.PackID != vectorPack.ID || info.DefinitionDigest != vectorPack.DefinitionDigest {
+		t.Fatalf("vectors at %s for %s %s; Go runs %s %s", py.CapsuleEngineCommit, info.PackID, info.DefinitionDigest,
+			vectorPack.ID, vectorPack.DefinitionDigest)
 	}
 	cited := map[string]string{}
-	for _, w := range shippedPack.Wickets {
+	for _, w := range vectorPack.Wickets {
 		cited[w.ID] = w.Digest
 	}
 	if !maps.Equal(cited, info.WicketDigests) {
-		t.Fatalf("the shipped pack cites %v, the engine's %v", cited, info.WicketDigests)
+		t.Fatalf("0.3.7 cites %v, the engine's %v", cited, info.WicketDigests)
 	}
-	if pin := shippedPack.Taxonomy; pin == nil || info.TaxonomyPin == nil || pin.Version != info.TaxonomyPin.Version || pin.Digest != info.TaxonomyPin.Digest {
-		t.Fatalf("taxonomy pin %+v, the engine's %+v", shippedPack.Taxonomy, info.TaxonomyPin)
+	if pin := vectorPack.Taxonomy; pin == nil || info.TaxonomyPin == nil || pin.Version != info.TaxonomyPin.Version || pin.Digest != info.TaxonomyPin.Digest {
+		t.Fatalf("taxonomy pin %+v, the engine's %+v", vectorPack.Taxonomy, info.TaxonomyPin)
 	}
 	if retired := py.Packs["0.3.2"]; retired.PackID != "asg/everyday/0.3.2" || retired.DefinitionDigest != "6f333fa8b7a7e137abe6c61e5a32097ed06d493479a018807cbf4d2e4f5da7b2" {
 		t.Fatalf("the 0.3.2 half ran under %s %s", retired.PackID, retired.DefinitionDigest)

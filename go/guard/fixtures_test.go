@@ -23,8 +23,13 @@ type fixtureSet struct {
 }
 
 var (
-	// shipped is the embedded pack (asg/everyday/0.3.7, capsule-engine #173).
-	shipped = fixtureSet{"shipped", "testdata/everyday-fixtures", "testdata/parity", func(t *testing.T) pack.Pack {
+	// fixtures037 is asg/everyday/0.3.7 (capsule-engine #173, 7339028), the pack
+	// the engine's fixtures and Python parity were run for. The default,
+	// asg/everyday/0.3.8, is 0.3.7 with action_class_gate/1.2.0 on r11 and
+	// r12 alone (TestEveryday038Is037WithToldBefore), which
+	// TestActionClassGate12AgreesWithTheEngine holds to the engine, so these
+	// vectors still hold every other check the default runs.
+	fixtures037 = fixtureSet{"everyday-0.3.7", "testdata/everyday-fixtures", "testdata/parity", func(t *testing.T) pack.Pack {
 		t.Helper()
 		p, err := pack.LoadEveryday037()
 		if err != nil {
@@ -32,7 +37,18 @@ var (
 		}
 		return p
 	}}
-	fixtureSets = []fixtureSet{shipped}
+	// fixtures038 is the default pack, asg/everyday/0.3.8, with the engine's
+	// own fixtures and Python parity at the commit that cut it (capsule-engine
+	// 0c93a58): testdata/everyday-fixtures-0.3.8 and testdata/parity-0.3.8.
+	fixtures038 = fixtureSet{"everyday-0.3.8", "testdata/everyday-fixtures-0.3.8", "testdata/parity-0.3.8", func(t *testing.T) pack.Pack {
+		t.Helper()
+		p, err := pack.LoadEveryday038()
+		if err != nil {
+			t.Fatal(err)
+		}
+		return p
+	}}
+	fixtureSets = []fixtureSet{fixtures037, fixtures038}
 )
 
 func (fx fixtureSet) engine(t *testing.T) (*Engine, pack.Pack) {
@@ -189,9 +205,25 @@ func scenarioActions(t *testing.T, fx fixtureSet) []Action {
 	return out
 }
 
+// everydayEngine is an engine over the default pack, asg/everyday/0.3.8.
 func everydayEngine(t *testing.T) (*Engine, pack.Pack) {
 	t.Helper()
-	return shipped.engine(t)
+	p, err := pack.LoadEveryday038()
+	if err != nil {
+		t.Fatal(err)
+	}
+	e, err := NewEngine(p)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return e, p
+}
+
+// everyday037Engine is an engine over the frozen asg/everyday/0.3.7, for the
+// vectors the engine decided under it (fixtures037).
+func everyday037Engine(t *testing.T) (*Engine, pack.Pack) {
+	t.Helper()
+	return fixtures037.engine(t)
 }
 
 // everyday036Engine is an engine over the frozen asg/everyday/0.3.6, for the

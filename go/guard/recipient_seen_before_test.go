@@ -24,11 +24,11 @@ func TestRecipientSeenBeforeParity(t *testing.T) {
 	if err := json.Unmarshal(readFile(t, "testdata", "parity", "recipient-seen-before-parity.json"), &p); err != nil {
 		t.Fatal(err)
 	}
-	if p.CapsuleEngineCommit != parity(t, shipped).CapsuleEngineCommit {
-		t.Fatalf("recipient_seen_before run at %s, parity run at %s", p.CapsuleEngineCommit, parity(t, shipped).CapsuleEngineCommit)
+	if p.CapsuleEngineCommit != parity(t, fixtures037).CapsuleEngineCommit {
+		t.Fatalf("recipient_seen_before run at %s, parity run at %s", p.CapsuleEngineCommit, parity(t, fixtures037).CapsuleEngineCommit)
 	}
 	e, _ := everydayEngine(t)
-	ledger := miniLedger(t, shipped)[:1]
+	ledger := miniLedger(t, fixtures037)[:1]
 	got := map[string]Constraint{}
 	for _, s := range p.Scenarios {
 		a, err := DecodeAction(bytes.NewReader(s.Action))

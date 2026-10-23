@@ -10,7 +10,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// NO RULE OF THE EVERYDAY PACK IS "NOT YET RUN": every check asg/everyday/0.3.7
+// NO RULE OF THE EVERYDAY PACK IS "NOT YET RUN": every check asg/everyday/0.3.8
 // cites is one this port runs, none at a definition pinned as unported (those
 // are asg/seller/0.1.0's), and no decision over the fixture scenarios or over
 // an action of any taxonomy class carries a not-yet-run constraint or rule.

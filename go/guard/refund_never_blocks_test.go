@@ -76,7 +76,7 @@ func refundVectorEngine(t *testing.T, window int64) *Engine {
 
 // refundVectorEngineOf is refundVectorEngine over the pack load gives,
 // whose caps fold must be fold: the frozen asg/everyday/0.3.5 over
-// spend.weekly/3.0.0, or the shipped 0.3.7 (0.3.6's caps) over spend.weekly/3.1.0.
+// spend.weekly/3.0.0, or the shipped 0.3.8 (0.3.6's caps) over spend.weekly/3.1.0.
 func refundVectorEngineOf(t *testing.T, window int64, load func() (pack.Pack, error), fold string) *Engine {
 	t.Helper()
 	p, err := load()
@@ -289,7 +289,7 @@ func TestTheExcludedMoneyInActStaysInternal(t *testing.T) {
 // "in", no disposition) is read with its direction and left out of the
 // window, by name, once; the window is the three accepted purchases.
 func TestARealRefundActIsReadAsMoneyIn(t *testing.T) {
-	p, err := pack.LoadEveryday037()
+	p, err := pack.LoadEveryday038()
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -13,8 +13,9 @@ import (
 )
 
 // THE G3 VECTORS AGAINST THE ENGINE (capsule-engine #138, a710636c,
-// asg/everyday/0.3.6, now frozen; the shipped 0.3.7 cites its caps and
-// fold unchanged, TestEveryday037Is036WithThePlatform): every step of the 17 sequences, decided by capsule-
+// asg/everyday/0.3.6, now frozen; 0.3.7 and the default 0.3.8 cite its caps
+// and fold unchanged, TestEveryday037Is036WithThePlatform and
+// TestEveryday038Is037WithToldBefore): every step of the 17 sequences, decided by capsule-
 // engine's live check path (engine_results.py, engine-results.json) and by
 // this port on the same envelope, as the plugin decodes it. Per step: caps'
 // result and sealed evidence digest, the decision's outcome, and every

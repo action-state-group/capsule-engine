@@ -50,7 +50,7 @@ func checkScalarParity(t *testing.T, check string) {
 	if len(p.Scenarios) == 0 || len(p.Records) == 0 {
 		t.Fatalf("%s parity: %d action and %d record scenarios", check, len(p.Scenarios), len(p.Records))
 	}
-	e, _ := everydayEngine(t)
+	e, _ := everyday037Engine(t)
 	var ledger []Record
 	for _, s := range p.Scenarios {
 		a, err := DecodeAction(bytes.NewReader(s.Action))

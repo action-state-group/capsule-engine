@@ -6,13 +6,14 @@ import (
 	"testing"
 )
 
-// gateRules are the eight rules asg/everyday/0.3.7 measures by one
-// action_class_gate selector each, with that selector.
+// gateRules are the eight rules asg/everyday/0.3.8 measures by one
+// action_class_gate selector each, with that selector (r11 and r12 on
+// action_class_gate/1.2.0's told-before selectors).
 var gateRules = map[string]string{
 	"r01-research-and-prepare":            "non_consequential",
 	"r04-prepare-without-committing":      "non_consequential",
-	"r11-home-address-to-an-individual":   "personal_disclosure",
-	"r12-personal-contact-to-a-new-party": "personal_disclosure",
+	"r11-home-address-to-an-individual":   "personal_disclosure_new_class",
+	"r12-personal-contact-to-a-new-party": "personal_disclosure_new_party",
 	"r15-public-posting":                  "public_posting",
 	"r16-booking-with-a-commitment":       "booking_create",
 	"r17-cancellation":                    "booking_cancel",
@@ -168,7 +169,7 @@ func TestABookingOverItsLimitFailsOnlyItsOwnGateRule(t *testing.T) {
 			t.Errorf("%s: %s (%s), want %s", id, r.Verdict, r.Reason, want)
 		}
 	}
-	if r := rules["r11-home-address-to-an-individual"]; r.Reason != "action class booking.create did not match selector personal_disclosure" {
+	if r := rules["r11-home-address-to-an-individual"]; r.Reason != "action class booking.create did not match selector personal_disclosure_new_class" {
 		t.Errorf("r11 reason %q", r.Reason)
 	}
 }

@@ -37,7 +37,7 @@ type golden struct {
 
 func readEverydayProvenance(t *testing.T) provenance {
 	t.Helper()
-	data, err := fs.ReadFile(packs.Everyday037, path.Join(packs.Everyday037Dir, "PROVENANCE.json"))
+	data, err := fs.ReadFile(packs.Everyday038, path.Join(packs.Everyday038Dir, "PROVENANCE.json"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -61,7 +61,7 @@ func fixtureBytes(t *testing.T) []byte {
 
 func loadFixture(t *testing.T, data []byte) (Pack, error) {
 	t.Helper()
-	return Load(data, packs.Everyday037, packs.Everyday037Dir)
+	return Load(data, packs.Everyday038, packs.Everyday038Dir)
 }
 
 // identity is what a golden pins: the pack id and its definition digest.
@@ -80,7 +80,7 @@ func sha256Hex(b []byte) string {
 func TestVendoredBytesMatchProvenance(t *testing.T) {
 	prov := readEverydayProvenance(t)
 	for name, f := range prov.Files {
-		data, err := fs.ReadFile(packs.Everyday037, path.Join(packs.Everyday037Dir, name))
+		data, err := fs.ReadFile(packs.Everyday038, path.Join(packs.Everyday038Dir, name))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -94,7 +94,7 @@ func TestVendoredBytesMatchProvenance(t *testing.T) {
 // capsule-engine computed at the vendored commit.
 func TestEverydayDigestMatchesEngineGolden(t *testing.T) {
 	prov := readEverydayProvenance(t)
-	p, err := LoadEveryday037()
+	p, err := LoadEveryday038()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -105,7 +105,7 @@ func TestEverydayDigestMatchesEngineGolden(t *testing.T) {
 
 func TestWicketDigestsMatchEngine(t *testing.T) {
 	prov := readEverydayProvenance(t)
-	ws, err := loadWickets(packs.Everyday037, path.Join(packs.Everyday037Dir, "wickets"))
+	ws, err := loadWickets(packs.Everyday038, path.Join(packs.Everyday038Dir, "wickets"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -125,7 +125,7 @@ func TestWicketDigestsMatchEngine(t *testing.T) {
 // capsule-engine computed for it (a reversal clause included).
 func TestFoldDigestsMatchEngine(t *testing.T) {
 	prov := readEverydayProvenance(t)
-	fs, err := loadFolds(packs.Everyday037, path.Join(packs.Everyday037Dir, "folds"))
+	fs, err := loadFolds(packs.Everyday038, path.Join(packs.Everyday038Dir, "folds"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -145,7 +145,7 @@ func TestFoldDigestsMatchEngine(t *testing.T) {
 // check (DETERMINISTIC, hence ENFORCED) and 3 declared_not_measured
 // (UNAVAILABLE-STATE-REQUIRED, hence UNKNOWN); no outcomes.
 func TestEverydayAssertsOnlyWhatExists(t *testing.T) {
-	p, err := LoadEveryday037()
+	p, err := LoadEveryday038()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -277,11 +277,11 @@ func TestLoadRefusesWhatThePortCannotCanonicalise(t *testing.T) {
 	}
 }
 
-// The vendored pack is capsule-engine's at the pin (7339028, PR #173's merge), and the digest the
+// The vendored pack is capsule-engine's at the pin (0c93a58, the rc21 pack cut), and the digest the
 // engine computed there is the one this build loads: re-vendoring changes
 // both on purpose, together.
 func TestEverydayIsVendoredFromThePin(t *testing.T) {
-	data, err := fs.ReadFile(packs.Everyday037, path.Join(packs.Everyday037Dir, "PROVENANCE.json"))
+	data, err := fs.ReadFile(packs.Everyday038, path.Join(packs.Everyday038Dir, "PROVENANCE.json"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -292,11 +292,11 @@ func TestEverydayIsVendoredFromThePin(t *testing.T) {
 	if err := json.Unmarshal(data, &prov); err != nil {
 		t.Fatal(err)
 	}
-	const pin, digest = "7339028ab2117d6c7adec89a26cd5022b8ac7140", "c1cea374102bba60de82e16663c550a278ee07a399c5faeb285fe1ea1ea27d4d"
+	const pin, digest = "0c93a58fccb6d39797d55ec7174aae16d24f0923", "ac7697061fd1c50177000648e2458f6236068679fc67ae924870ee8fb1cd8488"
 	if prov.SourceCommit != pin || prov.EngineDefinitionDigest != digest {
 		t.Fatalf("PROVENANCE names %s @ %s, want %s @ %s", prov.SourceCommit, prov.EngineDefinitionDigest, pin, digest)
 	}
-	p, err := LoadEveryday037()
+	p, err := LoadEveryday038()
 	if err != nil {
 		t.Fatal(err)
 	}

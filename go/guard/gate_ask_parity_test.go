@@ -135,8 +135,8 @@ func TestTaxonomy6MatchesTheEngine(t *testing.T) {
 	if err := json.Unmarshal(readFile(t, "testdata", "parity", "taxonomy6-parity.json"), &py); err != nil {
 		t.Fatal(err)
 	}
-	if py.CapsuleEngineCommit != parity(t, shipped).CapsuleEngineCommit {
-		t.Fatalf("taxonomy6: vectors at %s, the shipped pack's parity at %s", py.CapsuleEngineCommit, parity(t, shipped).CapsuleEngineCommit)
+	if py.CapsuleEngineCommit != parity(t, fixtures037).CapsuleEngineCommit {
+		t.Fatalf("taxonomy6: vectors at %s, the 0.3.7 fixtures' parity at %s", py.CapsuleEngineCommit, parity(t, fixtures037).CapsuleEngineCommit)
 	}
 	tax, err := engineTaxonomy()
 	if err != nil {
@@ -274,11 +274,11 @@ func checkGateCorpus(t *testing.T, name string, named map[string]string) {
 	if err := json.Unmarshal(readFile(t, "testdata", "parity", name+"-parity.json"), &py); err != nil {
 		t.Fatal(err)
 	}
-	_, shippedPack := everydayEngine(t)
-	if py.CapsuleEngineCommit != parity(t, shipped).CapsuleEngineCommit || py.PackDefinitionDigest != shippedPack.DefinitionDigest ||
-		corpus.PackID != shippedPack.ID {
-		t.Fatalf("%s: vectors at %s for %s %s; the shipped pack is %s %s", name, py.CapsuleEngineCommit, corpus.PackID,
-			py.PackDefinitionDigest, shippedPack.ID, shippedPack.DefinitionDigest)
+	_, vectorPack := everyday037Engine(t)
+	if py.CapsuleEngineCommit != parity(t, fixtures037).CapsuleEngineCommit || py.PackDefinitionDigest != vectorPack.DefinitionDigest ||
+		corpus.PackID != vectorPack.ID {
+		t.Fatalf("%s: vectors at %s for %s %s; Go runs %s %s", name, py.CapsuleEngineCommit, corpus.PackID,
+			py.PackDefinitionDigest, vectorPack.ID, vectorPack.DefinitionDigest)
 	}
 	if len(corpus.Cases) != len(py.Decisions) || len(corpus.Cases) != len(named) {
 		t.Fatalf("%s: %d cases, %d decisions, %d named", name, len(corpus.Cases), len(py.Decisions), len(named))
@@ -289,7 +289,7 @@ func checkGateCorpus(t *testing.T, name string, named map[string]string) {
 		if !ok {
 			t.Fatalf("%s: no engine decision", c.Name)
 		}
-		p := shippedPack
+		p := vectorPack
 		p.Rules = slices.Clone(p.Rules)
 		for i, r := range p.Rules {
 			if d, ok := c.Redeclare[r.ID]; ok {

@@ -47,9 +47,9 @@ func TestDedupeKeysOnTheCheckedActMatchTheEngine(t *testing.T) {
 	if err := json.Unmarshal(readFile(t, "testdata", "parity", "dedupe-act-parity.json"), &py); err != nil {
 		t.Fatal(err)
 	}
-	e, p := everydayEngine(t)
-	if py.CapsuleEngineCommit != parity(t, shipped).CapsuleEngineCommit || py.PackDefinitionDigest != p.DefinitionDigest {
-		t.Fatalf("vectors at %s for %s; the shipped pack is %s", py.CapsuleEngineCommit, py.PackDefinitionDigest, p.DefinitionDigest)
+	e, p := everyday037Engine(t)
+	if py.CapsuleEngineCommit != parity(t, fixtures037).CapsuleEngineCommit || py.PackDefinitionDigest != p.DefinitionDigest {
+		t.Fatalf("vectors at %s for %s; Go runs %s", py.CapsuleEngineCommit, py.PackDefinitionDigest, p.DefinitionDigest)
 	}
 	if len(py.Decisions) < 9 || len(py.KeyVectors) < 3 {
 		t.Fatalf("%d cases, %d key vectors", len(py.Decisions), len(py.KeyVectors))

@@ -7,7 +7,7 @@ import (
 	"github.com/action-state-group/capsule-engine/go/pack"
 )
 
-// seenBeforeEngine is the shipped engine: asg/everyday/0.3.7 cites
+// seenBeforeEngine is the shipped engine: asg/everyday/0.3.8 cites
 // counterparty_seen_before/4.0.0, which counts as 3.0.0 does (an action that
 // names a target), over counterparty.seen_before/3.0.0.
 func seenBeforeEngine(t *testing.T, v string) *Engine {

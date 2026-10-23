@@ -16,7 +16,7 @@ import (
 // here from its YAML file independently of the engine's decoder: the
 // closing message states what the pack sets, never a typed figure.
 func TestPurchaseLimitsAreThePacksCaps(t *testing.T) {
-	p, err := pack.LoadEveryday037()
+	p, err := pack.LoadEveryday038()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -32,7 +32,7 @@ func TestPurchaseLimitsAreThePacksCaps(t *testing.T) {
 			PerActionMinor map[string]int64 `yaml:"per_action_minor"`
 		} `yaml:"config"`
 	}
-	raw, err := os.ReadFile(filepath.Join("..", "packs", "everyday-0.3.7", "wickets", "caps.v5.1.yaml"))
+	raw, err := os.ReadFile(filepath.Join("..", "packs", "everyday-0.3.8", "wickets", "caps.v5.1.yaml"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -93,10 +93,10 @@ func TestNotCheckedOnPurchasesInputsAreNeverRead(t *testing.T) {
 }
 
 // The rules a purchase cannot make fail are those citing a listed check:
-// in asg/everyday/0.3.7, r07 and r19, as the v0.0.10 MANIFEST rules them,
+// in asg/everyday/0.3.8, r07 and r19, as the v0.0.10 MANIFEST rules them,
 // and r23, as ruled.
 func TestNotCheckedOnPurchasesRules(t *testing.T) {
-	p, err := pack.LoadEveryday037()
+	p, err := pack.LoadEveryday038()
 	if err != nil {
 		t.Fatal(err)
 	}

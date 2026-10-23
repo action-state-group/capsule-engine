@@ -57,7 +57,7 @@ func TestFoldDigestMatchesEngine(t *testing.T) {
 	var prov struct {
 		FoldDigests map[string]string `json:"fold_digests"`
 	}
-	b, err := fs.ReadFile(packs.Everyday037, path.Join(packs.Everyday037Dir, "PROVENANCE.json"))
+	b, err := fs.ReadFile(packs.Everyday038, path.Join(packs.Everyday038Dir, "PROVENANCE.json"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -77,7 +77,7 @@ func TestFoldDigestMatchesEngine(t *testing.T) {
 
 func TestCheckRefusesACitedMandate(t *testing.T) {
 	e, _ := everydayEngine(t)
-	a := scenarioActions(t, shipped)[0]
+	a := scenarioActions(t, fixtures037)[0]
 	a.CitedMandateCapsuleID = ptr(strings.Repeat("a", 64))
 	if _, err := e.Check(a, nil); err == nil {
 		t.Fatal("decided an action citing a mandate it cannot verify")

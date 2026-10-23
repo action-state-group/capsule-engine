@@ -139,7 +139,7 @@ func TestSellerPinsTheVendoredTaxonomy(t *testing.T) {
 	if p.Taxonomy == nil || *p.Taxonomy != (TaxonomyPin{Version: "6", Digest: digest}) || version != "6" {
 		t.Fatalf("seller pins %+v; vendored taxonomy is version %s digest %s", p.Taxonomy, version, digest)
 	}
-	e, err := LoadEveryday037()
+	e, err := LoadEveryday038()
 	if err != nil {
 		t.Fatal(err)
 	}

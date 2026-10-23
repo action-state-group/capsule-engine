@@ -31,7 +31,7 @@ func TestANonActDealRecordIsNotDeduped(t *testing.T) {
 	if err := json.Unmarshal(readFile(t, "testdata", "parity", "non-act-dedupe-parity.json"), &py); err != nil {
 		t.Fatal(err)
 	}
-	if py.CapsuleEngineCommit != parity(t, shipped).CapsuleEngineCommit || len(py.Bundles) != 2 {
+	if py.CapsuleEngineCommit != parity(t, fixtures037).CapsuleEngineCommit || len(py.Bundles) != 2 {
 		t.Fatalf("%d bundles at %s", len(py.Bundles), py.CapsuleEngineCommit)
 	}
 	e, _ := everydayEngine(t)

@@ -1,0 +1,19 @@
+{
+  "note": "TEST data vendored byte-for-byte; this sidecar is not part of the vendored bytes. Do not edit the fixtures.",
+  "source_repo": "action-state-group/capsule-engine",
+  "source_commit": "0c93a58fccb6d39797d55ec7174aae16d24f0923",
+  "files": {
+    "decision_table.yaml": {
+      "source_path": "capsule_engine/packs/catalog/everyday/fixtures/decision_table.yaml",
+      "sha256": "aeab4a4c164317411eac0dafac99cc75b9e01ac46f4776db2a1147fba49e2a47"
+    },
+    "gold_labels.yaml": {
+      "source_path": "capsule_engine/packs/catalog/everyday/fixtures/gold_labels.yaml",
+      "sha256": "548f9b8604cedaef814cdc0239c5253f2f54906d3fec6d95df27869e9e5f0822"
+    },
+    "mini_ledger.jsonl": {
+      "source_path": "capsule_engine/packs/catalog/everyday/fixtures/mini_ledger.jsonl",
+      "sha256": "adc93263875b7705f098d3cc4730a841dac48c6f5e8ec5422f41579510720245"
+    }
+  }
+}
