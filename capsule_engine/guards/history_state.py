@@ -15,7 +15,12 @@ that builder writes carries ``asg_payload.live_history``, one of:
 - ``statement``: a claim the user's agent made to the counterparty
   (``guards/statements.py``), which states no act;
 - ``incomplete``: written once when the history is not known to be complete,
-  so an act may be missing from the ledger.
+  so an act may be missing from the ledger;
+- ``window_held``: written once when the history is complete but the caps
+  window cannot be summed over it (``report/live_history.py``): it does not
+  reach back over the window, or holds acts classed under a taxonomy whose
+  classes are not the engine's. It carries ``held_reason``. Only ``caps``
+  reads it (it asks rather than allows); every act is still in the ledger.
 
 An act read from the history (``disposition`` or ``no_disposition``) also
 carries ``thread_counterparty``, ``{fp_alg, ids}``, when its check sealed a
@@ -30,7 +35,7 @@ replay's own record. A check that needs to know whether an act was accepted
 reads the state. Every history act was carried out, so an act in state
 ``disposition`` or ``no_disposition`` counts as an earlier act a repeat can
 match (``counts_as_act``); an unread entry, a statement and the incomplete
-marker never do.
+and window-held markers never do.
 """
 from __future__ import annotations
 
@@ -48,6 +53,7 @@ __all__ = [
     "COUNTERPARTY_KINDS",
     "THREAD_COUNTERPARTY",
     "UNREAD",
+    "WINDOW_HELD",
     "ThreadCounterparty",
     "counts_as_act",
     "history_state",
@@ -61,6 +67,7 @@ NO_DISPOSITION = "no_disposition"
 UNREAD = "unread"
 STATEMENT = "statement"
 INCOMPLETE = "incomplete"
+WINDOW_HELD = "window_held"
 THREAD_COUNTERPARTY = "thread_counterparty"
 # How far back a live check's history reaches: capsulectl sends the acts
 # sealed in the last 31 days (capsule-cli internal/cli RulesHistoryDays,

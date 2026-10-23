@@ -64,9 +64,11 @@ from agent_action_capsule import json_digest
 from cll.ledger.api import LedgerAPI
 
 from ..folds.definition import FoldDefinition
+from ..folds.duration import parse_duration_seconds
 from ..guards.action import Action
 from ..guards.capsule import act_payload
 from ..guards.checks.caps import counts_executed_acts
+from ..guards.classes import ENGINE_TAXONOMY, same_classes
 from ..guards.history_state import (
     DISPOSITION,
     INCOMPLETE,
@@ -75,6 +77,7 @@ from ..guards.history_state import (
     STATEMENT,
     THREAD_COUNTERPARTY,
     UNREAD,
+    WINDOW_HELD,
     ThreadCounterparty,
 )
 from ..guards.statements import StatementRecord, claim_of
@@ -183,6 +186,10 @@ def history_ledger(envelope: dict, ledger: LedgerAPI, *, caps_fold: FoldDefiniti
             ledger.append(dict(_marked(stated)), consequential=False)
     if not complete:
         ledger.append(_incomplete_record(envelope.get("record")), consequential=False)
+    else:
+        held = window_held_reason(scope, [entry for _, _, entry in dated], caps_fold)
+        if held is not None:
+            ledger.append(_window_held_record(envelope.get("record"), held), consequential=False)
     return HistoryLedger(
         complete=complete,
         disposition=counts[DISPOSITION],
@@ -275,6 +282,50 @@ def _incomplete_record(checked: object) -> dict:
         "operator": checked.get("operator", ""),
         "timestamp": checked.get("timestamp"),
         "asg_payload": {LIVE_HISTORY: INCOMPLETE},
+    }
+    return {**body, "capsule_id": json_digest(body)}
+
+
+def window_held_reason(scope: dict, entries: list[dict], caps_fold: FoldDefinition | None) -> str | None:
+    """Why a complete history cannot decide the caps window, or None: it
+    reaches back fewer days (``history_scope.days``, 0 when absent) than the
+    window, or some act names a taxonomy version whose classes are not the
+    engine's. A history that holds an act it reaches back over is no proof
+    that the acts before its first are absent, so a short one is held; an act
+    classed under other names cannot be summed against this engine's limits.
+    With no caps fold there is no window to hold."""
+    if caps_fold is None or caps_fold.window is None or not caps_fold.window.duration:
+        return None
+    window = caps_fold.window.duration
+    days = scope.get("days")
+    days = days if isinstance(days, int) and not isinstance(days, bool) else 0
+    if days * 86400 < parse_duration_seconds(window):
+        return f"the history supplied reaches back {days} day(s); the {window} total needs {window}"
+    other = 0
+    for entry in entries:
+        if _statement_record(entry) is not None:
+            continue
+        shown = bound_agent_input(entry)
+        body = shown.get("body") if isinstance(shown, dict) else None
+        version = body.get("taxonomy_version") if isinstance(body, dict) else None
+        if version is not None and not same_classes(version):
+            other += 1
+    if other:
+        return (
+            f"{other} earlier act(s) were classed under another taxonomy version than the engine's "
+            f"({ENGINE_TAXONOMY.version}), so the {window} total cannot be computed"
+        )
+    return None
+
+
+def _window_held_record(checked: object, reason: str) -> dict:
+    """The one record saying the caps window cannot be summed over this
+    history, why, under the checked record's operator, at its time."""
+    checked = checked if isinstance(checked, dict) else {}
+    body = {
+        "operator": checked.get("operator", ""),
+        "timestamp": checked.get("timestamp"),
+        "asg_payload": {LIVE_HISTORY: WINDOW_HELD, "held_reason": reason},
     }
     return {**body, "capsule_id": json_digest(body)}
 
