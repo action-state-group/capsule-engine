@@ -77,7 +77,10 @@ func decodeRecord(raw []byte, capsuleID string, profile json.RawMessage) (Action
 		return Action{}, err
 	}
 	if err := checkAgentInputDigest(header, agentInput); err != nil {
-		return Action{}, err
+		if se, ok := asSealError(err); ok {
+			return Action{}, se
+		}
+		return Action{}, fmt.Errorf("record: agent_input: %w", err)
 	}
 	var input struct {
 		Body  map[string]json.RawMessage `json:"body"`
@@ -791,7 +794,9 @@ func selectRecord(raw []byte, top map[string]json.RawMessage, capsuleID string) 
 	return h, d.AgentInput, nil
 }
 
-// checkAgentInputDigest refuses an agent_input the header does not seal.
+// checkAgentInputDigest refuses an agent_input the header does not seal: a
+// *sealError when the header binds no body or binds another, or the error
+// that kept the body from being canonicalized.
 func checkAgentInputDigest(header map[string]json.RawMessage, agentInput json.RawMessage) error {
 	var att struct {
 		ComputeAttestation struct {
@@ -799,20 +804,49 @@ func checkAgentInputDigest(header map[string]json.RawMessage, agentInput json.Ra
 		} `json:"compute_attestation"`
 	}
 	if raw, ok := header["model_attestation"]; !ok || json.Unmarshal(raw, &att) != nil || att.ComputeAttestation.AgentInputDigest == "" {
-		return errors.New("record: the capsule header has no model_attestation.compute_attestation.agent_input_digest, so the disclosed body is not bound to it")
+		return &sealError{}
 	}
 	v, err := canon.FromJSON(agentInput)
 	if err != nil {
-		return fmt.Errorf("record: agent_input: %w", err)
+		return err
 	}
 	got, err := canon.Digest(v)
 	if err != nil {
-		return fmt.Errorf("record: agent_input: %w", err)
+		return err
 	}
 	if got != att.ComputeAttestation.AgentInputDigest {
-		return fmt.Errorf("record: the disclosed agent_input digests to %s, not the header's agent_input_digest %s: the body is not the one the capsule seals", got, att.ComputeAttestation.AgentInputDigest)
+		return &sealError{got: got, sealed: att.ComputeAttestation.AgentInputDigest}
 	}
 	return nil
+}
+
+// sealError is a disclosed body its capsule does not seal: the header binds
+// no body (sealed is "") or binds another. Its message leads with that
+// reason and puts the ids and digests last, because a caller may show only
+// the first few hundred bytes of it (capsule-cli shows the first 300 of a
+// checker's stderr): the user must still read it as a refusal of a body its
+// capsule does not seal (capsule-engine #210, switch-over gate 2).
+type sealError struct {
+	got, sealed string
+}
+
+// Error is the refusal for the record a check is about.
+func (e *sealError) Error() string { return e.refusal("the record's body", "") }
+
+// refusal is the refusal for body, with at (an id, in parentheses) after
+// the reason and before the digests.
+func (e *sealError) refusal(body, at string) string {
+	if e.sealed == "" {
+		return body + " is not bound to its capsule" + at +
+			": the capsule header has no model_attestation.compute_attestation.agent_input_digest"
+	}
+	return body + " is not the one its capsule seals" + at + ": the disclosed agent_input digests to " + e.got +
+		", not the header's agent_input_digest " + e.sealed
+}
+
+func asSealError(err error) (*sealError, bool) {
+	var se *sealError
+	return se, errors.As(err, &se)
 }
 
 // Unevaluable is why a record cannot be evaluated at all (a missing header
@@ -842,19 +876,31 @@ func (a Action) Unevaluable() []string { return a.unevaluable }
 func DecodeHistoryAct(raw []byte) (Record, error) {
 	var header map[string]json.RawMessage
 	if err := json.Unmarshal(raw, &header); err != nil {
-		return Record{}, fmt.Errorf("history act: %w", err)
+		return Record{}, fmt.Errorf("a history act cannot be read: %w", err)
 	}
 	var id string
 	if err := json.Unmarshal(header["capsule_id"], &id); err != nil || id == "" {
-		return Record{}, errors.New("history act: no capsule_id")
+		return Record{}, errors.New("a history act has no capsule_id")
 	}
-	refuse := func(why string) (Record, error) { return Record{}, fmt.Errorf("history act %s: %s", id, why) }
+	// Each refusal leads with its reason and names the act after it, as
+	// sealError does: the id is 64 hex characters, and a caller may show
+	// only the first few hundred bytes.
+	at := " (act " + id + ")"
+	refuse := func(why string, cause error) (Record, error) {
+		if cause == nil {
+			return Record{}, errors.New("a history act's " + why + at)
+		}
+		return Record{}, fmt.Errorf("a history act's %s%s: %w", why, at, cause)
+	}
 	agentInput, ok := header["agent_input"]
 	if !ok {
-		return refuse("the capsule carries no disclosed agent_input")
+		return refuse("capsule carries no disclosed agent_input", nil)
 	}
 	if err := checkAgentInputDigest(header, agentInput); err != nil {
-		return refuse(err.Error())
+		if se, ok := asSealError(err); ok {
+			return Record{}, errors.New(se.refusal("a history act's body", at))
+		}
+		return refuse("agent_input cannot be read", err)
 	}
 	var h struct {
 		ActionID    string  `json:"action_id"`
@@ -871,15 +917,15 @@ func DecodeHistoryAct(raw []byte) (Record, error) {
 		} `json:"chain"`
 	}
 	if err := json.Unmarshal(raw, &h); err != nil {
-		return refuse(err.Error())
+		return refuse("capsule header cannot be read", err)
 	}
 	for name, v := range map[string]*string{"operator": h.Operator, "developer": h.Developer, "timestamp": h.Timestamp} {
 		if v == nil {
-			return refuse("capsule header has no " + name)
+			return refuse("capsule header has no "+name, nil)
 		}
 	}
 	if _, err := parseInstant(*h.Timestamp); err != nil {
-		return refuse("capsule header timestamp: " + err.Error())
+		return refuse("capsule header timestamp cannot be read", err)
 	}
 	// The amounts are read as sealed and parsed below (minorOf): the shape
 	// an undecided act seals is the window's to judge, not a refusal.
@@ -909,10 +955,10 @@ func DecodeHistoryAct(raw []byte) (Record, error) {
 		} `json:"x-deal-v0"`
 	}
 	if err := json.Unmarshal(agentInput, &input); err != nil {
-		return refuse("agent_input: " + err.Error())
+		return refuse("agent_input cannot be read", err)
 	}
 	if input.Body == nil {
-		return refuse("the disclosed agent_input has no body")
+		return refuse("disclosed agent_input has no body", nil)
 	}
 	got := input.Body.act
 	// An act taken without authority (capsule-cli deal_profile.go: sealed
@@ -959,9 +1005,9 @@ func DecodeHistoryAct(raw []byte) (Record, error) {
 			spend = nil
 		}
 	case !amountRead || amount == nil:
-		return refuse("the deal body has no amount_minor in integer minor units")
+		return refuse("deal body has no amount_minor in integer minor units", nil)
 	case !spendRead:
-		return refuse("the deal body's spend_minor is not in integer minor units")
+		return refuse("deal body states a spend_minor not in integer minor units", nil)
 	}
 	r := Record{CapsuleID: id, ActionID: h.ActionID, ActionType: h.ActionType, Operator: *h.Operator, Developer: *h.Developer,
 		Timestamp: *h.Timestamp, AmountMinor: amount, SpendMinor: spend, ActionClass: got.ActionClass,

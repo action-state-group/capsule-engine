@@ -39,7 +39,6 @@ from capsule_engine.guards.capsule import ALLOW, ESCALATE
 from capsule_engine.guards.checks import RUNNABLE_CHECKS
 from capsule_engine.guards.checks.caps import WINDOW_UNREADABLE_REASON
 from capsule_engine.guards.classes import TAXONOMY_VERSION
-from capsule_engine.guards.engine import NOT_EVALUABLE
 from capsule_engine.packs import install_pack, load_pack_dir
 from capsule_engine.packs.schema import PackDefinition
 from capsule_engine.report.replay import ReplayResult, replay
@@ -339,13 +338,14 @@ UNREADABLE = {"constraint_id": "caps", "in_scope": True, "missing_field": "spend
 
 def test_an_executed_act_whose_spend_cannot_be_read_is_not_evaluable_and_asks():
     """No spend: the total is not known. A transfer nothing else fails would
-    be allowed; it is asked about instead, verdict not evaluable."""
+    be allowed; it is asked about instead, and its verdict is the escalation
+    (#217)."""
     transfer = "money.transfer"
     decision, caps = _last(_replay(acted("deal-1", _act_body("sign", None), DAY_1),
                                    check("deal-2", 1_000, DAY_2, action_class=transfer)))
     assert (caps.result, caps.reason, caps.evidence) == ("n/a", WINDOW_UNREADABLE_REASON, UNREADABLE)
     assert [c.id for c in decision.constraints if c.result == "fail"] == []
-    assert (decision.outcome, decision.verdict) == (ESCALATE, NOT_EVALUABLE)
+    assert (decision.outcome, decision.verdict) == (ESCALATE, ESCALATE)
     assert decision.asked_unevaluated_checks == ("caps",)
 
 

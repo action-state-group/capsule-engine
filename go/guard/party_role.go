@@ -2,6 +2,7 @@ package guard
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"slices"
 	"strings"
@@ -69,7 +70,11 @@ func bundleDealRoles(raw []byte, dealID string) ([]string, error) {
 			continue
 		}
 		if err := checkAgentInputDigest(h, d.AgentInput); err != nil {
-			return nil, fmt.Errorf("record %s of the deal: %w", id, err)
+			at := " (record " + id + ")"
+			if se, ok := asSealError(err); ok {
+				return nil, errors.New(se.refusal("the body of a record of the deal", at))
+			}
+			return nil, fmt.Errorf("the agent_input of a record of the deal cannot be read%s: %w", at, err)
 		}
 		roles = append(roles, role)
 	}

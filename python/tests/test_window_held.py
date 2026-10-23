@@ -10,6 +10,7 @@ holds the same window with the same reasons, in the same order
 from __future__ import annotations
 
 import copy
+import dataclasses
 import json
 from pathlib import Path
 
@@ -51,7 +52,18 @@ def test_a_history_shorter_than_the_window_is_held():
     assert caps.reason == "the history supplied reaches back 5 day(s); the 7d total needs 7d"
     assert caps.evidence == {"constraint_id": "caps", "in_scope": True, "missing_field": None}
     assert decision.outcome == "escalate"
-    assert decision.verdict == "not_evaluable"
+    assert decision.verdict == "escalate"
+
+
+def test_a_held_window_reads_as_an_escalation_only_when_it_asks():
+    """capsule-engine#217: held with an approver, the decision asks, and its
+    verdict is the escalation. Refused for want of an approver (#216), the
+    same held window is labelled not_evaluable."""
+    decision, _ = _caps(_envelope("pay-history-incomplete"))
+    assert decision.asked_unevaluated_checks == ("caps",)
+    assert (decision.outcome, decision.verdict) == ("escalate", "escalate")
+    refused = dataclasses.replace(decision, outcome="deny")
+    assert refused.verdict == "not_evaluable"
 
 
 def test_acts_under_another_taxonomy_hold_the_window():
@@ -175,7 +187,7 @@ def test_an_undecided_act_whose_spend_cannot_be_read_holds_the_window():
     assert caps.method == "spend.weekly/3.0.0"
     assert caps.evidence == {"constraint_id": "caps", "in_scope": True, "missing_field": None}
     assert decision.outcome == "escalate"
-    assert decision.verdict == "not_evaluable"
+    assert decision.verdict == "escalate"
 
 
 def test_the_same_history_with_its_decisions_is_allowed():
