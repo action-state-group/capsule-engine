@@ -24,8 +24,13 @@ to requirements, which produced the EU AI Act packs' outcomes).
 
 ## Install
 
-capsule-engine is not on PyPI yet. Its first release there (see `RELEASING.md`) makes it
-`pip install capsule-engine`; until then, install it from source:
+capsule-engine is on PyPI:
+
+```
+pip install capsule-engine
+```
+
+To work on it, install it from source:
 
 ```
 git clone https://github.com/action-state-group/capsule-engine.git
