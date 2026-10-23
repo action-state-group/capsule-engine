@@ -14,8 +14,9 @@ the packs and definitions are those of 0.1.0.
   body is not the one its capsule seals is refused with the reason first and the id and
   digests last, so a caller that shows only the first few hundred bytes (capsule-cli shows the
   first 300 of a checker's stderr) still shows a refusal. `DecodeCheckInput`,
-  `DecodeCheckInputRecord`, `DecodeRecord` and `ReadSaleBundle` now return "the record's body is not the one its capsule seals:
-  the disclosed agent_input digests to X, not the header's agent_input_digest Y", in place of
+  `DecodeCheckInputRecord`, `DecodeRecord` and `SaleBundle.Check` now return "the record's
+  body is not the one its capsule seals: the disclosed agent_input digests to X, not the
+  header's agent_input_digest Y", in place of
   "record: the disclosed agent_input digests to X, not the header's agent_input_digest Y: the
   body is not the one the capsule seals". `DecodeHistoryAct` returns "a history act's body is
   not the one its capsule seals (act ID): ..." in place of "history act ID: record: ...". A
