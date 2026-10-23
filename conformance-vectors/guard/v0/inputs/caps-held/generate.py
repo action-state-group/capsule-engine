@@ -1,8 +1,11 @@
 # SPDX-License-Identifier: Apache-2.0
 """Writes the caps-held inputs: check inputs whose caps window the history
-cannot decide, at amounts over the 7-day limit, so a guard that read the held
-window as a pass would allow a purchase the limit stops (capsule-engine#214,
-groups 3 and 4).
+cannot decide, with the purchase over the per-purchase limit. A limit the
+check can evaluate still fails under a held window, on both engines
+(capsule-engine#214, groups 3 and 4); the held window alone, with nothing
+failing, is ``emit.json``'s ``pay-history-incomplete`` and
+``pay-history-5-days``. The amounts match no act in their history, so
+dedupe passes.
 
 Each is an existing check input with the checked purchase's amount raised:
 the record's ``agent_input`` body and its digest in the attestation are
@@ -22,7 +25,7 @@ EMIT = ROOT / "go" / "guard" / "testdata" / "emit"
 # (written name, source input, new amount in minor units)
 CASES = [
     ("short-history-over-limit", "pay-history-5-days.json", 6000),
-    ("incomplete-history-over-limit", "pay-history-incomplete.json", 9000),
+    ("incomplete-history-over-limit", "pay-history-incomplete.json", 8000),
 ]
 
 

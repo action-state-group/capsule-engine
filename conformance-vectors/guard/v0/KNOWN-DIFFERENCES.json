@@ -1041,7 +1041,7 @@
   {
    "case": "emit.json:pay-history-5-days",
    "issue": "https://github.com/action-state-group/capsule-engine/issues/214",
-   "why": "group 3: a history the caps window cannot be summed over (shorter than the window, or acts classed under another taxonomy): Go holds caps n/a and, never allowing on it, escalates; Python sums the window and passes, so it allows under the limit. Over the limit both escalate (caps-held.json)",
+   "why": "group 3: a history the caps window cannot be summed over (shorter than the window, or acts classed under another taxonomy): Go holds caps n/a and, never allowing on it, escalates; Python sums the window and passes, so it allows under the limit. Over the per-purchase limit both escalate on that failure (caps-held.json)",
    "python": {
     "outcome": "allow",
     "constraints": [
@@ -1274,7 +1274,7 @@
   {
    "case": "emit.json:pay-history-taxonomy-1-acts",
    "issue": "https://github.com/action-state-group/capsule-engine/issues/214",
-   "why": "group 3: a history the caps window cannot be summed over (shorter than the window, or acts classed under another taxonomy): Go holds caps n/a and, never allowing on it, escalates; Python sums the window and passes, so it allows under the limit. Over the limit both escalate (caps-held.json)",
+   "why": "group 3: a history the caps window cannot be summed over (shorter than the window, or acts classed under another taxonomy): Go holds caps n/a and, never allowing on it, escalates; Python sums the window and passes, so it allows under the limit. Over the per-purchase limit both escalate on that failure (caps-held.json)",
    "python": {
     "outcome": "allow",
     "constraints": [

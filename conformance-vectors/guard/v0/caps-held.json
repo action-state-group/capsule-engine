@@ -6,21 +6,21 @@
    "kind": "check-input",
    "pack": "everyday-0.3.8",
    "input": "conformance-vectors/guard/v0/inputs/caps-held/incomplete-history-over-limit.json",
-   "input_sha256": "668f504a8d58af2077ef0d57f789648f34016e86d7d47622d4b7cb04fed124a0",
+   "input_sha256": "145f203f6073c0120aab5ab03df2b635e49bac4c1a7ef94175543c2695df30d2",
    "expected": {
-    "outcome": "deny",
+    "outcome": "escalate",
     "constraints": [
      {
       "id": "dedupe",
-      "result": "fail",
+      "result": "pass",
       "method": "exact_match_index_v0",
-      "evidence_digest": "2f672e0563dbfffdcf4ab2cc3e11fadb320d3c6665165b69bc61d7a150f4e645"
+      "evidence_digest": "b5858c9105b73ce485d267f899c936ad9d4ec0e5365c1a4586ec8ad83a38741c"
      },
      {
       "id": "caps",
       "result": "fail",
       "method": "spend.weekly/3.1.0",
-      "evidence_digest": "20d817fe9237d57e6e10158e5b49b0a1508b41d3e51727cabebdcc08ff9666ab"
+      "evidence_digest": "179ea5d912bbc2c110a0ec1454ab638761e802a393d6d167c3c9925e03d1d1a7"
      },
      {
       "id": "verify_before_dispatch",

@@ -256,19 +256,19 @@
    "body": {
     "action": "pay",
     "action_class": "money.purchase",
-    "amount_minor": 9000,
+    "amount_minor": 8000,
     "currency": "USD",
     "description_commitment": "6666666666666666666666666666666666666666666666666666666666666666",
     "recourse": {
      "rail": "card",
      "refundable": true
     },
-    "spend_minor": 9000,
+    "spend_minor": 8000,
     "taxonomy_version": "6",
     "terms": {
      "currency": "USD",
      "item": "Example item",
-     "price_minor": 9000,
+     "price_minor": 8000,
      "quantity": 1
     }
    },
@@ -320,7 +320,7 @@
   "key_id": "4444444444444444444444444444444444444444444444444444444444444444",
   "model_attestation": {
    "compute_attestation": {
-    "agent_input_digest": "2a8f69057d795223bc082ca030fb11067a17f5d5bde133f3994f80ed965c4d19"
+    "agent_input_digest": "27d95cd4c9cf9ab936d37c525dc86a1436b26656fe3b0a5d6ffafc89b4efcdfa"
    }
   },
   "operator": "deal",

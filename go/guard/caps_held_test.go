@@ -51,6 +51,42 @@ func TestAHeldCapsWindowIsNeverAllowed(t *testing.T) {
 	}
 }
 
+// With no approver for the class, the same held window is refused, and the
+// report carries the refusal.
+func TestAHeldCapsWindowWithNoApproverIsRefused(t *testing.T) {
+	p, err := pack.LoadEveryday038()
+	if err != nil {
+		t.Fatal(err)
+	}
+	e, err := NewEngine(p)
+	if err != nil {
+		t.Fatal(err)
+	}
+	raw, err := os.ReadFile("testdata/emit/pay-history-incomplete.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	a, h, err := DecodeCheckInput(raw)
+	if err != nil {
+		t.Fatal(err)
+	}
+	class := "external_commitment.other" // capped, with no approver_role
+	a.ActionClass = &class
+	d, err := e.CheckWithHistory(a, h)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if caps, _ := d.Constraint("caps"); caps.Result != NotApplicable || caps.Pending() == "" || d.anyFailed() {
+		t.Fatalf("caps %s %q, failed=%v: want held and nothing failed", caps.Result, caps.Pending(), d.anyFailed())
+	}
+	if d.Outcome != Deny {
+		t.Errorf("outcome %s, want deny", d.Outcome)
+	}
+	if r := e.Report(a, d); r.Decision != VerdictNotEvaluable || !r.Refused {
+		t.Errorf("report decision %s refused=%v, want not_evaluable, refused", r.Decision, r.Refused)
+	}
+}
+
 // Only the caps check's own held window counts: a caps n/a the taxonomy
 // comparison set (refused on its own) carries no caps facts.
 func TestOnlyTheCapsCheckHoldsItsWindow(t *testing.T) {
