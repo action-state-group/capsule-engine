@@ -43,11 +43,13 @@ upstream to copy byte-for-byte.
 - **sha256:** input `468d77cc2492b3888385c582aaaa3a4c44df3eaf01ad6ef612338e6ddb380a39`, result
   `61e5ffe59b2abc8390e69228c7d7e5ba86562c6550a59008c15fb3990a24dd4d` (pinned by
   `tests/test_engine_plugin.py`)
-- **Form:** byte-for-byte; no local additions.
+- **Form:** the files are byte-for-byte, with no local additions. The checker applies the input
+  schema in memory without any `additionalProperties: false` (below), so it does not behave
+  exactly as shipped there.
 - **Why it is vendored:** `capsulectl engine check` (`capsule_engine/rulesets/`) validates what it
   reads and what it prints against them. A finding carries only the members the result schema
   lists, because capsulectl refuses any other. Re-vendor the result schema from a capsulectl
   release that ships capsule-cli#257 to print `limit_source` and `profile_digest`. That is a
   breaking change for capsulectl releases before it, which refuse both, so it ships in an
-  engine release that says so. The input schema is applied with its top-level
-  `additionalProperties` dropped: a member a later capsulectl adds is no reason to refuse.
+  engine release that says so. The input schema is applied with every `additionalProperties: false`
+  dropped: a member a later capsulectl adds, at the top or inside, is no reason to refuse.

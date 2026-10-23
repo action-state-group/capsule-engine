@@ -36,7 +36,7 @@ from jsonschema import Draft202012Validator
 from ..folds.record_type_coverage import evaluate_record_type_coverage
 from ..report.result_from_folds import Finding, finding_from_record_type_coverage
 
-__all__ = ["RULESET_FORMAT", "Refusal", "Ruleset", "check", "load_ruleset"]
+__all__ = ["RULESET_FORMAT", "Refusal", "Ruleset", "check", "encode_result", "load_ruleset"]
 
 RULESET_FORMAT = "engine-ruleset/v0"
 INPUT_SCHEMA = "external-check-input/v0"
@@ -58,20 +58,32 @@ class Ruleset:
         return self.document["ruleset_id"]
 
 
+def _open(node: Any) -> Any:
+    """``node`` with every ``additionalProperties: false`` removed."""
+    if isinstance(node, dict):
+        return {k: _open(v) for k, v in node.items() if not (k == "additionalProperties" and v is False)}
+    if isinstance(node, list):
+        return [_open(v) for v in node]
+    return node
+
+
 @cache
 def _validator(name: str) -> Draft202012Validator:
     text = (resources.files("capsule_engine") / "schemas" / name).read_text(encoding="utf-8")
     schema = json.loads(text)
     if name == _INPUT_SCHEMA_FILE:
         # capsulectl adds optional input members between releases (party_role,
-        # item_ref, ...). The checks read only history and history_scope, so a
-        # member this copy does not know yet is no reason to refuse a check.
-        schema.pop("additionalProperties")
+        # item_ref, ...), at the top and inside. The checks read only history
+        # and history_scope.complete, so a member this copy does not know yet
+        # is no reason to refuse a check.
+        schema = _open(schema)
     return Draft202012Validator(schema)
 
 
 _INPUT_SCHEMA_FILE = "vendor/external-check-input-v0.json"
 _RESULT_SCHEMA_FILE = "vendor/external-check-result-v0.json"
+# capsule-cli RulesMaxOutput: capsulectl reads no more of a checker's stdout.
+MAX_OUTPUT = 1 << 20
 
 
 def _finding_members() -> frozenset[str]:
@@ -79,32 +91,40 @@ def _finding_members() -> frozenset[str]:
     return frozenset(items["properties"])
 
 
-def _member_names(schema: Any) -> frozenset[str]:
-    """Every member name a schema declares, at any depth."""
-    names: set[str] = set()
-    stack = [schema]
-    while stack:
-        node = stack.pop()
-        if isinstance(node, dict):
-            names.update(node.get("properties", {}))
-            stack.extend(node.values())
-        elif isinstance(node, list):
-            stack.extend(node)
-    return frozenset(names)
+def _where(error) -> str:
+    """The failure's location, a step that is a key of an open map (such as a
+    counterparty's ids) reading ``*``: such a key is a value. The schema path
+    says how each step was reached: by name under ``properties``, or as any
+    key under ``additionalProperties`` or ``patternProperties``. A location
+    the schema path does not account for reads ``*`` throughout."""
+    kinds: list[str] = []
+    schema_path = list(error.absolute_schema_path)
+    i = 0
+    while i < len(schema_path):
+        keyword = schema_path[i]
+        last = i == len(schema_path) - 1
+        if keyword == "properties" and not last:
+            kinds.append("name")
+            i += 1
+        elif keyword in ("additionalProperties", "patternProperties") and not last:
+            kinds.append("key")
+            i += 1 if keyword == "patternProperties" else 0
+        elif keyword in ("items", "prefixItems") and not last:
+            kinds.append("index")
+            i += 1 if keyword == "prefixItems" else 0
+        i += 1
+    steps = list(error.absolute_path)
+    if len(kinds) != len(steps):
+        kinds = ["key"] * len(steps)
+    return "$" + "".join(
+        f"[{s}]" if isinstance(s, int) else f".{s}" if kind == "name" else ".*" for s, kind in zip(steps, kinds, strict=True)
+    )
 
 
 def _failures(validator: Draft202012Validator, doc: Any) -> list[str]:
     """Each failure's location and the schema keyword that failed, sorted,
-    with no value. A location step that is not a member the schema declares
-    (a key of an open map, such as a counterparty's ids) is a value too, and
-    reads ``*``."""
-    known = _member_names(validator.schema)
-
-    def where(error) -> str:
-        steps = (f"[{s}]" if isinstance(s, int) else f".{s}" if s in known else ".*" for s in error.absolute_path)
-        return "$" + "".join(steps)
-
-    return sorted({f"{where(e)}: {e.validator}" for e in validator.iter_errors(doc)})
+    with no value."""
+    return sorted({f"{_where(e)}: {e.validator}" for e in validator.iter_errors(doc)})
 
 
 class _Repeated(ValueError):
@@ -232,3 +252,13 @@ def check(ruleset: Ruleset, raw_input: bytes) -> dict:
         # A defect here, not a fault in the input or the ruleset.
         raise RuntimeError(f"the result built does not fit {RESULT_SCHEMA}: " + "; ".join(failures))
     return result
+
+
+def encode_result(result: dict) -> bytes:
+    """``result`` as the one line the checker prints: UTF-8, not \\u escapes
+    (up to 12 bytes a character), refused when capsulectl would not read it
+    all. The ruleset format keeps a result under the limit; this holds it."""
+    out = (json.dumps(result, separators=(",", ":"), ensure_ascii=False) + "\n").encode()
+    if len(out) > MAX_OUTPUT:
+        raise Refusal(f"the result is {len(out)} bytes, more than the {MAX_OUTPUT} capsulectl reads")
+    return out

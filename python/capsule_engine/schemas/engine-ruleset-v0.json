@@ -12,13 +12,14 @@
       "const": "engine-ruleset/v0"
     },
     "ruleset_id": {
-      "description": "The ruleset's name, version included, reported as the result's ruleset_id.",
+      "description": "The ruleset's name, version included, reported as the result's ruleset_id. No control character.",
       "type": "string",
       "minLength": 1,
-      "maxLength": 200
+      "maxLength": 200,
+      "pattern": "^[^\\u0000-\\u001f\\u007f]+$"
     },
     "clauses": {
-      "description": "One finding per clause, in this order. Clause ids are unique. At most 200, so a result of every clause failing with its longest reason stays under capsulectl's 1 MiB output limit.",
+      "description": "One finding per clause, in this order. Clause ids are unique. At most 200, so with no control character in any string (each would print as a 6-byte escape) a result of every clause failing with its longest reason stays under capsulectl's 1 MiB output limit.",
       "type": "array",
       "minItems": 1,
       "maxItems": 200,
@@ -31,11 +32,11 @@
       "required": ["id", "check", "disposition", "params"],
       "properties": {
         "id": {
-          "description": "The clause's id within the ruleset: the finding's id.",
+          "description": "The clause's id within the ruleset: the finding's id. No space or control character.",
           "type": "string",
           "minLength": 1,
           "maxLength": 200,
-          "pattern": "^[^\\s]+$"
+          "pattern": "^[^\\s\\u0000-\\u001f\\u007f]+$"
         },
         "check": {
           "description": "The engine check the clause runs, name/version.",
@@ -72,13 +73,13 @@
           "type": "array",
           "uniqueItems": true,
           "maxItems": 100,
-          "items": { "type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[^\\r\\n]*$" }
+          "items": { "type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[^\\u0000-\\u001f\\u007f]+$" }
         },
         "kind_field": {
           "type": "string",
           "minLength": 1,
           "maxLength": 200,
-          "pattern": "^[^.]+(\\.[^.]+)*$"
+          "pattern": "^[^.\\u0000-\\u001f\\u007f]+(\\.[^.\\u0000-\\u001f\\u007f]+)*$"
         }
       }
     }

@@ -28,7 +28,7 @@ import json
 import sys
 
 from .. import __version__
-from ..rulesets import Refusal, check, load_ruleset
+from ..rulesets import Refusal, check, encode_result, load_ruleset
 
 __all__ = ["main"]
 
@@ -73,13 +73,11 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     ns = _parser().parse_args(args)
     try:
-        result = check(load_ruleset(ns.ruleset), sys.stdin.buffer.read())
+        out = encode_result(check(load_ruleset(ns.ruleset), sys.stdin.buffer.read()))
     except Refusal as exc:
         print(f"capsulectl {NAME} check: {exc}", file=sys.stderr)
         return 1
-    # UTF-8 bytes, not \u escapes (up to 12 bytes a character), whatever the
-    # locale: capsulectl reads at most 1 MiB.
-    sys.stdout.buffer.write((json.dumps(result, separators=(",", ":"), ensure_ascii=False) + "\n").encode())
+    sys.stdout.buffer.write(out)
     sys.stdout.flush()
     return 0
 

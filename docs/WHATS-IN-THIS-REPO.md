@@ -98,6 +98,8 @@ schemas are capsulectl's, vendored from its v0.1.0-rc22 release in
   name/version), a `disposition` (`ask` or `deny`: what a failing clause does) and the check's
   `params`.
 
+No string in a ruleset holds a control character.
+
 The `definition_digest` the result reports is the lowercase-hex SHA-256 of the RFC 8785 (JCS)
 bytes of the document. Any change to the file other than its spelling (member order, whitespace,
 escapes) is a new digest, so a profile or a contract can pin it. A member given twice in one

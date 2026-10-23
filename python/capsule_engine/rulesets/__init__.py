@@ -8,6 +8,6 @@ tier ``recomputed``. The format is ``schemas/engine-ruleset-v0.json``; its
 """
 from __future__ import annotations
 
-from .check import RULESET_FORMAT, Refusal, Ruleset, check, load_ruleset
+from .check import RULESET_FORMAT, Refusal, Ruleset, check, encode_result, load_ruleset
 
-__all__ = ["RULESET_FORMAT", "Refusal", "Ruleset", "check", "load_ruleset"]
+__all__ = ["RULESET_FORMAT", "Refusal", "Ruleset", "check", "encode_result", "load_ruleset"]
