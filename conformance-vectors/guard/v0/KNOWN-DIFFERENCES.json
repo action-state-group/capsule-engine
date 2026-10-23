@@ -30086,7 +30086,7 @@
   {
    "case": "undecided-act-everyday-0.3.4.json:held-no-check-time",
    "issue": "https://github.com/action-state-group/capsule-engine/issues/214",
-   "why": "group 8: the checked record's capsule header has no timestamp. Go's decoder marks such a record unevaluable (\"capsule header has no timestamp\", for its caller to refuse) and decides it at a 1970-01-01 placeholder, so no act is in the window and caps passes; the engine decides it, caps reading the window as of now, and its history hold counts every undecided act whose spend cannot be read, as Go's windowCoverage does for a check time it cannot read, so caps is n/a and the engine asks",
+   "why": "group 8: the checked record's capsule header has no timestamp. Go's decoder marks such a record unevaluable (\"capsule header has no timestamp\"). Its caller never checks such a record: the product reports every rule not_evaluable instead (capsulectl check, Action.Unevaluable, Engine.ReportUnevaluable), so the product does not allow it. This runner calls Check directly, and Go decides it at a 1970-01-01 placeholder, so no act is in the window and caps passes; the engine decides it, caps reading the window as of now, and its history hold counts every undecided act whose spend cannot be read, as Go's windowCoverage does for a check time it cannot read, so caps is n/a and the engine asks",
    "python": {
     "outcome": "escalate",
     "constraints": [
@@ -31144,7 +31144,7 @@
   {
    "case": "undecided-act-everyday-0.3.5.json:held-no-check-time",
    "issue": "https://github.com/action-state-group/capsule-engine/issues/214",
-   "why": "group 8: the checked record's capsule header has no timestamp. Go's decoder marks such a record unevaluable (\"capsule header has no timestamp\", for its caller to refuse) and decides it at a 1970-01-01 placeholder, so no act is in the window and caps passes; the engine decides it, caps reading the window as of now, and its history hold counts every undecided act whose spend cannot be read, as Go's windowCoverage does for a check time it cannot read, so caps is n/a and the engine asks",
+   "why": "group 8: the checked record's capsule header has no timestamp. Go's decoder marks such a record unevaluable (\"capsule header has no timestamp\"). Its caller never checks such a record: the product reports every rule not_evaluable instead (capsulectl check, Action.Unevaluable, Engine.ReportUnevaluable), so the product does not allow it. This runner calls Check directly, and Go decides it at a 1970-01-01 placeholder, so no act is in the window and caps passes; the engine decides it, caps reading the window as of now, and its history hold counts every undecided act whose spend cannot be read, as Go's windowCoverage does for a check time it cannot read, so caps is n/a and the engine asks",
    "python": {
     "outcome": "escalate",
     "constraints": [
