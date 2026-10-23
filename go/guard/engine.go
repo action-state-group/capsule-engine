@@ -1105,7 +1105,29 @@ func (e *Engine) checkWith(a Action, ledger []Record, in checkInputs) (Decision,
 	if len(notEvaluated) > 0 {
 		outcome = Deny
 	}
+	// engine.py check (78098ff): a caps result the window could not decide
+	// (CheckOutcome.asks_when_unevaluated: the history is not known to hold
+	// every act, or an act in the window has no readable spend) is never
+	// allowed on. It asks when the class has an approver and is refused
+	// otherwise. A class held only by its taxonomy was refused above.
+	if outcome == Allow && capsHeld(cs) {
+		outcome = Deny
+		if approver {
+			outcome = Escalate
+		}
+	}
 	return Decision{Outcome: outcome, Constraints: cs, refusedForTaxonomy: refused, notEvaluated: notEvaluated}, nil
+}
+
+// capsHeld is whether caps is an n/a its window could not decide: the caps
+// check ran (it carries its facts) and left a limit pending.
+func capsHeld(cs []Constraint) bool {
+	for _, c := range cs {
+		if c.ID == "caps" && c.Result == NotApplicable && c.caps != nil && c.pending != "" {
+			return true
+		}
+	}
+	return false
 }
 
 // constraintFor is one check's result for a, before the taxonomy comparison
