@@ -305,9 +305,7 @@ def window_held_reason(scope: dict, entries: list[dict], caps_fold: FoldDefiniti
     for entry in entries:
         if _statement_record(entry) is not None:
             continue
-        shown = bound_agent_input(entry)
-        body = shown.get("body") if isinstance(shown, dict) else None
-        version = body.get("taxonomy_version") if isinstance(body, dict) else None
+        version = _act_taxonomy_version(bound_agent_input(entry))
         if version is not None and not same_classes(version):
             other += 1
     if other:
@@ -316,6 +314,24 @@ def window_held_reason(scope: dict, entries: list[dict], caps_fold: FoldDefiniti
             f"({ENGINE_TAXONOMY.version}), so the {window} total cannot be computed"
         )
     return None
+
+
+def _act_taxonomy_version(shown: object) -> object:
+    """The taxonomy version an act names, as the Go guard reads it
+    (``DecodeHistoryAct``): an act taken without a check names it in the
+    member that records the act, ``body.attempted`` of a typed
+    ``action-outcome/v0`` or ``body.unchecked``, and the body's own stands in
+    when that member names none."""
+    body = shown.get("body") if isinstance(shown, dict) else None
+    if not isinstance(body, dict):
+        return None
+    acted = None
+    if shown.get("type") == "action-outcome/v0" and isinstance(body.get("attempted"), dict):
+        acted = body["attempted"]
+    elif isinstance(body.get("unchecked"), dict):
+        acted = body["unchecked"]
+    version = acted.get("taxonomy_version") if acted is not None else None
+    return version if version is not None else body.get("taxonomy_version")
 
 
 def _window_held_record(checked: object, reason: str) -> dict:

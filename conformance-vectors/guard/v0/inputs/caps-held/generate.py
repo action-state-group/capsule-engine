@@ -5,7 +5,9 @@ check can evaluate still fails under a held window, on both engines
 (capsule-engine#214, groups 3 and 4); the held window alone, with nothing
 failing, is ``emit.json``'s ``pay-history-incomplete`` and
 ``pay-history-5-days``. The amounts match no act in their history, so
-dedupe passes.
+dedupe passes. One more holds the window through an act alone: an
+unchecked act that names a foreign taxonomy in its ``unchecked`` member,
+which both engines read before the body's own version.
 
 Each is an existing check input with the checked purchase's amount raised:
 the record's ``agent_input`` body and its digest in the attestation are
@@ -41,6 +43,15 @@ def raised(envelope: dict, amount: int) -> dict:
     return envelope
 
 
+def foreign_unchecked(envelope: dict) -> dict:
+    entry = envelope["history"][0]
+    entry["agent_input"]["body"]["unchecked"]["taxonomy_version"] = "1"
+    entry["model_attestation"]["compute_attestation"]["agent_input_digest"] = json_digest(entry["agent_input"])
+    return envelope
+
+
 for name, source, amount in CASES:
     envelope = raised(json.loads((EMIT / source).read_text()), amount)
     (HERE / f"{name}.json").write_text(json.dumps(envelope, indent=1, sort_keys=True) + "\n")
+envelope = foreign_unchecked(json.loads((EMIT / "pay-history-unchecked.json").read_text()))
+(HERE / "unchecked-act-foreign-taxonomy.json").write_text(json.dumps(envelope, indent=1, sort_keys=True) + "\n")

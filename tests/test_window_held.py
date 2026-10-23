@@ -12,10 +12,13 @@ import json
 from pathlib import Path
 
 import pytest
+from cll.ledger import LedgerStore
 
 from capsule_engine.guards.classes import ENGINE_TAXONOMY, same_classes
+from capsule_engine.guards.history_state import WINDOW_HELD, history_state
 from capsule_engine.packs import load_pack_dir
 from capsule_engine.report.live_check import decide_check_input
+from capsule_engine.report.live_history import _act_taxonomy_version, history_ledger
 
 ROOT = Path(__file__).resolve().parent.parent
 EMIT = ROOT / "go" / "guard" / "testdata" / "emit"
@@ -79,3 +82,42 @@ def test_a_carried_taxonomy_with_the_engines_classes_is_the_same_classes():
     assert all(same_classes(v) for v in ("2", "3", "4", "5"))
     assert not same_classes("1")
     assert not same_classes(6)
+
+
+def test_a_failing_per_purchase_limit_still_stands_under_a_held_window():
+    envelope = json.loads((ROOT / "conformance-vectors" / "guard" / "v0" / "inputs" / "caps-held"
+                           / "short-history-over-limit.json").read_text())
+    decision, caps = _caps(envelope)
+    assert caps.result == "fail"
+    assert decision.outcome == "escalate"
+
+
+def test_with_no_caps_fold_nothing_is_held(tmp_path):
+    with LedgerStore(tmp_path / "ledger") as store:
+        history_ledger(_envelope("pay-history-5-days"), store, caps_fold=None)
+        assert not [r for r in store.scan() if history_state(r.capsule) == WINDOW_HELD]
+
+
+def test_the_marker_changes_no_check_but_caps():
+    short = decide_check_input(PACK, _envelope("pay-history-5-days")).decision
+    whole = _envelope("pay-history-5-days")
+    whole["history_scope"]["days"] = 31
+    full = decide_check_input(PACK, whole).decision
+    others = lambda d: [(c.id, c.result, c.evidence) for c in d.constraints if c.id != "caps"]  # noqa: E731
+    assert others(short) == others(full)
+
+
+@pytest.mark.parametrize(
+    ("shown", "version"),
+    [
+        ({"body": {"taxonomy_version": "6", "unchecked": {"taxonomy_version": "1"}}}, "1"),
+        ({"body": {"taxonomy_version": "1", "unchecked": {"amount_minor": 1}}}, "1"),
+        ({"type": "action-outcome/v0", "body": {"taxonomy_version": "6", "attempted": {"taxonomy_version": "1"}}}, "1"),
+        # attempted counts only on a typed outcome, as the Go guard reads it
+        ({"body": {"taxonomy_version": "6", "attempted": {"taxonomy_version": "1"}}}, "6"),
+        ({"body": {"taxonomy_version": "6"}}, "6"),
+        (None, None),
+    ],
+)
+def test_an_act_names_its_taxonomy_in_the_member_that_records_it(shown, version):
+    assert _act_taxonomy_version(shown) == version
