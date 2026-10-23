@@ -1,0 +1,456 @@
+{
+ "definition": "offer_expiry/1.1.0",
+ "definition_digest": "e55083b32ffe5e9415d3ef6455398b42187d9de76aba9f6cc735f3ea71f590f1",
+ "vectors": [
+  {
+   "capsule_id": "offer",
+   "evidence": {
+    "age_seconds": 3000,
+    "decided_at": "2026-10-10T12:00:00Z",
+    "expired": false,
+    "max_age_seconds": 86400,
+    "proposal_at": "2026-10-10T11:10:00Z"
+   },
+   "input": "replay/answers-a-message-sent-at.json",
+   "no_proposal": null,
+   "proposal_at": "2026-10-10T11:10:00Z",
+   "reason": "the proposal is 3000s old, within the 86400s limit",
+   "result": "pass"
+  },
+  {
+   "capsule_id": "offer",
+   "evidence": {
+    "age_seconds": 1800,
+    "decided_at": "2026-10-10T12:00:00Z",
+    "expired": false,
+    "max_age_seconds": 86400,
+    "proposal_at": "2026-10-10T11:30:00Z"
+   },
+   "input": "replay/answers-a-message-noted.json",
+   "no_proposal": null,
+   "proposal_at": "2026-10-10T11:30:00Z",
+   "reason": "the proposal is 1800s old, within the 86400s limit",
+   "result": "pass"
+  },
+  {
+   "capsule_id": "offer",
+   "evidence": {
+    "age_seconds": 93600,
+    "decided_at": "2026-10-10T12:00:00Z",
+    "expired": true,
+    "max_age_seconds": 86400,
+    "proposal_at": "2026-10-09T10:00:00Z"
+   },
+   "input": "replay/answers-a-day-old-message.json",
+   "no_proposal": null,
+   "proposal_at": "2026-10-09T10:00:00Z",
+   "reason": "proposal expired: it is 93600s old, past the 86400s limit; a new proposed action is required",
+   "result": "fail"
+  },
+  {
+   "capsule_id": "offer",
+   "evidence": {
+    "expiry_unverified": true,
+    "missing_field": "proposal_at"
+   },
+   "input": "replay/message-withheld.json",
+   "no_proposal": null,
+   "proposal_at": null,
+   "reason": "the action carries no proposal_at; the offer's expiry could not be established",
+   "result": "fail"
+  },
+  {
+   "capsule_id": "offer",
+   "evidence": {
+    "expiry_unverified": true,
+    "missing_field": "proposal_at"
+   },
+   "input": "replay/message-unbound.json",
+   "no_proposal": null,
+   "proposal_at": null,
+   "reason": "the action carries no proposal_at; the offer's expiry could not be established",
+   "result": "fail"
+  },
+  {
+   "capsule_id": "offer",
+   "evidence": {
+    "expiry_unverified": true,
+    "missing_field": "proposal_at"
+   },
+   "input": "replay/message-absent.json",
+   "no_proposal": null,
+   "proposal_at": null,
+   "reason": "the action carries no proposal_at; the offer's expiry could not be established",
+   "result": "fail"
+  },
+  {
+   "capsule_id": "offer",
+   "evidence": {
+    "expiry_unverified": true,
+    "missing_field": "proposal_at"
+   },
+   "input": "replay/message-from-the-agent.json",
+   "no_proposal": null,
+   "proposal_at": null,
+   "reason": "the action carries no proposal_at; the offer's expiry could not be established",
+   "result": "fail"
+  },
+  {
+   "capsule_id": "offer",
+   "evidence": {
+    "expiry_unverified": true,
+    "missing_field": "proposal_at"
+   },
+   "input": "replay/message-later.json",
+   "no_proposal": null,
+   "proposal_at": null,
+   "reason": "the action carries no proposal_at; the offer's expiry could not be established",
+   "result": "fail"
+  },
+  {
+   "capsule_id": "offer",
+   "evidence": {
+    "constraint_id": "offer_expiry",
+    "in_scope": true,
+    "missing_field": null
+   },
+   "input": "replay/first-offer-no-proposal.json",
+   "no_proposal": true,
+   "proposal_at": null,
+   "reason": "the action answers no proposal (no_proposal), so there is none to go stale",
+   "result": "n/a"
+  },
+  {
+   "capsule_id": "offer",
+   "evidence": {
+    "age_seconds": 1800,
+    "decided_at": "2026-10-10T12:00:00Z",
+    "expired": false,
+    "max_age_seconds": 86400,
+    "proposal_at": "2026-10-10T11:30:00Z"
+   },
+   "input": "replay/no-proposal-beside-source-resolved.json",
+   "no_proposal": null,
+   "proposal_at": "2026-10-10T11:30:00Z",
+   "reason": "the proposal is 1800s old, within the 86400s limit",
+   "result": "pass"
+  },
+  {
+   "capsule_id": "offer",
+   "evidence": {
+    "age_seconds": 93600,
+    "decided_at": "2026-10-10T12:00:00Z",
+    "expired": true,
+    "max_age_seconds": 86400,
+    "proposal_at": "2026-10-09T10:00:00Z"
+   },
+   "input": "replay/no-proposal-beside-source-stale.json",
+   "no_proposal": null,
+   "proposal_at": "2026-10-09T10:00:00Z",
+   "reason": "proposal expired: it is 93600s old, past the 86400s limit; a new proposed action is required",
+   "result": "fail"
+  },
+  {
+   "capsule_id": "offer",
+   "evidence": {
+    "expiry_unverified": true,
+    "missing_field": "proposal_at"
+   },
+   "input": "replay/no-proposal-beside-source-withheld.json",
+   "no_proposal": null,
+   "proposal_at": null,
+   "reason": "the action carries no proposal_at; the offer's expiry could not be established",
+   "result": "fail"
+  },
+  {
+   "capsule_id": "offer",
+   "evidence": {
+    "expiry_unverified": true,
+    "missing_field": "proposal_at"
+   },
+   "input": "replay/no-proposal-beside-source-unbound.json",
+   "no_proposal": null,
+   "proposal_at": null,
+   "reason": "the action carries no proposal_at; the offer's expiry could not be established",
+   "result": "fail"
+  },
+  {
+   "capsule_id": "offer",
+   "evidence": {
+    "expiry_unverified": true,
+    "missing_field": "proposal_at"
+   },
+   "input": "replay/malformed-sent-at-0.json",
+   "no_proposal": null,
+   "proposal_at": null,
+   "reason": "the action carries no proposal_at; the offer's expiry could not be established",
+   "result": "fail"
+  },
+  {
+   "capsule_id": "offer",
+   "evidence": {
+    "expiry_unverified": true,
+    "missing_field": "proposal_at"
+   },
+   "input": "replay/malformed-sent-at-1.json",
+   "no_proposal": null,
+   "proposal_at": null,
+   "reason": "the action carries no proposal_at; the offer's expiry could not be established",
+   "result": "fail"
+  },
+  {
+   "capsule_id": "offer",
+   "evidence": {
+    "expiry_unverified": true,
+    "missing_field": "proposal_at"
+   },
+   "input": "replay/malformed-sent-at-2.json",
+   "no_proposal": null,
+   "proposal_at": null,
+   "reason": "the action carries no proposal_at; the offer's expiry could not be established",
+   "result": "fail"
+  },
+  {
+   "capsule_id": "offer",
+   "evidence": {
+    "expiry_unverified": true,
+    "missing_field": "proposal_at"
+   },
+   "input": "replay/malformed-sent-at-3.json",
+   "no_proposal": null,
+   "proposal_at": null,
+   "reason": "the action carries no proposal_at; the offer's expiry could not be established",
+   "result": "fail"
+  },
+  {
+   "capsule_id": "offer",
+   "evidence": {
+    "expiry_unverified": true,
+    "missing_field": "proposal_at"
+   },
+   "input": "replay/malformed-sent-at-4.json",
+   "no_proposal": null,
+   "proposal_at": null,
+   "reason": "the action carries no proposal_at; the offer's expiry could not be established",
+   "result": "fail"
+  },
+  {
+   "capsule_id": "offer",
+   "evidence": {
+    "expiry_unverified": true,
+    "missing_field": "proposal_at"
+   },
+   "input": "replay/malformed-sent-at-5.json",
+   "no_proposal": null,
+   "proposal_at": null,
+   "reason": "the action carries no proposal_at; the offer's expiry could not be established",
+   "result": "fail"
+  },
+  {
+   "capsule_id": "offer",
+   "evidence": {
+    "expiry_unverified": true,
+    "missing_field": "proposal_at"
+   },
+   "input": "replay/malformed-sent-at-6.json",
+   "no_proposal": null,
+   "proposal_at": null,
+   "reason": "the action carries no proposal_at; the offer's expiry could not be established",
+   "result": "fail"
+  },
+  {
+   "capsule_id": "offer",
+   "evidence": {
+    "expiry_unverified": true,
+    "missing_field": "proposal_at"
+   },
+   "input": "replay/malformed-noted-at-0.json",
+   "no_proposal": null,
+   "proposal_at": null,
+   "reason": "the action carries no proposal_at; the offer's expiry could not be established",
+   "result": "fail"
+  },
+  {
+   "capsule_id": "offer",
+   "evidence": {
+    "expiry_unverified": true,
+    "missing_field": "proposal_at"
+   },
+   "input": "replay/malformed-noted-at-1.json",
+   "no_proposal": null,
+   "proposal_at": null,
+   "reason": "the action carries no proposal_at; the offer's expiry could not be established",
+   "result": "fail"
+  },
+  {
+   "capsule_id": "offer",
+   "evidence": {
+    "expiry_unverified": true,
+    "missing_field": "proposal_at"
+   },
+   "input": "replay/malformed-noted-at-2.json",
+   "no_proposal": null,
+   "proposal_at": null,
+   "reason": "the action carries no proposal_at; the offer's expiry could not be established",
+   "result": "fail"
+  },
+  {
+   "capsule_id": "offer",
+   "evidence": {
+    "expiry_unverified": true,
+    "missing_field": "proposal_at"
+   },
+   "input": "replay/malformed-noted-at-3.json",
+   "no_proposal": null,
+   "proposal_at": null,
+   "reason": "the action carries no proposal_at; the offer's expiry could not be established",
+   "result": "fail"
+  },
+  {
+   "capsule_id": "offer",
+   "evidence": {
+    "expiry_unverified": true,
+    "missing_field": "proposal_at"
+   },
+   "input": "replay/malformed-noted-at-4.json",
+   "no_proposal": null,
+   "proposal_at": null,
+   "reason": "the action carries no proposal_at; the offer's expiry could not be established",
+   "result": "fail"
+  },
+  {
+   "capsule_id": "offer",
+   "evidence": {
+    "expiry_unverified": true,
+    "missing_field": "proposal_at"
+   },
+   "input": "replay/sent-at-year-0.json",
+   "no_proposal": null,
+   "proposal_at": null,
+   "reason": "the action carries no proposal_at; the offer's expiry could not be established",
+   "result": "fail"
+  },
+  {
+   "capsule_id": "offer",
+   "evidence": {
+    "expiry_unverified": true,
+    "missing_field": "proposal_at"
+   },
+   "input": "replay/sent-at-after-noted.json",
+   "no_proposal": null,
+   "proposal_at": null,
+   "reason": "the action carries no proposal_at; the offer's expiry could not be established",
+   "result": "fail"
+  },
+  {
+   "capsule_id": "offer",
+   "evidence": {
+    "age_seconds": 1800,
+    "decided_at": "2026-10-10T12:00:00Z",
+    "expired": false,
+    "max_age_seconds": 86400,
+    "proposal_at": "2026-10-10T11:30:00Z"
+   },
+   "input": "replay/sent-at-equal-noted.json",
+   "no_proposal": null,
+   "proposal_at": "2026-10-10T11:30:00Z",
+   "reason": "the proposal is 1800s old, within the 86400s limit",
+   "result": "pass"
+  },
+  {
+   "capsule_id": "offer",
+   "evidence": {
+    "expiry_unverified": true,
+    "missing_field": "proposal_at"
+   },
+   "input": "replay/two-source-refs.json",
+   "no_proposal": null,
+   "proposal_at": null,
+   "reason": "the action carries no proposal_at; the offer's expiry could not be established",
+   "result": "fail"
+  },
+  {
+   "capsule_id": "offer",
+   "evidence": {
+    "expiry_unverified": true,
+    "missing_field": "proposal_at"
+   },
+   "input": "replay/message-in-another-deal.json",
+   "no_proposal": null,
+   "proposal_at": null,
+   "reason": "the action carries no proposal_at; the offer's expiry could not be established",
+   "result": "fail"
+  },
+  {
+   "capsule_id": "offer",
+   "evidence": {
+    "expiry_unverified": true,
+    "missing_field": "proposal_at"
+   },
+   "input": "replay/sale-sealed-no-proposal.json",
+   "no_proposal": true,
+   "proposal_at": null,
+   "reason": "the action carries no proposal_at; the offer's expiry could not be established",
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "expiry_unverified": true,
+    "missing_field": "proposal_at"
+   },
+   "input": "live/answers-a-message-no-proposal-at.json",
+   "no_proposal": null,
+   "proposal_at": null,
+   "reason": "the action carries no proposal_at; the offer's expiry could not be established",
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "age_seconds": 1800,
+    "decided_at": "2026-10-10T12:00:00Z",
+    "expired": false,
+    "max_age_seconds": 86400,
+    "proposal_at": "2026-10-10T11:30:00Z"
+   },
+   "input": "live/answers-a-message-with-proposal-at.json",
+   "no_proposal": null,
+   "proposal_at": "2026-10-10T11:30:00Z",
+   "reason": "the proposal is 1800s old, within the 86400s limit",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "constraint_id": "offer_expiry",
+    "in_scope": true,
+    "missing_field": null
+   },
+   "input": "live/no-proposal.json",
+   "no_proposal": true,
+   "proposal_at": null,
+   "reason": "the action answers no proposal (no_proposal), so there is none to go stale",
+   "result": "n/a"
+  },
+  {
+   "evidence": {
+    "expiry_unverified": true,
+    "no_proposal_beside": "proposal_at"
+   },
+   "input": "live/no-proposal-beside-proposal-at.json",
+   "no_proposal": true,
+   "proposal_at": "2026-10-10T11:30:00Z",
+   "reason": "the action says it answers no proposal (no_proposal) but also carries a proposal_at, so the offer's expiry could not be established",
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "expiry_unverified": true,
+    "missing_field": "proposal_at"
+   },
+   "input": "live/no-proposal-beside-source.json",
+   "no_proposal": null,
+   "proposal_at": null,
+   "reason": "the action carries no proposal_at; the offer's expiry could not be established",
+   "result": "fail"
+  }
+ ]
+}

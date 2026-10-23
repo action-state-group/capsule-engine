@@ -1,0 +1,19 @@
+# Dedupe wicket: exact-match equivalence lookup over a rolling window
+# (guards/checks/dedupe.py). The check LOGIC (the equivalence-key formula,
+# the lookup itself) stays Python code -- this digest identifies "this
+# configuration of this check" (method + window), never the source file.
+#
+# `method` mirrors cli/constraints_cmd.py's CHECKS catalog entry for dedupe
+# ("exact_match_index_v0") -- pinned here as data so a manifest can declare
+# which equivalence formula version governed a decision, not just that
+# *some* dedupe check ran.
+#
+# `window_days` mirrors guards/engine.py's `_DEDUPE_WINDOW_DAYS` constant.
+# This wicket file does not drive that constant at runtime; the digest exists so the
+# *declared* window is checkable even before every deployment path
+# consumes it.
+wicket_id: dedupe/1.0.0
+check: dedupe
+config:
+  method: exact_match_index_v0
+  window_days: 30

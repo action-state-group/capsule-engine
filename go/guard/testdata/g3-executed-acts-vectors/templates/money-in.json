@@ -1,0 +1,83 @@
+{
+ "action_id": "deal-494deb1648d2afaa/10",
+ "action_type": "fyi",
+ "agent_input": {
+  "body": {
+   "action": "cancel",
+   "action_class": "money.refund",
+   "amount_minor": 2000,
+   "currency": "USD",
+   "direction": "in",
+   "reference_commitment": "bb8afdf1111729bba7ad56c53e3542745e080d8600cd7b67a6ba85c8b14b7bb2",
+   "spend_minor": 0,
+   "taxonomy_version": "6"
+  },
+  "x-deal-v0": {
+   "at": "2026-10-09T16:57:25Z",
+   "baseline_ref": {
+    "digest": "71551e3a92d7ec4b59e39cf8251fb950165a516b879ad2e3498b19d4df4914b4",
+    "digest_alg": "SHA-256",
+    "type": "deal-record"
+   },
+   "canonicalization": "jcs",
+   "commit_alg": "sha256-jcs-nonce256",
+   "counterparty": {
+    "fp_alg": "hmac-sha256-deal-key",
+    "ids": {
+     "payee": "61c6e1f9dcd8bf2c634e1647d31e842b4e1b03fb29a53513e602ff818e9b8406"
+    }
+   },
+   "deal_id": "deal-494deb1648d2afaa",
+   "prev": {
+    "digest": "28702ea6ea59214a892bfc7bc488ffa173dcadb884a4ca4c3c10a095cdee4d0d",
+    "digest_alg": "SHA-256",
+    "type": "deal-record"
+   },
+   "producer": {
+    "commit": "fde7ee0d29df980f7b202376023bc575f8794a37",
+    "name": "capsulectl",
+    "version": "v0.1.0-rc13-7-gfde7ee0"
+   },
+   "profile": "x-deal-v0",
+   "record_type": "action",
+   "refs": [
+    {
+     "digest": "28702ea6ea59214a892bfc7bc488ffa173dcadb884a4ca4c3c10a095cdee4d0d",
+     "digest_alg": "SHA-256",
+     "rel": "authorized_by",
+     "type": "deal-record"
+    },
+    {
+     "digest": "a4930663776a4ecba4f06c053b249f1478da07e12a6564fa2412278ba1c30456",
+     "digest_alg": "SHA-256",
+     "rel": "reverses",
+     "type": "deal-record"
+    }
+   ],
+   "seq": 10
+  }
+ },
+ "assurance": {
+  "attestation_mode": "self_attested",
+  "effect_mode": "not_applicable",
+  "ledger_mode": "chained"
+ },
+ "canonicalization_id": "jcs",
+ "capsule_id": "9adaaf89fb79a16f42515141f7f37a0f1df457e7ace543051b996a7e9b6a89aa",
+ "chain": {
+  "parent_capsule_id": "0008e62ed134ce1ceb3cbedbac1d0527230ca54bbb7e4f35bfb4c1deaeae1fdd",
+  "relation": "follows"
+ },
+ "developer": "capsulectl-deal",
+ "format_version": "4",
+ "key_id": "a57bfc54b09f28825dfe49e70f7c2d487c7286cba77e57012cff42024f6376f9",
+ "model_attestation": {
+  "compute_attestation": {
+   "agent_input_digest": "52faa03285583bf9d17f5eba3c5afacd816b2ab0c5c59835ec08fc64fb1b75cb"
+  }
+ },
+ "operator": "deal",
+ "signature": "d284584ca30378236170706c69636174696f6e2f6167656e742d616374696f6e2d63617073756c652d6964045820a57bfc54b09f28825dfe49e70f7c2d487c7286cba77e57012cff42024f6376f90127a058209adaaf89fb79a16f42515141f7f37a0f1df457e7ace543051b996a7e9b6a89aa58405d56322a1ed0c3c25256b6350f2d35b022dc73ec62c84e584d84c00e0b4400db72aefcaeba330d16ba80e0849b97c2ea54a029b7a895b4aee907eb1a359c1307",
+ "spec_version": "draft-mih-scitt-agent-action-capsule-05",
+ "timestamp": "2026-10-09T16:57:25Z"
+}

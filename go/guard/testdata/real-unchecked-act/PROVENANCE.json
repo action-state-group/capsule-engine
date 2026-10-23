@@ -1,0 +1,60 @@
+{
+  "note": "Provenance sidecar; not part of the fixture. The set has no MANIFEST, so each file's sha256 is pinned here.",
+  "producer": {
+    "name": "capsulectl",
+    "repo": "action-state-group/capsule-cli",
+    "commit": "53b702f7d673207f1f016dae27cca285a35d51ac",
+    "version": "main-53b702f"
+  },
+  "engine_replay": {
+    "capsule_engine_commit": "a710636c29814ce67e838c673026fd2063d913f8",
+    "generator": "generate_engine_replay.py",
+    "python": "3.13.7"
+  },
+  "known_difference_source": "an unpublished engine-side note of 2026-10-09 on unchecked-act spend (sha256 b58780de6740395837d29252e3b2bdf277cb75a141e3161a58815cc4d662be78)",
+  "files": {
+    "README.md": {
+      "sha256": "939eec00eb76c2eef9f560954b4e33d73ee288e44cedc4b2713013bd10b99dd9"
+    },
+    "build.sh": {
+      "sha256": "38be1cba114be01fb92a6882e21d6d3942a0a5ed086a002f0f426ad9a6691a4a"
+    },
+    "engine-replay.json": {
+      "sha256": "b4b7f7a42f1075678aff4d5368112cfca01fd845dd429a82c56b192479b6d9b9"
+    },
+    "generate_engine_replay.py": {
+      "sha256": "4754bda3c863789233b9d985674936306e9d63ad2ddbc9a8283c0cb7b3a50766"
+    },
+    "inputs/act-pay.json": {
+      "sha256": "0eb39dcbe421be170e178b95a4b14ef8281003665331e0bf74b4ad59f0d82314"
+    },
+    "inputs/check-pay.json": {
+      "sha256": "b4258a5676d16368125cc0a5ad017731fd57d8dbfa0556eaf77beac4a2f94b75"
+    },
+    "inputs/open.json": {
+      "sha256": "db78660ae0386f3b2847b4127c3bc1375e51c552179d9edf15e72c6547fe7e96"
+    },
+    "typed-act.json": {
+      "sha256": "3e9f974bec12aed45d471818c414ff6233903294377b296041f5109274b63445"
+    },
+    "typed-check-1.input.json": {
+      "sha256": "19ff66e1e2aeadb09773ba39c4f6e9f7ddd816fca8ad3596f1592e443e63385a"
+    },
+    "typed-check-2.input.json": {
+      "sha256": "cc000c83e43c084957787154c59811512da2b366e8cec23b4459cd935e7be6be"
+    },
+    "typed.bundle.json": {
+      "sha256": "f16c96cd41dab85cdbef7d3af412f4bdc3a5ee0da1df931ae6606a541387b858"
+    },
+    "x-deal-v0-act.json": {
+      "sha256": "fba48181f638a15b67039f8d2dd6bf7a495d7f830c38f88c9014a44d5f9bf5ad"
+    },
+    "x-deal-v0-check-2.input.json": {
+      "sha256": "6ab9a6883a422a09db3518bc4a52e9adfb14b02a655492d1daaf952f80300451"
+    },
+    "x-deal-v0.bundle.json": {
+      "sha256": "4ff7d56d3594046371efac68c48cc9fd1d9e0f7b6a8b769e84106918114449bd"
+    }
+  },
+  "known_difference_retired": "capsule-engine #138 (a710636c): the replay counts the unchecked act's 2000 before the second check, as this port does; regenerated with generate_engine_replay.py, which changes only the pack (asg/everyday/0.3.6), the caps fold (spend.weekly/3.1.0) and that window."
+}

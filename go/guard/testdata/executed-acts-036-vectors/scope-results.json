@@ -1,0 +1,30 @@
+{
+ "capsule_engine_commit": "a710636c29814ce67e838c673026fd2063d913f8",
+ "cases": {
+  "pay-history-empty-incomplete": {
+   "history_scope": {
+    "complete": false,
+    "days": 31,
+    "max_records": 1000
+   },
+   "r05_7d_limit": 10000,
+   "r05_7d_reason": "",
+   "r05_7d_value": 1299,
+   "r05_7d_verdict": "pass"
+  },
+  "pay-history-incomplete": {
+   "history_scope": {
+    "complete": false,
+    "days": 31,
+    "max_records": 1000
+   },
+   "r05_7d_limit": 10000,
+   "r05_7d_reason": "",
+   "r05_7d_value": 6299,
+   "r05_7d_verdict": "pass"
+  }
+ },
+ "pack": "asg/everyday/0.3.6",
+ "pack_digest": "8a8e0a7e1ca4319b6e45f2037f4af49e6592919f373e59874ce1ead7249b073d",
+ "schema": "executed-acts-036-scope-results/v0"
+}

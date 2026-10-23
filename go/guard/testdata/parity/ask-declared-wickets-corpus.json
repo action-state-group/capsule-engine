@@ -1,0 +1,1773 @@
+{
+  "cases": [
+    {
+      "expect": "escalate: caps (r05) + refundability (r08) + gate booking_create (r16), all ASK; account_holder",
+      "name": "booking-558-80-non-refundable-asks",
+      "steps": [
+        {
+          "action": {
+            "action_class": "booking.create",
+            "action_id": "book_room/wickets-diff-1",
+            "amount_minor": 55880,
+            "currency": "USD",
+            "developer": "household-assistant-wd@v1",
+            "operator": "household-wd-1",
+            "refundable": false,
+            "target": "venue/hotel-non-refundable",
+            "timestamp": "2026-08-10T15:01:00Z",
+            "verb": "book_room"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "expect": "deny: r08 re-declared NEVER",
+      "name": "booking-558-80-r08-never-refuses",
+      "redeclare": {
+        "r08-non-refundable-or-hard-to-undo": "NEVER"
+      },
+      "steps": [
+        {
+          "action": {
+            "action_class": "booking.create",
+            "action_id": "book_room/wickets-diff-2",
+            "amount_minor": 55880,
+            "currency": "USD",
+            "developer": "household-assistant-wd@v1",
+            "operator": "household-wd-2",
+            "refundable": false,
+            "target": "venue/hotel-non-refundable",
+            "timestamp": "2026-08-10T15:02:00Z",
+            "verb": "book_room"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "expect": "escalate: r08 alone, declared ASK; money.transfer names an approver",
+      "name": "r08-non-refundable-asks",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-10",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "counterparty_account_ref": "acct-ref-bike-10",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-10",
+            "rail": "card",
+            "recurrence": "one_time",
+            "refundable": false,
+            "target": "seller/bike-10",
+            "timestamp": "2026-08-10T14:10:00Z",
+            "upfront_amount_minor": 500,
+            "verb": "make_payment"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "expect": "deny: r08 re-declared NEVER",
+      "name": "r08-non-refundable-never-refuses",
+      "redeclare_rule_prefix": "r08",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-10",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "counterparty_account_ref": "acct-ref-bike-10",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-10",
+            "rail": "card",
+            "recurrence": "one_time",
+            "refundable": false,
+            "target": "seller/bike-10",
+            "timestamp": "2026-08-10T14:10:00Z",
+            "upfront_amount_minor": 500,
+            "verb": "make_payment"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "expect": "deny: credential_pattern (r23 NEVER) beside it",
+      "name": "r08-non-refundable-beside-credential-refuses",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-10",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "counterparty_account_ref": "acct-ref-bike-10",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-10",
+            "outgoing_content": "Your verification code is 482913",
+            "rail": "card",
+            "recurrence": "one_time",
+            "refundable": false,
+            "target": "seller/bike-10",
+            "timestamp": "2026-08-10T14:10:00Z",
+            "upfront_amount_minor": 500,
+            "verb": "make_payment"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "expect": "deny: verify_before_dispatch (integrity) beside it",
+      "name": "r08-non-refundable-citing-missing-mandate-refuses",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-10",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "cited_mandate_capsule_id": "0000000000000000000000000000000000000000000000000000000000000000",
+            "counterparty_account_ref": "acct-ref-bike-10",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-10",
+            "rail": "card",
+            "recurrence": "one_time",
+            "refundable": false,
+            "target": "seller/bike-10",
+            "timestamp": "2026-08-10T14:10:00Z",
+            "upfront_amount_minor": 500,
+            "verb": "make_payment"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "expect": "deny: dedupe hit (integrity) beside it",
+      "name": "r08-non-refundable-same-deal-repeat-refuses",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-10",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "counterparty_account_ref": "acct-ref-bike-10",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-10",
+            "rail": "card",
+            "recurrence": "one_time",
+            "refundable": false,
+            "target": "seller/bike-10",
+            "timestamp": "2026-08-10T14:10:00Z",
+            "upfront_amount_minor": 500,
+            "verb": "make_payment"
+          },
+          "dry_run": false
+        },
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-10",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "counterparty_account_ref": "acct-ref-bike-10",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-10",
+            "rail": "card",
+            "recurrence": "one_time",
+            "refundable": false,
+            "target": "seller/bike-10",
+            "timestamp": "2026-08-10T14:10:00Z",
+            "upfront_amount_minor": 500,
+            "verb": "make_payment"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "add_obligations": [
+        {
+          "check_of_rule": "r08",
+          "default_disposition": "NEVER",
+          "id": "rx-never",
+          "statement": "declared never"
+        }
+      ],
+      "expect": "deny: a second rule on the same check declares NEVER",
+      "name": "r08-non-refundable-mixed-binding-refuses",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-10",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "counterparty_account_ref": "acct-ref-bike-10",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-10",
+            "rail": "card",
+            "recurrence": "one_time",
+            "refundable": false,
+            "target": "seller/bike-10",
+            "timestamp": "2026-08-10T14:10:00Z",
+            "upfront_amount_minor": 500,
+            "verb": "make_payment"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "expect": "escalate: r09 alone, declared ASK; money.transfer names an approver",
+      "name": "r09-material-terms-changed-asks",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-11",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "counterparty_account_ref": "acct-ref-bike-11",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 2,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-11",
+            "rail": "card",
+            "recurrence": "one_time",
+            "refundable": true,
+            "target": "seller/bike-11",
+            "timestamp": "2026-08-10T14:11:00Z",
+            "upfront_amount_minor": 500,
+            "verb": "make_payment"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "expect": "deny: r09 re-declared NEVER",
+      "name": "r09-material-terms-changed-never-refuses",
+      "redeclare_rule_prefix": "r09",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-11",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "counterparty_account_ref": "acct-ref-bike-11",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 2,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-11",
+            "rail": "card",
+            "recurrence": "one_time",
+            "refundable": true,
+            "target": "seller/bike-11",
+            "timestamp": "2026-08-10T14:11:00Z",
+            "upfront_amount_minor": 500,
+            "verb": "make_payment"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "expect": "deny: credential_pattern (r23 NEVER) beside it",
+      "name": "r09-material-terms-changed-beside-credential-refuses",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-11",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "counterparty_account_ref": "acct-ref-bike-11",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 2,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-11",
+            "outgoing_content": "Your verification code is 482913",
+            "rail": "card",
+            "recurrence": "one_time",
+            "refundable": true,
+            "target": "seller/bike-11",
+            "timestamp": "2026-08-10T14:11:00Z",
+            "upfront_amount_minor": 500,
+            "verb": "make_payment"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "expect": "deny: verify_before_dispatch (integrity) beside it",
+      "name": "r09-material-terms-changed-citing-missing-mandate-refuses",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-11",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "cited_mandate_capsule_id": "0000000000000000000000000000000000000000000000000000000000000000",
+            "counterparty_account_ref": "acct-ref-bike-11",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 2,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-11",
+            "rail": "card",
+            "recurrence": "one_time",
+            "refundable": true,
+            "target": "seller/bike-11",
+            "timestamp": "2026-08-10T14:11:00Z",
+            "upfront_amount_minor": 500,
+            "verb": "make_payment"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "expect": "deny: dedupe hit (integrity) beside it",
+      "name": "r09-material-terms-changed-same-deal-repeat-refuses",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-11",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "counterparty_account_ref": "acct-ref-bike-11",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 2,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-11",
+            "rail": "card",
+            "recurrence": "one_time",
+            "refundable": true,
+            "target": "seller/bike-11",
+            "timestamp": "2026-08-10T14:11:00Z",
+            "upfront_amount_minor": 500,
+            "verb": "make_payment"
+          },
+          "dry_run": false
+        },
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-11",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "counterparty_account_ref": "acct-ref-bike-11",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 2,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-11",
+            "rail": "card",
+            "recurrence": "one_time",
+            "refundable": true,
+            "target": "seller/bike-11",
+            "timestamp": "2026-08-10T14:11:00Z",
+            "upfront_amount_minor": 500,
+            "verb": "make_payment"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "add_obligations": [
+        {
+          "check_of_rule": "r09",
+          "default_disposition": "NEVER",
+          "id": "rx-never",
+          "statement": "declared never"
+        }
+      ],
+      "expect": "deny: a second rule on the same check declares NEVER",
+      "name": "r09-material-terms-changed-mixed-binding-refuses",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-11",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "counterparty_account_ref": "acct-ref-bike-11",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 2,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-11",
+            "rail": "card",
+            "recurrence": "one_time",
+            "refundable": true,
+            "target": "seller/bike-11",
+            "timestamp": "2026-08-10T14:11:00Z",
+            "upfront_amount_minor": 500,
+            "verb": "make_payment"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "expect": "escalate: r10 alone, declared ASK; money.transfer names an approver",
+      "name": "r10-offer-differs-asks",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-12",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "counterparty_account_ref": "acct-ref-bike-12",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 1,
+            "operator": "household-wd-12",
+            "rail": "card",
+            "recurrence": "one_time",
+            "refundable": true,
+            "target": "seller/bike-12",
+            "timestamp": "2026-08-10T14:12:00Z",
+            "upfront_amount_minor": 500,
+            "verb": "make_payment"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "expect": "deny: r10 re-declared NEVER",
+      "name": "r10-offer-differs-never-refuses",
+      "redeclare_rule_prefix": "r10",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-12",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "counterparty_account_ref": "acct-ref-bike-12",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 1,
+            "operator": "household-wd-12",
+            "rail": "card",
+            "recurrence": "one_time",
+            "refundable": true,
+            "target": "seller/bike-12",
+            "timestamp": "2026-08-10T14:12:00Z",
+            "upfront_amount_minor": 500,
+            "verb": "make_payment"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "expect": "deny: credential_pattern (r23 NEVER) beside it",
+      "name": "r10-offer-differs-beside-credential-refuses",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-12",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "counterparty_account_ref": "acct-ref-bike-12",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 1,
+            "operator": "household-wd-12",
+            "outgoing_content": "Your verification code is 482913",
+            "rail": "card",
+            "recurrence": "one_time",
+            "refundable": true,
+            "target": "seller/bike-12",
+            "timestamp": "2026-08-10T14:12:00Z",
+            "upfront_amount_minor": 500,
+            "verb": "make_payment"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "expect": "deny: verify_before_dispatch (integrity) beside it",
+      "name": "r10-offer-differs-citing-missing-mandate-refuses",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-12",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "cited_mandate_capsule_id": "0000000000000000000000000000000000000000000000000000000000000000",
+            "counterparty_account_ref": "acct-ref-bike-12",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 1,
+            "operator": "household-wd-12",
+            "rail": "card",
+            "recurrence": "one_time",
+            "refundable": true,
+            "target": "seller/bike-12",
+            "timestamp": "2026-08-10T14:12:00Z",
+            "upfront_amount_minor": 500,
+            "verb": "make_payment"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "expect": "deny: dedupe hit (integrity) beside it",
+      "name": "r10-offer-differs-same-deal-repeat-refuses",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-12",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "counterparty_account_ref": "acct-ref-bike-12",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 1,
+            "operator": "household-wd-12",
+            "rail": "card",
+            "recurrence": "one_time",
+            "refundable": true,
+            "target": "seller/bike-12",
+            "timestamp": "2026-08-10T14:12:00Z",
+            "upfront_amount_minor": 500,
+            "verb": "make_payment"
+          },
+          "dry_run": false
+        },
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-12",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "counterparty_account_ref": "acct-ref-bike-12",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 1,
+            "operator": "household-wd-12",
+            "rail": "card",
+            "recurrence": "one_time",
+            "refundable": true,
+            "target": "seller/bike-12",
+            "timestamp": "2026-08-10T14:12:00Z",
+            "upfront_amount_minor": 500,
+            "verb": "make_payment"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "add_obligations": [
+        {
+          "check_of_rule": "r10",
+          "default_disposition": "NEVER",
+          "id": "rx-never",
+          "statement": "declared never"
+        }
+      ],
+      "expect": "deny: a second rule on the same check declares NEVER",
+      "name": "r10-offer-differs-mixed-binding-refuses",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-12",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "counterparty_account_ref": "acct-ref-bike-12",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 1,
+            "operator": "household-wd-12",
+            "rail": "card",
+            "recurrence": "one_time",
+            "refundable": true,
+            "target": "seller/bike-12",
+            "timestamp": "2026-08-10T14:12:00Z",
+            "upfront_amount_minor": 500,
+            "verb": "make_payment"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "expect": "escalate: r21 alone, declared ASK; money.transfer names an approver",
+      "name": "r21-channel-change-asks",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-13",
+            "amount_minor": 2000,
+            "channel": "whatsapp",
+            "counterparty_account_ref": "acct-ref-bike-13",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-13",
+            "rail": "card",
+            "recurrence": "one_time",
+            "refundable": true,
+            "target": "seller/bike-13",
+            "timestamp": "2026-08-10T14:13:00Z",
+            "upfront_amount_minor": 500,
+            "verb": "make_payment"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "expect": "deny: r21 re-declared NEVER",
+      "name": "r21-channel-change-never-refuses",
+      "redeclare_rule_prefix": "r21",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-13",
+            "amount_minor": 2000,
+            "channel": "whatsapp",
+            "counterparty_account_ref": "acct-ref-bike-13",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-13",
+            "rail": "card",
+            "recurrence": "one_time",
+            "refundable": true,
+            "target": "seller/bike-13",
+            "timestamp": "2026-08-10T14:13:00Z",
+            "upfront_amount_minor": 500,
+            "verb": "make_payment"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "expect": "deny: credential_pattern (r23 NEVER) beside it",
+      "name": "r21-channel-change-beside-credential-refuses",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-13",
+            "amount_minor": 2000,
+            "channel": "whatsapp",
+            "counterparty_account_ref": "acct-ref-bike-13",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-13",
+            "outgoing_content": "Your verification code is 482913",
+            "rail": "card",
+            "recurrence": "one_time",
+            "refundable": true,
+            "target": "seller/bike-13",
+            "timestamp": "2026-08-10T14:13:00Z",
+            "upfront_amount_minor": 500,
+            "verb": "make_payment"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "expect": "deny: verify_before_dispatch (integrity) beside it",
+      "name": "r21-channel-change-citing-missing-mandate-refuses",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-13",
+            "amount_minor": 2000,
+            "channel": "whatsapp",
+            "cited_mandate_capsule_id": "0000000000000000000000000000000000000000000000000000000000000000",
+            "counterparty_account_ref": "acct-ref-bike-13",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-13",
+            "rail": "card",
+            "recurrence": "one_time",
+            "refundable": true,
+            "target": "seller/bike-13",
+            "timestamp": "2026-08-10T14:13:00Z",
+            "upfront_amount_minor": 500,
+            "verb": "make_payment"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "expect": "deny: dedupe hit (integrity) beside it",
+      "name": "r21-channel-change-same-deal-repeat-refuses",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-13",
+            "amount_minor": 2000,
+            "channel": "whatsapp",
+            "counterparty_account_ref": "acct-ref-bike-13",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-13",
+            "rail": "card",
+            "recurrence": "one_time",
+            "refundable": true,
+            "target": "seller/bike-13",
+            "timestamp": "2026-08-10T14:13:00Z",
+            "upfront_amount_minor": 500,
+            "verb": "make_payment"
+          },
+          "dry_run": false
+        },
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-13",
+            "amount_minor": 2000,
+            "channel": "whatsapp",
+            "counterparty_account_ref": "acct-ref-bike-13",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-13",
+            "rail": "card",
+            "recurrence": "one_time",
+            "refundable": true,
+            "target": "seller/bike-13",
+            "timestamp": "2026-08-10T14:13:00Z",
+            "upfront_amount_minor": 500,
+            "verb": "make_payment"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "add_obligations": [
+        {
+          "check_of_rule": "r21",
+          "default_disposition": "NEVER",
+          "id": "rx-never",
+          "statement": "declared never"
+        }
+      ],
+      "expect": "deny: a second rule on the same check declares NEVER",
+      "name": "r21-channel-change-mixed-binding-refuses",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-13",
+            "amount_minor": 2000,
+            "channel": "whatsapp",
+            "counterparty_account_ref": "acct-ref-bike-13",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-13",
+            "rail": "card",
+            "recurrence": "one_time",
+            "refundable": true,
+            "target": "seller/bike-13",
+            "timestamp": "2026-08-10T14:13:00Z",
+            "upfront_amount_minor": 500,
+            "verb": "make_payment"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "expect": "escalate: r22 alone, declared ASK; money.transfer names an approver",
+      "name": "r22-unusual-deposit-asks",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-14",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "counterparty_account_ref": "acct-ref-bike-14",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-14",
+            "rail": "card",
+            "recurrence": "one_time",
+            "refundable": true,
+            "target": "seller/bike-14",
+            "timestamp": "2026-08-10T14:14:00Z",
+            "upfront_amount_minor": 501,
+            "verb": "make_payment"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "expect": "deny: r22 re-declared NEVER",
+      "name": "r22-unusual-deposit-never-refuses",
+      "redeclare_rule_prefix": "r22",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-14",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "counterparty_account_ref": "acct-ref-bike-14",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-14",
+            "rail": "card",
+            "recurrence": "one_time",
+            "refundable": true,
+            "target": "seller/bike-14",
+            "timestamp": "2026-08-10T14:14:00Z",
+            "upfront_amount_minor": 501,
+            "verb": "make_payment"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "expect": "deny: credential_pattern (r23 NEVER) beside it",
+      "name": "r22-unusual-deposit-beside-credential-refuses",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-14",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "counterparty_account_ref": "acct-ref-bike-14",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-14",
+            "outgoing_content": "Your verification code is 482913",
+            "rail": "card",
+            "recurrence": "one_time",
+            "refundable": true,
+            "target": "seller/bike-14",
+            "timestamp": "2026-08-10T14:14:00Z",
+            "upfront_amount_minor": 501,
+            "verb": "make_payment"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "expect": "deny: verify_before_dispatch (integrity) beside it",
+      "name": "r22-unusual-deposit-citing-missing-mandate-refuses",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-14",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "cited_mandate_capsule_id": "0000000000000000000000000000000000000000000000000000000000000000",
+            "counterparty_account_ref": "acct-ref-bike-14",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-14",
+            "rail": "card",
+            "recurrence": "one_time",
+            "refundable": true,
+            "target": "seller/bike-14",
+            "timestamp": "2026-08-10T14:14:00Z",
+            "upfront_amount_minor": 501,
+            "verb": "make_payment"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "expect": "deny: dedupe hit (integrity) beside it",
+      "name": "r22-unusual-deposit-same-deal-repeat-refuses",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-14",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "counterparty_account_ref": "acct-ref-bike-14",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-14",
+            "rail": "card",
+            "recurrence": "one_time",
+            "refundable": true,
+            "target": "seller/bike-14",
+            "timestamp": "2026-08-10T14:14:00Z",
+            "upfront_amount_minor": 501,
+            "verb": "make_payment"
+          },
+          "dry_run": false
+        },
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-14",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "counterparty_account_ref": "acct-ref-bike-14",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-14",
+            "rail": "card",
+            "recurrence": "one_time",
+            "refundable": true,
+            "target": "seller/bike-14",
+            "timestamp": "2026-08-10T14:14:00Z",
+            "upfront_amount_minor": 501,
+            "verb": "make_payment"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "add_obligations": [
+        {
+          "check_of_rule": "r22",
+          "default_disposition": "NEVER",
+          "id": "rx-never",
+          "statement": "declared never"
+        }
+      ],
+      "expect": "deny: a second rule on the same check declares NEVER",
+      "name": "r22-unusual-deposit-mixed-binding-refuses",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-14",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "counterparty_account_ref": "acct-ref-bike-14",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-14",
+            "rail": "card",
+            "recurrence": "one_time",
+            "refundable": true,
+            "target": "seller/bike-14",
+            "timestamp": "2026-08-10T14:14:00Z",
+            "upfront_amount_minor": 501,
+            "verb": "make_payment"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "expect": "escalate: r07 alone, declared ASK; money.transfer names an approver",
+      "name": "r07-recurring-charge-asks",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-15",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "counterparty_account_ref": "acct-ref-bike-15",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-15",
+            "rail": "card",
+            "recurrence": "monthly",
+            "refundable": true,
+            "target": "seller/bike-15",
+            "timestamp": "2026-08-10T14:15:00Z",
+            "upfront_amount_minor": 500,
+            "verb": "make_payment"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "expect": "deny: r07 re-declared NEVER",
+      "name": "r07-recurring-charge-never-refuses",
+      "redeclare_rule_prefix": "r07",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-15",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "counterparty_account_ref": "acct-ref-bike-15",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-15",
+            "rail": "card",
+            "recurrence": "monthly",
+            "refundable": true,
+            "target": "seller/bike-15",
+            "timestamp": "2026-08-10T14:15:00Z",
+            "upfront_amount_minor": 500,
+            "verb": "make_payment"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "expect": "deny: credential_pattern (r23 NEVER) beside it",
+      "name": "r07-recurring-charge-beside-credential-refuses",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-15",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "counterparty_account_ref": "acct-ref-bike-15",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-15",
+            "outgoing_content": "Your verification code is 482913",
+            "rail": "card",
+            "recurrence": "monthly",
+            "refundable": true,
+            "target": "seller/bike-15",
+            "timestamp": "2026-08-10T14:15:00Z",
+            "upfront_amount_minor": 500,
+            "verb": "make_payment"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "expect": "deny: verify_before_dispatch (integrity) beside it",
+      "name": "r07-recurring-charge-citing-missing-mandate-refuses",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-15",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "cited_mandate_capsule_id": "0000000000000000000000000000000000000000000000000000000000000000",
+            "counterparty_account_ref": "acct-ref-bike-15",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-15",
+            "rail": "card",
+            "recurrence": "monthly",
+            "refundable": true,
+            "target": "seller/bike-15",
+            "timestamp": "2026-08-10T14:15:00Z",
+            "upfront_amount_minor": 500,
+            "verb": "make_payment"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "expect": "deny: dedupe hit (integrity) beside it",
+      "name": "r07-recurring-charge-same-deal-repeat-refuses",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-15",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "counterparty_account_ref": "acct-ref-bike-15",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-15",
+            "rail": "card",
+            "recurrence": "monthly",
+            "refundable": true,
+            "target": "seller/bike-15",
+            "timestamp": "2026-08-10T14:15:00Z",
+            "upfront_amount_minor": 500,
+            "verb": "make_payment"
+          },
+          "dry_run": false
+        },
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-15",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "counterparty_account_ref": "acct-ref-bike-15",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-15",
+            "rail": "card",
+            "recurrence": "monthly",
+            "refundable": true,
+            "target": "seller/bike-15",
+            "timestamp": "2026-08-10T14:15:00Z",
+            "upfront_amount_minor": 500,
+            "verb": "make_payment"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "add_obligations": [
+        {
+          "check_of_rule": "r07",
+          "default_disposition": "NEVER",
+          "id": "rx-never",
+          "statement": "declared never"
+        }
+      ],
+      "expect": "deny: a second rule on the same check declares NEVER",
+      "name": "r07-recurring-charge-mixed-binding-refuses",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-15",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "counterparty_account_ref": "acct-ref-bike-15",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-15",
+            "rail": "card",
+            "recurrence": "monthly",
+            "refundable": true,
+            "target": "seller/bike-15",
+            "timestamp": "2026-08-10T14:15:00Z",
+            "upfront_amount_minor": 500,
+            "verb": "make_payment"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "expect": "escalate: r20 alone, declared ASK; money.transfer names an approver",
+      "name": "r20-watched-rail-asks",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-16",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "counterparty_account_ref": "acct-ref-bike-16",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-16",
+            "rail": "p2p",
+            "recurrence": "one_time",
+            "refundable": true,
+            "target": "seller/bike-16",
+            "timestamp": "2026-08-10T14:16:00Z",
+            "upfront_amount_minor": 500,
+            "verb": "make_payment"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "expect": "deny: r20 re-declared NEVER",
+      "name": "r20-watched-rail-never-refuses",
+      "redeclare_rule_prefix": "r20",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-16",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "counterparty_account_ref": "acct-ref-bike-16",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-16",
+            "rail": "p2p",
+            "recurrence": "one_time",
+            "refundable": true,
+            "target": "seller/bike-16",
+            "timestamp": "2026-08-10T14:16:00Z",
+            "upfront_amount_minor": 500,
+            "verb": "make_payment"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "expect": "deny: credential_pattern (r23 NEVER) beside it",
+      "name": "r20-watched-rail-beside-credential-refuses",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-16",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "counterparty_account_ref": "acct-ref-bike-16",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-16",
+            "outgoing_content": "Your verification code is 482913",
+            "rail": "p2p",
+            "recurrence": "one_time",
+            "refundable": true,
+            "target": "seller/bike-16",
+            "timestamp": "2026-08-10T14:16:00Z",
+            "upfront_amount_minor": 500,
+            "verb": "make_payment"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "expect": "deny: verify_before_dispatch (integrity) beside it",
+      "name": "r20-watched-rail-citing-missing-mandate-refuses",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-16",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "cited_mandate_capsule_id": "0000000000000000000000000000000000000000000000000000000000000000",
+            "counterparty_account_ref": "acct-ref-bike-16",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-16",
+            "rail": "p2p",
+            "recurrence": "one_time",
+            "refundable": true,
+            "target": "seller/bike-16",
+            "timestamp": "2026-08-10T14:16:00Z",
+            "upfront_amount_minor": 500,
+            "verb": "make_payment"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "expect": "deny: dedupe hit (integrity) beside it",
+      "name": "r20-watched-rail-same-deal-repeat-refuses",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-16",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "counterparty_account_ref": "acct-ref-bike-16",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-16",
+            "rail": "p2p",
+            "recurrence": "one_time",
+            "refundable": true,
+            "target": "seller/bike-16",
+            "timestamp": "2026-08-10T14:16:00Z",
+            "upfront_amount_minor": 500,
+            "verb": "make_payment"
+          },
+          "dry_run": false
+        },
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-16",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "counterparty_account_ref": "acct-ref-bike-16",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-16",
+            "rail": "p2p",
+            "recurrence": "one_time",
+            "refundable": true,
+            "target": "seller/bike-16",
+            "timestamp": "2026-08-10T14:16:00Z",
+            "upfront_amount_minor": 500,
+            "verb": "make_payment"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "add_obligations": [
+        {
+          "check_of_rule": "r20",
+          "default_disposition": "NEVER",
+          "id": "rx-never",
+          "statement": "declared never"
+        }
+      ],
+      "expect": "deny: a second rule on the same check declares NEVER",
+      "name": "r20-watched-rail-mixed-binding-refuses",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-16",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "counterparty_account_ref": "acct-ref-bike-16",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-16",
+            "rail": "p2p",
+            "recurrence": "one_time",
+            "refundable": true,
+            "target": "seller/bike-16",
+            "timestamp": "2026-08-10T14:16:00Z",
+            "upfront_amount_minor": 500,
+            "verb": "make_payment"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "expect": "escalate: r19 alone",
+      "name": "r19-payee-account-changed-asks",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-40",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "counterparty_account_ref": "acct-ref-water-1",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "equivalence_key": "water-co/2026-08",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-40",
+            "rail": "card",
+            "recurrence": "one_time",
+            "refundable": true,
+            "target": "utility/water-co",
+            "timestamp": "2026-08-10T14:40:00Z",
+            "upfront_amount_minor": 0,
+            "verb": "make_payment"
+          },
+          "dry_run": false
+        },
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-41",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "counterparty_account_ref": "acct-ref-water-2",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "equivalence_key": "water-co/2026-09",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-40",
+            "rail": "card",
+            "recurrence": "one_time",
+            "refundable": true,
+            "target": "utility/water-co",
+            "timestamp": "2026-08-10T14:41:00Z",
+            "upfront_amount_minor": 0,
+            "verb": "make_payment"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "expect": "escalate: r26 alone",
+      "name": "r26-outside-task-asks",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-42",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "counterparty_account_ref": "acct-ref-bike-42",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-42",
+            "rail": "card",
+            "recurrence": "one_time",
+            "refundable": true,
+            "target": "service/roofer",
+            "task_authority_ref": "6714006676964ebb292ff712a212ca353c78cb127c123e36e6fbb4fd60cc90d4",
+            "timestamp": "2026-08-10T14:42:00Z",
+            "upfront_amount_minor": 500,
+            "verb": "make_payment"
+          },
+          "dry_run": true,
+          "task_authority_record": {
+            "body": {
+              "allowed_actions": [
+                "make_payment"
+              ],
+              "binding": {
+                "subject": "service/plumber"
+              },
+              "outcome_id": "household.pay_the_plumber/1.0.0",
+              "preconditions": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "expect": "deny: r26 re-declared NEVER",
+      "name": "r26-never-refuses",
+      "redeclare": {
+        "r26-stay-within-task-bounds": "NEVER"
+      },
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "make_payment/wickets-diff-42",
+            "amount_minor": 2000,
+            "channel": "marketplace",
+            "counterparty_account_ref": "acct-ref-bike-42",
+            "currency": "EUR",
+            "developer": "household-assistant-wd@v1",
+            "first_contact_channel": "marketplace",
+            "material_fields_basis": "effa16bb95192a3208f24daa127a4f0ac387095e139856b7ce390ebd96b772c3",
+            "material_fields_changed": 0,
+            "offer_fields_basis": "52ddf74622010caba9ef3baf4d9600365e8670169fb4a56a3c5a5a1cea93739d",
+            "offer_fields_changed": 0,
+            "operator": "household-wd-42",
+            "rail": "card",
+            "recurrence": "one_time",
+            "refundable": true,
+            "target": "service/roofer",
+            "task_authority_ref": "6714006676964ebb292ff712a212ca353c78cb127c123e36e6fbb4fd60cc90d4",
+            "timestamp": "2026-08-10T14:42:00Z",
+            "upfront_amount_minor": 500,
+            "verb": "make_payment"
+          },
+          "dry_run": true,
+          "task_authority_record": {
+            "body": {
+              "allowed_actions": [
+                "make_payment"
+              ],
+              "binding": {
+                "subject": "service/plumber"
+              },
+              "outcome_id": "household.pay_the_plumber/1.0.0",
+              "preconditions": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "expect": "deny: recipient_seen_before (r13 ASK) fails alone but communication.send names no approver_role",
+      "name": "r13-new-recipient-no-approver-refuses",
+      "steps": [
+        {
+          "action": {
+            "action_class": "comms.external",
+            "action_id": "send_message/wickets-diff-43",
+            "developer": "household-assistant-wd@v1",
+            "operator": "household-wd-43",
+            "outgoing_content": "See you at noon.",
+            "target": "contact/new-friend",
+            "timestamp": "2026-08-10T14:43:00Z",
+            "verb": "send_message"
+          },
+          "dry_run": true
+        }
+      ]
+    }
+  ],
+  "note": "Writes corpus.json (the cases) and python-decisions.json (what the Python engine decided for each). Every case runs on a fresh ledger through a GuardEngine built from the installed everyday 0.3.2 pack. A case may `redeclare` an obligation's default_disposition or `add_obligations` (a test- only pack variant; its digest differs). Steps run in order; the last step's decision is compared. A step may carry `task_authority_record`.",
+  "pack_id": "asg/everyday/0.3.7"
+}

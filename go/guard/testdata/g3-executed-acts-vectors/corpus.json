@@ -1,0 +1,838 @@
+{
+ "schema": "g3-executed-acts-corpus/v0",
+ "note": "Each sequence is a list of earlier acts, oldest first. Step k checks the template check (commit 2000, money.purchase, asg/everyday/0.3.5 r05: per purchase 2500, 7d 10000) with history = the first k acts, newest first. hours_ago is before the check's timestamp. body sets members of the act's agent_input.body (null removes one; for the unchecked template, of body.unchecked). same_action_id_as / same_capsule_id_as reuse another act's action_id / capsule_id. expect is the rule's answer for r05-spending-limits#7d per step (0..n), computed by hand from the engine-side G3 ruling: [verdict, value]; value is the projected 7-day total, absent when not_evaluable. The reason on not_evaluable is the one in go-results.json.",
+ "sequences": [
+  {
+   "name": "decided-pay",
+   "acts": [
+    {
+     "id": "p1",
+     "template": "pay",
+     "hours_ago": 50,
+     "body": {
+      "amount_minor": 2000,
+      "spend_minor": 2000
+     }
+    },
+    {
+     "id": "p2",
+     "template": "pay",
+     "hours_ago": 40,
+     "body": {
+      "amount_minor": 2000,
+      "spend_minor": 2000
+     }
+    },
+    {
+     "id": "p3",
+     "template": "pay",
+     "hours_ago": 30,
+     "body": {
+      "amount_minor": 2000,
+      "spend_minor": 2000
+     }
+    },
+    {
+     "id": "p4",
+     "template": "pay",
+     "hours_ago": 20,
+     "body": {
+      "amount_minor": 2000,
+      "spend_minor": 2000
+     }
+    },
+    {
+     "id": "p5",
+     "template": "pay",
+     "hours_ago": 10,
+     "body": {
+      "amount_minor": 2000,
+      "spend_minor": 2000
+     }
+    }
+   ],
+   "expect": [
+    [
+     "pass",
+     2000
+    ],
+    [
+     "pass",
+     4000
+    ],
+    [
+     "pass",
+     6000
+    ],
+    [
+     "pass",
+     8000
+    ],
+    [
+     "pass",
+     10000
+    ],
+    [
+     "fail",
+     12000
+    ]
+   ]
+  },
+  {
+   "name": "fyi-commit",
+   "acts": [
+    {
+     "id": "c1",
+     "template": "commit",
+     "hours_ago": 50
+    },
+    {
+     "id": "c2",
+     "template": "commit",
+     "hours_ago": 40
+    },
+    {
+     "id": "c3",
+     "template": "commit",
+     "hours_ago": 30
+    },
+    {
+     "id": "c4",
+     "template": "commit",
+     "hours_ago": 20
+    },
+    {
+     "id": "c5",
+     "template": "commit",
+     "hours_ago": 10
+    }
+   ],
+   "expect": [
+    [
+     "pass",
+     2000
+    ],
+    [
+     "pass",
+     4000
+    ],
+    [
+     "pass",
+     6000
+    ],
+    [
+     "pass",
+     8000
+    ],
+    [
+     "pass",
+     10000
+    ],
+    [
+     "fail",
+     12000
+    ]
+   ]
+  },
+  {
+   "name": "fyi-commit-typed",
+   "acts": [
+    {
+     "id": "t1",
+     "template": "commit-typed",
+     "hours_ago": 50
+    },
+    {
+     "id": "t2",
+     "template": "commit-typed",
+     "hours_ago": 40
+    },
+    {
+     "id": "t3",
+     "template": "commit-typed",
+     "hours_ago": 30
+    },
+    {
+     "id": "t4",
+     "template": "commit-typed",
+     "hours_ago": 20
+    },
+    {
+     "id": "t5",
+     "template": "commit-typed",
+     "hours_ago": 10
+    }
+   ],
+   "expect": [
+    [
+     "pass",
+     2000
+    ],
+    [
+     "pass",
+     4000
+    ],
+    [
+     "pass",
+     6000
+    ],
+    [
+     "pass",
+     8000
+    ],
+    [
+     "pass",
+     10000
+    ],
+    [
+     "fail",
+     12000
+    ]
+   ]
+  },
+  {
+   "name": "fyi-sign",
+   "acts": [
+    {
+     "id": "s1",
+     "template": "sign",
+     "hours_ago": 50
+    },
+    {
+     "id": "s2",
+     "template": "sign",
+     "hours_ago": 40
+    },
+    {
+     "id": "s3",
+     "template": "sign",
+     "hours_ago": 30
+    },
+    {
+     "id": "s4",
+     "template": "sign",
+     "hours_ago": 20
+    },
+    {
+     "id": "s5",
+     "template": "sign",
+     "hours_ago": 10
+    }
+   ],
+   "expect": [
+    [
+     "pass",
+     2000
+    ],
+    [
+     "pass",
+     4000
+    ],
+    [
+     "pass",
+     6000
+    ],
+    [
+     "pass",
+     8000
+    ],
+    [
+     "pass",
+     10000
+    ],
+    [
+     "fail",
+     12000
+    ]
+   ]
+  },
+  {
+   "name": "unchecked",
+   "acts": [
+    {
+     "id": "u1",
+     "template": "unchecked",
+     "hours_ago": 50
+    },
+    {
+     "id": "u2",
+     "template": "unchecked",
+     "hours_ago": 40
+    },
+    {
+     "id": "u3",
+     "template": "unchecked",
+     "hours_ago": 30
+    },
+    {
+     "id": "u4",
+     "template": "unchecked",
+     "hours_ago": 20
+    },
+    {
+     "id": "u5",
+     "template": "unchecked",
+     "hours_ago": 10
+    }
+   ],
+   "expect": [
+    [
+     "pass",
+     2000
+    ],
+    [
+     "pass",
+     4000
+    ],
+    [
+     "pass",
+     6000
+    ],
+    [
+     "pass",
+     8000
+    ],
+    [
+     "pass",
+     10000
+    ],
+    [
+     "fail",
+     12000
+    ]
+   ]
+  },
+  {
+   "name": "money-in-fyi",
+   "acts": [
+    {
+     "id": "p1",
+     "template": "pay",
+     "hours_ago": 50,
+     "body": {
+      "amount_minor": 3000,
+      "spend_minor": 3000
+     }
+    },
+    {
+     "id": "r1",
+     "template": "money-in",
+     "hours_ago": 40
+    },
+    {
+     "id": "r2",
+     "template": "money-in",
+     "hours_ago": 35,
+     "body": {
+      "spend_minor": 2000
+     }
+    },
+    {
+     "id": "c1",
+     "template": "commit",
+     "hours_ago": 30
+    }
+   ],
+   "expect": [
+    [
+     "pass",
+     2000
+    ],
+    [
+     "pass",
+     5000
+    ],
+    [
+     "pass",
+     5000
+    ],
+    [
+     "pass",
+     5000
+    ],
+    [
+     "pass",
+     7000
+    ]
+   ]
+  },
+  {
+   "name": "unreadable-no-spend-minor",
+   "acts": [
+    {
+     "id": "p1",
+     "template": "pay",
+     "hours_ago": 50,
+     "body": {
+      "amount_minor": 2000,
+      "spend_minor": 2000
+     }
+    },
+    {
+     "id": "x1",
+     "template": "commit",
+     "hours_ago": 40,
+     "body": {
+      "spend_minor": null
+     }
+    }
+   ],
+   "expect": [
+    [
+     "pass",
+     2000
+    ],
+    [
+     "pass",
+     4000
+    ],
+    [
+     "not_evaluable",
+     null
+    ]
+   ]
+  },
+  {
+   "name": "unreadable-spend-a-string",
+   "acts": [
+    {
+     "id": "p1",
+     "template": "pay",
+     "hours_ago": 50,
+     "body": {
+      "amount_minor": 2000,
+      "spend_minor": 2000
+     }
+    },
+    {
+     "id": "x1",
+     "template": "commit",
+     "hours_ago": 40,
+     "body": {
+      "spend_minor": "2000"
+     }
+    }
+   ],
+   "expect": [
+    [
+     "pass",
+     2000
+    ],
+    [
+     "pass",
+     4000
+    ],
+    [
+     "not_evaluable",
+     null
+    ]
+   ]
+  },
+  {
+   "name": "unreadable-spend-an-object",
+   "acts": [
+    {
+     "id": "p1",
+     "template": "pay",
+     "hours_ago": 50,
+     "body": {
+      "amount_minor": 2000,
+      "spend_minor": 2000
+     }
+    },
+    {
+     "id": "x1",
+     "template": "commit",
+     "hours_ago": 40,
+     "body": {
+      "spend_minor": {
+       "minor": 2000
+      }
+     }
+    }
+   ],
+   "expect": [
+    [
+     "pass",
+     2000
+    ],
+    [
+     "pass",
+     4000
+    ],
+    [
+     "not_evaluable",
+     null
+    ]
+   ]
+  },
+  {
+   "name": "unreadable-spend-negative",
+   "acts": [
+    {
+     "id": "p1",
+     "template": "pay",
+     "hours_ago": 50,
+     "body": {
+      "amount_minor": 2000,
+      "spend_minor": 2000
+     }
+    },
+    {
+     "id": "x1",
+     "template": "commit",
+     "hours_ago": 40,
+     "body": {
+      "spend_minor": -2000
+     }
+    }
+   ],
+   "expect": [
+    [
+     "pass",
+     2000
+    ],
+    [
+     "pass",
+     4000
+    ],
+    [
+     "not_evaluable",
+     null
+    ]
+   ]
+  },
+  {
+   "name": "unreadable-no-amount-at-all",
+   "acts": [
+    {
+     "id": "p1",
+     "template": "pay",
+     "hours_ago": 50,
+     "body": {
+      "amount_minor": 2000,
+      "spend_minor": 2000
+     }
+    },
+    {
+     "id": "x1",
+     "template": "commit",
+     "hours_ago": 40,
+     "body": {
+      "amount_minor": null,
+      "spend_minor": null
+     }
+    }
+   ],
+   "expect": [
+    [
+     "pass",
+     2000
+    ],
+    [
+     "pass",
+     4000
+    ],
+    [
+     "not_evaluable",
+     null
+    ]
+   ]
+  },
+  {
+   "name": "spend-read-no-amount-minor",
+   "acts": [
+    {
+     "id": "x1",
+     "template": "commit",
+     "hours_ago": 40,
+     "body": {
+      "amount_minor": null,
+      "spend_minor": 1500
+     }
+    }
+   ],
+   "expect": [
+    [
+     "pass",
+     2000
+    ],
+    [
+     "pass",
+     3500
+    ]
+   ]
+  },
+  {
+   "name": "unreadable-outside-the-window",
+   "acts": [
+    {
+     "id": "x1",
+     "template": "commit",
+     "hours_ago": 480,
+     "body": {
+      "spend_minor": null
+     }
+    },
+    {
+     "id": "c1",
+     "template": "commit",
+     "hours_ago": 10
+    }
+   ],
+   "expect": [
+    [
+     "pass",
+     2000
+    ],
+    [
+     "pass",
+     2000
+    ],
+    [
+     "pass",
+     4000
+    ]
+   ]
+  },
+  {
+   "name": "unreadable-window-edge",
+   "acts": [
+    {
+     "id": "x-out",
+     "template": "commit",
+     "hours_ago": 169,
+     "body": {
+      "spend_minor": null
+     }
+    },
+    {
+     "id": "x-in",
+     "template": "commit",
+     "hours_ago": 167,
+     "body": {
+      "spend_minor": null
+     }
+    }
+   ],
+   "expect": [
+    [
+     "pass",
+     2000
+    ],
+    [
+     "pass",
+     2000
+    ],
+    [
+     "not_evaluable",
+     null
+    ]
+   ]
+  },
+  {
+   "name": "accepted-and-fyi-same-act",
+   "acts": [
+    {
+     "id": "p1",
+     "template": "pay",
+     "hours_ago": 50,
+     "body": {
+      "amount_minor": 2000,
+      "spend_minor": 2000
+     }
+    },
+    {
+     "id": "d1",
+     "template": "commit",
+     "hours_ago": 49,
+     "same_action_id_as": "p1"
+    },
+    {
+     "id": "d2",
+     "template": "unchecked",
+     "hours_ago": 48,
+     "same_action_id_as": "p1"
+    },
+    {
+     "id": "c1",
+     "template": "commit",
+     "hours_ago": 30
+    },
+    {
+     "id": "c1-again",
+     "template": "commit",
+     "hours_ago": 30,
+     "same_capsule_id_as": "c1",
+     "same_action_id_as": "c1"
+    },
+    {
+     "id": "c2",
+     "template": "commit",
+     "hours_ago": 20
+    }
+   ],
+   "expect": [
+    [
+     "pass",
+     2000
+    ],
+    [
+     "pass",
+     4000
+    ],
+    [
+     "pass",
+     4000
+    ],
+    [
+     "pass",
+     4000
+    ],
+    [
+     "pass",
+     6000
+    ],
+    [
+     "pass",
+     6000
+    ],
+    [
+     "pass",
+     8000
+    ]
+   ]
+  },
+  {
+   "name": "window-edge",
+   "acts": [
+    {
+     "id": "c-old",
+     "template": "commit",
+     "hours_ago": 169,
+     "body": {
+      "amount_minor": 5000,
+      "spend_minor": 5000
+     }
+    },
+    {
+     "id": "c-in",
+     "template": "commit",
+     "hours_ago": 167,
+     "body": {
+      "amount_minor": 5000,
+      "spend_minor": 5000
+     }
+    },
+    {
+     "id": "c1",
+     "template": "commit",
+     "hours_ago": 10,
+     "body": {
+      "amount_minor": 3000,
+      "spend_minor": 3000
+     }
+    }
+   ],
+   "expect": [
+    [
+     "pass",
+     2000
+    ],
+    [
+     "pass",
+     2000
+    ],
+    [
+     "pass",
+     7000
+    ],
+    [
+     "pass",
+     10000
+    ]
+   ]
+  },
+  {
+   "name": "mixed-to-the-limit",
+   "acts": [
+    {
+     "id": "p1",
+     "template": "pay",
+     "hours_ago": 100,
+     "body": {
+      "amount_minor": 2000,
+      "spend_minor": 2000
+     }
+    },
+    {
+     "id": "c1",
+     "template": "commit",
+     "hours_ago": 90,
+     "body": {
+      "amount_minor": 1500,
+      "spend_minor": 1500
+     }
+    },
+    {
+     "id": "u1",
+     "template": "unchecked",
+     "hours_ago": 80
+    },
+    {
+     "id": "r1",
+     "template": "money-in",
+     "hours_ago": 70
+    },
+    {
+     "id": "s1",
+     "template": "sign",
+     "hours_ago": 60,
+     "body": {
+      "amount_minor": 2500,
+      "spend_minor": 2500
+     }
+    },
+    {
+     "id": "c2",
+     "template": "commit",
+     "hours_ago": 50,
+     "body": {
+      "amount_minor": 1,
+      "spend_minor": 1
+     }
+    }
+   ],
+   "expect": [
+    [
+     "pass",
+     2000
+    ],
+    [
+     "pass",
+     4000
+    ],
+    [
+     "pass",
+     5500
+    ],
+    [
+     "pass",
+     7500
+    ],
+    [
+     "pass",
+     7500
+    ],
+    [
+     "pass",
+     10000
+    ],
+    [
+     "fail",
+     10001
+    ]
+   ]
+  }
+ ]
+}

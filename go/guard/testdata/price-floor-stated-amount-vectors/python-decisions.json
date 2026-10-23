@@ -1,0 +1,67 @@
+{
+ "bridge": {
+  "purchase-spend-only": {
+   "amount_minor": 2000,
+   "stated_amount_minor": null
+  },
+  "refund-direction-in": {
+   "amount_minor": 0,
+   "stated_amount_minor": 500
+  },
+  "sale-at-1900-spend-0": {
+   "amount_minor": 0,
+   "stated_amount_minor": 190000
+  },
+  "stated-wrong-shape": {
+   "amount_minor": 0,
+   "stated_amount_minor": null
+  }
+ },
+ "floor_minor": 170000,
+ "price_floor": {
+  "no-stated-spend-at": {
+   "amount_minor": 170000,
+   "evidence": {
+    "amount_minor": 170000,
+    "below_floor": false,
+    "bounds_commitment": "13563d6685d99e1bd4b5508a85a6ca679331cb3ff60e8516177ccafcfd5b4998",
+    "task_authority_ref": "97e7e75da19bf70863b695c1549ce063afd10c07087564dde922a25a7a67a4bc"
+   },
+   "result": "pass",
+   "stated_amount_minor": null
+  },
+  "no-stated-spend-below": {
+   "amount_minor": 169999,
+   "evidence": {
+    "amount_minor": 169999,
+    "below_floor": true,
+    "bounds_commitment": "13563d6685d99e1bd4b5508a85a6ca679331cb3ff60e8516177ccafcfd5b4998",
+    "task_authority_ref": "97e7e75da19bf70863b695c1549ce063afd10c07087564dde922a25a7a67a4bc"
+   },
+   "result": "fail",
+   "stated_amount_minor": null
+  },
+  "stated-at-floor": {
+   "amount_minor": 0,
+   "evidence": {
+    "amount_minor": 170000,
+    "below_floor": false,
+    "bounds_commitment": "13563d6685d99e1bd4b5508a85a6ca679331cb3ff60e8516177ccafcfd5b4998",
+    "task_authority_ref": "97e7e75da19bf70863b695c1549ce063afd10c07087564dde922a25a7a67a4bc"
+   },
+   "result": "pass",
+   "stated_amount_minor": 170000
+  },
+  "stated-below-floor": {
+   "amount_minor": 0,
+   "evidence": {
+    "amount_minor": 169999,
+    "below_floor": true,
+    "bounds_commitment": "13563d6685d99e1bd4b5508a85a6ca679331cb3ff60e8516177ccafcfd5b4998",
+    "task_authority_ref": "97e7e75da19bf70863b695c1549ce063afd10c07087564dde922a25a7a67a4bc"
+   },
+   "result": "fail",
+   "stated_amount_minor": 169999
+  }
+ }
+}

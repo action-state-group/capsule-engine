@@ -1,0 +1,13 @@
+{
+  "note": "Replay differential for the rule that a carried-out act needs the user's approval. Each case replays the real two-deal fixture (tests/fixtures/real-two-deal, own copies deal-1 then deal-2) under asg/everyday/0.3.4 with ONE change: deal 1's approval body.approver set to the case's value (absent: the key removed); its action step is re-pointed and re-sealed by digest, as the test helper _deals_changed does. Replay counts deal 1's act as carried out (so deal 2's counterparty_seen_before PASSES with prior_count 1) only when the sealed approver is \"user\" or \"standing_intent\", the rule capsule-cli internal/cli/deal.go dealDisposition applies live; any other value, absent or non-string, leaves the merchant unseen (FAIL, prior_count 0). Go must reproduce each case's decisions document (same encoding as expected_decisions.json) and deal2_seen.",
+  "cases": [
+    {"name": "as-sealed-standing-intent", "approver": "standing_intent", "expect": "seen"},
+    {"name": "user", "approver": "user", "expect": "seen"},
+    {"name": "agent-card", "approver": "agent_card", "expect": "unseen"},
+    {"name": "absent", "approver_absent": true, "expect": "unseen"},
+    {"name": "empty-string", "approver": "", "expect": "unseen"},
+    {"name": "null", "approver": null, "expect": "unseen"},
+    {"name": "wrong-case", "approver": "User", "expect": "unseen"},
+    {"name": "non-string", "approver": ["user"], "expect": "unseen"}
+  ]
+}

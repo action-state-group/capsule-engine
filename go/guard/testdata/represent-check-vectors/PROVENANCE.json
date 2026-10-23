@@ -1,0 +1,59 @@
+{
+  "note": "Vectors for the Go port of capsule-engine #205's representing bridge and replay task-authority binding: capsulectl v0.1.0-rc20's represent checks on a seller's sale. Each file byte for byte from its source; this sidecar is not part of the vectors.",
+  "producer": "capsulectl v0.1.0-rc20 (capsule-cli 401f39b54b6504750aa0e3de5a20749f85a5713c), core and deal plugin built from git archive of the tag with the release ldflags (capsulectl --version: capsulectl v0.1.0-rc20 (commit 401f39b54b6504750aa0e3de5a20749f85a5713c)), as for ../rc20-pickup-area-vectors",
+  "engine_commit": "0c93a58fccb6d39797d55ec7174aae16d24f0923",
+  "sources": {
+    "sale.bundle.json, check-inputs/a-represent-{approval-class,authenticity,condition,features}.json, check-inputs/b-represent-approval-class.json": "out/ of a script in capsule-engine tests/fixtures/release-on-acceptance/build.sh's style, run with that rc20 capsulectl and deal plugin, materiality builtin:neutral, on a throwaway HOME, XDG_CONFIG_HOME and plugin root, with a local stub rules checker that records each external-check-input/v0 and allows. One sale (deal sale new) whose intent orders the condition representation (intent.ordered_representations [condition]), two buyer threads (deal open --sale), then deal check --input of {\"action\":\"represent\",\"representing\":{\"class\":C,\"text\":T}} on A for condition, authenticity, features and one class seller 0.1.4's s04 lists under requires_approval (approval-class), and on B for that class, and deal sale bundle. Nothing was sent anywhere.",
+    "check-inputs/a-represent-{class-empty,class-missing,class-number,no-representing,representing-list}.json": "a-represent-approval-class.json with body.representing.class set to \"\", removed, or set to 17, or body.representing removed or set to [], the record re-bound to its edited agent_input (agent_action_capsule.json_digest).",
+    "expected_live.json, expected_replay.json": "written by capsule-engine at 0c93a58 (git archive; the merge of #205) through tests/test_sale_replay.py's own live_document() and replay_document(), with FIXTURE set to this directory, PACK to load_pack_dir of this repo's packs/seller-0.1.4, SALES to the copy as written and HISTORIES to as-sealed. The live document decides all ten inputs; the replay decides the five capsulectl wrote.",
+    "expected_promise.json": "the same engine's promise_never and promise_requires_approval constraints (result, reason, evidence) on each live decision (tests/test_sale_replay.py _live) and each replayed one (_replayed_check).",
+    "verify/sale.verify.json": "stdout of that rc20 capsulectl's verify --bundle sale.bundle.json (exit 0)."
+  },
+  "files": {
+    "check-inputs/a-represent-approval-class.json": {
+      "sha256": "0ab2b6596174987b448abe3f54a00d364af2ae8cb16085f7fbec5a497a9e9495"
+    },
+    "check-inputs/a-represent-authenticity.json": {
+      "sha256": "97f84dd478fdddcecd7c88d6756433a6828ced30a2a22d2c07ae11a1d1f39098"
+    },
+    "check-inputs/a-represent-class-empty.json": {
+      "sha256": "5352cc57ec777a6ad82d2eef2dd9102e21a371e8aa50016b46dcbf8f282babd1"
+    },
+    "check-inputs/a-represent-class-missing.json": {
+      "sha256": "b604e39ac71f8aeedec35991a8762ec585137a20dcceb8665bbece8b0d2cdf35"
+    },
+    "check-inputs/a-represent-class-number.json": {
+      "sha256": "40ded3271c9e7bd837436e589a9758945ed493266a75ef90afbb9adf4de836f8"
+    },
+    "check-inputs/a-represent-condition.json": {
+      "sha256": "8b5fc64b4d3877a52c7a6e33dd7fbfebd91ff45c41dea24e331a53ac550b62f5"
+    },
+    "check-inputs/a-represent-features.json": {
+      "sha256": "c78634f71e13a6101efa59b4fdf8df02ee1d9311811f234f13403260689006f1"
+    },
+    "check-inputs/a-represent-no-representing.json": {
+      "sha256": "b479573777a6165de6c537e41a03c1a420fd97eac5cd87199354ce2fc431dda0"
+    },
+    "check-inputs/a-represent-representing-list.json": {
+      "sha256": "b39331f71e7bf4fd71b91d65f74413bcdd4db04fc647ba7f3329588d31a59057"
+    },
+    "check-inputs/b-represent-approval-class.json": {
+      "sha256": "12182bb9dfa0a04699b6f868e0987adc67b29bb3c7c598e010df2b81e8657b0a"
+    },
+    "expected_live.json": {
+      "sha256": "88a3d4544fb807c5df5bfee3b456fa7d14791a60b1371bb0f68b52e6046b7889"
+    },
+    "expected_promise.json": {
+      "sha256": "bb73aeb6d4169361e6ff45169266c62708b4c1f75865e44a1b458dbfe81bb45c"
+    },
+    "expected_replay.json": {
+      "sha256": "3f09c5ab7e90af09c8414a7350929f0752c5c93b530ff15be139c69cea54f2f2"
+    },
+    "sale.bundle.json": {
+      "sha256": "20952ed72281869de48e7d63b436c9aa2d7fe8c32b79f86cce632224da5756fc"
+    },
+    "verify/sale.verify.json": {
+      "sha256": "26e188d88e34b6c3f18ec01783a3909fe7f2adf7ebd4dc3a30e077303798ec57"
+    }
+  }
+}

@@ -1,0 +1,131 @@
+{
+  "note": "Vectors for the Go port of capsule-engine #205's promise_requires_approval/1.1.0 and promise_never/1.1.0. Each file byte for byte from its source; this sidecar is not part of the vectors.",
+  "producer": "capsulectl and capsulectl-deal built from git archive of capsule-cli main 8eff953 (feat(deal): a sale's listing post, #398; the first commit with capsule-cli #391, the user's own attributed authenticity claim) with CGO_ENABLED=0 go build -trimpath (capsulectl --version: capsulectl 0.1.0-dev (commit unknown); no release carries attributed_to yet).",
+  "engine_commit": "0c93a58fccb6d39797d55ec7174aae16d24f0923",
+  "sources": {
+    "sale.bundle.json, check-inputs/{a-attributed,a-condition,a-ordered,a-own-authenticity,a-unordered,b-attributed,b-ordered}.json": "out/ of a script in capsule-engine tests/fixtures/release-on-acceptance/build.sh's style, run with that capsulectl and deal plugin, materiality builtin:neutral, on a throwaway HOME, XDG_CONFIG_HOME and plugin root, with a local stub rules checker that records each external-check-input/v0 and allows. One sale (deal sale new) whose intent orders one class seller 0.1.5's s04 lists under requires_approval (intent.ordered_representations), two buyer threads (deal open --sale). On A, deal check --input of a represent check of that ordered class (ordered), of the user's own authenticity claim {\"class\":\"authenticity\",\"text\":\"The seller says it's authentic (unverified)\",\"attributed_to\":\"user\"} (attributed), of the agent's own authenticity claim (own-authenticity), of delivery_date, not ordered (unordered), and of condition; on B, the ordered class and the attributed claim. Each check that did not pass got the user's proceed approval (deal note --kind approval). The claims of A's ordered, attributed and condition checks and of B's ordered check were noted against their checks (deal note --kind claim --check), so the threads' deal reports open their words; B's attributed claim was never noted. Then deal sale bundle. Nothing was sent anywhere.",
+    "check-inputs/a-attributed-*.json, a-ordered-*.json, a-unordered-no-task-authority.json": "live-only edits of a-attributed.json, a-ordered.json and a-unordered.json, each record re-bound to its edited agent_input (agent_action_capsule.json_digest): the attributed words rewritten with their text_commitment recomputed under the same nonce (no suffix, two sentences, an ellipsis, a line separator, a claim of U+001F or U+00A0 alone, another script, the prefix and suffix alone); the opening's nonce wrong, removed, null or a list; the opening's text with a lone surrogate escape; the commitment malformed, null or removed; attributed_to \"User\"; the class features; no task_authority_ref; and the task authority's ordered list with a number, with an unknown class, not a list, or empty, with task_authority_record and the ref's digest updated together.",
+    "expected_live.json, expected_replay.json": "written by capsule-engine at 0c93a58 (git archive; the merge of #205) through tests/test_sale_replay.py's own live_document() and replay_document(), with FIXTURE set to this directory, PACK to load_pack_dir of this repo's packs/seller-0.1.5, SALES to the copy as written and HISTORIES to as-sealed, and its _live replaced by one that also passes the record entry's representing_opening, as tests/test_live_history.py's _decide does. The live document decides all 31 inputs; the replay decides the seven capsulectl wrote. Regenerated the same way at a489e49 (regenerated_a489e49).",
+    "expected_promise.json": "the same engine's promise_never and promise_requires_approval constraints (result, reason, evidence) on each of those live and replayed decisions. Regenerated the same way at a489e49 (regenerated_a489e49).",
+    "template.json": "promise_never/1.1.0's attributed_template as the engine loads it from this repo's packs/seller-0.1.5/wickets/promise_never.v1.1.yaml (load_definition_file), and capsule_engine.guards.checks.promise_never.fits_attributed_template over 439 texts: a few around the template's edges, each sentence mark inside a claim and as the whole claim, and each code point Python's str.isspace counts (and U+180E, U+200B, U+FEFF, U+2060, which it does not) as the claim and around one.",
+    "openings.json": "capsule_engine.report.replay.representing_openings over 20 bundles: a report of two openings inline, standalone, in the log, and standalone with no x-deal-v0; both forms at once; a repeated opening; and members out of shape.",
+    "verify/sale.verify.json": "stdout of that capsulectl's verify --bundle sale.bundle.json (exit 0)."
+  },
+  "files": {
+    "check-inputs/a-attributed-class-features.json": {
+      "sha256": "210cdbca8a8e915c5b58f7bc56a172a5c41b79d042aaa64bbc89e1a6563e4444"
+    },
+    "check-inputs/a-attributed-ellipsis.json": {
+      "sha256": "020a3cec54f19dea4dc891a45e8233dfebc3a68dfc4bc447cd128c52c4286998"
+    },
+    "check-inputs/a-attributed-line-separator.json": {
+      "sha256": "d6041b1c62b6ff4be977e3d2dcbef7fa09264ead545a28b812e55f932f8557ed"
+    },
+    "check-inputs/a-attributed-list-opening.json": {
+      "sha256": "6cc7b69eb9edf79ddcc443244440ae8e7cedef478e067726a3af44d8366e5d7a"
+    },
+    "check-inputs/a-attributed-lone-surrogate.json": {
+      "sha256": "8f11fd33c986ccb5e0707382f8f4381b0b4849b48fe18e75f6191934c443f420"
+    },
+    "check-inputs/a-attributed-malformed-commitment.json": {
+      "sha256": "5927d3d11be9a15f91ca55c7347537d15b197eb2e2fceab8a41bbcdab3eeda97"
+    },
+    "check-inputs/a-attributed-nbsp-blank.json": {
+      "sha256": "6ab39e1f5e00ca743dc96ddce5b6b4760d1a25083eb4908121e9d126ba9eefb0"
+    },
+    "check-inputs/a-attributed-no-commitment.json": {
+      "sha256": "d73b1a2e9b9b6c9af7923f229f75643b7fcaf964641a02a9645c039d34ca1b74"
+    },
+    "check-inputs/a-attributed-no-opening.json": {
+      "sha256": "2f99d5159da772e2d67ce8aff29d79c8279436648afef7d46cf7cf6e2f349588"
+    },
+    "check-inputs/a-attributed-no-suffix.json": {
+      "sha256": "86b121ad69c3d77a4ad4ba6b4afc00904170bd27f2bcac63faffc3454cfcba06"
+    },
+    "check-inputs/a-attributed-null-commitment.json": {
+      "sha256": "0cbfd334ea6af69d09d73c501f455bab0898063728154e69afb37d0cafb3503b"
+    },
+    "check-inputs/a-attributed-null-opening.json": {
+      "sha256": "dfad38f60ef506a3343797426ca37aa93170755799cb668949855bbf200999f4"
+    },
+    "check-inputs/a-attributed-other-script.json": {
+      "sha256": "5b8d44c3e7a585b56139e738d466e328be41a7e34a8ac16f4751783f8a175c74"
+    },
+    "check-inputs/a-attributed-prefix-only.json": {
+      "sha256": "5a0de7e95ce84d4abaa396ad1856341890e9c57f39a9029661d27b9d3c7e8bba"
+    },
+    "check-inputs/a-attributed-to-other.json": {
+      "sha256": "d1e85b956cde5e64e5c6f753abc6946182a4b6a108a7754ec8e59ee8194d1000"
+    },
+    "check-inputs/a-attributed-two-sentences.json": {
+      "sha256": "27bd761e93719c4733edd104a97be48a8bbf330a05c6aa65595840ae68dd47c3"
+    },
+    "check-inputs/a-attributed-unit-separator-blank.json": {
+      "sha256": "9ca641bc266369ab59155f09b36d6f1d5be310e58a1d8fd101a4f74a033b4ca1"
+    },
+    "check-inputs/a-attributed-wrong-nonce.json": {
+      "sha256": "242ac70ad6a82c52a0b9035bc6161d0ebb4d635bdb34974b42529a446a5248cd"
+    },
+    "check-inputs/a-attributed.json": {
+      "sha256": "af7243e79b99031290b83e64f49b73f27eb729f577f175ec9b88d06034e82f5a"
+    },
+    "check-inputs/a-condition.json": {
+      "sha256": "810ebe8871eecc40324bea6c31a7af5af18c5590405e27c43fcf7896d8b93ba2"
+    },
+    "check-inputs/a-ordered-empty.json": {
+      "sha256": "a3be18def6b5043e69bd68c2984cb4c0e61ce7f39509f57ecdf4c69f61e864ef"
+    },
+    "check-inputs/a-ordered-list-with-number.json": {
+      "sha256": "29124519518a249e98266d95398f5b5f3892b5eed13b41f7e91718f2b4e3c7c6"
+    },
+    "check-inputs/a-ordered-list-with-unknown.json": {
+      "sha256": "4c17bef5f8c26e071d7d57ac6c567cbbd6b657ce549d6ad9f7ab82db70695378"
+    },
+    "check-inputs/a-ordered-no-task-authority.json": {
+      "sha256": "2c0f4b0d00d42d5ea079f498a3411d3fc917804335dcf4b72923de4b81c88dfa"
+    },
+    "check-inputs/a-ordered-not-a-list.json": {
+      "sha256": "cec4dae10e0783103b6ba6a9858bea4d44cfe40edd8594e96df3529218949574"
+    },
+    "check-inputs/a-ordered.json": {
+      "sha256": "c58666442e2778e2b673f706f9cdcf131360f311844d772ece3035177c47a3b9"
+    },
+    "check-inputs/a-own-authenticity.json": {
+      "sha256": "ea4ad92151862a4a76672d3864830a2b217d3cc2c5b3fc538b6b1da85089fd27"
+    },
+    "check-inputs/a-unordered-no-task-authority.json": {
+      "sha256": "ee967c80ffa167ece4c413a822ec05e25a7df9b6f18613dc8cf99687a67156c5"
+    },
+    "check-inputs/a-unordered.json": {
+      "sha256": "89f134b9cb7cc8acb8a019ca495f6efb8c0805409f7617d89f8ce5dc58d7ad86"
+    },
+    "check-inputs/b-attributed.json": {
+      "sha256": "3b138083e47244ee661ccbc79d507bacbc5a7bbe7eb13659e02dfc97ac7026b5"
+    },
+    "check-inputs/b-ordered.json": {
+      "sha256": "4b852ad6c889a193ac2638c8f0227c1e4d1306b8c3db78eb4ae8ff191c9d2061"
+    },
+    "expected_live.json": {
+      "sha256": "f56f365bbd6eac9c52e2a6b687aaac6ab0cc64106f4c1c9a0b83c4e899e2e242"
+    },
+    "expected_promise.json": {
+      "sha256": "de961caea5def81b115e276b8baf628fa8af522c21b46f36f751954238a82cbd"
+    },
+    "expected_replay.json": {
+      "sha256": "cd8309d1c4183576fab9fde88a4e7f76cf35351fc82e536da4a85d95ee52c886"
+    },
+    "openings.json": {
+      "sha256": "ae0fdf1137c591486fe5b5c556349671caa13c87363fae8515dad02dcbe35f9d"
+    },
+    "sale.bundle.json": {
+      "sha256": "41cd28f2dc845cba0359a23ef3e5f1b12a35081e4dbdfa835ddae52df8654fe3"
+    },
+    "template.json": {
+      "sha256": "b2cdb606827c85310e0d29cd7ecf43129cb1b78b4c983dcc2226d08d91ced37e"
+    },
+    "verify/sale.verify.json": {
+      "sha256": "5a942f67d4e208a410fa6cd0f9cd4ee6697f50e9e06c85d678763ac48645ecd8"
+    }
+  },
+  "regenerated_a489e49": "Regenerated at capsule-engine a489e49 (#209, which reworded s04's and s10's reasons and re-pinned asg/seller/0.1.5 to 81013aed): only the pack digest and those reasons changed; every decision is the same."
+}

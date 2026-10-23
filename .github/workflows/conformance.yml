@@ -1,0 +1,59 @@
+# Cross-language conformance: the Go guard (go/) against the Python reference.
+#
+# No path filter: a Python-only change can diverge from Go as easily as a Go
+# change can. The shared-vector job (`vectors`) joins in a later change
+# (docs/design/go-guard-module.md §5, §7); `conformance` is the one check
+# branch protection requires, and fails if any job it needs failed or was
+# skipped.
+name: conformance
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  go:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: go
+    env:
+      GOWORK: "off"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go/go.mod
+          cache-dependency-path: go/go.sum
+      - name: gofmt
+        run: test -z "$(gofmt -l .)" || { gofmt -l .; exit 1; }
+      - name: vet
+        run: go vet ./...
+      - name: test
+        run: go test ./...
+
+  packs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: install
+        run: pip install -e ".[dev]"
+      - name: the embedded pack tree is what the catalog generates
+        run: python scripts/generate_go_packs.py --check
+
+  conformance:
+    if: always()
+    needs: [go, packs]
+    runs-on: ubuntu-latest
+    steps:
+      - name: every job passed
+        run: |
+          echo 'go: ${{ needs.go.result }}, packs: ${{ needs.packs.result }}'
+          test '${{ needs.go.result }}' = success
+          test '${{ needs.packs.result }}' = success

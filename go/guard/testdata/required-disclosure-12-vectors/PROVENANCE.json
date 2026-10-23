@@ -1,0 +1,133 @@
+{
+  "note": "Differential vectors for required_disclosure/1.2.0 (the Go port of capsule-engine #204, d336c3a). This sidecar is not part of the vectors.",
+  "engine_commit": "0c93a58fccb6d39797d55ec7174aae16d24f0923",
+  "producer": "capsulectl v0.1.0-rc20 (capsule-cli 401f39b): A's offer and commit checks from capsule-engine's release-on-acceptance fixture steps run with it (see ../rc20-pickup-area-vectors/PROVENANCE.json; the offer check, a-offer-1900, is from the same run)",
+  "sources": {
+    "inputs/, expected.json": "Each of those two check inputs with its record's deal_claims kept or removed, and body.listing_classes absent, [], [condition], [condition, price], [price], [price, condition], [condition, condition], \"condition\", [Condition] or [1], the record re-bound to its edited agent_input (agent_action_capsule.json_digest). Each decided live by capsule-engine at 0c93a58 (git archive): history_ledger(input) as the ledger, action_for_check_input(input.record, item_ref=input.item_ref) (its listing_classes recorded), then CONFIGURED_CHECKS['required_disclosure'](action, ledger, config) under guards/wickets/catalog_defs/required_disclosure.v1.2.yaml (the definition packs/seller-0.1.5 vendors)."
+  },
+  "files": {
+    "expected.json": {
+      "sha256": "dd4b326f24cc226ebb3ebf1fd6d6f1e5e2679f1a929feb9932ba7d84ed75c4d4"
+    },
+    "inputs/a-commit-1900--no-claims--absent.json": {
+      "sha256": "edceee23d7e416de129840f09503e4883ffdfa57e9c9aaa697e24332d4fdb017"
+    },
+    "inputs/a-commit-1900--no-claims--bad-token.json": {
+      "sha256": "4c3ed8ee41c755c28f44246471a1f1d34062ab1aca1da4c5ccf5391676e09592"
+    },
+    "inputs/a-commit-1900--no-claims--condition-price.json": {
+      "sha256": "713b858f38f43879109416b5e1e42856404d431bc71667bc5dfa07b75aec8c05"
+    },
+    "inputs/a-commit-1900--no-claims--condition.json": {
+      "sha256": "f523439c6267e0ff29dd0f5da271fb4b35152ef4aa61d90186cd8c17306b23ef"
+    },
+    "inputs/a-commit-1900--no-claims--empty.json": {
+      "sha256": "6fb77cc30cfd0b93ce02ded329b15e8217a66d7ce09d4022fe945fb3a78aafe4"
+    },
+    "inputs/a-commit-1900--no-claims--not-a-list.json": {
+      "sha256": "cea94e228ac06dee2e7c936fbab2f07a5e35d67245c0182666fafabdc22a1a09"
+    },
+    "inputs/a-commit-1900--no-claims--not-strings.json": {
+      "sha256": "0053b622559fcb6ce1835016580c61fed23eb8191362d260ea9e861345028f4e"
+    },
+    "inputs/a-commit-1900--no-claims--price.json": {
+      "sha256": "0a2405935e1f0fb3c3783392d9f23ec9386fecf78434cbb9af9e287761d95050"
+    },
+    "inputs/a-commit-1900--no-claims--twice.json": {
+      "sha256": "180a78e9030ad968c5511cb6ea03943674cd48dae40bd9b072a332574f6deb18"
+    },
+    "inputs/a-commit-1900--no-claims--unsorted.json": {
+      "sha256": "0ce6ff7f7cc04afabafc747d71e9a02e8450336c302bb064915707766fbcf44c"
+    },
+    "inputs/a-commit-1900--with-claims--absent.json": {
+      "sha256": "f3abed53e62c8252ccd65a6b11157079678813aa01ed1e6582dfe2023a1a6d79"
+    },
+    "inputs/a-commit-1900--with-claims--bad-token.json": {
+      "sha256": "53669bf5979de595babc44666b9d220b7dde5455a6c98c45d4db83cbda05e261"
+    },
+    "inputs/a-commit-1900--with-claims--condition-price.json": {
+      "sha256": "0a688013d665303bbad4f201042d85ea26442b8437a5623d631e9a5ab24c28e7"
+    },
+    "inputs/a-commit-1900--with-claims--condition.json": {
+      "sha256": "1a046c95af49915e711af2a4f74d4741197368694b26d23782c2304d7b1bd7ce"
+    },
+    "inputs/a-commit-1900--with-claims--empty.json": {
+      "sha256": "36410688ec428150f6d317eba1cee00c1afedc14ebb0b9c4288c693cf0a2ff93"
+    },
+    "inputs/a-commit-1900--with-claims--not-a-list.json": {
+      "sha256": "7464b2336793f99e39c9226b76a1643b366537e7019bf5965a0582539895af73"
+    },
+    "inputs/a-commit-1900--with-claims--not-strings.json": {
+      "sha256": "c5b02e55c7c950c2b6e3d773af9255c7ae9baf1debcd8f76659e09bbf286cf57"
+    },
+    "inputs/a-commit-1900--with-claims--price.json": {
+      "sha256": "c14d697a31b02330737f0a9bdcaf1c731a0a47a26a4c34889b8c6e999a684747"
+    },
+    "inputs/a-commit-1900--with-claims--twice.json": {
+      "sha256": "cb09a4af249fb09435db5170c135fb221226be4e3f744d54afef078aa112aad6"
+    },
+    "inputs/a-commit-1900--with-claims--unsorted.json": {
+      "sha256": "789a844ee10f59ed4776335635f409c8450f411d643a9f8d1d5f9c42078ad2e0"
+    },
+    "inputs/a-offer-1900--no-claims--absent.json": {
+      "sha256": "a972fcb47e734b2dccc548a8af11757c248f1b510d78efd4c12fece6e5042162"
+    },
+    "inputs/a-offer-1900--no-claims--bad-token.json": {
+      "sha256": "27240c06e5e31865fb3497cd8f61da86d7521b7a10d45aa2bae8f9775472734f"
+    },
+    "inputs/a-offer-1900--no-claims--condition-price.json": {
+      "sha256": "6303480239be73aab27fe11d3c79462f5201b351a0674bd6927db5df1923b9d6"
+    },
+    "inputs/a-offer-1900--no-claims--condition.json": {
+      "sha256": "64682eab6fc4efed43b0bb1641e34d7ec0a18b22e9b33f23d6eb29191276586e"
+    },
+    "inputs/a-offer-1900--no-claims--empty.json": {
+      "sha256": "c83f90003151e12fdab64d59153a517b1ec03b3c343ed5109f9b20fc1817b08d"
+    },
+    "inputs/a-offer-1900--no-claims--not-a-list.json": {
+      "sha256": "dacf86e91ce2c1c77c619de1e6bc8df57a8e4c800542f26ecd6fcfd7662ac4e5"
+    },
+    "inputs/a-offer-1900--no-claims--not-strings.json": {
+      "sha256": "3554ba2c8933e353c2a33c0c4c06663e14509779b8b7e5e1e5a31de5c10b9d09"
+    },
+    "inputs/a-offer-1900--no-claims--price.json": {
+      "sha256": "cb90205c2b7a4b66bfe6f1c3af889dcfae500ba1103fc99f010da10fe87d9f88"
+    },
+    "inputs/a-offer-1900--no-claims--twice.json": {
+      "sha256": "4e43d9a6459fe2c8d1fa24e824c05e005efc61a92a030eeebe06fc642f30765e"
+    },
+    "inputs/a-offer-1900--no-claims--unsorted.json": {
+      "sha256": "9be1c2c407d5a2c01cf5c0c4fb2df82de3232e6c91708dd4aff14da2c6bdc68c"
+    },
+    "inputs/a-offer-1900--with-claims--absent.json": {
+      "sha256": "39c7b4a3c0394b67ae36da1c1fe5fa13d84905b36827ff692555bd21556b267a"
+    },
+    "inputs/a-offer-1900--with-claims--bad-token.json": {
+      "sha256": "51bb302853b862f95b0123df24cf4861e8bbd382b3a89d50919a2897c13ead6b"
+    },
+    "inputs/a-offer-1900--with-claims--condition-price.json": {
+      "sha256": "e7542c77583a13110e7fa841dfeb94e2adb6e547b1d8aa96dc79ed27cdef1dd1"
+    },
+    "inputs/a-offer-1900--with-claims--condition.json": {
+      "sha256": "4e989be737ea2f6de70dbe547eee34108063eccd0e050fa09d4798b6122b1875"
+    },
+    "inputs/a-offer-1900--with-claims--empty.json": {
+      "sha256": "24c19bc5eed7db0a9357c5ceb9fa62622921eae4569383935790b7754c54e406"
+    },
+    "inputs/a-offer-1900--with-claims--not-a-list.json": {
+      "sha256": "be90f746ab75036f6f3decbce7582664d5eab5e6b6b4f3449618f59d14d4419b"
+    },
+    "inputs/a-offer-1900--with-claims--not-strings.json": {
+      "sha256": "611a65cc83f02bfce6db539490644fe7077115745a5b69f5bce5ed49b399b0a8"
+    },
+    "inputs/a-offer-1900--with-claims--price.json": {
+      "sha256": "d719b4478d2315d13397a85192e7bd8c00ef8b3cde4bd01845003c51b3ebe3cf"
+    },
+    "inputs/a-offer-1900--with-claims--twice.json": {
+      "sha256": "5ff4d28c72b0e5b8c58a9ef34d67d8cbe8782bd90f03f8c2d35042e3fbd53788"
+    },
+    "inputs/a-offer-1900--with-claims--unsorted.json": {
+      "sha256": "c6d775bc5519cc277fec1b94e9b1a08b0e530e8fa43c4bea3484fd7029d75f7a"
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "note": "TEST FIXTURE golden: the engine's own digest of the fixture pack.yaml beside this file. The fixture is not a published pack.",
+  "pack_id": "test/everyday-25-fixture/0.0.0",
+  "pack_yaml_sha256": "1c29bbe9afcd51a292d93c03014c85b201089058f370491bfa1ce55f530d5949",
+  "engine_definition_digest": "294c978db8e569e8d3aed27da0ae6938337005e7843905d0a5a787299884aa73",
+  "how_computed": {
+    "engine": "capsule_engine.packs.loader.load_pack_dir(<dir>).definition_digest()  (capsule_engine/packs/schema.py:809)",
+    "engine_source": "action-state-group/capsule-engine @ 559288d0f61a3b4f7d5af67be3c1dfe796a66af9, extracted read-only with git archive; not modified",
+    "agent_action_capsule": "0.6.0",
+    "pyyaml": "6.0.3",
+    "python": "3.13.7",
+    "computed_at": "2026-10-05"
+  }
+}

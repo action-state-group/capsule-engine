@@ -1,0 +1,312 @@
+{
+ "bridge": {
+  "partial_cancel": {
+   "amount_minor": 0,
+   "body": {
+    "action": "cancel",
+    "action_class": "external_commitment.other",
+    "cancelled_amount_minor": 500,
+    "direction": "in",
+    "spend_minor": 500
+   }
+  },
+  "refund": {
+   "amount_minor": 0,
+   "body": {
+    "action": "cancel",
+    "action_class": "money.refund",
+    "amount_minor": 500,
+    "direction": "in",
+    "spend_minor": 500
+   }
+  }
+ },
+ "money_in_direction": "in",
+ "refund_stated_spend_minor": 500,
+ "sequences": {
+  "partial_cancel/over-limit": {
+   "steps": [
+    {
+     "act": "purchase",
+     "amount_minor": 300,
+     "caps_evidence": {
+      "amount_minor": 300,
+      "cap_minor": 499,
+      "fold": "25907741320624a830c5854fc7f2d434bfa17528c8bfc17f4a8a4f84a39f1b18",
+      "fold_key": {
+       "path": "operator",
+       "value": "household-a"
+      },
+      "projected_minor": 300,
+      "reversals": {
+       "linked_count": 0,
+       "linked_minor": 0,
+       "unlinked_count": 0
+      },
+      "weekly_spend_minor": 0
+     },
+     "caps_result": "pass",
+     "outcome": "allow"
+    },
+    {
+     "act": "partial_cancel",
+     "amount_minor": 0,
+     "caps_evidence": {
+      "amount_minor": 0,
+      "cap_minor": 499,
+      "fold": "25907741320624a830c5854fc7f2d434bfa17528c8bfc17f4a8a4f84a39f1b18",
+      "fold_key": {
+       "path": "operator",
+       "value": "household-a"
+      },
+      "projected_minor": 300,
+      "reversals": {
+       "linked_count": 0,
+       "linked_minor": 0,
+       "unlinked_count": 0
+      },
+      "weekly_spend_minor": 300
+     },
+     "caps_result": "pass",
+     "outcome": "allow"
+    },
+    {
+     "act": "purchase",
+     "amount_minor": 200,
+     "caps_evidence": {
+      "amount_minor": 200,
+      "cap_minor": 499,
+      "fold": "25907741320624a830c5854fc7f2d434bfa17528c8bfc17f4a8a4f84a39f1b18",
+      "fold_key": {
+       "path": "operator",
+       "value": "household-a"
+      },
+      "projected_minor": 500,
+      "reversals": {
+       "linked_count": 0,
+       "linked_minor": 0,
+       "unlinked_count": 0
+      },
+      "weekly_spend_minor": 300
+     },
+     "caps_result": "fail",
+     "outcome": "escalate"
+    }
+   ],
+   "window_minor": 499
+  },
+  "partial_cancel/under-limit": {
+   "steps": [
+    {
+     "act": "purchase",
+     "amount_minor": 300,
+     "caps_evidence": {
+      "amount_minor": 300,
+      "cap_minor": 1000,
+      "fold": "25907741320624a830c5854fc7f2d434bfa17528c8bfc17f4a8a4f84a39f1b18",
+      "fold_key": {
+       "path": "operator",
+       "value": "household-a"
+      },
+      "projected_minor": 300,
+      "reversals": {
+       "linked_count": 0,
+       "linked_minor": 0,
+       "unlinked_count": 0
+      },
+      "weekly_spend_minor": 0
+     },
+     "caps_result": "pass",
+     "outcome": "allow"
+    },
+    {
+     "act": "partial_cancel",
+     "amount_minor": 0,
+     "caps_evidence": {
+      "amount_minor": 0,
+      "cap_minor": 1000,
+      "fold": "25907741320624a830c5854fc7f2d434bfa17528c8bfc17f4a8a4f84a39f1b18",
+      "fold_key": {
+       "path": "operator",
+       "value": "household-a"
+      },
+      "projected_minor": 300,
+      "reversals": {
+       "linked_count": 0,
+       "linked_minor": 0,
+       "unlinked_count": 0
+      },
+      "weekly_spend_minor": 300
+     },
+     "caps_result": "pass",
+     "outcome": "allow"
+    },
+    {
+     "act": "purchase",
+     "amount_minor": 200,
+     "caps_evidence": {
+      "amount_minor": 200,
+      "cap_minor": 1000,
+      "fold": "25907741320624a830c5854fc7f2d434bfa17528c8bfc17f4a8a4f84a39f1b18",
+      "fold_key": {
+       "path": "operator",
+       "value": "household-a"
+      },
+      "projected_minor": 500,
+      "reversals": {
+       "linked_count": 0,
+       "linked_minor": 0,
+       "unlinked_count": 0
+      },
+      "weekly_spend_minor": 300
+     },
+     "caps_result": "pass",
+     "outcome": "allow"
+    }
+   ],
+   "window_minor": 1000
+  },
+  "refund/over-limit": {
+   "steps": [
+    {
+     "act": "purchase",
+     "amount_minor": 300,
+     "caps_evidence": {
+      "amount_minor": 300,
+      "cap_minor": 499,
+      "fold": "25907741320624a830c5854fc7f2d434bfa17528c8bfc17f4a8a4f84a39f1b18",
+      "fold_key": {
+       "path": "operator",
+       "value": "household-a"
+      },
+      "projected_minor": 300,
+      "reversals": {
+       "linked_count": 0,
+       "linked_minor": 0,
+       "unlinked_count": 0
+      },
+      "weekly_spend_minor": 0
+     },
+     "caps_result": "pass",
+     "outcome": "allow"
+    },
+    {
+     "act": "refund",
+     "amount_minor": 0,
+     "caps_evidence": {
+      "amount_minor": 0,
+      "cap_minor": 499,
+      "fold": "25907741320624a830c5854fc7f2d434bfa17528c8bfc17f4a8a4f84a39f1b18",
+      "fold_key": {
+       "path": "operator",
+       "value": "household-a"
+      },
+      "projected_minor": 300,
+      "reversals": {
+       "linked_count": 0,
+       "linked_minor": 0,
+       "unlinked_count": 0
+      },
+      "weekly_spend_minor": 300
+     },
+     "caps_result": "pass",
+     "outcome": "allow"
+    },
+    {
+     "act": "purchase",
+     "amount_minor": 200,
+     "caps_evidence": {
+      "amount_minor": 200,
+      "cap_minor": 499,
+      "fold": "25907741320624a830c5854fc7f2d434bfa17528c8bfc17f4a8a4f84a39f1b18",
+      "fold_key": {
+       "path": "operator",
+       "value": "household-a"
+      },
+      "projected_minor": 500,
+      "reversals": {
+       "linked_count": 0,
+       "linked_minor": 0,
+       "unlinked_count": 1
+      },
+      "weekly_spend_minor": 300
+     },
+     "caps_result": "fail",
+     "outcome": "escalate"
+    }
+   ],
+   "window_minor": 499
+  },
+  "refund/under-limit": {
+   "steps": [
+    {
+     "act": "purchase",
+     "amount_minor": 300,
+     "caps_evidence": {
+      "amount_minor": 300,
+      "cap_minor": 1000,
+      "fold": "25907741320624a830c5854fc7f2d434bfa17528c8bfc17f4a8a4f84a39f1b18",
+      "fold_key": {
+       "path": "operator",
+       "value": "household-a"
+      },
+      "projected_minor": 300,
+      "reversals": {
+       "linked_count": 0,
+       "linked_minor": 0,
+       "unlinked_count": 0
+      },
+      "weekly_spend_minor": 0
+     },
+     "caps_result": "pass",
+     "outcome": "allow"
+    },
+    {
+     "act": "refund",
+     "amount_minor": 0,
+     "caps_evidence": {
+      "amount_minor": 0,
+      "cap_minor": 1000,
+      "fold": "25907741320624a830c5854fc7f2d434bfa17528c8bfc17f4a8a4f84a39f1b18",
+      "fold_key": {
+       "path": "operator",
+       "value": "household-a"
+      },
+      "projected_minor": 300,
+      "reversals": {
+       "linked_count": 0,
+       "linked_minor": 0,
+       "unlinked_count": 0
+      },
+      "weekly_spend_minor": 300
+     },
+     "caps_result": "pass",
+     "outcome": "allow"
+    },
+    {
+     "act": "purchase",
+     "amount_minor": 200,
+     "caps_evidence": {
+      "amount_minor": 200,
+      "cap_minor": 1000,
+      "fold": "25907741320624a830c5854fc7f2d434bfa17528c8bfc17f4a8a4f84a39f1b18",
+      "fold_key": {
+       "path": "operator",
+       "value": "household-a"
+      },
+      "projected_minor": 500,
+      "reversals": {
+       "linked_count": 0,
+       "linked_minor": 0,
+       "unlinked_count": 1
+      },
+      "weekly_spend_minor": 300
+     },
+     "caps_result": "pass",
+     "outcome": "allow"
+    }
+   ],
+   "window_minor": 1000
+  }
+ }
+}

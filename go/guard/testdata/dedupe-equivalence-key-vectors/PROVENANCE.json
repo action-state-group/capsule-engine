@@ -1,0 +1,13 @@
+{
+  "note": "Copied byte for byte; this sidecar is not part of the copied bytes. The set has no MANIFEST, so each file's sha256 is pinned here.",
+  "source": "The engine side's Go vectors for the sealed dedupe equivalence key. The engine PR merged as capsule-engine #134, dbdaca1254af169a8a086ae4f087943511f712db. Regenerated at that merge commit (git archive into a scratch tree, Python 3.12.13, PYTHONPATH=<tree> python -P gen.py, agent_action_capsule and capsule_ledger from the capsule-engine worktree venv): vectors.json is byte-identical.",
+  "engine_commit": "dbdaca1254af169a8a086ae4f087943511f712db",
+  "files": {
+    "gen.py": {
+      "sha256": "7e28b137ef3b72fbbdb089e021002b0f5466e774b06a729d6a1380b798211458"
+    },
+    "vectors.json": {
+      "sha256": "5d7fcd8e9a81308bc153a012aaf4827939cbbc03bfd0450d9aba1ccbe575c6b0"
+    }
+  }
+}

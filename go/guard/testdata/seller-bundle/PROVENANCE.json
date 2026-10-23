@@ -1,0 +1,12 @@
+{
+  "note": "Copied byte for byte; this sidecar is not part of the copied bytes.",
+  "source_repo": "action-state-group/capsule-cli",
+  "source_commit": "e1b05a46e415cdc682002d392c56fcd8cd4feb70",
+  "files": {
+    "bundle.json": {
+      "source_path": "internal/cli/testdata/presentation/8-seller-buyer-copy/bundle.json",
+      "sha256": "a032e3863b31289955ab3889f5d83ea42838dc4a2ab3ff7d58b79d827cff9e3d"
+    }
+  },
+  "used_for": "a deal where the user sells (party_role seller, sealed on the baseline's intent, deal-04cc7725e632cdf0), with typed proposed-action/v0 records naming the deal by chain_id: the checker reads the role from the opening in the same bundle"
+}

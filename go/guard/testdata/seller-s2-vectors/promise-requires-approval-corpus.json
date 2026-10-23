@@ -1,0 +1,457 @@
+{
+ "note": "The engine's seller acceptance scenario (testdata/seller-vectors) runs the seller's rail only on steps that cite a mandate, which the Go port refuses, and reaches few of the promise and disclosure branches. These corpora run each of seller.destination_rail/1.0.0, promise_never/1.0.0, promise_requires_approval/1.0.0 and required_disclosure/1.0.0 (with its fold disclosure.class_seen/1.0.0) through every branch, on the seller pack, with no step citing a mandate.",
+ "pack": "capsule_engine/packs/catalog/seller (asg/seller/0.1.0)",
+ "records": {
+  "delivery-date-approval": {
+   "type": "approval/v0",
+   "body": {
+    "representation_class": "delivery_date"
+   }
+  },
+  "condition-approval": {
+   "type": "approval/v0",
+   "body": {
+    "representation_class": "condition"
+   }
+  },
+  "listed-class-approval": {
+   "type": "approval/v0",
+   "body": {
+    "representation_class": [
+     "delivery_date"
+    ]
+   }
+  },
+  "bodiless-approval": {
+   "type": "approval/v0",
+   "representation_class": "delivery_date"
+  },
+  "classless-approval": {
+   "type": "approval/v0",
+   "body": {}
+  },
+  "allows-delivery-date": {
+   "type": "task-authority/v0",
+   "body": {
+    "outcome_id": "seller.sell_one_item/1.0.0",
+    "allowed_actions": [
+     "offer",
+     "accept",
+     "sell",
+     "tell"
+    ],
+    "preconditions": [],
+    "authorized_representation_classes": [
+     "price",
+     "delivery_date"
+    ]
+   }
+  },
+  "allows-price-only": {
+   "type": "task-authority/v0",
+   "body": {
+    "outcome_id": "seller.sell_one_item/1.0.0",
+    "allowed_actions": [
+     "offer",
+     "accept",
+     "sell",
+     "tell"
+    ],
+    "preconditions": [],
+    "authorized_representation_classes": [
+     "price"
+    ]
+   }
+  },
+  "allows-delivery-date-as-text": {
+   "type": "task-authority/v0",
+   "body": {
+    "outcome_id": "seller.sell_one_item/1.0.0",
+    "allowed_actions": [
+     "offer",
+     "accept",
+     "sell",
+     "tell"
+    ],
+    "preconditions": [],
+    "authorized_representation_classes": "delivery_date"
+   }
+  },
+  "no-allowance": {
+   "type": "task-authority/v0",
+   "body": {
+    "outcome_id": "seller.sell_one_item/1.0.0",
+    "allowed_actions": [
+     "offer",
+     "accept",
+     "sell",
+     "tell"
+    ],
+    "preconditions": []
+   }
+  },
+  "approval-with-a-float": {
+   "type": "approval/v0",
+   "body": {
+    "representation_class": "delivery_date",
+    "weight": 1.5
+   }
+  },
+  "approval-with-an-unsafe-integer": {
+   "type": "approval/v0",
+   "body": {
+    "representation_class": "delivery_date",
+    "n": 1152921504606846976
+   }
+  }
+ },
+ "steps": [
+  {
+   "name": "delivery-date-citing-nothing",
+   "dry_run": true,
+   "action": {
+    "verb": "tell",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/s2-1",
+    "timestamp": "2026-10-09T11:01:00Z",
+    "equivalence_key": "tell/s2-1",
+    "target": "cp-fp:1111111111111111111111111111111111111111111111111111111111111111",
+    "representation_class": "delivery_date"
+   }
+  },
+  {
+   "name": "delivery-date-citing-an-approval-not-supplied",
+   "dry_run": true,
+   "action": {
+    "verb": "tell",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/s2-2",
+    "timestamp": "2026-10-09T11:02:00Z",
+    "equivalence_key": "tell/s2-2",
+    "target": "cp-fp:1111111111111111111111111111111111111111111111111111111111111111",
+    "representation_class": "delivery_date",
+    "authorized_by": "16f79ba926924ec021c14b910b81ad96600cd5fff34105cab6cbe124a08e48b6"
+   }
+  },
+  {
+   "name": "delivery-date-with-another-record-supplied",
+   "dry_run": true,
+   "action": {
+    "verb": "tell",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/s2-3",
+    "timestamp": "2026-10-09T11:03:00Z",
+    "equivalence_key": "tell/s2-3",
+    "target": "cp-fp:1111111111111111111111111111111111111111111111111111111111111111",
+    "representation_class": "delivery_date",
+    "authorized_by": "16f79ba926924ec021c14b910b81ad96600cd5fff34105cab6cbe124a08e48b6"
+   },
+   "authorization_record": "condition-approval"
+  },
+  {
+   "name": "delivery-date-with-an-approval-for-another-class",
+   "dry_run": true,
+   "action": {
+    "verb": "tell",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/s2-4",
+    "timestamp": "2026-10-09T11:04:00Z",
+    "equivalence_key": "tell/s2-4",
+    "target": "cp-fp:1111111111111111111111111111111111111111111111111111111111111111",
+    "representation_class": "delivery_date",
+    "authorized_by": "63586883d75c70e484db2a84d525a280e4faa10777ed6177d6bd031e64f683a3"
+   },
+   "authorization_record": "condition-approval"
+  },
+  {
+   "name": "delivery-date-with-a-bound-approval",
+   "dry_run": true,
+   "action": {
+    "verb": "tell",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/s2-5",
+    "timestamp": "2026-10-09T11:05:00Z",
+    "equivalence_key": "tell/s2-5",
+    "target": "cp-fp:1111111111111111111111111111111111111111111111111111111111111111",
+    "representation_class": "delivery_date",
+    "authorized_by": "16f79ba926924ec021c14b910b81ad96600cd5fff34105cab6cbe124a08e48b6"
+   },
+   "authorization_record": "delivery-date-approval"
+  },
+  {
+   "name": "delivery-date-approval-naming-a-list",
+   "dry_run": true,
+   "action": {
+    "verb": "tell",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/s2-6",
+    "timestamp": "2026-10-09T11:06:00Z",
+    "equivalence_key": "tell/s2-6",
+    "target": "cp-fp:1111111111111111111111111111111111111111111111111111111111111111",
+    "representation_class": "delivery_date",
+    "authorized_by": "81f4ac5f96315f004e150b06107715e8a7d2708c2a79384fd8e739c17d743288"
+   },
+   "authorization_record": "listed-class-approval"
+  },
+  {
+   "name": "delivery-date-approval-with-no-body",
+   "dry_run": true,
+   "action": {
+    "verb": "tell",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/s2-7",
+    "timestamp": "2026-10-09T11:07:00Z",
+    "equivalence_key": "tell/s2-7",
+    "target": "cp-fp:1111111111111111111111111111111111111111111111111111111111111111",
+    "representation_class": "delivery_date",
+    "authorized_by": "9962e5cbaeba55e4e836fc4f2c6d85425a3e4465850c2234133043daa829d68b"
+   },
+   "authorization_record": "bodiless-approval"
+  },
+  {
+   "name": "delivery-date-approval-naming-no-class",
+   "dry_run": true,
+   "action": {
+    "verb": "tell",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/s2-8",
+    "timestamp": "2026-10-09T11:08:00Z",
+    "equivalence_key": "tell/s2-8",
+    "target": "cp-fp:1111111111111111111111111111111111111111111111111111111111111111",
+    "representation_class": "delivery_date",
+    "authorized_by": "24a6dd301485bb523a66a83a34d46487840ad35ce1a015118753b741f818f89a"
+   },
+   "authorization_record": "classless-approval"
+  },
+  {
+   "name": "delivery-date-approval-with-a-float",
+   "dry_run": true,
+   "action": {
+    "verb": "tell",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/s2-21",
+    "timestamp": "2026-10-09T11:21:00Z",
+    "equivalence_key": "tell/s2-21",
+    "target": "cp-fp:1111111111111111111111111111111111111111111111111111111111111111",
+    "representation_class": "delivery_date",
+    "authorized_by": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+   },
+   "authorization_record": "approval-with-a-float"
+  },
+  {
+   "name": "delivery-date-approval-with-an-unsafe-integer",
+   "dry_run": true,
+   "action": {
+    "verb": "tell",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/s2-22",
+    "timestamp": "2026-10-09T11:22:00Z",
+    "equivalence_key": "tell/s2-22",
+    "target": "cp-fp:1111111111111111111111111111111111111111111111111111111111111111",
+    "representation_class": "delivery_date",
+    "authorized_by": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+   },
+   "authorization_record": "approval-with-an-unsafe-integer"
+  },
+  {
+   "name": "delivery-date-inside-the-task-authority",
+   "dry_run": true,
+   "action": {
+    "verb": "tell",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/s2-9",
+    "timestamp": "2026-10-09T11:09:00Z",
+    "equivalence_key": "tell/s2-9",
+    "target": "cp-fp:1111111111111111111111111111111111111111111111111111111111111111",
+    "representation_class": "delivery_date",
+    "task_authority_ref": "32515caa12ff0111cd0b1c015777ef8dad3c1d4c3dd285a84d4a60f31427635b"
+   },
+   "task_authority_record": "allows-delivery-date"
+  },
+  {
+   "name": "delivery-date-outside-the-task-authority",
+   "dry_run": true,
+   "action": {
+    "verb": "tell",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/s2-11",
+    "timestamp": "2026-10-09T11:11:00Z",
+    "equivalence_key": "tell/s2-11",
+    "target": "cp-fp:1111111111111111111111111111111111111111111111111111111111111111",
+    "representation_class": "delivery_date",
+    "task_authority_ref": "eaf6c7221c8ad06c5c055a61b4a8efaaa612a2de045d68c4a6116ed991908da6"
+   },
+   "task_authority_record": "allows-price-only"
+  },
+  {
+   "name": "delivery-date-outside-the-task-authority-with-a-bound-approval",
+   "dry_run": true,
+   "action": {
+    "verb": "tell",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/s2-12",
+    "timestamp": "2026-10-09T11:12:00Z",
+    "equivalence_key": "tell/s2-12",
+    "target": "cp-fp:1111111111111111111111111111111111111111111111111111111111111111",
+    "representation_class": "delivery_date",
+    "task_authority_ref": "eaf6c7221c8ad06c5c055a61b4a8efaaa612a2de045d68c4a6116ed991908da6",
+    "authorized_by": "16f79ba926924ec021c14b910b81ad96600cd5fff34105cab6cbe124a08e48b6"
+   },
+   "task_authority_record": "allows-price-only",
+   "authorization_record": "delivery-date-approval"
+  },
+  {
+   "name": "delivery-date-task-authority-listing-text",
+   "dry_run": true,
+   "action": {
+    "verb": "tell",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/s2-13",
+    "timestamp": "2026-10-09T11:13:00Z",
+    "equivalence_key": "tell/s2-13",
+    "target": "cp-fp:1111111111111111111111111111111111111111111111111111111111111111",
+    "representation_class": "delivery_date",
+    "task_authority_ref": "f5932734ace71ac25f578611b03814e84455827ccb22044f36e0bb0a90945271"
+   },
+   "task_authority_record": "allows-delivery-date-as-text"
+  },
+  {
+   "name": "delivery-date-task-authority-with-no-allowance",
+   "dry_run": true,
+   "action": {
+    "verb": "tell",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/s2-14",
+    "timestamp": "2026-10-09T11:14:00Z",
+    "equivalence_key": "tell/s2-14",
+    "target": "cp-fp:1111111111111111111111111111111111111111111111111111111111111111",
+    "representation_class": "delivery_date",
+    "task_authority_ref": "5abeae436289438daf770813397492821787e3250823bf5ab571f3eb46dba59c"
+   },
+   "task_authority_record": "no-allowance"
+  },
+  {
+   "name": "delivery-date-task-authority-not-bound",
+   "dry_run": true,
+   "action": {
+    "verb": "tell",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/s2-15",
+    "timestamp": "2026-10-09T11:15:00Z",
+    "equivalence_key": "tell/s2-15",
+    "target": "cp-fp:1111111111111111111111111111111111111111111111111111111111111111",
+    "representation_class": "delivery_date",
+    "task_authority_ref": "eaf6c7221c8ad06c5c055a61b4a8efaaa612a2de045d68c4a6116ed991908da6"
+   },
+   "task_authority_record": "allows-delivery-date"
+  },
+  {
+   "name": "delivery-date-task-authority-not-supplied",
+   "dry_run": true,
+   "action": {
+    "verb": "tell",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/s2-16",
+    "timestamp": "2026-10-09T11:16:00Z",
+    "equivalence_key": "tell/s2-16",
+    "target": "cp-fp:1111111111111111111111111111111111111111111111111111111111111111",
+    "representation_class": "delivery_date",
+    "task_authority_ref": "32515caa12ff0111cd0b1c015777ef8dad3c1d4c3dd285a84d4a60f31427635b"
+   }
+  },
+  {
+   "name": "condition",
+   "dry_run": true,
+   "action": {
+    "verb": "tell",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/s2-17",
+    "timestamp": "2026-10-09T11:17:00Z",
+    "equivalence_key": "tell/s2-17",
+    "target": "cp-fp:1111111111111111111111111111111111111111111111111111111111111111",
+    "representation_class": "condition"
+   }
+  },
+  {
+   "name": "a-class-outside-the-closed-set",
+   "dry_run": true,
+   "action": {
+    "verb": "tell",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/s2-18",
+    "timestamp": "2026-10-09T11:18:00Z",
+    "equivalence_key": "tell/s2-18",
+    "target": "cp-fp:1111111111111111111111111111111111111111111111111111111111111111",
+    "representation_class": "guarantee"
+   }
+  },
+  {
+   "name": "no-class",
+   "dry_run": true,
+   "action": {
+    "verb": "tell",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/s2-19",
+    "timestamp": "2026-10-09T11:19:00Z",
+    "equivalence_key": "tell/s2-19",
+    "target": "cp-fp:1111111111111111111111111111111111111111111111111111111111111111"
+   }
+  },
+  {
+   "name": "delivery-date-shared-as-personal-data",
+   "dry_run": true,
+   "action": {
+    "verb": "share",
+    "operator": "seller-s2",
+    "developer": "seller-assistant@v1",
+    "action_class": "disclosure.personal",
+    "action_id": "share/s2-20",
+    "timestamp": "2026-10-09T11:20:00Z",
+    "equivalence_key": "share/s2-20",
+    "target": "cp-fp:1111111111111111111111111111111111111111111111111111111111111111",
+    "recipient_role": "buyer",
+    "representation_class": "delivery_date"
+   }
+  }
+ ]
+}

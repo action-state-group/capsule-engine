@@ -1,0 +1,30 @@
+{
+  "note": "Copied byte for byte, except that internal work-item references in README.md and generate_python_decisions.py were reworded for publication (MANIFEST.sha256 updated to match); this sidecar is not part of the copied bytes.",
+  "source": "The engine side's Go vectors for a refund never blocking the spend window (MANIFEST.sha256 verified), generated on capsule-engine branch refund-never-blocks-spend-window (base 8522efcd714a6ba96de800e6c7ded5593e928d2d). The engine PR merged as #130, 62d7a92726366f1c39d324854256fc80fd1a51e8; regenerated at that merge commit (git archive into a scratch tree, Python 3.13.7, python -P generate_python_decisions.py) python-decisions.json is byte-identical.",
+  "engine_commit": "62d7a92726366f1c39d324854256fc80fd1a51e8",
+  "files": {
+    "README.md": {
+      "sha256": "bae7ad62e93f196a6ca9941410b4df23a2cc6083ecf31f785d061890ac6e4292"
+    },
+    "python-decisions.json": {
+      "sha256": "d410ba06b7ce3b3a6cddb4492f53d1e74838999f67878e7befb0ecd1489c5d0e"
+    },
+    "generate_python_decisions.py": {
+      "sha256": "52a4a7f0c82f43fda384f16c8436f08aea23618c79b42e779bd53a43ea4fe5de"
+    },
+    "MANIFEST.sha256": {
+      "sha256": "c8a4ba13a556c79b062e3a5e3d1ba951c378033cc3d8402f2543d42bf80bd098"
+    }
+  },
+  "real": {
+    "note": "Envelopes capsulectl 831afeeb (v0.1.0-rc13-7-gfde7ee0 in the producer block) sent its pinned rules checker during a real deal check in the v0.0.9 acceptance (finding F1), copied byte for byte. Under v0.0.9 both gave r05-spending-limits#7d not_evaluable, 'an earlier purchase was made without a check, and the total cannot count it'.",
+    "files": {
+      "real/acc-probe-purchase-after-a-refund.json": {
+        "sha256": "722d9d5955a160b53edc768e581e1e3ecf28f69b5b400e741afcbf84cdc8cd42"
+      },
+      "real/acc-refund-repeat-same-reversed-act.json": {
+        "sha256": "da5e8c24b8f07282b7520aa7eec48211fd7726c92b537a09adbc5faa9f6d6793"
+      }
+    }
+  }
+}

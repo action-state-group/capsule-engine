@@ -1,0 +1,45 @@
+{
+  "note": "Engine decisions under asg/seller/0.1.2, written by capsule-engine's own GuardEngine; each file is byte for byte what its generator wrote. This sidecar is not part of those bytes. There is no MANIFEST: every file's sha256 is here.",
+  "engine_commit": "e0e664de1ede4febae31931579ebe85497b4b120",
+  "engine_ref": "capsule-engine e0e664d ('a pack may cite no caps definition'), merged by #128 as 2ba51d4; the seller pack it runs is packs/seller-0.1.2 here (definition digest e599c5aff8d4171d5e58cae33fdc7022e4ee3762d1a884bb6e6098aca532a353)",
+  "how_generated": "The generators already vendored beside the earlier vectors, unmodified (sha256 below), run with python -P from a copy of their directory against a git clone of capsule-engine checked out at engine_commit and installed in a scratch virtualenv: generate.py <checkout> e0e664de1ede4febae31931579ebe85497b4b120 (s1), generate_s2_decisions.py <checkout> (s2), generate_python_decisions.py <checkout> (s3). Each wrote its outputs into that copy; they are copied here. A second run wrote identical bytes.",
+  "generators": {
+    "seller-s1-vectors/generate.py": "bd66d54f767a6caab337deb3cb177ac14f1ac3a8d49d84ccaedbd154b51ff2c6",
+    "seller-s2-vectors/generate_s2_decisions.py": "93b85489db802b49e66ff367ec3135a80a67434bc8d625f783661b60f62be426",
+    "seller-011-vectors/generate_python_decisions.py": "edaaf4639b58a4534b3605d5e3541ecbb9c99ca45531098830bb1f24c44e0400"
+  },
+  "corpora_reused": {
+    "note": "s2 and s3 run the corpora already vendored at these paths; the generators read them and left them byte-identical",
+    "files": {
+      "seller-s2-vectors/rail-corpus.json": "c81938f8824ba763fb311397028369f8a80f7e952ebd14ad55136f1f6f1f78cc",
+      "seller-s2-vectors/promise-never-corpus.json": "91731ff4e09d0ce604554f968a2041540ddc4b581f43f4ec606eff1c0d949ddc",
+      "seller-s2-vectors/promise-requires-approval-corpus.json": "375f0b89681722b8a4ca9bc36acb5c8469efbdcc6e4095201a1370fefceedb59",
+      "seller-s2-vectors/required-disclosure-corpus.json": "3da6f0ad82bf3a5c3de5f6fb7c46c462abd9c427d69734f99c82551032d62971",
+      "seller-011-vectors/corpus.json": "607ca768825150636bbd8afcb686f708b6be10952a51d2c2e093612502efa44e"
+    }
+  },
+  "files": {
+    "s2/rail-decisions.json": {
+      "sha256": "83a8ade21f7490b3e09241f2a453fa8d5580ada7e01bf5576ca71bff7c5ecba0"
+    },
+    "s2/required-disclosure-decisions.json": {
+      "sha256": "d8a6ecfa5708c0e0b93a6f591b7d1b47754c917e2945d60b505984408398e4f4"
+    },
+    "s2/promise-requires-approval-decisions.json": {
+      "sha256": "f3b69bc8b7f53dc3c25c6fc6f6070148daee6a2e25b2fe2540c27912d0c4f333"
+    },
+    "s2/promise-never-decisions.json": {
+      "sha256": "17774be37e93e95cf041dbd5c80264b73404dc08474ade73dd6da7c0348531a9"
+    },
+    "s3/python-decisions.json": {
+      "sha256": "c0951b1795bf21c602ea9e0d1c72de5081cdebfd92a99fde2bd4dfbcffa677b3"
+    },
+    "s1/corpus.json": {
+      "sha256": "4b1ddcad1866b1934c4cf760d2b8a6a50c59798c27b45129e19dbb337a4321d4"
+    },
+    "s1/decisions.json": {
+      "sha256": "7c517a7c50fba905df83b2f8198efda9486925f118430b870de477ac9f7b2763"
+    }
+  },
+  "generated_at": "2026-10-09"
+}

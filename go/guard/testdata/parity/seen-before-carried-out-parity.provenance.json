@@ -1,0 +1,10 @@
+{
+  "file": "seen-before-carried-out-parity.json",
+  "sha256": "5afc887f78ebd8e1e9a86f1baa0d0f96c23167f0366a60641ce3e7649a80c19d",
+  "generator": "generate_seen_before_carried_out.py (this directory), run as: cd <capsule-engine@c878edf0> && <venv>/bin/python <generator> c878edf0d8f6bfe2d9b7aba84e0023412efa4fb7",
+  "capsule_engine_commit": "c878edf0d8f6bfe2d9b7aba84e0023412efa4fb7",
+  "capsule_engine_pr": "#135, merged as c878edf0 (asg/everyday/0.3.5)",
+  "regenerated_by": "the Go side, 2026-10-09",
+  "why": "the shipped pack moved to asg/everyday/0.3.5; the chain half still carries deal 1 of the real two-deal fixture rebuilt by capsulectl at capsule-cli 831afeeb",
+  "decisions": "against the d12932523db4 copy (0.3.4) only the pack id and digest differ: every decision and fold count is equal"
+}

@@ -1,0 +1,26 @@
+# recipient_role/1.1.0: recipient_role/1.0.0 (recipient_role.yaml) with a
+# platform role: a marketplace, booking site or mail relay acting between the
+# user and the counterparty. A platform passes only a disclosure
+# whose every class is email, as a listing's confirmation or a relay needs;
+# a phone, an address or any other class to a platform fails, and so does a
+# disclosure to one that names no class. A first email to a platform is a
+# pause in the producer (capsulectl's first telling to a recipient), not here.
+# recipient_role/1.0.0 stays as it was for the records and packs that pin it.
+wicket_id: recipient_role/1.1.0
+check: recipient_role
+semantics: >-
+  A disclosure in action_classes whose recipient_role is in allowed_roles
+  passes. One whose recipient_role is a key of role_classes passes only when
+  it names at least one class of data (disclosed_classes) and every class it
+  names is listed for that role; one naming no class, or any class not
+  listed, fails. Any other recipient_role in roles fails, and one outside
+  roles fails as not recognised. An action that carries no recipient_role is
+  not applicable, in scope; any other action class is not applicable. The
+  evidence records the role and the class names read, never who the
+  recipient is or the data.
+config:
+  action_classes: [disclosure.personal]
+  roles: [fulfilling_merchant, platform, third_party, self]
+  allowed_roles: [fulfilling_merchant, self]
+  role_classes:
+    platform: [email]

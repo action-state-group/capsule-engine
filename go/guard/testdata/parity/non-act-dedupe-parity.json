@@ -1,0 +1,150 @@
+{
+  "bundles": {
+    "deal-purchase-then-partial-cancel": [
+      {
+        "capsule_id": "60cb5735338f3dafce14ae7958f428b5dcf6fe4bd96154c73ba12898731e4f95",
+        "dedupe_evidence_digest": "7fb68308834024c834ff239dd5732da5b768ee0524cf7cdcd5e432bbc0d3fd91",
+        "dedupe_result": "n/a",
+        "replay": "no_decision",
+        "sealed_record_type": "baseline"
+      },
+      {
+        "capsule_id": "d3839306e95ff5db24059edd605b568e134f0e5aad432086994a8f9f5761d2e3",
+        "dedupe_evidence_digest": "a62e8eae7147b1a0487d7b24b7b1935e592c2b31b985a7d3cc07d54a1a651ec4",
+        "dedupe_result": "pass",
+        "replay": "decision",
+        "sealed_record_type": "check"
+      },
+      {
+        "capsule_id": "831c5e884629995d550cb0d2ccd838b87c534b3cf0e341644bb2abed6339253f",
+        "dedupe_evidence_digest": "7fb68308834024c834ff239dd5732da5b768ee0524cf7cdcd5e432bbc0d3fd91",
+        "dedupe_result": "n/a",
+        "replay": "no_decision",
+        "sealed_record_type": "verdict"
+      },
+      {
+        "capsule_id": "da0629fc29ece362fe53336304a3cb4855cf5827cf98a737d6f01a0c0327b12b",
+        "dedupe_evidence_digest": "7fb68308834024c834ff239dd5732da5b768ee0524cf7cdcd5e432bbc0d3fd91",
+        "dedupe_result": "n/a",
+        "replay": "no_decision",
+        "sealed_record_type": "approval"
+      },
+      {
+        "capsule_id": "4c1f021573a96d7671de238053ecf06afb96d0d18b5f4a219ccd141c21611a5e",
+        "dedupe_evidence_digest": "7fb68308834024c834ff239dd5732da5b768ee0524cf7cdcd5e432bbc0d3fd91",
+        "dedupe_result": "n/a",
+        "replay": "no_decision",
+        "sealed_record_type": "action"
+      },
+      {
+        "capsule_id": "018bb22f7ac552ca900f3f7997ab87cb6fc7ceb95480df7ef4f7bd510b4d3919",
+        "dedupe_evidence_digest": "7fb68308834024c834ff239dd5732da5b768ee0524cf7cdcd5e432bbc0d3fd91",
+        "dedupe_result": "n/a",
+        "replay": "no_decision",
+        "sealed_record_type": "intent"
+      },
+      {
+        "capsule_id": "6b8c879b93c5010451596eb05482edd440de2f00a4fcc315e2b40de9d0756028",
+        "dedupe_evidence_digest": "2efe8ddbd96797a76b3467258c72b217fdceb75217831825bba4d743d3f116ba",
+        "dedupe_result": "pass",
+        "replay": "decision",
+        "sealed_record_type": "check"
+      },
+      {
+        "capsule_id": "c70b78f86279c0548c1623abe2256407fa438b362945ee43333d5c8a4adc4364",
+        "dedupe_evidence_digest": "7fb68308834024c834ff239dd5732da5b768ee0524cf7cdcd5e432bbc0d3fd91",
+        "dedupe_result": "n/a",
+        "replay": "no_decision",
+        "sealed_record_type": "verdict"
+      },
+      {
+        "capsule_id": "247938f1ae6da1c7172689101d871455d81d790684eb186e0bc27f3b0ccbd2d7",
+        "dedupe_evidence_digest": "7fb68308834024c834ff239dd5732da5b768ee0524cf7cdcd5e432bbc0d3fd91",
+        "dedupe_result": "n/a",
+        "replay": "no_decision",
+        "sealed_record_type": "approval"
+      },
+      {
+        "capsule_id": "22bc1ceb95a36a8328948f63b60caebaca2472b20ef7c052026e9afea3af2085",
+        "dedupe_evidence_digest": "7fb68308834024c834ff239dd5732da5b768ee0524cf7cdcd5e432bbc0d3fd91",
+        "dedupe_result": "n/a",
+        "replay": "no_decision",
+        "sealed_record_type": "action"
+      }
+    ],
+    "deal-purchase-then-refund": [
+      {
+        "capsule_id": "4784e1b1f2c49b674cd6b5e1e58ed15fb47bb620dfae995ffcee03d4951a0d45",
+        "dedupe_evidence_digest": "7fb68308834024c834ff239dd5732da5b768ee0524cf7cdcd5e432bbc0d3fd91",
+        "dedupe_result": "n/a",
+        "replay": "no_decision",
+        "sealed_record_type": "baseline"
+      },
+      {
+        "capsule_id": "a20df1667195f0fc0ce0796b0edcb7c5f19b0e086999b79d622b44b908295b51",
+        "dedupe_evidence_digest": "2ea31f9a427768ab421d8b9b9decc234204b1c32320860c5e064b4bc406cc9ba",
+        "dedupe_result": "pass",
+        "replay": "decision",
+        "sealed_record_type": "check"
+      },
+      {
+        "capsule_id": "1dce4ebc6439f3aeb136bcb5696d0121feed395550394f3bd22e5d0cbc041c2d",
+        "dedupe_evidence_digest": "7fb68308834024c834ff239dd5732da5b768ee0524cf7cdcd5e432bbc0d3fd91",
+        "dedupe_result": "n/a",
+        "replay": "no_decision",
+        "sealed_record_type": "verdict"
+      },
+      {
+        "capsule_id": "f8066103c8be0d0af6fd16483022a1817177063d533595e62d193ee5fb763153",
+        "dedupe_evidence_digest": "7fb68308834024c834ff239dd5732da5b768ee0524cf7cdcd5e432bbc0d3fd91",
+        "dedupe_result": "n/a",
+        "replay": "no_decision",
+        "sealed_record_type": "approval"
+      },
+      {
+        "capsule_id": "74ecd1c812c18509d58b9b42ec28aefe28327bb2f17e06b412c719d7969ce987",
+        "dedupe_evidence_digest": "7fb68308834024c834ff239dd5732da5b768ee0524cf7cdcd5e432bbc0d3fd91",
+        "dedupe_result": "n/a",
+        "replay": "no_decision",
+        "sealed_record_type": "action"
+      },
+      {
+        "capsule_id": "2d5247cfcb2ad8b27b3e3fbdf8354bc7a2ce31c70c1b6325cf8e9504dbe370a3",
+        "dedupe_evidence_digest": "7fb68308834024c834ff239dd5732da5b768ee0524cf7cdcd5e432bbc0d3fd91",
+        "dedupe_result": "n/a",
+        "replay": "no_decision",
+        "sealed_record_type": "intent"
+      },
+      {
+        "capsule_id": "754b4f782f0a0fa4979ed2442f679fa0268fb4ace77496bcde6ecbfdb791fe8c",
+        "dedupe_evidence_digest": "bb54f5e76abd988a33aaa9ae6f43a5bd103c76b029af3e5b5a0e33a057262004",
+        "dedupe_result": "pass",
+        "replay": "decision",
+        "sealed_record_type": "check"
+      },
+      {
+        "capsule_id": "23eb44cb3d0e0a889073dd3d724e2dde82dfe68d1b9934459e2b6eb32306f091",
+        "dedupe_evidence_digest": "7fb68308834024c834ff239dd5732da5b768ee0524cf7cdcd5e432bbc0d3fd91",
+        "dedupe_result": "n/a",
+        "replay": "no_decision",
+        "sealed_record_type": "verdict"
+      },
+      {
+        "capsule_id": "73800cc0c9544e2928bec5ddfe2bfb98e5a0be235f434a2e2d2a30ab328cbc53",
+        "dedupe_evidence_digest": "7fb68308834024c834ff239dd5732da5b768ee0524cf7cdcd5e432bbc0d3fd91",
+        "dedupe_result": "n/a",
+        "replay": "no_decision",
+        "sealed_record_type": "approval"
+      },
+      {
+        "capsule_id": "c586d0f72ebf8b0ee99a48d1137b53f34ded3c8af86f9925bfb45de46404f719",
+        "dedupe_evidence_digest": "7fb68308834024c834ff239dd5732da5b768ee0524cf7cdcd5e432bbc0d3fd91",
+        "dedupe_result": "n/a",
+        "replay": "no_decision",
+        "sealed_record_type": "action"
+      }
+    ]
+  },
+  "capsule_engine_commit": "7339028ab2117d6c7adec89a26cd5022b8ac7140",
+  "source": "go/guard/testdata/parity/generate_non_act_dedupe.py"
+}

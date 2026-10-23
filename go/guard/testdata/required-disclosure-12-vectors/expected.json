@@ -1,0 +1,1046 @@
+{
+ "definition": "required_disclosure/1.2.0",
+ "definition_digest": "cae962303066286b3c391a6c1a2f5f5db6742865fb84e1932ad68515a423224f",
+ "vectors": [
+  {
+   "evidence": {
+    "fold": "5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564",
+    "listing_classes": null,
+    "missing_classes": [],
+    "prior_counts": {
+     "condition": 0
+    },
+    "scope": {
+     "deal_id": "deal-ee96d9979e9e9316",
+     "operator": "synthetic-seller",
+     "target": "payee-fp:hmac-sha256-chain-key:3b5cc5b96e8659031ddc0d5c6b52ce45ad432d9f48fb6ce8c356baea670e59b3"
+    },
+    "stated_counts": {
+     "condition": 1
+    },
+    "statement_fold": "925e7ccd2e29b3f1984f966e968bdef47d0d22d2b85b8e0205a39d6a5a7ff0be"
+   },
+   "input": "inputs/a-offer-1900--with-claims--absent.json",
+   "listing_classes": null,
+   "reason": "every required class was stated to this counterparty",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "fold": "5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564",
+    "listing_classes": [],
+    "missing_classes": [],
+    "prior_counts": {
+     "condition": 0
+    },
+    "scope": {
+     "deal_id": "deal-ee96d9979e9e9316",
+     "operator": "synthetic-seller",
+     "target": "payee-fp:hmac-sha256-chain-key:3b5cc5b96e8659031ddc0d5c6b52ce45ad432d9f48fb6ce8c356baea670e59b3"
+    },
+    "stated_counts": {
+     "condition": 1
+    },
+    "statement_fold": "925e7ccd2e29b3f1984f966e968bdef47d0d22d2b85b8e0205a39d6a5a7ff0be"
+   },
+   "input": "inputs/a-offer-1900--with-claims--empty.json",
+   "listing_classes": [],
+   "reason": "every required class was stated to this counterparty",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "fold": "5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564",
+    "listing_classes": [
+     "condition"
+    ],
+    "missing_classes": [],
+    "prior_counts": {
+     "condition": 0
+    },
+    "scope": {
+     "deal_id": "deal-ee96d9979e9e9316",
+     "operator": "synthetic-seller",
+     "target": "payee-fp:hmac-sha256-chain-key:3b5cc5b96e8659031ddc0d5c6b52ce45ad432d9f48fb6ce8c356baea670e59b3"
+    },
+    "stated_counts": {
+     "condition": 1
+    },
+    "statement_fold": "925e7ccd2e29b3f1984f966e968bdef47d0d22d2b85b8e0205a39d6a5a7ff0be"
+   },
+   "input": "inputs/a-offer-1900--with-claims--condition.json",
+   "listing_classes": [
+    "condition"
+   ],
+   "reason": "every required class was stated to this counterparty",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "fold": "5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564",
+    "listing_classes": [
+     "condition",
+     "price"
+    ],
+    "missing_classes": [],
+    "prior_counts": {
+     "condition": 0
+    },
+    "scope": {
+     "deal_id": "deal-ee96d9979e9e9316",
+     "operator": "synthetic-seller",
+     "target": "payee-fp:hmac-sha256-chain-key:3b5cc5b96e8659031ddc0d5c6b52ce45ad432d9f48fb6ce8c356baea670e59b3"
+    },
+    "stated_counts": {
+     "condition": 1
+    },
+    "statement_fold": "925e7ccd2e29b3f1984f966e968bdef47d0d22d2b85b8e0205a39d6a5a7ff0be"
+   },
+   "input": "inputs/a-offer-1900--with-claims--condition-price.json",
+   "listing_classes": [
+    "condition",
+    "price"
+   ],
+   "reason": "every required class was stated to this counterparty",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "fold": "5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564",
+    "listing_classes": [
+     "price"
+    ],
+    "missing_classes": [],
+    "prior_counts": {
+     "condition": 0
+    },
+    "scope": {
+     "deal_id": "deal-ee96d9979e9e9316",
+     "operator": "synthetic-seller",
+     "target": "payee-fp:hmac-sha256-chain-key:3b5cc5b96e8659031ddc0d5c6b52ce45ad432d9f48fb6ce8c356baea670e59b3"
+    },
+    "stated_counts": {
+     "condition": 1
+    },
+    "statement_fold": "925e7ccd2e29b3f1984f966e968bdef47d0d22d2b85b8e0205a39d6a5a7ff0be"
+   },
+   "input": "inputs/a-offer-1900--with-claims--price.json",
+   "listing_classes": [
+    "price"
+   ],
+   "reason": "every required class was stated to this counterparty",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "fold": "5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564",
+    "listing_classes": [
+     "condition",
+     "price"
+    ],
+    "missing_classes": [],
+    "prior_counts": {
+     "condition": 0
+    },
+    "scope": {
+     "deal_id": "deal-ee96d9979e9e9316",
+     "operator": "synthetic-seller",
+     "target": "payee-fp:hmac-sha256-chain-key:3b5cc5b96e8659031ddc0d5c6b52ce45ad432d9f48fb6ce8c356baea670e59b3"
+    },
+    "stated_counts": {
+     "condition": 1
+    },
+    "statement_fold": "925e7ccd2e29b3f1984f966e968bdef47d0d22d2b85b8e0205a39d6a5a7ff0be"
+   },
+   "input": "inputs/a-offer-1900--with-claims--unsorted.json",
+   "listing_classes": [
+    "condition",
+    "price"
+   ],
+   "reason": "every required class was stated to this counterparty",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "fold": "5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564",
+    "listing_classes": [
+     "condition"
+    ],
+    "missing_classes": [],
+    "prior_counts": {
+     "condition": 0
+    },
+    "scope": {
+     "deal_id": "deal-ee96d9979e9e9316",
+     "operator": "synthetic-seller",
+     "target": "payee-fp:hmac-sha256-chain-key:3b5cc5b96e8659031ddc0d5c6b52ce45ad432d9f48fb6ce8c356baea670e59b3"
+    },
+    "stated_counts": {
+     "condition": 1
+    },
+    "statement_fold": "925e7ccd2e29b3f1984f966e968bdef47d0d22d2b85b8e0205a39d6a5a7ff0be"
+   },
+   "input": "inputs/a-offer-1900--with-claims--twice.json",
+   "listing_classes": [
+    "condition"
+   ],
+   "reason": "every required class was stated to this counterparty",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "fold": "5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564",
+    "listing_classes": null,
+    "missing_classes": [],
+    "prior_counts": {
+     "condition": 0
+    },
+    "scope": {
+     "deal_id": "deal-ee96d9979e9e9316",
+     "operator": "synthetic-seller",
+     "target": "payee-fp:hmac-sha256-chain-key:3b5cc5b96e8659031ddc0d5c6b52ce45ad432d9f48fb6ce8c356baea670e59b3"
+    },
+    "stated_counts": {
+     "condition": 1
+    },
+    "statement_fold": "925e7ccd2e29b3f1984f966e968bdef47d0d22d2b85b8e0205a39d6a5a7ff0be"
+   },
+   "input": "inputs/a-offer-1900--with-claims--not-a-list.json",
+   "listing_classes": null,
+   "reason": "every required class was stated to this counterparty",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "fold": "5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564",
+    "listing_classes": null,
+    "missing_classes": [],
+    "prior_counts": {
+     "condition": 0
+    },
+    "scope": {
+     "deal_id": "deal-ee96d9979e9e9316",
+     "operator": "synthetic-seller",
+     "target": "payee-fp:hmac-sha256-chain-key:3b5cc5b96e8659031ddc0d5c6b52ce45ad432d9f48fb6ce8c356baea670e59b3"
+    },
+    "stated_counts": {
+     "condition": 1
+    },
+    "statement_fold": "925e7ccd2e29b3f1984f966e968bdef47d0d22d2b85b8e0205a39d6a5a7ff0be"
+   },
+   "input": "inputs/a-offer-1900--with-claims--bad-token.json",
+   "listing_classes": null,
+   "reason": "every required class was stated to this counterparty",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "fold": "5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564",
+    "listing_classes": null,
+    "missing_classes": [],
+    "prior_counts": {
+     "condition": 0
+    },
+    "scope": {
+     "deal_id": "deal-ee96d9979e9e9316",
+     "operator": "synthetic-seller",
+     "target": "payee-fp:hmac-sha256-chain-key:3b5cc5b96e8659031ddc0d5c6b52ce45ad432d9f48fb6ce8c356baea670e59b3"
+    },
+    "stated_counts": {
+     "condition": 1
+    },
+    "statement_fold": "925e7ccd2e29b3f1984f966e968bdef47d0d22d2b85b8e0205a39d6a5a7ff0be"
+   },
+   "input": "inputs/a-offer-1900--with-claims--not-strings.json",
+   "listing_classes": null,
+   "reason": "every required class was stated to this counterparty",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "fold": "5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564",
+    "listing_classes": null,
+    "missing_classes": [
+     "condition"
+    ],
+    "prior_counts": {
+     "condition": 0
+    },
+    "scope": {
+     "deal_id": "deal-ee96d9979e9e9316",
+     "operator": "synthetic-seller",
+     "target": "payee-fp:hmac-sha256-chain-key:3b5cc5b96e8659031ddc0d5c6b52ce45ad432d9f48fb6ce8c356baea670e59b3"
+    },
+    "stated_counts": {
+     "condition": 0
+    },
+    "statement_fold": "925e7ccd2e29b3f1984f966e968bdef47d0d22d2b85b8e0205a39d6a5a7ff0be"
+   },
+   "input": "inputs/a-offer-1900--no-claims--absent.json",
+   "listing_classes": null,
+   "reason": "no accepted prior statement of ['condition'] to this counterparty: make the disclosure first or change the task authority; an approval does not waive it",
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "fold": "5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564",
+    "listing_classes": [],
+    "missing_classes": [
+     "condition"
+    ],
+    "prior_counts": {
+     "condition": 0
+    },
+    "scope": {
+     "deal_id": "deal-ee96d9979e9e9316",
+     "operator": "synthetic-seller",
+     "target": "payee-fp:hmac-sha256-chain-key:3b5cc5b96e8659031ddc0d5c6b52ce45ad432d9f48fb6ce8c356baea670e59b3"
+    },
+    "stated_counts": {
+     "condition": 0
+    },
+    "statement_fold": "925e7ccd2e29b3f1984f966e968bdef47d0d22d2b85b8e0205a39d6a5a7ff0be"
+   },
+   "input": "inputs/a-offer-1900--no-claims--empty.json",
+   "listing_classes": [],
+   "reason": "no accepted prior statement of ['condition'] to this counterparty: make the disclosure first or change the task authority; an approval does not waive it",
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "fold": "5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564",
+    "listing_classes": [
+     "condition"
+    ],
+    "missing_classes": [],
+    "prior_counts": {
+     "condition": 0
+    },
+    "scope": {
+     "deal_id": "deal-ee96d9979e9e9316",
+     "operator": "synthetic-seller",
+     "target": "payee-fp:hmac-sha256-chain-key:3b5cc5b96e8659031ddc0d5c6b52ce45ad432d9f48fb6ce8c356baea670e59b3"
+    },
+    "stated_counts": {
+     "condition": 0
+    },
+    "statement_fold": "925e7ccd2e29b3f1984f966e968bdef47d0d22d2b85b8e0205a39d6a5a7ff0be"
+   },
+   "input": "inputs/a-offer-1900--no-claims--condition.json",
+   "listing_classes": [
+    "condition"
+   ],
+   "reason": "every required class was stated to this counterparty",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "fold": "5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564",
+    "listing_classes": [
+     "condition",
+     "price"
+    ],
+    "missing_classes": [],
+    "prior_counts": {
+     "condition": 0
+    },
+    "scope": {
+     "deal_id": "deal-ee96d9979e9e9316",
+     "operator": "synthetic-seller",
+     "target": "payee-fp:hmac-sha256-chain-key:3b5cc5b96e8659031ddc0d5c6b52ce45ad432d9f48fb6ce8c356baea670e59b3"
+    },
+    "stated_counts": {
+     "condition": 0
+    },
+    "statement_fold": "925e7ccd2e29b3f1984f966e968bdef47d0d22d2b85b8e0205a39d6a5a7ff0be"
+   },
+   "input": "inputs/a-offer-1900--no-claims--condition-price.json",
+   "listing_classes": [
+    "condition",
+    "price"
+   ],
+   "reason": "every required class was stated to this counterparty",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "fold": "5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564",
+    "listing_classes": [
+     "price"
+    ],
+    "missing_classes": [
+     "condition"
+    ],
+    "prior_counts": {
+     "condition": 0
+    },
+    "scope": {
+     "deal_id": "deal-ee96d9979e9e9316",
+     "operator": "synthetic-seller",
+     "target": "payee-fp:hmac-sha256-chain-key:3b5cc5b96e8659031ddc0d5c6b52ce45ad432d9f48fb6ce8c356baea670e59b3"
+    },
+    "stated_counts": {
+     "condition": 0
+    },
+    "statement_fold": "925e7ccd2e29b3f1984f966e968bdef47d0d22d2b85b8e0205a39d6a5a7ff0be"
+   },
+   "input": "inputs/a-offer-1900--no-claims--price.json",
+   "listing_classes": [
+    "price"
+   ],
+   "reason": "no accepted prior statement of ['condition'] to this counterparty: make the disclosure first or change the task authority; an approval does not waive it",
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "fold": "5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564",
+    "listing_classes": [
+     "condition",
+     "price"
+    ],
+    "missing_classes": [],
+    "prior_counts": {
+     "condition": 0
+    },
+    "scope": {
+     "deal_id": "deal-ee96d9979e9e9316",
+     "operator": "synthetic-seller",
+     "target": "payee-fp:hmac-sha256-chain-key:3b5cc5b96e8659031ddc0d5c6b52ce45ad432d9f48fb6ce8c356baea670e59b3"
+    },
+    "stated_counts": {
+     "condition": 0
+    },
+    "statement_fold": "925e7ccd2e29b3f1984f966e968bdef47d0d22d2b85b8e0205a39d6a5a7ff0be"
+   },
+   "input": "inputs/a-offer-1900--no-claims--unsorted.json",
+   "listing_classes": [
+    "condition",
+    "price"
+   ],
+   "reason": "every required class was stated to this counterparty",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "fold": "5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564",
+    "listing_classes": [
+     "condition"
+    ],
+    "missing_classes": [],
+    "prior_counts": {
+     "condition": 0
+    },
+    "scope": {
+     "deal_id": "deal-ee96d9979e9e9316",
+     "operator": "synthetic-seller",
+     "target": "payee-fp:hmac-sha256-chain-key:3b5cc5b96e8659031ddc0d5c6b52ce45ad432d9f48fb6ce8c356baea670e59b3"
+    },
+    "stated_counts": {
+     "condition": 0
+    },
+    "statement_fold": "925e7ccd2e29b3f1984f966e968bdef47d0d22d2b85b8e0205a39d6a5a7ff0be"
+   },
+   "input": "inputs/a-offer-1900--no-claims--twice.json",
+   "listing_classes": [
+    "condition"
+   ],
+   "reason": "every required class was stated to this counterparty",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "fold": "5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564",
+    "listing_classes": null,
+    "missing_classes": [
+     "condition"
+    ],
+    "prior_counts": {
+     "condition": 0
+    },
+    "scope": {
+     "deal_id": "deal-ee96d9979e9e9316",
+     "operator": "synthetic-seller",
+     "target": "payee-fp:hmac-sha256-chain-key:3b5cc5b96e8659031ddc0d5c6b52ce45ad432d9f48fb6ce8c356baea670e59b3"
+    },
+    "stated_counts": {
+     "condition": 0
+    },
+    "statement_fold": "925e7ccd2e29b3f1984f966e968bdef47d0d22d2b85b8e0205a39d6a5a7ff0be"
+   },
+   "input": "inputs/a-offer-1900--no-claims--not-a-list.json",
+   "listing_classes": null,
+   "reason": "no accepted prior statement of ['condition'] to this counterparty: make the disclosure first or change the task authority; an approval does not waive it",
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "fold": "5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564",
+    "listing_classes": null,
+    "missing_classes": [
+     "condition"
+    ],
+    "prior_counts": {
+     "condition": 0
+    },
+    "scope": {
+     "deal_id": "deal-ee96d9979e9e9316",
+     "operator": "synthetic-seller",
+     "target": "payee-fp:hmac-sha256-chain-key:3b5cc5b96e8659031ddc0d5c6b52ce45ad432d9f48fb6ce8c356baea670e59b3"
+    },
+    "stated_counts": {
+     "condition": 0
+    },
+    "statement_fold": "925e7ccd2e29b3f1984f966e968bdef47d0d22d2b85b8e0205a39d6a5a7ff0be"
+   },
+   "input": "inputs/a-offer-1900--no-claims--bad-token.json",
+   "listing_classes": null,
+   "reason": "no accepted prior statement of ['condition'] to this counterparty: make the disclosure first or change the task authority; an approval does not waive it",
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "fold": "5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564",
+    "listing_classes": null,
+    "missing_classes": [
+     "condition"
+    ],
+    "prior_counts": {
+     "condition": 0
+    },
+    "scope": {
+     "deal_id": "deal-ee96d9979e9e9316",
+     "operator": "synthetic-seller",
+     "target": "payee-fp:hmac-sha256-chain-key:3b5cc5b96e8659031ddc0d5c6b52ce45ad432d9f48fb6ce8c356baea670e59b3"
+    },
+    "stated_counts": {
+     "condition": 0
+    },
+    "statement_fold": "925e7ccd2e29b3f1984f966e968bdef47d0d22d2b85b8e0205a39d6a5a7ff0be"
+   },
+   "input": "inputs/a-offer-1900--no-claims--not-strings.json",
+   "listing_classes": null,
+   "reason": "no accepted prior statement of ['condition'] to this counterparty: make the disclosure first or change the task authority; an approval does not waive it",
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "fold": "5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564",
+    "listing_classes": null,
+    "missing_classes": [],
+    "prior_counts": {
+     "condition": 0
+    },
+    "scope": {
+     "deal_id": "deal-ee96d9979e9e9316",
+     "operator": "synthetic-seller",
+     "target": "payee-fp:hmac-sha256-chain-key:3b5cc5b96e8659031ddc0d5c6b52ce45ad432d9f48fb6ce8c356baea670e59b3"
+    },
+    "stated_counts": {
+     "condition": 1
+    },
+    "statement_fold": "925e7ccd2e29b3f1984f966e968bdef47d0d22d2b85b8e0205a39d6a5a7ff0be"
+   },
+   "input": "inputs/a-commit-1900--with-claims--absent.json",
+   "listing_classes": null,
+   "reason": "every required class was stated to this counterparty",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "fold": "5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564",
+    "listing_classes": [],
+    "missing_classes": [],
+    "prior_counts": {
+     "condition": 0
+    },
+    "scope": {
+     "deal_id": "deal-ee96d9979e9e9316",
+     "operator": "synthetic-seller",
+     "target": "payee-fp:hmac-sha256-chain-key:3b5cc5b96e8659031ddc0d5c6b52ce45ad432d9f48fb6ce8c356baea670e59b3"
+    },
+    "stated_counts": {
+     "condition": 1
+    },
+    "statement_fold": "925e7ccd2e29b3f1984f966e968bdef47d0d22d2b85b8e0205a39d6a5a7ff0be"
+   },
+   "input": "inputs/a-commit-1900--with-claims--empty.json",
+   "listing_classes": [],
+   "reason": "every required class was stated to this counterparty",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "fold": "5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564",
+    "listing_classes": [
+     "condition"
+    ],
+    "missing_classes": [],
+    "prior_counts": {
+     "condition": 0
+    },
+    "scope": {
+     "deal_id": "deal-ee96d9979e9e9316",
+     "operator": "synthetic-seller",
+     "target": "payee-fp:hmac-sha256-chain-key:3b5cc5b96e8659031ddc0d5c6b52ce45ad432d9f48fb6ce8c356baea670e59b3"
+    },
+    "stated_counts": {
+     "condition": 1
+    },
+    "statement_fold": "925e7ccd2e29b3f1984f966e968bdef47d0d22d2b85b8e0205a39d6a5a7ff0be"
+   },
+   "input": "inputs/a-commit-1900--with-claims--condition.json",
+   "listing_classes": [
+    "condition"
+   ],
+   "reason": "every required class was stated to this counterparty",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "fold": "5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564",
+    "listing_classes": [
+     "condition",
+     "price"
+    ],
+    "missing_classes": [],
+    "prior_counts": {
+     "condition": 0
+    },
+    "scope": {
+     "deal_id": "deal-ee96d9979e9e9316",
+     "operator": "synthetic-seller",
+     "target": "payee-fp:hmac-sha256-chain-key:3b5cc5b96e8659031ddc0d5c6b52ce45ad432d9f48fb6ce8c356baea670e59b3"
+    },
+    "stated_counts": {
+     "condition": 1
+    },
+    "statement_fold": "925e7ccd2e29b3f1984f966e968bdef47d0d22d2b85b8e0205a39d6a5a7ff0be"
+   },
+   "input": "inputs/a-commit-1900--with-claims--condition-price.json",
+   "listing_classes": [
+    "condition",
+    "price"
+   ],
+   "reason": "every required class was stated to this counterparty",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "fold": "5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564",
+    "listing_classes": [
+     "price"
+    ],
+    "missing_classes": [],
+    "prior_counts": {
+     "condition": 0
+    },
+    "scope": {
+     "deal_id": "deal-ee96d9979e9e9316",
+     "operator": "synthetic-seller",
+     "target": "payee-fp:hmac-sha256-chain-key:3b5cc5b96e8659031ddc0d5c6b52ce45ad432d9f48fb6ce8c356baea670e59b3"
+    },
+    "stated_counts": {
+     "condition": 1
+    },
+    "statement_fold": "925e7ccd2e29b3f1984f966e968bdef47d0d22d2b85b8e0205a39d6a5a7ff0be"
+   },
+   "input": "inputs/a-commit-1900--with-claims--price.json",
+   "listing_classes": [
+    "price"
+   ],
+   "reason": "every required class was stated to this counterparty",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "fold": "5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564",
+    "listing_classes": [
+     "condition",
+     "price"
+    ],
+    "missing_classes": [],
+    "prior_counts": {
+     "condition": 0
+    },
+    "scope": {
+     "deal_id": "deal-ee96d9979e9e9316",
+     "operator": "synthetic-seller",
+     "target": "payee-fp:hmac-sha256-chain-key:3b5cc5b96e8659031ddc0d5c6b52ce45ad432d9f48fb6ce8c356baea670e59b3"
+    },
+    "stated_counts": {
+     "condition": 1
+    },
+    "statement_fold": "925e7ccd2e29b3f1984f966e968bdef47d0d22d2b85b8e0205a39d6a5a7ff0be"
+   },
+   "input": "inputs/a-commit-1900--with-claims--unsorted.json",
+   "listing_classes": [
+    "condition",
+    "price"
+   ],
+   "reason": "every required class was stated to this counterparty",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "fold": "5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564",
+    "listing_classes": [
+     "condition"
+    ],
+    "missing_classes": [],
+    "prior_counts": {
+     "condition": 0
+    },
+    "scope": {
+     "deal_id": "deal-ee96d9979e9e9316",
+     "operator": "synthetic-seller",
+     "target": "payee-fp:hmac-sha256-chain-key:3b5cc5b96e8659031ddc0d5c6b52ce45ad432d9f48fb6ce8c356baea670e59b3"
+    },
+    "stated_counts": {
+     "condition": 1
+    },
+    "statement_fold": "925e7ccd2e29b3f1984f966e968bdef47d0d22d2b85b8e0205a39d6a5a7ff0be"
+   },
+   "input": "inputs/a-commit-1900--with-claims--twice.json",
+   "listing_classes": [
+    "condition"
+   ],
+   "reason": "every required class was stated to this counterparty",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "fold": "5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564",
+    "listing_classes": null,
+    "missing_classes": [],
+    "prior_counts": {
+     "condition": 0
+    },
+    "scope": {
+     "deal_id": "deal-ee96d9979e9e9316",
+     "operator": "synthetic-seller",
+     "target": "payee-fp:hmac-sha256-chain-key:3b5cc5b96e8659031ddc0d5c6b52ce45ad432d9f48fb6ce8c356baea670e59b3"
+    },
+    "stated_counts": {
+     "condition": 1
+    },
+    "statement_fold": "925e7ccd2e29b3f1984f966e968bdef47d0d22d2b85b8e0205a39d6a5a7ff0be"
+   },
+   "input": "inputs/a-commit-1900--with-claims--not-a-list.json",
+   "listing_classes": null,
+   "reason": "every required class was stated to this counterparty",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "fold": "5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564",
+    "listing_classes": null,
+    "missing_classes": [],
+    "prior_counts": {
+     "condition": 0
+    },
+    "scope": {
+     "deal_id": "deal-ee96d9979e9e9316",
+     "operator": "synthetic-seller",
+     "target": "payee-fp:hmac-sha256-chain-key:3b5cc5b96e8659031ddc0d5c6b52ce45ad432d9f48fb6ce8c356baea670e59b3"
+    },
+    "stated_counts": {
+     "condition": 1
+    },
+    "statement_fold": "925e7ccd2e29b3f1984f966e968bdef47d0d22d2b85b8e0205a39d6a5a7ff0be"
+   },
+   "input": "inputs/a-commit-1900--with-claims--bad-token.json",
+   "listing_classes": null,
+   "reason": "every required class was stated to this counterparty",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "fold": "5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564",
+    "listing_classes": null,
+    "missing_classes": [],
+    "prior_counts": {
+     "condition": 0
+    },
+    "scope": {
+     "deal_id": "deal-ee96d9979e9e9316",
+     "operator": "synthetic-seller",
+     "target": "payee-fp:hmac-sha256-chain-key:3b5cc5b96e8659031ddc0d5c6b52ce45ad432d9f48fb6ce8c356baea670e59b3"
+    },
+    "stated_counts": {
+     "condition": 1
+    },
+    "statement_fold": "925e7ccd2e29b3f1984f966e968bdef47d0d22d2b85b8e0205a39d6a5a7ff0be"
+   },
+   "input": "inputs/a-commit-1900--with-claims--not-strings.json",
+   "listing_classes": null,
+   "reason": "every required class was stated to this counterparty",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "fold": "5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564",
+    "listing_classes": null,
+    "missing_classes": [
+     "condition"
+    ],
+    "prior_counts": {
+     "condition": 0
+    },
+    "scope": {
+     "deal_id": "deal-ee96d9979e9e9316",
+     "operator": "synthetic-seller",
+     "target": "payee-fp:hmac-sha256-chain-key:3b5cc5b96e8659031ddc0d5c6b52ce45ad432d9f48fb6ce8c356baea670e59b3"
+    },
+    "stated_counts": {
+     "condition": 0
+    },
+    "statement_fold": "925e7ccd2e29b3f1984f966e968bdef47d0d22d2b85b8e0205a39d6a5a7ff0be"
+   },
+   "input": "inputs/a-commit-1900--no-claims--absent.json",
+   "listing_classes": null,
+   "reason": "no accepted prior statement of ['condition'] to this counterparty: make the disclosure first or change the task authority; an approval does not waive it",
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "fold": "5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564",
+    "listing_classes": [],
+    "missing_classes": [
+     "condition"
+    ],
+    "prior_counts": {
+     "condition": 0
+    },
+    "scope": {
+     "deal_id": "deal-ee96d9979e9e9316",
+     "operator": "synthetic-seller",
+     "target": "payee-fp:hmac-sha256-chain-key:3b5cc5b96e8659031ddc0d5c6b52ce45ad432d9f48fb6ce8c356baea670e59b3"
+    },
+    "stated_counts": {
+     "condition": 0
+    },
+    "statement_fold": "925e7ccd2e29b3f1984f966e968bdef47d0d22d2b85b8e0205a39d6a5a7ff0be"
+   },
+   "input": "inputs/a-commit-1900--no-claims--empty.json",
+   "listing_classes": [],
+   "reason": "no accepted prior statement of ['condition'] to this counterparty: make the disclosure first or change the task authority; an approval does not waive it",
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "fold": "5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564",
+    "listing_classes": [
+     "condition"
+    ],
+    "missing_classes": [],
+    "prior_counts": {
+     "condition": 0
+    },
+    "scope": {
+     "deal_id": "deal-ee96d9979e9e9316",
+     "operator": "synthetic-seller",
+     "target": "payee-fp:hmac-sha256-chain-key:3b5cc5b96e8659031ddc0d5c6b52ce45ad432d9f48fb6ce8c356baea670e59b3"
+    },
+    "stated_counts": {
+     "condition": 0
+    },
+    "statement_fold": "925e7ccd2e29b3f1984f966e968bdef47d0d22d2b85b8e0205a39d6a5a7ff0be"
+   },
+   "input": "inputs/a-commit-1900--no-claims--condition.json",
+   "listing_classes": [
+    "condition"
+   ],
+   "reason": "every required class was stated to this counterparty",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "fold": "5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564",
+    "listing_classes": [
+     "condition",
+     "price"
+    ],
+    "missing_classes": [],
+    "prior_counts": {
+     "condition": 0
+    },
+    "scope": {
+     "deal_id": "deal-ee96d9979e9e9316",
+     "operator": "synthetic-seller",
+     "target": "payee-fp:hmac-sha256-chain-key:3b5cc5b96e8659031ddc0d5c6b52ce45ad432d9f48fb6ce8c356baea670e59b3"
+    },
+    "stated_counts": {
+     "condition": 0
+    },
+    "statement_fold": "925e7ccd2e29b3f1984f966e968bdef47d0d22d2b85b8e0205a39d6a5a7ff0be"
+   },
+   "input": "inputs/a-commit-1900--no-claims--condition-price.json",
+   "listing_classes": [
+    "condition",
+    "price"
+   ],
+   "reason": "every required class was stated to this counterparty",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "fold": "5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564",
+    "listing_classes": [
+     "price"
+    ],
+    "missing_classes": [
+     "condition"
+    ],
+    "prior_counts": {
+     "condition": 0
+    },
+    "scope": {
+     "deal_id": "deal-ee96d9979e9e9316",
+     "operator": "synthetic-seller",
+     "target": "payee-fp:hmac-sha256-chain-key:3b5cc5b96e8659031ddc0d5c6b52ce45ad432d9f48fb6ce8c356baea670e59b3"
+    },
+    "stated_counts": {
+     "condition": 0
+    },
+    "statement_fold": "925e7ccd2e29b3f1984f966e968bdef47d0d22d2b85b8e0205a39d6a5a7ff0be"
+   },
+   "input": "inputs/a-commit-1900--no-claims--price.json",
+   "listing_classes": [
+    "price"
+   ],
+   "reason": "no accepted prior statement of ['condition'] to this counterparty: make the disclosure first or change the task authority; an approval does not waive it",
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "fold": "5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564",
+    "listing_classes": [
+     "condition",
+     "price"
+    ],
+    "missing_classes": [],
+    "prior_counts": {
+     "condition": 0
+    },
+    "scope": {
+     "deal_id": "deal-ee96d9979e9e9316",
+     "operator": "synthetic-seller",
+     "target": "payee-fp:hmac-sha256-chain-key:3b5cc5b96e8659031ddc0d5c6b52ce45ad432d9f48fb6ce8c356baea670e59b3"
+    },
+    "stated_counts": {
+     "condition": 0
+    },
+    "statement_fold": "925e7ccd2e29b3f1984f966e968bdef47d0d22d2b85b8e0205a39d6a5a7ff0be"
+   },
+   "input": "inputs/a-commit-1900--no-claims--unsorted.json",
+   "listing_classes": [
+    "condition",
+    "price"
+   ],
+   "reason": "every required class was stated to this counterparty",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "fold": "5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564",
+    "listing_classes": [
+     "condition"
+    ],
+    "missing_classes": [],
+    "prior_counts": {
+     "condition": 0
+    },
+    "scope": {
+     "deal_id": "deal-ee96d9979e9e9316",
+     "operator": "synthetic-seller",
+     "target": "payee-fp:hmac-sha256-chain-key:3b5cc5b96e8659031ddc0d5c6b52ce45ad432d9f48fb6ce8c356baea670e59b3"
+    },
+    "stated_counts": {
+     "condition": 0
+    },
+    "statement_fold": "925e7ccd2e29b3f1984f966e968bdef47d0d22d2b85b8e0205a39d6a5a7ff0be"
+   },
+   "input": "inputs/a-commit-1900--no-claims--twice.json",
+   "listing_classes": [
+    "condition"
+   ],
+   "reason": "every required class was stated to this counterparty",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "fold": "5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564",
+    "listing_classes": null,
+    "missing_classes": [
+     "condition"
+    ],
+    "prior_counts": {
+     "condition": 0
+    },
+    "scope": {
+     "deal_id": "deal-ee96d9979e9e9316",
+     "operator": "synthetic-seller",
+     "target": "payee-fp:hmac-sha256-chain-key:3b5cc5b96e8659031ddc0d5c6b52ce45ad432d9f48fb6ce8c356baea670e59b3"
+    },
+    "stated_counts": {
+     "condition": 0
+    },
+    "statement_fold": "925e7ccd2e29b3f1984f966e968bdef47d0d22d2b85b8e0205a39d6a5a7ff0be"
+   },
+   "input": "inputs/a-commit-1900--no-claims--not-a-list.json",
+   "listing_classes": null,
+   "reason": "no accepted prior statement of ['condition'] to this counterparty: make the disclosure first or change the task authority; an approval does not waive it",
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "fold": "5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564",
+    "listing_classes": null,
+    "missing_classes": [
+     "condition"
+    ],
+    "prior_counts": {
+     "condition": 0
+    },
+    "scope": {
+     "deal_id": "deal-ee96d9979e9e9316",
+     "operator": "synthetic-seller",
+     "target": "payee-fp:hmac-sha256-chain-key:3b5cc5b96e8659031ddc0d5c6b52ce45ad432d9f48fb6ce8c356baea670e59b3"
+    },
+    "stated_counts": {
+     "condition": 0
+    },
+    "statement_fold": "925e7ccd2e29b3f1984f966e968bdef47d0d22d2b85b8e0205a39d6a5a7ff0be"
+   },
+   "input": "inputs/a-commit-1900--no-claims--bad-token.json",
+   "listing_classes": null,
+   "reason": "no accepted prior statement of ['condition'] to this counterparty: make the disclosure first or change the task authority; an approval does not waive it",
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "fold": "5b4d0280892db43c5209629137be8634be01c32d481ae79e005c4a1c6358c564",
+    "listing_classes": null,
+    "missing_classes": [
+     "condition"
+    ],
+    "prior_counts": {
+     "condition": 0
+    },
+    "scope": {
+     "deal_id": "deal-ee96d9979e9e9316",
+     "operator": "synthetic-seller",
+     "target": "payee-fp:hmac-sha256-chain-key:3b5cc5b96e8659031ddc0d5c6b52ce45ad432d9f48fb6ce8c356baea670e59b3"
+    },
+    "stated_counts": {
+     "condition": 0
+    },
+    "statement_fold": "925e7ccd2e29b3f1984f966e968bdef47d0d22d2b85b8e0205a39d6a5a7ff0be"
+   },
+   "input": "inputs/a-commit-1900--no-claims--not-strings.json",
+   "listing_classes": null,
+   "reason": "no accepted prior statement of ['condition'] to this counterparty: make the disclosure first or change the task authority; an approval does not waive it",
+   "result": "fail"
+  }
+ ]
+}

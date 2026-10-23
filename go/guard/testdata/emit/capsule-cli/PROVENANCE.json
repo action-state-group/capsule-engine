@@ -1,0 +1,11 @@
+{
+  "note": "TEST data vendored byte-for-byte from capsule-cli (a synthetic fixture); this sidecar is not part of the vendored bytes.",
+  "source_repo": "action-state-group/capsule-cli",
+  "source_commit": "30510c4b7d2ac8f6b9c93316ffea5dea5c03b4ab",
+  "files": {
+    "02-task-authority.json": {
+      "source_path": "skills/deal/profile/fixtures/positive-typed/02-task-authority.json",
+      "sha256": "62312d0ca80798e8f18fb63e221faf680bb2b50250c5386b3577c8523272429e"
+    }
+  }
+}

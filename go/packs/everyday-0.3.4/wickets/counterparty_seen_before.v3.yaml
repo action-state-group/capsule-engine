@@ -1,0 +1,23 @@
+# counterparty_seen_before wicket, version 3: counterparty_seen_before/2.0.0
+# read against counterparty.seen_before/3.0.0, which also counts an act that
+# asked first and was then approved and executed. Under version 2 a replay
+# never counted one, so a merchant whose first purchase asked stayed
+# first-time on every later purchase. Version 2
+# (counterparty_seen_before.v2.yaml) stays as it was for the packs that pin it.
+#
+# `fold_digest` is the real `definition_digest()` of
+# folds/catalog_defs/counterparty.seen_before.v3.yaml (folds/definition.py);
+# the check refuses to run when the catalog fold does not match it.
+wicket_id: counterparty_seen_before/3.0.0
+check: counterparty_seen_before
+semantics: >-
+  For an action in action_classes, the operator's prior acts addressed to the
+  action's target are counted, leaving dry runs out: an accepted decision, or
+  an act whose check was approved to proceed and then executed. One or more
+  passes; none fails. An act that was declined, or approved and never
+  executed, is not counted. It is not applicable, naming the field, when the
+  action names no target. Any other action class is out of scope.
+config:
+  fold_id: counterparty.seen_before/3.0.0
+  fold_digest: 73dbf8cd8a36fadca0ac823d2b17592fdc457c24081bc44667f032601e914033
+  action_classes: [money.purchase]

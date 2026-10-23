@@ -1,0 +1,656 @@
+{
+ "definition": "action_class_gate/1.2.0",
+ "definition_digest": "39a7c5b94173a4c8496b338028b8680ba20ac65543802c67e419577acce097bf",
+ "vectors": [
+  {
+   "evidence": {
+    "action_class": "disclosure.personal",
+    "consequential": true,
+    "matched_selectors": [
+     "personal_disclosure_new_class",
+     "personal_disclosure_new_party"
+    ],
+    "taxonomy_version": "6",
+    "trigger_class": "DISCLOSE"
+   },
+   "input": "inputs/a-share-phone--buyer--phone--no-repeat--no-told.json",
+   "reason": "action class 'disclosure.personal' matched ['personal_disclosure_new_class', 'personal_disclosure_new_party']",
+   "recipient_told_before": null,
+   "repeat_disclosures": null,
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "action_class": "disclosure.personal",
+    "consequential": true,
+    "matched_selectors": [
+     "personal_disclosure_new_class"
+    ],
+    "taxonomy_version": "6",
+    "trigger_class": "DISCLOSE"
+   },
+   "input": "inputs/a-share-phone--buyer--phone--no-repeat--told.json",
+   "reason": "action class 'disclosure.personal' matched ['personal_disclosure_new_class']",
+   "recipient_told_before": true,
+   "repeat_disclosures": null,
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "action_class": "disclosure.personal",
+    "consequential": true,
+    "matched_selectors": [
+     "personal_disclosure_new_class",
+     "personal_disclosure_new_party"
+    ],
+    "taxonomy_version": "6",
+    "trigger_class": "DISCLOSE"
+   },
+   "input": "inputs/a-share-phone--buyer--phone--no-repeat--not-told.json",
+   "reason": "action class 'disclosure.personal' matched ['personal_disclosure_new_class', 'personal_disclosure_new_party']",
+   "recipient_told_before": false,
+   "repeat_disclosures": null,
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "action_class": "disclosure.personal",
+    "consequential": true,
+    "matched_selectors": [
+     "personal_disclosure_new_class",
+     "personal_disclosure_new_party"
+    ],
+    "taxonomy_version": "6",
+    "trigger_class": "DISCLOSE"
+   },
+   "input": "inputs/a-share-phone--buyer--phone--no-repeat--told-string.json",
+   "reason": "action class 'disclosure.personal' matched ['personal_disclosure_new_class', 'personal_disclosure_new_party']",
+   "recipient_told_before": null,
+   "repeat_disclosures": null,
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "action_class": "disclosure.personal",
+    "consequential": true,
+    "matched_selectors": [
+     "personal_disclosure_new_class",
+     "personal_disclosure_new_party"
+    ],
+    "taxonomy_version": "6",
+    "trigger_class": "DISCLOSE"
+   },
+   "input": "inputs/a-share-phone--buyer--phone--repeat-empty--no-told.json",
+   "reason": "action class 'disclosure.personal' matched ['personal_disclosure_new_class', 'personal_disclosure_new_party']",
+   "recipient_told_before": null,
+   "repeat_disclosures": [],
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "action_class": "disclosure.personal",
+    "consequential": true,
+    "matched_selectors": [
+     "personal_disclosure_new_class"
+    ],
+    "taxonomy_version": "6",
+    "trigger_class": "DISCLOSE"
+   },
+   "input": "inputs/a-share-phone--buyer--phone--repeat-empty--told.json",
+   "reason": "action class 'disclosure.personal' matched ['personal_disclosure_new_class']",
+   "recipient_told_before": true,
+   "repeat_disclosures": [],
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "action_class": "disclosure.personal",
+    "consequential": true,
+    "matched_selectors": [
+     "personal_disclosure_new_class",
+     "personal_disclosure_new_party"
+    ],
+    "taxonomy_version": "6",
+    "trigger_class": "DISCLOSE"
+   },
+   "input": "inputs/a-share-phone--buyer--phone--repeat-empty--not-told.json",
+   "reason": "action class 'disclosure.personal' matched ['personal_disclosure_new_class', 'personal_disclosure_new_party']",
+   "recipient_told_before": false,
+   "repeat_disclosures": [],
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "action_class": "disclosure.personal",
+    "consequential": true,
+    "matched_selectors": [
+     "personal_disclosure_new_class",
+     "personal_disclosure_new_party"
+    ],
+    "taxonomy_version": "6",
+    "trigger_class": "DISCLOSE"
+   },
+   "input": "inputs/a-share-phone--buyer--phone--repeat-empty--told-string.json",
+   "reason": "action class 'disclosure.personal' matched ['personal_disclosure_new_class', 'personal_disclosure_new_party']",
+   "recipient_told_before": null,
+   "repeat_disclosures": [],
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "action_class": "disclosure.personal",
+    "consequential": true,
+    "matched_selectors": [
+     "personal_disclosure_new_party"
+    ],
+    "taxonomy_version": "6",
+    "trigger_class": "DISCLOSE"
+   },
+   "input": "inputs/a-share-phone--buyer--phone--repeat-phone--no-told.json",
+   "reason": "action class 'disclosure.personal' matched ['personal_disclosure_new_party']",
+   "recipient_told_before": null,
+   "repeat_disclosures": [
+    "phone"
+   ],
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "constraint_id": "action_class_gate",
+    "in_scope": false,
+    "missing_field": null
+   },
+   "input": "inputs/a-share-phone--buyer--phone--repeat-phone--told.json",
+   "reason": "the selectors naming action class 'disclosure.personal' leave this action out: every class it discloses was told to this recipient before; this recipient was told something before",
+   "recipient_told_before": true,
+   "repeat_disclosures": [
+    "phone"
+   ],
+   "result": "n/a"
+  },
+  {
+   "evidence": {
+    "action_class": "disclosure.personal",
+    "consequential": true,
+    "matched_selectors": [
+     "personal_disclosure_new_party"
+    ],
+    "taxonomy_version": "6",
+    "trigger_class": "DISCLOSE"
+   },
+   "input": "inputs/a-share-phone--buyer--phone--repeat-phone--not-told.json",
+   "reason": "action class 'disclosure.personal' matched ['personal_disclosure_new_party']",
+   "recipient_told_before": false,
+   "repeat_disclosures": [
+    "phone"
+   ],
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "action_class": "disclosure.personal",
+    "consequential": true,
+    "matched_selectors": [
+     "personal_disclosure_new_party"
+    ],
+    "taxonomy_version": "6",
+    "trigger_class": "DISCLOSE"
+   },
+   "input": "inputs/a-share-phone--buyer--phone--repeat-phone--told-string.json",
+   "reason": "action class 'disclosure.personal' matched ['personal_disclosure_new_party']",
+   "recipient_told_before": null,
+   "repeat_disclosures": [
+    "phone"
+   ],
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "action_class": "disclosure.personal",
+    "consequential": true,
+    "matched_selectors": [
+     "personal_disclosure_new_party"
+    ],
+    "taxonomy_version": "6",
+    "trigger_class": "DISCLOSE"
+   },
+   "input": "inputs/a-share-phone--buyer--phone--repeat-phone-email--no-told.json",
+   "reason": "action class 'disclosure.personal' matched ['personal_disclosure_new_party']",
+   "recipient_told_before": null,
+   "repeat_disclosures": [
+    "email",
+    "phone"
+   ],
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "constraint_id": "action_class_gate",
+    "in_scope": false,
+    "missing_field": null
+   },
+   "input": "inputs/a-share-phone--buyer--phone--repeat-phone-email--told.json",
+   "reason": "the selectors naming action class 'disclosure.personal' leave this action out: every class it discloses was told to this recipient before; this recipient was told something before",
+   "recipient_told_before": true,
+   "repeat_disclosures": [
+    "email",
+    "phone"
+   ],
+   "result": "n/a"
+  },
+  {
+   "evidence": {
+    "action_class": "disclosure.personal",
+    "consequential": true,
+    "matched_selectors": [
+     "personal_disclosure_new_party"
+    ],
+    "taxonomy_version": "6",
+    "trigger_class": "DISCLOSE"
+   },
+   "input": "inputs/a-share-phone--buyer--phone--repeat-phone-email--not-told.json",
+   "reason": "action class 'disclosure.personal' matched ['personal_disclosure_new_party']",
+   "recipient_told_before": false,
+   "repeat_disclosures": [
+    "email",
+    "phone"
+   ],
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "action_class": "disclosure.personal",
+    "consequential": true,
+    "matched_selectors": [
+     "personal_disclosure_new_party"
+    ],
+    "taxonomy_version": "6",
+    "trigger_class": "DISCLOSE"
+   },
+   "input": "inputs/a-share-phone--buyer--phone--repeat-phone-email--told-string.json",
+   "reason": "action class 'disclosure.personal' matched ['personal_disclosure_new_party']",
+   "recipient_told_before": null,
+   "repeat_disclosures": [
+    "email",
+    "phone"
+   ],
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "action_class": "disclosure.personal",
+    "consequential": true,
+    "matched_selectors": [
+     "personal_disclosure_new_class",
+     "personal_disclosure_new_party"
+    ],
+    "taxonomy_version": "6",
+    "trigger_class": "DISCLOSE"
+   },
+   "input": "inputs/a-share-phone--buyer--phone--repeat-email--no-told.json",
+   "reason": "action class 'disclosure.personal' matched ['personal_disclosure_new_class', 'personal_disclosure_new_party']",
+   "recipient_told_before": null,
+   "repeat_disclosures": [
+    "email"
+   ],
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "action_class": "disclosure.personal",
+    "consequential": true,
+    "matched_selectors": [
+     "personal_disclosure_new_class"
+    ],
+    "taxonomy_version": "6",
+    "trigger_class": "DISCLOSE"
+   },
+   "input": "inputs/a-share-phone--buyer--phone--repeat-email--told.json",
+   "reason": "action class 'disclosure.personal' matched ['personal_disclosure_new_class']",
+   "recipient_told_before": true,
+   "repeat_disclosures": [
+    "email"
+   ],
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "action_class": "disclosure.personal",
+    "consequential": true,
+    "matched_selectors": [
+     "personal_disclosure_new_class",
+     "personal_disclosure_new_party"
+    ],
+    "taxonomy_version": "6",
+    "trigger_class": "DISCLOSE"
+   },
+   "input": "inputs/a-share-phone--buyer--phone--repeat-email--not-told.json",
+   "reason": "action class 'disclosure.personal' matched ['personal_disclosure_new_class', 'personal_disclosure_new_party']",
+   "recipient_told_before": false,
+   "repeat_disclosures": [
+    "email"
+   ],
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "action_class": "disclosure.personal",
+    "consequential": true,
+    "matched_selectors": [
+     "personal_disclosure_new_class",
+     "personal_disclosure_new_party"
+    ],
+    "taxonomy_version": "6",
+    "trigger_class": "DISCLOSE"
+   },
+   "input": "inputs/a-share-phone--buyer--phone--repeat-email--told-string.json",
+   "reason": "action class 'disclosure.personal' matched ['personal_disclosure_new_class', 'personal_disclosure_new_party']",
+   "recipient_told_before": null,
+   "repeat_disclosures": [
+    "email"
+   ],
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "action_class": "disclosure.personal",
+    "consequential": true,
+    "matched_selectors": [
+     "personal_disclosure_new_class",
+     "personal_disclosure_new_party"
+    ],
+    "taxonomy_version": "6",
+    "trigger_class": "DISCLOSE"
+   },
+   "input": "inputs/a-share-phone--buyer--phone--repeat-unknown--no-told.json",
+   "reason": "action class 'disclosure.personal' matched ['personal_disclosure_new_class', 'personal_disclosure_new_party']",
+   "recipient_told_before": null,
+   "repeat_disclosures": null,
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "action_class": "disclosure.personal",
+    "consequential": true,
+    "matched_selectors": [
+     "personal_disclosure_new_class"
+    ],
+    "taxonomy_version": "6",
+    "trigger_class": "DISCLOSE"
+   },
+   "input": "inputs/a-share-phone--buyer--phone--repeat-unknown--told.json",
+   "reason": "action class 'disclosure.personal' matched ['personal_disclosure_new_class']",
+   "recipient_told_before": true,
+   "repeat_disclosures": null,
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "action_class": "disclosure.personal",
+    "consequential": true,
+    "matched_selectors": [
+     "personal_disclosure_new_class",
+     "personal_disclosure_new_party"
+    ],
+    "taxonomy_version": "6",
+    "trigger_class": "DISCLOSE"
+   },
+   "input": "inputs/a-share-phone--buyer--phone--repeat-unknown--not-told.json",
+   "reason": "action class 'disclosure.personal' matched ['personal_disclosure_new_class', 'personal_disclosure_new_party']",
+   "recipient_told_before": false,
+   "repeat_disclosures": null,
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "action_class": "disclosure.personal",
+    "consequential": true,
+    "matched_selectors": [
+     "personal_disclosure_new_class",
+     "personal_disclosure_new_party"
+    ],
+    "taxonomy_version": "6",
+    "trigger_class": "DISCLOSE"
+   },
+   "input": "inputs/a-share-phone--buyer--phone--repeat-unknown--told-string.json",
+   "reason": "action class 'disclosure.personal' matched ['personal_disclosure_new_class', 'personal_disclosure_new_party']",
+   "recipient_told_before": null,
+   "repeat_disclosures": null,
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "action_class": "disclosure.personal",
+    "consequential": true,
+    "matched_selectors": [
+     "personal_disclosure_new_class",
+     "personal_disclosure_new_party"
+    ],
+    "taxonomy_version": "6",
+    "trigger_class": "DISCLOSE"
+   },
+   "input": "inputs/a-share-phone--buyer--phone--repeat-string--no-told.json",
+   "reason": "action class 'disclosure.personal' matched ['personal_disclosure_new_class', 'personal_disclosure_new_party']",
+   "recipient_told_before": null,
+   "repeat_disclosures": null,
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "action_class": "disclosure.personal",
+    "consequential": true,
+    "matched_selectors": [
+     "personal_disclosure_new_class"
+    ],
+    "taxonomy_version": "6",
+    "trigger_class": "DISCLOSE"
+   },
+   "input": "inputs/a-share-phone--buyer--phone--repeat-string--told.json",
+   "reason": "action class 'disclosure.personal' matched ['personal_disclosure_new_class']",
+   "recipient_told_before": true,
+   "repeat_disclosures": null,
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "action_class": "disclosure.personal",
+    "consequential": true,
+    "matched_selectors": [
+     "personal_disclosure_new_class",
+     "personal_disclosure_new_party"
+    ],
+    "taxonomy_version": "6",
+    "trigger_class": "DISCLOSE"
+   },
+   "input": "inputs/a-share-phone--buyer--phone--repeat-string--not-told.json",
+   "reason": "action class 'disclosure.personal' matched ['personal_disclosure_new_class', 'personal_disclosure_new_party']",
+   "recipient_told_before": false,
+   "repeat_disclosures": null,
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "action_class": "disclosure.personal",
+    "consequential": true,
+    "matched_selectors": [
+     "personal_disclosure_new_class",
+     "personal_disclosure_new_party"
+    ],
+    "taxonomy_version": "6",
+    "trigger_class": "DISCLOSE"
+   },
+   "input": "inputs/a-share-phone--buyer--phone--repeat-string--told-string.json",
+   "reason": "action class 'disclosure.personal' matched ['personal_disclosure_new_class', 'personal_disclosure_new_party']",
+   "recipient_told_before": null,
+   "repeat_disclosures": null,
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "action_class": "disclosure.personal",
+    "consequential": true,
+    "matched_selectors": [
+     "personal_disclosure_new_class",
+     "personal_disclosure_new_party"
+    ],
+    "taxonomy_version": "6",
+    "trigger_class": "DISCLOSE"
+   },
+   "input": "inputs/a-share-phone--buyer--email-phone--repeat-phone--no-told.json",
+   "reason": "action class 'disclosure.personal' matched ['personal_disclosure_new_class', 'personal_disclosure_new_party']",
+   "recipient_told_before": null,
+   "repeat_disclosures": [
+    "phone"
+   ],
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "action_class": "disclosure.personal",
+    "consequential": true,
+    "matched_selectors": [
+     "personal_disclosure_new_class"
+    ],
+    "taxonomy_version": "6",
+    "trigger_class": "DISCLOSE"
+   },
+   "input": "inputs/a-share-phone--buyer--email-phone--repeat-phone--told.json",
+   "reason": "action class 'disclosure.personal' matched ['personal_disclosure_new_class']",
+   "recipient_told_before": true,
+   "repeat_disclosures": [
+    "phone"
+   ],
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "action_class": "disclosure.personal",
+    "consequential": true,
+    "matched_selectors": [
+     "personal_disclosure_new_party"
+    ],
+    "taxonomy_version": "6",
+    "trigger_class": "DISCLOSE"
+   },
+   "input": "inputs/a-share-phone--buyer--email-phone--repeat-phone-email--no-told.json",
+   "reason": "action class 'disclosure.personal' matched ['personal_disclosure_new_party']",
+   "recipient_told_before": null,
+   "repeat_disclosures": [
+    "email",
+    "phone"
+   ],
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "constraint_id": "action_class_gate",
+    "in_scope": false,
+    "missing_field": null
+   },
+   "input": "inputs/a-share-phone--buyer--email-phone--repeat-phone-email--told.json",
+   "reason": "the selectors naming action class 'disclosure.personal' leave this action out: every class it discloses was told to this recipient before; this recipient was told something before",
+   "recipient_told_before": true,
+   "repeat_disclosures": [
+    "email",
+    "phone"
+   ],
+   "result": "n/a"
+  },
+  {
+   "evidence": {
+    "constraint_id": "action_class_gate",
+    "in_scope": false,
+    "missing_field": null
+   },
+   "input": "inputs/a-share-phone--platform--email--no-repeat--no-told.json",
+   "reason": "the selectors naming action class 'disclosure.personal' leave out recipient_role 'platform'",
+   "recipient_told_before": null,
+   "repeat_disclosures": null,
+   "result": "n/a"
+  },
+  {
+   "evidence": {
+    "constraint_id": "action_class_gate",
+    "in_scope": false,
+    "missing_field": null
+   },
+   "input": "inputs/a-share-phone--platform--email--no-repeat--told.json",
+   "reason": "the selectors naming action class 'disclosure.personal' leave out recipient_role 'platform'",
+   "recipient_told_before": true,
+   "repeat_disclosures": null,
+   "result": "n/a"
+  },
+  {
+   "evidence": {
+    "constraint_id": "action_class_gate",
+    "in_scope": false,
+    "missing_field": null
+   },
+   "input": "inputs/a-share-phone--platform--email--repeat-email--no-told.json",
+   "reason": "the selectors naming action class 'disclosure.personal' leave out recipient_role 'platform'",
+   "recipient_told_before": null,
+   "repeat_disclosures": [
+    "email"
+   ],
+   "result": "n/a"
+  },
+  {
+   "evidence": {
+    "constraint_id": "action_class_gate",
+    "in_scope": false,
+    "missing_field": null
+   },
+   "input": "inputs/a-share-phone--platform--email--repeat-email--told.json",
+   "reason": "the selectors naming action class 'disclosure.personal' leave out recipient_role 'platform'",
+   "recipient_told_before": true,
+   "repeat_disclosures": [
+    "email"
+   ],
+   "result": "n/a"
+  },
+  {
+   "evidence": {
+    "action_class": "disclosure.personal",
+    "consequential": true,
+    "matched_selectors": [
+     "personal_disclosure_new_class"
+    ],
+    "taxonomy_version": "6",
+    "trigger_class": "DISCLOSE"
+   },
+   "input": "inputs/a-share-phone--buyer--no-class--repeat-phone--told.json",
+   "reason": "action class 'disclosure.personal' matched ['personal_disclosure_new_class']",
+   "recipient_told_before": true,
+   "repeat_disclosures": [
+    "phone"
+   ],
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "constraint_id": "action_class_gate",
+    "in_scope": false,
+    "missing_field": null
+   },
+   "input": "inputs/a-commit-1900--none--no-class--no-repeat--no-told.json",
+   "reason": "no selector names this action class",
+   "recipient_told_before": null,
+   "repeat_disclosures": null,
+   "result": "n/a"
+  },
+  {
+   "evidence": {
+    "constraint_id": "action_class_gate",
+    "in_scope": false,
+    "missing_field": null
+   },
+   "input": "inputs/a-commit-1900--none--no-class--repeat-phone--told.json",
+   "reason": "no selector names this action class",
+   "recipient_told_before": true,
+   "repeat_disclosures": [
+    "phone"
+   ],
+   "result": "n/a"
+  }
+ ]
+}

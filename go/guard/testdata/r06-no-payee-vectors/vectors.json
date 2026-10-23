@@ -1,0 +1,547 @@
+{
+ "live": {
+  "0.3.4": {
+   "blank_after_blank_accepted": {
+    "evidence": {
+     "fold": "73dbf8cd8a36fadca0ac823d2b17592fdc457c24081bc44667f032601e914033",
+     "fold_key": {
+      "path": "asg_payload.target",
+      "value": ""
+     },
+     "operator": "r06-no-payee",
+     "prior_count": 1,
+     "seen_before": true
+    },
+    "failing_checks": [],
+    "method": "counterparty.seen_before/3.0.0",
+    "outcome": "allow",
+    "probe_action_class": "money.purchase",
+    "probe_target": "",
+    "reason": "repeat counterparty: 1 accepted prior action(s) for this operator",
+    "result": "pass",
+    "rules": {
+     "r02-ordinary-purchase": "pass",
+     "r06-new-merchant": "pass"
+    },
+    "sealed_evidence_digest": "c19e832f5288eec20c3ac49ba941f24809ab7ef85a24e86ce6bbe252bb11083c",
+    "setup_outcomes": [
+     "allow"
+    ]
+   },
+   "empty_target": {
+    "evidence": {
+     "fold": "73dbf8cd8a36fadca0ac823d2b17592fdc457c24081bc44667f032601e914033",
+     "fold_key": {
+      "path": "asg_payload.target",
+      "value": ""
+     },
+     "operator": "r06-no-payee",
+     "prior_count": 0,
+     "seen_before": false
+    },
+    "failing_checks": [
+     "counterparty_seen_before"
+    ],
+    "method": "counterparty.seen_before/3.0.0",
+    "outcome": "escalate",
+    "probe_action_class": "money.purchase",
+    "probe_target": "",
+    "reason": "first-time counterparty: no accepted prior action for this operator",
+    "result": "fail",
+    "rules": {
+     "r02-ordinary-purchase": "fail",
+     "r06-new-merchant": "fail"
+    },
+    "sealed_evidence_digest": "99e157a0254432d0d0b810ca253eca11b3fa3d237c62e4b8741bf5b6c4b8965f",
+    "setup_outcomes": []
+   },
+   "new_payee": {
+    "evidence": {
+     "fold": "73dbf8cd8a36fadca0ac823d2b17592fdc457c24081bc44667f032601e914033",
+     "fold_key": {
+      "path": "asg_payload.target",
+      "value": "shop/new"
+     },
+     "operator": "r06-no-payee",
+     "prior_count": 0,
+     "seen_before": false
+    },
+    "failing_checks": [
+     "counterparty_seen_before"
+    ],
+    "method": "counterparty.seen_before/3.0.0",
+    "outcome": "escalate",
+    "probe_action_class": "money.purchase",
+    "probe_target": "shop/new",
+    "reason": "first-time counterparty: no accepted prior action for this operator",
+    "result": "fail",
+    "rules": {
+     "r02-ordinary-purchase": "fail",
+     "r06-new-merchant": "fail"
+    },
+    "sealed_evidence_digest": "26833fc0966f59854bc940b27d25997b37475c47556a571b62d28a77808c87da",
+    "setup_outcomes": []
+   },
+   "no_target": {
+    "evidence": {
+     "constraint_id": "counterparty_seen_before",
+     "in_scope": true,
+     "missing_field": "target"
+    },
+    "failing_checks": [],
+    "method": "counterparty.seen_before/3.0.0",
+    "outcome": "allow",
+    "probe_action_class": "money.purchase",
+    "probe_target": null,
+    "reason": "the action names no target; the counterparty could not be identified",
+    "result": "n/a",
+    "rules": {
+     "r02-ordinary-purchase": "n/a",
+     "r06-new-merchant": "n/a"
+    },
+    "sealed_evidence_digest": "d7053b2a52dfc0b0fc11d546252835b31c4e0f4faa1b69e02391b25081e2add3",
+    "setup_outcomes": []
+   },
+   "out_of_scope_class_no_target": {
+    "evidence": {
+     "constraint_id": "counterparty_seen_before",
+     "in_scope": false,
+     "missing_field": null
+    },
+    "failing_checks": [],
+    "method": "counterparty.seen_before/3.0.0",
+    "outcome": "allow",
+    "probe_action_class": "comms.external",
+    "probe_target": null,
+    "reason": "the rule is not configured for this action class",
+    "result": "n/a",
+    "rules": {
+     "r02-ordinary-purchase": "n/a",
+     "r06-new-merchant": "n/a"
+    },
+    "sealed_evidence_digest": "029cd64fa2475bae9a0fd960a7a61c5df24d383fdf1683885fafa87ec448486e",
+    "setup_outcomes": []
+   },
+   "seen_payee": {
+    "evidence": {
+     "fold": "73dbf8cd8a36fadca0ac823d2b17592fdc457c24081bc44667f032601e914033",
+     "fold_key": {
+      "path": "asg_payload.target",
+      "value": "shop/known"
+     },
+     "operator": "r06-no-payee",
+     "prior_count": 1,
+     "seen_before": true
+    },
+    "failing_checks": [],
+    "method": "counterparty.seen_before/3.0.0",
+    "outcome": "allow",
+    "probe_action_class": "money.purchase",
+    "probe_target": "shop/known",
+    "reason": "repeat counterparty: 1 accepted prior action(s) for this operator",
+    "result": "pass",
+    "rules": {
+     "r02-ordinary-purchase": "pass",
+     "r06-new-merchant": "pass"
+    },
+    "sealed_evidence_digest": "4231588503bfe6b9b15c7fd9ffab2f51666c3d31798699a7e16c0ad0ca28dc96",
+    "setup_outcomes": [
+     "allow"
+    ]
+   },
+   "whitespace_target": {
+    "evidence": {
+     "fold": "73dbf8cd8a36fadca0ac823d2b17592fdc457c24081bc44667f032601e914033",
+     "fold_key": {
+      "path": "asg_payload.target",
+      "value": "   "
+     },
+     "operator": "r06-no-payee",
+     "prior_count": 0,
+     "seen_before": false
+    },
+    "failing_checks": [
+     "counterparty_seen_before"
+    ],
+    "method": "counterparty.seen_before/3.0.0",
+    "outcome": "escalate",
+    "probe_action_class": "money.purchase",
+    "probe_target": "   ",
+    "reason": "first-time counterparty: no accepted prior action for this operator",
+    "result": "fail",
+    "rules": {
+     "r02-ordinary-purchase": "fail",
+     "r06-new-merchant": "fail"
+    },
+    "sealed_evidence_digest": "cdf6a9bc4ab5e5d7853b39edfc308fd986a20b3103c764e384bd291396119964",
+    "setup_outcomes": []
+   }
+  },
+  "0.3.5": {
+   "blank_after_blank_accepted": {
+    "evidence": {
+     "missing_field": "target",
+     "operator": "r06-no-payee",
+     "seen_before": false
+    },
+    "failing_checks": [
+     "counterparty_seen_before"
+    ],
+    "method": "counterparty.seen_before/3.0.0",
+    "outcome": "escalate",
+    "probe_action_class": "money.purchase",
+    "probe_target": "",
+    "reason": "no payee named: the action names no target, so the counterparty is read as first-time",
+    "result": "fail",
+    "rules": {
+     "r02-ordinary-purchase": "fail",
+     "r06-new-merchant": "fail"
+    },
+    "sealed_evidence_digest": "f168ab9c9c2923e5d62a5e8fdfb3671da37ef4686aaa755c55f559ba253c5809",
+    "setup_outcomes": [
+     "allow"
+    ]
+   },
+   "empty_target": {
+    "evidence": {
+     "missing_field": "target",
+     "operator": "r06-no-payee",
+     "seen_before": false
+    },
+    "failing_checks": [
+     "counterparty_seen_before"
+    ],
+    "method": "counterparty.seen_before/3.0.0",
+    "outcome": "escalate",
+    "probe_action_class": "money.purchase",
+    "probe_target": "",
+    "reason": "no payee named: the action names no target, so the counterparty is read as first-time",
+    "result": "fail",
+    "rules": {
+     "r02-ordinary-purchase": "fail",
+     "r06-new-merchant": "fail"
+    },
+    "sealed_evidence_digest": "f168ab9c9c2923e5d62a5e8fdfb3671da37ef4686aaa755c55f559ba253c5809",
+    "setup_outcomes": []
+   },
+   "new_payee": {
+    "evidence": {
+     "fold": "73dbf8cd8a36fadca0ac823d2b17592fdc457c24081bc44667f032601e914033",
+     "fold_key": {
+      "path": "asg_payload.target",
+      "value": "shop/new"
+     },
+     "operator": "r06-no-payee",
+     "prior_count": 0,
+     "seen_before": false
+    },
+    "failing_checks": [
+     "counterparty_seen_before"
+    ],
+    "method": "counterparty.seen_before/3.0.0",
+    "outcome": "escalate",
+    "probe_action_class": "money.purchase",
+    "probe_target": "shop/new",
+    "reason": "first-time counterparty: no accepted prior action for this operator",
+    "result": "fail",
+    "rules": {
+     "r02-ordinary-purchase": "fail",
+     "r06-new-merchant": "fail"
+    },
+    "sealed_evidence_digest": "26833fc0966f59854bc940b27d25997b37475c47556a571b62d28a77808c87da",
+    "setup_outcomes": []
+   },
+   "no_target": {
+    "evidence": {
+     "missing_field": "target",
+     "operator": "r06-no-payee",
+     "seen_before": false
+    },
+    "failing_checks": [
+     "counterparty_seen_before"
+    ],
+    "method": "counterparty.seen_before/3.0.0",
+    "outcome": "escalate",
+    "probe_action_class": "money.purchase",
+    "probe_target": null,
+    "reason": "no payee named: the action names no target, so the counterparty is read as first-time",
+    "result": "fail",
+    "rules": {
+     "r02-ordinary-purchase": "fail",
+     "r06-new-merchant": "fail"
+    },
+    "sealed_evidence_digest": "f168ab9c9c2923e5d62a5e8fdfb3671da37ef4686aaa755c55f559ba253c5809",
+    "setup_outcomes": []
+   },
+   "out_of_scope_class_no_target": {
+    "evidence": {
+     "constraint_id": "counterparty_seen_before",
+     "in_scope": false,
+     "missing_field": null
+    },
+    "failing_checks": [],
+    "method": "counterparty.seen_before/3.0.0",
+    "outcome": "allow",
+    "probe_action_class": "comms.external",
+    "probe_target": null,
+    "reason": "the rule is not configured for this action class",
+    "result": "n/a",
+    "rules": {
+     "r02-ordinary-purchase": "n/a",
+     "r06-new-merchant": "n/a"
+    },
+    "sealed_evidence_digest": "029cd64fa2475bae9a0fd960a7a61c5df24d383fdf1683885fafa87ec448486e",
+    "setup_outcomes": []
+   },
+   "seen_payee": {
+    "evidence": {
+     "fold": "73dbf8cd8a36fadca0ac823d2b17592fdc457c24081bc44667f032601e914033",
+     "fold_key": {
+      "path": "asg_payload.target",
+      "value": "shop/known"
+     },
+     "operator": "r06-no-payee",
+     "prior_count": 1,
+     "seen_before": true
+    },
+    "failing_checks": [],
+    "method": "counterparty.seen_before/3.0.0",
+    "outcome": "allow",
+    "probe_action_class": "money.purchase",
+    "probe_target": "shop/known",
+    "reason": "repeat counterparty: 1 accepted prior action(s) for this operator",
+    "result": "pass",
+    "rules": {
+     "r02-ordinary-purchase": "pass",
+     "r06-new-merchant": "pass"
+    },
+    "sealed_evidence_digest": "4231588503bfe6b9b15c7fd9ffab2f51666c3d31798699a7e16c0ad0ca28dc96",
+    "setup_outcomes": [
+     "allow"
+    ]
+   },
+   "whitespace_target": {
+    "evidence": {
+     "missing_field": "target",
+     "operator": "r06-no-payee",
+     "seen_before": false
+    },
+    "failing_checks": [
+     "counterparty_seen_before"
+    ],
+    "method": "counterparty.seen_before/3.0.0",
+    "outcome": "escalate",
+    "probe_action_class": "money.purchase",
+    "probe_target": "   ",
+    "reason": "no payee named: the action names no target, so the counterparty is read as first-time",
+    "result": "fail",
+    "rules": {
+     "r02-ordinary-purchase": "fail",
+     "r06-new-merchant": "fail"
+    },
+    "sealed_evidence_digest": "f168ab9c9c2923e5d62a5e8fdfb3671da37ef4686aaa755c55f559ba253c5809",
+    "setup_outcomes": []
+   }
+  }
+ },
+ "packs": {
+  "0.3.4": {
+   "digest": "cd98aaec5acf8cea86f91fc21dd7df6b36a67c7b55340489b66e6ce88b85117b",
+   "pack_id": "asg/everyday/0.3.4"
+  },
+  "0.3.5": {
+   "digest": "0400d22c4464e91728bac2d00ca3bf8551ec98cdd20ef18d803b5b4432d4e8f4",
+   "pack_id": "asg/everyday/0.3.5"
+  }
+ },
+ "replay_typed": {
+  "0.3.4": {
+   "typed_new_payee": {
+    "evidence": {
+     "fold": "73dbf8cd8a36fadca0ac823d2b17592fdc457c24081bc44667f032601e914033",
+     "fold_key": {
+      "path": "asg_payload.target",
+      "value": "payee-fp:hmac-sha256-chain-key:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+     },
+     "operator": "r06-no-payee",
+     "prior_count": 0,
+     "seen_before": false
+    },
+    "failing_checks": [
+     "counterparty_seen_before"
+    ],
+    "method": "counterparty.seen_before/3.0.0",
+    "outcome": "escalate",
+    "reason": "first-time counterparty: no accepted prior action for this operator",
+    "record": {
+     "at": "2026-10-09T12:00:00Z",
+     "body": {
+      "action": "pay",
+      "action_class": "money.purchase",
+      "amount_minor": 4500,
+      "counterparty": {
+       "fp_alg": "hmac-sha256-chain-key",
+       "ids": {
+        "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+       }
+      },
+      "currency": "USD",
+      "spend_minor": 4500,
+      "taxonomy_version": "6"
+     },
+     "canonicalization": "jcs",
+     "chain_id": "deal-cccccccccccccccc",
+     "seq": 1,
+     "type": "proposed-action/v0"
+    },
+    "result": "fail",
+    "rules": {
+     "r02-ordinary-purchase": "fail",
+     "r06-new-merchant": "fail"
+    },
+    "sealed_evidence_digest": "9ab80799b139fe982fba454d65d6ffaf785fc80c14816cc6555aa418004da5e2"
+   },
+   "typed_no_counterparty": {
+    "evidence": {
+     "constraint_id": "counterparty_seen_before",
+     "in_scope": true,
+     "missing_field": "target"
+    },
+    "failing_checks": [],
+    "method": "counterparty.seen_before/3.0.0",
+    "outcome": "allow",
+    "reason": "the action names no target; the counterparty could not be identified",
+    "record": {
+     "at": "2026-10-09T12:00:00Z",
+     "body": {
+      "action": "pay",
+      "action_class": "money.purchase",
+      "amount_minor": 4500,
+      "currency": "USD",
+      "spend_minor": 4500,
+      "taxonomy_version": "6"
+     },
+     "canonicalization": "jcs",
+     "chain_id": "deal-cccccccccccccccc",
+     "seq": 1,
+     "type": "proposed-action/v0"
+    },
+    "result": "n/a",
+    "rules": {
+     "r02-ordinary-purchase": "n/a",
+     "r06-new-merchant": "n/a"
+    },
+    "sealed_evidence_digest": "d7053b2a52dfc0b0fc11d546252835b31c4e0f4faa1b69e02391b25081e2add3"
+   }
+  },
+  "0.3.5": {
+   "typed_new_payee": {
+    "evidence": {
+     "fold": "73dbf8cd8a36fadca0ac823d2b17592fdc457c24081bc44667f032601e914033",
+     "fold_key": {
+      "path": "asg_payload.target",
+      "value": "payee-fp:hmac-sha256-chain-key:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+     },
+     "operator": "r06-no-payee",
+     "prior_count": 0,
+     "seen_before": false
+    },
+    "failing_checks": [
+     "counterparty_seen_before"
+    ],
+    "method": "counterparty.seen_before/3.0.0",
+    "outcome": "escalate",
+    "reason": "first-time counterparty: no accepted prior action for this operator",
+    "record": {
+     "at": "2026-10-09T12:00:00Z",
+     "body": {
+      "action": "pay",
+      "action_class": "money.purchase",
+      "amount_minor": 4500,
+      "counterparty": {
+       "fp_alg": "hmac-sha256-chain-key",
+       "ids": {
+        "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+       }
+      },
+      "currency": "USD",
+      "spend_minor": 4500,
+      "taxonomy_version": "6"
+     },
+     "canonicalization": "jcs",
+     "chain_id": "deal-cccccccccccccccc",
+     "seq": 1,
+     "type": "proposed-action/v0"
+    },
+    "result": "fail",
+    "rules": {
+     "r02-ordinary-purchase": "fail",
+     "r06-new-merchant": "fail"
+    },
+    "sealed_evidence_digest": "9ab80799b139fe982fba454d65d6ffaf785fc80c14816cc6555aa418004da5e2"
+   },
+   "typed_no_counterparty": {
+    "evidence": {
+     "missing_field": "target",
+     "operator": "r06-no-payee",
+     "seen_before": false
+    },
+    "failing_checks": [
+     "counterparty_seen_before"
+    ],
+    "method": "counterparty.seen_before/3.0.0",
+    "outcome": "escalate",
+    "reason": "no payee named: the action names no target, so the counterparty is read as first-time",
+    "record": {
+     "at": "2026-10-09T12:00:00Z",
+     "body": {
+      "action": "pay",
+      "action_class": "money.purchase",
+      "amount_minor": 4500,
+      "currency": "USD",
+      "spend_minor": 4500,
+      "taxonomy_version": "6"
+     },
+     "canonicalization": "jcs",
+     "chain_id": "deal-cccccccccccccccc",
+     "seq": 1,
+     "type": "proposed-action/v0"
+    },
+    "result": "fail",
+    "rules": {
+     "r02-ordinary-purchase": "fail",
+     "r06-new-merchant": "fail"
+    },
+    "sealed_evidence_digest": "f168ab9c9c2923e5d62a5e8fdfb3671da37ef4686aaa755c55f559ba253c5809"
+   }
+  }
+ },
+ "rule": "counterparty_seen_before/4.0.0 = 3.0.0 + config missing_target: 'unseen' (absent => 'n/a', versions 1-3). Order: class not in action_classes -> n/a (in_scope false); then, under 'unseen', target None OR target.strip()=='' -> fail, reason starts 'no payee named', evidence {missing_field:'target', operator, seen_before:false} (+ ignored_inputs when non-empty), NO fold run, no fold envelope; under 'n/a', target None -> n/a missing_field target (a blank string still runs the fold, unchanged); else the v3 count. Failing csb escalates when the class names an approver.",
+ "wickets": {
+  "counterparty_seen_before/3.0.0": {
+   "canonical_jcs_sha256": "9cfab71d142ca7af8912218f4c4ea194f60fb02784d8536233cb7e18eddc24a8",
+   "config": {
+    "action_classes": [
+     "money.purchase"
+    ],
+    "fold_digest": "73dbf8cd8a36fadca0ac823d2b17592fdc457c24081bc44667f032601e914033",
+    "fold_id": "counterparty.seen_before/3.0.0"
+   },
+   "digest": "9cfab71d142ca7af8912218f4c4ea194f60fb02784d8536233cb7e18eddc24a8",
+   "semantics": "For an action in action_classes, the operator's prior acts addressed to the action's target are counted, leaving dry runs out: an accepted decision, or an act whose check was approved to proceed and then executed. One or more passes; none fails. An act that was declined, or approved and never executed, is not counted. It is not applicable, naming the field, when the action names no target. Any other action class is out of scope."
+  },
+  "counterparty_seen_before/4.0.0": {
+   "canonical_jcs_sha256": "c7c20d9e57cb0a75184b9c6c4d037c9bea813a7b1105c581defd4481acf964b0",
+   "config": {
+    "action_classes": [
+     "money.purchase"
+    ],
+    "fold_digest": "73dbf8cd8a36fadca0ac823d2b17592fdc457c24081bc44667f032601e914033",
+    "fold_id": "counterparty.seen_before/3.0.0",
+    "missing_target": "unseen"
+   },
+   "digest": "c7c20d9e57cb0a75184b9c6c4d037c9bea813a7b1105c581defd4481acf964b0",
+   "semantics": "For an action in action_classes, the operator's prior acts addressed to the action's target are counted, leaving dry runs out: an accepted decision, or an act whose check was approved to proceed and then executed. One or more passes; none fails. An act that was declined, or approved and never executed, is not counted. An action that names no target, or a target that is empty or only whitespace, fails as a first-time counterparty, with the reason no payee named. Any other action class is out of scope."
+  }
+ }
+}

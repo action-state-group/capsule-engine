@@ -1,0 +1,38 @@
+{
+ "bodies": {
+  "purchase-spend-only": {
+   "spend_minor": 2000
+  },
+  "refund-direction-in": {
+   "amount_minor": 500,
+   "direction": "in",
+   "spend_minor": 500
+  },
+  "sale-at-1900-spend-0": {
+   "amount_minor": 190000,
+   "spend_minor": 0
+  },
+  "stated-wrong-shape": {
+   "amount_minor": "190000",
+   "spend_minor": 0
+  }
+ },
+ "floor_cases": {
+  "no-stated-spend-at": [
+   170000,
+   null
+  ],
+  "no-stated-spend-below": [
+   169999,
+   null
+  ],
+  "stated-at-floor": [
+   0,
+   170000
+  ],
+  "stated-below-floor": [
+   0,
+   169999
+  ]
+ }
+}

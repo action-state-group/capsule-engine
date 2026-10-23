@@ -1,0 +1,19 @@
+{
+  "note": "Copied byte for byte; this sidecar is not part of the copied bytes.",
+  "source": "The engine side's vectors for capsule-engine #129 (price_floor reads a sale's stated amount; MANIFEST.sha256 verified), generated from a capsule-engine checkout at 8522efc. The price_floor cases use the engine test's bicycle vector (tests/fixtures/commercial-bounds/vectors.json, sha256 4b85fb3e...e2, capsule-cli's) and its task-authority record (tests/test_price_floor_committed_bounds.py AUTHORITY), which the Go test rebuilds and checks against the digest the evidence names.",
+  "engine_commit": "8522efcd714a6ba96de800e6c7ded5593e928d2d",
+  "files": {
+    "corpus.json": {
+      "sha256": "346f4de93aa1cba592e44d505c3010cffabbf6c6d96e8c3903b7104da1b8014c"
+    },
+    "python-decisions.json": {
+      "sha256": "1af41287270e940e320ec7ed94c4e9469384fd7c964e69b57b20ffa48b575daa"
+    },
+    "generate_python_decisions.py": {
+      "sha256": "720d45820e22208c95fbd76b3d5f3f500c5873ef5c7737e62637748d23ad4a50"
+    },
+    "MANIFEST.sha256": {
+      "sha256": "83bca00c117083f64f5b3ec6c3dccb10cc7f67e59f57f08c0b6282a4ea188ea2"
+    }
+  }
+}

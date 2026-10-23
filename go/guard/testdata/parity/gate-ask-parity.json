@@ -1,0 +1,203 @@
+{
+  "capsule_engine_commit": "7339028ab2117d6c7adec89a26cd5022b8ac7140",
+  "decisions": {
+    "booking-cancel-no-approver-refuses": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "decision": "needs_input",
+      "failing_constraints": [
+        "action_class_gate"
+      ],
+      "failing_rules": [
+        "r17-cancellation"
+      ],
+      "outcome": "escalate",
+      "reason": "escalate: dedupe=pass, caps=n/a, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=fail, counterparty_seen_before=n/a, recipient_role=n/a, refundability=n/a, material_fields_changed=n/a, offer_fields_changed=n/a, recipient_seen_before=n/a, channel_change=n/a, upfront_amount=n/a, task_authority=n/a",
+      "verdict_class": "hitl_dispatched"
+    },
+    "booking-create-asks": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "decision": "needs_input",
+      "failing_constraints": [
+        "action_class_gate"
+      ],
+      "failing_rules": [
+        "r16-booking-with-a-commitment"
+      ],
+      "outcome": "escalate",
+      "reason": "escalate: dedupe=pass, caps=pass, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=fail, counterparty_seen_before=n/a, recipient_role=n/a, refundability=n/a, material_fields_changed=n/a, offer_fields_changed=n/a, recipient_seen_before=n/a, channel_change=n/a, upfront_amount=n/a, task_authority=n/a",
+      "verdict_class": "hitl_dispatched"
+    },
+    "booking-create-r16-never-refuses": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "action_class_gate"
+      ],
+      "failing_rules": [
+        "r16-booking-with-a-commitment"
+      ],
+      "outcome": "deny",
+      "reason": "deny: dedupe=pass, caps=pass, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=fail, counterparty_seen_before=n/a, recipient_role=n/a, refundability=n/a, material_fields_changed=n/a, offer_fields_changed=n/a, recipient_seen_before=n/a, channel_change=n/a, upfront_amount=n/a, task_authority=n/a",
+      "verdict_class": "blocked"
+    },
+    "booking-create-repeat-dedupe-refuses": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "dedupe",
+        "action_class_gate"
+      ],
+      "failing_rules": [
+        "r16-booking-with-a-commitment",
+        "r27-no-commitment-beyond-task-bounds"
+      ],
+      "outcome": "deny",
+      "reason": "deny: dedupe=fail, caps=pass, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=fail, counterparty_seen_before=n/a, recipient_role=n/a, refundability=n/a, material_fields_changed=n/a, offer_fields_changed=n/a, recipient_seen_before=n/a, channel_change=n/a, upfront_amount=n/a, task_authority=n/a",
+      "verdict_class": "blocked"
+    },
+    "data-delete-no-approver-refuses": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "decision": "needs_input",
+      "failing_constraints": [
+        "action_class_gate"
+      ],
+      "failing_rules": [
+        "r18-delete-persistent-data"
+      ],
+      "outcome": "escalate",
+      "reason": "escalate: dedupe=pass, caps=n/a, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=fail, counterparty_seen_before=n/a, recipient_role=n/a, refundability=n/a, material_fields_changed=n/a, offer_fields_changed=n/a, recipient_seen_before=n/a, channel_change=n/a, upfront_amount=n/a, task_authority=n/a",
+      "verdict_class": "hitl_dispatched"
+    },
+    "info-query-passes": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "decision": "accept",
+      "failing_constraints": [],
+      "failing_rules": [],
+      "outcome": "allow",
+      "reason": "allow: dedupe=pass, caps=n/a, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=pass, counterparty_seen_before=n/a, recipient_role=n/a, refundability=n/a, material_fields_changed=n/a, offer_fields_changed=n/a, recipient_seen_before=n/a, channel_change=n/a, upfront_amount=n/a, task_authority=n/a",
+      "verdict_class": null
+    },
+    "off-taxonomy-fails-closed": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "action_class_gate"
+      ],
+      "failing_rules": [
+        "r01-research-and-prepare",
+        "r04-prepare-without-committing",
+        "r11-home-address-to-an-individual",
+        "r12-personal-contact-to-a-new-party",
+        "r15-public-posting",
+        "r16-booking-with-a-commitment",
+        "r17-cancellation",
+        "r18-delete-persistent-data"
+      ],
+      "outcome": "deny",
+      "reason": "deny: dedupe=pass, caps=n/a, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=fail, counterparty_seen_before=n/a, recipient_role=n/a, refundability=n/a, material_fields_changed=n/a, offer_fields_changed=n/a, recipient_seen_before=n/a, channel_change=n/a, upfront_amount=n/a, task_authority=n/a",
+      "verdict_class": "blocked"
+    },
+    "personal-disclosure-no-approver-refuses": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "decision": "needs_input",
+      "failing_constraints": [
+        "action_class_gate"
+      ],
+      "failing_rules": [
+        "r11-home-address-to-an-individual",
+        "r12-personal-contact-to-a-new-party"
+      ],
+      "outcome": "escalate",
+      "reason": "escalate: dedupe=pass, caps=n/a, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=fail, counterparty_seen_before=n/a, recipient_role=n/a, refundability=n/a, material_fields_changed=n/a, offer_fields_changed=n/a, recipient_seen_before=n/a, channel_change=n/a, upfront_amount=n/a, task_authority=n/a",
+      "verdict_class": "hitl_dispatched"
+    },
+    "personal-disclosure-r12-never-leaves-ask-set": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "public_posting"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "action_class_gate"
+      ],
+      "failing_rules": [
+        "r11-home-address-to-an-individual",
+        "r12-personal-contact-to-a-new-party"
+      ],
+      "outcome": "deny",
+      "reason": "deny: dedupe=pass, caps=n/a, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=fail, counterparty_seen_before=n/a, recipient_role=n/a, refundability=n/a, material_fields_changed=n/a, offer_fields_changed=n/a, recipient_seen_before=n/a, channel_change=n/a, upfront_amount=n/a, task_authority=n/a",
+      "verdict_class": "blocked"
+    },
+    "public-posting-no-approver-refuses": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "decision": "needs_input",
+      "failing_constraints": [
+        "action_class_gate"
+      ],
+      "failing_rules": [
+        "r15-public-posting"
+      ],
+      "outcome": "escalate",
+      "reason": "escalate: dedupe=pass, caps=n/a, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=fail, counterparty_seen_before=n/a, recipient_role=n/a, refundability=n/a, material_fields_changed=n/a, offer_fields_changed=n/a, recipient_seen_before=n/a, channel_change=n/a, upfront_amount=n/a, task_authority=n/a",
+      "verdict_class": "hitl_dispatched"
+    }
+  },
+  "pack_definition_digest": "c1cea374102bba60de82e16663c550a278ee07a399c5faeb285fe1ea1ea27d4d",
+  "pack_id": "asg/everyday/0.3.7",
+  "source": "go/guard/testdata/parity/generate_gate_ask.py"
+}

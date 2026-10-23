@@ -1,0 +1,22 @@
+# offer_fields_changed wicket, version 1.1: offer_fields_changed/1.0.0's
+# config with marketplace.sale added to action_classes
+# (guards/checks/field_change_count.py). The rule itself is the `semantics`
+# field below: it is inside the digested body, so rewording it moves the
+# digest. offer_fields_changed/1.0.0 (offer_fields_changed.yaml) stays as it
+# was for the packs that pin it.
+wicket_id: offer_fields_changed/1.1.0
+check: offer_fields_changed
+semantics: >-
+  For an action in action_classes, Action.offer_fields_changed is the
+  producer's count of the fields in counted_fields on which the offer being
+  accepted differs from what the user stated, and Action.offer_fields_basis
+  the SHA-256 over the JCS bytes of the list it counted over. The count is
+  read only when that basis equals the digest of counted_fields as pinned
+  here. A count at or below max_changed passes; above it fails. It is not
+  applicable, naming the field, when the action carries no count, or no basis
+  or one for another list. The fields and their values are never read.
+  marketplace.sale is in scope. Any other action class is out of scope.
+config:
+  action_classes: [money.purchase, money.transfer, money.subscription, booking.create, booking.modify, agreement.accept, marketplace.offer, external_commitment.other, marketplace.sale]
+  counted_fields: [terms.item, terms.quantity, terms.price_minor, terms.deposit_minor, terms.conditions, recourse.refundable]
+  max_changed: 0

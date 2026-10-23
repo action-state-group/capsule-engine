@@ -1,0 +1,52 @@
+# action_class_gate/1.2.0: action_class_gate/1.1.0 (action_class_gate.v1.1.yaml)
+# with its personal_disclosure selector split in two (capsule-engine#188).
+# Each has 1.1.0's match, platform exception included, and one exception of
+# its own from the producer's telling memory: personal_disclosure_new_class
+# does not match when every class disclosed was told to this recipient
+# before (repeat_disclosures), and personal_disclosure_new_party does not
+# match when this recipient was told any class before
+# (recipient_told_before). A missing or malformed input is no exception, so
+# it still asks. Every other selector is 1.1.0's. 1.0.0 and 1.1.0 stay as
+# they were for the records and packs that pin them.
+wicket_id: action_class_gate/1.2.0
+check: action_class_gate
+semantics: >-
+  Each selector matches an action whose canonical action class, trigger
+  class and consequential flag match every one of those keys it sets, unless
+  it sets except_recipient_roles and the action's recipient_role is one of
+  them, it sets except_repeat_disclosures and every class in the action's
+  disclosed_classes is in its repeat_disclosures, or it sets
+  except_recipient_told_before and the action's recipient_told_before is
+  true. An action missing disclosed_classes, repeat_disclosures or
+  recipient_told_before, or carrying one that is malformed, takes no
+  exception that reads it. The check fails when a fail selector matches,
+  else passes when a pass selector matches, else is not applicable. An
+  action whose class has no row in the taxonomy fails. The evidence names
+  every selector that matched.
+config:
+  selectors:
+    non_consequential:
+      consequential: false
+      on_match: pass
+    public_posting:
+      action_classes: [communication.publish]
+      on_match: fail
+    booking_create:
+      action_classes: [booking.create]
+      on_match: fail
+    booking_cancel:
+      action_classes: [booking.cancel]
+      on_match: fail
+    destructive_mutation:
+      trigger_classes: [MUTATE]
+      on_match: fail
+    personal_disclosure_new_class:
+      trigger_classes: [DISCLOSE]
+      except_recipient_roles: [platform]
+      except_repeat_disclosures: true
+      on_match: fail
+    personal_disclosure_new_party:
+      trigger_classes: [DISCLOSE]
+      except_recipient_roles: [platform]
+      except_recipient_told_before: true
+      on_match: fail

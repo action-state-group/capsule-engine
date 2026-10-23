@@ -1,0 +1,4548 @@
+{
+ "capsule_engine_commit": "e0e664de1ede4febae31931579ebe85497b4b120",
+ "decisions": {
+  "caps-at-limit": {
+   "capsule_id": "b2e82b080a9b3846f0c83a887c258e20b65804138c3b01b287af914e6ab04bda",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "0392fc1b7d20df0efa0d70da716bfc7ccb26def512342a8a5c666634df30f3ef",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "299fbc9f7e6847eba5f93de60e12976aaef8f28c0cd4a303096c49daa495e0be",
+     "result": "n/a"
+    },
+    "price_floor": {
+     "evidence_digest": "9d548b915de1ff97c046aa15d2f13fae31884894ff36be4ddba1fc9106988bed",
+     "result": "n/a"
+    },
+    "promise_never": {
+     "evidence_digest": "ff0cab0c159ae1d81c52b65a17e63d9b88fe9bd2aab205cbe60102796beaf77b",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "26999f1f990a56334d343c6c31f6f042c162eef0f2c012d019db39d6826b45af",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "46a692401917ddcf0644832f8a53756b6b2b04dc87e1d4a4625d428ca911e5b5",
+     "result": "n/a"
+    },
+    "single_commitment": {
+     "evidence_digest": "39ec56c6c92be9834f1042500b15fcf814b928782821ff1879834e29066f65df",
+     "result": "n/a"
+    },
+    "task_authority": {
+     "evidence_digest": "3c94a44812b9f227f1da0e8ed27510ad37fccfa3b7c3035fbd75b52901b160fb",
+     "result": "n/a"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "accept",
+   "outcome": "allow"
+  },
+  "caps-dry-run-not-counted": {
+   "capsule_id": "c0c401be92f5e365f16dca49b66714d14b8203b95bb41f6a719858cd44919591",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "2d9516d3bbdc8c115f7eeefed198d2160270046499957b41662f7c5d7f81e535",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "299fbc9f7e6847eba5f93de60e12976aaef8f28c0cd4a303096c49daa495e0be",
+     "result": "n/a"
+    },
+    "price_floor": {
+     "evidence_digest": "9d548b915de1ff97c046aa15d2f13fae31884894ff36be4ddba1fc9106988bed",
+     "result": "n/a"
+    },
+    "promise_never": {
+     "evidence_digest": "ff0cab0c159ae1d81c52b65a17e63d9b88fe9bd2aab205cbe60102796beaf77b",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "26999f1f990a56334d343c6c31f6f042c162eef0f2c012d019db39d6826b45af",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "46a692401917ddcf0644832f8a53756b6b2b04dc87e1d4a4625d428ca911e5b5",
+     "result": "n/a"
+    },
+    "single_commitment": {
+     "evidence_digest": "39ec56c6c92be9834f1042500b15fcf814b928782821ff1879834e29066f65df",
+     "result": "n/a"
+    },
+    "task_authority": {
+     "evidence_digest": "3c94a44812b9f227f1da0e8ed27510ad37fccfa3b7c3035fbd75b52901b160fb",
+     "result": "n/a"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "accept",
+   "outcome": "allow"
+  },
+  "caps-first": {
+   "capsule_id": "ba9004f8a2033e2ccac891fa0768d9c6ff307270629e4648d1ea06b7962e65bc",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "7ad3608ee5469dd49d87124caa66c3bc99cd8e5d47b1752820f50192530ea8c3",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "299fbc9f7e6847eba5f93de60e12976aaef8f28c0cd4a303096c49daa495e0be",
+     "result": "n/a"
+    },
+    "price_floor": {
+     "evidence_digest": "9d548b915de1ff97c046aa15d2f13fae31884894ff36be4ddba1fc9106988bed",
+     "result": "n/a"
+    },
+    "promise_never": {
+     "evidence_digest": "ff0cab0c159ae1d81c52b65a17e63d9b88fe9bd2aab205cbe60102796beaf77b",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "26999f1f990a56334d343c6c31f6f042c162eef0f2c012d019db39d6826b45af",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "46a692401917ddcf0644832f8a53756b6b2b04dc87e1d4a4625d428ca911e5b5",
+     "result": "n/a"
+    },
+    "single_commitment": {
+     "evidence_digest": "39ec56c6c92be9834f1042500b15fcf814b928782821ff1879834e29066f65df",
+     "result": "n/a"
+    },
+    "task_authority": {
+     "evidence_digest": "3c94a44812b9f227f1da0e8ed27510ad37fccfa3b7c3035fbd75b52901b160fb",
+     "result": "n/a"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "accept",
+   "outcome": "allow"
+  },
+  "caps-no-amount": {
+   "capsule_id": "cb29003ef4b99a6760be4c53ccfb090658373f843da59cf750296a10f21a50cd",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "3393caeb607e9acecffb63c9755606ef1596c625fe00bbcf0eb0fde97a5805d1",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "299fbc9f7e6847eba5f93de60e12976aaef8f28c0cd4a303096c49daa495e0be",
+     "result": "n/a"
+    },
+    "price_floor": {
+     "evidence_digest": "9d548b915de1ff97c046aa15d2f13fae31884894ff36be4ddba1fc9106988bed",
+     "result": "n/a"
+    },
+    "promise_never": {
+     "evidence_digest": "ff0cab0c159ae1d81c52b65a17e63d9b88fe9bd2aab205cbe60102796beaf77b",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "26999f1f990a56334d343c6c31f6f042c162eef0f2c012d019db39d6826b45af",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "46a692401917ddcf0644832f8a53756b6b2b04dc87e1d4a4625d428ca911e5b5",
+     "result": "n/a"
+    },
+    "single_commitment": {
+     "evidence_digest": "39ec56c6c92be9834f1042500b15fcf814b928782821ff1879834e29066f65df",
+     "result": "n/a"
+    },
+    "task_authority": {
+     "evidence_digest": "3c94a44812b9f227f1da0e8ed27510ad37fccfa3b7c3035fbd75b52901b160fb",
+     "result": "n/a"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "accept",
+   "outcome": "allow"
+  },
+  "caps-other-developer": {
+   "capsule_id": "ce3ea42a9180f3cf111f3b0b0874fba91a06023b29b5c39b17b292363085b856",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "751ade4bfb29a7807aa415d00808f586e6e76c23ec49793eceb063eb1f65271e",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "299fbc9f7e6847eba5f93de60e12976aaef8f28c0cd4a303096c49daa495e0be",
+     "result": "n/a"
+    },
+    "price_floor": {
+     "evidence_digest": "9d548b915de1ff97c046aa15d2f13fae31884894ff36be4ddba1fc9106988bed",
+     "result": "n/a"
+    },
+    "promise_never": {
+     "evidence_digest": "ff0cab0c159ae1d81c52b65a17e63d9b88fe9bd2aab205cbe60102796beaf77b",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "26999f1f990a56334d343c6c31f6f042c162eef0f2c012d019db39d6826b45af",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "46a692401917ddcf0644832f8a53756b6b2b04dc87e1d4a4625d428ca911e5b5",
+     "result": "n/a"
+    },
+    "single_commitment": {
+     "evidence_digest": "39ec56c6c92be9834f1042500b15fcf814b928782821ff1879834e29066f65df",
+     "result": "n/a"
+    },
+    "task_authority": {
+     "evidence_digest": "3c94a44812b9f227f1da0e8ed27510ad37fccfa3b7c3035fbd75b52901b160fb",
+     "result": "n/a"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "accept",
+   "outcome": "allow"
+  },
+  "caps-out-of-class": {
+   "capsule_id": "592e88a12a9ccbde2ae2018ab600d7376a459896db168ab3cbeb37b8f5a4af72",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "e6f42f541f44868f8cf8e5606db62527f43fd0da42ff62aa266640383c10ee90",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "aeffdd1ec4df6c49d0bb4f5ed2a02fd0bb223ff94b0235f0c8861f60665424c5",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "5c75df029be34de92a6f75e1b520e724453984177677dff7f7c8c59691626905",
+     "result": "pass"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "bec525fb32cc2ec1af31cda123fbf41a79069639046912b9cd81c0415d630719",
+     "result": "fail"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "reject",
+   "outcome": "deny"
+  },
+  "caps-over": {
+   "capsule_id": "72e30a36053e7db8d6b79fa8249b3837656faa1f8aa0a306fa4bb5cd3f6dbed8",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "4021a7ef60802ba0807a61ddc0c50d768cc7aab3f38663240b8ee3988baf89ef",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "299fbc9f7e6847eba5f93de60e12976aaef8f28c0cd4a303096c49daa495e0be",
+     "result": "n/a"
+    },
+    "price_floor": {
+     "evidence_digest": "9d548b915de1ff97c046aa15d2f13fae31884894ff36be4ddba1fc9106988bed",
+     "result": "n/a"
+    },
+    "promise_never": {
+     "evidence_digest": "ff0cab0c159ae1d81c52b65a17e63d9b88fe9bd2aab205cbe60102796beaf77b",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "26999f1f990a56334d343c6c31f6f042c162eef0f2c012d019db39d6826b45af",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "46a692401917ddcf0644832f8a53756b6b2b04dc87e1d4a4625d428ca911e5b5",
+     "result": "n/a"
+    },
+    "single_commitment": {
+     "evidence_digest": "39ec56c6c92be9834f1042500b15fcf814b928782821ff1879834e29066f65df",
+     "result": "n/a"
+    },
+    "task_authority": {
+     "evidence_digest": "3c94a44812b9f227f1da0e8ed27510ad37fccfa3b7c3035fbd75b52901b160fb",
+     "result": "n/a"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "accept",
+   "outcome": "allow"
+  },
+  "caps-second": {
+   "capsule_id": "996ad96141193598b4c8368bc1c9cddc8ef3af98e84d60b84ed0b3c74374387e",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "ee71956a444aadaf92315ebba8f9752231acbb8f0f922fc33a579cab3ae838ad",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "299fbc9f7e6847eba5f93de60e12976aaef8f28c0cd4a303096c49daa495e0be",
+     "result": "n/a"
+    },
+    "price_floor": {
+     "evidence_digest": "9d548b915de1ff97c046aa15d2f13fae31884894ff36be4ddba1fc9106988bed",
+     "result": "n/a"
+    },
+    "promise_never": {
+     "evidence_digest": "ff0cab0c159ae1d81c52b65a17e63d9b88fe9bd2aab205cbe60102796beaf77b",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "26999f1f990a56334d343c6c31f6f042c162eef0f2c012d019db39d6826b45af",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "46a692401917ddcf0644832f8a53756b6b2b04dc87e1d4a4625d428ca911e5b5",
+     "result": "n/a"
+    },
+    "single_commitment": {
+     "evidence_digest": "39ec56c6c92be9834f1042500b15fcf814b928782821ff1879834e29066f65df",
+     "result": "n/a"
+    },
+    "task_authority": {
+     "evidence_digest": "3c94a44812b9f227f1da0e8ed27510ad37fccfa3b7c3035fbd75b52901b160fb",
+     "result": "n/a"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "accept",
+   "outcome": "allow"
+  },
+  "caps-window-edge": {
+   "capsule_id": "2a97078c66f6b1232b7fd49a2a1ef6af87e43aeebae782569492a7d651859adf",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "88bfba8dfe6f51cac196bb6118e1257025518b0f5e23d4c417d8952fbff986e2",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "299fbc9f7e6847eba5f93de60e12976aaef8f28c0cd4a303096c49daa495e0be",
+     "result": "n/a"
+    },
+    "price_floor": {
+     "evidence_digest": "9d548b915de1ff97c046aa15d2f13fae31884894ff36be4ddba1fc9106988bed",
+     "result": "n/a"
+    },
+    "promise_never": {
+     "evidence_digest": "ff0cab0c159ae1d81c52b65a17e63d9b88fe9bd2aab205cbe60102796beaf77b",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "26999f1f990a56334d343c6c31f6f042c162eef0f2c012d019db39d6826b45af",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "46a692401917ddcf0644832f8a53756b6b2b04dc87e1d4a4625d428ca911e5b5",
+     "result": "n/a"
+    },
+    "single_commitment": {
+     "evidence_digest": "39ec56c6c92be9834f1042500b15fcf814b928782821ff1879834e29066f65df",
+     "result": "n/a"
+    },
+    "task_authority": {
+     "evidence_digest": "3c94a44812b9f227f1da0e8ed27510ad37fccfa3b7c3035fbd75b52901b160fb",
+     "result": "n/a"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "accept",
+   "outcome": "allow"
+  },
+  "caps-window-passed": {
+   "capsule_id": "8d281902939261dbc4146dedb09207013647982b079285ac1d580f3bb8d5dcd2",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "d77fddb5840d37653fd65bba362d237d152b9578a1d9ed3da0954782a365c863",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "299fbc9f7e6847eba5f93de60e12976aaef8f28c0cd4a303096c49daa495e0be",
+     "result": "n/a"
+    },
+    "price_floor": {
+     "evidence_digest": "9d548b915de1ff97c046aa15d2f13fae31884894ff36be4ddba1fc9106988bed",
+     "result": "n/a"
+    },
+    "promise_never": {
+     "evidence_digest": "ff0cab0c159ae1d81c52b65a17e63d9b88fe9bd2aab205cbe60102796beaf77b",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "26999f1f990a56334d343c6c31f6f042c162eef0f2c012d019db39d6826b45af",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "46a692401917ddcf0644832f8a53756b6b2b04dc87e1d4a4625d428ca911e5b5",
+     "result": "n/a"
+    },
+    "single_commitment": {
+     "evidence_digest": "39ec56c6c92be9834f1042500b15fcf814b928782821ff1879834e29066f65df",
+     "result": "n/a"
+    },
+    "task_authority": {
+     "evidence_digest": "3c94a44812b9f227f1da0e8ed27510ad37fccfa3b7c3035fbd75b52901b160fb",
+     "result": "n/a"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "accept",
+   "outcome": "allow"
+  },
+  "condition-to-a": {
+   "capsule_id": "b4eb12f6ecba886918537b7274a652dcff999adc93179f7bdfd048e5a3b84396",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "ff7d86a0f57f8f1422f4cb43b2b4e1c478a1b7c904fa7c2413058a229949c905",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "299fbc9f7e6847eba5f93de60e12976aaef8f28c0cd4a303096c49daa495e0be",
+     "result": "n/a"
+    },
+    "price_floor": {
+     "evidence_digest": "9d548b915de1ff97c046aa15d2f13fae31884894ff36be4ddba1fc9106988bed",
+     "result": "n/a"
+    },
+    "promise_never": {
+     "evidence_digest": "fd560e92b88714a0ef791543ac543185cb7d0759fe552ac6ce9a21123199ee27",
+     "result": "pass"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "0f027c4313f4e064be018bd667b9e19d8da91be5f602161ee021a7fdb3c8f940",
+     "result": "pass"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "46a692401917ddcf0644832f8a53756b6b2b04dc87e1d4a4625d428ca911e5b5",
+     "result": "n/a"
+    },
+    "single_commitment": {
+     "evidence_digest": "39ec56c6c92be9834f1042500b15fcf814b928782821ff1879834e29066f65df",
+     "result": "n/a"
+    },
+    "task_authority": {
+     "evidence_digest": "c41e4b3a2077a40320e10ad50ccbfe5cc0efe57bd2d3dfe235357c61e8d051b9",
+     "result": "n/a"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "accept",
+   "outcome": "allow"
+  },
+  "condition-to-b": {
+   "capsule_id": "68d6a89053c2f8d6ac26e38ff2b8ef57cde9c6c358ca053324af2c54e101f2fd",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "fc0ad1dafcb2071aab57b02f978c8df4b451dc04c49e31e9914367b16452dea7",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "299fbc9f7e6847eba5f93de60e12976aaef8f28c0cd4a303096c49daa495e0be",
+     "result": "n/a"
+    },
+    "price_floor": {
+     "evidence_digest": "9d548b915de1ff97c046aa15d2f13fae31884894ff36be4ddba1fc9106988bed",
+     "result": "n/a"
+    },
+    "promise_never": {
+     "evidence_digest": "fd560e92b88714a0ef791543ac543185cb7d0759fe552ac6ce9a21123199ee27",
+     "result": "pass"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "0f027c4313f4e064be018bd667b9e19d8da91be5f602161ee021a7fdb3c8f940",
+     "result": "pass"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "46a692401917ddcf0644832f8a53756b6b2b04dc87e1d4a4625d428ca911e5b5",
+     "result": "n/a"
+    },
+    "single_commitment": {
+     "evidence_digest": "39ec56c6c92be9834f1042500b15fcf814b928782821ff1879834e29066f65df",
+     "result": "n/a"
+    },
+    "task_authority": {
+     "evidence_digest": "c41e4b3a2077a40320e10ad50ccbfe5cc0efe57bd2d3dfe235357c61e8d051b9",
+     "result": "n/a"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "accept",
+   "outcome": "allow"
+  },
+  "condition-to-c": {
+   "capsule_id": "ee46e8d147d67a8386ce4c4382c4d52085ea8c7c5d5d45c06c650abcd79089c4",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "8bd54049b22081c69c5b2c7266505416891234bde4953beed3d3f655c012ff65",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "299fbc9f7e6847eba5f93de60e12976aaef8f28c0cd4a303096c49daa495e0be",
+     "result": "n/a"
+    },
+    "price_floor": {
+     "evidence_digest": "9d548b915de1ff97c046aa15d2f13fae31884894ff36be4ddba1fc9106988bed",
+     "result": "n/a"
+    },
+    "promise_never": {
+     "evidence_digest": "fd560e92b88714a0ef791543ac543185cb7d0759fe552ac6ce9a21123199ee27",
+     "result": "pass"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "0f027c4313f4e064be018bd667b9e19d8da91be5f602161ee021a7fdb3c8f940",
+     "result": "pass"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "46a692401917ddcf0644832f8a53756b6b2b04dc87e1d4a4625d428ca911e5b5",
+     "result": "n/a"
+    },
+    "single_commitment": {
+     "evidence_digest": "39ec56c6c92be9834f1042500b15fcf814b928782821ff1879834e29066f65df",
+     "result": "n/a"
+    },
+    "task_authority": {
+     "evidence_digest": "c41e4b3a2077a40320e10ad50ccbfe5cc0efe57bd2d3dfe235357c61e8d051b9",
+     "result": "n/a"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "accept",
+   "outcome": "allow"
+  },
+  "oe-at-limit": {
+   "capsule_id": "c5a5701d01fa8d79ef55439d78757f40b19202ac6d734b51f345a10d818e5b44",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "7bd53e28f6b23ca157f09212fd76b17024138a55b4b4967d943fd14d17cbbe2e",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "1578f097461cd433aa0975c1e3fee5d549dcf05c996b327dabc565ac67ffa3a2",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "b579de3f6c776c32ae05ba77b4e666e38a82a427995f380a6acfe693dd1aeeab",
+     "result": "pass"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "accept",
+   "outcome": "allow"
+  },
+  "oe-fraction": {
+   "capsule_id": "7e7c8decbc0a976789bfd5564eb55e77522e1c36915c9e8ad3cbf1b42588b5d3",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "9b7b883a63f11c998af7672911446a09343e905def6bd0d65da4a9f0c060962c",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "c0bb380d6367ff0e65a3b6074abc261a1fe275d8909f0b3945905d2af45fb983",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "b579de3f6c776c32ae05ba77b4e666e38a82a427995f380a6acfe693dd1aeeab",
+     "result": "pass"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "accept",
+   "outcome": "allow"
+  },
+  "oe-fraction-both": {
+   "capsule_id": "56348d0f41ce226062a8b3eec5fc1a28be85f4033b504aea1ff8717d40b55767",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "74540635c7a6d6ea8ba580b1edd0893789a7a15ebc50af78f355844fe19e1f25",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "d6142440a52bb9344a7fa79d59786b6a15a185a9a5fed5bd5b1a2dc2698ed2c4",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "b579de3f6c776c32ae05ba77b4e666e38a82a427995f380a6acfe693dd1aeeab",
+     "result": "pass"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "accept",
+   "outcome": "allow"
+  },
+  "oe-fresh": {
+   "capsule_id": "61e5eefe94583961e01c0f97ef890f1755da76c1d4dba06b0ac836680f7772ef",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "5534c651cdac35dd03902fc635c0c872fa8aef8bf2a06a83400c9f8279fdb0ee",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "4b913393556df25713b617b25ce6e9a0557bda6034cfe0df5499a470bbd7c05a",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "b579de3f6c776c32ae05ba77b4e666e38a82a427995f380a6acfe693dd1aeeab",
+     "result": "pass"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "accept",
+   "outcome": "allow"
+  },
+  "oe-half-second-later": {
+   "capsule_id": "1ff2610097110618d13d0a1dbac282dcc4dc1e4e2b6f171bc50089fa69058b98",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "6c3de00c191451dbbd9306019a33c4af6c40970a1bccf5c62bb601bd46ac2b91",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "7392286ba24565ff03fb9cb5e3e97f8a6cb4b1b4bc38672d31c54f3661cd6fd5",
+     "result": "fail"
+    },
+    "price_floor": {
+     "evidence_digest": "b579de3f6c776c32ae05ba77b4e666e38a82a427995f380a6acfe693dd1aeeab",
+     "result": "pass"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "needs_input",
+   "outcome": "escalate"
+  },
+  "oe-hour-24": {
+   "capsule_id": "e70a517da3f4f5765233e8fdbeba2d8eab93ef815c6acafe7777a99b417a6074",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "d84a89b71a503737d8797c84a68d84047a2fcb0cd2057b9951ccb0c8b448f91d",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "7392286ba24565ff03fb9cb5e3e97f8a6cb4b1b4bc38672d31c54f3661cd6fd5",
+     "result": "fail"
+    },
+    "price_floor": {
+     "evidence_digest": "b579de3f6c776c32ae05ba77b4e666e38a82a427995f380a6acfe693dd1aeeab",
+     "result": "pass"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "needs_input",
+   "outcome": "escalate"
+  },
+  "oe-later-than-action": {
+   "capsule_id": "0b6558ee72b85c7bd83018d76cd71dd447dd82a254adca2d1bcf95bde2b38578",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "6f6ff4b439431a11357d00ad3f3b5ff922f911c54f49d9e10bf8172fea7d10fd",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "7392286ba24565ff03fb9cb5e3e97f8a6cb4b1b4bc38672d31c54f3661cd6fd5",
+     "result": "fail"
+    },
+    "price_floor": {
+     "evidence_digest": "b579de3f6c776c32ae05ba77b4e666e38a82a427995f380a6acfe693dd1aeeab",
+     "result": "pass"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "needs_input",
+   "outcome": "escalate"
+  },
+  "oe-leap-second": {
+   "capsule_id": "cdfa97fb1bfa1788eeab18db9ef6514293c7f625ccc31e51cfb9fedaed45924a",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "58580608fba1a21708c51b9f27ac02ef95157aae24642144305bbbefd6a06140",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "7392286ba24565ff03fb9cb5e3e97f8a6cb4b1b4bc38672d31c54f3661cd6fd5",
+     "result": "fail"
+    },
+    "price_floor": {
+     "evidence_digest": "b579de3f6c776c32ae05ba77b4e666e38a82a427995f380a6acfe693dd1aeeab",
+     "result": "pass"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "needs_input",
+   "outcome": "escalate"
+  },
+  "oe-lowercase-z": {
+   "capsule_id": "dc7324e4dd67d6c21c3843db42efffe19137f2b0b32f3959fdcb848026a96eed",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "2a0eaab551745a11196f372c219c9c9faddb85590c004a21970caaa3cc30e4e0",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "7392286ba24565ff03fb9cb5e3e97f8a6cb4b1b4bc38672d31c54f3661cd6fd5",
+     "result": "fail"
+    },
+    "price_floor": {
+     "evidence_digest": "b579de3f6c776c32ae05ba77b4e666e38a82a427995f380a6acfe693dd1aeeab",
+     "result": "pass"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "needs_input",
+   "outcome": "escalate"
+  },
+  "oe-no-proposal": {
+   "capsule_id": "ad3c3a5821f6775c079ddd2ac9859e34abe8d49f746075275782ffeda1cfc977",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "1612866d0926c3f3a473c2a8b6edce1c0f67fc3b3b29ad561031036e2b3bfc96",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "7392286ba24565ff03fb9cb5e3e97f8a6cb4b1b4bc38672d31c54f3661cd6fd5",
+     "result": "fail"
+    },
+    "price_floor": {
+     "evidence_digest": "b579de3f6c776c32ae05ba77b4e666e38a82a427995f380a6acfe693dd1aeeab",
+     "result": "pass"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "needs_input",
+   "outcome": "escalate"
+  },
+  "oe-no-such-day": {
+   "capsule_id": "8628f91447233762f19243ed96aeed4e38c0260182b0ee5835b683d60dec6354",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "a86deaa5f77063f0410bc204cf65f0fc0c419fd46357a289f8b0bd58892f410f",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "7392286ba24565ff03fb9cb5e3e97f8a6cb4b1b4bc38672d31c54f3661cd6fd5",
+     "result": "fail"
+    },
+    "price_floor": {
+     "evidence_digest": "b579de3f6c776c32ae05ba77b4e666e38a82a427995f380a6acfe693dd1aeeab",
+     "result": "pass"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "needs_input",
+   "outcome": "escalate"
+  },
+  "oe-not-utc": {
+   "capsule_id": "46e7ee2e18cb43069e7b5e9e0d85b3ffaef29a2df50b07fd067cd3642a200eb5",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "99df8505200680f4a5290004dfff14fd938e7d293227b2021f6ec627621bd2b5",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "7392286ba24565ff03fb9cb5e3e97f8a6cb4b1b4bc38672d31c54f3661cd6fd5",
+     "result": "fail"
+    },
+    "price_floor": {
+     "evidence_digest": "b579de3f6c776c32ae05ba77b4e666e38a82a427995f380a6acfe693dd1aeeab",
+     "result": "pass"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "needs_input",
+   "outcome": "escalate"
+  },
+  "oe-other-digits": {
+   "capsule_id": "fd8f26d0395338d852d28e26182000ffa11c38ea05c11183aeed6994d0b5a729",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "305a532c90d8f6f3c15913e4d2f029f00d5b8497191b2d25ebed0d8879c56bed",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "7392286ba24565ff03fb9cb5e3e97f8a6cb4b1b4bc38672d31c54f3661cd6fd5",
+     "result": "fail"
+    },
+    "price_floor": {
+     "evidence_digest": "b579de3f6c776c32ae05ba77b4e666e38a82a427995f380a6acfe693dd1aeeab",
+     "result": "pass"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "needs_input",
+   "outcome": "escalate"
+  },
+  "oe-out-of-class": {
+   "capsule_id": "6096bd2dbb6eb3649297756eb0d6dc94466528621f7390041cf7c719d448cd6f",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "29586628ae9a14e6b8d63719f263ef489266c89fcfb95534094844c14ed0e4d8",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "299fbc9f7e6847eba5f93de60e12976aaef8f28c0cd4a303096c49daa495e0be",
+     "result": "n/a"
+    },
+    "price_floor": {
+     "evidence_digest": "9d548b915de1ff97c046aa15d2f13fae31884894ff36be4ddba1fc9106988bed",
+     "result": "n/a"
+    },
+    "promise_never": {
+     "evidence_digest": "93f505f0bdf8e34c02f647bdd8615b791c1870465662625966cd2f0cb96a9095",
+     "result": "pass"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "1b6d6d734d298caaf8c2430063593a47d85a498a20e146853cb3ae8c275e902d",
+     "result": "pass"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "46a692401917ddcf0644832f8a53756b6b2b04dc87e1d4a4625d428ca911e5b5",
+     "result": "n/a"
+    },
+    "single_commitment": {
+     "evidence_digest": "39ec56c6c92be9834f1042500b15fcf814b928782821ff1879834e29066f65df",
+     "result": "n/a"
+    },
+    "task_authority": {
+     "evidence_digest": "c41e4b3a2077a40320e10ad50ccbfe5cc0efe57bd2d3dfe235357c61e8d051b9",
+     "result": "n/a"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "accept",
+   "outcome": "allow"
+  },
+  "oe-past-limit": {
+   "capsule_id": "24bcebf578f8a99fa628c41e067ec8dae9ef81abf7ad3e91fc9af39e262776f1",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "44e16f4b7ccd1e751667070fb424bc6c3fd486acbae6ab884dbd183780901896",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "074ad154e19977a88e522262e1587eb7b41b3b81b4ece0181bdfc681fabfcac2",
+     "result": "fail"
+    },
+    "price_floor": {
+     "evidence_digest": "b579de3f6c776c32ae05ba77b4e666e38a82a427995f380a6acfe693dd1aeeab",
+     "result": "pass"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "needs_input",
+   "outcome": "escalate"
+  },
+  "oe-same-instant": {
+   "capsule_id": "d29cdd01110d80efb27496cbfb466503be96f464a6c4bd2ecaefab14268dacc8",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "1071ca858dcf26264367fd2f4c6ce13cc624f3e93386edc8ea3eb745858042c3",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "d474176094ab2d015c88925b9b15be533b14afc6c1e75837439398a791db9c69",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "b579de3f6c776c32ae05ba77b4e666e38a82a427995f380a6acfe693dd1aeeab",
+     "result": "pass"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "accept",
+   "outcome": "allow"
+  },
+  "oe-seven-digits": {
+   "capsule_id": "67f88bcb02c987fd3609fedffb3fc775c385cf3cac0206ac70e221f49546ae04",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "a24a84a684bfa576451c08d2b1bb7ec839b245d363e5eb2b970959afeb532072",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "7392286ba24565ff03fb9cb5e3e97f8a6cb4b1b4bc38672d31c54f3661cd6fd5",
+     "result": "fail"
+    },
+    "price_floor": {
+     "evidence_digest": "b579de3f6c776c32ae05ba77b4e666e38a82a427995f380a6acfe693dd1aeeab",
+     "result": "pass"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "needs_input",
+   "outcome": "escalate"
+  },
+  "oe-space": {
+   "capsule_id": "3a1364662e28d95a55c5588e7fe7132cf553394d5a94c509d8aac2ebfc6c2ac0",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "786b4d84ac6c681d81a7d97b0eb4dcd836db6a2b9d2206e0c6640157ab0a43c0",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "7392286ba24565ff03fb9cb5e3e97f8a6cb4b1b4bc38672d31c54f3661cd6fd5",
+     "result": "fail"
+    },
+    "price_floor": {
+     "evidence_digest": "b579de3f6c776c32ae05ba77b4e666e38a82a427995f380a6acfe693dd1aeeab",
+     "result": "pass"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "needs_input",
+   "outcome": "escalate"
+  },
+  "oe-trailing-newline": {
+   "capsule_id": "49e6504c6e820a2c365d2430ae2b59afe03895fe7e03a76e386d8d49ad5904af",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "d2fef99a7535f0342eed9edc996e487608e533629e53469464649219558ffe4c",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "7392286ba24565ff03fb9cb5e3e97f8a6cb4b1b4bc38672d31c54f3661cd6fd5",
+     "result": "fail"
+    },
+    "price_floor": {
+     "evidence_digest": "b579de3f6c776c32ae05ba77b4e666e38a82a427995f380a6acfe693dd1aeeab",
+     "result": "pass"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "needs_input",
+   "outcome": "escalate"
+  },
+  "oe-year-zero": {
+   "capsule_id": "c4e23c480c8bba260289cae9c9df89e9d2479eaee427b4d99688a3017e094f86",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "95c2f49b1e7aa58826e387adf747b081830f2be16faab0bf43e88c3bb927258c",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "7392286ba24565ff03fb9cb5e3e97f8a6cb4b1b4bc38672d31c54f3661cd6fd5",
+     "result": "fail"
+    },
+    "price_floor": {
+     "evidence_digest": "b579de3f6c776c32ae05ba77b4e666e38a82a427995f380a6acfe693dd1aeeab",
+     "result": "pass"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "needs_input",
+   "outcome": "escalate"
+  },
+  "pf-accept-below": {
+   "capsule_id": "f675043e0c3845c485c5dcc00798e6f28fdfe0c888a155b7a04888ca14f22d96",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "25e2ede77159d9510f2b8d815801e3dd0a56447b8a6dd97f1b5d96c1303859dd",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "ef01520a9fab79530917823f24878b93bc74cae14967fb0750b34745eb237337",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "ca9880db47bc8d1d9c27d06efd5780fe700f0f1374129a28c7454cb4ef3a396c",
+     "result": "fail"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "needs_input",
+   "outcome": "escalate"
+  },
+  "pf-at-floor": {
+   "capsule_id": "cb2069b6734b9f228d0a885261fc7c17967f6eae1ac0837388dbe043ba86a09e",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "008d4955eb55fc900c37c1d5474f390fb00d5fcfd6223b3c83c32e59170bbc64",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "ef01520a9fab79530917823f24878b93bc74cae14967fb0750b34745eb237337",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "5422ec00d5d82937d8034562ab64c3c4f066277d1ce98cb1b5428eea429dcb8d",
+     "result": "pass"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "accept",
+   "outcome": "allow"
+  },
+  "pf-below-floor": {
+   "capsule_id": "e77da5d3360a9512a0c58a288d87a1134a3d8a98f416c52dae1526c2c133cd40",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "f58ece672e81e6afb8a4ec1b7f0facce4b8deaaa4b280edb03836de6e5363ff8",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "ef01520a9fab79530917823f24878b93bc74cae14967fb0750b34745eb237337",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "6a75489db4f46b66c0cbe2e81902f68df934533848ac34dafe2019237287515f",
+     "result": "fail"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "needs_input",
+   "outcome": "escalate"
+  },
+  "pf-bool-floor": {
+   "capsule_id": "2854c737e2418fb4bb2824283e2ed40c2742d840c41fbcf8efa57c74d5c0b163",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "1f7562a457b6ed1966171bee0cb9d730b0fbdcf903a46325b0651cf872261e07",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "ef01520a9fab79530917823f24878b93bc74cae14967fb0750b34745eb237337",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "2446992426967dc8fbcaf2da6f3e0591a5a7f45742d5cfd99be28c05af4d7592",
+     "result": "fail"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "05bbf0ecd95f926a3f087af64645909a7f2af5beb57b314819b5d8406d32b556",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "needs_input",
+   "outcome": "escalate"
+  },
+  "pf-document-not-an-object": {
+   "capsule_id": "1d791a71f275872479f37a2ee594c368fd48c56d5927b04c8075d74df0793975",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "0dd0472f365475254cfcbde8bb31d5616307c246fc06bb713789609c5d5d9b36",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "ef01520a9fab79530917823f24878b93bc74cae14967fb0750b34745eb237337",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "7ed41aedbc4e95f5cc98ae3e5506719fd231e89b98d8c27bb27a5a172f5e4403",
+     "result": "fail"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "needs_input",
+   "outcome": "escalate"
+  },
+  "pf-float-floor": {
+   "capsule_id": "01f98a5470e2985baf07cc66f83a575f6b7710c2b6133bfab4619cd0fbdd3ca3",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "b74de6a1ae71e5f3ef2bce82d782ad4d3717dc2e7b5b8a888577819abfd2e99f",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "ef01520a9fab79530917823f24878b93bc74cae14967fb0750b34745eb237337",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "7ed41aedbc4e95f5cc98ae3e5506719fd231e89b98d8c27bb27a5a172f5e4403",
+     "result": "fail"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "needs_input",
+   "outcome": "escalate"
+  },
+  "pf-lone-surrogate": {
+   "capsule_id": "598112f3dd478efbac8cb4c3a24226df30c5b3d0835362dd095cd176e5a18e84",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "eda760da5a16022e8fe292afbc41a9967e70797c961710c949a360d7703af347",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "ef01520a9fab79530917823f24878b93bc74cae14967fb0750b34745eb237337",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "dc212c3b37658d437ad2d5a2e37d9475b12d5f78f44d2ea56d7d7f0534350544",
+     "result": "fail"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "121c2f32ec3e7d101c0b5b4312e286bb9f7fb8e9306da5fda96453c27baabf95",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "needs_input",
+   "outcome": "escalate"
+  },
+  "pf-malformed-commitment": {
+   "capsule_id": "ce6531ede1a0ffb5bc84d75371fa9d6c9b99c6b03d00e7baab7b82b82bfa84f2",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "4cecd252be6d732a6503f9902584c967911dd0f281617744d8382f97641ee6af",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "ef01520a9fab79530917823f24878b93bc74cae14967fb0750b34745eb237337",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "c4682e814ca4da5d681876ba11b60eb7902d3db7c987826bb5fb605f5c0552a6",
+     "result": "fail"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "f194dbaba70f7589cb17aff93041dea5843af8c40e577e63a303fbb6dced0eef",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "needs_input",
+   "outcome": "escalate"
+  },
+  "pf-negative-floor": {
+   "capsule_id": "c7396a4bce1533be396f377ea8ea39b065f5c72fdf95ac0acb7718fc0e832483",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "f7ab3eed22d5d56a463e40d48e11d5b105e39cdfa06d8f9da5f9359b369ae90f",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "ef01520a9fab79530917823f24878b93bc74cae14967fb0750b34745eb237337",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "ebf3fc6a5bf6bc9a7babcb3f08a5aca41a34ddaf65a15251f8719756ff6b9950",
+     "result": "fail"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "8076df1002ea6a962ea3eac4e0f02e7ecb400292132a37aca133f1acb570289a",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "needs_input",
+   "outcome": "escalate"
+  },
+  "pf-no-amount": {
+   "capsule_id": "a4cc4080b0fcc3da9d54d7a6cdd6eaa948ead6ac089c1ee0abdfb3fa53964d40",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "8940237cf5bd1f28e7d26ae5564185c201b0299e638db4142f22a59cf28fda4e",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "ef01520a9fab79530917823f24878b93bc74cae14967fb0750b34745eb237337",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "b522ff819180a5964005069b41497f28ed252a4fbb9d1d560c88d34dc211c47a",
+     "result": "n/a"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "accept",
+   "outcome": "allow"
+  },
+  "pf-no-floor-committed": {
+   "capsule_id": "1c156aa015ee7377101be51359a43a0ee844d26773abd5b5f7874ca4dbfb93ea",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "b2dd97c42105bbd0e94d3bef5240f32cbb61fda62902dc7df89dd6880863a796",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "ef01520a9fab79530917823f24878b93bc74cae14967fb0750b34745eb237337",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "9d548b915de1ff97c046aa15d2f13fae31884894ff36be4ddba1fc9106988bed",
+     "result": "n/a"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "29f105aadc37362ab7ef41ec680734fb45ab0bf000bd1dbb8ad3848a1d27debd",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "accept",
+   "outcome": "allow"
+  },
+  "pf-no-opening": {
+   "capsule_id": "6797030f186b2058c0d022789850d3a6d64c955f79c936ea527c4460a0603f12",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "9017262cb6218473126923a81f8bd406b46a84072bec77e3d1711a309c762d62",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "ef01520a9fab79530917823f24878b93bc74cae14967fb0750b34745eb237337",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "2db61759404ff7c755dfd36065a31bc10f6aecf71b46b43330bcc333e23a47f5",
+     "result": "n/a"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "accept",
+   "outcome": "allow"
+  },
+  "pf-no-task-ref": {
+   "capsule_id": "f1e671fb12a156e0c8d17e7fa8b7bdb1827078175a21782a57c15f7714ad7bfc",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "3dda3b5d6dbfba3a948e2811de6cfbc486866c3c2a127d6a9d3b66c929e93ef2",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "ef01520a9fab79530917823f24878b93bc74cae14967fb0750b34745eb237337",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "c3de79752971419f8e6e4c3e24d346a40a163980436114f12c6b045f4f4a9137",
+     "result": "n/a"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "1541f8655a86e71acf2683fee46b3cbef82d7cc83da3e89a098549aff0693e2f",
+     "result": "n/a"
+    },
+    "task_authority": {
+     "evidence_digest": "3c94a44812b9f227f1da0e8ed27510ad37fccfa3b7c3035fbd75b52901b160fb",
+     "result": "n/a"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "accept",
+   "outcome": "allow"
+  },
+  "pf-null-body": {
+   "capsule_id": "6551c60e2d6472425f3534c52218d5bd28911cc99fefccc7f8be9525eeab61f5",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "dc9ef697870107a9c9d354ae5df0b83fb6d884f87ec6f63a84492a7cd8a26878",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "ef01520a9fab79530917823f24878b93bc74cae14967fb0750b34745eb237337",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "9d548b915de1ff97c046aa15d2f13fae31884894ff36be4ddba1fc9106988bed",
+     "result": "n/a"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "6e9d343d83a0681a689599d49f20a8f6b08dbdd8c93b51a7fe88cc1f5a2648aa",
+     "result": "n/a"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "accept",
+   "outcome": "allow"
+  },
+  "pf-opening-not-an-object": {
+   "capsule_id": "7be90a36918da862d857a4477030d875d1070017e83192765f27c5832619f81c",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "cf7b74b6eb8614585037f27c2d7f52ba335986aade73f60559e452b931d70d1a",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "ef01520a9fab79530917823f24878b93bc74cae14967fb0750b34745eb237337",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "7ed41aedbc4e95f5cc98ae3e5506719fd231e89b98d8c27bb27a5a172f5e4403",
+     "result": "fail"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "needs_input",
+   "outcome": "escalate"
+  },
+  "pf-other-commitment": {
+   "capsule_id": "f37a68968667ca3723978947733dd7f792d331a568a261b99e555bdc9847b9a5",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "7b904bb6359affcc6739b6107e1021236ed95a812acfd9fff1b06e4466e45cd7",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "ef01520a9fab79530917823f24878b93bc74cae14967fb0750b34745eb237337",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "7ed41aedbc4e95f5cc98ae3e5506719fd231e89b98d8c27bb27a5a172f5e4403",
+     "result": "fail"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "needs_input",
+   "outcome": "escalate"
+  },
+  "pf-other-floor-document": {
+   "capsule_id": "93502d604050132447391578214e7b858461e5b87c1d653c2df9ba6e885a6cdd",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "bff690ce91fbe8e90d1aed7b5ea8183afc658d3858923ccae45d82e459a68ee3",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "ef01520a9fab79530917823f24878b93bc74cae14967fb0750b34745eb237337",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "7ed41aedbc4e95f5cc98ae3e5506719fd231e89b98d8c27bb27a5a172f5e4403",
+     "result": "fail"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "needs_input",
+   "outcome": "escalate"
+  },
+  "pf-other-kind": {
+   "capsule_id": "cbf0ea3292dd5c8d82ae0f0eb49975a98a340683b7f6154e1e8b59e7b2ae4a75",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "eebc34d6a187d69b7ab144219497ec8c561c39ed4d08d5b981f0e3914a5f0618",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "ef01520a9fab79530917823f24878b93bc74cae14967fb0750b34745eb237337",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "59887c05aeb77f5ccb8996072177a6c02dc47af6ff7bbc92e6078c9335e52283",
+     "result": "fail"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "7f605a7423344f46cf3ea468fbf6d9300d0eab4eaec2d2bdf7ce437eda5da504",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "needs_input",
+   "outcome": "escalate"
+  },
+  "pf-out-of-class": {
+   "capsule_id": "654095ef02d9d908e8e92c1e018cfa5b979d26bbf59b73d22a614d06ac8e5d72",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "b9e0d4d5199b2992a10c9a23a8ebfb59c5247112ed4342268205c47f1e6f7da2",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "299fbc9f7e6847eba5f93de60e12976aaef8f28c0cd4a303096c49daa495e0be",
+     "result": "n/a"
+    },
+    "price_floor": {
+     "evidence_digest": "9d548b915de1ff97c046aa15d2f13fae31884894ff36be4ddba1fc9106988bed",
+     "result": "n/a"
+    },
+    "promise_never": {
+     "evidence_digest": "93f505f0bdf8e34c02f647bdd8615b791c1870465662625966cd2f0cb96a9095",
+     "result": "pass"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "6d51faf4733d32962a5fc4ef425ef1ce0569a370de7386311d62864eaf013211",
+     "result": "pass"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "46a692401917ddcf0644832f8a53756b6b2b04dc87e1d4a4625d428ca911e5b5",
+     "result": "n/a"
+    },
+    "single_commitment": {
+     "evidence_digest": "39ec56c6c92be9834f1042500b15fcf814b928782821ff1879834e29066f65df",
+     "result": "n/a"
+    },
+    "task_authority": {
+     "evidence_digest": "c41e4b3a2077a40320e10ad50ccbfe5cc0efe57bd2d3dfe235357c61e8d051b9",
+     "result": "n/a"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "accept",
+   "outcome": "allow"
+  },
+  "pf-record-not-the-ref": {
+   "capsule_id": "3376e8669f65e403884d535f201e6594632d0dce89be3427d99aa985dff35b25",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "17189fc485e91ee8948f9f04b246b02c181b13acb9b8ded4fce2679be76e8f4c",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "ef01520a9fab79530917823f24878b93bc74cae14967fb0750b34745eb237337",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "01b58f8700b215f7940b8232373c87594054a0d21152b74644a000fe4b02221b",
+     "result": "n/a"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "6e9d343d83a0681a689599d49f20a8f6b08dbdd8c93b51a7fe88cc1f5a2648aa",
+     "result": "n/a"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "accept",
+   "outcome": "allow"
+  },
+  "pf-sale-below": {
+   "capsule_id": "1150b0bbf1f4d1311228755ba8799af7ddf85ca51b29ab94fe3068444643ade7",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "790a87347f96e3245925e1198bdbdaa468e4f0e7be896f659cff5dce7ed2db12",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "14491f195e7ee8e10199d351bd17fbe82caed86629e68f90f834a7a6a34d111f",
+     "result": "pass"
+    },
+    "offer_expiry": {
+     "evidence_digest": "ef01520a9fab79530917823f24878b93bc74cae14967fb0750b34745eb237337",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "ca9880db47bc8d1d9c27d06efd5780fe700f0f1374129a28c7454cb4ef3a396c",
+     "result": "fail"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "needs_input",
+   "outcome": "escalate"
+  },
+  "pf-unsafe-floor": {
+   "capsule_id": "38c92a48137d3811f27761576cb2d70dce4a8e8fbb3fbac42613fbdb9c169c2e",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "0c76e8c0c2e4b886c0fc99d9a1e2b930f26393c026f0fca8fba93e36bd3fe40b",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "ef01520a9fab79530917823f24878b93bc74cae14967fb0750b34745eb237337",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "7ed41aedbc4e95f5cc98ae3e5506719fd231e89b98d8c27bb27a5a172f5e4403",
+     "result": "fail"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "needs_input",
+   "outcome": "escalate"
+  },
+  "pf-upper-hex-commitment": {
+   "capsule_id": "c5183011170269ace17be810197e5f9159d65f60450c6913ff5d785f02a4fa5d",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "81a40a33db9917b7bcc2861ae29bb6ca243215d2d96a7034ba2e1940909993c0",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "ef01520a9fab79530917823f24878b93bc74cae14967fb0750b34745eb237337",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "307d8b6700d6fd1ae4b24673b0718c03f1148c4d7fedf91401551bc6d6f199d3",
+     "result": "fail"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "03b77c5f86d24589d125699839d569245830574697be90e715871e8771b2534a",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "needs_input",
+   "outcome": "escalate"
+  },
+  "pf-upper-nonce": {
+   "capsule_id": "57827573c2b6a4741c59d019a3d4c08be98ad246a1dd4de456aa9ef63b22eeb0",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "a2a0a26101de76b631bd8b5bf2dc9e05a7f73f3ea92fb74521a49d5f6b315afb",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "ef01520a9fab79530917823f24878b93bc74cae14967fb0750b34745eb237337",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "7ed41aedbc4e95f5cc98ae3e5506719fd231e89b98d8c27bb27a5a172f5e4403",
+     "result": "fail"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "needs_input",
+   "outcome": "escalate"
+  },
+  "pf-wrong-nonce": {
+   "capsule_id": "9293b364a00aacb901fbca444b2084c3f29a1cff6ac74e1d2a59c492fddaaafa",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "29e56b27bce65fd5a15ba3758eb4617ada395f7808681e529fdb6631c5f449c1",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "ef01520a9fab79530917823f24878b93bc74cae14967fb0750b34745eb237337",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "7ed41aedbc4e95f5cc98ae3e5506719fd231e89b98d8c27bb27a5a172f5e4403",
+     "result": "fail"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "needs_input",
+   "outcome": "escalate"
+  },
+  "pf-zero": {
+   "capsule_id": "5fce825cf98815590d71817b0caee747f3e99a6bafbfe31a3c6a661a934c67fb",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "baa18488273640b4ccf1c6910e6a9a206ef8b8a8d9f1f8318c5ecdd299f2ae5a",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "ef01520a9fab79530917823f24878b93bc74cae14967fb0750b34745eb237337",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "e9df191183fb19e25b2fd4a7ea916c307456352d7e53e02cca3bc139c01c6b89",
+     "result": "fail"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "needs_input",
+   "outcome": "escalate"
+  },
+  "sc-acceptance-dry-run": {
+   "capsule_id": "e11008ae97cf82938a58232fbe02ef8a46b6f3572285d24060e52c07a2b6327b",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "6592f3b48216ee262302b5eff3c9f34a7871705405bd22a3f9d9e89772c7dd11",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "d1cd7a7c90d77194fb54316b1b4d23437f49e172a639a41f90bc97e55383f9c4",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "79ae62bc6392614316668650a6d0b0a1d5ea104d3505417f0ab4fe474a377590",
+     "result": "pass"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "accept",
+   "outcome": "allow"
+  },
+  "sc-acceptance-in-a": {
+   "capsule_id": "5679b2d57e2c5776a64594dd33272494f86011729f35ca107801fefd78b940e2",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "78decc5c8f1768af2d236924ec65a62b7901b624366c56b2dcbcd8bb26c13a54",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "8e7c9737e63d640febbf7b2d52b9653030c96fdebf9c1449ec08325089e5ca71",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "79ae62bc6392614316668650a6d0b0a1d5ea104d3505417f0ab4fe474a377590",
+     "result": "pass"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "accept",
+   "outcome": "allow"
+  },
+  "sc-acceptance-in-c-other-operator": {
+   "capsule_id": "782a3ea883f211182ac60d0ecbd3704df5f3a785b638fbc07c36a0e12133e32f",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "b00537ac9f2a2fa338ff33cea0248c2d69fe5937253551d9e8d617ec14051c22",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "d1cd7a7c90d77194fb54316b1b4d23437f49e172a639a41f90bc97e55383f9c4",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "79ae62bc6392614316668650a6d0b0a1d5ea104d3505417f0ab4fe474a377590",
+     "result": "pass"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "2aa42f984368d951f8594028b9f31abb1d063ab1096e2ef42c797e93cdd7039d",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "accept",
+   "outcome": "allow"
+  },
+  "sc-before-acceptance": {
+   "capsule_id": "89caebc9249f78d65a7c8fac8a3dbece69d2b7b6cb68311a1dfe8ab8ebd52713",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "d166dca6fbf8a51b62d70ccebfd8f4e3a4a48f46edc53651d0480fdfa07dc227",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "ebddf6448f9ae7f194095f601a2921646f1715b6836a30ec6373ad7ec0eca120",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "b579de3f6c776c32ae05ba77b4e666e38a82a427995f380a6acfe693dd1aeeab",
+     "result": "pass"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "f8e2be3d26032ce1b219b5f7ca39ae62401183f1e4c1297e2f6d47fbc4650239",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "accept",
+   "outcome": "allow"
+  },
+  "sc-condition-to-c-other-operator": {
+   "capsule_id": "4cd17724cd38584342285fa50d57f2830b4f106a55582e322644e8f705c99e6d",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "b42d83b51a8190e3bca464554b25c933a12f14136f6f3f43f6ed350ccfb352fb",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "299fbc9f7e6847eba5f93de60e12976aaef8f28c0cd4a303096c49daa495e0be",
+     "result": "n/a"
+    },
+    "price_floor": {
+     "evidence_digest": "9d548b915de1ff97c046aa15d2f13fae31884894ff36be4ddba1fc9106988bed",
+     "result": "n/a"
+    },
+    "promise_never": {
+     "evidence_digest": "fd560e92b88714a0ef791543ac543185cb7d0759fe552ac6ce9a21123199ee27",
+     "result": "pass"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "0f027c4313f4e064be018bd667b9e19d8da91be5f602161ee021a7fdb3c8f940",
+     "result": "pass"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "46a692401917ddcf0644832f8a53756b6b2b04dc87e1d4a4625d428ca911e5b5",
+     "result": "n/a"
+    },
+    "single_commitment": {
+     "evidence_digest": "39ec56c6c92be9834f1042500b15fcf814b928782821ff1879834e29066f65df",
+     "result": "n/a"
+    },
+    "task_authority": {
+     "evidence_digest": "c41e4b3a2077a40320e10ad50ccbfe5cc0efe57bd2d3dfe235357c61e8d051b9",
+     "result": "n/a"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "accept",
+   "outcome": "allow"
+  },
+  "sc-external-commitment": {
+   "capsule_id": "4c3fa10982e0ec51bb18389626a50fe45891e706e6c80b9f27a046d6836c3d32",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "34cb542df61b2892689bc75a847667d22767d82ac3e37b7ba8cadeba1abf7172",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "299fbc9f7e6847eba5f93de60e12976aaef8f28c0cd4a303096c49daa495e0be",
+     "result": "n/a"
+    },
+    "price_floor": {
+     "evidence_digest": "9d548b915de1ff97c046aa15d2f13fae31884894ff36be4ddba1fc9106988bed",
+     "result": "n/a"
+    },
+    "promise_never": {
+     "evidence_digest": "ff0cab0c159ae1d81c52b65a17e63d9b88fe9bd2aab205cbe60102796beaf77b",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "26999f1f990a56334d343c6c31f6f042c162eef0f2c012d019db39d6826b45af",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "46a692401917ddcf0644832f8a53756b6b2b04dc87e1d4a4625d428ca911e5b5",
+     "result": "n/a"
+    },
+    "single_commitment": {
+     "evidence_digest": "bec525fb32cc2ec1af31cda123fbf41a79069639046912b9cd81c0415d630719",
+     "result": "fail"
+    },
+    "task_authority": {
+     "evidence_digest": "47159b351d5afb6c8177f5869167d3f813cc9a9f2ff919fb2b81d71acaefcefb",
+     "result": "fail"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "reject",
+   "outcome": "deny"
+  },
+  "sc-no-item": {
+   "capsule_id": "5825844a9dbdced0417eb9b7b4bedafc2e8195fa313006734042f6d65a8bc6ea",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "1ebc3ff4e2a18d15379a535966a66d755fe1ab5bcbe8b22e316ff30d16e733e6",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "ebddf6448f9ae7f194095f601a2921646f1715b6836a30ec6373ad7ec0eca120",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "b579de3f6c776c32ae05ba77b4e666e38a82a427995f380a6acfe693dd1aeeab",
+     "result": "pass"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "5efbf63594b45361ba5dc88fbba02c0b69e500ea13a5d45e5c075bb5609cb093",
+     "result": "n/a"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "accept",
+   "outcome": "allow"
+  },
+  "sc-no-target-citing": {
+   "capsule_id": "2a6d8c054cea0b34d4bbdcf4d11a1d15d28edf28eb086ae54c130fa7490e8a8f",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "fe20c92c3b26c17d3dd39693aa746d2e75429f968e67ddc0ef46b566affcdcf5",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "14491f195e7ee8e10199d351bd17fbe82caed86629e68f90f834a7a6a34d111f",
+     "result": "pass"
+    },
+    "offer_expiry": {
+     "evidence_digest": "0028b175347a4fa9aa78ebef5ea463f7de26bfd6f3aa713b26fdf6e2b6d23d5e",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "79ae62bc6392614316668650a6d0b0a1d5ea104d3505417f0ab4fe474a377590",
+     "result": "pass"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "455c3504ab891acc29cd8e1d12c6e392495c72c7391df4f4a96d4bc02b80b35f",
+     "result": "n/a"
+    },
+    "single_commitment": {
+     "evidence_digest": "bec525fb32cc2ec1af31cda123fbf41a79069639046912b9cd81c0415d630719",
+     "result": "fail"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "17f37cf8014c25c982ed808e1103a78d14cc1cb4a489b4a78b77848aa5f54c78",
+     "result": "pass"
+    }
+   },
+   "decision": "reject",
+   "outcome": "deny"
+  },
+  "sc-no-task-ref": {
+   "capsule_id": "856d39f43612549c31632db56de571d3e0ec912bda511cd23a5a7ed24cfc3c7b",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "37e35e1cb0c1f4ec0c1c2f890da44a117ec9fcd34b9e3fd5fc676218cd9c5c19",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "ebddf6448f9ae7f194095f601a2921646f1715b6836a30ec6373ad7ec0eca120",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "c3de79752971419f8e6e4c3e24d346a40a163980436114f12c6b045f4f4a9137",
+     "result": "n/a"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "1541f8655a86e71acf2683fee46b3cbef82d7cc83da3e89a098549aff0693e2f",
+     "result": "n/a"
+    },
+    "task_authority": {
+     "evidence_digest": "3c94a44812b9f227f1da0e8ed27510ad37fccfa3b7c3035fbd75b52901b160fb",
+     "result": "n/a"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "accept",
+   "outcome": "allow"
+  },
+  "sc-offer-in-b": {
+   "capsule_id": "65148fc9f4c2dc9027c70c6ed4a6f94f6faf6839fe673c18bca85089f2b88b86",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "c3000abbbb1a499636928fd2298439832ef23e580d288bd8c4465b8dce550fdc",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "ce143006de27a387c385736afe038c515790bc60503861dc31219c554b81f2af",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "b579de3f6c776c32ae05ba77b4e666e38a82a427995f380a6acfe693dd1aeeab",
+     "result": "pass"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "f8e2be3d26032ce1b219b5f7ca39ae62401183f1e4c1297e2f6d47fbc4650239",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "bec525fb32cc2ec1af31cda123fbf41a79069639046912b9cd81c0415d630719",
+     "result": "fail"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "reject",
+   "outcome": "deny"
+  },
+  "sc-other-item": {
+   "capsule_id": "8e731fdc5904c97f92622214a69946a73de455d971c1d1dd447d3454ddffe041",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "26196e4c35cfd944d98df9a05802196b9a7bffbf8c5841637d7973f7bf95b970",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "0028b175347a4fa9aa78ebef5ea463f7de26bfd6f3aa713b26fdf6e2b6d23d5e",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "b579de3f6c776c32ae05ba77b4e666e38a82a427995f380a6acfe693dd1aeeab",
+     "result": "pass"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "f8e2be3d26032ce1b219b5f7ca39ae62401183f1e4c1297e2f6d47fbc4650239",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "accept",
+   "outcome": "allow"
+  },
+  "sc-other-operator-offer-in-b": {
+   "capsule_id": "718b6de4726652ae59291543f970b8f683541f6877aa0e49679ee18ffbf3ae0d",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "5b2528882ad471bb6c41293bb0b0f1df062a850a4b8a981e46b45cb5b28cf217",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "0028b175347a4fa9aa78ebef5ea463f7de26bfd6f3aa713b26fdf6e2b6d23d5e",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "b579de3f6c776c32ae05ba77b4e666e38a82a427995f380a6acfe693dd1aeeab",
+     "result": "pass"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "720981063d8eb80c3cd249c68f9f6432eca35b098cbf99bbe7eaf090696c2e96",
+     "result": "fail"
+    },
+    "single_commitment": {
+     "evidence_digest": "bec525fb32cc2ec1af31cda123fbf41a79069639046912b9cd81c0415d630719",
+     "result": "fail"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "reject",
+   "outcome": "deny"
+  },
+  "sc-other-task": {
+   "capsule_id": "8e8863f5676eeb3c8a9ada79b8091ce214505ec6284039eb3c6d528da75d7257",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "3b802b6162670b6351d111751d5fb26008b209a933e33fe543027e8f2caf0b1b",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "0028b175347a4fa9aa78ebef5ea463f7de26bfd6f3aa713b26fdf6e2b6d23d5e",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "9d548b915de1ff97c046aa15d2f13fae31884894ff36be4ddba1fc9106988bed",
+     "result": "n/a"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "f8e2be3d26032ce1b219b5f7ca39ae62401183f1e4c1297e2f6d47fbc4650239",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "29f105aadc37362ab7ef41ec680734fb45ab0bf000bd1dbb8ad3848a1d27debd",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "accept",
+   "outcome": "allow"
+  },
+  "sc-out-of-class": {
+   "capsule_id": "c31e78cff0517239841b7a4c269d66539b287925799f13ff5bd40354fdf1d0d2",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "46eb089a7cde6aab3185d7151e0b49f9140496f8a59c5265a433f520de79ce08",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "299fbc9f7e6847eba5f93de60e12976aaef8f28c0cd4a303096c49daa495e0be",
+     "result": "n/a"
+    },
+    "price_floor": {
+     "evidence_digest": "9d548b915de1ff97c046aa15d2f13fae31884894ff36be4ddba1fc9106988bed",
+     "result": "n/a"
+    },
+    "promise_never": {
+     "evidence_digest": "93f505f0bdf8e34c02f647bdd8615b791c1870465662625966cd2f0cb96a9095",
+     "result": "pass"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "6d51faf4733d32962a5fc4ef425ef1ce0569a370de7386311d62864eaf013211",
+     "result": "pass"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "46a692401917ddcf0644832f8a53756b6b2b04dc87e1d4a4625d428ca911e5b5",
+     "result": "n/a"
+    },
+    "single_commitment": {
+     "evidence_digest": "39ec56c6c92be9834f1042500b15fcf814b928782821ff1879834e29066f65df",
+     "result": "n/a"
+    },
+    "task_authority": {
+     "evidence_digest": "c41e4b3a2077a40320e10ad50ccbfe5cc0efe57bd2d3dfe235357c61e8d051b9",
+     "result": "n/a"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "accept",
+   "outcome": "allow"
+  },
+  "sc-sale-to-a-citing": {
+   "capsule_id": "22b885f9bcb0089cf520524ede40bc7e71f243b739441d5e3563080eec76a540",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "08b81c8e1dc7f7355e07255f8e56a5e4fa41bed17816ff25f1935e18578dedc1",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "14491f195e7ee8e10199d351bd17fbe82caed86629e68f90f834a7a6a34d111f",
+     "result": "pass"
+    },
+    "offer_expiry": {
+     "evidence_digest": "0028b175347a4fa9aa78ebef5ea463f7de26bfd6f3aa713b26fdf6e2b6d23d5e",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "79ae62bc6392614316668650a6d0b0a1d5ea104d3505417f0ab4fe474a377590",
+     "result": "pass"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "bec525fb32cc2ec1af31cda123fbf41a79069639046912b9cd81c0415d630719",
+     "result": "pass"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "17f37cf8014c25c982ed808e1103a78d14cc1cb4a489b4a78b77848aa5f54c78",
+     "result": "pass"
+    }
+   },
+   "decision": "accept",
+   "outcome": "allow"
+  },
+  "sc-sale-to-a-not-citing": {
+   "capsule_id": "70106cd5d8adb89cbcb78bd48d313f1d8c557bfbeeb39527d0fd15bf23337fd1",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "4b62cd91ce9e426223b52c478f73e16c23f47e69d7dab6b9e64e197ee2db5b9a",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "14491f195e7ee8e10199d351bd17fbe82caed86629e68f90f834a7a6a34d111f",
+     "result": "pass"
+    },
+    "offer_expiry": {
+     "evidence_digest": "0028b175347a4fa9aa78ebef5ea463f7de26bfd6f3aa713b26fdf6e2b6d23d5e",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "79ae62bc6392614316668650a6d0b0a1d5ea104d3505417f0ab4fe474a377590",
+     "result": "pass"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "404a24eb51bcb9ffac4a289fc6f73207a8ee96f31784aa79ad9304f00b61d2c3",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "bec525fb32cc2ec1af31cda123fbf41a79069639046912b9cd81c0415d630719",
+     "result": "fail"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "reject",
+   "outcome": "deny"
+  },
+  "sc-sale-to-b-citing": {
+   "capsule_id": "4c07a72f8f5a4ed987dd8089d804389a1dac45c4a14b105b5486cce5cb8c272a",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "540bf7c588f7f0bfb0013e64dea581b4444ca90e89415901cb8d5ce0f8e8873d",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "14491f195e7ee8e10199d351bd17fbe82caed86629e68f90f834a7a6a34d111f",
+     "result": "pass"
+    },
+    "offer_expiry": {
+     "evidence_digest": "0028b175347a4fa9aa78ebef5ea463f7de26bfd6f3aa713b26fdf6e2b6d23d5e",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "79ae62bc6392614316668650a6d0b0a1d5ea104d3505417f0ab4fe474a377590",
+     "result": "pass"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "f8e2be3d26032ce1b219b5f7ca39ae62401183f1e4c1297e2f6d47fbc4650239",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "bec525fb32cc2ec1af31cda123fbf41a79069639046912b9cd81c0415d630719",
+     "result": "fail"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "17f37cf8014c25c982ed808e1103a78d14cc1cb4a489b4a78b77848aa5f54c78",
+     "result": "pass"
+    }
+   },
+   "decision": "reject",
+   "outcome": "deny"
+  },
+  "sc-second-acceptance-in-b": {
+   "capsule_id": "afd11e0e3347b28a69b8283553537711601a4ae68d7e87b2236e82d045f7e786",
+   "constraints": {
+    "caps": {
+     "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+     "result": "n/a"
+    },
+    "dedupe": {
+     "evidence_digest": "1d57288013cebf898937b5de923265dac4edc1cabf2f27deb7b1ce040aafb226",
+     "result": "pass"
+    },
+    "destination_rail": {
+     "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+     "result": "n/a"
+    },
+    "offer_expiry": {
+     "evidence_digest": "ce143006de27a387c385736afe038c515790bc60503861dc31219c554b81f2af",
+     "result": "pass"
+    },
+    "price_floor": {
+     "evidence_digest": "79ae62bc6392614316668650a6d0b0a1d5ea104d3505417f0ab4fe474a377590",
+     "result": "pass"
+    },
+    "promise_never": {
+     "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+     "result": "n/a"
+    },
+    "promise_requires_approval": {
+     "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+     "result": "n/a"
+    },
+    "recipient_role": {
+     "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+     "result": "n/a"
+    },
+    "release_on_acceptance": {
+     "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+     "result": "n/a"
+    },
+    "required_disclosure": {
+     "evidence_digest": "f8e2be3d26032ce1b219b5f7ca39ae62401183f1e4c1297e2f6d47fbc4650239",
+     "result": "pass"
+    },
+    "single_commitment": {
+     "evidence_digest": "bec525fb32cc2ec1af31cda123fbf41a79069639046912b9cd81c0415d630719",
+     "result": "fail"
+    },
+    "task_authority": {
+     "evidence_digest": "49cb7dcdb952edb724d0e91016e3bdb5b70915d57dcb87a7f8a4e0f8ab80bace",
+     "result": "pass"
+    },
+    "verify_before_dispatch": {
+     "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+     "result": "n/a"
+    }
+   },
+   "decision": "reject",
+   "outcome": "deny"
+  }
+ }
+}

@@ -1,0 +1,53 @@
+# Caps wicket, version 5.1: caps/5.0.0's limits and per-action reading over
+# spend.weekly/3.1.0, which also counts an executed act
+# (folds/catalog_defs/spend.weekly.v3.1.yaml). caps/5.0.0 (caps.v5.yaml) stays
+# as it was for the records and packs that pin it.
+#
+# Under 5.0.0 a replay counted no act toward the 7-day total: its own
+# decisions are dry runs, which spend.weekly/3.0.0 leaves out. Here every act a
+# deal executed counts once, at the spend its record seals, whoever approved
+# it: a booking commit or a signature as much as a payment. With an executed
+# act whose spend cannot be read in the window, the total is not known, so
+# the check is n/a, in scope, with the reason "an earlier act has no recorded
+# decision, so the total cannot count it", and the engine asks where it would
+# allow (guards/checks/caps.py, CheckOutcome.asks_when_unevaluated): the
+# verdict is not_evaluable. A per-action limit the action exceeds still fails.
+#
+# `fold_digest` is the real `definition_digest()` of
+# folds/catalog_defs/spend.weekly.v3.1.yaml (folds/definition.py).
+wicket_id: caps/5.1.0
+check: caps
+semantics: >-
+  For an action in caps_minor, two limits. The per-action limit compares the
+  action's authorised maximum, or its capture when it declares none or one
+  below the capture, with per_action_minor. The window limit compares the
+  operator's spend over the rolling 7 days plus the action's capture with
+  caps_minor. The window counts each act that was executed once, at the
+  spend its record seals and 0 when money moved in, and each accepted
+  decision that was not a dry run, less the cancels and refunds that cite a
+  charge it counted. Exceeding either limit fails. When an executed act in the
+  window has a spend that cannot be read, the total is not known: the check is
+  not applicable, in scope, and the action is asked about rather than allowed,
+  unless the per-action limit fails.
+config:
+  per_action_reads: spend_authorized_minor
+  fold_id: spend.weekly/3.1.0
+  fold_digest: f379cd4b2b12284fa5d682845f23bcd7ab1ae8b8d1dd827cd9b5dd7069735997
+  caps_minor:
+    money.purchase: 10000
+    money.transfer: 10000
+    money.subscription: 10000
+    booking.create: 10000
+    booking.modify: 10000
+    agreement.accept: 10000
+    marketplace.offer: 10000
+    external_commitment.other: 10000
+  per_action_minor:
+    money.purchase: 2500
+    money.transfer: 2500
+    money.subscription: 2500
+    booking.create: 2500
+    booking.modify: 2500
+    agreement.accept: 2500
+    marketplace.offer: 2500
+    external_commitment.other: 2500

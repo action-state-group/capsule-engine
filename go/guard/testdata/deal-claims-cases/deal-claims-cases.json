@@ -1,0 +1,690 @@
+{
+ "cases": [
+  {
+   "case": "as given",
+   "deal_claims": [
+    {
+     "at": "2026-10-10T02:30:02Z",
+     "capsule_id": "ffdceefafa14dab7901b8b119e8ad27727ae04c77612e11006115fdc7f8e9fcf",
+     "class": "condition",
+     "record_digest": "d9ede1860573871a25afb395fb6dbb7a0bea6ff21b8c3690e53892e9acdee341",
+     "source_kind": "agent",
+     "text_commitment": "0b4fe80d9c85b3f0a227084115d57b8efb1b814abc3f05971680f9e98412ba2e"
+    }
+   ],
+   "ignored": false,
+   "ignored_inputs": [],
+   "statements": [
+    {
+     "asg_payload": {
+      "stated": {
+       "claim": "ffdceefafa14dab7901b8b119e8ad27727ae04c77612e11006115fdc7f8e9fcf",
+       "class": "condition",
+       "deal_id": "deal-a4a44a1583055667",
+       "source_kind": "agent"
+      }
+     },
+     "capsule_id": "1b081dcba62550d585e4e20b41524f048bc74c51c8158ded9ce7c4683b9e43b9",
+     "operator": "synthetic-seller",
+     "timestamp": "2026-10-10T02:30:02Z"
+    }
+   ]
+  },
+  {
+   "case": "absent",
+   "deal_claims": "<absent>",
+   "ignored": false,
+   "ignored_inputs": [],
+   "statements": []
+  },
+  {
+   "case": "empty list",
+   "deal_claims": [],
+   "ignored": false,
+   "ignored_inputs": [],
+   "statements": []
+  },
+  {
+   "case": "no class",
+   "deal_claims": [
+    {
+     "at": "2026-10-10T02:30:02Z",
+     "capsule_id": "ffdceefafa14dab7901b8b119e8ad27727ae04c77612e11006115fdc7f8e9fcf",
+     "record_digest": "d9ede1860573871a25afb395fb6dbb7a0bea6ff21b8c3690e53892e9acdee341",
+     "source_kind": "agent",
+     "text_commitment": "0b4fe80d9c85b3f0a227084115d57b8efb1b814abc3f05971680f9e98412ba2e"
+    }
+   ],
+   "ignored": true,
+   "ignored_inputs": [
+    "deal_claims"
+   ],
+   "statements": []
+  },
+  {
+   "case": "empty class",
+   "deal_claims": [
+    {
+     "at": "2026-10-10T02:30:02Z",
+     "capsule_id": "ffdceefafa14dab7901b8b119e8ad27727ae04c77612e11006115fdc7f8e9fcf",
+     "class": "",
+     "record_digest": "d9ede1860573871a25afb395fb6dbb7a0bea6ff21b8c3690e53892e9acdee341",
+     "source_kind": "agent",
+     "text_commitment": "0b4fe80d9c85b3f0a227084115d57b8efb1b814abc3f05971680f9e98412ba2e"
+    }
+   ],
+   "ignored": true,
+   "ignored_inputs": [
+    "deal_claims"
+   ],
+   "statements": []
+  },
+  {
+   "case": "class not a string",
+   "deal_claims": [
+    {
+     "at": "2026-10-10T02:30:02Z",
+     "capsule_id": "ffdceefafa14dab7901b8b119e8ad27727ae04c77612e11006115fdc7f8e9fcf",
+     "class": 7,
+     "record_digest": "d9ede1860573871a25afb395fb6dbb7a0bea6ff21b8c3690e53892e9acdee341",
+     "source_kind": "agent",
+     "text_commitment": "0b4fe80d9c85b3f0a227084115d57b8efb1b814abc3f05971680f9e98412ba2e"
+    }
+   ],
+   "ignored": true,
+   "ignored_inputs": [
+    "deal_claims"
+   ],
+   "statements": []
+  },
+  {
+   "case": "a class outside the set",
+   "deal_claims": [
+    {
+     "at": "2026-10-10T02:30:02Z",
+     "capsule_id": "ffdceefafa14dab7901b8b119e8ad27727ae04c77612e11006115fdc7f8e9fcf",
+     "class": "warranty_terms",
+     "record_digest": "d9ede1860573871a25afb395fb6dbb7a0bea6ff21b8c3690e53892e9acdee341",
+     "source_kind": "agent",
+     "text_commitment": "0b4fe80d9c85b3f0a227084115d57b8efb1b814abc3f05971680f9e98412ba2e"
+    }
+   ],
+   "ignored": false,
+   "ignored_inputs": [],
+   "statements": [
+    {
+     "asg_payload": {
+      "stated": {
+       "claim": "ffdceefafa14dab7901b8b119e8ad27727ae04c77612e11006115fdc7f8e9fcf",
+       "class": "warranty_terms",
+       "deal_id": "deal-a4a44a1583055667",
+       "source_kind": "agent"
+      }
+     },
+     "capsule_id": "cc020b90a4740284a585b5044f16b74112342b7cb01b1c705097a120a3a23452",
+     "operator": "synthetic-seller",
+     "timestamp": "2026-10-10T02:30:02Z"
+    }
+   ]
+  },
+  {
+   "case": "delivery_promise",
+   "deal_claims": [
+    {
+     "at": "2026-10-10T02:30:02Z",
+     "capsule_id": "ffdceefafa14dab7901b8b119e8ad27727ae04c77612e11006115fdc7f8e9fcf",
+     "class": "delivery_promise",
+     "record_digest": "d9ede1860573871a25afb395fb6dbb7a0bea6ff21b8c3690e53892e9acdee341",
+     "source_kind": "agent",
+     "text_commitment": "0b4fe80d9c85b3f0a227084115d57b8efb1b814abc3f05971680f9e98412ba2e"
+    }
+   ],
+   "ignored": false,
+   "ignored_inputs": [],
+   "statements": [
+    {
+     "asg_payload": {
+      "stated": {
+       "claim": "ffdceefafa14dab7901b8b119e8ad27727ae04c77612e11006115fdc7f8e9fcf",
+       "class": "delivery_date",
+       "deal_id": "deal-a4a44a1583055667",
+       "source_kind": "agent"
+      }
+     },
+     "capsule_id": "63743eb74b92927c95917764e735ec0cf74bb45b93ba4a9116d0142866b800e0",
+     "operator": "synthetic-seller",
+     "timestamp": "2026-10-10T02:30:02Z"
+    }
+   ]
+  },
+  {
+   "case": "the buyer's",
+   "deal_claims": [
+    {
+     "at": "2026-10-10T02:30:02Z",
+     "capsule_id": "ffdceefafa14dab7901b8b119e8ad27727ae04c77612e11006115fdc7f8e9fcf",
+     "class": "condition",
+     "record_digest": "d9ede1860573871a25afb395fb6dbb7a0bea6ff21b8c3690e53892e9acdee341",
+     "source_kind": "counterparty",
+     "text_commitment": "0b4fe80d9c85b3f0a227084115d57b8efb1b814abc3f05971680f9e98412ba2e"
+    }
+   ],
+   "ignored": true,
+   "ignored_inputs": [
+    "deal_claims"
+   ],
+   "statements": []
+  },
+  {
+   "case": "no source_kind",
+   "deal_claims": [
+    {
+     "at": "2026-10-10T02:30:02Z",
+     "capsule_id": "ffdceefafa14dab7901b8b119e8ad27727ae04c77612e11006115fdc7f8e9fcf",
+     "class": "condition",
+     "record_digest": "d9ede1860573871a25afb395fb6dbb7a0bea6ff21b8c3690e53892e9acdee341",
+     "text_commitment": "0b4fe80d9c85b3f0a227084115d57b8efb1b814abc3f05971680f9e98412ba2e"
+    }
+   ],
+   "ignored": true,
+   "ignored_inputs": [
+    "deal_claims"
+   ],
+   "statements": []
+  },
+  {
+   "case": "digest upper case",
+   "deal_claims": [
+    {
+     "at": "2026-10-10T02:30:02Z",
+     "capsule_id": "ffdceefafa14dab7901b8b119e8ad27727ae04c77612e11006115fdc7f8e9fcf",
+     "class": "condition",
+     "record_digest": "ABABABABABABABABABABABABABABABABABABABABABABABABABABABABABABABAB",
+     "source_kind": "agent",
+     "text_commitment": "0b4fe80d9c85b3f0a227084115d57b8efb1b814abc3f05971680f9e98412ba2e"
+    }
+   ],
+   "ignored": true,
+   "ignored_inputs": [
+    "deal_claims"
+   ],
+   "statements": []
+  },
+  {
+   "case": "digest short",
+   "deal_claims": [
+    {
+     "at": "2026-10-10T02:30:02Z",
+     "capsule_id": "ffdceefafa14dab7901b8b119e8ad27727ae04c77612e11006115fdc7f8e9fcf",
+     "class": "condition",
+     "record_digest": "ababababababababababababababababababababababababababababababab",
+     "source_kind": "agent",
+     "text_commitment": "0b4fe80d9c85b3f0a227084115d57b8efb1b814abc3f05971680f9e98412ba2e"
+    }
+   ],
+   "ignored": true,
+   "ignored_inputs": [
+    "deal_claims"
+   ],
+   "statements": []
+  },
+  {
+   "case": "no capsule_id",
+   "deal_claims": [
+    {
+     "at": "2026-10-10T02:30:02Z",
+     "class": "condition",
+     "record_digest": "d9ede1860573871a25afb395fb6dbb7a0bea6ff21b8c3690e53892e9acdee341",
+     "source_kind": "agent",
+     "text_commitment": "0b4fe80d9c85b3f0a227084115d57b8efb1b814abc3f05971680f9e98412ba2e"
+    }
+   ],
+   "ignored": true,
+   "ignored_inputs": [
+    "deal_claims"
+   ],
+   "statements": []
+  },
+  {
+   "case": "capsule_id upper case",
+   "deal_claims": [
+    {
+     "at": "2026-10-10T02:30:02Z",
+     "capsule_id": "FFDCEEFAFA14DAB7901B8B119E8AD27727AE04C77612E11006115FDC7F8E9FCF",
+     "class": "condition",
+     "record_digest": "d9ede1860573871a25afb395fb6dbb7a0bea6ff21b8c3690e53892e9acdee341",
+     "source_kind": "agent",
+     "text_commitment": "0b4fe80d9c85b3f0a227084115d57b8efb1b814abc3f05971680f9e98412ba2e"
+    }
+   ],
+   "ignored": true,
+   "ignored_inputs": [
+    "deal_claims"
+   ],
+   "statements": []
+  },
+  {
+   "case": "no commitment",
+   "deal_claims": [
+    {
+     "at": "2026-10-10T02:30:02Z",
+     "capsule_id": "ffdceefafa14dab7901b8b119e8ad27727ae04c77612e11006115fdc7f8e9fcf",
+     "class": "condition",
+     "record_digest": "d9ede1860573871a25afb395fb6dbb7a0bea6ff21b8c3690e53892e9acdee341",
+     "source_kind": "agent"
+    }
+   ],
+   "ignored": true,
+   "ignored_inputs": [
+    "deal_claims"
+   ],
+   "statements": []
+  },
+  {
+   "case": "commitment short",
+   "deal_claims": [
+    {
+     "at": "2026-10-10T02:30:02Z",
+     "capsule_id": "ffdceefafa14dab7901b8b119e8ad27727ae04c77612e11006115fdc7f8e9fcf",
+     "class": "condition",
+     "record_digest": "d9ede1860573871a25afb395fb6dbb7a0bea6ff21b8c3690e53892e9acdee341",
+     "source_kind": "agent",
+     "text_commitment": "ababababababababababababababababababababababababababababababab"
+    }
+   ],
+   "ignored": true,
+   "ignored_inputs": [
+    "deal_claims"
+   ],
+   "statements": []
+  },
+  {
+   "case": "at not a time",
+   "deal_claims": [
+    {
+     "at": "yesterday",
+     "capsule_id": "ffdceefafa14dab7901b8b119e8ad27727ae04c77612e11006115fdc7f8e9fcf",
+     "class": "condition",
+     "record_digest": "d9ede1860573871a25afb395fb6dbb7a0bea6ff21b8c3690e53892e9acdee341",
+     "source_kind": "agent",
+     "text_commitment": "0b4fe80d9c85b3f0a227084115d57b8efb1b814abc3f05971680f9e98412ba2e"
+    }
+   ],
+   "ignored": true,
+   "ignored_inputs": [
+    "deal_claims"
+   ],
+   "statements": []
+  },
+  {
+   "case": "at with no zone",
+   "deal_claims": [
+    {
+     "at": "2026-10-10T00:41:06",
+     "capsule_id": "ffdceefafa14dab7901b8b119e8ad27727ae04c77612e11006115fdc7f8e9fcf",
+     "class": "condition",
+     "record_digest": "d9ede1860573871a25afb395fb6dbb7a0bea6ff21b8c3690e53892e9acdee341",
+     "source_kind": "agent",
+     "text_commitment": "0b4fe80d9c85b3f0a227084115d57b8efb1b814abc3f05971680f9e98412ba2e"
+    }
+   ],
+   "ignored": true,
+   "ignored_inputs": [
+    "deal_claims"
+   ],
+   "statements": []
+  },
+  {
+   "case": "no at",
+   "deal_claims": [
+    {
+     "capsule_id": "ffdceefafa14dab7901b8b119e8ad27727ae04c77612e11006115fdc7f8e9fcf",
+     "class": "condition",
+     "record_digest": "d9ede1860573871a25afb395fb6dbb7a0bea6ff21b8c3690e53892e9acdee341",
+     "source_kind": "agent",
+     "text_commitment": "0b4fe80d9c85b3f0a227084115d57b8efb1b814abc3f05971680f9e98412ba2e"
+    }
+   ],
+   "ignored": true,
+   "ignored_inputs": [
+    "deal_claims"
+   ],
+   "statements": []
+  },
+  {
+   "case": "at not a string",
+   "deal_claims": [
+    {
+     "at": 1760057000,
+     "capsule_id": "ffdceefafa14dab7901b8b119e8ad27727ae04c77612e11006115fdc7f8e9fcf",
+     "class": "condition",
+     "record_digest": "d9ede1860573871a25afb395fb6dbb7a0bea6ff21b8c3690e53892e9acdee341",
+     "source_kind": "agent",
+     "text_commitment": "0b4fe80d9c85b3f0a227084115d57b8efb1b814abc3f05971680f9e98412ba2e"
+    }
+   ],
+   "ignored": true,
+   "ignored_inputs": [
+    "deal_claims"
+   ],
+   "statements": []
+  },
+  {
+   "case": "at after the check",
+   "deal_claims": [
+    {
+     "at": "2030-01-01T00:00:00Z",
+     "capsule_id": "ffdceefafa14dab7901b8b119e8ad27727ae04c77612e11006115fdc7f8e9fcf",
+     "class": "condition",
+     "record_digest": "d9ede1860573871a25afb395fb6dbb7a0bea6ff21b8c3690e53892e9acdee341",
+     "source_kind": "agent",
+     "text_commitment": "0b4fe80d9c85b3f0a227084115d57b8efb1b814abc3f05971680f9e98412ba2e"
+    }
+   ],
+   "ignored": true,
+   "ignored_inputs": [
+    "deal_claims"
+   ],
+   "statements": []
+  },
+  {
+   "case": "at in the check's own second",
+   "deal_claims": [
+    {
+     "at": "2026-10-10T02:30:02Z",
+     "capsule_id": "ffdceefafa14dab7901b8b119e8ad27727ae04c77612e11006115fdc7f8e9fcf",
+     "class": "condition",
+     "record_digest": "d9ede1860573871a25afb395fb6dbb7a0bea6ff21b8c3690e53892e9acdee341",
+     "source_kind": "agent",
+     "text_commitment": "0b4fe80d9c85b3f0a227084115d57b8efb1b814abc3f05971680f9e98412ba2e"
+    }
+   ],
+   "ignored": false,
+   "ignored_inputs": [],
+   "statements": [
+    {
+     "asg_payload": {
+      "stated": {
+       "claim": "ffdceefafa14dab7901b8b119e8ad27727ae04c77612e11006115fdc7f8e9fcf",
+       "class": "condition",
+       "deal_id": "deal-a4a44a1583055667",
+       "source_kind": "agent"
+      }
+     },
+     "capsule_id": "1b081dcba62550d585e4e20b41524f048bc74c51c8158ded9ce7c4683b9e43b9",
+     "operator": "synthetic-seller",
+     "timestamp": "2026-10-10T02:30:02Z"
+    }
+   ]
+  },
+  {
+   "case": "at with an offset",
+   "deal_claims": [
+    {
+     "at": "2026-10-10T02:30:02+00:00",
+     "capsule_id": "ffdceefafa14dab7901b8b119e8ad27727ae04c77612e11006115fdc7f8e9fcf",
+     "class": "condition",
+     "record_digest": "d9ede1860573871a25afb395fb6dbb7a0bea6ff21b8c3690e53892e9acdee341",
+     "source_kind": "agent",
+     "text_commitment": "0b4fe80d9c85b3f0a227084115d57b8efb1b814abc3f05971680f9e98412ba2e"
+    }
+   ],
+   "ignored": false,
+   "ignored_inputs": [],
+   "statements": [
+    {
+     "asg_payload": {
+      "stated": {
+       "claim": "ffdceefafa14dab7901b8b119e8ad27727ae04c77612e11006115fdc7f8e9fcf",
+       "class": "condition",
+       "deal_id": "deal-a4a44a1583055667",
+       "source_kind": "agent"
+      }
+     },
+     "capsule_id": "732f627cbd82c953eb2790067b703a4fe839b87e7501aa64fe5815cd0011b27b",
+     "operator": "synthetic-seller",
+     "timestamp": "2026-10-10T02:30:02+00:00"
+    }
+   ]
+  },
+  {
+   "case": "given twice",
+   "deal_claims": [
+    {
+     "at": "2026-10-10T02:30:02Z",
+     "capsule_id": "ffdceefafa14dab7901b8b119e8ad27727ae04c77612e11006115fdc7f8e9fcf",
+     "class": "condition",
+     "record_digest": "d9ede1860573871a25afb395fb6dbb7a0bea6ff21b8c3690e53892e9acdee341",
+     "source_kind": "agent",
+     "text_commitment": "0b4fe80d9c85b3f0a227084115d57b8efb1b814abc3f05971680f9e98412ba2e"
+    },
+    {
+     "at": "2026-10-10T02:30:02Z",
+     "capsule_id": "ffdceefafa14dab7901b8b119e8ad27727ae04c77612e11006115fdc7f8e9fcf",
+     "class": "condition",
+     "record_digest": "d9ede1860573871a25afb395fb6dbb7a0bea6ff21b8c3690e53892e9acdee341",
+     "source_kind": "agent",
+     "text_commitment": "0b4fe80d9c85b3f0a227084115d57b8efb1b814abc3f05971680f9e98412ba2e"
+    }
+   ],
+   "ignored": false,
+   "ignored_inputs": [],
+   "statements": [
+    {
+     "asg_payload": {
+      "stated": {
+       "claim": "ffdceefafa14dab7901b8b119e8ad27727ae04c77612e11006115fdc7f8e9fcf",
+       "class": "condition",
+       "deal_id": "deal-a4a44a1583055667",
+       "source_kind": "agent"
+      }
+     },
+     "capsule_id": "1b081dcba62550d585e4e20b41524f048bc74c51c8158ded9ce7c4683b9e43b9",
+     "operator": "synthetic-seller",
+     "timestamp": "2026-10-10T02:30:02Z"
+    }
+   ]
+  },
+  {
+   "case": "one bad, one good",
+   "deal_claims": [
+    {
+     "at": "2026-10-10T02:30:02Z",
+     "capsule_id": "ffdceefafa14dab7901b8b119e8ad27727ae04c77612e11006115fdc7f8e9fcf",
+     "class": "condition",
+     "record_digest": "d9ede1860573871a25afb395fb6dbb7a0bea6ff21b8c3690e53892e9acdee341",
+     "source_kind": "agent",
+     "text_commitment": "0b4fe80d9c85b3f0a227084115d57b8efb1b814abc3f05971680f9e98412ba2e"
+    },
+    {
+     "at": "2026-10-10T02:30:02Z",
+     "capsule_id": "ffdceefafa14dab7901b8b119e8ad27727ae04c77612e11006115fdc7f8e9fcf",
+     "class": "",
+     "record_digest": "d9ede1860573871a25afb395fb6dbb7a0bea6ff21b8c3690e53892e9acdee341",
+     "source_kind": "agent",
+     "text_commitment": "0b4fe80d9c85b3f0a227084115d57b8efb1b814abc3f05971680f9e98412ba2e"
+    }
+   ],
+   "ignored": true,
+   "ignored_inputs": [
+    "deal_claims"
+   ],
+   "statements": [
+    {
+     "asg_payload": {
+      "stated": {
+       "claim": "ffdceefafa14dab7901b8b119e8ad27727ae04c77612e11006115fdc7f8e9fcf",
+       "class": "condition",
+       "deal_id": "deal-a4a44a1583055667",
+       "source_kind": "agent"
+      }
+     },
+     "capsule_id": "1b081dcba62550d585e4e20b41524f048bc74c51c8158ded9ce7c4683b9e43b9",
+     "operator": "synthetic-seller",
+     "timestamp": "2026-10-10T02:30:02Z"
+    }
+   ]
+  },
+  {
+   "case": "one bad, then one good",
+   "deal_claims": [
+    {
+     "at": "2026-10-10T02:30:02Z",
+     "capsule_id": "ffdceefafa14dab7901b8b119e8ad27727ae04c77612e11006115fdc7f8e9fcf",
+     "class": "",
+     "record_digest": "d9ede1860573871a25afb395fb6dbb7a0bea6ff21b8c3690e53892e9acdee341",
+     "source_kind": "agent",
+     "text_commitment": "0b4fe80d9c85b3f0a227084115d57b8efb1b814abc3f05971680f9e98412ba2e"
+    },
+    {
+     "at": "2026-10-10T02:30:02Z",
+     "capsule_id": "ffdceefafa14dab7901b8b119e8ad27727ae04c77612e11006115fdc7f8e9fcf",
+     "class": "condition",
+     "record_digest": "d9ede1860573871a25afb395fb6dbb7a0bea6ff21b8c3690e53892e9acdee341",
+     "source_kind": "agent",
+     "text_commitment": "0b4fe80d9c85b3f0a227084115d57b8efb1b814abc3f05971680f9e98412ba2e"
+    }
+   ],
+   "ignored": true,
+   "ignored_inputs": [
+    "deal_claims"
+   ],
+   "statements": [
+    {
+     "asg_payload": {
+      "stated": {
+       "claim": "ffdceefafa14dab7901b8b119e8ad27727ae04c77612e11006115fdc7f8e9fcf",
+       "class": "condition",
+       "deal_id": "deal-a4a44a1583055667",
+       "source_kind": "agent"
+      }
+     },
+     "capsule_id": "1b081dcba62550d585e4e20b41524f048bc74c51c8158ded9ce7c4683b9e43b9",
+     "operator": "synthetic-seller",
+     "timestamp": "2026-10-10T02:30:02Z"
+    }
+   ]
+  },
+  {
+   "case": "two claims",
+   "deal_claims": [
+    {
+     "at": "2026-10-10T02:30:02Z",
+     "capsule_id": "ffdceefafa14dab7901b8b119e8ad27727ae04c77612e11006115fdc7f8e9fcf",
+     "class": "condition",
+     "record_digest": "d9ede1860573871a25afb395fb6dbb7a0bea6ff21b8c3690e53892e9acdee341",
+     "source_kind": "agent",
+     "text_commitment": "0b4fe80d9c85b3f0a227084115d57b8efb1b814abc3f05971680f9e98412ba2e"
+    },
+    {
+     "at": "2026-10-10T02:30:02Z",
+     "capsule_id": "abababababababababababababababababababababababababababababababab",
+     "class": "delivery_date",
+     "record_digest": "d9ede1860573871a25afb395fb6dbb7a0bea6ff21b8c3690e53892e9acdee341",
+     "source_kind": "agent",
+     "text_commitment": "0b4fe80d9c85b3f0a227084115d57b8efb1b814abc3f05971680f9e98412ba2e"
+    }
+   ],
+   "ignored": false,
+   "ignored_inputs": [],
+   "statements": [
+    {
+     "asg_payload": {
+      "stated": {
+       "claim": "ffdceefafa14dab7901b8b119e8ad27727ae04c77612e11006115fdc7f8e9fcf",
+       "class": "condition",
+       "deal_id": "deal-a4a44a1583055667",
+       "source_kind": "agent"
+      }
+     },
+     "capsule_id": "1b081dcba62550d585e4e20b41524f048bc74c51c8158ded9ce7c4683b9e43b9",
+     "operator": "synthetic-seller",
+     "timestamp": "2026-10-10T02:30:02Z"
+    },
+    {
+     "asg_payload": {
+      "stated": {
+       "claim": "abababababababababababababababababababababababababababababababab",
+       "class": "delivery_date",
+       "deal_id": "deal-a4a44a1583055667",
+       "source_kind": "agent"
+      }
+     },
+     "capsule_id": "dcce73d71f3bfb56d8a3a7c9749d96d9fc7f31a5564ebeae317133121901624e",
+     "operator": "synthetic-seller",
+     "timestamp": "2026-10-10T02:30:02Z"
+    }
+   ]
+  },
+  {
+   "case": "a string",
+   "deal_claims": "condition",
+   "ignored": true,
+   "ignored_inputs": [
+    "deal_claims"
+   ],
+   "statements": []
+  },
+  {
+   "case": "a mapping",
+   "deal_claims": {
+    "class": "condition"
+   },
+   "ignored": true,
+   "ignored_inputs": [
+    "deal_claims"
+   ],
+   "statements": []
+  },
+  {
+   "case": "a number",
+   "deal_claims": 5,
+   "ignored": true,
+   "ignored_inputs": [
+    "deal_claims"
+   ],
+   "statements": []
+  },
+  {
+   "case": "a boolean",
+   "deal_claims": true,
+   "ignored": true,
+   "ignored_inputs": [
+    "deal_claims"
+   ],
+   "statements": []
+  },
+  {
+   "case": "a null entry",
+   "deal_claims": [
+    null
+   ],
+   "ignored": true,
+   "ignored_inputs": [
+    "deal_claims"
+   ],
+   "statements": []
+  },
+  {
+   "case": "a list entry",
+   "deal_claims": [
+    [
+     "condition"
+    ]
+   ],
+   "ignored": true,
+   "ignored_inputs": [
+    "deal_claims"
+   ],
+   "statements": []
+  },
+  {
+   "case": "null",
+   "deal_claims": null,
+   "ignored": false,
+   "ignored_inputs": [],
+   "statements": []
+  }
+ ],
+ "generator": "gen_deal_claims_cases.py"
+}

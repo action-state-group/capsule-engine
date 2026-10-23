@@ -1,0 +1,737 @@
+{
+ "note": "The spend.weekly/3.1.0 differential: every case of corpus.json (the 3.0.0 corpus), which 3.1.0 must total the same, and the cases 3.1.0 adds, each naming what it holds. The Go fold and capsule-engine's Python fold must compute the same weekly_spend_minor and reversal summary for each case (key: operator op-a, as_of 2026-10-07T12:00:00Z).",
+ "fold": "spend.weekly/3.1.0",
+ "key_value": "op-a",
+ "as_of": "2026-10-07T12:00:00Z",
+ "cases": [
+  {
+   "name": "buy-then-linked-cancel",
+   "expect": "expect 0: the cancel cites the charge under supersedes",
+   "records": [
+    {
+     "capsule_id": "c1",
+     "operator": "op-a",
+     "developer": "dev@v1",
+     "timestamp": "2026-10-07T10:01:00Z",
+     "disposition": {
+      "decision": "accept"
+     },
+     "asg_payload": {
+      "action_class": "booking.create",
+      "amount_minor": 2000
+     }
+    },
+    {
+     "capsule_id": "c2",
+     "operator": "op-a",
+     "developer": "dev@v1",
+     "timestamp": "2026-10-07T10:02:00Z",
+     "disposition": {
+      "decision": "accept"
+     },
+     "asg_payload": {
+      "action_class": "booking.cancel",
+      "amount_minor": 2000
+     },
+     "chain": {
+      "parent_capsule_id": "c1",
+      "relation": "supersedes"
+     }
+    }
+   ]
+  },
+  {
+   "name": "unlinked-cancel",
+   "expect": "expect 2000: a cancel citing nothing neither adds nor subtracts",
+   "records": [
+    {
+     "capsule_id": "c1",
+     "operator": "op-a",
+     "developer": "dev@v1",
+     "timestamp": "2026-10-07T10:01:00Z",
+     "disposition": {
+      "decision": "accept"
+     },
+     "asg_payload": {
+      "action_class": "booking.create",
+      "amount_minor": 2000
+     }
+    },
+    {
+     "capsule_id": "c2",
+     "operator": "op-a",
+     "developer": "dev@v1",
+     "timestamp": "2026-10-07T10:02:00Z",
+     "disposition": {
+      "decision": "accept"
+     },
+     "asg_payload": {
+      "action_class": "booking.cancel",
+      "amount_minor": 2000
+     }
+    }
+   ]
+  },
+  {
+   "name": "dry-run-excluded",
+   "expect": "expect 500: the dry-run charge is left out",
+   "records": [
+    {
+     "capsule_id": "c1",
+     "operator": "op-a",
+     "developer": "dev@v1",
+     "timestamp": "2026-10-07T10:01:00Z",
+     "disposition": {
+      "decision": "accept"
+     },
+     "asg_payload": {
+      "action_class": "money.purchase",
+      "amount_minor": 2000,
+      "checkpoint": {
+       "dry_run": true
+      }
+     }
+    },
+    {
+     "capsule_id": "c2",
+     "operator": "op-a",
+     "developer": "dev@v1",
+     "timestamp": "2026-10-07T10:02:00Z",
+     "disposition": {
+      "decision": "accept"
+     },
+     "asg_payload": {
+      "action_class": "money.purchase",
+      "amount_minor": 500,
+      "checkpoint": {
+       "dry_run": false
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "partial-refunds-floor-at-the-charge",
+   "expect": "expect 0: 1000 charged, 300 then 900 refunded, the second capped at the 700 left",
+   "records": [
+    {
+     "capsule_id": "c1",
+     "operator": "op-a",
+     "developer": "dev@v1",
+     "timestamp": "2026-10-07T10:01:00Z",
+     "disposition": {
+      "decision": "accept"
+     },
+     "asg_payload": {
+      "action_class": "money.purchase",
+      "amount_minor": 1000
+     }
+    },
+    {
+     "capsule_id": "c2",
+     "operator": "op-a",
+     "developer": "dev@v1",
+     "timestamp": "2026-10-07T10:02:00Z",
+     "disposition": {
+      "decision": "accept"
+     },
+     "asg_payload": {
+      "action_class": "money.refund",
+      "amount_minor": 300
+     },
+     "chain": {
+      "parent_capsule_id": "c1",
+      "relation": "supersedes"
+     }
+    },
+    {
+     "capsule_id": "c3",
+     "operator": "op-a",
+     "developer": "dev@v1",
+     "timestamp": "2026-10-07T10:03:00Z",
+     "disposition": {
+      "decision": "accept"
+     },
+     "asg_payload": {
+      "action_class": "money.refund",
+      "amount_minor": 900
+     },
+     "chain": {
+      "parent_capsule_id": "c1",
+      "relation": "supersedes"
+     }
+    }
+   ]
+  },
+  {
+   "name": "refund-cannot-reach-other-charges",
+   "expect": "expect 1500: a refund larger than its charge takes back only that charge",
+   "records": [
+    {
+     "capsule_id": "c1",
+     "operator": "op-a",
+     "developer": "dev@v1",
+     "timestamp": "2026-10-07T10:01:00Z",
+     "disposition": {
+      "decision": "accept"
+     },
+     "asg_payload": {
+      "action_class": "money.purchase",
+      "amount_minor": 500
+     }
+    },
+    {
+     "capsule_id": "c2",
+     "operator": "op-a",
+     "developer": "dev@v1",
+     "timestamp": "2026-10-07T10:02:00Z",
+     "disposition": {
+      "decision": "accept"
+     },
+     "asg_payload": {
+      "action_class": "money.purchase",
+      "amount_minor": 1500
+     }
+    },
+    {
+     "capsule_id": "c3",
+     "operator": "op-a",
+     "developer": "dev@v1",
+     "timestamp": "2026-10-07T10:03:00Z",
+     "disposition": {
+      "decision": "accept"
+     },
+     "asg_payload": {
+      "action_class": "money.refund",
+      "amount_minor": 2000
+     },
+     "chain": {
+      "parent_capsule_id": "c1",
+      "relation": "supersedes"
+     }
+    }
+   ]
+  },
+  {
+   "name": "wrong-relation-is-unlinked",
+   "expect": "expect 2000: confirms is not a reversal relation",
+   "records": [
+    {
+     "capsule_id": "c1",
+     "operator": "op-a",
+     "developer": "dev@v1",
+     "timestamp": "2026-10-07T10:01:00Z",
+     "disposition": {
+      "decision": "accept"
+     },
+     "asg_payload": {
+      "action_class": "booking.create",
+      "amount_minor": 2000
+     }
+    },
+    {
+     "capsule_id": "c2",
+     "operator": "op-a",
+     "developer": "dev@v1",
+     "timestamp": "2026-10-07T10:02:00Z",
+     "disposition": {
+      "decision": "accept"
+     },
+     "asg_payload": {
+      "action_class": "booking.cancel",
+      "amount_minor": 2000
+     },
+     "chain": {
+      "parent_capsule_id": "c1",
+      "relation": "confirms"
+     }
+    }
+   ]
+  },
+  {
+   "name": "cancel-citing-another-operators-charge",
+   "expect": "expect 2000: the cited charge is in another group",
+   "records": [
+    {
+     "capsule_id": "x1",
+     "operator": "op-b",
+     "developer": "dev@v1",
+     "timestamp": "2026-10-07T10:01:00Z",
+     "disposition": {
+      "decision": "accept"
+     },
+     "asg_payload": {
+      "action_class": "booking.create",
+      "amount_minor": 3000
+     }
+    },
+    {
+     "capsule_id": "c1",
+     "operator": "op-a",
+     "developer": "dev@v1",
+     "timestamp": "2026-10-07T10:02:00Z",
+     "disposition": {
+      "decision": "accept"
+     },
+     "asg_payload": {
+      "action_class": "booking.create",
+      "amount_minor": 2000
+     }
+    },
+    {
+     "capsule_id": "c2",
+     "operator": "op-a",
+     "developer": "dev@v1",
+     "timestamp": "2026-10-07T10:03:00Z",
+     "disposition": {
+      "decision": "accept"
+     },
+     "asg_payload": {
+      "action_class": "booking.cancel",
+      "amount_minor": 3000
+     },
+     "chain": {
+      "parent_capsule_id": "x1",
+      "relation": "supersedes"
+     }
+    }
+   ]
+  },
+  {
+   "name": "cancel-before-its-charge",
+   "expect": "expect 2000: a reversal reads only charges already counted",
+   "records": [
+    {
+     "capsule_id": "c2",
+     "operator": "op-a",
+     "developer": "dev@v1",
+     "timestamp": "2026-10-07T10:01:00Z",
+     "disposition": {
+      "decision": "accept"
+     },
+     "asg_payload": {
+      "action_class": "booking.cancel",
+      "amount_minor": 2000
+     },
+     "chain": {
+      "parent_capsule_id": "c1",
+      "relation": "supersedes"
+     }
+    },
+    {
+     "capsule_id": "c1",
+     "operator": "op-a",
+     "developer": "dev@v1",
+     "timestamp": "2026-10-07T10:02:00Z",
+     "disposition": {
+      "decision": "accept"
+     },
+     "asg_payload": {
+      "action_class": "booking.create",
+      "amount_minor": 2000
+     }
+    }
+   ]
+  },
+  {
+   "name": "rejected-charge-not-counted",
+   "expect": "expect 0: only accepted actions count, and the cancel then has nothing to cite",
+   "records": [
+    {
+     "capsule_id": "c1",
+     "operator": "op-a",
+     "developer": "dev@v1",
+     "timestamp": "2026-10-07T10:01:00Z",
+     "disposition": {
+      "decision": "reject"
+     },
+     "asg_payload": {
+      "action_class": "money.purchase",
+      "amount_minor": 2000
+     }
+    },
+    {
+     "capsule_id": "c2",
+     "operator": "op-a",
+     "developer": "dev@v1",
+     "timestamp": "2026-10-07T10:02:00Z",
+     "disposition": {
+      "decision": "accept"
+     },
+     "asg_payload": {
+      "action_class": "booking.cancel",
+      "amount_minor": 2000
+     },
+     "chain": {
+      "parent_capsule_id": "c1",
+      "relation": "supersedes"
+     }
+    }
+   ]
+  },
+  {
+   "name": "negative-charge-counts-zero",
+   "expect": "expect 1000: a negative charge buys no room",
+   "records": [
+    {
+     "capsule_id": "c1",
+     "operator": "op-a",
+     "developer": "dev@v1",
+     "timestamp": "2026-10-07T10:01:00Z",
+     "disposition": {
+      "decision": "accept"
+     },
+     "asg_payload": {
+      "action_class": "money.purchase",
+      "amount_minor": -5000
+     }
+    },
+    {
+     "capsule_id": "c2",
+     "operator": "op-a",
+     "developer": "dev@v1",
+     "timestamp": "2026-10-07T10:02:00Z",
+     "disposition": {
+      "decision": "accept"
+     },
+     "asg_payload": {
+      "action_class": "money.purchase",
+      "amount_minor": 1000
+     }
+    }
+   ]
+  },
+  {
+   "name": "zero-amount-reversal-unlinked",
+   "expect": "expect 2000",
+   "records": [
+    {
+     "capsule_id": "c1",
+     "operator": "op-a",
+     "developer": "dev@v1",
+     "timestamp": "2026-10-07T10:01:00Z",
+     "disposition": {
+      "decision": "accept"
+     },
+     "asg_payload": {
+      "action_class": "booking.create",
+      "amount_minor": 2000
+     }
+    },
+    {
+     "capsule_id": "c2",
+     "operator": "op-a",
+     "developer": "dev@v1",
+     "timestamp": "2026-10-07T10:02:00Z",
+     "disposition": {
+      "decision": "accept"
+     },
+     "asg_payload": {
+      "action_class": "booking.cancel",
+      "amount_minor": 0
+     },
+     "chain": {
+      "parent_capsule_id": "c1",
+      "relation": "supersedes"
+     }
+    }
+   ]
+  },
+  {
+   "name": "outside-the-window",
+   "expect": "expect 700: the charge 8 days back is out of the 7-day window, and so is what its cancel could cite",
+   "records": [
+    {
+     "capsule_id": "c1",
+     "operator": "op-a",
+     "developer": "dev@v1",
+     "timestamp": "2026-09-29T10:01:00Z",
+     "disposition": {
+      "decision": "accept"
+     },
+     "asg_payload": {
+      "action_class": "money.purchase",
+      "amount_minor": 2000
+     }
+    },
+    {
+     "capsule_id": "c2",
+     "operator": "op-a",
+     "developer": "dev@v1",
+     "timestamp": "2026-10-07T10:02:00Z",
+     "disposition": {
+      "decision": "accept"
+     },
+     "asg_payload": {
+      "action_class": "money.purchase",
+      "amount_minor": 700
+     }
+    },
+    {
+     "capsule_id": "c3",
+     "operator": "op-a",
+     "developer": "dev@v1",
+     "timestamp": "2026-10-07T10:03:00Z",
+     "disposition": {
+      "decision": "accept"
+     },
+     "asg_payload": {
+      "action_class": "booking.cancel",
+      "amount_minor": 2000
+     },
+     "chain": {
+      "parent_capsule_id": "c1",
+      "relation": "supersedes"
+     }
+    }
+   ]
+  },
+  {
+   "name": "no-amount-skipped",
+   "expect": "expect 400: a record with no amount is skipped",
+   "records": [
+    {
+     "capsule_id": "c1",
+     "operator": "op-a",
+     "developer": "dev@v1",
+     "timestamp": "2026-10-07T10:01:00Z",
+     "disposition": {
+      "decision": "accept"
+     },
+     "asg_payload": {
+      "action_class": "money.purchase"
+     }
+    },
+    {
+     "capsule_id": "c2",
+     "operator": "op-a",
+     "developer": "dev@v1",
+     "timestamp": "2026-10-07T10:02:00Z",
+     "disposition": {
+      "decision": "accept"
+     },
+     "asg_payload": {
+      "action_class": "money.purchase",
+      "amount_minor": 400
+     }
+    }
+   ]
+  },
+  {
+   "name": "executed-record-counted",
+   "expect": "expect 3500: an executed act's record counts at its amount, beside an accepted charge",
+   "records": [
+    {
+     "capsule_id": "c1",
+     "operator": "op-a",
+     "developer": "dev@v1",
+     "timestamp": "2026-10-07T10:01:00Z",
+     "disposition": {
+      "decision": "accept"
+     },
+     "asg_payload": {
+      "action_class": "money.purchase",
+      "amount_minor": 2000
+     }
+    },
+    {
+     "capsule_id": "x1",
+     "operator": "op-a",
+     "developer": "dev@v1",
+     "timestamp": "2026-10-07T10:02:00Z",
+     "disposition": {
+      "decision": "executed"
+     },
+     "asg_payload": {
+      "action_class": "booking.create",
+      "amount_minor": 1500
+     }
+    }
+   ]
+  },
+  {
+   "name": "live-history-copy-left-out",
+   "expect": "expect 1500: the engine's copy of a history act (live_history disposition) is left out; its executed record counts",
+   "records": [
+    {
+     "capsule_id": "h1",
+     "operator": "op-a",
+     "developer": "dev@v1",
+     "timestamp": "2026-10-07T10:01:00Z",
+     "disposition": {
+      "decision": "accept"
+     },
+     "asg_payload": {
+      "action_class": "money.purchase",
+      "amount_minor": 1500,
+      "live_history": "disposition"
+     }
+    },
+    {
+     "capsule_id": "x1",
+     "operator": "op-a",
+     "developer": "dev@v1",
+     "timestamp": "2026-10-07T10:01:00Z",
+     "disposition": {
+      "decision": "executed"
+     },
+     "asg_payload": {
+      "action_class": "money.purchase",
+      "amount_minor": 1500
+     }
+    }
+   ]
+  },
+  {
+   "name": "live-history-other-mark-counted",
+   "expect": "expect 2000: only the mark disposition is left out",
+   "records": [
+    {
+     "capsule_id": "h1",
+     "operator": "op-a",
+     "developer": "dev@v1",
+     "timestamp": "2026-10-07T10:01:00Z",
+     "disposition": {
+      "decision": "accept"
+     },
+     "asg_payload": {
+      "action_class": "money.purchase",
+      "amount_minor": 2000,
+      "live_history": "no_disposition"
+     }
+    }
+   ]
+  },
+  {
+   "name": "executed-unreadable-skipped",
+   "expect": "expect 2000: an executed record with no amount (spend_unreadable) is skipped by the fold",
+   "records": [
+    {
+     "capsule_id": "c1",
+     "operator": "op-a",
+     "developer": "dev@v1",
+     "timestamp": "2026-10-07T10:01:00Z",
+     "disposition": {
+      "decision": "accept"
+     },
+     "asg_payload": {
+      "action_class": "money.purchase",
+      "amount_minor": 2000
+     }
+    },
+    {
+     "capsule_id": "x1",
+     "operator": "op-a",
+     "developer": "dev@v1",
+     "timestamp": "2026-10-07T10:02:00Z",
+     "disposition": {
+      "decision": "executed"
+     },
+     "asg_payload": {
+      "action_class": "money.purchase",
+      "spend_unreadable": true
+     }
+    }
+   ]
+  },
+  {
+   "name": "executed-dry-run-left-out",
+   "expect": "expect 2000: a dry run is left out, executed or not",
+   "records": [
+    {
+     "capsule_id": "c1",
+     "operator": "op-a",
+     "developer": "dev@v1",
+     "timestamp": "2026-10-07T10:01:00Z",
+     "disposition": {
+      "decision": "accept"
+     },
+     "asg_payload": {
+      "action_class": "money.purchase",
+      "amount_minor": 2000
+     }
+    },
+    {
+     "capsule_id": "x1",
+     "operator": "op-a",
+     "developer": "dev@v1",
+     "timestamp": "2026-10-07T10:02:00Z",
+     "disposition": {
+      "decision": "executed"
+     },
+     "asg_payload": {
+      "action_class": "money.purchase",
+      "amount_minor": 900,
+      "checkpoint": {
+       "dry_run": true
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "executed-cancel-unlinked",
+   "expect": "expect 2000: an executed cancel cites no charge, so it is an unlinked reversal",
+   "records": [
+    {
+     "capsule_id": "c1",
+     "operator": "op-a",
+     "developer": "dev@v1",
+     "timestamp": "2026-10-07T10:01:00Z",
+     "disposition": {
+      "decision": "accept"
+     },
+     "asg_payload": {
+      "action_class": "money.purchase",
+      "amount_minor": 2000
+     }
+    },
+    {
+     "capsule_id": "x1",
+     "operator": "op-a",
+     "developer": "dev@v1",
+     "timestamp": "2026-10-07T10:02:00Z",
+     "disposition": {
+      "decision": "executed"
+     },
+     "asg_payload": {
+      "action_class": "booking.cancel",
+      "amount_minor": 700
+     }
+    }
+   ]
+  },
+  {
+   "name": "rejected-still-left-out",
+   "expect": "expect 2000: a reject is neither accept nor executed",
+   "records": [
+    {
+     "capsule_id": "c1",
+     "operator": "op-a",
+     "developer": "dev@v1",
+     "timestamp": "2026-10-07T10:01:00Z",
+     "disposition": {
+      "decision": "accept"
+     },
+     "asg_payload": {
+      "action_class": "money.purchase",
+      "amount_minor": 2000
+     }
+    },
+    {
+     "capsule_id": "r1",
+     "operator": "op-a",
+     "developer": "dev@v1",
+     "timestamp": "2026-10-07T10:02:00Z",
+     "disposition": {
+      "decision": "reject"
+     },
+     "asg_payload": {
+      "action_class": "money.purchase",
+      "amount_minor": 900
+     }
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,823 @@
+{
+  "capsule_engine_commit": "7339028ab2117d6c7adec89a26cd5022b8ac7140",
+  "decisions": {
+    "another-amount-passes": {
+      "decision": "needs_input",
+      "dedupe_matched_step": null,
+      "dedupe_result": "pass",
+      "failing_constraints": [
+        "counterparty_seen_before"
+      ],
+      "outcome": "escalate",
+      "steps": [
+        {
+          "candidate_key": "021885b3fafef111b7025cb2eee903be85c6f01f6cb1e5c378b164555696ce3f",
+          "decision_action_id": "deal-0000000000000000/2",
+          "decision_action_type": "fyi",
+          "decision_capsule_key": "021885b3fafef111b7025cb2eee903be85c6f01f6cb1e5c378b164555696ce3f",
+          "record": {
+            "action_id": "deal-0000000000000000/2",
+            "action_type": "fyi",
+            "agent_input": {
+              "body": {
+                "action": "pay",
+                "action_class": "money.purchase",
+                "amount_minor": 500,
+                "currency": "USD",
+                "spend_minor": 500,
+                "taxonomy_version": "6"
+              },
+              "x-deal-v0": {
+                "counterparty": {
+                  "fp_alg": "hmac-sha256-deal-key",
+                  "ids": {
+                    "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                  }
+                },
+                "deal_id": "deal-0000000000000000",
+                "record_type": "check",
+                "seq": 2
+              }
+            },
+            "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+            "developer": "capsulectl-deal",
+            "model_attestation": {
+              "compute_attestation": {
+                "agent_input_digest": "a895b308c4305514aa41c111bac1a48d2cd635baae6dacb41e5356e0f2fb4c32"
+              }
+            },
+            "operator": "household-dedupe-diff",
+            "timestamp": "2026-10-07T12:00:00Z"
+          }
+        },
+        {
+          "candidate_key": "d4a52fdb9f93ea7ac608fc6620b76d46220ae91fb92b17a39dd379341fb69a90",
+          "decision_action_id": "deal-0000000000000000/7",
+          "decision_action_type": "fyi",
+          "decision_capsule_key": "d4a52fdb9f93ea7ac608fc6620b76d46220ae91fb92b17a39dd379341fb69a90",
+          "record": {
+            "action_id": "deal-0000000000000000/7",
+            "action_type": "fyi",
+            "agent_input": {
+              "body": {
+                "action": "pay",
+                "action_class": "money.purchase",
+                "amount_minor": 501,
+                "currency": "USD",
+                "spend_minor": 501,
+                "taxonomy_version": "6"
+              },
+              "x-deal-v0": {
+                "counterparty": {
+                  "fp_alg": "hmac-sha256-deal-key",
+                  "ids": {
+                    "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                  }
+                },
+                "deal_id": "deal-0000000000000000",
+                "record_type": "check",
+                "seq": 7
+              }
+            },
+            "capsule_id": "0000000000000000000000000000000000000000000000000000000000000007",
+            "developer": "capsulectl-deal",
+            "model_attestation": {
+              "compute_attestation": {
+                "agent_input_digest": "8c4f7991d2b46d4d83f5018f21e50c56cf52cacab010b5e924805ba12b90eab2"
+              }
+            },
+            "operator": "household-dedupe-diff",
+            "timestamp": "2026-10-07T13:00:00Z"
+          }
+        }
+      ]
+    },
+    "another-class-passes": {
+      "decision": "accept",
+      "dedupe_matched_step": null,
+      "dedupe_result": "pass",
+      "failing_constraints": [],
+      "outcome": "allow",
+      "steps": [
+        {
+          "candidate_key": "021885b3fafef111b7025cb2eee903be85c6f01f6cb1e5c378b164555696ce3f",
+          "decision_action_id": "deal-0000000000000000/2",
+          "decision_action_type": "fyi",
+          "decision_capsule_key": "021885b3fafef111b7025cb2eee903be85c6f01f6cb1e5c378b164555696ce3f",
+          "record": {
+            "action_id": "deal-0000000000000000/2",
+            "action_type": "fyi",
+            "agent_input": {
+              "body": {
+                "action": "pay",
+                "action_class": "money.purchase",
+                "amount_minor": 500,
+                "currency": "USD",
+                "spend_minor": 500,
+                "taxonomy_version": "6"
+              },
+              "x-deal-v0": {
+                "counterparty": {
+                  "fp_alg": "hmac-sha256-deal-key",
+                  "ids": {
+                    "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                  }
+                },
+                "deal_id": "deal-0000000000000000",
+                "record_type": "check",
+                "seq": 2
+              }
+            },
+            "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+            "developer": "capsulectl-deal",
+            "model_attestation": {
+              "compute_attestation": {
+                "agent_input_digest": "a895b308c4305514aa41c111bac1a48d2cd635baae6dacb41e5356e0f2fb4c32"
+              }
+            },
+            "operator": "household-dedupe-diff",
+            "timestamp": "2026-10-07T12:00:00Z"
+          }
+        },
+        {
+          "candidate_key": "c99635476ff8f2259e2f4a5dae8397be5771b44dd8f128fb79f94025c661489b",
+          "decision_action_id": "deal-0000000000000000/7",
+          "decision_action_type": "fyi",
+          "decision_capsule_key": "c99635476ff8f2259e2f4a5dae8397be5771b44dd8f128fb79f94025c661489b",
+          "record": {
+            "action_id": "deal-0000000000000000/7",
+            "action_type": "fyi",
+            "agent_input": {
+              "body": {
+                "action": "cancel",
+                "action_class": "money.refund",
+                "amount_minor": 500,
+                "currency": "USD",
+                "spend_minor": 500,
+                "taxonomy_version": "6"
+              },
+              "x-deal-v0": {
+                "counterparty": {
+                  "fp_alg": "hmac-sha256-deal-key",
+                  "ids": {
+                    "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                  }
+                },
+                "deal_id": "deal-0000000000000000",
+                "record_type": "check",
+                "seq": 7
+              }
+            },
+            "capsule_id": "0000000000000000000000000000000000000000000000000000000000000007",
+            "developer": "capsulectl-deal",
+            "model_attestation": {
+              "compute_attestation": {
+                "agent_input_digest": "7a4465034a66079c724d15759c1d3bfe18bd6f2c337f11ea516f2d33038e6cbb"
+              }
+            },
+            "operator": "household-dedupe-diff",
+            "timestamp": "2026-10-07T13:00:00Z"
+          }
+        }
+      ]
+    },
+    "another-payee-passes": {
+      "decision": "needs_input",
+      "dedupe_matched_step": null,
+      "dedupe_result": "pass",
+      "failing_constraints": [
+        "counterparty_seen_before"
+      ],
+      "outcome": "escalate",
+      "steps": [
+        {
+          "candidate_key": "021885b3fafef111b7025cb2eee903be85c6f01f6cb1e5c378b164555696ce3f",
+          "decision_action_id": "deal-0000000000000000/2",
+          "decision_action_type": "fyi",
+          "decision_capsule_key": "021885b3fafef111b7025cb2eee903be85c6f01f6cb1e5c378b164555696ce3f",
+          "record": {
+            "action_id": "deal-0000000000000000/2",
+            "action_type": "fyi",
+            "agent_input": {
+              "body": {
+                "action": "pay",
+                "action_class": "money.purchase",
+                "amount_minor": 500,
+                "currency": "USD",
+                "spend_minor": 500,
+                "taxonomy_version": "6"
+              },
+              "x-deal-v0": {
+                "counterparty": {
+                  "fp_alg": "hmac-sha256-deal-key",
+                  "ids": {
+                    "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                  }
+                },
+                "deal_id": "deal-0000000000000000",
+                "record_type": "check",
+                "seq": 2
+              }
+            },
+            "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+            "developer": "capsulectl-deal",
+            "model_attestation": {
+              "compute_attestation": {
+                "agent_input_digest": "a895b308c4305514aa41c111bac1a48d2cd635baae6dacb41e5356e0f2fb4c32"
+              }
+            },
+            "operator": "household-dedupe-diff",
+            "timestamp": "2026-10-07T12:00:00Z"
+          }
+        },
+        {
+          "candidate_key": "78cd8300e9ba660578983bb9534fd37c01f43f0cc1894973d951e13c339d6bce",
+          "decision_action_id": "deal-0000000000000000/7",
+          "decision_action_type": "fyi",
+          "decision_capsule_key": "78cd8300e9ba660578983bb9534fd37c01f43f0cc1894973d951e13c339d6bce",
+          "record": {
+            "action_id": "deal-0000000000000000/7",
+            "action_type": "fyi",
+            "agent_input": {
+              "body": {
+                "action": "pay",
+                "action_class": "money.purchase",
+                "amount_minor": 500,
+                "currency": "USD",
+                "spend_minor": 500,
+                "taxonomy_version": "6"
+              },
+              "x-deal-v0": {
+                "counterparty": {
+                  "fp_alg": "hmac-sha256-deal-key",
+                  "ids": {
+                    "payee": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                  }
+                },
+                "deal_id": "deal-0000000000000000",
+                "record_type": "check",
+                "seq": 7
+              }
+            },
+            "capsule_id": "0000000000000000000000000000000000000000000000000000000000000007",
+            "developer": "capsulectl-deal",
+            "model_attestation": {
+              "compute_attestation": {
+                "agent_input_digest": "4577a210411e50067ef1fd8da7f5eb8bc7d9c33bdbdb478fa91804111a287d9d"
+              }
+            },
+            "operator": "household-dedupe-diff",
+            "timestamp": "2026-10-07T13:00:00Z"
+          }
+        }
+      ]
+    },
+    "checks-differing-in-act-never-match": {
+      "decision": "needs_input",
+      "dedupe_matched_step": null,
+      "dedupe_result": "pass",
+      "failing_constraints": [
+        "counterparty_seen_before"
+      ],
+      "outcome": "escalate",
+      "steps": [
+        {
+          "candidate_key": "021885b3fafef111b7025cb2eee903be85c6f01f6cb1e5c378b164555696ce3f",
+          "decision_action_id": "deal-0000000000000000/2",
+          "decision_action_type": "fyi",
+          "decision_capsule_key": "021885b3fafef111b7025cb2eee903be85c6f01f6cb1e5c378b164555696ce3f",
+          "record": {
+            "action_id": "deal-0000000000000000/2",
+            "action_type": "fyi",
+            "agent_input": {
+              "body": {
+                "action": "pay",
+                "action_class": "money.purchase",
+                "amount_minor": 500,
+                "currency": "USD",
+                "spend_minor": 500,
+                "taxonomy_version": "6"
+              },
+              "x-deal-v0": {
+                "counterparty": {
+                  "fp_alg": "hmac-sha256-deal-key",
+                  "ids": {
+                    "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                  }
+                },
+                "deal_id": "deal-0000000000000000",
+                "record_type": "check",
+                "seq": 2
+              }
+            },
+            "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+            "developer": "capsulectl-deal",
+            "model_attestation": {
+              "compute_attestation": {
+                "agent_input_digest": "a895b308c4305514aa41c111bac1a48d2cd635baae6dacb41e5356e0f2fb4c32"
+              }
+            },
+            "operator": "household-dedupe-diff",
+            "timestamp": "2026-10-07T12:00:00Z"
+          }
+        },
+        {
+          "candidate_key": "08718104688c0ba0e37fc97a0544c9deb6533308576a5729d6a97509c10aa80d",
+          "decision_action_id": "deal-0000000000000000/7",
+          "decision_action_type": "fyi",
+          "decision_capsule_key": "08718104688c0ba0e37fc97a0544c9deb6533308576a5729d6a97509c10aa80d",
+          "record": {
+            "action_id": "deal-0000000000000000/7",
+            "action_type": "fyi",
+            "agent_input": {
+              "body": {
+                "action": "pay",
+                "action_class": "money.purchase",
+                "amount_minor": 1200,
+                "currency": "USD",
+                "spend_minor": 1200,
+                "taxonomy_version": "6"
+              },
+              "x-deal-v0": {
+                "counterparty": {
+                  "fp_alg": "hmac-sha256-deal-key",
+                  "ids": {
+                    "payee": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                  }
+                },
+                "deal_id": "deal-0000000000000000",
+                "record_type": "check",
+                "seq": 7
+              }
+            },
+            "capsule_id": "0000000000000000000000000000000000000000000000000000000000000007",
+            "developer": "capsulectl-deal",
+            "model_attestation": {
+              "compute_attestation": {
+                "agent_input_digest": "756f923378cc2669756c0066d86849c3cab75b78bd52fd0710d8b5fd25d96199"
+              }
+            },
+            "operator": "household-dedupe-diff",
+            "timestamp": "2026-10-07T13:00:00Z"
+          }
+        }
+      ]
+    },
+    "earlier-act-under-decide-type-is-matched": {
+      "decision": "reject",
+      "dedupe_matched_step": 0,
+      "dedupe_result": "fail",
+      "failing_constraints": [
+        "dedupe",
+        "counterparty_seen_before"
+      ],
+      "outcome": "deny",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.purchase",
+            "action_id": "pay/elsewhere-1",
+            "amount_minor": 500,
+            "currency": "USD",
+            "developer": "capsulectl-deal",
+            "operator": "household-dedupe-diff",
+            "target": "payee-fp:hmac-sha256-deal-key:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "taxonomy_version": "6",
+            "timestamp": "2026-10-07T12:00:00Z",
+            "verb": "pay"
+          },
+          "candidate_key": "021885b3fafef111b7025cb2eee903be85c6f01f6cb1e5c378b164555696ce3f",
+          "decision_action_id": "pay/elsewhere-1",
+          "decision_action_type": "decide",
+          "decision_capsule_key": "021885b3fafef111b7025cb2eee903be85c6f01f6cb1e5c378b164555696ce3f"
+        },
+        {
+          "candidate_key": "021885b3fafef111b7025cb2eee903be85c6f01f6cb1e5c378b164555696ce3f",
+          "decision_action_id": "deal-0000000000000000/7",
+          "decision_action_type": "fyi",
+          "decision_capsule_key": "021885b3fafef111b7025cb2eee903be85c6f01f6cb1e5c378b164555696ce3f",
+          "record": {
+            "action_id": "deal-0000000000000000/7",
+            "action_type": "fyi",
+            "agent_input": {
+              "body": {
+                "action": "pay",
+                "action_class": "money.purchase",
+                "amount_minor": 500,
+                "currency": "USD",
+                "spend_minor": 500,
+                "taxonomy_version": "6"
+              },
+              "x-deal-v0": {
+                "counterparty": {
+                  "fp_alg": "hmac-sha256-deal-key",
+                  "ids": {
+                    "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                  }
+                },
+                "deal_id": "deal-0000000000000000",
+                "record_type": "check",
+                "seq": 7
+              }
+            },
+            "capsule_id": "0000000000000000000000000000000000000000000000000000000000000007",
+            "developer": "capsulectl-deal",
+            "model_attestation": {
+              "compute_attestation": {
+                "agent_input_digest": "1cf97919004c54b5ee3db4f3fc34c85e30719c8d0e13c87f951776a143796763"
+              }
+            },
+            "operator": "household-dedupe-diff",
+            "timestamp": "2026-10-07T13:00:00Z"
+          }
+        }
+      ]
+    },
+    "outside-window-passes": {
+      "decision": "needs_input",
+      "dedupe_matched_step": null,
+      "dedupe_result": "pass",
+      "failing_constraints": [
+        "counterparty_seen_before"
+      ],
+      "outcome": "escalate",
+      "steps": [
+        {
+          "candidate_key": "021885b3fafef111b7025cb2eee903be85c6f01f6cb1e5c378b164555696ce3f",
+          "decision_action_id": "deal-0000000000000000/2",
+          "decision_action_type": "fyi",
+          "decision_capsule_key": "021885b3fafef111b7025cb2eee903be85c6f01f6cb1e5c378b164555696ce3f",
+          "record": {
+            "action_id": "deal-0000000000000000/2",
+            "action_type": "fyi",
+            "agent_input": {
+              "body": {
+                "action": "pay",
+                "action_class": "money.purchase",
+                "amount_minor": 500,
+                "currency": "USD",
+                "spend_minor": 500,
+                "taxonomy_version": "6"
+              },
+              "x-deal-v0": {
+                "counterparty": {
+                  "fp_alg": "hmac-sha256-deal-key",
+                  "ids": {
+                    "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                  }
+                },
+                "deal_id": "deal-0000000000000000",
+                "record_type": "check",
+                "seq": 2
+              }
+            },
+            "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+            "developer": "capsulectl-deal",
+            "model_attestation": {
+              "compute_attestation": {
+                "agent_input_digest": "a895b308c4305514aa41c111bac1a48d2cd635baae6dacb41e5356e0f2fb4c32"
+              }
+            },
+            "operator": "household-dedupe-diff",
+            "timestamp": "2026-10-07T12:00:00Z"
+          }
+        },
+        {
+          "candidate_key": "021885b3fafef111b7025cb2eee903be85c6f01f6cb1e5c378b164555696ce3f",
+          "decision_action_id": "deal-0000000000000000/7",
+          "decision_action_type": "fyi",
+          "decision_capsule_key": "021885b3fafef111b7025cb2eee903be85c6f01f6cb1e5c378b164555696ce3f",
+          "record": {
+            "action_id": "deal-0000000000000000/7",
+            "action_type": "fyi",
+            "agent_input": {
+              "body": {
+                "action": "pay",
+                "action_class": "money.purchase",
+                "amount_minor": 500,
+                "currency": "USD",
+                "spend_minor": 500,
+                "taxonomy_version": "6"
+              },
+              "x-deal-v0": {
+                "counterparty": {
+                  "fp_alg": "hmac-sha256-deal-key",
+                  "ids": {
+                    "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                  }
+                },
+                "deal_id": "deal-0000000000000000",
+                "record_type": "check",
+                "seq": 7
+              }
+            },
+            "capsule_id": "0000000000000000000000000000000000000000000000000000000000000007",
+            "developer": "capsulectl-deal",
+            "model_attestation": {
+              "compute_attestation": {
+                "agent_input_digest": "1cf97919004c54b5ee3db4f3fc34c85e30719c8d0e13c87f951776a143796763"
+              }
+            },
+            "operator": "household-dedupe-diff",
+            "timestamp": "2026-11-16T12:00:00Z"
+          }
+        }
+      ]
+    },
+    "same-act-from-another-deal-is-refused": {
+      "decision": "needs_input",
+      "dedupe_matched_step": 0,
+      "dedupe_result": "fail",
+      "failing_constraints": [
+        "dedupe",
+        "counterparty_seen_before"
+      ],
+      "outcome": "escalate",
+      "steps": [
+        {
+          "candidate_key": "021885b3fafef111b7025cb2eee903be85c6f01f6cb1e5c378b164555696ce3f",
+          "decision_action_id": "deal-0000000000000000/2",
+          "decision_action_type": "fyi",
+          "decision_capsule_key": "021885b3fafef111b7025cb2eee903be85c6f01f6cb1e5c378b164555696ce3f",
+          "record": {
+            "action_id": "deal-0000000000000000/2",
+            "action_type": "fyi",
+            "agent_input": {
+              "body": {
+                "action": "pay",
+                "action_class": "money.purchase",
+                "amount_minor": 500,
+                "currency": "USD",
+                "spend_minor": 500,
+                "taxonomy_version": "6"
+              },
+              "x-deal-v0": {
+                "counterparty": {
+                  "fp_alg": "hmac-sha256-deal-key",
+                  "ids": {
+                    "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                  }
+                },
+                "deal_id": "deal-0000000000000000",
+                "record_type": "check",
+                "seq": 2
+              }
+            },
+            "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+            "developer": "capsulectl-deal",
+            "model_attestation": {
+              "compute_attestation": {
+                "agent_input_digest": "a895b308c4305514aa41c111bac1a48d2cd635baae6dacb41e5356e0f2fb4c32"
+              }
+            },
+            "operator": "household-dedupe-diff",
+            "timestamp": "2026-10-07T12:00:00Z"
+          }
+        },
+        {
+          "candidate_key": "021885b3fafef111b7025cb2eee903be85c6f01f6cb1e5c378b164555696ce3f",
+          "decision_action_id": "deal-1111111111111111/3",
+          "decision_action_type": "fyi",
+          "decision_capsule_key": "021885b3fafef111b7025cb2eee903be85c6f01f6cb1e5c378b164555696ce3f",
+          "record": {
+            "action_id": "deal-1111111111111111/3",
+            "action_type": "fyi",
+            "agent_input": {
+              "body": {
+                "action": "pay",
+                "action_class": "money.purchase",
+                "amount_minor": 500,
+                "currency": "USD",
+                "spend_minor": 500,
+                "taxonomy_version": "6"
+              },
+              "x-deal-v0": {
+                "counterparty": {
+                  "fp_alg": "hmac-sha256-deal-key",
+                  "ids": {
+                    "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                  }
+                },
+                "deal_id": "deal-1111111111111111",
+                "record_type": "check",
+                "seq": 3
+              }
+            },
+            "capsule_id": "0000000000000000000000000000000000000000000000000000000000000003",
+            "developer": "capsulectl-deal",
+            "model_attestation": {
+              "compute_attestation": {
+                "agent_input_digest": "62fc6d891c20bc3c4acc1a4501b31104a0dfa8df008421487a909aae0ef4720c"
+              }
+            },
+            "operator": "household-dedupe-diff",
+            "timestamp": "2026-10-07T13:00:00Z"
+          }
+        }
+      ]
+    },
+    "same-act-repeated-is-refused": {
+      "decision": "reject",
+      "dedupe_matched_step": 0,
+      "dedupe_result": "fail",
+      "failing_constraints": [
+        "dedupe",
+        "counterparty_seen_before"
+      ],
+      "outcome": "deny",
+      "steps": [
+        {
+          "candidate_key": "021885b3fafef111b7025cb2eee903be85c6f01f6cb1e5c378b164555696ce3f",
+          "decision_action_id": "deal-0000000000000000/2",
+          "decision_action_type": "fyi",
+          "decision_capsule_key": "021885b3fafef111b7025cb2eee903be85c6f01f6cb1e5c378b164555696ce3f",
+          "record": {
+            "action_id": "deal-0000000000000000/2",
+            "action_type": "fyi",
+            "agent_input": {
+              "body": {
+                "action": "pay",
+                "action_class": "money.purchase",
+                "amount_minor": 500,
+                "currency": "USD",
+                "spend_minor": 500,
+                "taxonomy_version": "6"
+              },
+              "x-deal-v0": {
+                "counterparty": {
+                  "fp_alg": "hmac-sha256-deal-key",
+                  "ids": {
+                    "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                  }
+                },
+                "deal_id": "deal-0000000000000000",
+                "record_type": "check",
+                "seq": 2
+              }
+            },
+            "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+            "developer": "capsulectl-deal",
+            "model_attestation": {
+              "compute_attestation": {
+                "agent_input_digest": "a895b308c4305514aa41c111bac1a48d2cd635baae6dacb41e5356e0f2fb4c32"
+              }
+            },
+            "operator": "household-dedupe-diff",
+            "timestamp": "2026-10-07T12:00:00Z"
+          }
+        },
+        {
+          "candidate_key": "021885b3fafef111b7025cb2eee903be85c6f01f6cb1e5c378b164555696ce3f",
+          "decision_action_id": "deal-0000000000000000/7",
+          "decision_action_type": "fyi",
+          "decision_capsule_key": "021885b3fafef111b7025cb2eee903be85c6f01f6cb1e5c378b164555696ce3f",
+          "record": {
+            "action_id": "deal-0000000000000000/7",
+            "action_type": "fyi",
+            "agent_input": {
+              "body": {
+                "action": "pay",
+                "action_class": "money.purchase",
+                "amount_minor": 500,
+                "currency": "USD",
+                "spend_minor": 500,
+                "taxonomy_version": "6"
+              },
+              "x-deal-v0": {
+                "counterparty": {
+                  "fp_alg": "hmac-sha256-deal-key",
+                  "ids": {
+                    "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                  }
+                },
+                "deal_id": "deal-0000000000000000",
+                "record_type": "check",
+                "seq": 7
+              }
+            },
+            "capsule_id": "0000000000000000000000000000000000000000000000000000000000000007",
+            "developer": "capsulectl-deal",
+            "model_attestation": {
+              "compute_attestation": {
+                "agent_input_digest": "1cf97919004c54b5ee3db4f3fc34c85e30719c8d0e13c87f951776a143796763"
+              }
+            },
+            "operator": "household-dedupe-diff",
+            "timestamp": "2026-10-07T13:00:00Z"
+          }
+        }
+      ]
+    },
+    "unpinned-actions-keep-the-legacy-key": {
+      "decision": "reject",
+      "dedupe_matched_step": 0,
+      "dedupe_result": "fail",
+      "failing_constraints": [
+        "dedupe"
+      ],
+      "outcome": "deny",
+      "steps": [
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "transfer_funds/1",
+            "amount_minor": 100,
+            "currency": "EUR",
+            "developer": "agent@v1",
+            "operator": "household-dedupe-diff",
+            "target": "acct-ref-1",
+            "timestamp": "2026-10-07T12:00:00Z",
+            "verb": "transfer_funds"
+          },
+          "candidate_key": "c6cce2c7efec84d6b7c55a216ec806aaf47e0dcf7d929ccf31d70dd68a384779",
+          "decision_action_id": "transfer_funds/1",
+          "decision_action_type": "decide",
+          "decision_capsule_key": "c6cce2c7efec84d6b7c55a216ec806aaf47e0dcf7d929ccf31d70dd68a384779"
+        },
+        {
+          "action": {
+            "action_class": "money.transfer",
+            "action_id": "transfer_funds/2",
+            "amount_minor": 999,
+            "currency": "EUR",
+            "developer": "agent@v1",
+            "operator": "household-dedupe-diff",
+            "target": "acct-ref-1",
+            "timestamp": "2026-10-07T13:00:00Z",
+            "verb": "transfer_funds"
+          },
+          "candidate_key": "c6cce2c7efec84d6b7c55a216ec806aaf47e0dcf7d929ccf31d70dd68a384779",
+          "decision_action_id": "transfer_funds/2",
+          "decision_action_type": "decide",
+          "decision_capsule_key": "c6cce2c7efec84d6b7c55a216ec806aaf47e0dcf7d929ccf31d70dd68a384779"
+        }
+      ]
+    }
+  },
+  "key_vectors": [
+    {
+      "action": {
+        "action_class": "money.purchase",
+        "action_id": "deal-0000000000000000/2",
+        "action_type": "fyi",
+        "amount_minor": 500,
+        "developer": "capsulectl-deal",
+        "operator": "household-dedupe-diff",
+        "target": "payee-fp:hmac-sha256-deal-key:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "taxonomy_version": "6",
+        "verb": "pay"
+      },
+      "digest": "021885b3fafef111b7025cb2eee903be85c6f01f6cb1e5c378b164555696ce3f",
+      "equivalence_key_for_action": "021885b3fafef111b7025cb2eee903be85c6f01f6cb1e5c378b164555696ce3f",
+      "fields": {
+        "action_class": "money.purchase",
+        "amount_minor": 500,
+        "developer": "capsulectl-deal",
+        "operator": "household-dedupe-diff",
+        "target": "payee-fp:hmac-sha256-deal-key:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "name": "pinned-act"
+    },
+    {
+      "action": {
+        "action_class": "money.purchase",
+        "developer": "capsulectl-deal",
+        "operator": "household-dedupe-diff",
+        "taxonomy_version": "6",
+        "verb": "pay"
+      },
+      "digest": "fdca81f0c8b1675e187b4c4a7e6448f6fc1a470b30f8e5f29c984080c77fd240",
+      "equivalence_key_for_action": "fdca81f0c8b1675e187b4c4a7e6448f6fc1a470b30f8e5f29c984080c77fd240",
+      "fields": {
+        "action_class": "money.purchase",
+        "amount_minor": null,
+        "developer": "capsulectl-deal",
+        "operator": "household-dedupe-diff",
+        "target": null
+      },
+      "name": "pinned-act-no-target-no-amount"
+    },
+    {
+      "action": {
+        "amount_minor": 100,
+        "developer": "agent@v1",
+        "operator": "household-dedupe-diff",
+        "target": "acct-ref-1",
+        "verb": "transfer_funds"
+      },
+      "digest": "c6cce2c7efec84d6b7c55a216ec806aaf47e0dcf7d929ccf31d70dd68a384779",
+      "equivalence_key_for_action": "c6cce2c7efec84d6b7c55a216ec806aaf47e0dcf7d929ccf31d70dd68a384779",
+      "fields": {
+        "action_type": "decide",
+        "developer": "agent@v1",
+        "operator": "household-dedupe-diff",
+        "target": "acct-ref-1",
+        "verb": "transfer_funds"
+      },
+      "name": "unpinned-legacy"
+    }
+  ],
+  "pack_definition_digest": "c1cea374102bba60de82e16663c550a278ee07a399c5faeb285fe1ea1ea27d4d",
+  "pack_id": "asg/everyday/0.3.7",
+  "source": "go/guard/testdata/parity/generate_dedupe_act.py"
+}

@@ -1,0 +1,1530 @@
+{
+  "capsule_engine_commit": "7339028ab2117d6c7adec89a26cd5022b8ac7140",
+  "decisions": {
+    "booking-558-80-non-refundable-asks": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "destination_rail",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "refundability",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "needs_input",
+      "failing_constraints": [
+        "caps",
+        "action_class_gate",
+        "refundability"
+      ],
+      "failing_rules": [
+        "r05-spending-limits",
+        "r08-non-refundable-or-hard-to-undo",
+        "r16-booking-with-a-commitment"
+      ],
+      "outcome": "escalate",
+      "reason": "escalate: dedupe=pass, caps=fail, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=fail, counterparty_seen_before=n/a, recipient_role=n/a, refundability=fail, material_fields_changed=n/a, offer_fields_changed=n/a, recipient_seen_before=n/a, channel_change=n/a, upfront_amount=n/a, task_authority=n/a",
+      "verdict_class": "hitl_dispatched"
+    },
+    "booking-558-80-r08-never-refuses": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "destination_rail",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "caps",
+        "action_class_gate",
+        "refundability"
+      ],
+      "failing_rules": [
+        "r05-spending-limits",
+        "r08-non-refundable-or-hard-to-undo",
+        "r16-booking-with-a-commitment"
+      ],
+      "outcome": "deny",
+      "reason": "deny: dedupe=pass, caps=fail, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=fail, counterparty_seen_before=n/a, recipient_role=n/a, refundability=fail, material_fields_changed=n/a, offer_fields_changed=n/a, recipient_seen_before=n/a, channel_change=n/a, upfront_amount=n/a, task_authority=n/a",
+      "verdict_class": "blocked"
+    },
+    "r07-recurring-charge-asks": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "destination_rail",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "refundability",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "needs_input",
+      "failing_constraints": [
+        "recurring_charge"
+      ],
+      "failing_rules": [
+        "r07-subscription-or-free-trial"
+      ],
+      "outcome": "escalate",
+      "reason": "escalate: dedupe=pass, caps=pass, verify_before_dispatch=n/a, destination_rail=pass, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=fail, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=pass, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=pass, upfront_amount=pass, task_authority=n/a",
+      "verdict_class": "hitl_dispatched"
+    },
+    "r07-recurring-charge-beside-credential-refuses": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "destination_rail",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "refundability",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "credential_pattern",
+        "recurring_charge"
+      ],
+      "failing_rules": [
+        "r07-subscription-or-free-trial",
+        "r23-secrets-and-authentication"
+      ],
+      "outcome": "deny",
+      "reason": "deny: dedupe=pass, caps=pass, verify_before_dispatch=n/a, destination_rail=pass, counterparty_identity_change=n/a, credential_pattern=fail, recurring_charge=fail, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=pass, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=pass, upfront_amount=pass, task_authority=n/a",
+      "verdict_class": "blocked"
+    },
+    "r07-recurring-charge-citing-missing-mandate-refuses": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "destination_rail",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "refundability",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "verify_before_dispatch",
+        "recurring_charge"
+      ],
+      "failing_rules": [
+        "r07-subscription-or-free-trial"
+      ],
+      "outcome": "deny",
+      "reason": "deny: dedupe=pass, caps=pass, verify_before_dispatch=fail, destination_rail=pass, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=fail, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=pass, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=pass, upfront_amount=pass, task_authority=n/a",
+      "verdict_class": "blocked"
+    },
+    "r07-recurring-charge-mixed-binding-refuses": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "destination_rail",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "refundability",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "recurring_charge"
+      ],
+      "failing_rules": [
+        "r07-subscription-or-free-trial",
+        "rx-never"
+      ],
+      "outcome": "deny",
+      "reason": "deny: dedupe=pass, caps=pass, verify_before_dispatch=n/a, destination_rail=pass, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=fail, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=pass, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=pass, upfront_amount=pass, task_authority=n/a",
+      "verdict_class": "blocked"
+    },
+    "r07-recurring-charge-never-refuses": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "destination_rail",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "refundability",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "recurring_charge"
+      ],
+      "failing_rules": [
+        "r07-subscription-or-free-trial"
+      ],
+      "outcome": "deny",
+      "reason": "deny: dedupe=pass, caps=pass, verify_before_dispatch=n/a, destination_rail=pass, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=fail, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=pass, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=pass, upfront_amount=pass, task_authority=n/a",
+      "verdict_class": "blocked"
+    },
+    "r07-recurring-charge-same-deal-repeat-refuses": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "destination_rail",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "refundability",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "dedupe",
+        "recurring_charge"
+      ],
+      "failing_rules": [
+        "r07-subscription-or-free-trial",
+        "r27-no-commitment-beyond-task-bounds"
+      ],
+      "outcome": "deny",
+      "reason": "deny: dedupe=fail, caps=pass, verify_before_dispatch=n/a, destination_rail=pass, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=fail, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=pass, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=pass, upfront_amount=pass, task_authority=n/a",
+      "verdict_class": "blocked"
+    },
+    "r08-non-refundable-asks": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "destination_rail",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "refundability",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "needs_input",
+      "failing_constraints": [
+        "refundability"
+      ],
+      "failing_rules": [
+        "r08-non-refundable-or-hard-to-undo"
+      ],
+      "outcome": "escalate",
+      "reason": "escalate: dedupe=pass, caps=pass, verify_before_dispatch=n/a, destination_rail=pass, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=pass, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=fail, material_fields_changed=pass, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=pass, upfront_amount=pass, task_authority=n/a",
+      "verdict_class": "hitl_dispatched"
+    },
+    "r08-non-refundable-beside-credential-refuses": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "destination_rail",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "refundability",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "credential_pattern",
+        "refundability"
+      ],
+      "failing_rules": [
+        "r08-non-refundable-or-hard-to-undo",
+        "r23-secrets-and-authentication"
+      ],
+      "outcome": "deny",
+      "reason": "deny: dedupe=pass, caps=pass, verify_before_dispatch=n/a, destination_rail=pass, counterparty_identity_change=n/a, credential_pattern=fail, recurring_charge=pass, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=fail, material_fields_changed=pass, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=pass, upfront_amount=pass, task_authority=n/a",
+      "verdict_class": "blocked"
+    },
+    "r08-non-refundable-citing-missing-mandate-refuses": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "destination_rail",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "refundability",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "verify_before_dispatch",
+        "refundability"
+      ],
+      "failing_rules": [
+        "r08-non-refundable-or-hard-to-undo"
+      ],
+      "outcome": "deny",
+      "reason": "deny: dedupe=pass, caps=pass, verify_before_dispatch=fail, destination_rail=pass, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=pass, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=fail, material_fields_changed=pass, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=pass, upfront_amount=pass, task_authority=n/a",
+      "verdict_class": "blocked"
+    },
+    "r08-non-refundable-mixed-binding-refuses": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "destination_rail",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "refundability"
+      ],
+      "failing_rules": [
+        "r08-non-refundable-or-hard-to-undo",
+        "rx-never"
+      ],
+      "outcome": "deny",
+      "reason": "deny: dedupe=pass, caps=pass, verify_before_dispatch=n/a, destination_rail=pass, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=pass, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=fail, material_fields_changed=pass, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=pass, upfront_amount=pass, task_authority=n/a",
+      "verdict_class": "blocked"
+    },
+    "r08-non-refundable-never-refuses": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "destination_rail",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "refundability"
+      ],
+      "failing_rules": [
+        "r08-non-refundable-or-hard-to-undo"
+      ],
+      "outcome": "deny",
+      "reason": "deny: dedupe=pass, caps=pass, verify_before_dispatch=n/a, destination_rail=pass, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=pass, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=fail, material_fields_changed=pass, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=pass, upfront_amount=pass, task_authority=n/a",
+      "verdict_class": "blocked"
+    },
+    "r08-non-refundable-same-deal-repeat-refuses": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "destination_rail",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "refundability",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "dedupe",
+        "refundability"
+      ],
+      "failing_rules": [
+        "r08-non-refundable-or-hard-to-undo",
+        "r27-no-commitment-beyond-task-bounds"
+      ],
+      "outcome": "deny",
+      "reason": "deny: dedupe=fail, caps=pass, verify_before_dispatch=n/a, destination_rail=pass, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=pass, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=fail, material_fields_changed=pass, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=pass, upfront_amount=pass, task_authority=n/a",
+      "verdict_class": "blocked"
+    },
+    "r09-material-terms-changed-asks": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "destination_rail",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "refundability",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "needs_input",
+      "failing_constraints": [
+        "material_fields_changed"
+      ],
+      "failing_rules": [
+        "r09-material-terms-changed"
+      ],
+      "outcome": "escalate",
+      "reason": "escalate: dedupe=pass, caps=pass, verify_before_dispatch=n/a, destination_rail=pass, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=pass, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=fail, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=pass, upfront_amount=pass, task_authority=n/a",
+      "verdict_class": "hitl_dispatched"
+    },
+    "r09-material-terms-changed-beside-credential-refuses": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "destination_rail",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "refundability",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "credential_pattern",
+        "material_fields_changed"
+      ],
+      "failing_rules": [
+        "r09-material-terms-changed",
+        "r23-secrets-and-authentication"
+      ],
+      "outcome": "deny",
+      "reason": "deny: dedupe=pass, caps=pass, verify_before_dispatch=n/a, destination_rail=pass, counterparty_identity_change=n/a, credential_pattern=fail, recurring_charge=pass, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=fail, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=pass, upfront_amount=pass, task_authority=n/a",
+      "verdict_class": "blocked"
+    },
+    "r09-material-terms-changed-citing-missing-mandate-refuses": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "destination_rail",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "refundability",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "verify_before_dispatch",
+        "material_fields_changed"
+      ],
+      "failing_rules": [
+        "r09-material-terms-changed"
+      ],
+      "outcome": "deny",
+      "reason": "deny: dedupe=pass, caps=pass, verify_before_dispatch=fail, destination_rail=pass, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=pass, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=fail, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=pass, upfront_amount=pass, task_authority=n/a",
+      "verdict_class": "blocked"
+    },
+    "r09-material-terms-changed-mixed-binding-refuses": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "destination_rail",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "refundability",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "material_fields_changed"
+      ],
+      "failing_rules": [
+        "r09-material-terms-changed",
+        "rx-never"
+      ],
+      "outcome": "deny",
+      "reason": "deny: dedupe=pass, caps=pass, verify_before_dispatch=n/a, destination_rail=pass, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=pass, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=fail, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=pass, upfront_amount=pass, task_authority=n/a",
+      "verdict_class": "blocked"
+    },
+    "r09-material-terms-changed-never-refuses": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "destination_rail",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "refundability",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "material_fields_changed"
+      ],
+      "failing_rules": [
+        "r09-material-terms-changed"
+      ],
+      "outcome": "deny",
+      "reason": "deny: dedupe=pass, caps=pass, verify_before_dispatch=n/a, destination_rail=pass, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=pass, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=fail, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=pass, upfront_amount=pass, task_authority=n/a",
+      "verdict_class": "blocked"
+    },
+    "r09-material-terms-changed-same-deal-repeat-refuses": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "destination_rail",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "refundability",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "dedupe",
+        "material_fields_changed"
+      ],
+      "failing_rules": [
+        "r09-material-terms-changed",
+        "r27-no-commitment-beyond-task-bounds"
+      ],
+      "outcome": "deny",
+      "reason": "deny: dedupe=fail, caps=pass, verify_before_dispatch=n/a, destination_rail=pass, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=pass, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=fail, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=pass, upfront_amount=pass, task_authority=n/a",
+      "verdict_class": "blocked"
+    },
+    "r10-offer-differs-asks": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "destination_rail",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "refundability",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "needs_input",
+      "failing_constraints": [
+        "offer_fields_changed"
+      ],
+      "failing_rules": [
+        "r10-materially-different-offer"
+      ],
+      "outcome": "escalate",
+      "reason": "escalate: dedupe=pass, caps=pass, verify_before_dispatch=n/a, destination_rail=pass, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=pass, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=pass, offer_fields_changed=fail, recipient_seen_before=n/a, channel_change=pass, upfront_amount=pass, task_authority=n/a",
+      "verdict_class": "hitl_dispatched"
+    },
+    "r10-offer-differs-beside-credential-refuses": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "destination_rail",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "refundability",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "credential_pattern",
+        "offer_fields_changed"
+      ],
+      "failing_rules": [
+        "r10-materially-different-offer",
+        "r23-secrets-and-authentication"
+      ],
+      "outcome": "deny",
+      "reason": "deny: dedupe=pass, caps=pass, verify_before_dispatch=n/a, destination_rail=pass, counterparty_identity_change=n/a, credential_pattern=fail, recurring_charge=pass, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=pass, offer_fields_changed=fail, recipient_seen_before=n/a, channel_change=pass, upfront_amount=pass, task_authority=n/a",
+      "verdict_class": "blocked"
+    },
+    "r10-offer-differs-citing-missing-mandate-refuses": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "destination_rail",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "refundability",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "verify_before_dispatch",
+        "offer_fields_changed"
+      ],
+      "failing_rules": [
+        "r10-materially-different-offer"
+      ],
+      "outcome": "deny",
+      "reason": "deny: dedupe=pass, caps=pass, verify_before_dispatch=fail, destination_rail=pass, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=pass, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=pass, offer_fields_changed=fail, recipient_seen_before=n/a, channel_change=pass, upfront_amount=pass, task_authority=n/a",
+      "verdict_class": "blocked"
+    },
+    "r10-offer-differs-mixed-binding-refuses": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "destination_rail",
+        "material_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "refundability",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "offer_fields_changed"
+      ],
+      "failing_rules": [
+        "r10-materially-different-offer",
+        "rx-never"
+      ],
+      "outcome": "deny",
+      "reason": "deny: dedupe=pass, caps=pass, verify_before_dispatch=n/a, destination_rail=pass, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=pass, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=pass, offer_fields_changed=fail, recipient_seen_before=n/a, channel_change=pass, upfront_amount=pass, task_authority=n/a",
+      "verdict_class": "blocked"
+    },
+    "r10-offer-differs-never-refuses": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "destination_rail",
+        "material_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "refundability",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "offer_fields_changed"
+      ],
+      "failing_rules": [
+        "r10-materially-different-offer"
+      ],
+      "outcome": "deny",
+      "reason": "deny: dedupe=pass, caps=pass, verify_before_dispatch=n/a, destination_rail=pass, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=pass, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=pass, offer_fields_changed=fail, recipient_seen_before=n/a, channel_change=pass, upfront_amount=pass, task_authority=n/a",
+      "verdict_class": "blocked"
+    },
+    "r10-offer-differs-same-deal-repeat-refuses": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "destination_rail",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "refundability",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "dedupe",
+        "offer_fields_changed"
+      ],
+      "failing_rules": [
+        "r10-materially-different-offer",
+        "r27-no-commitment-beyond-task-bounds"
+      ],
+      "outcome": "deny",
+      "reason": "deny: dedupe=fail, caps=pass, verify_before_dispatch=n/a, destination_rail=pass, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=pass, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=pass, offer_fields_changed=fail, recipient_seen_before=n/a, channel_change=pass, upfront_amount=pass, task_authority=n/a",
+      "verdict_class": "blocked"
+    },
+    "r13-new-recipient-no-approver-refuses": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "destination_rail",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "refundability",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "needs_input",
+      "failing_constraints": [
+        "recipient_seen_before"
+      ],
+      "failing_rules": [
+        "r13-message-to-a-new-recipient"
+      ],
+      "outcome": "escalate",
+      "reason": "escalate: dedupe=pass, caps=n/a, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=pass, recurring_charge=n/a, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=n/a, material_fields_changed=n/a, offer_fields_changed=n/a, recipient_seen_before=fail, channel_change=n/a, upfront_amount=n/a, task_authority=n/a",
+      "verdict_class": "hitl_dispatched"
+    },
+    "r19-payee-account-changed-asks": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "destination_rail",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "refundability",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "needs_input",
+      "failing_constraints": [
+        "counterparty_identity_change"
+      ],
+      "failing_rules": [
+        "r19-counterparty-identity-changed"
+      ],
+      "outcome": "escalate",
+      "reason": "escalate: dedupe=pass, caps=pass, verify_before_dispatch=n/a, destination_rail=pass, counterparty_identity_change=fail, credential_pattern=n/a, recurring_charge=pass, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=pass, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=pass, upfront_amount=pass, task_authority=n/a",
+      "verdict_class": "hitl_dispatched"
+    },
+    "r20-watched-rail-asks": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "destination_rail",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "refundability",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "needs_input",
+      "failing_constraints": [
+        "destination_rail"
+      ],
+      "failing_rules": [
+        "r20-payment-method-or-destination-changed"
+      ],
+      "outcome": "escalate",
+      "reason": "escalate: dedupe=pass, caps=pass, verify_before_dispatch=n/a, destination_rail=fail, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=pass, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=pass, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=pass, upfront_amount=pass, task_authority=n/a",
+      "verdict_class": "hitl_dispatched"
+    },
+    "r20-watched-rail-beside-credential-refuses": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "destination_rail",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "refundability",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "destination_rail",
+        "credential_pattern"
+      ],
+      "failing_rules": [
+        "r20-payment-method-or-destination-changed",
+        "r23-secrets-and-authentication"
+      ],
+      "outcome": "deny",
+      "reason": "deny: dedupe=pass, caps=pass, verify_before_dispatch=n/a, destination_rail=fail, counterparty_identity_change=n/a, credential_pattern=fail, recurring_charge=pass, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=pass, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=pass, upfront_amount=pass, task_authority=n/a",
+      "verdict_class": "blocked"
+    },
+    "r20-watched-rail-citing-missing-mandate-refuses": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "destination_rail",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "refundability",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "verify_before_dispatch",
+        "destination_rail"
+      ],
+      "failing_rules": [
+        "r20-payment-method-or-destination-changed"
+      ],
+      "outcome": "deny",
+      "reason": "deny: dedupe=pass, caps=pass, verify_before_dispatch=fail, destination_rail=fail, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=pass, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=pass, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=pass, upfront_amount=pass, task_authority=n/a",
+      "verdict_class": "blocked"
+    },
+    "r20-watched-rail-mixed-binding-refuses": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "refundability",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "destination_rail"
+      ],
+      "failing_rules": [
+        "r20-payment-method-or-destination-changed",
+        "rx-never"
+      ],
+      "outcome": "deny",
+      "reason": "deny: dedupe=pass, caps=pass, verify_before_dispatch=n/a, destination_rail=fail, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=pass, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=pass, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=pass, upfront_amount=pass, task_authority=n/a",
+      "verdict_class": "blocked"
+    },
+    "r20-watched-rail-never-refuses": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "refundability",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "destination_rail"
+      ],
+      "failing_rules": [
+        "r20-payment-method-or-destination-changed"
+      ],
+      "outcome": "deny",
+      "reason": "deny: dedupe=pass, caps=pass, verify_before_dispatch=n/a, destination_rail=fail, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=pass, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=pass, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=pass, upfront_amount=pass, task_authority=n/a",
+      "verdict_class": "blocked"
+    },
+    "r20-watched-rail-same-deal-repeat-refuses": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "destination_rail",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "refundability",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "dedupe",
+        "destination_rail"
+      ],
+      "failing_rules": [
+        "r20-payment-method-or-destination-changed",
+        "r27-no-commitment-beyond-task-bounds"
+      ],
+      "outcome": "deny",
+      "reason": "deny: dedupe=fail, caps=pass, verify_before_dispatch=n/a, destination_rail=fail, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=pass, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=pass, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=pass, upfront_amount=pass, task_authority=n/a",
+      "verdict_class": "blocked"
+    },
+    "r21-channel-change-asks": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "destination_rail",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "refundability",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "needs_input",
+      "failing_constraints": [
+        "channel_change"
+      ],
+      "failing_rules": [
+        "r21-unexpected-channel-change"
+      ],
+      "outcome": "escalate",
+      "reason": "escalate: dedupe=pass, caps=pass, verify_before_dispatch=n/a, destination_rail=pass, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=pass, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=pass, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=fail, upfront_amount=pass, task_authority=n/a",
+      "verdict_class": "hitl_dispatched"
+    },
+    "r21-channel-change-beside-credential-refuses": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "destination_rail",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "refundability",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "credential_pattern",
+        "channel_change"
+      ],
+      "failing_rules": [
+        "r21-unexpected-channel-change",
+        "r23-secrets-and-authentication"
+      ],
+      "outcome": "deny",
+      "reason": "deny: dedupe=pass, caps=pass, verify_before_dispatch=n/a, destination_rail=pass, counterparty_identity_change=n/a, credential_pattern=fail, recurring_charge=pass, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=pass, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=fail, upfront_amount=pass, task_authority=n/a",
+      "verdict_class": "blocked"
+    },
+    "r21-channel-change-citing-missing-mandate-refuses": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "destination_rail",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "refundability",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "verify_before_dispatch",
+        "channel_change"
+      ],
+      "failing_rules": [
+        "r21-unexpected-channel-change"
+      ],
+      "outcome": "deny",
+      "reason": "deny: dedupe=pass, caps=pass, verify_before_dispatch=fail, destination_rail=pass, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=pass, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=pass, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=fail, upfront_amount=pass, task_authority=n/a",
+      "verdict_class": "blocked"
+    },
+    "r21-channel-change-mixed-binding-refuses": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "counterparty_identity_change",
+        "destination_rail",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "refundability",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "channel_change"
+      ],
+      "failing_rules": [
+        "r21-unexpected-channel-change",
+        "rx-never"
+      ],
+      "outcome": "deny",
+      "reason": "deny: dedupe=pass, caps=pass, verify_before_dispatch=n/a, destination_rail=pass, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=pass, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=pass, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=fail, upfront_amount=pass, task_authority=n/a",
+      "verdict_class": "blocked"
+    },
+    "r21-channel-change-never-refuses": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "counterparty_identity_change",
+        "destination_rail",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "refundability",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "channel_change"
+      ],
+      "failing_rules": [
+        "r21-unexpected-channel-change"
+      ],
+      "outcome": "deny",
+      "reason": "deny: dedupe=pass, caps=pass, verify_before_dispatch=n/a, destination_rail=pass, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=pass, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=pass, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=fail, upfront_amount=pass, task_authority=n/a",
+      "verdict_class": "blocked"
+    },
+    "r21-channel-change-same-deal-repeat-refuses": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "destination_rail",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "refundability",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "dedupe",
+        "channel_change"
+      ],
+      "failing_rules": [
+        "r21-unexpected-channel-change",
+        "r27-no-commitment-beyond-task-bounds"
+      ],
+      "outcome": "deny",
+      "reason": "deny: dedupe=fail, caps=pass, verify_before_dispatch=n/a, destination_rail=pass, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=pass, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=pass, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=fail, upfront_amount=pass, task_authority=n/a",
+      "verdict_class": "blocked"
+    },
+    "r22-unusual-deposit-asks": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "destination_rail",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "refundability",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "needs_input",
+      "failing_constraints": [
+        "upfront_amount"
+      ],
+      "failing_rules": [
+        "r22-unusual-counterparty-behaviour"
+      ],
+      "outcome": "escalate",
+      "reason": "escalate: dedupe=pass, caps=pass, verify_before_dispatch=n/a, destination_rail=pass, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=pass, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=pass, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=pass, upfront_amount=fail, task_authority=n/a",
+      "verdict_class": "hitl_dispatched"
+    },
+    "r22-unusual-deposit-beside-credential-refuses": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "destination_rail",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "refundability",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "credential_pattern",
+        "upfront_amount"
+      ],
+      "failing_rules": [
+        "r22-unusual-counterparty-behaviour",
+        "r23-secrets-and-authentication"
+      ],
+      "outcome": "deny",
+      "reason": "deny: dedupe=pass, caps=pass, verify_before_dispatch=n/a, destination_rail=pass, counterparty_identity_change=n/a, credential_pattern=fail, recurring_charge=pass, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=pass, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=pass, upfront_amount=fail, task_authority=n/a",
+      "verdict_class": "blocked"
+    },
+    "r22-unusual-deposit-citing-missing-mandate-refuses": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "destination_rail",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "refundability",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "verify_before_dispatch",
+        "upfront_amount"
+      ],
+      "failing_rules": [
+        "r22-unusual-counterparty-behaviour"
+      ],
+      "outcome": "deny",
+      "reason": "deny: dedupe=pass, caps=pass, verify_before_dispatch=fail, destination_rail=pass, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=pass, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=pass, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=pass, upfront_amount=fail, task_authority=n/a",
+      "verdict_class": "blocked"
+    },
+    "r22-unusual-deposit-mixed-binding-refuses": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "destination_rail",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "refundability",
+        "task_authority"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "upfront_amount"
+      ],
+      "failing_rules": [
+        "r22-unusual-counterparty-behaviour",
+        "rx-never"
+      ],
+      "outcome": "deny",
+      "reason": "deny: dedupe=pass, caps=pass, verify_before_dispatch=n/a, destination_rail=pass, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=pass, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=pass, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=pass, upfront_amount=fail, task_authority=n/a",
+      "verdict_class": "blocked"
+    },
+    "r22-unusual-deposit-never-refuses": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "destination_rail",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "refundability",
+        "task_authority"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "upfront_amount"
+      ],
+      "failing_rules": [
+        "r22-unusual-counterparty-behaviour"
+      ],
+      "outcome": "deny",
+      "reason": "deny: dedupe=pass, caps=pass, verify_before_dispatch=n/a, destination_rail=pass, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=pass, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=pass, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=pass, upfront_amount=fail, task_authority=n/a",
+      "verdict_class": "blocked"
+    },
+    "r22-unusual-deposit-same-deal-repeat-refuses": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "destination_rail",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "refundability",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "dedupe",
+        "upfront_amount"
+      ],
+      "failing_rules": [
+        "r22-unusual-counterparty-behaviour",
+        "r27-no-commitment-beyond-task-bounds"
+      ],
+      "outcome": "deny",
+      "reason": "deny: dedupe=fail, caps=pass, verify_before_dispatch=n/a, destination_rail=pass, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=pass, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=pass, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=pass, upfront_amount=fail, task_authority=n/a",
+      "verdict_class": "blocked"
+    },
+    "r26-never-refuses": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "destination_rail",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "refundability",
+        "upfront_amount"
+      ],
+      "decision": "reject",
+      "failing_constraints": [
+        "task_authority"
+      ],
+      "failing_rules": [
+        "r26-stay-within-task-bounds"
+      ],
+      "outcome": "deny",
+      "reason": "deny: dedupe=pass, caps=pass, verify_before_dispatch=n/a, destination_rail=pass, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=pass, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=pass, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=pass, upfront_amount=pass, task_authority=fail",
+      "verdict_class": "blocked"
+    },
+    "r26-outside-task-asks": {
+      "ask_gate_selectors": [
+        "booking_cancel",
+        "booking_create",
+        "destructive_mutation",
+        "personal_disclosure",
+        "public_posting"
+      ],
+      "ask_wickets": [
+        "channel_change",
+        "counterparty_identity_change",
+        "destination_rail",
+        "material_fields_changed",
+        "offer_fields_changed",
+        "recipient_seen_before",
+        "recurring_charge",
+        "refundability",
+        "task_authority",
+        "upfront_amount"
+      ],
+      "decision": "needs_input",
+      "failing_constraints": [
+        "task_authority"
+      ],
+      "failing_rules": [
+        "r26-stay-within-task-bounds"
+      ],
+      "outcome": "escalate",
+      "reason": "escalate: dedupe=pass, caps=pass, verify_before_dispatch=n/a, destination_rail=pass, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=pass, action_class_gate=n/a, counterparty_seen_before=n/a, recipient_role=n/a, refundability=pass, material_fields_changed=pass, offer_fields_changed=pass, recipient_seen_before=n/a, channel_change=pass, upfront_amount=pass, task_authority=fail",
+      "verdict_class": "hitl_dispatched"
+    }
+  },
+  "pack_definition_digest": "c1cea374102bba60de82e16663c550a278ee07a399c5faeb285fe1ea1ea27d4d",
+  "pack_id": "asg/everyday/0.3.7",
+  "source": "go/guard/testdata/parity/generate_ask_declared_wickets.py"
+}

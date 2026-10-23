@@ -1,0 +1,8 @@
+{
+  "action": "commit",
+  "amount_minor": 2000,
+  "currency": "USD",
+  "payee": "Example Shop",
+  "rail": "card",
+  "reference": "BOOKING-EXAMPLE"
+}

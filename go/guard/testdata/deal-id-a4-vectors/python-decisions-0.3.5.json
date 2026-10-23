@@ -1,0 +1,473 @@
+{
+  "capsule_engine_commit": "c878edf0d8f6bfe2d9b7aba84e0023412efa4fb7",
+  "corpus_sha256": "1399709f21841f9258ef2c8a2b68976799f9c6a59b6885cacd7ac93fcc921fb5",
+  "engine_taxonomy_version": "6",
+  "live": {
+    "party-role-absent": {
+      "capsule_identical": true,
+      "deal_id": "deal-aaaaaaaaaaaaaaaa",
+      "deal_id_conflict": null,
+      "decision": "accept",
+      "dedupe_repeat": null,
+      "failing_constraints": [],
+      "outcome": "allow",
+      "reason": "allow: dedupe=pass, caps=n/a, verify_before_dispatch=n/a",
+      "verdict": "allow"
+    },
+    "party-role-buyer": {
+      "capsule_identical": true,
+      "deal_id": "deal-aaaaaaaaaaaaaaaa",
+      "deal_id_conflict": null,
+      "decision": "accept",
+      "dedupe_repeat": null,
+      "failing_constraints": [],
+      "outcome": "allow",
+      "reason": "allow: dedupe=pass, caps=n/a, verify_before_dispatch=n/a",
+      "verdict": "allow"
+    },
+    "party-role-neither": {
+      "capsule_identical": true,
+      "deal_id": "deal-aaaaaaaaaaaaaaaa",
+      "deal_id_conflict": null,
+      "decision": "accept",
+      "dedupe_repeat": null,
+      "failing_constraints": [],
+      "outcome": "allow",
+      "reason": "allow: dedupe=pass, caps=n/a, verify_before_dispatch=n/a",
+      "verdict": "allow"
+    },
+    "party-role-seller": {
+      "capsule_identical": true,
+      "deal_id": "deal-aaaaaaaaaaaaaaaa",
+      "deal_id_conflict": null,
+      "decision": "accept",
+      "dedupe_repeat": null,
+      "failing_constraints": [],
+      "outcome": "allow",
+      "reason": "allow: dedupe=pass, caps=n/a, verify_before_dispatch=n/a",
+      "verdict": "allow"
+    }
+  },
+  "pack_definition_digest": "0400d22c4464e91728bac2d00ca3bf8551ec98cdd20ef18d803b5b4432d4e8f4",
+  "pack_id": "asg/everyday/0.3.5",
+  "replay": {
+    "both-different": {
+      "bare": [
+        {
+          "deal_id": null,
+          "deal_id_conflict": {
+            "fields": [
+              "x-deal-v0.deal_id",
+              "chain_id"
+            ]
+          },
+          "decision": "reject",
+          "dedupe_repeat": null,
+          "failing_constraints": [],
+          "outcome": "deny",
+          "reason": "deny: dedupe=pass, caps=n/a, verify_before_dispatch=n/a; not evaluable: the record states its deal in x-deal-v0.deal_id and chain_id with different values, so it is in no deal; refused because its deal is not known",
+          "verdict": "not_evaluable"
+        }
+      ],
+      "everyday": [
+        {
+          "deal_id": null,
+          "deal_id_conflict": {
+            "fields": [
+              "x-deal-v0.deal_id",
+              "chain_id"
+            ]
+          },
+          "decision": "needs_input",
+          "dedupe_repeat": null,
+          "failing_constraints": [
+            "counterparty_seen_before"
+          ],
+          "failing_rules": [
+            "r02-ordinary-purchase",
+            "r06-new-merchant"
+          ],
+          "outcome": "escalate",
+          "reason": "escalate: dedupe=pass, caps=pass, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=n/a, counterparty_seen_before=fail, recipient_role=n/a, refundability=n/a, material_fields_changed=n/a, offer_fields_changed=n/a, recipient_seen_before=n/a, channel_change=n/a, upfront_amount=n/a, task_authority=n/a; not evaluable: the record states its deal in x-deal-v0.deal_id and chain_id with different values, so it is in no deal",
+          "verdict": "escalate"
+        }
+      ]
+    },
+    "both-different-empty-deal-id": {
+      "bare": [
+        {
+          "deal_id": null,
+          "deal_id_conflict": {
+            "fields": [
+              "x-deal-v0.deal_id",
+              "chain_id"
+            ]
+          },
+          "decision": "reject",
+          "dedupe_repeat": null,
+          "failing_constraints": [],
+          "outcome": "deny",
+          "reason": "deny: dedupe=pass, caps=n/a, verify_before_dispatch=n/a; not evaluable: the record states its deal in x-deal-v0.deal_id and chain_id with different values, so it is in no deal; refused because its deal is not known",
+          "verdict": "not_evaluable"
+        }
+      ],
+      "everyday": [
+        {
+          "deal_id": null,
+          "deal_id_conflict": {
+            "fields": [
+              "x-deal-v0.deal_id",
+              "chain_id"
+            ]
+          },
+          "decision": "needs_input",
+          "dedupe_repeat": null,
+          "failing_constraints": [
+            "counterparty_seen_before"
+          ],
+          "failing_rules": [
+            "r02-ordinary-purchase",
+            "r06-new-merchant"
+          ],
+          "outcome": "escalate",
+          "reason": "escalate: dedupe=pass, caps=pass, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=n/a, counterparty_seen_before=fail, recipient_role=n/a, refundability=n/a, material_fields_changed=n/a, offer_fields_changed=n/a, recipient_seen_before=n/a, channel_change=n/a, upfront_amount=n/a, task_authority=n/a; not evaluable: the record states its deal in x-deal-v0.deal_id and chain_id with different values, so it is in no deal",
+          "verdict": "escalate"
+        }
+      ]
+    },
+    "both-different-null-chain-id": {
+      "bare": [
+        {
+          "deal_id": null,
+          "deal_id_conflict": {
+            "fields": [
+              "x-deal-v0.deal_id",
+              "chain_id"
+            ]
+          },
+          "decision": "reject",
+          "dedupe_repeat": null,
+          "failing_constraints": [],
+          "outcome": "deny",
+          "reason": "deny: dedupe=pass, caps=n/a, verify_before_dispatch=n/a; not evaluable: the record states its deal in x-deal-v0.deal_id and chain_id with different values, so it is in no deal; refused because its deal is not known",
+          "verdict": "not_evaluable"
+        }
+      ],
+      "everyday": [
+        {
+          "deal_id": null,
+          "deal_id_conflict": {
+            "fields": [
+              "x-deal-v0.deal_id",
+              "chain_id"
+            ]
+          },
+          "decision": "needs_input",
+          "dedupe_repeat": null,
+          "failing_constraints": [
+            "counterparty_seen_before"
+          ],
+          "failing_rules": [
+            "r02-ordinary-purchase",
+            "r06-new-merchant"
+          ],
+          "outcome": "escalate",
+          "reason": "escalate: dedupe=pass, caps=pass, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=n/a, counterparty_seen_before=fail, recipient_role=n/a, refundability=n/a, material_fields_changed=n/a, offer_fields_changed=n/a, recipient_seen_before=n/a, channel_change=n/a, upfront_amount=n/a, task_authority=n/a; not evaluable: the record states its deal in x-deal-v0.deal_id and chain_id with different values, so it is in no deal",
+          "verdict": "escalate"
+        }
+      ]
+    },
+    "both-equal": {
+      "bare": [
+        {
+          "deal_id": "deal-aaaaaaaaaaaaaaaa",
+          "deal_id_conflict": null,
+          "decision": "accept",
+          "dedupe_repeat": null,
+          "failing_constraints": [],
+          "outcome": "allow",
+          "reason": "allow: dedupe=pass, caps=n/a, verify_before_dispatch=n/a",
+          "verdict": "allow"
+        }
+      ],
+      "everyday": [
+        {
+          "deal_id": "deal-aaaaaaaaaaaaaaaa",
+          "deal_id_conflict": null,
+          "decision": "needs_input",
+          "dedupe_repeat": null,
+          "failing_constraints": [
+            "counterparty_seen_before"
+          ],
+          "failing_rules": [
+            "r02-ordinary-purchase",
+            "r06-new-merchant"
+          ],
+          "outcome": "escalate",
+          "reason": "escalate: dedupe=pass, caps=pass, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=n/a, counterparty_seen_before=fail, recipient_role=n/a, refundability=n/a, material_fields_changed=n/a, offer_fields_changed=n/a, recipient_seen_before=n/a, channel_change=n/a, upfront_amount=n/a, task_authority=n/a",
+          "verdict": "escalate"
+        }
+      ]
+    },
+    "chain-id-only": {
+      "bare": [
+        {
+          "deal_id": "deal-aaaaaaaaaaaaaaaa",
+          "deal_id_conflict": null,
+          "decision": "accept",
+          "dedupe_repeat": null,
+          "failing_constraints": [],
+          "outcome": "allow",
+          "reason": "allow: dedupe=pass, caps=n/a, verify_before_dispatch=n/a",
+          "verdict": "allow"
+        }
+      ],
+      "everyday": [
+        {
+          "deal_id": "deal-aaaaaaaaaaaaaaaa",
+          "deal_id_conflict": null,
+          "decision": "needs_input",
+          "dedupe_repeat": null,
+          "failing_constraints": [
+            "counterparty_seen_before"
+          ],
+          "failing_rules": [
+            "r02-ordinary-purchase",
+            "r06-new-merchant"
+          ],
+          "outcome": "escalate",
+          "reason": "escalate: dedupe=pass, caps=pass, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=n/a, counterparty_seen_before=fail, recipient_role=n/a, refundability=n/a, material_fields_changed=n/a, offer_fields_changed=n/a, recipient_seen_before=n/a, channel_change=n/a, upfront_amount=n/a, task_authority=n/a",
+          "verdict": "escalate"
+        }
+      ]
+    },
+    "conflicted-repeat": {
+      "bare": [
+        {
+          "deal_id": "deal-aaaaaaaaaaaaaaaa",
+          "deal_id_conflict": null,
+          "decision": "accept",
+          "dedupe_repeat": null,
+          "failing_constraints": [],
+          "outcome": "allow",
+          "reason": "allow: dedupe=pass, caps=n/a, verify_before_dispatch=n/a",
+          "verdict": "allow"
+        },
+        {
+          "deal_id": null,
+          "deal_id_conflict": {
+            "fields": [
+              "x-deal-v0.deal_id",
+              "chain_id"
+            ]
+          },
+          "decision": "reject",
+          "dedupe_repeat": null,
+          "failing_constraints": [
+            "dedupe"
+          ],
+          "outcome": "deny",
+          "reason": "deny: dedupe=fail, caps=n/a, verify_before_dispatch=n/a; not evaluable: the record states its deal in x-deal-v0.deal_id and chain_id with different values, so it is in no deal",
+          "verdict": "deny"
+        }
+      ],
+      "everyday": [
+        {
+          "deal_id": "deal-aaaaaaaaaaaaaaaa",
+          "deal_id_conflict": null,
+          "decision": "needs_input",
+          "dedupe_repeat": null,
+          "failing_constraints": [
+            "counterparty_seen_before"
+          ],
+          "failing_rules": [
+            "r02-ordinary-purchase",
+            "r06-new-merchant"
+          ],
+          "outcome": "escalate",
+          "reason": "escalate: dedupe=pass, caps=pass, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=n/a, counterparty_seen_before=fail, recipient_role=n/a, refundability=n/a, material_fields_changed=n/a, offer_fields_changed=n/a, recipient_seen_before=n/a, channel_change=n/a, upfront_amount=n/a, task_authority=n/a",
+          "verdict": "escalate"
+        },
+        {
+          "deal_id": null,
+          "deal_id_conflict": {
+            "fields": [
+              "x-deal-v0.deal_id",
+              "chain_id"
+            ]
+          },
+          "decision": "reject",
+          "dedupe_repeat": null,
+          "failing_constraints": [
+            "counterparty_seen_before",
+            "dedupe"
+          ],
+          "failing_rules": [
+            "r02-ordinary-purchase",
+            "r06-new-merchant",
+            "r27-no-commitment-beyond-task-bounds"
+          ],
+          "outcome": "deny",
+          "reason": "deny: dedupe=fail, caps=pass, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=n/a, counterparty_seen_before=fail, recipient_role=n/a, refundability=n/a, material_fields_changed=n/a, offer_fields_changed=n/a, recipient_seen_before=n/a, channel_change=n/a, upfront_amount=n/a, task_authority=n/a; not evaluable: the record states its deal in x-deal-v0.deal_id and chain_id with different values, so it is in no deal",
+          "verdict": "deny"
+        }
+      ]
+    },
+    "deal-id-only": {
+      "bare": [
+        {
+          "deal_id": "deal-aaaaaaaaaaaaaaaa",
+          "deal_id_conflict": null,
+          "decision": "accept",
+          "dedupe_repeat": null,
+          "failing_constraints": [],
+          "outcome": "allow",
+          "reason": "allow: dedupe=pass, caps=n/a, verify_before_dispatch=n/a",
+          "verdict": "allow"
+        }
+      ],
+      "everyday": [
+        {
+          "deal_id": "deal-aaaaaaaaaaaaaaaa",
+          "deal_id_conflict": null,
+          "decision": "needs_input",
+          "dedupe_repeat": null,
+          "failing_constraints": [
+            "counterparty_seen_before"
+          ],
+          "failing_rules": [
+            "r02-ordinary-purchase",
+            "r06-new-merchant"
+          ],
+          "outcome": "escalate",
+          "reason": "escalate: dedupe=pass, caps=pass, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=n/a, counterparty_seen_before=fail, recipient_role=n/a, refundability=n/a, material_fields_changed=n/a, offer_fields_changed=n/a, recipient_seen_before=n/a, channel_change=n/a, upfront_amount=n/a, task_authority=n/a",
+          "verdict": "escalate"
+        }
+      ]
+    },
+    "typed-repeat-other-deal": {
+      "bare": [
+        {
+          "deal_id": "deal-aaaaaaaaaaaaaaaa",
+          "deal_id_conflict": null,
+          "decision": "accept",
+          "dedupe_repeat": null,
+          "failing_constraints": [],
+          "outcome": "allow",
+          "reason": "allow: dedupe=pass, caps=n/a, verify_before_dispatch=n/a",
+          "verdict": "allow"
+        },
+        {
+          "deal_id": "deal-bbbbbbbbbbbbbbbb",
+          "deal_id_conflict": null,
+          "decision": "needs_input",
+          "dedupe_repeat": "other_deal",
+          "failing_constraints": [
+            "dedupe"
+          ],
+          "outcome": "escalate",
+          "reason": "escalate: dedupe=fail, caps=n/a, verify_before_dispatch=n/a",
+          "verdict": "escalate"
+        }
+      ],
+      "everyday": [
+        {
+          "deal_id": "deal-aaaaaaaaaaaaaaaa",
+          "deal_id_conflict": null,
+          "decision": "needs_input",
+          "dedupe_repeat": null,
+          "failing_constraints": [
+            "counterparty_seen_before"
+          ],
+          "failing_rules": [
+            "r02-ordinary-purchase",
+            "r06-new-merchant"
+          ],
+          "outcome": "escalate",
+          "reason": "escalate: dedupe=pass, caps=pass, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=n/a, counterparty_seen_before=fail, recipient_role=n/a, refundability=n/a, material_fields_changed=n/a, offer_fields_changed=n/a, recipient_seen_before=n/a, channel_change=n/a, upfront_amount=n/a, task_authority=n/a",
+          "verdict": "escalate"
+        },
+        {
+          "deal_id": "deal-bbbbbbbbbbbbbbbb",
+          "deal_id_conflict": null,
+          "decision": "needs_input",
+          "dedupe_repeat": "other_deal",
+          "failing_constraints": [
+            "counterparty_seen_before",
+            "dedupe"
+          ],
+          "failing_rules": [
+            "r02-ordinary-purchase",
+            "r06-new-merchant",
+            "r27-no-commitment-beyond-task-bounds"
+          ],
+          "outcome": "escalate",
+          "reason": "escalate: dedupe=fail, caps=pass, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=n/a, counterparty_seen_before=fail, recipient_role=n/a, refundability=n/a, material_fields_changed=n/a, offer_fields_changed=n/a, recipient_seen_before=n/a, channel_change=n/a, upfront_amount=n/a, task_authority=n/a",
+          "verdict": "escalate"
+        }
+      ]
+    },
+    "typed-repeat-same-deal": {
+      "bare": [
+        {
+          "deal_id": "deal-aaaaaaaaaaaaaaaa",
+          "deal_id_conflict": null,
+          "decision": "accept",
+          "dedupe_repeat": null,
+          "failing_constraints": [],
+          "outcome": "allow",
+          "reason": "allow: dedupe=pass, caps=n/a, verify_before_dispatch=n/a",
+          "verdict": "allow"
+        },
+        {
+          "deal_id": "deal-aaaaaaaaaaaaaaaa",
+          "deal_id_conflict": null,
+          "decision": "reject",
+          "dedupe_repeat": null,
+          "failing_constraints": [
+            "dedupe"
+          ],
+          "outcome": "deny",
+          "reason": "deny: dedupe=fail, caps=n/a, verify_before_dispatch=n/a",
+          "verdict": "deny"
+        }
+      ],
+      "everyday": [
+        {
+          "deal_id": "deal-aaaaaaaaaaaaaaaa",
+          "deal_id_conflict": null,
+          "decision": "needs_input",
+          "dedupe_repeat": null,
+          "failing_constraints": [
+            "counterparty_seen_before"
+          ],
+          "failing_rules": [
+            "r02-ordinary-purchase",
+            "r06-new-merchant"
+          ],
+          "outcome": "escalate",
+          "reason": "escalate: dedupe=pass, caps=pass, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=n/a, counterparty_seen_before=fail, recipient_role=n/a, refundability=n/a, material_fields_changed=n/a, offer_fields_changed=n/a, recipient_seen_before=n/a, channel_change=n/a, upfront_amount=n/a, task_authority=n/a",
+          "verdict": "escalate"
+        },
+        {
+          "deal_id": "deal-aaaaaaaaaaaaaaaa",
+          "deal_id_conflict": null,
+          "decision": "reject",
+          "dedupe_repeat": null,
+          "failing_constraints": [
+            "counterparty_seen_before",
+            "dedupe"
+          ],
+          "failing_rules": [
+            "r02-ordinary-purchase",
+            "r06-new-merchant",
+            "r27-no-commitment-beyond-task-bounds"
+          ],
+          "outcome": "deny",
+          "reason": "deny: dedupe=fail, caps=pass, verify_before_dispatch=n/a, destination_rail=n/a, counterparty_identity_change=n/a, credential_pattern=n/a, recurring_charge=n/a, action_class_gate=n/a, counterparty_seen_before=fail, recipient_role=n/a, refundability=n/a, material_fields_changed=n/a, offer_fields_changed=n/a, recipient_seen_before=n/a, channel_change=n/a, upfront_amount=n/a, task_authority=n/a",
+          "verdict": "deny"
+        }
+      ]
+    }
+  }
+}

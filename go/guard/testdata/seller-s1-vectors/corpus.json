@@ -1,0 +1,1876 @@
+{
+ "note": "Every step runs IN ORDER through capsule-engine's own GuardEngine, built from the seller pack, on ONE ledger, as the pack's acceptance scenario does (tests/test_pack_seller_acceptance.py): single_commitment and caps read what earlier steps sealed. Each step names the task-authority record and the commercial-bounds opening it is checked with (variants built below), and whether it cites the acceptance step's sealed capsule.",
+ "python": "3.13.7",
+ "pack_id": "asg/seller/0.1.0",
+ "definition_digest": "7b854f0f0feb51381d936ad992bef659234d77a799a2a319585a856f65a19c77",
+ "acceptance_step": "sc-acceptance-in-a",
+ "tasks": {
+  "floor": {
+   "type": "task-authority/v0",
+   "body": {
+    "outcome_id": "seller.sell_one_item/1.0.0",
+    "allowed_actions": [
+     "offer",
+     "accept",
+     "sell",
+     "tell",
+     "transfer"
+    ],
+    "preconditions": [],
+    "bounds_commitment": "a6586c0c295278d97e8e81c60a7cba8845cc3671d2e336b688290bfa74e5c4d7"
+   }
+  },
+  "no-floor": {
+   "type": "task-authority/v0",
+   "body": {
+    "outcome_id": "seller.sell_one_item/1.0.0",
+    "allowed_actions": [
+     "offer",
+     "accept",
+     "sell",
+     "tell",
+     "transfer"
+    ],
+    "preconditions": []
+   }
+  },
+  "malformed-commitment": {
+   "type": "task-authority/v0",
+   "body": {
+    "outcome_id": "seller.sell_one_item/1.0.0",
+    "allowed_actions": [
+     "offer",
+     "accept",
+     "sell",
+     "tell",
+     "transfer"
+    ],
+    "preconditions": [],
+    "bounds_commitment": "ABC"
+   }
+  },
+  "upper-hex-commitment": {
+   "type": "task-authority/v0",
+   "body": {
+    "outcome_id": "seller.sell_one_item/1.0.0",
+    "allowed_actions": [
+     "offer",
+     "accept",
+     "sell",
+     "tell",
+     "transfer"
+    ],
+    "preconditions": [],
+    "bounds_commitment": "A6586C0C295278D97E8E81C60A7CBA8845CC3671D2E336B688290BFA74E5C4D7"
+   }
+  },
+  "bool-floor": {
+   "type": "task-authority/v0",
+   "body": {
+    "outcome_id": "seller.sell_one_item/1.0.0",
+    "allowed_actions": [
+     "offer",
+     "accept",
+     "sell",
+     "tell",
+     "transfer"
+    ],
+    "preconditions": [],
+    "bounds_commitment": "0f3037cf25c07e391a355baf4d5abc881f660c3e49ade2b38c2acd84b6df0123"
+   }
+  },
+  "negative-floor": {
+   "type": "task-authority/v0",
+   "body": {
+    "outcome_id": "seller.sell_one_item/1.0.0",
+    "allowed_actions": [
+     "offer",
+     "accept",
+     "sell",
+     "tell",
+     "transfer"
+    ],
+    "preconditions": [],
+    "bounds_commitment": "017d6f59db928927c05a9098a0076696226be7ed7564a28459926fc104178f14"
+   }
+  },
+  "other-kind": {
+   "type": "task-authority/v0",
+   "body": {
+    "outcome_id": "seller.sell_one_item/1.0.0",
+    "allowed_actions": [
+     "offer",
+     "accept",
+     "sell",
+     "tell",
+     "transfer"
+    ],
+    "preconditions": [],
+    "bounds_commitment": "c4ab5a978f88f2b32a3ed4ead2afd36173e0ef2165e1fa0dbd697750496106e3"
+   }
+  },
+  "nested-null-body": {
+   "type": "task-authority/v0",
+   "body": null
+  },
+  "fffd": {
+   "type": "task-authority/v0",
+   "body": {
+    "outcome_id": "seller.sell_one_item/1.0.0",
+    "allowed_actions": [
+     "offer",
+     "accept",
+     "sell",
+     "tell",
+     "transfer"
+    ],
+    "preconditions": [],
+    "bounds_commitment": "c8467a94401d16960609753a74cc510111c86283fa0e3b2a2ae67441a1543743"
+   }
+  }
+ },
+ "openings": {
+  "floor": {
+   "document": {
+    "type": "commercial-bounds/v0",
+    "min_total_minor": 170000
+   },
+   "nonce": "535ec0dce4d7675c6c236e9aa4a164c569543e0f3a14d31676e9297409e33399",
+   "bounds_commitment": "a6586c0c295278d97e8e81c60a7cba8845cc3671d2e336b688290bfa74e5c4d7"
+  },
+  "none": null,
+  "wrong-nonce": {
+   "document": {
+    "type": "commercial-bounds/v0",
+    "min_total_minor": 170000
+   },
+   "nonce": "610befd5d6a2d0013f72aabc244f647e54a09524bdb30b09805616557b691d11",
+   "bounds_commitment": "a6586c0c295278d97e8e81c60a7cba8845cc3671d2e336b688290bfa74e5c4d7"
+  },
+  "upper-nonce": {
+   "document": {
+    "type": "commercial-bounds/v0",
+    "min_total_minor": 170000
+   },
+   "nonce": "535EC0DCE4D7675C6C236E9AA4A164C569543E0F3A14D31676E9297409E33399",
+   "bounds_commitment": "a6586c0c295278d97e8e81c60a7cba8845cc3671d2e336b688290bfa74e5c4d7"
+  },
+  "other-commitment": {
+   "document": {
+    "type": "commercial-bounds/v0",
+    "min_total_minor": 170000
+   },
+   "nonce": "535ec0dce4d7675c6c236e9aa4a164c569543e0f3a14d31676e9297409e33399",
+   "bounds_commitment": "d9298a10d1b0735837dc4bd85dac641b0f3cef27a47e5d53a54f2f3f5b2fcffa"
+  },
+  "other-floor": {
+   "document": {
+    "type": "commercial-bounds/v0",
+    "min_total_minor": 1
+   },
+   "nonce": "535ec0dce4d7675c6c236e9aa4a164c569543e0f3a14d31676e9297409e33399",
+   "bounds_commitment": "a6586c0c295278d97e8e81c60a7cba8845cc3671d2e336b688290bfa74e5c4d7"
+  },
+  "float-floor": {
+   "document": {
+    "type": "commercial-bounds/v0",
+    "min_total_minor": 1.5
+   },
+   "nonce": "535ec0dce4d7675c6c236e9aa4a164c569543e0f3a14d31676e9297409e33399",
+   "bounds_commitment": "a6586c0c295278d97e8e81c60a7cba8845cc3671d2e336b688290bfa74e5c4d7"
+  },
+  "not-an-object": "opening",
+  "document-not-an-object": {
+   "document": [
+    1
+   ],
+   "nonce": "535ec0dce4d7675c6c236e9aa4a164c569543e0f3a14d31676e9297409e33399",
+   "bounds_commitment": "a6586c0c295278d97e8e81c60a7cba8845cc3671d2e336b688290bfa74e5c4d7"
+  },
+  "bool-floor": {
+   "document": {
+    "type": "commercial-bounds/v0",
+    "min_total_minor": true
+   },
+   "nonce": "535ec0dce4d7675c6c236e9aa4a164c569543e0f3a14d31676e9297409e33399",
+   "bounds_commitment": "0f3037cf25c07e391a355baf4d5abc881f660c3e49ade2b38c2acd84b6df0123"
+  },
+  "negative-floor": {
+   "document": {
+    "type": "commercial-bounds/v0",
+    "min_total_minor": -1
+   },
+   "nonce": "535ec0dce4d7675c6c236e9aa4a164c569543e0f3a14d31676e9297409e33399",
+   "bounds_commitment": "017d6f59db928927c05a9098a0076696226be7ed7564a28459926fc104178f14"
+  },
+  "other-kind": {
+   "document": {
+    "type": "commercial-bounds/v1",
+    "min_total_minor": 1
+   },
+   "nonce": "535ec0dce4d7675c6c236e9aa4a164c569543e0f3a14d31676e9297409e33399",
+   "bounds_commitment": "c4ab5a978f88f2b32a3ed4ead2afd36173e0ef2165e1fa0dbd697750496106e3"
+  },
+  "unsafe-floor": {
+   "document": {
+    "type": "commercial-bounds/v0",
+    "min_total_minor": 1152921504606846976
+   },
+   "nonce": "535ec0dce4d7675c6c236e9aa4a164c569543e0f3a14d31676e9297409e33399",
+   "bounds_commitment": "a6586c0c295278d97e8e81c60a7cba8845cc3671d2e336b688290bfa74e5c4d7"
+  },
+  "lone-surrogate": {
+   "document": {
+    "type": "commercial-bounds/v0",
+    "min_total_minor": 1,
+    "note": "\ud800"
+   },
+   "nonce": "535ec0dce4d7675c6c236e9aa4a164c569543e0f3a14d31676e9297409e33399",
+   "bounds_commitment": "c8467a94401d16960609753a74cc510111c86283fa0e3b2a2ae67441a1543743"
+  }
+ },
+ "steps": [
+  {
+   "name": "condition-to-a",
+   "dry_run": false,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "tell",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/condition-a",
+    "timestamp": "2026-10-09T10:01:30Z",
+    "equivalence_key": "tell/condition-a",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "representation_class": "condition"
+   }
+  },
+  {
+   "name": "condition-to-b",
+   "dry_run": false,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "tell",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/condition-b",
+    "timestamp": "2026-10-09T10:01:30Z",
+    "equivalence_key": "tell/condition-b",
+    "target": "cp-fp:071876ed3bb3a48a4e80f062b9891a0eaf4789a71d3550890da2ec86c8ff1e12",
+    "representation_class": "condition"
+   }
+  },
+  {
+   "name": "condition-to-c",
+   "dry_run": false,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "tell",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/condition-c",
+    "timestamp": "2026-10-09T10:01:30Z",
+    "equivalence_key": "tell/condition-c",
+    "target": "cp-fp:8add981faa5a20bd4e4ca22a43d42582024c35dd6b71b7f45b9198ebeb5a8ec1",
+    "representation_class": "condition"
+   }
+  },
+  {
+   "name": "pf-at-floor",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/pf-at-floor",
+    "timestamp": "2026-10-09T10:02:30Z",
+    "equivalence_key": "offer/pf-at-floor",
+    "amount_minor": 170000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:02:00Z"
+   }
+  },
+  {
+   "name": "pf-below-floor",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/pf-below",
+    "timestamp": "2026-10-09T10:02:30Z",
+    "equivalence_key": "offer/pf-below",
+    "amount_minor": 169999,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:02:00Z"
+   }
+  },
+  {
+   "name": "pf-zero",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/pf-zero",
+    "timestamp": "2026-10-09T10:02:30Z",
+    "equivalence_key": "offer/pf-zero",
+    "amount_minor": 0,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:02:00Z"
+   }
+  },
+  {
+   "name": "pf-no-amount",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/pf-no-amount",
+    "timestamp": "2026-10-09T10:02:30Z",
+    "equivalence_key": "offer/pf-no-amount",
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:02:00Z"
+   }
+  },
+  {
+   "name": "pf-no-task-ref",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/pf-no-ref",
+    "timestamp": "2026-10-09T10:02:30Z",
+    "equivalence_key": "offer/pf-no-ref",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:02:00Z"
+   }
+  },
+  {
+   "name": "pf-record-not-the-ref",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/pf-not-ref",
+    "timestamp": "2026-10-09T10:02:30Z",
+    "equivalence_key": "offer/pf-not-ref",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "4f9854ac4509f4cc06eac7c0bfef3d8327f98d07f38743a903cb4fa477e1f458",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:02:00Z"
+   }
+  },
+  {
+   "name": "pf-no-floor-committed",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "no-floor",
+   "opening": "none",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/pf-no-floor",
+    "timestamp": "2026-10-09T10:02:30Z",
+    "equivalence_key": "offer/pf-no-floor",
+    "amount_minor": 1,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "4f9854ac4509f4cc06eac7c0bfef3d8327f98d07f38743a903cb4fa477e1f458",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:02:00Z"
+   }
+  },
+  {
+   "name": "pf-malformed-commitment",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "malformed-commitment",
+   "opening": "floor",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/pf-malformed",
+    "timestamp": "2026-10-09T10:02:30Z",
+    "equivalence_key": "offer/pf-malformed",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "0bc1aeefba7b0053d7f4ab9af801fd000c717ec54d8a24767637f669c5e91301",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:02:00Z"
+   }
+  },
+  {
+   "name": "pf-upper-hex-commitment",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "upper-hex-commitment",
+   "opening": "floor",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/pf-upper",
+    "timestamp": "2026-10-09T10:02:30Z",
+    "equivalence_key": "offer/pf-upper",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "44415c97360b0a8a701113f085e50490c1551a9fce9d4cc5b4e36fa003f7d07c",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:02:00Z"
+   }
+  },
+  {
+   "name": "pf-null-body",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "nested-null-body",
+   "opening": "floor",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/pf-null-body",
+    "timestamp": "2026-10-09T10:02:30Z",
+    "equivalence_key": "offer/pf-null-body",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "b087a0633fc8d652fa67584862cd268837d4c968a6672665d4a02a45618f268e",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:02:00Z"
+   }
+  },
+  {
+   "name": "pf-no-opening",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "none",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/pf-no-opening",
+    "timestamp": "2026-10-09T10:02:30Z",
+    "equivalence_key": "offer/pf-no-opening",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:02:00Z"
+   }
+  },
+  {
+   "name": "pf-wrong-nonce",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "wrong-nonce",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/pf-wrong-nonce",
+    "timestamp": "2026-10-09T10:02:30Z",
+    "equivalence_key": "offer/pf-wrong-nonce",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:02:00Z"
+   }
+  },
+  {
+   "name": "pf-upper-nonce",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "upper-nonce",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/pf-upper-nonce",
+    "timestamp": "2026-10-09T10:02:30Z",
+    "equivalence_key": "offer/pf-upper-nonce",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:02:00Z"
+   }
+  },
+  {
+   "name": "pf-other-commitment",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "other-commitment",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/pf-other-c",
+    "timestamp": "2026-10-09T10:02:30Z",
+    "equivalence_key": "offer/pf-other-c",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:02:00Z"
+   }
+  },
+  {
+   "name": "pf-other-floor-document",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "other-floor",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/pf-other-f",
+    "timestamp": "2026-10-09T10:02:30Z",
+    "equivalence_key": "offer/pf-other-f",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:02:00Z"
+   }
+  },
+  {
+   "name": "pf-float-floor",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "float-floor",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/pf-float",
+    "timestamp": "2026-10-09T10:02:30Z",
+    "equivalence_key": "offer/pf-float",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:02:00Z"
+   }
+  },
+  {
+   "name": "pf-opening-not-an-object",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "not-an-object",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/pf-not-obj",
+    "timestamp": "2026-10-09T10:02:30Z",
+    "equivalence_key": "offer/pf-not-obj",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:02:00Z"
+   }
+  },
+  {
+   "name": "pf-document-not-an-object",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "document-not-an-object",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/pf-doc-list",
+    "timestamp": "2026-10-09T10:02:30Z",
+    "equivalence_key": "offer/pf-doc-list",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:02:00Z"
+   }
+  },
+  {
+   "name": "pf-bool-floor",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "bool-floor",
+   "opening": "bool-floor",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/pf-bool",
+    "timestamp": "2026-10-09T10:02:30Z",
+    "equivalence_key": "offer/pf-bool",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "4f322054c1c361536f0327992205bb7758a3772cb7b15056481ed8b4f3152b40",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:02:00Z"
+   }
+  },
+  {
+   "name": "pf-negative-floor",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "negative-floor",
+   "opening": "negative-floor",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/pf-neg",
+    "timestamp": "2026-10-09T10:02:30Z",
+    "equivalence_key": "offer/pf-neg",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "2ecbd77675f4ca6a42152cca7e784115042685f5110830a9479d186f641fe592",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:02:00Z"
+   }
+  },
+  {
+   "name": "pf-other-kind",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "other-kind",
+   "opening": "other-kind",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/pf-kind",
+    "timestamp": "2026-10-09T10:02:30Z",
+    "equivalence_key": "offer/pf-kind",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "190f5a7476a4197db18e37a7c891d28998d2e9655f8804c8bfbf40248e9f4d6c",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:02:00Z"
+   }
+  },
+  {
+   "name": "pf-unsafe-floor",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "unsafe-floor",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/pf-unsafe",
+    "timestamp": "2026-10-09T10:02:30Z",
+    "equivalence_key": "offer/pf-unsafe",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:02:00Z"
+   }
+  },
+  {
+   "name": "pf-lone-surrogate",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "fffd",
+   "opening": "lone-surrogate",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/pf-surrogate",
+    "timestamp": "2026-10-09T10:02:30Z",
+    "equivalence_key": "offer/pf-surrogate",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "a0865b6d8de8ef3d3acd2fb4dc022c1c590f7a68a486ebeb1041507c07e21661",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:02:00Z"
+   }
+  },
+  {
+   "name": "pf-out-of-class",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "tell",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/pf-tell",
+    "timestamp": "2026-10-09T10:02:30Z",
+    "equivalence_key": "tell/pf-tell",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "representation_class": "pickup",
+    "amount_minor": 1,
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec"
+   }
+  },
+  {
+   "name": "pf-sale-below",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "sell",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.sale",
+    "action_id": "sell/pf-sale-below",
+    "timestamp": "2026-10-09T10:02:30Z",
+    "equivalence_key": "sell/pf-sale-below",
+    "amount_minor": 100,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:02:00Z",
+    "rail": "card"
+   }
+  },
+  {
+   "name": "pf-accept-below",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "accept",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "agreement.accept",
+    "action_id": "accept/pf-accept-below",
+    "timestamp": "2026-10-09T10:02:30Z",
+    "equivalence_key": "accept/pf-accept-below",
+    "amount_minor": 100,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:02:00Z"
+   }
+  },
+  {
+   "name": "oe-fresh",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/oe-fresh",
+    "timestamp": "2026-10-09T10:03:30Z",
+    "equivalence_key": "offer/oe-fresh",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T09:03:30Z"
+   }
+  },
+  {
+   "name": "oe-at-limit",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/oe-limit",
+    "timestamp": "2026-10-09T10:03:30Z",
+    "equivalence_key": "offer/oe-limit",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-08T10:03:30Z"
+   }
+  },
+  {
+   "name": "oe-past-limit",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/oe-past",
+    "timestamp": "2026-10-09T10:03:30Z",
+    "equivalence_key": "offer/oe-past",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-08T10:03:29Z"
+   }
+  },
+  {
+   "name": "oe-fraction",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/oe-frac",
+    "timestamp": "2026-10-09T10:03:30Z",
+    "equivalence_key": "offer/oe-frac",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-08T10:03:29.5Z"
+   }
+  },
+  {
+   "name": "oe-fraction-both",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/oe-frac2",
+    "timestamp": "2026-10-09T10:03:30.25Z",
+    "equivalence_key": "offer/oe-frac2",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:03:29.75Z"
+   }
+  },
+  {
+   "name": "oe-same-instant",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/oe-same",
+    "timestamp": "2026-10-09T10:03:30Z",
+    "equivalence_key": "offer/oe-same",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:03:30Z"
+   }
+  },
+  {
+   "name": "oe-later-than-action",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/oe-later",
+    "timestamp": "2026-10-09T10:03:30Z",
+    "equivalence_key": "offer/oe-later",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:03:31Z"
+   }
+  },
+  {
+   "name": "oe-not-utc",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/oe-offset",
+    "timestamp": "2026-10-09T10:03:30Z",
+    "equivalence_key": "offer/oe-offset",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:03:00+00:00"
+   }
+  },
+  {
+   "name": "oe-space",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/oe-space",
+    "timestamp": "2026-10-09T10:03:30Z",
+    "equivalence_key": "offer/oe-space",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09 10:03:00Z"
+   }
+  },
+  {
+   "name": "oe-no-such-day",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/oe-feb30",
+    "timestamp": "2026-10-09T10:03:30Z",
+    "equivalence_key": "offer/oe-feb30",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-02-30T10:00:00Z"
+   }
+  },
+  {
+   "name": "oe-seven-digits",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/oe-7d",
+    "timestamp": "2026-10-09T10:03:30Z",
+    "equivalence_key": "offer/oe-7d",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:03:00.1234567Z"
+   }
+  },
+  {
+   "name": "oe-lowercase-z",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/oe-lz",
+    "timestamp": "2026-10-09T10:03:30Z",
+    "equivalence_key": "offer/oe-lz",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:03:00z"
+   }
+  },
+  {
+   "name": "oe-half-second-later",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/oe-half",
+    "timestamp": "2026-10-09T10:03:30.25Z",
+    "equivalence_key": "offer/oe-half",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:03:30.75Z"
+   }
+  },
+  {
+   "name": "oe-hour-24",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/oe-h24",
+    "timestamp": "2026-10-09T10:03:30Z",
+    "equivalence_key": "offer/oe-h24",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-08T24:00:00Z"
+   }
+  },
+  {
+   "name": "oe-leap-second",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/oe-leap",
+    "timestamp": "2026-10-09T10:03:30Z",
+    "equivalence_key": "offer/oe-leap",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T09:59:60Z"
+   }
+  },
+  {
+   "name": "oe-trailing-newline",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/oe-nl",
+    "timestamp": "2026-10-09T10:03:30Z",
+    "equivalence_key": "offer/oe-nl",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:03:00Z\n"
+   }
+  },
+  {
+   "name": "oe-other-digits",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/oe-digits",
+    "timestamp": "2026-10-09T10:03:30Z",
+    "equivalence_key": "offer/oe-digits",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "\u0662\u0660\u0662\u0666-10-09T10:03:00Z"
+   }
+  },
+  {
+   "name": "oe-year-zero",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/oe-y0",
+    "timestamp": "2026-10-09T10:03:30Z",
+    "equivalence_key": "offer/oe-y0",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "0000-10-09T10:03:00Z"
+   }
+  },
+  {
+   "name": "oe-out-of-class",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "tell",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/oe-tell",
+    "timestamp": "2026-10-09T10:03:30Z",
+    "equivalence_key": "tell/oe-tell",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "representation_class": "pickup",
+    "proposal_at": "garbage"
+   }
+  },
+  {
+   "name": "oe-no-proposal",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/oe-none",
+    "timestamp": "2026-10-09T10:03:30Z",
+    "equivalence_key": "offer/oe-none",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58"
+   }
+  },
+  {
+   "name": "sc-before-acceptance",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/sc-before",
+    "timestamp": "2026-10-09T10:04:30Z",
+    "equivalence_key": "offer/sc-before",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:071876ed3bb3a48a4e80f062b9891a0eaf4789a71d3550890da2ec86c8ff1e12",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:04:00Z"
+   }
+  },
+  {
+   "name": "sc-no-item",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/sc-no-item",
+    "timestamp": "2026-10-09T10:04:30Z",
+    "equivalence_key": "offer/sc-no-item",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "proposal_at": "2026-10-09T10:04:00Z"
+   }
+  },
+  {
+   "name": "sc-no-task-ref",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/sc-no-ref",
+    "timestamp": "2026-10-09T10:04:30Z",
+    "equivalence_key": "offer/sc-no-ref",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:04:00Z"
+   }
+  },
+  {
+   "name": "sc-acceptance-dry-run",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "accept",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "agreement.accept",
+    "action_id": "accept/sc-accept-dry",
+    "timestamp": "2026-10-09T10:05:30Z",
+    "equivalence_key": "accept/sc-accept-dry",
+    "amount_minor": 175000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:05:00Z"
+   }
+  },
+  {
+   "name": "sc-condition-to-c-other-operator",
+   "dry_run": false,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "tell",
+    "operator": "another-seller",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/sc-condition-c-other",
+    "timestamp": "2026-10-09T10:05:30Z",
+    "equivalence_key": "tell/sc-condition-c-other",
+    "target": "cp-fp:8add981faa5a20bd4e4ca22a43d42582024c35dd6b71b7f45b9198ebeb5a8ec1",
+    "representation_class": "condition"
+   }
+  },
+  {
+   "name": "sc-acceptance-in-c-other-operator",
+   "dry_run": false,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "accept",
+    "operator": "another-seller",
+    "developer": "seller-assistant@v1",
+    "action_class": "agreement.accept",
+    "action_id": "accept/sc-accept-other-op",
+    "timestamp": "2026-10-09T10:05:30Z",
+    "equivalence_key": "accept/sc-accept-other-op",
+    "amount_minor": 175000,
+    "currency": "USD",
+    "target": "cp-fp:8add981faa5a20bd4e4ca22a43d42582024c35dd6b71b7f45b9198ebeb5a8ec1",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:05:00Z"
+   }
+  },
+  {
+   "name": "sc-acceptance-in-a",
+   "dry_run": false,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "accept",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "agreement.accept",
+    "action_id": "accept/sc-accept-a",
+    "timestamp": "2026-10-09T10:06:30Z",
+    "equivalence_key": "accept/sc-accept-a",
+    "amount_minor": 175000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:06:00Z"
+   }
+  },
+  {
+   "name": "sc-second-acceptance-in-b",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "accept",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "agreement.accept",
+    "action_id": "accept/sc-accept-b",
+    "timestamp": "2026-10-09T10:07:30Z",
+    "equivalence_key": "accept/sc-accept-b",
+    "amount_minor": 175000,
+    "currency": "USD",
+    "target": "cp-fp:071876ed3bb3a48a4e80f062b9891a0eaf4789a71d3550890da2ec86c8ff1e12",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:07:00Z"
+   }
+  },
+  {
+   "name": "sc-offer-in-b",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/sc-offer-b",
+    "timestamp": "2026-10-09T10:07:30Z",
+    "equivalence_key": "offer/sc-offer-b",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:071876ed3bb3a48a4e80f062b9891a0eaf4789a71d3550890da2ec86c8ff1e12",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:07:00Z"
+   }
+  },
+  {
+   "name": "sc-sale-to-a-citing",
+   "dry_run": true,
+   "cites_acceptance": true,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "sell",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.sale",
+    "action_id": "sell/sc-sale-a",
+    "timestamp": "2026-10-09T10:08:30Z",
+    "equivalence_key": "sell/sc-sale-a",
+    "amount_minor": 175000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:08:00Z",
+    "rail": "card"
+   }
+  },
+  {
+   "name": "sc-sale-to-a-not-citing",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "sell",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.sale",
+    "action_id": "sell/sc-sale-a-nocite",
+    "timestamp": "2026-10-09T10:08:30Z",
+    "equivalence_key": "sell/sc-sale-a-nocite",
+    "amount_minor": 175000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:08:00Z",
+    "rail": "card"
+   }
+  },
+  {
+   "name": "sc-sale-to-b-citing",
+   "dry_run": true,
+   "cites_acceptance": true,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "sell",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.sale",
+    "action_id": "sell/sc-sale-b",
+    "timestamp": "2026-10-09T10:08:30Z",
+    "equivalence_key": "sell/sc-sale-b",
+    "amount_minor": 175000,
+    "currency": "USD",
+    "target": "cp-fp:071876ed3bb3a48a4e80f062b9891a0eaf4789a71d3550890da2ec86c8ff1e12",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:08:00Z",
+    "rail": "card"
+   }
+  },
+  {
+   "name": "sc-other-item",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/sc-other-item",
+    "timestamp": "2026-10-09T10:08:30Z",
+    "equivalence_key": "offer/sc-other-item",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:071876ed3bb3a48a4e80f062b9891a0eaf4789a71d3550890da2ec86c8ff1e12",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:d05d66ac26af39fc74503d9aa1c4263e495bb647a0c8369be33cdee11cbcfec3",
+    "proposal_at": "2026-10-09T10:08:00Z"
+   }
+  },
+  {
+   "name": "sc-other-task",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "no-floor",
+   "opening": "none",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/sc-other-task",
+    "timestamp": "2026-10-09T10:08:30Z",
+    "equivalence_key": "offer/sc-other-task",
+    "amount_minor": 1,
+    "currency": "USD",
+    "target": "cp-fp:071876ed3bb3a48a4e80f062b9891a0eaf4789a71d3550890da2ec86c8ff1e12",
+    "task_authority_ref": "4f9854ac4509f4cc06eac7c0bfef3d8327f98d07f38743a903cb4fa477e1f458",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:08:00Z"
+   }
+  },
+  {
+   "name": "sc-external-commitment",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "commit",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "external_commitment.other",
+    "action_id": "commit/sc-ext",
+    "timestamp": "2026-10-09T10:08:30Z",
+    "equivalence_key": "commit/sc-ext",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:071876ed3bb3a48a4e80f062b9891a0eaf4789a71d3550890da2ec86c8ff1e12",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:08:00Z"
+   }
+  },
+  {
+   "name": "sc-no-target-citing",
+   "dry_run": true,
+   "cites_acceptance": true,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "sell",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.sale",
+    "action_id": "sell/sc-no-target",
+    "timestamp": "2026-10-09T10:08:30Z",
+    "equivalence_key": "sell/sc-no-target",
+    "amount_minor": 175000,
+    "currency": "USD",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:08:00Z",
+    "rail": "card"
+   }
+  },
+  {
+   "name": "sc-other-operator-offer-in-b",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "offer",
+    "operator": "another-seller",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/sc-other-op-b",
+    "timestamp": "2026-10-09T10:08:30Z",
+    "equivalence_key": "offer/sc-other-op-b",
+    "amount_minor": 180000,
+    "currency": "USD",
+    "target": "cp-fp:071876ed3bb3a48a4e80f062b9891a0eaf4789a71d3550890da2ec86c8ff1e12",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:08:00Z"
+   }
+  },
+  {
+   "name": "sc-out-of-class",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "tell",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "communication.send",
+    "action_id": "tell/sc-tell",
+    "timestamp": "2026-10-09T10:08:30Z",
+    "equivalence_key": "tell/sc-tell",
+    "target": "cp-fp:071876ed3bb3a48a4e80f062b9891a0eaf4789a71d3550890da2ec86c8ff1e12",
+    "representation_class": "pickup",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec"
+   }
+  },
+  {
+   "name": "caps-first",
+   "dry_run": false,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "transfer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "money.transfer",
+    "action_id": "transfer/caps-first",
+    "timestamp": "2026-10-09T10:10:30Z",
+    "equivalence_key": "transfer/caps-first",
+    "amount_minor": 4000000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb"
+   }
+  },
+  {
+   "name": "caps-second",
+   "dry_run": false,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "transfer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "money.transfer",
+    "action_id": "transfer/caps-second",
+    "timestamp": "2026-10-09T10:11:30Z",
+    "equivalence_key": "transfer/caps-second",
+    "amount_minor": 5000000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb"
+   }
+  },
+  {
+   "name": "caps-at-limit",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "transfer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "money.transfer",
+    "action_id": "transfer/caps-at-limit",
+    "timestamp": "2026-10-09T10:12:30Z",
+    "equivalence_key": "transfer/caps-at-limit",
+    "amount_minor": 1000000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb"
+   }
+  },
+  {
+   "name": "caps-over",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "transfer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "money.transfer",
+    "action_id": "transfer/caps-over",
+    "timestamp": "2026-10-09T10:12:30Z",
+    "equivalence_key": "transfer/caps-over",
+    "amount_minor": 1000001,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb"
+   }
+  },
+  {
+   "name": "caps-dry-run-not-counted",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "transfer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "money.transfer",
+    "action_id": "transfer/caps-dry",
+    "timestamp": "2026-10-09T10:13:30Z",
+    "equivalence_key": "transfer/caps-dry",
+    "amount_minor": 1000000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb"
+   }
+  },
+  {
+   "name": "caps-other-developer",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "transfer",
+    "operator": "seller-fixture",
+    "developer": "another-assistant",
+    "action_class": "money.transfer",
+    "action_id": "transfer/caps-other-dev",
+    "timestamp": "2026-10-09T10:13:30Z",
+    "equivalence_key": "transfer/caps-other-dev",
+    "amount_minor": 9000000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb"
+   }
+  },
+  {
+   "name": "caps-no-amount",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "transfer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "money.transfer",
+    "action_id": "transfer/caps-none",
+    "timestamp": "2026-10-09T10:13:30Z",
+    "equivalence_key": "transfer/caps-none",
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb"
+   }
+  },
+  {
+   "name": "caps-window-passed",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "transfer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "money.transfer",
+    "action_id": "transfer/caps-later",
+    "timestamp": "2026-10-16T10:12:00Z",
+    "equivalence_key": "transfer/caps-later",
+    "amount_minor": 9000000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb"
+   }
+  },
+  {
+   "name": "caps-window-edge",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "transfer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "money.transfer",
+    "action_id": "transfer/caps-edge",
+    "timestamp": "2026-10-16T10:10:30Z",
+    "equivalence_key": "transfer/caps-edge",
+    "amount_minor": 6000001,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb"
+   }
+  },
+  {
+   "name": "caps-out-of-class",
+   "dry_run": true,
+   "cites_acceptance": false,
+   "task": "floor",
+   "opening": "floor",
+   "action": {
+    "verb": "offer",
+    "operator": "seller-fixture",
+    "developer": "seller-assistant@v1",
+    "action_class": "marketplace.offer",
+    "action_id": "offer/caps-offer",
+    "timestamp": "2026-10-09T10:14:30Z",
+    "equivalence_key": "offer/caps-offer",
+    "amount_minor": 99000000,
+    "currency": "USD",
+    "target": "cp-fp:9a47ead6be8ef8459b75db7c1cbb3e1135edb7cf814ab11a6010662614b6aeeb",
+    "task_authority_ref": "e45f2c49ff222c520c4e5206f430cdc54d6fd896df531fb36e0f9ce38247acec",
+    "item_ref": "item-ref:9b00fa8bf033b8bf4f51ec5019e8429e4ff2fb1af97c63e75d50d0e9cfb8ed58",
+    "proposal_at": "2026-10-09T10:14:00Z"
+   }
+  }
+ ]
+}

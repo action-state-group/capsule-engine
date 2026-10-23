@@ -1,0 +1,132 @@
+{
+  "note": "capsule-engine #149 (a sale-log record is read only when its disclosure binds it and it verifies; only the latest cut counts) vectors, on #148's and #147's (AMENDMENT 11: the sale's log shows each thread opened and cut whole); #149 changes only tamper/expected_findings.json (07, 08 and 10 add sale_record_not_disclosed, 08 dropping thread_opened_not_read; 09: [no_sale_cut, sale_bundle_not_valid, sale_record_not_disclosed]) and MANIFEST.sha256, every other file is #147's. They supersede every #146 vector (c49a9258: sale.bundle.json, sale-after-c.bundle.json and its B-withheld copy, the check inputs and expected files, SHA256SUMS). Each file byte for byte from its source; this sidecar is not part of those bytes.",
+  "engine_commit": "fd43d4329ea31d69e9bdd0a79f23f013c3615219",
+  "sources": {
+    "check-inputs/, expected_live.json, expected_replay.json, README.md, fixture_steps.py, sale.bundle.json, tamper/, MANIFEST.sha256": "the engine side's go-vectors for replaying s11 on typed deals (refreshed for #149 2026-10-10; MANIFEST.sha256 verified with shasum -a 256 -c, 23 files), = capsule-engine tests/fixtures/sale-replay/ at 7b2d0339 (merge of #147, unchanged at a6405ea2, the merge of #148, and at fd43d432, the merge of #149) for the fixture files; tamper/ is the engine's CUT_AND_OPENED edits plus the never_opened relabel, written on the engine side from the engine at 68b1b4b5, with the engine's findings at fd43d432 in tamper/expected_findings.json.",
+    "sale-b-withheld.bundle.json": "the engine's fixture step fixture_steps.withhold_thread (this directory's fixture_steps.py, run unmodified with only its capsule_engine import stubbed to SALE_EXTENSION) on sale.bundle.json for thread deal-73bb7fe1c1462a86 (B), written as compact JSON: the copy the engine's test reads as sale-b-withheld.",
+    "verify/<name>.verify.json": "stdout of `capsulectl verify --bundle` on sale.bundle.json (exit 0, VALID), sale-b-withheld.bundle.json (exit 3, INCOMPLETE, thread_not_shown) and tamper/NN.bundle.json (verify/tamper-NN.verify.json, each exit 1, INVALID), by capsulectl built from git archive of capsule-cli 9691acadf137a92735f128ae5c3ecc27bc7d9390 with the README's build command (capsulectl --version: capsulectl v0.1.0-rc14-23-g9691aca (commit 9691acadf137a92735f128ae5c3ecc27bc7d9390)), the producer of the fixture."
+  },
+  "producer": "capsulectl at capsule-cli 9691acadf137a92735f128ae5c3ecc27bc7d9390 (v0.1.0-rc14-23-g9691aca)",
+  "files": {
+    "MANIFEST.sha256": {
+      "sha256": "e73f5536121279df0bb116cd2d08a9c12d86c36c32529cd54765931c5ace1244"
+    },
+    "README.md": {
+      "sha256": "f8be1e93ab64f8699eca77b72e31eb93c0548e405c0502e1a9e59462cffd553b"
+    },
+    "check-inputs/a-commit-1900.json": {
+      "sha256": "384d7d9d8d93a61b66610f92acacb3c0a381aa9455b64dd3b7b28baac49e6e24"
+    },
+    "check-inputs/a-commit-again-1900.json": {
+      "sha256": "5249332dae104838405995cc741bd1bab3a75484347221eda044b5178703a403"
+    },
+    "check-inputs/a-offer-1900.json": {
+      "sha256": "c30d3e57ee1f3339f5880ebf2414e6a2b1d3c04467e897a5195324e73fe5def1"
+    },
+    "check-inputs/b-commit-1850.json": {
+      "sha256": "02771f9c209aff888ba1f61eeedea48ed4803e3e8c1eb1e89f6293bd7a501380"
+    },
+    "check-inputs/b-offer-1850.json": {
+      "sha256": "389f5d85f0cc3a40c905cb087f8edb072eb23e0c73cd63955a145c947be76919"
+    },
+    "expected_live.json": {
+      "sha256": "2bdfd3b694045392aa85404559a65210b5267dff7bfd1aa9641e007fb7ff689f"
+    },
+    "expected_replay.json": {
+      "sha256": "b3a17d04744ccb0d2e0f48e7d1d56bf7a777f91a96e9d75a7de2ed0ee4a0b49b"
+    },
+    "fixture_steps.py": {
+      "sha256": "b6b09ec0eb37deee91171e86712f6be0288e2e8e927e3d2956f0db354dbc2827"
+    },
+    "sale-b-withheld.bundle.json": {
+      "sha256": "2f099f40dd07bd42bc74268ca95a8fd9ba2412fe7b47817584bbca80851dd3a3"
+    },
+    "sale.bundle.json": {
+      "sha256": "67cb7ef7bdafef928110f4459742c7b7b6ef273a6780cbf41b06895bd4ffc422"
+    },
+    "tamper/00.bundle.json": {
+      "sha256": "864fa327de6f9584bf6d0f617c21dc791b58470def1e40596cc39b48137dc8b1"
+    },
+    "tamper/01.bundle.json": {
+      "sha256": "e3e9a059fd33e13acce4410b1046d12113271cba44b964be7143165138fabfa0"
+    },
+    "tamper/02.bundle.json": {
+      "sha256": "ba2f067f2fb845efd4b9b05b80602413d8063cea8384886e929054562d50298d"
+    },
+    "tamper/03.bundle.json": {
+      "sha256": "b10b956067cd52a0a845931c65ae94163fd950ee4705b5b5760124f10b04b80f"
+    },
+    "tamper/04.bundle.json": {
+      "sha256": "a3468273b9e56a1e350d7b81b4ba6207c0e67e6c5c760428453fa99d5a5ba3f8"
+    },
+    "tamper/05.bundle.json": {
+      "sha256": "97ca8dc5e0d7b14da1af7b86a31c96ec04272e88947accf0d0f546395642fea0"
+    },
+    "tamper/06.bundle.json": {
+      "sha256": "c6c136ca729fe649f8f93284edb361c2d029a998f9e1e8339baa429ad6ef2eb0"
+    },
+    "tamper/07.bundle.json": {
+      "sha256": "ab383372640a2ab0a8787ba1c08137fe6461dc1b8fdde34d12d9236969b790e6"
+    },
+    "tamper/08.bundle.json": {
+      "sha256": "317ca8e3d56c093484b538fd05f5a310071077a1b66c16c72a7b3bfd33584a4d"
+    },
+    "tamper/09.bundle.json": {
+      "sha256": "fd06fa5e237bb2505bbc6a7f83a378d9bbf34344b50ffd82c8389c478af28abd"
+    },
+    "tamper/10.bundle.json": {
+      "sha256": "bcefba3f65393cec09c119b8830f12777c4ebc8cc56c879eaeecdf884eabdae1"
+    },
+    "tamper/11.bundle.json": {
+      "sha256": "5ab6554804f13965b34905707606fa453df19522e657e25efaf36d2ba742b81a"
+    },
+    "tamper/expected_findings.json": {
+      "sha256": "f9422da849b3fd73bf9c15dcb080ad586d213033e30914048825349168faea5e"
+    },
+    "verify/sale-b-withheld.verify.json": {
+      "sha256": "caef92a6e05d21898575e69b2e2af6f7e30bccba84933cdde9216001d73b83f1"
+    },
+    "verify/sale.verify.json": {
+      "sha256": "14d48c04295417354c01cbe5550ab5c6e5ddb6c94c3cf6a144bb68e8c9d394aa"
+    },
+    "verify/tamper-00.verify.json": {
+      "sha256": "0671964d6a29352e7dbf7b6cf6986f09758acdeca7da47f2363dc649904fb5de"
+    },
+    "verify/tamper-01.verify.json": {
+      "sha256": "50f6b54a5bcefeb6ac45f9eb357285d35b4af39555713af7e3c1bce02ae091a0"
+    },
+    "verify/tamper-02.verify.json": {
+      "sha256": "f5d472dda4eece4eac34e7e901ffc493ee686f87d0024226a79be4ae0d6c5058"
+    },
+    "verify/tamper-03.verify.json": {
+      "sha256": "19d544497584cc43a11fb79025e2cdedd879b9f8f0ef2cd157af520c171bfe73"
+    },
+    "verify/tamper-04.verify.json": {
+      "sha256": "4d38f1cb0549366d8f31080d3cd2dfd4297ce03c1039783a70ed5b22c231041c"
+    },
+    "verify/tamper-05.verify.json": {
+      "sha256": "c49f96cfc5bf23db1d70edf55a9a1aa20994633bc69f0da74bfc6b0126afe774"
+    },
+    "verify/tamper-06.verify.json": {
+      "sha256": "825a424d451554c635596fd424d1be48eaf81a2e67dcd0af57ffc8259aa25ec3"
+    },
+    "verify/tamper-07.verify.json": {
+      "sha256": "fe6b893ce9b4d43665d126352a8fea408cd8d37a8b0237f6a8950766fb3c605c"
+    },
+    "verify/tamper-08.verify.json": {
+      "sha256": "63f84b5271a6102e735daa62116879aec1f181038d33e11f79049ffb071b4516"
+    },
+    "verify/tamper-09.verify.json": {
+      "sha256": "b40e6f9a73102a2db74cf85c860e9dbdf809f07bd807b587bfa64a16b131f25a"
+    },
+    "verify/tamper-10.verify.json": {
+      "sha256": "354d5cb30d104a9cc87986c7cb706c4761de74e894f05c1c39600178df76fb58"
+    },
+    "verify/tamper-11.verify.json": {
+      "sha256": "b317485aa186a3a6b5996ec0a06a41e8e0170384e1e6c41debc3871a5c9bb6bf"
+    }
+  },
+  "generated_at": "2026-10-10",
+  "revendored_7339028": "Re-vendored from capsule-engine 7339028ab2117d6c7adec89a26cd5022b8ac7140 (#173, asg/everyday/0.3.7 and asg/seller/0.1.4): expected_live.json, expected_replay.json (and MANIFEST.sha256 over them) byte for byte from tests/fixtures there, which #173 changed only in their pack header; every decision is the earlier copy's. The sha256 above is the re-vendored file's.",
+  "regenerated_0c93a58": "expected_replay.json (and its MANIFEST.sha256 line) regenerated by capsule-engine at 0c93a58fccb6d39797d55ec7174aae16d24f0923 (git archive; the merge of #205, whose replay decides a check citing a task authority with the record the bundle discloses under that digest) through tests/test_sale_replay.py's own replay_document(), with its defaults but PACK set to load_pack_dir of this repo's packs/seller-0.1.4: the engine's own copy there is now under asg/seller/0.1.5. expected_live.json regenerated the same way is byte for byte the vendored one. Only s08 changes, n/a to pass; the engine's verdicts are unchanged. This plugin labels the replayed commits not_evaluable, where s03 reads a floor in force without its opening (floorUnreadVerdict)."
+}

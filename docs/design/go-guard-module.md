@@ -1,7 +1,7 @@
 # Design note: the Go guard moves into this repo as a `go/` module
 
-Status: v3, for review, 2026-10-22. Ethan's agent. Reviewers: Codex, a
-`claude -p --permission-mode plan` stand-in for Kimi (Kimi is out of quota), and Sherlock2 (this
+Status: v4, as built in PR A, 2026-10-22. Converged as v3. Ethan's agent. Reviewers: Codex, a
+`claude -p --permission-mode plan` stand-in for Kimi, and Sherlock2 (this
 note moves code ownership between ASG repositories).
 
 Issue: capsule-engine#210. How ack: capsule-engine#210 issuecomment-6352734012.
@@ -44,6 +44,29 @@ review links are in the PR's review record. What changed:
 - **vocabgate (§3, §9).** vocabgate walks the pinned module's `packs.All`, never a copy (Codex
   round 3, `claude -p` round 4).
 
+**v4, as built in PR A.** Building the move changed these points, each recorded in the section
+it touches:
+
+- **Party roles (§1, §9).** The set of known party roles (`pack.KnownPartyRole`,
+  `UnknownPartyRoleError`) stays in the module. The guard reads it while decoding, and it is
+  capsule-cli's vocabulary (absent, buyer, seller), not a product choice. Only the
+  role-to-pack-version map (`partyPacks`, `ForPartyRole`) leaves.
+- **The generator (§2, §3, §7).** It is `scripts/generate_go_packs.py`, in Python: it uses the
+  engine's own catalog loader and digests, as the repo's other `scripts/*.py --check` tools do,
+  in place of `go run ./internal/gen`. It also writes `go/guard/testdata/engine-definitions.json`,
+  which the §6 checks read.
+- **Copy audiences (§1).** These are `SaleVerification.CopyAudiences`. Nil reads the engine's set
+  (`report/sale_bundle.py` `_COPY_AUDIENCES`: counterparty, adjudicator, keep), and Muse passes
+  its two.
+- **Pack names (§1, §3).** The un-versioned names are renamed to versioned ones (`packs.Everyday`
+  is now `Everyday037`, and `packs.Seller` is `Seller010`). `packs.All` and `pack.Embedded()` are
+  added.
+- **Kept back (§12).** `testdata/actions` and the two `parity` outputs that carry a real name and
+  booking (`caps-v5-parity.json`, `supplementary-parity.json`, with their generators) are kept
+  back. So are the three tests that read them (`TestCapsV5MatchesPythonDecisions`,
+  the booking gate-rule test in `selectors_test.go`, `TestLeg3SupplementaryParity`). A later PR here
+  regenerates them synthetically before the switch-over.
+
 ## 0. Problem, and what this note does not do
 
 The guard has two implementations today. The Python one is here, and it is the reference. The Go
@@ -85,7 +108,7 @@ moves. Whatever names Muse, or exists for one Muse verb or one Muse release deci
 |---|---|---|
 | `internal/canon` (JCS values, `json.go`) | `go/canon` | a canonical JSON port, used by every digest |
 | `internal/pack` (loader, digests, fold definitions, pack source) | `go/pack` | the pack runtime: the Go half of `capsule_engine/packs`, `guards/wickets/loader.py` and `folds/` |
-| `internal/pack` `partyPacks` / `ForPartyRole` / `KnownPartyRole` (which pack version serves which party role), and `packs`' un-versioned aliases (`Everyday`, `EverydayDir`, `Seller`, ...) with `catalogFor`'s built-in catalog default | stay in Muse, as caller-supplied values | which pack a product serves, and which catalog a bare `--pack` resolves against, are that product's release decisions (Muse #248 switches them for rc21) |
+| `internal/pack` `partyPacks` / `ForPartyRole` (which pack version serves which party role), and `packs`' un-versioned aliases (`Everyday`, `EverydayDir`, `Seller`, ...) with `catalogFor`'s built-in catalog default | stay in Muse, as caller-supplied values | which pack a product serves, and which catalog a bare `--pack` resolves against, are that product's release decisions (Muse #248 switches them for rc21) |
 | `packs/` (embedded byte-for-byte pack copies, `engine/action_taxonomy.json`) | `go/packs`, generated (§3) | copies of this repo's own catalog |
 | `internal/guard`: the engine, gate, checks, fold, record, history, taxonomy and every wicket check (dedupe, caps and operator limits, seen_before, price_floor, offer_expiry, release, single_commitment, promise and statements, task_authority, change checks, party_role, deal_id, commitment) | `go/guard` | a port of `guards/engine.py`, `guards/checks/*` and `folds/engine.py`. Each file's header already names its Python source |
 | `internal/guard`: `check_input.go` (external-check-input/v0), `sale_bundle.go`, `sale_history.go`, `standalone_report.go`, `bundle_replay.go`, `seller_records.go` | `go/guard` | they read neutral formats (agent-action-capsule and capsulectl), mirroring `report/replay.py`, `report/live_history.py` and `report/sale_bundle.py` |
@@ -104,12 +127,13 @@ the caller passes. Muse passes today's values, so Muse's behavior does not chang
   change.
 - `partyPacks` becomes a caller-supplied role-to-loader map, wherever the guard resolves a role
   today (`action.go`, `party_role.go`). The module keeps the loaders (`pack.LoadSeller015`, ...)
-  and has no default map. `UnknownPartyRoleError`'s text ("not one this plugin knows") moves to
-  Muse with the map.
+  and has no default map. The set of known roles, `KnownPartyRole` and `UnknownPartyRoleError`,
+  stays in the module (v4).
 - `catalogFor` (`source.go`) resolves a source that holds only a pack.yaml against
   `packs.Everyday` / `packs.EverydayDir`, which is everyday 0.3.7 in Muse's hand-written
-  `embed.go` today. In the module, `LoadFrom` / `LoadPath` take that fallback catalog as an
-  argument. `go/packs` exports only versioned names (`Everyday037`, `Seller015`, ...), plus
+  `embed.go` today. In the module, `LoadPath` takes that fallback catalog as an argument,
+  and `LoadFrom` resolves only against the source's own definitions. Every caller in Muse that
+  loads a pack.yaml-only source goes through `LoadPath`. `go/packs` exports only versioned names (`Everyday037`, `Seller015`, ...), plus
   `All`, the whole tree as one `embed.FS`, and no un-versioned alias. Muse keeps its aliases in its own code and passes the same catalog, so a
   bare `--pack` resolves exactly as it does today.
 
@@ -138,7 +162,6 @@ go/
   packs/                generated pack tree, embed.go and registry (§3)
   guard/                from internal/guard
   guard/testdata/       the moved vector sets that pass §12
-  internal/gen/         `go run ./internal/gen` writes packs/ from the catalog
 conformance-vectors/
   guard/v0/             shared vectors (§5), read by tests/ and by go/guard's conformance_test.go
 .github/workflows/conformance.yml
@@ -150,8 +173,11 @@ imports each of them outside the guard. Their only non-standard dependency is
 these packages. The module is public, so Muse needs no `GOPRIVATE` entry for it.
 
 One moved test reads `../../packs/...` today. In `go/guard` that resolves outside the module, so
-PR A rewrites those paths to `../packs/...`. That is the only test edit PR A makes besides the
-§12 rewrites. The Python package and its wheel do not change: nothing under `go/` or
+PR A rewrites the path to `../packs/...`. Another, `seller_pack_test.go`, read a fixture of the
+plugin's (`../plugin/testdata/seller-bundle/bundle.json`, a byte copy of capsule-cli's public
+fixture). PR A copies that fixture to `go/guard/testdata/seller-bundle/` and points the test at
+it. Besides the §12 rewrites, the removal of the kept-back tests (v4), and the tests the caller-side
+parameters needed, those are the only test edits PR A makes. The Python package and its wheel do not change: nothing under `go/` or
 `conformance-vectors/` ships in the wheel.
 
 ## 3. Packs inside the module
@@ -159,7 +185,7 @@ PR A rewrites those paths to `../packs/...`. That is the only test edit PR A mak
 Go `embed` cannot read outside the module directory, so the module cannot embed the catalog
 directly. Instead, `go/packs/` is a generated tree in Muse's current layout: one
 `<pack>-<version>/` directory per pack version (pack.yaml, the wicket and fold definitions it
-cites, PROVENANCE.json), plus `engine/action_taxonomy.json`. `go run ./internal/gen` writes it,
+cites, PROVENANCE.json), plus `engine/action_taxonomy.json`. `scripts/generate_go_packs.py` writes it,
 together with `packs/embed.go` (one `embed.FS` per version, and `All` over the whole tree,
 `engine/PROVENANCE.json` included) and the pack registry that `go/pack` reads (the `LoadXxx`
 functions and `source.go`'s pack list, which are hand-written in Muse today).
@@ -170,7 +196,7 @@ The generator has four sources and nothing else:
 - `capsule_engine/guards/wickets/catalog_defs/`;
 - `capsule_engine/folds/catalog_defs/` (spend.weekly, counterparty.seen_before,
   disclosure.\*);
-- `capsule_engine/guards/action_taxonomy*.json`.
+- `capsule_engine/guards/action_taxonomy.json`.
 
 Two kinds of pack version go into the tree:
 
@@ -334,7 +360,7 @@ no path filter, because a Python-only change can diverge from Go as easily as a 
      by design.
 
    A failure prints both sides' outcome, constraint table and evidence.
-3. **`packs`**: `go run ./internal/gen --check`, plus the byte and digest checks of §3 and the
+3. **`packs`**: `python scripts/generate_go_packs.py --check`, plus the byte and digest checks of §3 and the
    checks of §6.
 4. **`conformance`**: needs 1-3, and fails if any of them failed or was skipped. This is the one
    check branch protection requires. An admin sets that.
@@ -375,7 +401,7 @@ the switch-over's parent commit (§10), one actionstate-muse PR does the followi
 
 - adds `require github.com/action-state-group/capsule-engine/go v0.1.0`;
 - rewrites the imports of `internal/{guard,pack,canon}` and `packs` to the module paths;
-- moves `partyPacks` (with `ForPartyRole`, `KnownPartyRole` and `UnknownPartyRoleError`) and
+- moves `partyPacks` (with `ForPartyRole`) and
   the un-versioned pack aliases into `internal/plugin`, and passes them, the fallback catalog,
   `copyAudiences` and the schema id `actionstate-check/v1`;
 - deletes `internal/guard`, `internal/pack`, `internal/canon` and `packs/`. A vector set kept back
@@ -399,6 +425,10 @@ the switch-over's parent commit (§10), one actionstate-muse PR does the followi
   A grep can miss paths built from separate `Join` arguments. So the check is the full
   `go test ./...` and every e2e script, run after the deletion. The PR also records vocabgate's
   surface count before and after, and the two must be equal;
+- builds every `guard.SaleVerification` through one Muse helper that sets `CopyAudiences` to Muse's
+  two audiences. A nil value reads the engine's three, so a site that is missed would accept an
+  adjudicator copy and nothing would fail. At 93bf526 the sites are `internal/plugin/sale.go`'s
+  two constructions and its `SaleVerification{}` returns;
 - adds a CI check that fails a PR touching any Go file under the old paths, naming capsule-engine
   `go/` as the owner;
 - keeps every other test outside the deleted directories passing unchanged, including

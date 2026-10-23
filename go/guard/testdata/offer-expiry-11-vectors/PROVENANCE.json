@@ -1,0 +1,120 @@
+{
+  "note": "Differential vectors for offer_expiry/1.1.0 (the Go port of capsule-engine #202, d3066f5). This sidecar is not part of the vectors.",
+  "engine_commit": "0c93a58fccb6d39797d55ec7174aae16d24f0923",
+  "sources": {
+    "replay/, live/, expected.json": "The records capsule-engine's own tests/test_offer_expiry_no_proposal.py builds (its _message, _typed_offer and _bound helpers, imported at 0c93a58 from a git archive), in each case that test covers plus nine more (two source refs, a message in another deal, a sale sealed no_proposal, a message with no sent_at whose noted at is malformed in five ways, year 0 included, and a year-0 sent_at). replay/<case>.json is a bundle of those records ({records, disclosures}, a withheld record undisclosed, an unbound one with a zeroed agent_input_digest), decided by the engine's replay(..., wickets=(offer_expiry/1.1.0,)): the offer's action.proposal_at and no_proposal and its offer_expiry constraint. live/<case>.json is an external-check-input/v0 whose record is the offer (with proposal_at beside it when the case gives one), decided by action_for_check_input and check_offer_expiry under the 1.1.0 definition (the one packs/seller-0.1.5 vendors)."
+  },
+  "files": {
+    "expected.json": {
+      "sha256": "50ddea0a7182b98b94d5daf2b0a817d1f82c6d024e4d30f50ed86c93b2e40f7c"
+    },
+    "live/answers-a-message-no-proposal-at.json": {
+      "sha256": "3611ce985a8698ee6124fe436200991c78bd6f273dbb942d317bd87b6e668aac"
+    },
+    "live/answers-a-message-with-proposal-at.json": {
+      "sha256": "a6232d0c0d0d4472d3c7682a83b43666e61b1159edc20d57dc26f48c41a631dc"
+    },
+    "live/no-proposal-beside-proposal-at.json": {
+      "sha256": "1fcfe670c96577f4b3d647c3ba1dc0e3c60a1d7ed2f0bd676e77a6989c565797"
+    },
+    "live/no-proposal-beside-source.json": {
+      "sha256": "cffac754a515bd9e7cf8ed99b41d53e604bfd61b82c96e4327eb6324f472d706"
+    },
+    "live/no-proposal.json": {
+      "sha256": "21eb430fc6a66222d179faf20c1d0114c8600631cfd959c42aa8ce167946aafb"
+    },
+    "replay/answers-a-day-old-message.json": {
+      "sha256": "0cad6ce3ce8528c18c531092bac33db1988847adb929a150c1686e648db8b284"
+    },
+    "replay/answers-a-message-noted.json": {
+      "sha256": "1dde3b713a3afb0b53b0fb30fd3bf09364d412a2d2928b5b2f69d34368393f7b"
+    },
+    "replay/answers-a-message-sent-at.json": {
+      "sha256": "53ffc2581e6eead92f7a10a8641ae9855f959db88e7a44156c6ea404981da578"
+    },
+    "replay/first-offer-no-proposal.json": {
+      "sha256": "378208663593cfad1a7d736adcdd2cf8fa3a13465c0ef339fa3668efa5b21ef5"
+    },
+    "replay/malformed-noted-at-0.json": {
+      "sha256": "31618a22a523233b54ca065d1cd20ee283f3c8f87e624da6b34af0ff94e092e5"
+    },
+    "replay/malformed-noted-at-1.json": {
+      "sha256": "434dfb36e4e04b6fa68de3c2e3f7a9fc46d2cf66aa09c4ce1b8cf2b2fbb03455"
+    },
+    "replay/malformed-noted-at-2.json": {
+      "sha256": "d97442529616d7e6c760add088177124353fa01ee9252c848cb1759f71fcd7d8"
+    },
+    "replay/malformed-noted-at-3.json": {
+      "sha256": "5dfea8d26ada5cc458c583572cd47e76e4788553456f7e07b84fee538d7d51f1"
+    },
+    "replay/malformed-noted-at-4.json": {
+      "sha256": "439afd63d6e81e6b28d8ff49c323161979b9b681244ff6bcd28f63fe0f6cbb1e"
+    },
+    "replay/malformed-sent-at-0.json": {
+      "sha256": "0c04d37ca2effaff3940ab4dd6ecfbd2db59e3acc593aef7c460e82e857a8c9f"
+    },
+    "replay/malformed-sent-at-1.json": {
+      "sha256": "4b1ad586ed58d03e052db1627de43ea672980553cf7fadc3e3be01764745dc67"
+    },
+    "replay/malformed-sent-at-2.json": {
+      "sha256": "6493051a91ff3719f6b1e57b6fd04ac390c60d641de0c4f44b68629269d19765"
+    },
+    "replay/malformed-sent-at-3.json": {
+      "sha256": "9dcbbea2d8fbbfb07ee3ee8340c178502d80a5578eb4c679892243773b7d7d9b"
+    },
+    "replay/malformed-sent-at-4.json": {
+      "sha256": "35a8dcbff4b44b6e99de947b450fc53b3ffc9eebb5422d5c6c1b00a766bacb2a"
+    },
+    "replay/malformed-sent-at-5.json": {
+      "sha256": "e6a38b095466c7a62646455ed3b5141ac79906edce59df83d3edb6ca63310ad2"
+    },
+    "replay/malformed-sent-at-6.json": {
+      "sha256": "707327fccb41f4bbe2ec84ffd477ad82072723f5de0ee6b875c3806613942630"
+    },
+    "replay/message-absent.json": {
+      "sha256": "b25cd7dcf85d0f03db9a82b23b92e045c6e52ce939911eb40402577478516bf4"
+    },
+    "replay/message-from-the-agent.json": {
+      "sha256": "302cafcbae547f1208dd2975f9ae6d0915ce402079285e86b553a2e61289efbb"
+    },
+    "replay/message-in-another-deal.json": {
+      "sha256": "660cd0701abfa0951a64bb4ccababc2cd88ca59bd416dc704e281ffbca7c1af2"
+    },
+    "replay/message-later.json": {
+      "sha256": "3087db142e7733781f4261538344c8b53783524280c217e15c14cbefeee4a3e9"
+    },
+    "replay/message-unbound.json": {
+      "sha256": "14758c8eda36b2862820e2304ae9744834df0cf14d6e95bb606eefd00688ddb3"
+    },
+    "replay/message-withheld.json": {
+      "sha256": "ecd26c28f21ce056ca5c661113f2eb838d1808b4fefb265e6af2408fa2ddf307"
+    },
+    "replay/no-proposal-beside-source-resolved.json": {
+      "sha256": "937ebd032e00d50aa1ea609030dafe030d256462e08b3526a2b7a7d7315f32be"
+    },
+    "replay/no-proposal-beside-source-stale.json": {
+      "sha256": "6d09315d1a71ab87da37dc9b31af5d736c810e164941842114ffbba49f28331c"
+    },
+    "replay/no-proposal-beside-source-unbound.json": {
+      "sha256": "15e873cf360d0c03c64982dd500b0ccf8303920d163f740c491fccb5b58efc06"
+    },
+    "replay/no-proposal-beside-source-withheld.json": {
+      "sha256": "b1f9fcbb0ecd462655d0ddc56ac9aef82088d4d5b0cc9fe52faaddae52009d9c"
+    },
+    "replay/sale-sealed-no-proposal.json": {
+      "sha256": "f21c5bb79d636952dcc6e344c91ff4cc5ee4e919fa02c15cce7721c3dac09c56"
+    },
+    "replay/sent-at-after-noted.json": {
+      "sha256": "f2f813f8000b6fa1fd6b069c7d6bbde1568dd71892954c90f73b3e6e592913f6"
+    },
+    "replay/sent-at-equal-noted.json": {
+      "sha256": "65f1d024927d5b6e53a09ed6740f26f13c099dd46e35c4607dc4c1475acbc689"
+    },
+    "replay/sent-at-year-0.json": {
+      "sha256": "affd12ac0d21292b093539fcb4a1483fbafdffeafd79c89181b1152b6162184a"
+    },
+    "replay/two-source-refs.json": {
+      "sha256": "7d5be7904040c8eee490dacd64fd72b9358fddb059519625a96f0c87e4e16c1b"
+    }
+  }
+}

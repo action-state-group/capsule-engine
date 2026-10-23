@@ -1,0 +1,33 @@
+{
+  "type": "purchase",
+  "demo": true,
+  "channel": "web",
+  "intent": {
+    "verbatim": "Order the item in my cart",
+    "asked": {
+      "item": "example item",
+      "quantity": 1
+    },
+    "allowed": [
+      "pay",
+      "commit",
+      "cancel",
+      "share_contact",
+      "share_credentials"
+    ]
+  },
+  "who": {
+    "name": "Example Shop",
+    "domain": "shop.example"
+  },
+  "terms": {
+    "item": "example item",
+    "quantity": 1,
+    "price_minor": 2000,
+    "currency": "USD"
+  },
+  "recourse": {
+    "rail": "card",
+    "refundable": true
+  }
+}

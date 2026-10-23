@@ -102,6 +102,14 @@ record-query verbs; the default is `full`. Run any command with `--help`.
 | `payments-safety/` | `asg/payments-safety/1.0.0` | Caps per scope and window, dedupe, and verify-before-dispatch on money movement, plus the spend fold. |
 | `standard-vendor/` | `asg/standard-vendor/1.0.1` | The standard outcome catalog over the general capsule vocabulary: one pack that grades any vendor's ledger. |
 
+### The Go guard (`go/`)
+
+`go/` is the Go module `github.com/action-state-group/capsule-engine/go`, the
+Go implementation of the guard for the everyday and seller packs. The Python
+guard above is the reference. CI checks the Go guard against the engine's vectors and the
+catalog. A job that runs both on the same vectors at every PR's head is still to come. See
+[go/README.md](go/README.md).
+
 For the parts you can use on their own (the Evidence Contract schema and
 validator, the obligation register format and its sample compiler, and the
 examples, including the Evidence Contracts in `examples/contracts/`), see

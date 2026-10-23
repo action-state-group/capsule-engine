@@ -1,0 +1,28 @@
+{
+  "note": "Provenance sidecar; not part of the fixture. The set has no MANIFEST, so each file's sha256 is pinned here.",
+  "producer": {
+    "name": "capsulectl",
+    "repo": "action-state-group/capsule-cli",
+    "commit": "49651e2f156e370208dec605ded653c5f0a9a4bf",
+    "version": "v0.1.0-rc14",
+    "binary_sha256_darwin_arm64": "88c30256a56f91c275db4c477a4e90173c49d4401eaacf8e54b9abe45a1448f7"
+  },
+  "source": "the 2026-10-09 fyi buyer-acts probe run (scenarios/sensitivity.sh line s4; acc-s4-purchase-commit-repeat.json)",
+  "files": {
+    "README.md": {
+      "sha256": "cde26f1dc0c1ed2c0f99c092850b212c7ac1f74047a634d22190e8ee48ed530d"
+    },
+    "inputs/act-commit.json": {
+      "sha256": "2a2546f5b2d32c964f2288f88f66607c9dd37654192c444c6a10330b79965caf"
+    },
+    "inputs/check-commit.json": {
+      "sha256": "9a4a93295d645e32acf3242c88047b7031314994789385b3f94cff6e67480e4c"
+    },
+    "inputs/open.json": {
+      "sha256": "7bbc8f2f3acd3242a702f12ed013491342ba1f6994c59b9fd8254c33335c533a"
+    },
+    "purchase-commit-repeat.input.json": {
+      "sha256": "ddfd4bcca22fb701eb39a86d1e4e856fb13ef69fc60b48f5fd3da3587ad37c8f"
+    }
+  }
+}

@@ -1,0 +1,411 @@
+{
+  "note": "Decision-level differential for taxonomy 4's approver roles on the remaining ASK classes: taxonomy 4 sets approver_role account_holder on booking.cancel, data.delete, communication.publish, disclosure.personal, so their ASK-declared gate rules (r11 r12 r15 r17 r18) ESCALATE under the #104 rule; NEVER re-declarations and integrity failures (dedupe, verify_before_dispatch) still DENY. Each case runs on a fresh ledger under the installed everyday 0.3.2 pack; `redeclare` overrides obligation default_disposition for that case only (test-only pack variant; its digest differs). Steps run in order; the last step's decision is the one compared.",
+  "pack_id": "asg/everyday/0.3.7",
+  "cases": [
+    {
+      "name": "booking-cancel-asks",
+      "expect": "escalate (needs_input/hitl_dispatched): taxonomy 4 names account_holder on booking.cancel; only action_class_gate fails; failing rules r17",
+      "steps": [
+        {
+          "action": {
+            "verb": "act",
+            "operator": "household-tax4-diff",
+            "developer": "household-assistant-t4@v1",
+            "action_class": "booking.cancel",
+            "action_id": "act/tax4-diff-1",
+            "timestamp": "2026-08-10T15:01:00Z"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "name": "booking-cancel-never-refuses",
+      "expect": "deny: r17-cancellation re-declared NEVER",
+      "steps": [
+        {
+          "action": {
+            "verb": "act",
+            "operator": "household-tax4-diff",
+            "developer": "household-assistant-t4@v1",
+            "action_class": "booking.cancel",
+            "action_id": "act/tax4-diff-2",
+            "timestamp": "2026-08-10T15:02:00Z"
+          },
+          "dry_run": true
+        }
+      ],
+      "redeclare": {
+        "r17-cancellation": "NEVER"
+      }
+    },
+    {
+      "name": "booking-cancel-repeat-dedupe-refuses",
+      "expect": "deny: the second (live) check of the same act is a dedupe hit beside the gate; integrity never asks",
+      "steps": [
+        {
+          "action": {
+            "verb": "act",
+            "operator": "household-tax4-diff",
+            "developer": "household-assistant-t4@v1",
+            "action_class": "booking.cancel",
+            "action_id": "act/tax4-diff-3",
+            "timestamp": "2026-08-10T15:03:00Z",
+            "target": "service/repeat"
+          },
+          "dry_run": false
+        },
+        {
+          "action": {
+            "verb": "act",
+            "operator": "household-tax4-diff",
+            "developer": "household-assistant-t4@v1",
+            "action_class": "booking.cancel",
+            "action_id": "act/tax4-diff-3",
+            "timestamp": "2026-08-10T15:03:00Z",
+            "target": "service/repeat"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "name": "booking-cancel-missing-mandate-refuses",
+      "expect": "deny: cited mandate not on the ledger fails verify_before_dispatch beside the gate",
+      "steps": [
+        {
+          "action": {
+            "verb": "act",
+            "operator": "household-tax4-diff",
+            "developer": "household-assistant-t4@v1",
+            "action_class": "booking.cancel",
+            "action_id": "act/tax4-diff-4",
+            "timestamp": "2026-08-10T15:04:00Z",
+            "cited_mandate_capsule_id": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "name": "data-delete-asks",
+      "expect": "escalate (needs_input/hitl_dispatched): taxonomy 4 names account_holder on data.delete; only action_class_gate fails; failing rules r18",
+      "steps": [
+        {
+          "action": {
+            "verb": "act",
+            "operator": "household-tax4-diff",
+            "developer": "household-assistant-t4@v1",
+            "action_class": "data.delete",
+            "action_id": "act/tax4-diff-5",
+            "timestamp": "2026-08-10T15:05:00Z"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "name": "data-delete-never-refuses",
+      "expect": "deny: r18-delete-persistent-data re-declared NEVER",
+      "steps": [
+        {
+          "action": {
+            "verb": "act",
+            "operator": "household-tax4-diff",
+            "developer": "household-assistant-t4@v1",
+            "action_class": "data.delete",
+            "action_id": "act/tax4-diff-6",
+            "timestamp": "2026-08-10T15:06:00Z"
+          },
+          "dry_run": true
+        }
+      ],
+      "redeclare": {
+        "r18-delete-persistent-data": "NEVER"
+      }
+    },
+    {
+      "name": "data-delete-repeat-dedupe-refuses",
+      "expect": "deny: the second (live) check of the same act is a dedupe hit beside the gate; integrity never asks",
+      "steps": [
+        {
+          "action": {
+            "verb": "act",
+            "operator": "household-tax4-diff",
+            "developer": "household-assistant-t4@v1",
+            "action_class": "data.delete",
+            "action_id": "act/tax4-diff-7",
+            "timestamp": "2026-08-10T15:07:00Z",
+            "target": "service/repeat"
+          },
+          "dry_run": false
+        },
+        {
+          "action": {
+            "verb": "act",
+            "operator": "household-tax4-diff",
+            "developer": "household-assistant-t4@v1",
+            "action_class": "data.delete",
+            "action_id": "act/tax4-diff-7",
+            "timestamp": "2026-08-10T15:07:00Z",
+            "target": "service/repeat"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "name": "data-delete-missing-mandate-refuses",
+      "expect": "deny: cited mandate not on the ledger fails verify_before_dispatch beside the gate",
+      "steps": [
+        {
+          "action": {
+            "verb": "act",
+            "operator": "household-tax4-diff",
+            "developer": "household-assistant-t4@v1",
+            "action_class": "data.delete",
+            "action_id": "act/tax4-diff-8",
+            "timestamp": "2026-08-10T15:08:00Z",
+            "cited_mandate_capsule_id": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "name": "communication-publish-asks",
+      "expect": "escalate (needs_input/hitl_dispatched): taxonomy 4 names account_holder on communication.publish; only action_class_gate fails; failing rules r15",
+      "steps": [
+        {
+          "action": {
+            "verb": "act",
+            "operator": "household-tax4-diff",
+            "developer": "household-assistant-t4@v1",
+            "action_class": "communication.publish",
+            "action_id": "act/tax4-diff-9",
+            "timestamp": "2026-08-10T15:09:00Z"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "name": "communication-publish-never-refuses",
+      "expect": "deny: r15-public-posting re-declared NEVER",
+      "steps": [
+        {
+          "action": {
+            "verb": "act",
+            "operator": "household-tax4-diff",
+            "developer": "household-assistant-t4@v1",
+            "action_class": "communication.publish",
+            "action_id": "act/tax4-diff-10",
+            "timestamp": "2026-08-10T15:10:00Z"
+          },
+          "dry_run": true
+        }
+      ],
+      "redeclare": {
+        "r15-public-posting": "NEVER"
+      }
+    },
+    {
+      "name": "communication-publish-repeat-dedupe-refuses",
+      "expect": "deny: the second (live) check of the same act is a dedupe hit beside the gate; integrity never asks",
+      "steps": [
+        {
+          "action": {
+            "verb": "act",
+            "operator": "household-tax4-diff",
+            "developer": "household-assistant-t4@v1",
+            "action_class": "communication.publish",
+            "action_id": "act/tax4-diff-11",
+            "timestamp": "2026-08-10T15:11:00Z",
+            "target": "service/repeat"
+          },
+          "dry_run": false
+        },
+        {
+          "action": {
+            "verb": "act",
+            "operator": "household-tax4-diff",
+            "developer": "household-assistant-t4@v1",
+            "action_class": "communication.publish",
+            "action_id": "act/tax4-diff-11",
+            "timestamp": "2026-08-10T15:11:00Z",
+            "target": "service/repeat"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "name": "communication-publish-missing-mandate-refuses",
+      "expect": "deny: cited mandate not on the ledger fails verify_before_dispatch beside the gate",
+      "steps": [
+        {
+          "action": {
+            "verb": "act",
+            "operator": "household-tax4-diff",
+            "developer": "household-assistant-t4@v1",
+            "action_class": "communication.publish",
+            "action_id": "act/tax4-diff-12",
+            "timestamp": "2026-08-10T15:12:00Z",
+            "cited_mandate_capsule_id": "0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "name": "disclosure-personal-asks",
+      "expect": "escalate (needs_input/hitl_dispatched): taxonomy 4 names account_holder on disclosure.personal; only action_class_gate fails; failing rules r11 + r12 (both bound to personal_disclosure)",
+      "steps": [
+        {
+          "action": {
+            "verb": "act",
+            "operator": "household-tax4-diff",
+            "developer": "household-assistant-t4@v1",
+            "action_class": "disclosure.personal",
+            "action_id": "act/tax4-diff-13",
+            "timestamp": "2026-08-10T15:13:00Z",
+            "recipient_role": "fulfilling_merchant",
+            "target": "shop/bakery"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "name": "disclosure-personal-never-refuses",
+      "expect": "deny: r11-home-address-to-an-individual re-declared NEVER",
+      "steps": [
+        {
+          "action": {
+            "verb": "act",
+            "operator": "household-tax4-diff",
+            "developer": "household-assistant-t4@v1",
+            "action_class": "disclosure.personal",
+            "action_id": "act/tax4-diff-14",
+            "timestamp": "2026-08-10T15:14:00Z",
+            "recipient_role": "fulfilling_merchant",
+            "target": "shop/bakery"
+          },
+          "dry_run": true
+        }
+      ],
+      "redeclare": {
+        "r11-home-address-to-an-individual": "NEVER"
+      }
+    },
+    {
+      "name": "disclosure-personal-repeat-dedupe-refuses",
+      "expect": "deny: the second (live) check of the same act is a dedupe hit beside the gate; integrity never asks",
+      "steps": [
+        {
+          "action": {
+            "verb": "act",
+            "operator": "household-tax4-diff",
+            "developer": "household-assistant-t4@v1",
+            "action_class": "disclosure.personal",
+            "action_id": "act/tax4-diff-15",
+            "timestamp": "2026-08-10T15:15:00Z",
+            "recipient_role": "fulfilling_merchant",
+            "target": "shop/bakery"
+          },
+          "dry_run": false
+        },
+        {
+          "action": {
+            "verb": "act",
+            "operator": "household-tax4-diff",
+            "developer": "household-assistant-t4@v1",
+            "action_class": "disclosure.personal",
+            "action_id": "act/tax4-diff-15",
+            "timestamp": "2026-08-10T15:15:00Z",
+            "recipient_role": "fulfilling_merchant",
+            "target": "shop/bakery"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "name": "disclosure-personal-missing-mandate-refuses",
+      "expect": "deny: cited mandate not on the ledger fails verify_before_dispatch beside the gate",
+      "steps": [
+        {
+          "action": {
+            "verb": "act",
+            "operator": "household-tax4-diff",
+            "developer": "household-assistant-t4@v1",
+            "action_class": "disclosure.personal",
+            "action_id": "act/tax4-diff-16",
+            "timestamp": "2026-08-10T15:16:00Z",
+            "cited_mandate_capsule_id": "0000000000000000000000000000000000000000000000000000000000000000",
+            "recipient_role": "fulfilling_merchant",
+            "target": "shop/bakery"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "name": "disclosure-personal-third-party-refuses",
+      "expect": "deny: recipient_role third_party fails beside the gate; recipient_role never asks",
+      "steps": [
+        {
+          "action": {
+            "verb": "act",
+            "operator": "household-tax4-diff",
+            "developer": "household-assistant-t4@v1",
+            "action_class": "disclosure.personal",
+            "action_id": "act/tax4-diff-17",
+            "timestamp": "2026-08-10T15:17:00Z",
+            "recipient_role": "third_party",
+            "target": "person/neighbour-2"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "name": "booking-create-still-asks",
+      "expect": "escalate: unchanged from taxonomy 3 (r16)",
+      "steps": [
+        {
+          "action": {
+            "verb": "act",
+            "operator": "household-tax4-diff",
+            "developer": "household-assistant-t4@v1",
+            "action_class": "booking.create",
+            "action_id": "act/tax4-diff-18",
+            "timestamp": "2026-08-10T15:18:00Z",
+            "amount_minor": 2000,
+            "currency": "EUR",
+            "target": "venue/restaurant"
+          },
+          "dry_run": true
+        }
+      ]
+    },
+    {
+      "name": "off-taxonomy-refuses",
+      "expect": "deny: a class with no taxonomy row fails the gate closed",
+      "steps": [
+        {
+          "action": {
+            "verb": "act",
+            "operator": "household-tax4-diff",
+            "developer": "household-assistant-t4@v1",
+            "action_class": "household.unlisted",
+            "action_id": "act/tax4-diff-19",
+            "timestamp": "2026-08-10T15:19:00Z",
+            "target": "service/unlisted"
+          },
+          "dry_run": true
+        }
+      ]
+    }
+  ]
+}

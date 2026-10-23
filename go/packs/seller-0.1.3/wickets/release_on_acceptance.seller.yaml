@@ -1,0 +1,36 @@
+# release_on_acceptance wicket, configured for a seller (guards/checks/
+# release_on_acceptance.py). Personal data reaches a buyer only once that
+# buyer's acceptance of the sale is sealed. The rule itself is the
+# `semantics` field below: it is inside the digested body, so rewording it
+# moves the digest. A failure refuses; it never asks, and an approval does
+# not clear it.
+#
+# `release_classes` is the closed set of statement classes, the same list
+# promise_never/1.0.0 and promise_requires_approval/1.0.0 close over, so
+# every class a disclosure may declare is held back until acceptance and
+# any other class is refused. No class is released before acceptance. `acceptance_classes` are the classes whose accepted,
+# non-dry-run record seals the acceptance (the same reading as
+# seller.single_commitment). `action_classes` are the disclosures the rule
+# applies to.
+wicket_id: seller.release_on_acceptance/1.0.0
+check: release_on_acceptance
+semantics: >-
+  A disclosure in action_classes passes only when its representation_class
+  is in release_classes and it names its task_authority_ref, item_ref and
+  target, cites by cited_mandate_capsule_id the sale's acceptance, and that
+  acceptance re-verifies and was sealed for the same target. The sale's
+  acceptance is the first record in ledger order, among the operator's,
+  whose action_class is in acceptance_classes, whose decision was accept,
+  which was not a dry run, and which carries the same task_authority_ref and
+  item_ref. Every other such disclosure fails: no citation, another sale's
+  or another recipient's acceptance, a record that is not the sale's
+  acceptance, a missing reference, or a representation_class missing or
+  outside release_classes. An action whose action_class is missing or has no
+  row in the action taxonomy fails too, since it cannot be shown to be out
+  of scope. Any other known action class is not applicable. A failure is
+  refused and no approval clears it. The reason and evidence carry no
+  disclosed value, reference, counterparty or capsule id.
+config:
+  release_classes: [price, condition, features, authenticity, availability, delivery_date, service_scope, warranty, refund_terms, payment_methods, pickup, deadline, address, other]
+  acceptance_classes: [agreement.accept]
+  action_classes: [disclosure.personal]

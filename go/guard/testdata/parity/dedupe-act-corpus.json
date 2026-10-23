@@ -1,0 +1,652 @@
+{
+  "note": "Differential for dedupe keyed on the checked act: an act stated against a pinned taxonomy (taxonomy_version set; every bridged deal check) is keyed on operator, developer, action_class, target, amount_minor, with the record's action_type and action_id prefix excluded and the scan over every action_type; every other action keeps the legacy key. A dedupe failure is DENY, never ESCALATE. Each case runs on a fresh ledger under the installed everyday 0.3.2 pack (mode observe); steps run in order; the last step's decision is compared.",
+  "pack_id": "asg/everyday/0.3.6",
+  "cases": [
+    {
+      "name": "same-act-repeated-is-refused",
+      "expect": "deny: dedupe fails on step 1, matching step 0's decision",
+      "steps": [
+        {
+          "check": {
+            "record": {
+              "body": {
+                "action": "pay",
+                "action_class": "money.purchase",
+                "taxonomy_version": "6",
+                "currency": "USD",
+                "amount_minor": 500,
+                "spend_minor": 500
+              },
+              "x-deal-v0": {
+                "record_type": "check",
+                "deal_id": "deal-0000000000000000",
+                "seq": 2,
+                "counterparty": {
+                  "fp_alg": "hmac-sha256-deal-key",
+                  "ids": {
+                    "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                  }
+                }
+              }
+            },
+            "capsule": {
+              "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+              "action_id": "deal-0000000000000000/2",
+              "action_type": "fyi",
+              "operator": "household-dedupe-diff",
+              "developer": "capsulectl-deal",
+              "timestamp": "2026-10-07T12:00:00Z"
+            }
+          }
+        },
+        {
+          "check": {
+            "record": {
+              "body": {
+                "action": "pay",
+                "action_class": "money.purchase",
+                "taxonomy_version": "6",
+                "currency": "USD",
+                "amount_minor": 500,
+                "spend_minor": 500
+              },
+              "x-deal-v0": {
+                "record_type": "check",
+                "deal_id": "deal-0000000000000000",
+                "seq": 7,
+                "counterparty": {
+                  "fp_alg": "hmac-sha256-deal-key",
+                  "ids": {
+                    "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                  }
+                }
+              }
+            },
+            "capsule": {
+              "capsule_id": "0000000000000000000000000000000000000000000000000000000000000007",
+              "action_id": "deal-0000000000000000/7",
+              "action_type": "fyi",
+              "operator": "household-dedupe-diff",
+              "developer": "capsulectl-deal",
+              "timestamp": "2026-10-07T13:00:00Z"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "same-act-from-another-deal-is-refused",
+      "expect": "deny: the deal id prefix never enters the key, so another deal's check carrying the same act matches",
+      "steps": [
+        {
+          "check": {
+            "record": {
+              "body": {
+                "action": "pay",
+                "action_class": "money.purchase",
+                "taxonomy_version": "6",
+                "currency": "USD",
+                "amount_minor": 500,
+                "spend_minor": 500
+              },
+              "x-deal-v0": {
+                "record_type": "check",
+                "deal_id": "deal-0000000000000000",
+                "seq": 2,
+                "counterparty": {
+                  "fp_alg": "hmac-sha256-deal-key",
+                  "ids": {
+                    "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                  }
+                }
+              }
+            },
+            "capsule": {
+              "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+              "action_id": "deal-0000000000000000/2",
+              "action_type": "fyi",
+              "operator": "household-dedupe-diff",
+              "developer": "capsulectl-deal",
+              "timestamp": "2026-10-07T12:00:00Z"
+            }
+          }
+        },
+        {
+          "check": {
+            "record": {
+              "body": {
+                "action": "pay",
+                "action_class": "money.purchase",
+                "taxonomy_version": "6",
+                "currency": "USD",
+                "amount_minor": 500,
+                "spend_minor": 500
+              },
+              "x-deal-v0": {
+                "record_type": "check",
+                "deal_id": "deal-1111111111111111",
+                "seq": 3,
+                "counterparty": {
+                  "fp_alg": "hmac-sha256-deal-key",
+                  "ids": {
+                    "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                  }
+                }
+              }
+            },
+            "capsule": {
+              "capsule_id": "0000000000000000000000000000000000000000000000000000000000000003",
+              "action_id": "deal-1111111111111111/3",
+              "action_type": "fyi",
+              "operator": "household-dedupe-diff",
+              "developer": "capsulectl-deal",
+              "timestamp": "2026-10-07T13:00:00Z"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "another-payee-passes",
+      "expect": "dedupe pass",
+      "steps": [
+        {
+          "check": {
+            "record": {
+              "body": {
+                "action": "pay",
+                "action_class": "money.purchase",
+                "taxonomy_version": "6",
+                "currency": "USD",
+                "amount_minor": 500,
+                "spend_minor": 500
+              },
+              "x-deal-v0": {
+                "record_type": "check",
+                "deal_id": "deal-0000000000000000",
+                "seq": 2,
+                "counterparty": {
+                  "fp_alg": "hmac-sha256-deal-key",
+                  "ids": {
+                    "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                  }
+                }
+              }
+            },
+            "capsule": {
+              "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+              "action_id": "deal-0000000000000000/2",
+              "action_type": "fyi",
+              "operator": "household-dedupe-diff",
+              "developer": "capsulectl-deal",
+              "timestamp": "2026-10-07T12:00:00Z"
+            }
+          }
+        },
+        {
+          "check": {
+            "record": {
+              "body": {
+                "action": "pay",
+                "action_class": "money.purchase",
+                "taxonomy_version": "6",
+                "currency": "USD",
+                "amount_minor": 500,
+                "spend_minor": 500
+              },
+              "x-deal-v0": {
+                "record_type": "check",
+                "deal_id": "deal-0000000000000000",
+                "seq": 7,
+                "counterparty": {
+                  "fp_alg": "hmac-sha256-deal-key",
+                  "ids": {
+                    "payee": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                  }
+                }
+              }
+            },
+            "capsule": {
+              "capsule_id": "0000000000000000000000000000000000000000000000000000000000000007",
+              "action_id": "deal-0000000000000000/7",
+              "action_type": "fyi",
+              "operator": "household-dedupe-diff",
+              "developer": "capsulectl-deal",
+              "timestamp": "2026-10-07T13:00:00Z"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "another-amount-passes",
+      "expect": "dedupe pass",
+      "steps": [
+        {
+          "check": {
+            "record": {
+              "body": {
+                "action": "pay",
+                "action_class": "money.purchase",
+                "taxonomy_version": "6",
+                "currency": "USD",
+                "amount_minor": 500,
+                "spend_minor": 500
+              },
+              "x-deal-v0": {
+                "record_type": "check",
+                "deal_id": "deal-0000000000000000",
+                "seq": 2,
+                "counterparty": {
+                  "fp_alg": "hmac-sha256-deal-key",
+                  "ids": {
+                    "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                  }
+                }
+              }
+            },
+            "capsule": {
+              "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+              "action_id": "deal-0000000000000000/2",
+              "action_type": "fyi",
+              "operator": "household-dedupe-diff",
+              "developer": "capsulectl-deal",
+              "timestamp": "2026-10-07T12:00:00Z"
+            }
+          }
+        },
+        {
+          "check": {
+            "record": {
+              "body": {
+                "action": "pay",
+                "action_class": "money.purchase",
+                "taxonomy_version": "6",
+                "currency": "USD",
+                "amount_minor": 501,
+                "spend_minor": 501
+              },
+              "x-deal-v0": {
+                "record_type": "check",
+                "deal_id": "deal-0000000000000000",
+                "seq": 7,
+                "counterparty": {
+                  "fp_alg": "hmac-sha256-deal-key",
+                  "ids": {
+                    "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                  }
+                }
+              }
+            },
+            "capsule": {
+              "capsule_id": "0000000000000000000000000000000000000000000000000000000000000007",
+              "action_id": "deal-0000000000000000/7",
+              "action_type": "fyi",
+              "operator": "household-dedupe-diff",
+              "developer": "capsulectl-deal",
+              "timestamp": "2026-10-07T13:00:00Z"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "another-class-passes",
+      "expect": "dedupe pass (cancel/money.refund vs pay/money.purchase)",
+      "steps": [
+        {
+          "check": {
+            "record": {
+              "body": {
+                "action": "pay",
+                "action_class": "money.purchase",
+                "taxonomy_version": "6",
+                "currency": "USD",
+                "amount_minor": 500,
+                "spend_minor": 500
+              },
+              "x-deal-v0": {
+                "record_type": "check",
+                "deal_id": "deal-0000000000000000",
+                "seq": 2,
+                "counterparty": {
+                  "fp_alg": "hmac-sha256-deal-key",
+                  "ids": {
+                    "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                  }
+                }
+              }
+            },
+            "capsule": {
+              "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+              "action_id": "deal-0000000000000000/2",
+              "action_type": "fyi",
+              "operator": "household-dedupe-diff",
+              "developer": "capsulectl-deal",
+              "timestamp": "2026-10-07T12:00:00Z"
+            }
+          }
+        },
+        {
+          "check": {
+            "record": {
+              "body": {
+                "action": "cancel",
+                "action_class": "money.refund",
+                "taxonomy_version": "6",
+                "currency": "USD",
+                "amount_minor": 500,
+                "spend_minor": 500
+              },
+              "x-deal-v0": {
+                "record_type": "check",
+                "deal_id": "deal-0000000000000000",
+                "seq": 7,
+                "counterparty": {
+                  "fp_alg": "hmac-sha256-deal-key",
+                  "ids": {
+                    "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                  }
+                }
+              }
+            },
+            "capsule": {
+              "capsule_id": "0000000000000000000000000000000000000000000000000000000000000007",
+              "action_id": "deal-0000000000000000/7",
+              "action_type": "fyi",
+              "operator": "household-dedupe-diff",
+              "developer": "capsulectl-deal",
+              "timestamp": "2026-10-07T13:00:00Z"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "outside-window-passes",
+      "expect": "dedupe pass: 40 days later, past the 30-day window",
+      "steps": [
+        {
+          "check": {
+            "record": {
+              "body": {
+                "action": "pay",
+                "action_class": "money.purchase",
+                "taxonomy_version": "6",
+                "currency": "USD",
+                "amount_minor": 500,
+                "spend_minor": 500
+              },
+              "x-deal-v0": {
+                "record_type": "check",
+                "deal_id": "deal-0000000000000000",
+                "seq": 2,
+                "counterparty": {
+                  "fp_alg": "hmac-sha256-deal-key",
+                  "ids": {
+                    "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                  }
+                }
+              }
+            },
+            "capsule": {
+              "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+              "action_id": "deal-0000000000000000/2",
+              "action_type": "fyi",
+              "operator": "household-dedupe-diff",
+              "developer": "capsulectl-deal",
+              "timestamp": "2026-10-07T12:00:00Z"
+            }
+          }
+        },
+        {
+          "check": {
+            "record": {
+              "body": {
+                "action": "pay",
+                "action_class": "money.purchase",
+                "taxonomy_version": "6",
+                "currency": "USD",
+                "amount_minor": 500,
+                "spend_minor": 500
+              },
+              "x-deal-v0": {
+                "record_type": "check",
+                "deal_id": "deal-0000000000000000",
+                "seq": 7,
+                "counterparty": {
+                  "fp_alg": "hmac-sha256-deal-key",
+                  "ids": {
+                    "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                  }
+                }
+              }
+            },
+            "capsule": {
+              "capsule_id": "0000000000000000000000000000000000000000000000000000000000000007",
+              "action_id": "deal-0000000000000000/7",
+              "action_type": "fyi",
+              "operator": "household-dedupe-diff",
+              "developer": "capsulectl-deal",
+              "timestamp": "2026-11-16T12:00:00Z"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "checks-differing-in-act-never-match",
+      "expect": "dedupe pass: same deal, same fyi type, different payee and amount",
+      "steps": [
+        {
+          "check": {
+            "record": {
+              "body": {
+                "action": "pay",
+                "action_class": "money.purchase",
+                "taxonomy_version": "6",
+                "currency": "USD",
+                "amount_minor": 500,
+                "spend_minor": 500
+              },
+              "x-deal-v0": {
+                "record_type": "check",
+                "deal_id": "deal-0000000000000000",
+                "seq": 2,
+                "counterparty": {
+                  "fp_alg": "hmac-sha256-deal-key",
+                  "ids": {
+                    "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                  }
+                }
+              }
+            },
+            "capsule": {
+              "capsule_id": "0000000000000000000000000000000000000000000000000000000000000002",
+              "action_id": "deal-0000000000000000/2",
+              "action_type": "fyi",
+              "operator": "household-dedupe-diff",
+              "developer": "capsulectl-deal",
+              "timestamp": "2026-10-07T12:00:00Z"
+            }
+          }
+        },
+        {
+          "check": {
+            "record": {
+              "body": {
+                "action": "pay",
+                "action_class": "money.purchase",
+                "taxonomy_version": "6",
+                "currency": "USD",
+                "amount_minor": 1200,
+                "spend_minor": 1200
+              },
+              "x-deal-v0": {
+                "record_type": "check",
+                "deal_id": "deal-0000000000000000",
+                "seq": 7,
+                "counterparty": {
+                  "fp_alg": "hmac-sha256-deal-key",
+                  "ids": {
+                    "payee": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                  }
+                }
+              }
+            },
+            "capsule": {
+              "capsule_id": "0000000000000000000000000000000000000000000000000000000000000007",
+              "action_id": "deal-0000000000000000/7",
+              "action_type": "fyi",
+              "operator": "household-dedupe-diff",
+              "developer": "capsulectl-deal",
+              "timestamp": "2026-10-07T13:00:00Z"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "earlier-act-under-decide-type-is-matched",
+      "expect": "deny: an earlier act decided as action_type decide, another id, same act fields; the scan is type-blind for a pinned act",
+      "steps": [
+        {
+          "action": {
+            "verb": "pay",
+            "operator": "household-dedupe-diff",
+            "developer": "capsulectl-deal",
+            "action_class": "money.purchase",
+            "action_id": "pay/elsewhere-1",
+            "timestamp": "2026-10-07T12:00:00Z",
+            "amount_minor": 500,
+            "currency": "USD",
+            "target": "payee-fp:hmac-sha256-deal-key:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "taxonomy_version": "6"
+          }
+        },
+        {
+          "check": {
+            "record": {
+              "body": {
+                "action": "pay",
+                "action_class": "money.purchase",
+                "taxonomy_version": "6",
+                "currency": "USD",
+                "amount_minor": 500,
+                "spend_minor": 500
+              },
+              "x-deal-v0": {
+                "record_type": "check",
+                "deal_id": "deal-0000000000000000",
+                "seq": 7,
+                "counterparty": {
+                  "fp_alg": "hmac-sha256-deal-key",
+                  "ids": {
+                    "payee": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                  }
+                }
+              }
+            },
+            "capsule": {
+              "capsule_id": "0000000000000000000000000000000000000000000000000000000000000007",
+              "action_id": "deal-0000000000000000/7",
+              "action_type": "fyi",
+              "operator": "household-dedupe-diff",
+              "developer": "capsulectl-deal",
+              "timestamp": "2026-10-07T13:00:00Z"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "unpinned-actions-keep-the-legacy-key",
+      "expect": "deny on the second: no taxonomy_version, legacy key (operator, developer, action_type, verb, target), amount NOT in the key",
+      "steps": [
+        {
+          "action": {
+            "verb": "transfer_funds",
+            "operator": "household-dedupe-diff",
+            "developer": "agent@v1",
+            "action_class": "money.transfer",
+            "action_id": "transfer_funds/1",
+            "timestamp": "2026-10-07T12:00:00Z",
+            "amount_minor": 100,
+            "currency": "EUR",
+            "target": "acct-ref-1"
+          }
+        },
+        {
+          "action": {
+            "verb": "transfer_funds",
+            "operator": "household-dedupe-diff",
+            "developer": "agent@v1",
+            "action_class": "money.transfer",
+            "action_id": "transfer_funds/2",
+            "timestamp": "2026-10-07T13:00:00Z",
+            "amount_minor": 999,
+            "currency": "EUR",
+            "target": "acct-ref-1"
+          }
+        }
+      ]
+    }
+  ],
+  "key_vectors": [
+    {
+      "name": "pinned-act",
+      "action": {
+        "verb": "pay",
+        "operator": "household-dedupe-diff",
+        "developer": "capsulectl-deal",
+        "action_class": "money.purchase",
+        "action_type": "fyi",
+        "action_id": "deal-0000000000000000/2",
+        "amount_minor": 500,
+        "target": "payee-fp:hmac-sha256-deal-key:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "taxonomy_version": "6"
+      },
+      "fields": {
+        "operator": "household-dedupe-diff",
+        "developer": "capsulectl-deal",
+        "action_class": "money.purchase",
+        "target": "payee-fp:hmac-sha256-deal-key:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "amount_minor": 500
+      }
+    },
+    {
+      "name": "pinned-act-no-target-no-amount",
+      "action": {
+        "verb": "pay",
+        "operator": "household-dedupe-diff",
+        "developer": "capsulectl-deal",
+        "action_class": "money.purchase",
+        "taxonomy_version": "6"
+      },
+      "fields": {
+        "operator": "household-dedupe-diff",
+        "developer": "capsulectl-deal",
+        "action_class": "money.purchase",
+        "target": null,
+        "amount_minor": null
+      }
+    },
+    {
+      "name": "unpinned-legacy",
+      "action": {
+        "verb": "transfer_funds",
+        "operator": "household-dedupe-diff",
+        "developer": "agent@v1",
+        "amount_minor": 100,
+        "target": "acct-ref-1"
+      },
+      "fields": {
+        "operator": "household-dedupe-diff",
+        "developer": "agent@v1",
+        "action_type": "decide",
+        "verb": "transfer_funds",
+        "target": "acct-ref-1"
+      }
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+# Net spend per operator over a rolling 7-day window: spend.weekly/3.0.0, which
+# stays as it was for the records and packs that pin it, with one change. It
+# also counts an act that was executed (disposition.decision `executed`), not
+# only an accepted decision. Used by the caps/5.1.0 wicket.
+#
+# A replay re-decides each check as a dry run, so under 3.0.0 no check it
+# decided ever counted, and a deal's executed acts added 0 to the total. A
+# replay, and a live check's history ledger, write an `executed` record for
+# every act executed (report/replay.py, ExecutedActs): a purchase, a booking
+# commit, a signature, an act whose check asked and was approved, and an act
+# taken without a check. Each counts once: an accepted act at its
+# amount_minor, an act taken without a check at its spend_minor or else its
+# amount_minor, any other at its spend_minor; 0 when the money moved in. An
+# executed act whose spend cannot be read carries no amount, so this fold
+# skips it, and caps/5.1.0 is not evaluated rather than read a total that
+# leaves it out.
+#
+# An accepted decision that was not a dry run still counts, as in 3.0.0. A
+# replay never writes one. A live check's history ledger writes each history
+# act as a decision on it would read (asg_payload.live_history), and its
+# `executed` record already counts it, so that copy is left out here and no
+# act counts twice.
+fold_id: spend.weekly/3.1.0
+reads:
+  - path: operator
+    erasure_class: commitment-ok
+  - path: timestamp
+    erasure_class: commitment-ok
+  - path: asg_payload.amount_minor
+    erasure_class: commitment-ok
+  - path: disposition.decision
+    erasure_class: commitment-ok
+  - path: asg_payload.checkpoint.dry_run
+    erasure_class: commitment-ok
+    default: false
+  - path: asg_payload.action_class
+    erasure_class: commitment-ok
+    default: null
+  - path: chain.parent_capsule_id
+    erasure_class: commitment-ok
+    default: null
+  - path: chain.relation
+    erasure_class: commitment-ok
+    default: null
+  - path: asg_payload.live_history
+    erasure_class: commitment-ok
+    default: null
+filter:
+  - field: disposition.decision
+    op: in
+    value: [accept, executed]
+  - field: asg_payload.checkpoint.dry_run
+    op: ne
+    value: true
+  - field: asg_payload.live_history
+    op: ne
+    value: disposition
+key: operator
+window:
+  mode: rolling
+  duration: 7d
+reduce:
+  reducer: sum
+  field: asg_payload.amount_minor
+reversal:
+  class_field: asg_payload.action_class
+  classes: [booking.cancel, money.refund]
+  parent_field: chain.parent_capsule_id
+  relation_field: chain.relation
+  relation: supersedes
+emit: weekly_spend_minor

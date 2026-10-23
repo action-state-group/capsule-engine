@@ -1,0 +1,88 @@
+{
+  "engine_commit": "f256abcad1f2d1d73bc0647c52329676e917602e",
+  "files": {
+    "MANIFEST.sha256": {
+      "sha256": "6c6e6e29b8046f6ab9851b9b716863fcb492725537b9e112006087011bc348f5"
+    },
+    "probe_live.py": {
+      "sha256": "a3e2b3e0bc0d170b8e088e170099d4854be6d09684231f11a11bd87a76d8e989"
+    },
+    "real-seller/README.md": {
+      "sha256": "2941e36836cf892cb21550e6781f7684574e16f5a22e8e91d1305428edc86e46"
+    },
+    "real-seller/build.sh": {
+      "sha256": "79300c1dd8e74397b61090c5e37e09252c68e69310b706dea07eecbb613d013e"
+    },
+    "real-seller/buyer-a.bundle.json": {
+      "sha256": "b691898e2d21ac1de86c3f4f748633fbddd82d7a55dd495ec2afef4199d97ce7"
+    },
+    "real-seller/buyer-b.bundle.json": {
+      "sha256": "3a81c153bbedffe47384672dfdde71e96515959ceb3b88b2862c0020291beb70"
+    },
+    "real-seller/buyer-c.bundle.json": {
+      "sha256": "2c3323a359d5181418f8cfd8290d8c4e04f443f3b2b8d9822e4e64c99a87147e"
+    },
+    "real-seller/check-inputs/a-commit-1900.json": {
+      "sha256": "736205088e5bde569cc6b5837f3601c22520ad99857a2177b730ed9fd3bb6c28"
+    },
+    "real-seller/check-inputs/a-offer-1900.json": {
+      "sha256": "790ca35c37b0e6356e841e07d7578c4a6948fa0f8d9a25b0edcddbd0aa80fc2f"
+    },
+    "real-seller/check-inputs/b-offer-1500.json": {
+      "sha256": "9f6b600f29c799027021992080680293916cf4a9f00027153447507d555678f3"
+    },
+    "real-seller/check-inputs/c-commit-1600.json": {
+      "sha256": "6f109b631ae6edee9aec7b280b26b34683b1955583996bd10c3d73d31a1a985c"
+    },
+    "real-seller/check-inputs/c-offer-1600.json": {
+      "sha256": "24e0879b98f0d89655e98fc4b4dcf6a0a78fdde5f98029c4e8917850ccb10977"
+    },
+    "real-seller/expected_decisions.json": {
+      "sha256": "3998df686a2f71cd75ca10faf66557558deed1580aaaaa67649e3a76f41c7eb5"
+    },
+    "real-seller/inputs/act-commit-1900.json": {
+      "sha256": "f43f199217759b1403e030914c8a4f4cfa46366aef279ad3ef3c664f7c175068"
+    },
+    "real-seller/inputs/act-offer-1600.json": {
+      "sha256": "8b2bfc15d14bee6b33a1929a2c25a96646c1f8e4c0151e9a4488544afd81c8d2"
+    },
+    "real-seller/inputs/act-offer-1900.json": {
+      "sha256": "af38354ad8abf117cf0f6e9300cf32754b62f43bb02b19e98cdfca3bd913a006"
+    },
+    "real-seller/inputs/check-commit-1600.json": {
+      "sha256": "18d2f3838b34d565db0018fdc8fd28c44cba36ee90ace37c0711d808871d6fbc"
+    },
+    "real-seller/inputs/check-commit-1900.json": {
+      "sha256": "846efdee30cad11b094b8166fcfdec46edbab68cae9e2b436aab5f7d8f546f0d"
+    },
+    "real-seller/inputs/check-offer-1500.json": {
+      "sha256": "2a837c29b943c0e199de8b58842d65194d4f0d0871ff86c5ee669f7ab83ec2a1"
+    },
+    "real-seller/inputs/check-offer-1600.json": {
+      "sha256": "8427206d47239dd330226dcc5b791b02d0c3cde186044587a005f794b5a6bfea"
+    },
+    "real-seller/inputs/check-offer-1900.json": {
+      "sha256": "2eb04aff8e1274086316cc45dbbfe4ce846347006f54d514ac1bebc5840424a7"
+    },
+    "real-seller/inputs/claim-condition.json": {
+      "sha256": "f5e08da5b6810b9502f3086eb061d4f6509b1fd65695b54e4064aa4433c90ec8"
+    },
+    "real-seller/inputs/open-a.json": {
+      "sha256": "0f2a8af3d28fc2dde08d705482e4b0534a62b96c067526492a2fcf713f92a6f1"
+    },
+    "real-seller/inputs/open-b.json": {
+      "sha256": "f7a073ab549705474e6a1ff3ef988f3c8fb1f2ed15f9e3cf131bee438ec7e87d"
+    },
+    "real-seller/inputs/open-c.json": {
+      "sha256": "404a74fce57d838bff2e4241a3030f2a046a4f85cea0bd7d9ab6c1e647c47999"
+    },
+    "real-seller/inputs/sale.json": {
+      "sha256": "f6f933099ac58492126b6c1e851cccb43477d4b110ad3efc5262f5b1d24a811a"
+    },
+    "test_real_seller_bundle.py": {
+      "sha256": "58d6254a337a3f03a1c6502eaf44e3f072df4b7f99d4b2028049b9eb7ad7239a"
+    }
+  },
+  "note": "Copied byte for byte, except that two internal work-item references in test_real_seller_bundle.py's comments and xfail reasons were removed for publication (MANIFEST.sha256 updated to match); this sidecar is not part of the copied bytes.",
+  "source": "The engine side's go-vectors for the seller pack reading a sale's amount from its offer, not its spend (MANIFEST.sha256 verified): capsule-engine tests/fixtures/real-seller (three bundles and five external-check-input/v0 capsulectl wrote, producer capsule-cli 831afeeb9fd76b7196486a9af38ca455b1230791) with expected_decisions.json, the replay and live decisions under asg/seller/0.1.2, and the engine's own test of it."
+}

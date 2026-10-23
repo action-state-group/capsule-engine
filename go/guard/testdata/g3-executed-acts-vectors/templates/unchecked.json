@@ -1,0 +1,71 @@
+{
+ "action_id": "deal-9025087d62160575/5",
+ "action_type": "fyi",
+ "agent_input": {
+  "body": {
+   "differences": [
+    {
+     "question": "asked",
+     "rule": "no_sealed_approval"
+    }
+   ],
+   "outcome": "mismatch",
+   "status": "unchecked_action",
+   "unchecked": {
+    "action": "pay",
+    "amount_minor": 2000,
+    "currency": "USD",
+    "direction": "out",
+    "rail": "card",
+    "reference_commitment": "afb5d7d31a4e56f980c0903a6ca25f2deae49ccbfcb06c57bb270fe4a71c7fe3"
+   }
+  },
+  "x-deal-v0": {
+   "at": "2026-10-10T00:19:46Z",
+   "baseline_ref": {
+    "digest": "d672be292e6e2d06d63a08be2c730851601de67bc1f0d96aa72eb3e569f73d71",
+    "digest_alg": "SHA-256",
+    "type": "deal-record"
+   },
+   "canonicalization": "jcs",
+   "commit_alg": "sha256-jcs-nonce256",
+   "deal_id": "deal-9025087d62160575",
+   "prev": {
+    "digest": "993aa3c6a07870615219faf845d37e1eeb58ed88117b45654c783c77f0ad90a7",
+    "digest_alg": "SHA-256",
+    "type": "deal-record"
+   },
+   "producer": {
+    "commit": "53b702f",
+    "name": "capsulectl",
+    "version": "main-53b702f"
+   },
+   "profile": "x-deal-v0",
+   "record_type": "outcome",
+   "seq": 5
+  }
+ },
+ "assurance": {
+  "attestation_mode": "self_attested",
+  "effect_mode": "not_applicable",
+  "ledger_mode": "chained"
+ },
+ "canonicalization_id": "jcs",
+ "capsule_id": "eb31678face6697b75e7345afc5661a9d0950dfb753362417a0c65a0bf2bc0d7",
+ "chain": {
+  "parent_capsule_id": "e9a9ba450279362d0492c76c6d3f185dd8fbd6300cb937f1ed9cbc5dc266213d",
+  "relation": "follows"
+ },
+ "developer": "capsulectl-deal",
+ "format_version": "4",
+ "key_id": "5dfe36e7da20ee182e75edde66a96625d44ac94a87e04ac8ad1650d838328a63",
+ "model_attestation": {
+  "compute_attestation": {
+   "agent_input_digest": "642d2d97f50bf38b541b1db53b3008003282f419ebaafa5963610b3cbb743fb9"
+  }
+ },
+ "operator": "synthetic-unchecked",
+ "signature": "d284584ca30378236170706c69636174696f6e2f6167656e742d616374696f6e2d63617073756c652d69640458205dfe36e7da20ee182e75edde66a96625d44ac94a87e04ac8ad1650d838328a630127a05820eb31678face6697b75e7345afc5661a9d0950dfb753362417a0c65a0bf2bc0d758405b9fecf5c0975e80aa75f9219f73460fe0cc37bd0e45fd6e1c41b6dcad110a27728eaa44c5392a58024144ab64272dc986813e7e66921e8e9a264f781a773c05",
+ "spec_version": "draft-mih-scitt-agent-action-capsule-05",
+ "timestamp": "2026-10-10T00:19:46Z"
+}

@@ -1,0 +1,65 @@
+{
+  "note": "Engine decisions and vectors under asg/seller/0.1.3 (capsule-engine #139). Each file is byte for byte what its source wrote; this sidecar is not part of those bytes. go-vectors/ is verified by its own MANIFEST.sha256 (shasum -a 256 -c, as the engine side wrote it), whose sha256 is recorded here; every other file's sha256 is recorded here.",
+  "engine_commit": "08cd96d03b6b23e0a7b71169dd5c24ea0381ff04",
+  "engine_ref": "capsule-engine 08cd96d (merge of PR #139: a54222dc1f6094359f00943aa60de597f5715d14, 2c02db9e9bd24107c7d38684e4a8d42c39930d6d); the seller pack it runs is packs/seller-0.1.3 here (definition digest f0068688317b0cae3c40e839d7cff0137991aca466a878f9b558356f1808321a)",
+  "sources": {
+    "s1, s2, s3": "The generators already vendored beside the earlier vectors, unmodified (sha256 below), run with python -P from a copy of their directory against a git clone of capsule-engine checked out at engine_commit: generate.py <checkout> 08cd96d03b6b23e0a7b71169dd5c24ea0381ff04 (s1), generate_s2_decisions.py <checkout> (s2), generate_python_decisions.py <checkout> (s3). A second run wrote identical bytes.",
+    "go-vectors/": "the engine side's go-vectors for s07 asking on every offer, as written from branch commit 2c02db9 with its MANIFEST.sha256 (shasum -a 256 -c: every file OK). Re-derived at engine_commit before vendoring: each check-inputs/*.claims-in-history.json equals tests/test_live_history.py _given(<input>, 'disposition-accept-claims-in-history'), and the engine decides every one of the 10 live rows and 5 replay rows of expected.json exactly as recorded (outcome, every rule, s05 result and evidence).",
+    "live-history/": "tests/fixtures/live-history/{buyer-a,buyer-b}.bundle.json and README.md at engine_commit: the bundles expected.json's replay rows replay (capsulectl 65f54e528a78).",
+    "real-seller/expected_decisions.json": "tests/fixtures/real-seller/expected_decisions.json at engine_commit: the #131 real-seller decisions under asg/seller/0.1.3 (inputs are the ones vendored at testdata/real-seller-131)."
+  },
+  "generators": {
+    "seller-s1-vectors/generate.py": "bd66d54f767a6caab337deb3cb177ac14f1ac3a8d49d84ccaedbd154b51ff2c6",
+    "seller-s2-vectors/generate_s2_decisions.py": "93b85489db802b49e66ff367ec3135a80a67434bc8d625f783661b60f62be426",
+    "seller-011-vectors/generate_python_decisions.py": "edaaf4639b58a4534b3605d5e3541ecbb9c99ca45531098830bb1f24c44e0400"
+  },
+  "corpora_reused": {
+    "note": "s2 and s3 run the corpora already vendored at these paths; the generators read them and left them byte-identical",
+    "files": {
+      "seller-s2-vectors/rail-corpus.json": "c81938f8824ba763fb311397028369f8a80f7e952ebd14ad55136f1f6f1f78cc",
+      "seller-s2-vectors/promise-never-corpus.json": "91731ff4e09d0ce604554f968a2041540ddc4b581f43f4ec606eff1c0d949ddc",
+      "seller-s2-vectors/promise-requires-approval-corpus.json": "375f0b89681722b8a4ca9bc36acb5c8469efbdcc6e4095201a1370fefceedb59",
+      "seller-s2-vectors/required-disclosure-corpus.json": "3da6f0ad82bf3a5c3de5f6fb7c46c462abd9c427d69734f99c82551032d62971",
+      "seller-011-vectors/corpus.json": "607ca768825150636bbd8afcb686f708b6be10952a51d2c2e093612502efa44e"
+    }
+  },
+  "files": {
+    "s2/promise-never-decisions.json": {
+      "sha256": "f8a5453b8feb6da0d03d5987094afcaf08dd02c935f1d090850b18a71a092274"
+    },
+    "s2/promise-requires-approval-decisions.json": {
+      "sha256": "7349d64ec450ce1468350450d14b71ceaacf203bb18c7c5bb3fc0320bd7c438a"
+    },
+    "s2/rail-decisions.json": {
+      "sha256": "373262c0c764ea0069e3103b9bdb19836f30ce6fc6df87e0b088e131bcdb2b60"
+    },
+    "s2/required-disclosure-decisions.json": {
+      "sha256": "f32a89376bdf9c6f9d2be035d6113d41a7e55202926ef62268f34c730210cdfe"
+    },
+    "s3/python-decisions.json": {
+      "sha256": "158f88e8e636a145c95273d1c6836897ff30ae0183a896a08d8e652f8f7200c8"
+    },
+    "real-seller/expected_decisions.json": {
+      "sha256": "fa5c707d4ec27e217667f95bb755299f0760f1f2a1d0af6ad777e748353dee4a"
+    },
+    "live-history/README.md": {
+      "sha256": "2f5c2b752c5ee7f3bda61561eefb8e559455f37ea9e993d479d99b2e097d9d96"
+    },
+    "live-history/buyer-a.bundle.json": {
+      "sha256": "b815ac5fea77adc16a266eaf293f55aa54af9b50a7571c24a810974d2db05361"
+    },
+    "live-history/buyer-b.bundle.json": {
+      "sha256": "db31a7564eaf23cd29cab7856a12979dd4e9291bbc050393dfa564d82e80ad07"
+    },
+    "go-vectors/MANIFEST.sha256": {
+      "sha256": "c373517684328793974ffed578b0a6f4e60933eb30f9e5affe097aa15b445c6c"
+    },
+    "s1/corpus.json": {
+      "sha256": "1023d54af961e98776e6c3ebcc753173ba04099793f1deee5e1b2addc2630ea2"
+    },
+    "s1/decisions.json": {
+      "sha256": "a3d896e5a45603b9b9927507bccd6863a2e9abed823cfc23c579e5111fac7548"
+    }
+  },
+  "generated_at": "2026-10-09"
+}

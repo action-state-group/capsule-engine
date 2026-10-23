@@ -1,0 +1,524 @@
+{
+ "vectors": [
+  {
+   "name": "inline",
+   "bundle": {
+    "records": [],
+    "disclosures": {},
+    "extensions": {
+     "x-deal-v0": {
+      "type": "deal_report",
+      "representations": [
+       {
+        "step": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "nonce": "7777777777777777777777777777777777777777777777777777777777777777",
+        "text": "The seller says it's authentic (unverified)"
+       },
+       {
+        "step": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "nonce": "8888888888888888888888888888888888888888888888888888888888888888",
+        "text": "Covered for a year."
+       }
+      ]
+     }
+    }
+   },
+   "openings": {
+    "92897b9db0bfdd9b9d6bf226424eb589db87850900bc4b98af3bda211cd3e769": {
+     "nonce": "7777777777777777777777777777777777777777777777777777777777777777",
+     "text": "The seller says it's authentic (unverified)"
+    },
+    "1c02f70fdf363a73024533546be106717aa1b304af5d58324f7d83e1b4b0d849": {
+     "nonce": "8888888888888888888888888888888888888888888888888888888888888888",
+     "text": "Covered for a year."
+    }
+   }
+  },
+  {
+   "name": "standalone",
+   "bundle": {
+    "records": [],
+    "disclosures": {},
+    "extensions": {
+     "x-deal-v0": {
+      "sealed_report": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+     },
+     "x-deal-report/v0": {
+      "record": {
+       "capsule_id": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+      },
+      "agent_input": {
+       "report": {
+        "type": "deal_report",
+        "representations": [
+         {
+          "step": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "nonce": "7777777777777777777777777777777777777777777777777777777777777777",
+          "text": "The seller says it's authentic (unverified)"
+         },
+         {
+          "step": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "nonce": "8888888888888888888888888888888888888888888888888888888888888888",
+          "text": "Covered for a year."
+         }
+        ]
+       }
+      }
+     }
+    }
+   },
+   "openings": {
+    "92897b9db0bfdd9b9d6bf226424eb589db87850900bc4b98af3bda211cd3e769": {
+     "nonce": "7777777777777777777777777777777777777777777777777777777777777777",
+     "text": "The seller says it's authentic (unverified)"
+    },
+    "1c02f70fdf363a73024533546be106717aa1b304af5d58324f7d83e1b4b0d849": {
+     "nonce": "8888888888888888888888888888888888888888888888888888888888888888",
+     "text": "Covered for a year."
+    }
+   }
+  },
+  {
+   "name": "in_log",
+   "bundle": {
+    "records": [],
+    "disclosures": {
+     "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd": {
+      "agent_input": {
+       "report": {
+        "type": "deal_report",
+        "representations": [
+         {
+          "step": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "nonce": "7777777777777777777777777777777777777777777777777777777777777777",
+          "text": "The seller says it's authentic (unverified)"
+         },
+         {
+          "step": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "nonce": "8888888888888888888888888888888888888888888888888888888888888888",
+          "text": "Covered for a year."
+         }
+        ]
+       }
+      }
+     }
+    },
+    "extensions": {
+     "x-deal-v0": {
+      "sealed_report": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+     }
+    }
+   },
+   "openings": {
+    "92897b9db0bfdd9b9d6bf226424eb589db87850900bc4b98af3bda211cd3e769": {
+     "nonce": "7777777777777777777777777777777777777777777777777777777777777777",
+     "text": "The seller says it's authentic (unverified)"
+    },
+    "1c02f70fdf363a73024533546be106717aa1b304af5d58324f7d83e1b4b0d849": {
+     "nonce": "8888888888888888888888888888888888888888888888888888888888888888",
+     "text": "Covered for a year."
+    }
+   }
+  },
+  {
+   "name": "standalone_without_x_deal",
+   "bundle": {
+    "records": [],
+    "disclosures": {},
+    "extensions": {
+     "x-deal-report/v0": {
+      "agent_input": {
+       "report": {
+        "type": "deal_report",
+        "representations": [
+         {
+          "step": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "nonce": "7777777777777777777777777777777777777777777777777777777777777777",
+          "text": "The seller says it's authentic (unverified)"
+         },
+         {
+          "step": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "nonce": "8888888888888888888888888888888888888888888888888888888888888888",
+          "text": "Covered for a year."
+         }
+        ]
+       }
+      }
+     }
+    }
+   },
+   "openings": {
+    "92897b9db0bfdd9b9d6bf226424eb589db87850900bc4b98af3bda211cd3e769": {
+     "nonce": "7777777777777777777777777777777777777777777777777777777777777777",
+     "text": "The seller says it's authentic (unverified)"
+    },
+    "1c02f70fdf363a73024533546be106717aa1b304af5d58324f7d83e1b4b0d849": {
+     "nonce": "8888888888888888888888888888888888888888888888888888888888888888",
+     "text": "Covered for a year."
+    }
+   }
+  },
+  {
+   "name": "two forms, same words",
+   "bundle": {
+    "records": [],
+    "disclosures": {
+     "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd": {
+      "agent_input": {
+       "report": {
+        "type": "deal_report",
+        "representations": [
+         {
+          "step": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "nonce": "7777777777777777777777777777777777777777777777777777777777777777",
+          "text": "The seller says it's authentic (unverified)"
+         },
+         {
+          "step": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "nonce": "8888888888888888888888888888888888888888888888888888888888888888",
+          "text": "Covered for a year."
+         }
+        ]
+       }
+      }
+     }
+    },
+    "extensions": {
+     "x-deal-v0": {
+      "type": "deal_report",
+      "representations": [
+       {
+        "step": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "nonce": "7777777777777777777777777777777777777777777777777777777777777777",
+        "text": "The seller says it's authentic (unverified)"
+       },
+       {
+        "step": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "nonce": "8888888888888888888888888888888888888888888888888888888888888888",
+        "text": "Covered for a year."
+       }
+      ],
+      "sealed_report": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+     }
+    }
+   },
+   "openings": {
+    "92897b9db0bfdd9b9d6bf226424eb589db87850900bc4b98af3bda211cd3e769": {
+     "nonce": "7777777777777777777777777777777777777777777777777777777777777777",
+     "text": "The seller says it's authentic (unverified)"
+    },
+    "1c02f70fdf363a73024533546be106717aa1b304af5d58324f7d83e1b4b0d849": {
+     "nonce": "8888888888888888888888888888888888888888888888888888888888888888",
+     "text": "Covered for a year."
+    }
+   }
+  },
+  {
+   "name": "first opening kept",
+   "bundle": {
+    "records": [],
+    "disclosures": {},
+    "extensions": {
+     "x-deal-v0": {
+      "type": "deal_report",
+      "representations": [
+       {
+        "step": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "nonce": "7777777777777777777777777777777777777777777777777777777777777777",
+        "text": "a"
+       },
+       {
+        "step": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "nonce": "7777777777777777777777777777777777777777777777777777777777777777",
+        "text": "a"
+       }
+      ]
+     }
+    }
+   },
+   "openings": {
+    "41de10b7ad869d5cc05b6c6e49f6e363e825dcc5f26803aac20aef56f3b8e34f": {
+     "nonce": "7777777777777777777777777777777777777777777777777777777777777777",
+     "text": "a"
+    }
+   }
+  },
+  {
+   "name": "nonce uppercase",
+   "bundle": {
+    "records": [],
+    "disclosures": {},
+    "extensions": {
+     "x-deal-v0": {
+      "type": "deal_report",
+      "representations": [
+       {
+        "step": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "nonce": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "text": "x"
+       }
+      ]
+     }
+    }
+   },
+   "openings": {}
+  },
+  {
+   "name": "nonce short",
+   "bundle": {
+    "records": [],
+    "disclosures": {},
+    "extensions": {
+     "x-deal-v0": {
+      "type": "deal_report",
+      "representations": [
+       {
+        "step": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "nonce": "777777777777777777777777777777777777777777777777777777777777777",
+        "text": "x"
+       }
+      ]
+     }
+    }
+   },
+   "openings": {}
+  },
+  {
+   "name": "nonce not a string",
+   "bundle": {
+    "records": [],
+    "disclosures": {},
+    "extensions": {
+     "x-deal-v0": {
+      "type": "deal_report",
+      "representations": [
+       {
+        "nonce": 7,
+        "text": "x"
+       }
+      ]
+     }
+    }
+   },
+   "openings": {}
+  },
+  {
+   "name": "text not a string",
+   "bundle": {
+    "records": [],
+    "disclosures": {},
+    "extensions": {
+     "x-deal-v0": {
+      "type": "deal_report",
+      "representations": [
+       {
+        "nonce": "7777777777777777777777777777777777777777777777777777777777777777",
+        "text": [
+         "x"
+        ]
+       }
+      ]
+     }
+    }
+   },
+   "openings": {}
+  },
+  {
+   "name": "entry not an object",
+   "bundle": {
+    "records": [],
+    "disclosures": {},
+    "extensions": {
+     "x-deal-v0": {
+      "type": "deal_report",
+      "representations": [
+       "x",
+       null,
+       3
+      ]
+     }
+    }
+   },
+   "openings": {}
+  },
+  {
+   "name": "representations not a list",
+   "bundle": {
+    "records": [],
+    "disclosures": {},
+    "extensions": {
+     "x-deal-v0": {
+      "representations": {
+       "a": {
+        "step": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "nonce": "7777777777777777777777777777777777777777777777777777777777777777",
+        "text": "x"
+       }
+      }
+     }
+    }
+   },
+   "openings": {}
+  },
+  {
+   "name": "extensions a list",
+   "bundle": {
+    "records": [],
+    "disclosures": {},
+    "extensions": []
+   },
+   "openings": {}
+  },
+  {
+   "name": "x-deal-v0 a list",
+   "bundle": {
+    "records": [],
+    "disclosures": {},
+    "extensions": {
+     "x-deal-v0": []
+    }
+   },
+   "openings": {}
+  },
+  {
+   "name": "pointer not a string",
+   "bundle": {
+    "records": [],
+    "disclosures": {
+     "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd": {
+      "agent_input": {
+       "report": {
+        "type": "deal_report",
+        "representations": [
+         {
+          "step": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "nonce": "7777777777777777777777777777777777777777777777777777777777777777",
+          "text": "The seller says it's authentic (unverified)"
+         },
+         {
+          "step": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "nonce": "8888888888888888888888888888888888888888888888888888888888888888",
+          "text": "Covered for a year."
+         }
+        ]
+       }
+      }
+     }
+    },
+    "extensions": {
+     "x-deal-v0": {
+      "sealed_report": 7
+     }
+    }
+   },
+   "openings": {}
+  },
+  {
+   "name": "pointer to nothing",
+   "bundle": {
+    "records": [],
+    "disclosures": {},
+    "extensions": {
+     "x-deal-v0": {
+      "sealed_report": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+     }
+    }
+   },
+   "openings": {}
+  },
+  {
+   "name": "disclosures a list",
+   "bundle": {
+    "records": [],
+    "disclosures": [],
+    "extensions": {
+     "x-deal-v0": {
+      "sealed_report": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+     }
+    }
+   },
+   "openings": {}
+  },
+  {
+   "name": "report not an object",
+   "bundle": {
+    "records": [],
+    "disclosures": {},
+    "extensions": {
+     "x-deal-report/v0": {
+      "agent_input": {
+       "report": [
+        {
+         "type": "deal_report",
+         "representations": [
+          {
+           "step": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+           "nonce": "7777777777777777777777777777777777777777777777777777777777777777",
+           "text": "The seller says it's authentic (unverified)"
+          },
+          {
+           "step": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+           "nonce": "8888888888888888888888888888888888888888888888888888888888888888",
+           "text": "Covered for a year."
+          }
+         ]
+        }
+       ]
+      }
+     }
+    }
+   },
+   "openings": {}
+  },
+  {
+   "name": "case alias",
+   "bundle": {
+    "records": [],
+    "disclosures": {},
+    "Extensions": {
+     "x-deal-v0": {
+      "type": "deal_report",
+      "representations": [
+       {
+        "step": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "nonce": "7777777777777777777777777777777777777777777777777777777777777777",
+        "text": "The seller says it's authentic (unverified)"
+       },
+       {
+        "step": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "nonce": "8888888888888888888888888888888888888888888888888888888888888888",
+        "text": "Covered for a year."
+       }
+      ]
+     }
+    }
+   },
+   "openings": {}
+  },
+  {
+   "name": "unicode words",
+   "bundle": {
+    "records": [],
+    "disclosures": {},
+    "extensions": {
+     "x-deal-v0": {
+      "type": "deal_report",
+      "representations": [
+       {
+        "step": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "nonce": "7777777777777777777777777777777777777777777777777777777777777777",
+        "text": "The seller says \u4fdd\u8bc1 caf\u00e9 \ud83d\ude00 (unverified)"
+       }
+      ]
+     }
+    }
+   },
+   "openings": {
+    "c80256b0f08a760cd475a017ce4a9240ae3602b798dc17a767c665d46315c75b": {
+     "nonce": "7777777777777777777777777777777777777777777777777777777777777777",
+     "text": "The seller says \u4fdd\u8bc1 caf\u00e9 \ud83d\ude00 (unverified)"
+    }
+   }
+  }
+ ]
+}

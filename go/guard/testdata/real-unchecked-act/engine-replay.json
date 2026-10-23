@@ -1,0 +1,156 @@
+{
+ "bundles": {
+  "typed.bundle.json": {
+   "decisions": [
+    {
+     "amount_minor": 2000,
+     "caps_evidence": {
+      "amount_minor": 2000,
+      "cap_minor": 10000,
+      "fold": "f379cd4b2b12284fa5d682845f23bcd7ab1ae8b8d1dd827cd9b5dd7069735997",
+      "fold_key": {
+       "path": "operator",
+       "value": "synthetic-unchecked"
+      },
+      "per_action_basis": {
+       "fell_back": false,
+       "field": "spend_authorized_minor",
+       "observed_minor": 2000
+      },
+      "per_action_cap_minor": 2500,
+      "projected_minor": 2000,
+      "reversals": {
+       "linked_count": 0,
+       "linked_minor": 0,
+       "unlinked_count": 0
+      },
+      "tripped": [],
+      "weekly_spend_minor": 0
+     },
+     "caps_result": "pass",
+     "capsule_id": "8d1a648880796dba265fa0f389079806ac4dd33e25cb98946b2231e6c54eaa17",
+     "outcome": "escalate",
+     "verb": "pay"
+    },
+    {
+     "amount_minor": 2000,
+     "caps_evidence": {
+      "amount_minor": 2000,
+      "cap_minor": 10000,
+      "fold": "f379cd4b2b12284fa5d682845f23bcd7ab1ae8b8d1dd827cd9b5dd7069735997",
+      "fold_key": {
+       "path": "operator",
+       "value": "synthetic-unchecked"
+      },
+      "per_action_basis": {
+       "fell_back": false,
+       "field": "spend_authorized_minor",
+       "observed_minor": 2000
+      },
+      "per_action_cap_minor": 2500,
+      "projected_minor": 4000,
+      "reversals": {
+       "linked_count": 0,
+       "linked_minor": 0,
+       "unlinked_count": 0
+      },
+      "tripped": [],
+      "weekly_spend_minor": 2000
+     },
+     "caps_result": "pass",
+     "capsule_id": "8ae6c8df664479af1fa7e368175bb2fec6f909d5b6ce7c35e0f2eaa36d97de5e",
+     "outcome": "deny",
+     "verb": "pay"
+    }
+   ],
+   "undecided": [
+    "bbff5346db59ab9499e8db178242dffcb1854c5935617fdd55ef96af6ce326e8",
+    "2d2310b468927d8001061ce3edb95cd47f1604d26a6f723ac2708b2673699bb2",
+    "9d1fc858856abf8ad475edc40ccfef78d954b80e9d6eecf1f392b94da69a016a",
+    "2de0e896a578d9ca846d9e6f33fadab490c27baeafd1d66e0041e34bde7b2d2a",
+    "08162afab0d74c83548998cc869be0107171d3fc68554216832e12e41dc539cc",
+    "011c3908dc9f65227b8eb617d4283e0d0df54ee79cb9d9b4ceeb30551db7e4bb",
+    "51e0f87521e592856d55c556f08b39acb9caad3516ba585924a6b4675cdcc65a",
+    "048536acbd3ee9b28f437e55194369d162a8d19e4e3cf956e103ac037fe4c383"
+   ]
+  },
+  "x-deal-v0.bundle.json": {
+   "decisions": [
+    {
+     "amount_minor": 2000,
+     "caps_evidence": {
+      "amount_minor": 2000,
+      "cap_minor": 10000,
+      "fold": "f379cd4b2b12284fa5d682845f23bcd7ab1ae8b8d1dd827cd9b5dd7069735997",
+      "fold_key": {
+       "path": "operator",
+       "value": "synthetic-unchecked"
+      },
+      "per_action_basis": {
+       "fell_back": false,
+       "field": "spend_authorized_minor",
+       "observed_minor": 2000
+      },
+      "per_action_cap_minor": 2500,
+      "projected_minor": 2000,
+      "reversals": {
+       "linked_count": 0,
+       "linked_minor": 0,
+       "unlinked_count": 0
+      },
+      "tripped": [],
+      "weekly_spend_minor": 0
+     },
+     "caps_result": "pass",
+     "capsule_id": "e9eeead5a084f5c324c5dd94494c8ef6a89946ceef0b0cc03a3810d682f18c8c",
+     "outcome": "escalate",
+     "verb": "pay"
+    },
+    {
+     "amount_minor": 2000,
+     "caps_evidence": {
+      "amount_minor": 2000,
+      "cap_minor": 10000,
+      "fold": "f379cd4b2b12284fa5d682845f23bcd7ab1ae8b8d1dd827cd9b5dd7069735997",
+      "fold_key": {
+       "path": "operator",
+       "value": "synthetic-unchecked"
+      },
+      "per_action_basis": {
+       "fell_back": false,
+       "field": "spend_authorized_minor",
+       "observed_minor": 2000
+      },
+      "per_action_cap_minor": 2500,
+      "projected_minor": 4000,
+      "reversals": {
+       "linked_count": 0,
+       "linked_minor": 0,
+       "unlinked_count": 0
+      },
+      "tripped": [],
+      "weekly_spend_minor": 2000
+     },
+     "caps_result": "pass",
+     "capsule_id": "e4cfd1a85dd5e78b89ac79ebdd8f512ced77149daa7d59a3f01e8ca31de10e7a",
+     "outcome": "deny",
+     "verb": "pay"
+    }
+   ],
+   "undecided": [
+    "b532dac1e6a8f4d929bb401e22fb9bb4725745bd69c7d7e4adf991e07a391125",
+    "6fcabd44d9307df223cd092cc5187b6b03b1d480a4f76d46c775afad357a4472",
+    "e9a9ba450279362d0492c76c6d3f185dd8fbd6300cb937f1ed9cbc5dc266213d",
+    "eb31678face6697b75e7345afc5661a9d0950dfb753362417a0c65a0bf2bc0d7",
+    "63425c61a3e561bcfb113771587b5e07551efc7ce99dafa383a7a10c6eb874eb",
+    "9c023700c3ce64d437f462090c4ac7e36b84da7ae0851c92298a11a6fa3cd89b",
+    "3b9a70ce69a1c6d181fb541b5ee41da6cca17295fbbed7ed3db683f73bc5156d"
+   ]
+  }
+ },
+ "capsule_engine_commit": "a710636c29814ce67e838c673026fd2063d913f8",
+ "pack": {
+  "definition_digest": "8a8e0a7e1ca4319b6e45f2037f4af49e6592919f373e59874ce1ead7249b073d",
+  "pack_id": "asg/everyday/0.3.6"
+ }
+}

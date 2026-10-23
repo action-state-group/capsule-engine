@@ -1,0 +1,353 @@
+{
+ "capsule_engine_commit": "a710636c29814ce67e838c673026fd2063d913f8",
+ "cases": {
+  "executed-counted": {
+   "action": {
+    "action_class": "money.purchase",
+    "action_id": "buy/ledger-2000",
+    "amount_minor": 2000,
+    "currency": "USD",
+    "developer": "dev@v1",
+    "operator": "op-a",
+    "rail": "card",
+    "target": "merchant/ledger",
+    "timestamp": "2026-10-07T12:00:00Z",
+    "verb": "buy"
+   },
+   "caps": {
+    "evidence": {
+     "amount_minor": 2000,
+     "cap_minor": 10000,
+     "fold": "f379cd4b2b12284fa5d682845f23bcd7ab1ae8b8d1dd827cd9b5dd7069735997",
+     "fold_key": {
+      "path": "operator",
+      "value": "op-a"
+     },
+     "per_action_basis": {
+      "fell_back": true,
+      "field": "spend_minor",
+      "observed_minor": 2000
+     },
+     "per_action_cap_minor": 2500,
+     "projected_minor": 3500,
+     "reversals": {
+      "linked_count": 0,
+      "linked_minor": 0,
+      "unlinked_count": 0
+     },
+     "tripped": [],
+     "weekly_spend_minor": 1500
+    },
+    "evidence_digest": "15ea8062852a8fd04ff55b1817f1445aec998a1da0e51b542b409db5a9b8ab91",
+    "reason": "spend_minor 2000 <= per-action limit 2500; projected 3500 <= window limit 10000 (minor units)",
+    "result": "pass"
+   },
+   "records": [
+    {
+     "asg_payload": {
+      "action_class": "booking.create",
+      "amount_minor": 1500
+     },
+     "capsule_id": "x1",
+     "developer": "dev@v1",
+     "disposition": {
+      "decision": "executed"
+     },
+     "operator": "op-a",
+     "timestamp": "2026-10-06T12:00:00Z"
+    }
+   ]
+  },
+  "executed-unreadable-in-window": {
+   "action": {
+    "action_class": "money.purchase",
+    "action_id": "buy/ledger-2000",
+    "amount_minor": 2000,
+    "currency": "USD",
+    "developer": "dev@v1",
+    "operator": "op-a",
+    "rail": "card",
+    "target": "merchant/ledger",
+    "timestamp": "2026-10-07T12:00:00Z",
+    "verb": "buy"
+   },
+   "caps": {
+    "evidence": {
+     "constraint_id": "caps",
+     "in_scope": true,
+     "missing_field": "spend_minor"
+    },
+    "evidence_digest": "9d5916a6c256c52124d6b684f9c2eb43899c745b74dbe792e3e31e41b4606898",
+    "reason": "an earlier act has no recorded decision, so the total cannot count it",
+    "result": "n/a"
+   },
+   "records": [
+    {
+     "asg_payload": {
+      "action_class": "money.purchase",
+      "spend_unreadable": true
+     },
+     "capsule_id": "x1",
+     "developer": "dev@v1",
+     "disposition": {
+      "decision": "executed"
+     },
+     "operator": "op-a",
+     "timestamp": "2026-10-06T12:00:00Z"
+    }
+   ]
+  },
+  "executed-unreadable-other-operator": {
+   "action": {
+    "action_class": "money.purchase",
+    "action_id": "buy/ledger-2000",
+    "amount_minor": 2000,
+    "currency": "USD",
+    "developer": "dev@v1",
+    "operator": "op-a",
+    "rail": "card",
+    "target": "merchant/ledger",
+    "timestamp": "2026-10-07T12:00:00Z",
+    "verb": "buy"
+   },
+   "caps": {
+    "evidence": {
+     "amount_minor": 2000,
+     "cap_minor": 10000,
+     "fold": "f379cd4b2b12284fa5d682845f23bcd7ab1ae8b8d1dd827cd9b5dd7069735997",
+     "fold_key": {
+      "path": "operator",
+      "value": "op-a"
+     },
+     "per_action_basis": {
+      "fell_back": true,
+      "field": "spend_minor",
+      "observed_minor": 2000
+     },
+     "per_action_cap_minor": 2500,
+     "projected_minor": 2000,
+     "reversals": {
+      "linked_count": 0,
+      "linked_minor": 0,
+      "unlinked_count": 0
+     },
+     "tripped": [],
+     "weekly_spend_minor": 0
+    },
+    "evidence_digest": "b7b7b3b13fab90effe7774efde227c6b88609389ce30ffc62209db213b5b4b26",
+    "reason": "spend_minor 2000 <= per-action limit 2500; projected 2000 <= window limit 10000 (minor units)",
+    "result": "pass"
+   },
+   "records": [
+    {
+     "asg_payload": {
+      "action_class": "money.purchase",
+      "spend_unreadable": true
+     },
+     "capsule_id": "x1",
+     "developer": "dev@v1",
+     "disposition": {
+      "decision": "executed"
+     },
+     "operator": "op-b",
+     "timestamp": "2026-10-06T12:00:00Z"
+    }
+   ]
+  },
+  "executed-unreadable-outside-window": {
+   "action": {
+    "action_class": "money.purchase",
+    "action_id": "buy/ledger-2000",
+    "amount_minor": 2000,
+    "currency": "USD",
+    "developer": "dev@v1",
+    "operator": "op-a",
+    "rail": "card",
+    "target": "merchant/ledger",
+    "timestamp": "2026-10-07T12:00:00Z",
+    "verb": "buy"
+   },
+   "caps": {
+    "evidence": {
+     "amount_minor": 2000,
+     "cap_minor": 10000,
+     "fold": "f379cd4b2b12284fa5d682845f23bcd7ab1ae8b8d1dd827cd9b5dd7069735997",
+     "fold_key": {
+      "path": "operator",
+      "value": "op-a"
+     },
+     "per_action_basis": {
+      "fell_back": true,
+      "field": "spend_minor",
+      "observed_minor": 2000
+     },
+     "per_action_cap_minor": 2500,
+     "projected_minor": 2000,
+     "reversals": {
+      "linked_count": 0,
+      "linked_minor": 0,
+      "unlinked_count": 0
+     },
+     "tripped": [],
+     "weekly_spend_minor": 0
+    },
+    "evidence_digest": "b7b7b3b13fab90effe7774efde227c6b88609389ce30ffc62209db213b5b4b26",
+    "reason": "spend_minor 2000 <= per-action limit 2500; projected 2000 <= window limit 10000 (minor units)",
+    "result": "pass"
+   },
+   "records": [
+    {
+     "asg_payload": {
+      "action_class": "money.purchase",
+      "spend_unreadable": true
+     },
+     "capsule_id": "x1",
+     "developer": "dev@v1",
+     "disposition": {
+      "decision": "executed"
+     },
+     "operator": "op-a",
+     "timestamp": "2026-09-28T12:00:00Z"
+    }
+   ]
+  },
+  "live-history-copy-counted-once": {
+   "action": {
+    "action_class": "money.purchase",
+    "action_id": "buy/ledger-2000",
+    "amount_minor": 2000,
+    "currency": "USD",
+    "developer": "dev@v1",
+    "operator": "op-a",
+    "rail": "card",
+    "target": "merchant/ledger",
+    "timestamp": "2026-10-07T12:00:00Z",
+    "verb": "buy"
+   },
+   "caps": {
+    "evidence": {
+     "amount_minor": 2000,
+     "cap_minor": 10000,
+     "fold": "f379cd4b2b12284fa5d682845f23bcd7ab1ae8b8d1dd827cd9b5dd7069735997",
+     "fold_key": {
+      "path": "operator",
+      "value": "op-a"
+     },
+     "per_action_basis": {
+      "fell_back": true,
+      "field": "spend_minor",
+      "observed_minor": 2000
+     },
+     "per_action_cap_minor": 2500,
+     "projected_minor": 3500,
+     "reversals": {
+      "linked_count": 0,
+      "linked_minor": 0,
+      "unlinked_count": 0
+     },
+     "tripped": [],
+     "weekly_spend_minor": 1500
+    },
+    "evidence_digest": "15ea8062852a8fd04ff55b1817f1445aec998a1da0e51b542b409db5a9b8ab91",
+    "reason": "spend_minor 2000 <= per-action limit 2500; projected 3500 <= window limit 10000 (minor units)",
+    "result": "pass"
+   },
+   "records": [
+    {
+     "asg_payload": {
+      "action_class": "money.purchase",
+      "amount_minor": 1500,
+      "live_history": "disposition"
+     },
+     "capsule_id": "h1",
+     "developer": "dev@v1",
+     "disposition": {
+      "decision": "accept"
+     },
+     "operator": "op-a",
+     "timestamp": "2026-10-06T12:00:00Z"
+    },
+    {
+     "asg_payload": {
+      "action_class": "money.purchase",
+      "amount_minor": 1500
+     },
+     "capsule_id": "x1",
+     "developer": "dev@v1",
+     "disposition": {
+      "decision": "executed"
+     },
+     "operator": "op-a",
+     "timestamp": "2026-10-06T12:00:00Z"
+    }
+   ]
+  },
+  "per-action-over-beside-unreadable": {
+   "action": {
+    "action_class": "money.purchase",
+    "action_id": "buy/ledger-3000",
+    "amount_minor": 3000,
+    "currency": "USD",
+    "developer": "dev@v1",
+    "operator": "op-a",
+    "rail": "card",
+    "target": "merchant/ledger",
+    "timestamp": "2026-10-07T12:00:00Z",
+    "verb": "buy"
+   },
+   "caps": {
+    "evidence": {
+     "amount_minor": 3000,
+     "cap_minor": 10000,
+     "fold": "f379cd4b2b12284fa5d682845f23bcd7ab1ae8b8d1dd827cd9b5dd7069735997",
+     "fold_key": {
+      "path": "operator",
+      "value": "op-a"
+     },
+     "per_action_basis": {
+      "fell_back": true,
+      "field": "spend_minor",
+      "observed_minor": 3000
+     },
+     "per_action_cap_minor": 2500,
+     "projected_minor": 3000,
+     "reversals": {
+      "linked_count": 0,
+      "linked_minor": 0,
+      "unlinked_count": 0
+     },
+     "tripped": [
+      {
+       "limit": "per_action",
+       "observed_minor": 3000,
+       "threshold_minor": 2500
+      }
+     ],
+     "weekly_spend_minor": 0,
+     "window_unreadable_count": 1
+    },
+    "evidence_digest": "1c66e005d85f9974415d72fa8a75a8923989318d5265c66b61b592acd7faa6ba",
+    "reason": "per_action limit 2500 exceeded by 3000 (minor units)",
+    "result": "fail"
+   },
+   "records": [
+    {
+     "asg_payload": {
+      "action_class": "money.purchase",
+      "spend_unreadable": true
+     },
+     "capsule_id": "x1",
+     "developer": "dev@v1",
+     "disposition": {
+      "decision": "executed"
+     },
+     "operator": "op-a",
+     "timestamp": "2026-10-06T12:00:00Z"
+    }
+   ]
+  }
+ },
+ "pack": "asg/everyday/0.3.6",
+ "pack_digest": "8a8e0a7e1ca4319b6e45f2037f4af49e6592919f373e59874ce1ead7249b073d",
+ "schema": "executed-acts-036-ledger-results/v0"
+}

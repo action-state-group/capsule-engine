@@ -1,0 +1,776 @@
+{
+ "definition": "seller.recipient_role/1.2.0",
+ "definition_digest": "6216addfa4e53b746dd72ec6dd4986758e064d2885e007b0fa546e2d42d189d1",
+ "vectors": [
+  {
+   "evidence": {
+    "allowed_roles": [
+     "buyer",
+     "self"
+    ],
+    "disclosed_classes": [
+     "pickup_area"
+    ],
+    "recipient_role": "buyer",
+    "recognised": true,
+    "role_classes": {
+     "platform": [
+      "email",
+      "pickup_area"
+     ]
+    }
+   },
+   "input": "inputs/buyer--pickup_area.json",
+   "reason": "the recipient is the buyer",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "allowed_roles": [
+     "buyer",
+     "self"
+    ],
+    "disclosed_classes": [
+     "email"
+    ],
+    "recipient_role": "buyer",
+    "recognised": true,
+    "role_classes": {
+     "platform": [
+      "email",
+      "pickup_area"
+     ]
+    }
+   },
+   "input": "inputs/buyer--email.json",
+   "reason": "the recipient is the buyer",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "allowed_roles": [
+     "buyer",
+     "self"
+    ],
+    "disclosed_classes": [
+     "email",
+     "pickup_area"
+    ],
+    "recipient_role": "buyer",
+    "recognised": true,
+    "role_classes": {
+     "platform": [
+      "email",
+      "pickup_area"
+     ]
+    }
+   },
+   "input": "inputs/buyer--email-pickup_area.json",
+   "reason": "the recipient is the buyer",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "allowed_roles": [
+     "buyer",
+     "self"
+    ],
+    "disclosed_classes": [
+     "phone",
+     "pickup_area"
+    ],
+    "recipient_role": "buyer",
+    "recognised": true,
+    "role_classes": {
+     "platform": [
+      "email",
+      "pickup_area"
+     ]
+    }
+   },
+   "input": "inputs/buyer--phone-pickup_area.json",
+   "reason": "the recipient is the buyer",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "allowed_roles": [
+     "buyer",
+     "self"
+    ],
+    "disclosed_classes": [
+     "pickup_location"
+    ],
+    "recipient_role": "buyer",
+    "recognised": true,
+    "role_classes": {
+     "platform": [
+      "email",
+      "pickup_area"
+     ]
+    }
+   },
+   "input": "inputs/buyer--pickup_location.json",
+   "reason": "the recipient is the buyer",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "allowed_roles": [
+     "buyer",
+     "self"
+    ],
+    "disclosed_classes": [
+     "phone"
+    ],
+    "recipient_role": "buyer",
+    "recognised": true,
+    "role_classes": {
+     "platform": [
+      "email",
+      "pickup_area"
+     ]
+    }
+   },
+   "input": "inputs/buyer--phone.json",
+   "reason": "the recipient is the buyer",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "allowed_roles": [
+     "buyer",
+     "self"
+    ],
+    "disclosed_classes": null,
+    "recipient_role": "buyer",
+    "recognised": true,
+    "role_classes": {
+     "platform": [
+      "email",
+      "pickup_area"
+     ]
+    }
+   },
+   "input": "inputs/buyer--no-class.json",
+   "reason": "the recipient is the buyer",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "allowed_roles": [
+     "buyer",
+     "self"
+    ],
+    "disclosed_classes": [
+     "pickup_area"
+    ],
+    "recipient_role": "platform",
+    "recognised": true,
+    "role_classes": {
+     "platform": [
+      "email",
+      "pickup_area"
+     ]
+    }
+   },
+   "input": "inputs/platform--pickup_area.json",
+   "reason": "the recipient is a platform, given only pickup_area",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "allowed_roles": [
+     "buyer",
+     "self"
+    ],
+    "disclosed_classes": [
+     "email"
+    ],
+    "recipient_role": "platform",
+    "recognised": true,
+    "role_classes": {
+     "platform": [
+      "email",
+      "pickup_area"
+     ]
+    }
+   },
+   "input": "inputs/platform--email.json",
+   "reason": "the recipient is a platform, given only email",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "allowed_roles": [
+     "buyer",
+     "self"
+    ],
+    "disclosed_classes": [
+     "email",
+     "pickup_area"
+    ],
+    "recipient_role": "platform",
+    "recognised": true,
+    "role_classes": {
+     "platform": [
+      "email",
+      "pickup_area"
+     ]
+    }
+   },
+   "input": "inputs/platform--email-pickup_area.json",
+   "reason": "the recipient is a platform, given only email or pickup_area",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "allowed_roles": [
+     "buyer",
+     "self"
+    ],
+    "disclosed_classes": [
+     "phone",
+     "pickup_area"
+    ],
+    "recipient_role": "platform",
+    "recognised": true,
+    "role_classes": {
+     "platform": [
+      "email",
+      "pickup_area"
+     ]
+    }
+   },
+   "input": "inputs/platform--phone-pickup_area.json",
+   "reason": "the recipient is a platform, which may be given only email or pickup_area; this disclosure also gives phone",
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "allowed_roles": [
+     "buyer",
+     "self"
+    ],
+    "disclosed_classes": [
+     "pickup_location"
+    ],
+    "recipient_role": "platform",
+    "recognised": true,
+    "role_classes": {
+     "platform": [
+      "email",
+      "pickup_area"
+     ]
+    }
+   },
+   "input": "inputs/platform--pickup_location.json",
+   "reason": "the recipient is a platform, which may be given only email or pickup_area; this disclosure also gives pickup_location",
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "allowed_roles": [
+     "buyer",
+     "self"
+    ],
+    "disclosed_classes": [
+     "phone"
+    ],
+    "recipient_role": "platform",
+    "recognised": true,
+    "role_classes": {
+     "platform": [
+      "email",
+      "pickup_area"
+     ]
+    }
+   },
+   "input": "inputs/platform--phone.json",
+   "reason": "the recipient is a platform, which may be given only email or pickup_area; this disclosure also gives phone",
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "allowed_roles": [
+     "buyer",
+     "self"
+    ],
+    "disclosed_classes": null,
+    "recipient_role": "platform",
+    "recognised": true,
+    "role_classes": {
+     "platform": [
+      "email",
+      "pickup_area"
+     ]
+    }
+   },
+   "input": "inputs/platform--no-class.json",
+   "reason": "the recipient is a platform, which may be given only email or pickup_area; the disclosure names no class of data",
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "allowed_roles": [
+     "buyer",
+     "self"
+    ],
+    "disclosed_classes": [
+     "pickup_area"
+    ],
+    "recipient_role": "third_party",
+    "recognised": true,
+    "role_classes": {
+     "platform": [
+      "email",
+      "pickup_area"
+     ]
+    }
+   },
+   "input": "inputs/third_party--pickup_area.json",
+   "reason": "the recipient is a third_party; personal data passes only to buyer or self, or a platform given only email or pickup_area",
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "allowed_roles": [
+     "buyer",
+     "self"
+    ],
+    "disclosed_classes": [
+     "email"
+    ],
+    "recipient_role": "third_party",
+    "recognised": true,
+    "role_classes": {
+     "platform": [
+      "email",
+      "pickup_area"
+     ]
+    }
+   },
+   "input": "inputs/third_party--email.json",
+   "reason": "the recipient is a third_party; personal data passes only to buyer or self, or a platform given only email or pickup_area",
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "allowed_roles": [
+     "buyer",
+     "self"
+    ],
+    "disclosed_classes": [
+     "email",
+     "pickup_area"
+    ],
+    "recipient_role": "third_party",
+    "recognised": true,
+    "role_classes": {
+     "platform": [
+      "email",
+      "pickup_area"
+     ]
+    }
+   },
+   "input": "inputs/third_party--email-pickup_area.json",
+   "reason": "the recipient is a third_party; personal data passes only to buyer or self, or a platform given only email or pickup_area",
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "allowed_roles": [
+     "buyer",
+     "self"
+    ],
+    "disclosed_classes": [
+     "phone",
+     "pickup_area"
+    ],
+    "recipient_role": "third_party",
+    "recognised": true,
+    "role_classes": {
+     "platform": [
+      "email",
+      "pickup_area"
+     ]
+    }
+   },
+   "input": "inputs/third_party--phone-pickup_area.json",
+   "reason": "the recipient is a third_party; personal data passes only to buyer or self, or a platform given only email or pickup_area",
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "allowed_roles": [
+     "buyer",
+     "self"
+    ],
+    "disclosed_classes": [
+     "pickup_location"
+    ],
+    "recipient_role": "third_party",
+    "recognised": true,
+    "role_classes": {
+     "platform": [
+      "email",
+      "pickup_area"
+     ]
+    }
+   },
+   "input": "inputs/third_party--pickup_location.json",
+   "reason": "the recipient is a third_party; personal data passes only to buyer or self, or a platform given only email or pickup_area",
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "allowed_roles": [
+     "buyer",
+     "self"
+    ],
+    "disclosed_classes": [
+     "phone"
+    ],
+    "recipient_role": "third_party",
+    "recognised": true,
+    "role_classes": {
+     "platform": [
+      "email",
+      "pickup_area"
+     ]
+    }
+   },
+   "input": "inputs/third_party--phone.json",
+   "reason": "the recipient is a third_party; personal data passes only to buyer or self, or a platform given only email or pickup_area",
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "allowed_roles": [
+     "buyer",
+     "self"
+    ],
+    "disclosed_classes": null,
+    "recipient_role": "third_party",
+    "recognised": true,
+    "role_classes": {
+     "platform": [
+      "email",
+      "pickup_area"
+     ]
+    }
+   },
+   "input": "inputs/third_party--no-class.json",
+   "reason": "the recipient is a third_party; personal data passes only to buyer or self, or a platform given only email or pickup_area",
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "allowed_roles": [
+     "buyer",
+     "self"
+    ],
+    "disclosed_classes": [
+     "pickup_area"
+    ],
+    "recipient_role": "self",
+    "recognised": true,
+    "role_classes": {
+     "platform": [
+      "email",
+      "pickup_area"
+     ]
+    }
+   },
+   "input": "inputs/self--pickup_area.json",
+   "reason": "the recipient is the self",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "allowed_roles": [
+     "buyer",
+     "self"
+    ],
+    "disclosed_classes": [
+     "email"
+    ],
+    "recipient_role": "self",
+    "recognised": true,
+    "role_classes": {
+     "platform": [
+      "email",
+      "pickup_area"
+     ]
+    }
+   },
+   "input": "inputs/self--email.json",
+   "reason": "the recipient is the self",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "allowed_roles": [
+     "buyer",
+     "self"
+    ],
+    "disclosed_classes": [
+     "email",
+     "pickup_area"
+    ],
+    "recipient_role": "self",
+    "recognised": true,
+    "role_classes": {
+     "platform": [
+      "email",
+      "pickup_area"
+     ]
+    }
+   },
+   "input": "inputs/self--email-pickup_area.json",
+   "reason": "the recipient is the self",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "allowed_roles": [
+     "buyer",
+     "self"
+    ],
+    "disclosed_classes": [
+     "phone",
+     "pickup_area"
+    ],
+    "recipient_role": "self",
+    "recognised": true,
+    "role_classes": {
+     "platform": [
+      "email",
+      "pickup_area"
+     ]
+    }
+   },
+   "input": "inputs/self--phone-pickup_area.json",
+   "reason": "the recipient is the self",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "allowed_roles": [
+     "buyer",
+     "self"
+    ],
+    "disclosed_classes": [
+     "pickup_location"
+    ],
+    "recipient_role": "self",
+    "recognised": true,
+    "role_classes": {
+     "platform": [
+      "email",
+      "pickup_area"
+     ]
+    }
+   },
+   "input": "inputs/self--pickup_location.json",
+   "reason": "the recipient is the self",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "allowed_roles": [
+     "buyer",
+     "self"
+    ],
+    "disclosed_classes": [
+     "phone"
+    ],
+    "recipient_role": "self",
+    "recognised": true,
+    "role_classes": {
+     "platform": [
+      "email",
+      "pickup_area"
+     ]
+    }
+   },
+   "input": "inputs/self--phone.json",
+   "reason": "the recipient is the self",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "allowed_roles": [
+     "buyer",
+     "self"
+    ],
+    "disclosed_classes": null,
+    "recipient_role": "self",
+    "recognised": true,
+    "role_classes": {
+     "platform": [
+      "email",
+      "pickup_area"
+     ]
+    }
+   },
+   "input": "inputs/self--no-class.json",
+   "reason": "the recipient is the self",
+   "result": "pass"
+  },
+  {
+   "evidence": {
+    "allowed_roles": [
+     "buyer",
+     "self"
+    ],
+    "disclosed_classes": [
+     "pickup_area"
+    ],
+    "recipient_role": "courier",
+    "recognised": false,
+    "role_classes": {
+     "platform": [
+      "email",
+      "pickup_area"
+     ]
+    }
+   },
+   "input": "inputs/courier--pickup_area.json",
+   "reason": "recipient_role 'courier' is not a role this rule knows; personal data passes only to buyer or self, or a platform given only email or pickup_area",
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "allowed_roles": [
+     "buyer",
+     "self"
+    ],
+    "disclosed_classes": [
+     "email"
+    ],
+    "recipient_role": "courier",
+    "recognised": false,
+    "role_classes": {
+     "platform": [
+      "email",
+      "pickup_area"
+     ]
+    }
+   },
+   "input": "inputs/courier--email.json",
+   "reason": "recipient_role 'courier' is not a role this rule knows; personal data passes only to buyer or self, or a platform given only email or pickup_area",
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "allowed_roles": [
+     "buyer",
+     "self"
+    ],
+    "disclosed_classes": [
+     "email",
+     "pickup_area"
+    ],
+    "recipient_role": "courier",
+    "recognised": false,
+    "role_classes": {
+     "platform": [
+      "email",
+      "pickup_area"
+     ]
+    }
+   },
+   "input": "inputs/courier--email-pickup_area.json",
+   "reason": "recipient_role 'courier' is not a role this rule knows; personal data passes only to buyer or self, or a platform given only email or pickup_area",
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "allowed_roles": [
+     "buyer",
+     "self"
+    ],
+    "disclosed_classes": [
+     "phone",
+     "pickup_area"
+    ],
+    "recipient_role": "courier",
+    "recognised": false,
+    "role_classes": {
+     "platform": [
+      "email",
+      "pickup_area"
+     ]
+    }
+   },
+   "input": "inputs/courier--phone-pickup_area.json",
+   "reason": "recipient_role 'courier' is not a role this rule knows; personal data passes only to buyer or self, or a platform given only email or pickup_area",
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "allowed_roles": [
+     "buyer",
+     "self"
+    ],
+    "disclosed_classes": [
+     "pickup_location"
+    ],
+    "recipient_role": "courier",
+    "recognised": false,
+    "role_classes": {
+     "platform": [
+      "email",
+      "pickup_area"
+     ]
+    }
+   },
+   "input": "inputs/courier--pickup_location.json",
+   "reason": "recipient_role 'courier' is not a role this rule knows; personal data passes only to buyer or self, or a platform given only email or pickup_area",
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "allowed_roles": [
+     "buyer",
+     "self"
+    ],
+    "disclosed_classes": [
+     "phone"
+    ],
+    "recipient_role": "courier",
+    "recognised": false,
+    "role_classes": {
+     "platform": [
+      "email",
+      "pickup_area"
+     ]
+    }
+   },
+   "input": "inputs/courier--phone.json",
+   "reason": "recipient_role 'courier' is not a role this rule knows; personal data passes only to buyer or self, or a platform given only email or pickup_area",
+   "result": "fail"
+  },
+  {
+   "evidence": {
+    "allowed_roles": [
+     "buyer",
+     "self"
+    ],
+    "disclosed_classes": null,
+    "recipient_role": "courier",
+    "recognised": false,
+    "role_classes": {
+     "platform": [
+      "email",
+      "pickup_area"
+     ]
+    }
+   },
+   "input": "inputs/courier--no-class.json",
+   "reason": "recipient_role 'courier' is not a role this rule knows; personal data passes only to buyer or self, or a platform given only email or pickup_area",
+   "result": "fail"
+  }
+ ]
+}
