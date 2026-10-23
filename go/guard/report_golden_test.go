@@ -16,15 +16,19 @@ var updateReportGoldens = flag.Bool("update-report-goldens", false, "rewrite tes
 
 // The per-rule report's wording is this port's own (the engine keeps none
 // for most rules), so no shared vector holds it. Every check-input case of
-// the shared vectors is reported here and held to its golden: a change in a
-// verdict, a reason or a value shows in review as a change to this file.
+// the shared vectors is reported here and held to its golden, one line per
+// case (a refused one holds its refusal): a change in a verdict, a reason, a
+// value or a refusal shows in review as a change to this file.
 func TestReportGoldens(t *testing.T) {
 	engines := conformanceEngines(t)
 	// golden is one case's report, with Refused, which the report's JSON
 	// leaves out and a caller reads.
+	// A case this port refuses has no report; its line holds the refusal,
+	// so a case that starts or stops being refused shows in review.
 	type golden struct {
-		Report  CheckReport `json:"report"`
-		Refused bool        `json:"refused"`
+		Error   string       `json:"error,omitempty"`
+		Report  *CheckReport `json:"report,omitempty"`
+		Refused bool         `json:"refused,omitempty"`
 	}
 	reports := map[string]golden{}
 	for name, s := range readConformanceSets(t) {
@@ -36,17 +40,20 @@ func TestReportGoldens(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
+			id := name + ":" + c.Case
 			a, h, err := DecodeCheckInput(raw)
 			if err != nil {
-				continue // refused at decode: no report (KNOWN-DIFFERENCES group 5)
+				reports[id] = golden{Error: "decode: " + err.Error()}
+				continue
 			}
 			e := engines[c.Pack]
 			d, err := e.CheckWithHistory(a, h)
 			if err != nil {
+				reports[id] = golden{Error: "check: " + err.Error()}
 				continue
 			}
 			r := e.Report(a, d)
-			reports[name+":"+c.Case] = golden{Report: r, Refused: r.Refused}
+			reports[id] = golden{Report: &r, Refused: r.Refused}
 		}
 	}
 	keys := make([]string, 0, len(reports))

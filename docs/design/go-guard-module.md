@@ -117,7 +117,7 @@ it touches:
     evidence itself.
 - **Report wording (Sherlock2, on #215).** The per-rule `Report` is the Go guard's own wording;
   the engine keeps no such text for most rules. So no shared vector holds it.
-  `go/guard/report_golden_test.go` holds every check-input case's report, with its `Refused`, to
+  `go/guard/report_golden_test.go` holds every check-input case's report, with its `Refused` (or, for a case it refuses, the refusal), to
   `go/guard/testdata/report-goldens.json` (`-update-report-goldens` rewrites it). A wording change
   shows in review as a change to that file.
 - **Pack versions covered.** Cases are decided under the current version of each served pack
