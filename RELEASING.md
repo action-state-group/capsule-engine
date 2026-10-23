@@ -34,7 +34,7 @@ pushed tag itself, with no workflow in between:
   (id, digest), or any other fix that leaves the vectors' expected results unchanged.
 - **Neither:** a change in what an already-ported (id, digest) means. That needs a new
   definition version with a new digest, or a retirement in
-  `capsule_engine/guards/wickets/retired.py`, on both sides.
+  `python/capsule_engine/guards/wickets/retired.py`, on both sides.
 
 **Safeguards:**
 

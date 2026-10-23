@@ -28,7 +28,7 @@ from capsule_engine.report.result import (
     verify_result,
 )
 
-CONTRACT_PATH = Path(__file__).resolve().parents[1] / "examples" / "contracts" / "ai-act-human-oversight.json"
+CONTRACT_PATH = Path(__file__).resolve().parents[2] / "examples" / "contracts" / "ai-act-human-oversight.json"
 OTEL_BLOCK_KEY = "org.agentactioncapsule.otel"  # capsule_emit.otel.OTEL_BLOCK_KEY
 
 

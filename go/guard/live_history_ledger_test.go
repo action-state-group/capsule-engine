@@ -89,7 +89,7 @@ type liveVectors struct {
 	Decisions []liveVector `json:"decisions"`
 }
 
-// The ways the engine's test (tests/test_live_history.py _given) gives a
+// The ways the engine's test (python/tests/test_live_history.py _given) gives a
 // check input's history.
 const (
 	historyAsSealed     = "as-sealed"

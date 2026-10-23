@@ -49,7 +49,7 @@ func capsEvidence(t *testing.T, e *Engine, a Action) (Decision, Constraint, stri
 	return d, c, j
 }
 
-// capsule-engine tests/test_operator_limits.py, the acceptance case: an
+// capsule-engine python/tests/test_operator_limits.py, the acceptance case: an
 // operator's 5.00 per-action limit holds a 6.00 purchase for approval, the
 // caps evidence names 500 as the per-action limit, tripped, with its source
 // operator_profile and the profile's digest, and the window's source

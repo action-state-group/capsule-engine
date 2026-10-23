@@ -40,7 +40,7 @@ import (
 	"time"
 )
 
-// Action is one normalized candidate action (capsule_engine/guards/action.py
+// Action is one normalized candidate action (python/capsule_engine/guards/action.py
 // Action). Absent optional fields are nil.
 type Action struct {
 	Verb        string  `json:"verb"`

@@ -25,7 +25,7 @@ import (
 	"github.com/action-state-group/capsule-engine/go/packs"
 )
 
-// ForwardVerdict is capsule_engine/compiler/vocabulary.py FORWARD_VERDICTS.
+// ForwardVerdict is python/capsule_engine/compiler/vocabulary.py FORWARD_VERDICTS.
 // There is no model-valued forward verdict: a rule that needs a model is
 // UNAVAILABLE-MODEL-REQUIRED.
 type ForwardVerdict string

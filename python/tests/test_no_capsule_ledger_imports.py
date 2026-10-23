@@ -8,7 +8,7 @@ import ast
 import sys
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
+REPO_ROOT = Path(__file__).resolve().parents[2]
 FORBIDDEN = "capsule_ledger"
 
 
@@ -56,7 +56,7 @@ def _is_loader(func: ast.expr, loaders: tuple[set[str], set[str]]) -> bool:
 
 def _offenders() -> list[str]:
     found = []
-    for directory in ("capsule_engine", "tests", "scripts", "examples"):
+    for directory in ("python/capsule_engine", "python/tests", "python/scripts", "scripts", "examples"):
         for path in sorted((REPO_ROOT / directory).rglob("*.py")):
             hits = [m for m in _imported_modules(path) if m == FORBIDDEN or m.startswith(FORBIDDEN + ".")]
             if hits:
@@ -69,8 +69,8 @@ def test_no_capsule_ledger_imports():
 
 
 def test_detector_flags_an_aliased_import(tmp_path, monkeypatch):
-    package = tmp_path / "capsule_engine"
-    package.mkdir()
+    package = tmp_path / "python" / "capsule_engine"
+    package.mkdir(parents=True)
     (package / "a.py").write_text("from capsule_ledger.ledger.api import LedgerAPI\n", encoding="utf-8")
     (package / "b.py").write_text("from capsule_ledger import ledger as old\n", encoding="utf-8")
     (package / "c.py").write_text(
@@ -93,11 +93,11 @@ def test_detector_flags_an_aliased_import(tmp_path, monkeypatch):
     )
     monkeypatch.setattr(sys.modules[__name__], "REPO_ROOT", tmp_path)
     assert _offenders() == [
-        "capsule_engine/a.py: capsule_ledger.ledger.api",
-        "capsule_engine/b.py: capsule_ledger",
-        "capsule_engine/c.py: capsule_ledger.ledger.store",
-        "capsule_engine/d.py: capsule_ledger.ledger",
-        "capsule_engine/e.py: capsule_ledger.ledger.records",
-        "capsule_engine/f.py: capsule_ledger.ledger",
-        "capsule_engine/g.py: capsule_ledger.payload_store",
+        "python/capsule_engine/a.py: capsule_ledger.ledger.api",
+        "python/capsule_engine/b.py: capsule_ledger",
+        "python/capsule_engine/c.py: capsule_ledger.ledger.store",
+        "python/capsule_engine/d.py: capsule_ledger.ledger",
+        "python/capsule_engine/e.py: capsule_ledger.ledger.records",
+        "python/capsule_engine/f.py: capsule_ledger.ledger",
+        "python/capsule_engine/g.py: capsule_ledger.payload_store",
     ]

@@ -43,8 +43,8 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 
 SCANNED_PATHS = (
     REPO_ROOT / "capsule_engine",
-    REPO_ROOT / "docs",
-    REPO_ROOT / "README.md",
+    REPO_ROOT.parent / "docs",
+    REPO_ROOT.parent / "README.md",
 )
 
 _SCANNED_SUFFIXES = {".py", ".md", ".html", ".js"}

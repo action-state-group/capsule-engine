@@ -77,7 +77,7 @@ func testExecutedActsMatchTheEngine(t *testing.T, set string, sequences, wantSte
 		t.Fatal(err)
 	}
 	e, p := everyday036Engine(t)
-	// The engine's live check path (tests/test_executed_acts_window.py
+	// The engine's live check path (python/tests/test_executed_acts_window.py
 	// _decide_envelope) builds its GuardEngine from the pack's limits with no
 	// activated policy, so its caps evidence names no limit_sources.
 	e.limitSources = false

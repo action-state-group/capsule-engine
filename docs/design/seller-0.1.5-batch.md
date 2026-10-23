@@ -83,7 +83,7 @@ Steven ruled #186-#192 (2026-10-22 03:27 UTC) and #181 (2026-10-22).
 Users migrate once: one seller pack 0.1.5 and one everyday pack 0.3.8. No pack or capsulectl
 release is cut by this work; the coordinator plans it (rc20 or rc21). Until then the catalog
 packs on `main` carry the unreleased 0.1.5 / 0.3.8, and the first PR that touches each pack
-freezes the released one under `tests/fixtures/packs/` as #173 did.
+freezes the released one under `python/tests/fixtures/packs/` as #173 did.
 
 As built: no pack release was cut. #195 froze seller 0.1.4 (`c14c8f81…9e5b`) and #203 froze everyday
 0.3.7 (`c1cea374…7d4d`). On engine `main` the unreleased packs are seller 0.1.5 at
@@ -339,7 +339,7 @@ the listing word guard's Unicode hardening (lookalikes and marks), capsule-cli#3
 approved commit acts with a disposition (`deal.go` `basisDisposition`); E1b regenerates a seller
 live-history fixture from rc19 and tests the share after acceptance on it. And history carries
 only acts with an amount (`rules_checker.go` L783): the seller's commit act states its price,
-which the fixture confirms. (As built, #197: the fixture `tests/fixtures/release-on-acceptance/` was
+which the fixture confirms. (As built, #197: the fixture `python/tests/fixtures/release-on-acceptance/` was
 built with capsulectl from capsule-cli 6210b93, after rc19; its commit act seals `accept` and the
 buyer's block, and the shares decide live with no edit. The 31-day case is tested on moved records,
 because capsulectl's deal clock has no override.)
@@ -373,7 +373,7 @@ statement path. Muse's `record.go` gets the same mapping (future work: actionsta
 capsulectl seals `body.ordered_representations` in `task-authority/v0`. The sealed name stays.
 `promise_requires_approval/1.1.0` adds a config member `authorized_path`
 (`[body, ordered_representations]`); 1.0.0 keeps today's constant. The engine has no production live path; its live-history
-harness already passes `task_authority_record` (`tests/test_live_history.py` L220), and E2
+harness already passes `task_authority_record` (`python/tests/test_live_history.py` L220), and E2
 extends it to read `representing_opening` too. Muse is the live path and does both. Replay does the same: it
 resolves the task-authority record the check's `task_authority_ref` names in the bundle, binds
 it by digest, and passes it to the check (today no `_decide` branch passes one,
@@ -407,7 +407,7 @@ unverified; never Muse's own.
   them is not blank. As built (#205, capsule-cli#391), the marks are an explicit, frozen list of
   181 code points: every Unicode 17.0 Sentence_Terminal code point, every line terminator
   Python's `str.splitlines` uses, and U+2026. Both repositories hold it in a byte-identical
-  fixture (engine `tests/fixtures/sentence-marks.txt`, capsule-cli `plugins/internal/plugin/testdata/sentence-marks.txt`,
+  fixture (engine `python/tests/fixtures/sentence-marks.txt`, capsule-cli `plugins/internal/plugin/testdata/sentence-marks.txt`,
   sha256 `8869f15b…b9aa`), and each side's test compares its list with the fixture code point for
   code point. A blank claim is judged as Python's `str.strip` judges it on both sides.
 - Engine (E2): when the envelope gives `representing_opening` and it opens the commitment,
@@ -804,7 +804,7 @@ digests: `seller.recipient_role/1.2.0` `6216addf…89d1`, `seller.release_on_acc
 `854718b6…a832`, `promise_requires_approval/1.1.0` `52514fb6…e386` (#209; `66d1e62d…d5d5` at #205), `promise_never/1.1.0`
 `ed9e02ed…2b8b`, `offer_expiry/1.1.0` `e55083b3…90f1`, `seller.destination_rail/1.1.0`
 `a86844bd…be0e`, `action_class_gate/1.2.0` `39a7c5b9…97bf`, `required_disclosure/1.2.0`
-`cae96230…224f` (engine `tests/test_wicket_definition.py`).
+`cae96230…224f` (engine `python/tests/test_wicket_definition.py`).
 
 Not a door: #179 needs no `external-check-input/v0` member (option b); #191 is a test (#380, its
 consequence, is D9).

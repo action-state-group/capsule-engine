@@ -51,7 +51,7 @@ func TestSealDisposition213VectorsMatchTheirSHA256SUMS(t *testing.T) {
 	}
 }
 
-// claimsInHistory is the engine's claim_entries (tests/test_live_history.py):
+// claimsInHistory is the engine's claim_entries (python/tests/test_live_history.py):
 // every claim either thread's bundle seals by before, as a history entry (the
 // capsule with its disclosed agent_input and the sale's item_ref beside it).
 func claimsInHistory(t *testing.T, before string, itemRef json.RawMessage) []map[string]json.RawMessage {
@@ -103,7 +103,7 @@ func entryTime(t *testing.T, e map[string]json.RawMessage) string {
 }
 
 // given213 is the check input name of the staged live-history set given as
-// history says: the engine's _given (tests/test_live_history.py) for the six
+// history says: the engine's _given (python/tests/test_live_history.py) for the six
 // ways expected_live.without-deal-claims-step.json decides.
 func given213(t *testing.T, name, history string) []byte {
 	t.Helper()
@@ -282,7 +282,7 @@ func TestSealDisposition213BookingAgreesWithTheEngine(t *testing.T) {
 	}
 }
 
-// givenBooking213 is the engine's _given (tests/test_history_act_counterparty.py)
+// givenBooking213 is the engine's _given (python/tests/test_history_act_counterparty.py)
 // on a staged booking input: as sealed; an accept disposition on every
 // history act; and, with it, no counterparty_profile, then also no
 // counterparty block, or a block with uppercase ids.

@@ -21,7 +21,8 @@ from capsule_engine.report.live_check import decide_check_input
 from capsule_engine.report.live_history import _act_taxonomy_version, history_ledger
 
 ROOT = Path(__file__).resolve().parent.parent
-EMIT = ROOT / "go" / "guard" / "testdata" / "emit"
+REPO_ROOT = ROOT.parent
+EMIT = REPO_ROOT / "go" / "guard" / "testdata" / "emit"
 PACK = load_pack_dir(ROOT / "capsule_engine" / "packs" / "catalog" / "everyday")
 
 
@@ -85,7 +86,7 @@ def test_a_carried_taxonomy_with_the_engines_classes_is_the_same_classes():
 
 
 def test_a_failing_per_purchase_limit_still_stands_under_a_held_window():
-    envelope = json.loads((ROOT / "conformance-vectors" / "guard" / "v0" / "inputs" / "caps-held"
+    envelope = json.loads((REPO_ROOT / "conformance-vectors" / "guard" / "v0" / "inputs" / "caps-held"
                            / "short-history-over-limit.json").read_text())
     decision, caps = _caps(envelope)
     assert caps.result == "fail"

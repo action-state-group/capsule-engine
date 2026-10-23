@@ -53,13 +53,12 @@ Go release automation either:
 3. **RELEASING.md in the siblings' shape.** Name both rulesets under Safeguards, say the version
    is fetchable as soon as the tag exists, and add the check after tagging (below).
 
-**If Python publishing is approved later,** the Python lane is the siblings' with this repo's
-layout: copy `.github/release.py` byte for byte, add `.github/releases.json` with a single
-`python` entry (`pyproject.toml`, `python/v`, `publish-python.yml`), copy `tag-release.yml`,
-and copy `prepare-release.yml` with its package choice cut to `python`. Take
-`publish-python.yml` from agent-action-capsule (its separate build job runs `twine check`), with
-its `python/` working directory, `python/dist/` artifact path and `python/**` path filter moved
-to the repository root, where this `pyproject.toml` is. Before the first upload, an admin creates the `pypi` environment (tag
+**If Python publishing is approved later,** the Python lane is the siblings': copy
+`.github/release.py` byte for byte, add `.github/releases.json` with a single `python` entry
+(`python/pyproject.toml`, `python/v`, `publish-python.yml`), copy `tag-release.yml`, and copy
+`prepare-release.yml` with its package choice cut to `python`. Take `publish-python.yml` from
+agent-action-capsule (its separate build job runs `twine check`) with its `python/` working
+directory, `python/dist/` artifact path and `python/**` path filter as they are. Before the first upload, an admin creates the `pypi` environment (tag
 rule `python/v*`) and registers the PyPI trusted publisher.
 
 ## What this does not add

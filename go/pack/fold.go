@@ -27,7 +27,7 @@ type FoldFilter struct {
 	Value     yaml.Node
 }
 
-// Fold is one fold definition (capsule_engine/folds/definition.py), with the
+// Fold is one fold definition (python/capsule_engine/folds/definition.py), with the
 // digest capsule-engine computes over its canonical form.
 type Fold struct {
 	ID, Digest                 string

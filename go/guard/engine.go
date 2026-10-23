@@ -295,7 +295,7 @@ const (
 // counterparty_seen_before, so here it is caps alone in practice.
 var escalatable = map[string]bool{"caps": true, "counterparty_seen_before": true}
 
-// Outcome values (capsule_engine/guards/capsule.py:75-77).
+// Outcome values (python/capsule_engine/guards/capsule.py:75-77).
 const (
 	Allow    = "allow"
 	Deny     = "deny"

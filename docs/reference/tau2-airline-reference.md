@@ -8,7 +8,7 @@ fixture built to pass.
 ## Run it (offline, under a minute)
 
 ```console
-$ pip install -e ".[dev]"
+$ pip install -e "./python[dev]"
 $ python -m capsule_engine.examples.tau2_airline_reference --all --out-dir /tmp/tau2-airline
 dataset                        ALLOW      DENY   WITH-INSTRUMENTATION   CAPSULES   sample refusal capsule
 pilot1-gemini-2-5-flash        9 [1]     4 [1]                  0 [1]     22 [1]   f42fe531878454c8… (cancel_reservation, task "7")
@@ -49,11 +49,11 @@ $ capsule verify f42fe531878454c892488227c05de581068461ad26d1fac8fb2af7d4bd80345
 
 No live model calls happen anywhere in this path. Every number above is
 real and reproducible from the committed data — see
-`tests/test_tau2_airline_reference.py`.
+`python/tests/test_tau2_airline_reference.py`.
 
 ## What's being replayed, and why it isn't live inference
 
-Five datasets, vendored under `capsule_engine/examples/data/tau2_airline/`
+Five datasets, vendored under `python/capsule_engine/examples/data/tau2_airline/`
 (provenance recorded in that directory's `PROVENANCE.json`):
 
 | dataset | source | model | tasks |
@@ -91,7 +91,7 @@ tau2-bench airline's real `policy.md` rules against it:
 - **`cancel_reservation`**: cancellable if booked within 24 hours or
   business cabin (narrowed from `policy.md`'s full rule — see the
   `_cancel_eligibility` docstring in
-  `capsule_engine/examples/tau2_airline_reference.py` for exactly what's
+  `python/capsule_engine/examples/tau2_airline_reference.py` for exactly what's
   out of scope and why).
 
 Every replayed call goes through a real `GuardEngine.check()` and produces
@@ -110,7 +110,7 @@ generated committed transcripts — denies it, for the same reason.** This
 isn't a fixture built to demonstrate the guard; it's five different agents,
 none of them aware this reference exists, hitting the same real policy
 constraint and getting refused in five separate, real, unforced trajectories.
-`tests/test_tau2_airline_reference.py::test_task_17_basic_economy_denial_is_consistent_across_every_model`
+`python/tests/test_tau2_airline_reference.py::test_task_17_basic_economy_denial_is_consistent_across_every_model`
 checks this mechanically, not just in this doc's prose.
 
 ## WITH-INSTRUMENTATION: an honest capability gap, not a guess
@@ -160,12 +160,12 @@ combined number.
 
 ## Regenerating the vendored data
 
-`scripts/vendor_tau2_airline_reference_data.py` is the (non-runtime)
+`python/scripts/vendor_tau2_airline_reference_data.py` is the (non-runtime)
 extraction script that produced the five files under
-`capsule_engine/examples/data/tau2_airline/`. Its own docstring has the
+`python/capsule_engine/examples/data/tau2_airline/`. Its own docstring has the
 exact regeneration steps and the upstream source (tau2-bench's public
 `data/tau2/results/final/*_airline_*_4trials.json`, plus
 record-grounding-bench's pilot-1 log). Provenance for every vendored file
 — source repo, source filename, the exact upstream `git_commit` each
 result set was generated against, trial index used, event counts — is
-recorded in `capsule_engine/examples/data/tau2_airline/PROVENANCE.json`.
+recorded in `python/capsule_engine/examples/data/tau2_airline/PROVENANCE.json`.
