@@ -1,0 +1,919 @@
+{
+ "source": "go/guard/testdata/recipient-role-12-vectors",
+ "cases": [
+  {
+   "case": "inputs/buyer--email",
+   "kind": "check-input",
+   "pack": "seller-0.1.4",
+   "input": "go/guard/testdata/recipient-role-12-vectors/inputs/buyer--email.json",
+   "input_sha256": "2f2a5c735cc2308a7682d739f6a1a57f49a49a780a4e2deb02bd962398ee2689",
+   "frozen": true,
+   "expected": {
+    "outcome": "deny",
+    "constraints": [
+     {
+      "id": "dedupe",
+      "result": "pass",
+      "method": "exact_match_index_v0",
+      "evidence_digest": "a7ef0bd3517715acbbed0225b41316ab40512212769d7b8b8096b87d8a0293a0"
+     },
+     {
+      "id": "caps",
+      "result": "n/a",
+      "method": "",
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
+     },
+     {
+      "id": "verify_before_dispatch",
+      "result": "n/a",
+      "method": "agent_action_capsule.verify",
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
+     },
+     {
+      "id": "recipient_role",
+      "result": "pass",
+      "method": "set_membership_v0",
+      "evidence_digest": "2abee73aa1300e1f5c99178ac4bc205d73953885ff8a523cebfdbe7b8ab47c5d"
+     },
+     {
+      "id": "price_floor",
+      "result": "n/a",
+      "method": "committed_floor_threshold_v1",
+      "evidence_digest": "9d548b915de1ff97c046aa15d2f13fae31884894ff36be4ddba1fc9106988bed",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "promise_requires_approval",
+      "result": "n/a",
+      "method": "authority_or_bound_approval_v0",
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
+     },
+     {
+      "id": "promise_never",
+      "result": "n/a",
+      "method": "class_membership_v0",
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
+     },
+     {
+      "id": "required_disclosure",
+      "result": "n/a",
+      "method": "disclosure.class_seen/1.0.0",
+      "evidence_digest": "46a692401917ddcf0644832f8a53756b6b2b04dc87e1d4a4625d428ca911e5b5",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "offer_expiry",
+      "result": "n/a",
+      "method": "age_threshold_v0",
+      "evidence_digest": "299fbc9f7e6847eba5f93de60e12976aaef8f28c0cd4a303096c49daa495e0be",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "single_commitment",
+      "result": "n/a",
+      "method": "first_sealed_acceptance_v1",
+      "evidence_digest": "39ec56c6c92be9834f1042500b15fcf814b928782821ff1879834e29066f65df",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "destination_rail",
+      "result": "n/a",
+      "method": "set_membership_v0",
+      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "task_authority",
+      "result": "n/a",
+      "method": "bound_plan_containment_v0",
+      "evidence_digest": "c41e4b3a2077a40320e10ad50ccbfe5cc0efe57bd2d3dfe235357c61e8d051b9",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "release_on_acceptance",
+      "result": "fail",
+      "method": "cited_sealed_acceptance_v1",
+      "evidence_digest": "8a5d6def4db3524cd94407fcfe1a9c4fe19e864c1d03409cc4f167b9a57b4e75"
+     }
+    ]
+   }
+  },
+  {
+   "case": "inputs/courier--email",
+   "kind": "check-input",
+   "pack": "seller-0.1.4",
+   "input": "go/guard/testdata/recipient-role-12-vectors/inputs/courier--email.json",
+   "input_sha256": "f82b6f40a33a00ca512dd7444b46eb614d86a55396d2cd564cb875bde56aa215",
+   "frozen": true,
+   "expected": {
+    "outcome": "deny",
+    "constraints": [
+     {
+      "id": "dedupe",
+      "result": "pass",
+      "method": "exact_match_index_v0",
+      "evidence_digest": "a7ef0bd3517715acbbed0225b41316ab40512212769d7b8b8096b87d8a0293a0"
+     },
+     {
+      "id": "caps",
+      "result": "n/a",
+      "method": "",
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
+     },
+     {
+      "id": "verify_before_dispatch",
+      "result": "n/a",
+      "method": "agent_action_capsule.verify",
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
+     },
+     {
+      "id": "recipient_role",
+      "result": "fail",
+      "method": "set_membership_v0",
+      "evidence_digest": "3704a9e9e1541492941bf3c17f106ba35e0e67ca5d7f43d6b003872f2747f890"
+     },
+     {
+      "id": "price_floor",
+      "result": "n/a",
+      "method": "committed_floor_threshold_v1",
+      "evidence_digest": "9d548b915de1ff97c046aa15d2f13fae31884894ff36be4ddba1fc9106988bed",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "promise_requires_approval",
+      "result": "n/a",
+      "method": "authority_or_bound_approval_v0",
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
+     },
+     {
+      "id": "promise_never",
+      "result": "n/a",
+      "method": "class_membership_v0",
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
+     },
+     {
+      "id": "required_disclosure",
+      "result": "n/a",
+      "method": "disclosure.class_seen/1.0.0",
+      "evidence_digest": "46a692401917ddcf0644832f8a53756b6b2b04dc87e1d4a4625d428ca911e5b5",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "offer_expiry",
+      "result": "n/a",
+      "method": "age_threshold_v0",
+      "evidence_digest": "299fbc9f7e6847eba5f93de60e12976aaef8f28c0cd4a303096c49daa495e0be",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "single_commitment",
+      "result": "n/a",
+      "method": "first_sealed_acceptance_v1",
+      "evidence_digest": "39ec56c6c92be9834f1042500b15fcf814b928782821ff1879834e29066f65df",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "destination_rail",
+      "result": "n/a",
+      "method": "set_membership_v0",
+      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "task_authority",
+      "result": "n/a",
+      "method": "bound_plan_containment_v0",
+      "evidence_digest": "c41e4b3a2077a40320e10ad50ccbfe5cc0efe57bd2d3dfe235357c61e8d051b9",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "release_on_acceptance",
+      "result": "fail",
+      "method": "cited_sealed_acceptance_v1",
+      "evidence_digest": "8a5d6def4db3524cd94407fcfe1a9c4fe19e864c1d03409cc4f167b9a57b4e75"
+     }
+    ]
+   }
+  },
+  {
+   "case": "inputs/platform--email-pickup_area",
+   "kind": "check-input",
+   "pack": "seller-0.1.4",
+   "input": "go/guard/testdata/recipient-role-12-vectors/inputs/platform--email-pickup_area.json",
+   "input_sha256": "941a2d425b31e4171e1793a25e450247bf606d8edd6f2d2bd877cbcaf469353d",
+   "frozen": true,
+   "expected": {
+    "outcome": "deny",
+    "constraints": [
+     {
+      "id": "dedupe",
+      "result": "pass",
+      "method": "exact_match_index_v0",
+      "evidence_digest": "a7ef0bd3517715acbbed0225b41316ab40512212769d7b8b8096b87d8a0293a0"
+     },
+     {
+      "id": "caps",
+      "result": "n/a",
+      "method": "",
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
+     },
+     {
+      "id": "verify_before_dispatch",
+      "result": "n/a",
+      "method": "agent_action_capsule.verify",
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
+     },
+     {
+      "id": "recipient_role",
+      "result": "fail",
+      "method": "set_membership_v0",
+      "evidence_digest": "d54c670a9240dc9072e0db9de24b14822ff0cee8f722d79b36a67e5fa15428ec"
+     },
+     {
+      "id": "price_floor",
+      "result": "n/a",
+      "method": "committed_floor_threshold_v1",
+      "evidence_digest": "9d548b915de1ff97c046aa15d2f13fae31884894ff36be4ddba1fc9106988bed",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "promise_requires_approval",
+      "result": "n/a",
+      "method": "authority_or_bound_approval_v0",
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
+     },
+     {
+      "id": "promise_never",
+      "result": "n/a",
+      "method": "class_membership_v0",
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
+     },
+     {
+      "id": "required_disclosure",
+      "result": "n/a",
+      "method": "disclosure.class_seen/1.0.0",
+      "evidence_digest": "46a692401917ddcf0644832f8a53756b6b2b04dc87e1d4a4625d428ca911e5b5",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "offer_expiry",
+      "result": "n/a",
+      "method": "age_threshold_v0",
+      "evidence_digest": "299fbc9f7e6847eba5f93de60e12976aaef8f28c0cd4a303096c49daa495e0be",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "single_commitment",
+      "result": "n/a",
+      "method": "first_sealed_acceptance_v1",
+      "evidence_digest": "39ec56c6c92be9834f1042500b15fcf814b928782821ff1879834e29066f65df",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "destination_rail",
+      "result": "n/a",
+      "method": "set_membership_v0",
+      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "task_authority",
+      "result": "n/a",
+      "method": "bound_plan_containment_v0",
+      "evidence_digest": "c41e4b3a2077a40320e10ad50ccbfe5cc0efe57bd2d3dfe235357c61e8d051b9",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "release_on_acceptance",
+      "result": "n/a",
+      "method": "cited_sealed_acceptance_v1",
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the recipient is a platform, not a buyer; recipient_role measures it"
+     }
+    ]
+   }
+  },
+  {
+   "case": "inputs/platform--email",
+   "kind": "check-input",
+   "pack": "seller-0.1.4",
+   "input": "go/guard/testdata/recipient-role-12-vectors/inputs/platform--email.json",
+   "input_sha256": "0b20ffc1f28a37997d5f396595607c55a3ca1e81b9b330b63b298e7d4fa50d1c",
+   "frozen": true,
+   "expected": {
+    "outcome": "allow",
+    "constraints": [
+     {
+      "id": "dedupe",
+      "result": "pass",
+      "method": "exact_match_index_v0",
+      "evidence_digest": "a7ef0bd3517715acbbed0225b41316ab40512212769d7b8b8096b87d8a0293a0"
+     },
+     {
+      "id": "caps",
+      "result": "n/a",
+      "method": "",
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
+     },
+     {
+      "id": "verify_before_dispatch",
+      "result": "n/a",
+      "method": "agent_action_capsule.verify",
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
+     },
+     {
+      "id": "recipient_role",
+      "result": "pass",
+      "method": "set_membership_v0",
+      "evidence_digest": "d511a33fe8571c43022bdf2e38909f69bbf733813fb17b2bce22e69867089477"
+     },
+     {
+      "id": "price_floor",
+      "result": "n/a",
+      "method": "committed_floor_threshold_v1",
+      "evidence_digest": "9d548b915de1ff97c046aa15d2f13fae31884894ff36be4ddba1fc9106988bed",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "promise_requires_approval",
+      "result": "n/a",
+      "method": "authority_or_bound_approval_v0",
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
+     },
+     {
+      "id": "promise_never",
+      "result": "n/a",
+      "method": "class_membership_v0",
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
+     },
+     {
+      "id": "required_disclosure",
+      "result": "n/a",
+      "method": "disclosure.class_seen/1.0.0",
+      "evidence_digest": "46a692401917ddcf0644832f8a53756b6b2b04dc87e1d4a4625d428ca911e5b5",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "offer_expiry",
+      "result": "n/a",
+      "method": "age_threshold_v0",
+      "evidence_digest": "299fbc9f7e6847eba5f93de60e12976aaef8f28c0cd4a303096c49daa495e0be",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "single_commitment",
+      "result": "n/a",
+      "method": "first_sealed_acceptance_v1",
+      "evidence_digest": "39ec56c6c92be9834f1042500b15fcf814b928782821ff1879834e29066f65df",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "destination_rail",
+      "result": "n/a",
+      "method": "set_membership_v0",
+      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "task_authority",
+      "result": "n/a",
+      "method": "bound_plan_containment_v0",
+      "evidence_digest": "c41e4b3a2077a40320e10ad50ccbfe5cc0efe57bd2d3dfe235357c61e8d051b9",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "release_on_acceptance",
+      "result": "n/a",
+      "method": "cited_sealed_acceptance_v1",
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the recipient is a platform, not a buyer; recipient_role measures it"
+     }
+    ]
+   }
+  },
+  {
+   "case": "inputs/platform--no-class",
+   "kind": "check-input",
+   "pack": "seller-0.1.4",
+   "input": "go/guard/testdata/recipient-role-12-vectors/inputs/platform--no-class.json",
+   "input_sha256": "c35fd46340c883738d35f365ed9fe5a9108a66aef61ae73ed0bc0f7131dc7a99",
+   "frozen": true,
+   "expected": {
+    "outcome": "deny",
+    "constraints": [
+     {
+      "id": "dedupe",
+      "result": "pass",
+      "method": "exact_match_index_v0",
+      "evidence_digest": "a7ef0bd3517715acbbed0225b41316ab40512212769d7b8b8096b87d8a0293a0"
+     },
+     {
+      "id": "caps",
+      "result": "n/a",
+      "method": "",
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
+     },
+     {
+      "id": "verify_before_dispatch",
+      "result": "n/a",
+      "method": "agent_action_capsule.verify",
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
+     },
+     {
+      "id": "recipient_role",
+      "result": "fail",
+      "method": "set_membership_v0",
+      "evidence_digest": "127f7379fec85ce358af7baba4468f3b8dbfc9f4884e687512aa102d77470d3c"
+     },
+     {
+      "id": "price_floor",
+      "result": "n/a",
+      "method": "committed_floor_threshold_v1",
+      "evidence_digest": "9d548b915de1ff97c046aa15d2f13fae31884894ff36be4ddba1fc9106988bed",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "promise_requires_approval",
+      "result": "n/a",
+      "method": "authority_or_bound_approval_v0",
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
+     },
+     {
+      "id": "promise_never",
+      "result": "n/a",
+      "method": "class_membership_v0",
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
+     },
+     {
+      "id": "required_disclosure",
+      "result": "n/a",
+      "method": "disclosure.class_seen/1.0.0",
+      "evidence_digest": "46a692401917ddcf0644832f8a53756b6b2b04dc87e1d4a4625d428ca911e5b5",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "offer_expiry",
+      "result": "n/a",
+      "method": "age_threshold_v0",
+      "evidence_digest": "299fbc9f7e6847eba5f93de60e12976aaef8f28c0cd4a303096c49daa495e0be",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "single_commitment",
+      "result": "n/a",
+      "method": "first_sealed_acceptance_v1",
+      "evidence_digest": "39ec56c6c92be9834f1042500b15fcf814b928782821ff1879834e29066f65df",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "destination_rail",
+      "result": "n/a",
+      "method": "set_membership_v0",
+      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "task_authority",
+      "result": "n/a",
+      "method": "bound_plan_containment_v0",
+      "evidence_digest": "c41e4b3a2077a40320e10ad50ccbfe5cc0efe57bd2d3dfe235357c61e8d051b9",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "release_on_acceptance",
+      "result": "n/a",
+      "method": "cited_sealed_acceptance_v1",
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the recipient is a platform, not a buyer; recipient_role measures it"
+     }
+    ]
+   }
+  },
+  {
+   "case": "inputs/platform--phone",
+   "kind": "check-input",
+   "pack": "seller-0.1.4",
+   "input": "go/guard/testdata/recipient-role-12-vectors/inputs/platform--phone.json",
+   "input_sha256": "6676b9ea18b451f7a14d1af8fc619eae95f47d317e900bdad42c942eb1bf3500",
+   "frozen": true,
+   "expected": {
+    "outcome": "deny",
+    "constraints": [
+     {
+      "id": "dedupe",
+      "result": "pass",
+      "method": "exact_match_index_v0",
+      "evidence_digest": "a7ef0bd3517715acbbed0225b41316ab40512212769d7b8b8096b87d8a0293a0"
+     },
+     {
+      "id": "caps",
+      "result": "n/a",
+      "method": "",
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
+     },
+     {
+      "id": "verify_before_dispatch",
+      "result": "n/a",
+      "method": "agent_action_capsule.verify",
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
+     },
+     {
+      "id": "recipient_role",
+      "result": "fail",
+      "method": "set_membership_v0",
+      "evidence_digest": "cd2843a3d6b33a2e2c41575e2a56d17e3c89a4998f6901ac5992e236d6f78a52"
+     },
+     {
+      "id": "price_floor",
+      "result": "n/a",
+      "method": "committed_floor_threshold_v1",
+      "evidence_digest": "9d548b915de1ff97c046aa15d2f13fae31884894ff36be4ddba1fc9106988bed",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "promise_requires_approval",
+      "result": "n/a",
+      "method": "authority_or_bound_approval_v0",
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
+     },
+     {
+      "id": "promise_never",
+      "result": "n/a",
+      "method": "class_membership_v0",
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
+     },
+     {
+      "id": "required_disclosure",
+      "result": "n/a",
+      "method": "disclosure.class_seen/1.0.0",
+      "evidence_digest": "46a692401917ddcf0644832f8a53756b6b2b04dc87e1d4a4625d428ca911e5b5",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "offer_expiry",
+      "result": "n/a",
+      "method": "age_threshold_v0",
+      "evidence_digest": "299fbc9f7e6847eba5f93de60e12976aaef8f28c0cd4a303096c49daa495e0be",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "single_commitment",
+      "result": "n/a",
+      "method": "first_sealed_acceptance_v1",
+      "evidence_digest": "39ec56c6c92be9834f1042500b15fcf814b928782821ff1879834e29066f65df",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "destination_rail",
+      "result": "n/a",
+      "method": "set_membership_v0",
+      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "task_authority",
+      "result": "n/a",
+      "method": "bound_plan_containment_v0",
+      "evidence_digest": "c41e4b3a2077a40320e10ad50ccbfe5cc0efe57bd2d3dfe235357c61e8d051b9",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "release_on_acceptance",
+      "result": "n/a",
+      "method": "cited_sealed_acceptance_v1",
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the recipient is a platform, not a buyer; recipient_role measures it"
+     }
+    ]
+   }
+  },
+  {
+   "case": "inputs/platform--pickup_area",
+   "kind": "check-input",
+   "pack": "seller-0.1.4",
+   "input": "go/guard/testdata/recipient-role-12-vectors/inputs/platform--pickup_area.json",
+   "input_sha256": "82389bafac9333cca6699d1905c1539914f1a2018b9882e77448b594968ef2e1",
+   "frozen": true,
+   "expected": {
+    "outcome": "deny",
+    "constraints": [
+     {
+      "id": "dedupe",
+      "result": "pass",
+      "method": "exact_match_index_v0",
+      "evidence_digest": "a7ef0bd3517715acbbed0225b41316ab40512212769d7b8b8096b87d8a0293a0"
+     },
+     {
+      "id": "caps",
+      "result": "n/a",
+      "method": "",
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
+     },
+     {
+      "id": "verify_before_dispatch",
+      "result": "n/a",
+      "method": "agent_action_capsule.verify",
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
+     },
+     {
+      "id": "recipient_role",
+      "result": "fail",
+      "method": "set_membership_v0",
+      "evidence_digest": "0fa71b9d931bc82aeca875a244ecd6742b73e85bd252bf9167fd9486ee967c16"
+     },
+     {
+      "id": "price_floor",
+      "result": "n/a",
+      "method": "committed_floor_threshold_v1",
+      "evidence_digest": "9d548b915de1ff97c046aa15d2f13fae31884894ff36be4ddba1fc9106988bed",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "promise_requires_approval",
+      "result": "n/a",
+      "method": "authority_or_bound_approval_v0",
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
+     },
+     {
+      "id": "promise_never",
+      "result": "n/a",
+      "method": "class_membership_v0",
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
+     },
+     {
+      "id": "required_disclosure",
+      "result": "n/a",
+      "method": "disclosure.class_seen/1.0.0",
+      "evidence_digest": "46a692401917ddcf0644832f8a53756b6b2b04dc87e1d4a4625d428ca911e5b5",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "offer_expiry",
+      "result": "n/a",
+      "method": "age_threshold_v0",
+      "evidence_digest": "299fbc9f7e6847eba5f93de60e12976aaef8f28c0cd4a303096c49daa495e0be",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "single_commitment",
+      "result": "n/a",
+      "method": "first_sealed_acceptance_v1",
+      "evidence_digest": "39ec56c6c92be9834f1042500b15fcf814b928782821ff1879834e29066f65df",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "destination_rail",
+      "result": "n/a",
+      "method": "set_membership_v0",
+      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "task_authority",
+      "result": "n/a",
+      "method": "bound_plan_containment_v0",
+      "evidence_digest": "c41e4b3a2077a40320e10ad50ccbfe5cc0efe57bd2d3dfe235357c61e8d051b9",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "release_on_acceptance",
+      "result": "n/a",
+      "method": "cited_sealed_acceptance_v1",
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the recipient is a platform, not a buyer; recipient_role measures it"
+     }
+    ]
+   }
+  },
+  {
+   "case": "inputs/self--email",
+   "kind": "check-input",
+   "pack": "seller-0.1.4",
+   "input": "go/guard/testdata/recipient-role-12-vectors/inputs/self--email.json",
+   "input_sha256": "318a3ec986adfdddcdd27524cc7e86fef749d7077f0c6a408e5c4a64cda30236",
+   "frozen": true,
+   "expected": {
+    "outcome": "deny",
+    "constraints": [
+     {
+      "id": "dedupe",
+      "result": "pass",
+      "method": "exact_match_index_v0",
+      "evidence_digest": "a7ef0bd3517715acbbed0225b41316ab40512212769d7b8b8096b87d8a0293a0"
+     },
+     {
+      "id": "caps",
+      "result": "n/a",
+      "method": "",
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
+     },
+     {
+      "id": "verify_before_dispatch",
+      "result": "n/a",
+      "method": "agent_action_capsule.verify",
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
+     },
+     {
+      "id": "recipient_role",
+      "result": "pass",
+      "method": "set_membership_v0",
+      "evidence_digest": "a7ea6516b01668893515076667a266ad6898c911f18d80c37ffc2f4f43087e92"
+     },
+     {
+      "id": "price_floor",
+      "result": "n/a",
+      "method": "committed_floor_threshold_v1",
+      "evidence_digest": "9d548b915de1ff97c046aa15d2f13fae31884894ff36be4ddba1fc9106988bed",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "promise_requires_approval",
+      "result": "n/a",
+      "method": "authority_or_bound_approval_v0",
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
+     },
+     {
+      "id": "promise_never",
+      "result": "n/a",
+      "method": "class_membership_v0",
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
+     },
+     {
+      "id": "required_disclosure",
+      "result": "n/a",
+      "method": "disclosure.class_seen/1.0.0",
+      "evidence_digest": "46a692401917ddcf0644832f8a53756b6b2b04dc87e1d4a4625d428ca911e5b5",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "offer_expiry",
+      "result": "n/a",
+      "method": "age_threshold_v0",
+      "evidence_digest": "299fbc9f7e6847eba5f93de60e12976aaef8f28c0cd4a303096c49daa495e0be",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "single_commitment",
+      "result": "n/a",
+      "method": "first_sealed_acceptance_v1",
+      "evidence_digest": "39ec56c6c92be9834f1042500b15fcf814b928782821ff1879834e29066f65df",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "destination_rail",
+      "result": "n/a",
+      "method": "set_membership_v0",
+      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "task_authority",
+      "result": "n/a",
+      "method": "bound_plan_containment_v0",
+      "evidence_digest": "c41e4b3a2077a40320e10ad50ccbfe5cc0efe57bd2d3dfe235357c61e8d051b9",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "release_on_acceptance",
+      "result": "fail",
+      "method": "cited_sealed_acceptance_v1",
+      "evidence_digest": "8a5d6def4db3524cd94407fcfe1a9c4fe19e864c1d03409cc4f167b9a57b4e75"
+     }
+    ]
+   }
+  },
+  {
+   "case": "inputs/third_party--email",
+   "kind": "check-input",
+   "pack": "seller-0.1.4",
+   "input": "go/guard/testdata/recipient-role-12-vectors/inputs/third_party--email.json",
+   "input_sha256": "27d51ee2ca1459493f6092a2c7c9773241daff1478a2a9f461ba6bb7b2ef398e",
+   "frozen": true,
+   "expected": {
+    "outcome": "deny",
+    "constraints": [
+     {
+      "id": "dedupe",
+      "result": "pass",
+      "method": "exact_match_index_v0",
+      "evidence_digest": "a7ef0bd3517715acbbed0225b41316ab40512212769d7b8b8096b87d8a0293a0"
+     },
+     {
+      "id": "caps",
+      "result": "n/a",
+      "method": "",
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
+     },
+     {
+      "id": "verify_before_dispatch",
+      "result": "n/a",
+      "method": "agent_action_capsule.verify",
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
+     },
+     {
+      "id": "recipient_role",
+      "result": "fail",
+      "method": "set_membership_v0",
+      "evidence_digest": "31efaa3b3cbcf3e79d173ed7091dfe3066ae90ff55d1ed253a735e7e90f0fc76"
+     },
+     {
+      "id": "price_floor",
+      "result": "n/a",
+      "method": "committed_floor_threshold_v1",
+      "evidence_digest": "9d548b915de1ff97c046aa15d2f13fae31884894ff36be4ddba1fc9106988bed",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "promise_requires_approval",
+      "result": "n/a",
+      "method": "authority_or_bound_approval_v0",
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
+     },
+     {
+      "id": "promise_never",
+      "result": "n/a",
+      "method": "class_membership_v0",
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
+     },
+     {
+      "id": "required_disclosure",
+      "result": "n/a",
+      "method": "disclosure.class_seen/1.0.0",
+      "evidence_digest": "46a692401917ddcf0644832f8a53756b6b2b04dc87e1d4a4625d428ca911e5b5",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "offer_expiry",
+      "result": "n/a",
+      "method": "age_threshold_v0",
+      "evidence_digest": "299fbc9f7e6847eba5f93de60e12976aaef8f28c0cd4a303096c49daa495e0be",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "single_commitment",
+      "result": "n/a",
+      "method": "first_sealed_acceptance_v1",
+      "evidence_digest": "39ec56c6c92be9834f1042500b15fcf814b928782821ff1879834e29066f65df",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "destination_rail",
+      "result": "n/a",
+      "method": "set_membership_v0",
+      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "task_authority",
+      "result": "n/a",
+      "method": "bound_plan_containment_v0",
+      "evidence_digest": "c41e4b3a2077a40320e10ad50ccbfe5cc0efe57bd2d3dfe235357c61e8d051b9",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "release_on_acceptance",
+      "result": "fail",
+      "method": "cited_sealed_acceptance_v1",
+      "evidence_digest": "8a5d6def4db3524cd94407fcfe1a9c4fe19e864c1d03409cc4f167b9a57b4e75"
+     }
+    ]
+   }
+  }
+ ]
+}
