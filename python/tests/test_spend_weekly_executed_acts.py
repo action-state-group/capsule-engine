@@ -336,7 +336,7 @@ def test_an_act_older_than_the_window_or_of_another_operator_is_not_counted():
 UNREADABLE = {"constraint_id": "caps", "in_scope": True, "missing_field": "spend_minor"}
 
 
-def test_an_executed_act_whose_spend_cannot_be_read_is_not_evaluable_and_asks():
+def test_an_executed_act_whose_spend_cannot_be_read_is_held_and_asks():
     """No spend: the total is not known. A transfer nothing else fails would
     be allowed; it is asked about instead, and its verdict is the escalation
     (#217)."""

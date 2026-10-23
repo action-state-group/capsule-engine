@@ -13,8 +13,8 @@ the packs and definitions are those of 0.1.0.
 - Changed (capsule-engine#210, switch-over gate 2): a record or history act whose disclosed
   body is not the one its capsule seals is refused with the reason first and the id and
   digests last, so a caller that shows only the first few hundred bytes (capsule-cli shows the
-  first 300 of a checker's stderr) still shows a refusal. `DecodeCheckInput` and
-  `DecodeCheckInputRecord` now return "the record's body is not the one its capsule seals:
+  first 300 of a checker's stderr) still shows a refusal. `DecodeCheckInput`,
+  `DecodeCheckInputRecord`, `DecodeRecord` and `ReadSaleBundle` now return "the record's body is not the one its capsule seals:
   the disclosed agent_input digests to X, not the header's agent_input_digest Y", in place of
   "record: the disclosed agent_input digests to X, not the header's agent_input_digest Y: the
   body is not the one the capsule seals". `DecodeHistoryAct` returns "a history act's body is
@@ -23,6 +23,8 @@ the packs and definitions are those of 0.1.0.
   header has no model_attestation.compute_attestation.agent_input_digest". Every other
   refusal of a history act also leads with its reason and names the act after it, as
   "a history act's capsule header has no operator (act ID)".
+  A record of a sale bundle's deal reads "the body of a record of the deal is not the one its
+  capsule seals (record ID): ..." in place of "record ID of the deal: record: ...".
 - Changed (capsule-engine#217): `Report` labels a held caps window with an approver, where
   nothing failed, with the escalation: `CheckReport.Decision` is `escalate` (it asks for
   approval), no longer `not_evaluable`. This matches the Python engine's
