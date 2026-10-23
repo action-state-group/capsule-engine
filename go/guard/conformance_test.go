@@ -400,6 +400,11 @@ func TestConformanceVectors(t *testing.T) {
 				if !agrees(got, k.Go, true) {
 					t.Errorf("%s: Go now decides %s, not the pinned %s: re-pin or close %s", id, describe(got), describe(k.Go), k.Issue)
 				}
+				// A sale's pin covers its verification only: every step
+				// still agrees, so a re-pin cannot accept a step divergence.
+				if c.Kind == "sale-bundle" && !sameDecision(conformanceDecision{Steps: got.Steps}, conformanceDecision{Steps: c.Expected.Steps}) {
+					t.Errorf("%s: a sale's steps are not pinned: %s", id, difference(conformanceDecision{Steps: got.Steps}, conformanceDecision{Steps: c.Expected.Steps}))
+				}
 				continue
 			}
 			if !sameDecision(got, c.Expected) {
