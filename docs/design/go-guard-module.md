@@ -82,7 +82,7 @@ it touches:
 - **Kinds.** Two kinds are built.
   - `check-input` is decided by `capsule_engine.report.live_check.decide_check_input`, the one
     library function a live check now goes through. It is wired as `build_engine` wires an
-    install, and `tests/test_live_history.py` calls it.
+    install, and `python/tests/test_live_history.py` calls it.
   - `action-ledger` is decided by `decide_steps`. Its expected steps carry the capsule id the
     engine sealed, and the Go runner gives that id to the record it appends.
 
@@ -185,7 +185,7 @@ moves. Whatever names Muse, or exists for one Muse verb or one Muse release deci
 | Muse path | Where it goes | Why |
 |---|---|---|
 | `internal/canon` (JCS values, `json.go`) | `go/canon` | a canonical JSON port, used by every digest |
-| `internal/pack` (loader, digests, fold definitions, pack source) | `go/pack` | the pack runtime: the Go half of `capsule_engine/packs`, `guards/wickets/loader.py` and `folds/` |
+| `internal/pack` (loader, digests, fold definitions, pack source) | `go/pack` | the pack runtime: the Go half of `python/capsule_engine/packs`, `guards/wickets/loader.py` and `folds/` |
 | `internal/pack` `partyPacks` / `ForPartyRole` (which pack version serves which party role), and `packs`' un-versioned aliases (`Everyday`, `EverydayDir`, `Seller`, ...) with `catalogFor`'s built-in catalog default | stay in Muse, as caller-supplied values | which pack a product serves, and which catalog a bare `--pack` resolves against, are that product's release decisions (Muse #248 switches them for rc21) |
 | `packs/` (embedded byte-for-byte pack copies, `engine/action_taxonomy.json`) | `go/packs`, generated (§3) | copies of this repo's own catalog |
 | `internal/guard`: the engine, gate, checks, fold, record, history, taxonomy and every wicket check (dedupe, caps and operator limits, seen_before, price_floor, offer_expiry, release, single_commitment, promise and statements, task_authority, change checks, party_role, deal_id, commitment) | `go/guard` | a port of `guards/engine.py`, `guards/checks/*` and `folds/engine.py`. Each file's header already names its Python source |
@@ -241,7 +241,7 @@ go/
   guard/                from internal/guard
   guard/testdata/       the moved vector sets that pass §12
 conformance-vectors/
-  guard/v0/             shared vectors (§5), read by tests/ and by go/guard's conformance_test.go
+  guard/v0/             shared vectors (§5), read by python/tests/ and by go/guard's conformance_test.go
 .github/workflows/conformance.yml
 ```
 
@@ -270,11 +270,11 @@ functions and `source.go`'s pack list, which are hand-written in Muse today).
 
 The generator has four sources and nothing else:
 
-- `capsule_engine/packs/catalog/<pack>/pack.yaml`;
-- `capsule_engine/guards/wickets/catalog_defs/`;
-- `capsule_engine/folds/catalog_defs/` (spend.weekly, counterparty.seen_before,
+- `python/capsule_engine/packs/catalog/<pack>/pack.yaml`;
+- `python/capsule_engine/guards/wickets/catalog_defs/`;
+- `python/capsule_engine/folds/catalog_defs/` (spend.weekly, counterparty.seen_before,
   disclosure.\*);
-- `capsule_engine/guards/action_taxonomy.json`.
+- `python/capsule_engine/guards/action_taxonomy.json`.
 
 Two kinds of pack version go into the tree:
 
@@ -328,7 +328,7 @@ reaches the same authorization and verification-failure branches.
 
 The new Python functions configure the engine the way the Go guard runs: observe mode, the
 runnable checks, the ask sets, the record taxonomy, and the task-authority, floor and
-representing openings. Today that setup lives in test helpers (`tests/test_live_history.py`
+representing openings. Today that setup lives in test helpers (`python/tests/test_live_history.py`
 `_live_engine` / `_decide`). PR B moves it into these functions, and the existing tests then call
 them. That is a test-only refactor with no behavior change.
 

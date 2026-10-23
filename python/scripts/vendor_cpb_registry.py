@@ -59,8 +59,8 @@ import subprocess
 import sys
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
-REGISTRY_PKG = REPO_ROOT / "capsule_engine" / "registry"
+REPO_ROOT = Path(__file__).resolve().parents[2]
+REGISTRY_PKG = REPO_ROOT / "python" / "capsule_engine" / "registry"
 CPB_OUT = REGISTRY_PKG / "cpb_registry.json"
 CONVENTIONS = REGISTRY_PKG / "conventions.json"
 

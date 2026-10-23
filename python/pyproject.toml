@@ -97,8 +97,15 @@ line-length = 110
 target-version = "py310"
 # The Go guard's vector generators are frozen with the vectors they wrote
 # (each pinned by sha256 in its set's PROVENANCE.json), so they are not linted.
+# CI runs ruff from the repository root with --config python/pyproject.toml,
+# which resolves this path against the root.
 extend-exclude = ["go/guard/testdata"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP"]
 ignore = ["E501"]
+
+# Named, because a run from the repository root does not find the package
+# under the default src.
+[tool.ruff.lint.isort]
+known-first-party = ["capsule_engine"]

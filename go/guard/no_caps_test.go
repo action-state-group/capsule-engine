@@ -26,7 +26,7 @@ func seller012Engine(t *testing.T) (*Engine, pack.Pack) {
 }
 
 // noCapsTransfer is a money transfer: the one class caps/1.0.0 limits, so
-// caps would read it under 0.1.1 (capsule-engine tests/test_pack_without_caps.py).
+// caps would read it under 0.1.1 (capsule-engine python/tests/test_pack_without_caps.py).
 func noCapsTransfer(t *testing.T, n int, taxonomy string) Action {
 	t.Helper()
 	tv := ""

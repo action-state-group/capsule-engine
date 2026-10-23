@@ -29,7 +29,7 @@ from capsule_engine.packs.loader import load_pack_dir
 from capsule_engine.packs.schema import EPISTEMIC_TYPE_VALUES, ClauseSpec, EvidenceContract
 
 REPO_ROOT = Path(__file__).parent.parent
-EXAMPLES_DIR = REPO_ROOT / "examples" / "contracts"
+EXAMPLES_DIR = REPO_ROOT.parent / "examples" / "contracts"
 NEGATIVE_DIR = EXAMPLES_DIR / "negative"
 VENDORED_EPISTEMIC_TYPES = REPO_ROOT / "capsule_engine" / "schemas" / "vendor" / "epistemic-types.json"
 

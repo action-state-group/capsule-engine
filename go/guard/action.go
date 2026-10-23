@@ -3,7 +3,7 @@
 // credential_pattern, recurring_charge) and the decision they compose into.
 // The semantics are the vendored wicket and fold definitions'; where a
 // definition leaves something open, capsule-engine 559288d0f61a's
-// implementation (capsule_engine/guards/...) was read and is cited at the
+// implementation (python/capsule_engine/guards/...) was read and is cited at the
 // point it decides. The pack is the authority: an engine is built from a
 // loaded pack and refuses one whose definitions are not the ones ported.
 //
@@ -40,7 +40,7 @@ import (
 	"time"
 )
 
-// Action is one normalized candidate action (capsule_engine/guards/action.py
+// Action is one normalized candidate action (python/capsule_engine/guards/action.py
 // Action). Absent optional fields are nil.
 type Action struct {
 	Verb        string  `json:"verb"`

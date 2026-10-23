@@ -49,7 +49,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: install
-        run: pip install -e ".[dev]"
+        run: pip install -e "./python[dev]"
       - name: the embedded pack tree is what the catalog generates
         run: python scripts/generate_go_packs.py --check
 
@@ -61,7 +61,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: install
-        run: pip install -e ".[dev]"
+        run: pip install -e "./python[dev]"
       - name: the Python engine decides every shared vector as written, and the coverage gate holds
         run: python scripts/conformance_vectors.py --check
 

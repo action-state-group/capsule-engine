@@ -12,7 +12,7 @@ import (
 // counts a record whose disposition.decision is carried_out beside an
 // accepted one, leaving dry runs out; /2.0.0 counts accepted ones only, and
 // no spend fold counts a carried_out record. Held against the engine's own
-// fold evaluation of the engine side's cases (tests/test_counterparty_seen_before_
+// fold evaluation of the engine side's cases (python/tests/test_counterparty_seen_before_
 // carried_out.py), every vendored fold that could read them
 // (testdata/parity/generate_seen_before_carried_out.py, "fold"). The file
 // was regenerated at capsule-engine d1293252 (#126's merge), whose real

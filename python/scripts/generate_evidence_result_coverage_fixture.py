@@ -42,7 +42,7 @@ from capsule_engine.report.result import (
 )
 
 ROOT = Path(__file__).resolve().parent.parent
-CONTRACT_PATH = ROOT / "examples" / "contracts" / "ai-act-human-oversight.json"
+CONTRACT_PATH = ROOT.parent / "examples" / "contracts" / "ai-act-human-oversight.json"
 FIXTURE_PATH = ROOT / "tests" / "fixtures" / "evidence-result" / "coverage-report-result.json"
 GENERATED_AT = "2026-10-01T00:00:00Z"
 OTEL_BLOCK_KEY = "org.agentactioncapsule.otel"

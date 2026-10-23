@@ -29,4 +29,4 @@ wheel="$(ls "$work"/dist/capsule_engine-*.whl)"
 "$work/venv/bin/python" -m pip install --quiet "$wheel" "$@"
 
 cd "$work"
-"$work/venv/bin/python" "$repo/scripts/clean_room_wheel_check.py" "$repo/examples/contracts"
+"$work/venv/bin/python" "$repo/scripts/clean_room_wheel_check.py" "$repo/../examples/contracts"

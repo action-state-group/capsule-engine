@@ -30,12 +30,12 @@ capsule-engine is installed from source; it is not on PyPI:
 git clone https://github.com/action-state-group/capsule-engine.git
 cd capsule-engine
 python3 -m venv .venv && source .venv/bin/activate
-pip install -e .
+pip install -e ./python
 ```
 
 `checkpointed-local-log` (0.6.0 or later), `capsule-emit` (0.12.0 or later)
 and `agent-action-capsule` (0.11.0 or later) come from PyPI. With these steps
-the test suite passes (`pip install pytest "mcp<2"`, then `python -m pytest`).
+the test suite passes (`pip install pytest "mcp<2"`, then `python -m pytest` in `python/`).
 
 ## The `capsule-engine` command
 
@@ -82,7 +82,7 @@ record-query verbs; the default is `full`. Run any command with `--help`.
   labels) is loaded at runtime. `cpb_registry.json` is a verbatim copy of
   `scitt-payload-binding`'s `registry.json` at the commit it names
   (`_vendored_commit`); no runtime code loads it, and like any vendored
-  snapshot it can fall behind its source: `scripts/vendor_cpb_registry.py`
+  snapshot it can fall behind its source: `python/scripts/vendor_cpb_registry.py`
   refreshes it and the `vendor-drift` workflow checks it.
 - `tenants.py` — engine-instance-per-tenant provisioning, behind
   `capsule-engine tenant`.
@@ -92,7 +92,7 @@ record-query verbs; the default is `full`. Run any command with `--help`.
   (`python -m capsule_engine.examples.tau2_airline_reference --all`) and a
   tau2 simulation sealed as one conversation-exchange capsule.
 
-### Catalog packs (`capsule_engine/packs/catalog/`)
+### Catalog packs (`python/capsule_engine/packs/catalog/`)
 
 | Pack | `pack_id` | What it is |
 |---|---|---|
