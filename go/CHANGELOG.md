@@ -5,8 +5,11 @@ and `portedDefinitions` (`guard/engine.go`).
 
 ## Unreleased
 
-The Go guard, moved into this repository unchanged apart from the caller-side
-parameters in `README.md` ("What the caller decides").
+## 0.1.0 — 2026-10-23
+
+The first release of the module `github.com/action-state-group/capsule-engine/go`: the
+Go guard, moved into this repository unchanged apart from the caller-side parameters in
+`README.md` ("What the caller decides").
 
 - Packs: asg/everyday/0.3.4-0.3.8 and asg/seller/0.1.0-0.1.5, at the digests
   in their PROVENANCE.json.
