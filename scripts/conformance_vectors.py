@@ -20,7 +20,19 @@ Kinds:
   decision is ``{"steps": [<decision>, ...]}``, each step with the
   ``capsule_id`` the engine sealed for it: the caller seals in Go, so the Go
   runner gives the record it appends that id, and a later step's evidence
-  naming an earlier decision names the same capsule.
+  naming an earlier decision names the same capsule;
+* ``sale-bundle``: ``{"sale_bundle": <path>, "verify": <path>}``, a sale bundle
+  and what capsulectl's ``verify --bundle`` reported of it, replayed by
+  ``decide_sale_bundle`` (Go: ``ReadSaleBundle`` with the verify report's
+  states, then each check's ``Check`` and ``CheckSale`` on the replay's
+  ledger). Its expected decision is ``{"sale": {"complete", "findings"},
+  "steps": [<decision>, ...]}``, one step per check the replay decides, in
+  its order. Here a step's ``capsule_id`` is the checked record's own (in an
+  ``action-ledger`` step it is the capsule the engine sealed), and its
+  ``sealed_capsule_id`` is the decision the replay sealed for it, which the
+  Go runner's replay ledger takes as that record's id. The Go runner works
+  out its own step list, in seal order, so a check one side decides and the
+  other does not is a difference.
 
 A decision is compared as its outcome and, per constraint in order, its id,
 result, method ("" when it has none) and the JCS-SHA256 of its evidence, which
@@ -61,7 +73,7 @@ from agent_action_capsule import json_digest
 
 from capsule_engine.guards.wickets.loader import load_definition_file as load_wicket_file
 from capsule_engine.packs import load_pack_dir
-from capsule_engine.report.live_check import decide_check_input, decide_steps
+from capsule_engine.report.live_check import decide_check_input, decide_sale_bundle, decide_steps
 
 ROOT = Path(__file__).resolve().parent.parent
 VECTORS = ROOT / "conformance-vectors" / "guard" / "v0"
@@ -127,12 +139,16 @@ def decide(case: dict) -> tuple[dict, set[str]]:
     """The expected decision of one case, from the Python engine, and every
     string its constraints' evidence holds (a fold that ran names its digest
     there)."""
-    if case["kind"] not in ("check-input", "action-ledger"):
+    if case["kind"] not in ("check-input", "action-ledger", "sale-bundle"):
         raise ValueError(f"{case['case']}: unknown kind {case['kind']!r}")
     data = json.loads((ROOT / case["input"]).read_text())
     try:
         if case["kind"] == "check-input":
             decisions = [decide_check_input(_pack(case["pack"]), data).decision]
+        elif case["kind"] == "sale-bundle":
+            sale, result = decide_sale_bundle(_pack(case["pack"]), json.loads((ROOT / data["sale_bundle"]).read_text()))
+            decisions = [s.decision for s in result.decisions]
+            records = [s.record for s in result.decisions]
         else:
             decisions = decide_steps(_pack(case["pack"]), data["steps"])
     except Exception as exc:  # the engine refuses the input
@@ -140,6 +156,12 @@ def decide(case: dict) -> tuple[dict, set[str]]:
     seen = set().union(set(), *(_strings(c.evidence) for d in decisions for c in d.constraints))
     if case["kind"] == "check-input":
         return _decision(decisions[0]), seen
+    if case["kind"] == "sale-bundle":
+        steps = [
+            {**_decision(d), "capsule_id": r.get("capsule_id", ""), "sealed_capsule_id": (d.capsule or {}).get("capsule_id", "")}
+            for d, r in zip(decisions, records, strict=True)
+        ]
+        return {"sale": {"complete": sale.complete, "findings": list(sale.findings)}, "steps": steps}, seen
     steps = [{**_decision(d), "capsule_id": (d.capsule or {}).get("capsule_id", "")} for d in decisions]
     return {"steps": steps}, seen
 
@@ -196,6 +218,8 @@ def _kind_and_pack(data) -> tuple[str, str] | None:
         return "check-input", current["seller"] if party == "seller" else current["everyday"]
     if isinstance(data, dict) and isinstance(data.get("steps"), list):
         return "action-ledger", current["everyday"]
+    if isinstance(data, dict) and isinstance(data.get("sale_bundle"), str):
+        return "sale-bundle", current["seller"]
     return None
 
 

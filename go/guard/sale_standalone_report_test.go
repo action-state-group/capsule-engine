@@ -53,6 +53,13 @@ func standaloneVerified(t *testing.T, raw []byte) SaleVerification {
 // x-deal-sale/v0 names it invalid or incomplete.
 func verifiedIn(t *testing.T, dir string, raw []byte) SaleVerification {
 	t.Helper()
+	return verifiedBy(t, readFile(t, dir, "verify", "sale.verify.json"), raw)
+}
+
+// verifiedBy is what one capsulectl verify --bundle report says of the sale
+// bundle raw, read as verifiedIn reads it.
+func verifiedBy(t *testing.T, verify, raw []byte) SaleVerification {
+	t.Helper()
 	var report struct {
 		Verdict    string            `json:"verdict"`
 		Identity   map[string]string `json:"record_identity"`
@@ -63,7 +70,7 @@ func verifiedIn(t *testing.T, dir string, raw []byte) SaleVerification {
 			Findings []string `json:"findings"`
 		} `json:"extensions"`
 	}
-	if err := json.Unmarshal(readFile(t, dir, "verify", "sale.verify.json"), &report); err != nil {
+	if err := json.Unmarshal(verify, &report); err != nil {
 		t.Fatal(err)
 	}
 	v := SaleVerification{Sale: report.Verdict == "VALID", Records: map[string]bool{}, Threads: map[string]bool{}}

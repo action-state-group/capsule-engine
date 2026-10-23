@@ -275,6 +275,14 @@ func sealOrder(t *testing.T, s SaleBundle) []struct {
 // ledger so far and written to it as a dry run.
 func replayLedger(t *testing.T, e *Engine, s SaleBundle, capsuleID string) []Record {
 	t.Helper()
+	return replayLedgerSealed(t, e, s, capsuleID, nil)
+}
+
+// replayLedgerSealed is replayLedger with each decided record given the
+// capsule id sealed names for it, where it names one: the caller seals, so
+// a replay that sealed its own decisions (the engine's) names them.
+func replayLedgerSealed(t *testing.T, e *Engine, s SaleBundle, capsuleID string, sealed map[string]string) []Record {
+	t.Helper()
 	var ledger []Record
 	claims := map[string]bool{}
 	for _, x := range sealOrder(t, s) {
@@ -307,6 +315,9 @@ func replayLedger(t *testing.T, e *Engine, s SaleBundle, capsuleID string) []Rec
 		}
 		rec := RecordFor(a, d)
 		rec.CapsuleID, rec.DryRun = id, ptr(true)
+		if as, ok := sealed[id]; ok {
+			rec.CapsuleID = as
+		}
 		ledger = append(ledger, rec)
 	}
 	t.Fatalf("no carried record %s", capsuleID)

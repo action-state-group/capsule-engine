@@ -1,0 +1,4 @@
+{
+ "sale_bundle": "go/guard/testdata/sale-replay-vectors/sale-b-withheld.bundle.json",
+ "verify": "go/guard/testdata/sale-replay-vectors/verify/sale-b-withheld.verify.json"
+}

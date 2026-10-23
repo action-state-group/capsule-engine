@@ -44,9 +44,15 @@ type conformanceDecision struct {
 	Constraints []conformanceConstraint `json:"constraints,omitempty"`
 	// Steps are an action-ledger case's decisions, one per step.
 	Steps []conformanceDecision `json:"steps,omitempty"`
-	// CapsuleID is the capsule the Python engine sealed for a step. The
-	// caller seals in Go, so the runner gives the record it appends this id.
+	// CapsuleID is the capsule the Python engine sealed for an
+	// action-ledger step (the caller seals in Go, so the runner gives the
+	// record it appends this id), or a sale-bundle step's checked record.
 	CapsuleID string `json:"capsule_id,omitempty"`
+	// SealedCapsuleID is the decision capsule the engine's replay sealed for
+	// a sale-bundle step.
+	SealedCapsuleID string `json:"sealed_capsule_id,omitempty"`
+	// Sale is a sale-bundle case's sale.
+	Sale *conformanceSale `json:"sale,omitempty"`
 }
 
 type conformanceConstraint struct {
@@ -194,9 +200,117 @@ func decideCase(t *testing.T, engines map[string]*Engine, c conformanceCase) con
 			ledger = append(ledger, r)
 		}
 		return out
+	case "sale-bundle":
+		var in struct {
+			SaleBundle string `json:"sale_bundle"`
+			Verify     string `json:"verify"`
+		}
+		if err := json.Unmarshal(raw, &in); err != nil {
+			t.Fatalf("%s: %v", c.Case, err)
+		}
+		bundlePath := filepath.Join(conformanceRoot, filepath.FromSlash(in.SaleBundle))
+		verifyPath := filepath.Join(conformanceRoot, filepath.FromSlash(in.Verify))
+		if !strings.HasPrefix(verifyPath, filepath.Join(filepath.Dir(bundlePath), "verify")+string(filepath.Separator)) &&
+			!strings.HasPrefix(verifyPath, filepath.Join(filepath.Dir(filepath.Dir(bundlePath)), "verify")+string(filepath.Separator)) {
+			t.Fatalf("%s: the verify report is not under its fixture's verify/", c.Case)
+		}
+		bundle, err := os.ReadFile(bundlePath)
+		if err != nil {
+			t.Fatal(err)
+		}
+		verify, err := os.ReadFile(verifyPath)
+		if err != nil {
+			t.Fatal(err)
+		}
+		sale, err := ReadSaleBundle(bundle, verifiedBy(t, verify, bundle))
+		if err != nil {
+			return conformanceDecision{Error: "decode: " + err.Error()}
+		}
+		out := conformanceDecision{Sale: &conformanceSale{Complete: sale.Complete(), Findings: sale.Findings}}
+		if out.Sale.Findings == nil {
+			out.Sale.Findings = []string{}
+		}
+		// The engine's replay seals a decision of its own for each check, and
+		// a later check's evidence names it; the caller seals in Go, so the
+		// replay here gives each decided record that capsule's id.
+		sealed := map[string]string{}
+		for _, step := range c.Expected.Steps {
+			if step.SealedCapsuleID != "" {
+				sealed[step.CapsuleID] = step.SealedCapsuleID
+			}
+		}
+		// Which checks are decided, and in what order, is this port's own:
+		// the replay walks the records in seal order with the replay ledger's
+		// own skips, so a check one side decides and the other does not is a
+		// difference in the step list.
+		for _, step := range replaySteps(t, e, sale, sealed) {
+			got := step.decision
+			got.CapsuleID, got.SealedCapsuleID = step.id, sealed[step.id]
+			out.Steps = append(out.Steps, got)
+		}
+		return out
 	}
 	t.Fatalf("%s: unknown kind %q", c.Case, c.Kind)
 	return conformanceDecision{}
+}
+
+type replayStep struct {
+	id       string
+	decision conformanceDecision
+}
+
+// replaySteps decides every check of sale in seal order, as the replay
+// ledger builds it (replayLedgerSealed): statements and undisclosed records
+// enter the ledger or are passed over, a record that states no act or cannot
+// be evaluated is not decided, and each decided record enters the ledger
+// under the capsule id sealed names for it.
+func replaySteps(t *testing.T, e *Engine, s SaleBundle, sealed map[string]string) []replayStep {
+	t.Helper()
+	var steps []replayStep
+	var ledger []Record
+	claims := map[string]bool{}
+	for _, x := range sealOrder(t, s) {
+		id, _ := textOf(x.record["capsule_id"])
+		shown, ok := x.thread.disclosed[id]
+		if !ok {
+			continue
+		}
+		capsule, err := json.Marshal(x.record)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if stated, ok := StatementOf(capsule, shown); ok {
+			if !claims[stated.Stated.Claim] {
+				claims[stated.Stated.Claim] = true
+				ledger = append(ledger, stated)
+			}
+			continue
+		}
+		a, h, err := s.Check(id)
+		if err != nil || a.statesNoAct || len(a.Unevaluable()) > 0 {
+			continue
+		}
+		d, err := e.CheckSale(a, ledger, h)
+		if err != nil {
+			steps = append(steps, replayStep{id, conformanceDecision{Error: "check: " + err.Error()}})
+			continue
+		}
+		steps = append(steps, replayStep{id, decisionShape(t, id, d)})
+		rec := RecordFor(a, d)
+		rec.CapsuleID, rec.DryRun = id, ptr(true)
+		if as, ok := sealed[id]; ok {
+			rec.CapsuleID = as
+		}
+		ledger = append(ledger, rec)
+	}
+	return steps
+}
+
+// conformanceSale is a sale-bundle case's sale: whether the replay holds
+// every thread, and each link that does not hold.
+type conformanceSale struct {
+	Complete bool     `json:"complete"`
+	Findings []string `json:"findings"`
 }
 
 // decisionShape is a decision in the vectors' shape.
@@ -248,11 +362,14 @@ func agrees(a, b conformanceDecision, exact bool) bool {
 		}
 		return a.Error != "" && b.Error != ""
 	}
+	if (a.Sale == nil) != (b.Sale == nil) || a.Sale != nil && (a.Sale.Complete != b.Sale.Complete || !slices.Equal(a.Sale.Findings, b.Sale.Findings)) {
+		return false
+	}
 	if len(a.Steps) != len(b.Steps) {
 		return false
 	}
 	for i := range a.Steps {
-		if !agrees(a.Steps[i], b.Steps[i], exact) {
+		if a.Steps[i].CapsuleID != b.Steps[i].CapsuleID || !agrees(a.Steps[i], b.Steps[i], exact) {
 			return false
 		}
 	}
@@ -283,6 +400,11 @@ func TestConformanceVectors(t *testing.T) {
 				if !agrees(got, k.Go, true) {
 					t.Errorf("%s: Go now decides %s, not the pinned %s: re-pin or close %s", id, describe(got), describe(k.Go), k.Issue)
 				}
+				// A sale's pin covers its verification only: every step
+				// still agrees, so a re-pin cannot accept a step divergence.
+				if c.Kind == "sale-bundle" && !sameDecision(conformanceDecision{Steps: got.Steps}, conformanceDecision{Steps: c.Expected.Steps}) {
+					t.Errorf("%s: a sale's steps are not pinned: %s", id, difference(conformanceDecision{Steps: got.Steps}, conformanceDecision{Steps: c.Expected.Steps}))
+				}
 				continue
 			}
 			if !sameDecision(got, c.Expected) {
@@ -304,12 +426,19 @@ func difference(g, p conformanceDecision) string {
 	if g.Error != "" || p.Error != "" {
 		return fmt.Sprintf("Go error %q, Python error %q", g.Error, p.Error)
 	}
+	if g.Sale != nil && p.Sale != nil && (g.Sale.Complete != p.Sale.Complete || !slices.Equal(g.Sale.Findings, p.Sale.Findings)) {
+		return fmt.Sprintf("sale Go %+v, Python %+v", *g.Sale, *p.Sale)
+	}
 	if len(g.Steps) > 0 || len(p.Steps) > 0 {
 		if len(g.Steps) != len(p.Steps) {
 			return fmt.Sprintf("Go %d steps, Python %d", len(g.Steps), len(p.Steps))
 		}
 		out := ""
 		for i := range g.Steps {
+			if g.Steps[i].CapsuleID != p.Steps[i].CapsuleID {
+				out += fmt.Sprintf("step %d: Go decides %s, Python %s; ", i, g.Steps[i].CapsuleID, p.Steps[i].CapsuleID)
+				continue
+			}
 			if !sameDecision(g.Steps[i], p.Steps[i]) {
 				out += fmt.Sprintf("step %d: %s", i, difference(g.Steps[i], p.Steps[i]))
 			}
