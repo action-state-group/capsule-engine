@@ -140,3 +140,105 @@ func TestPerActionReadsIsOneOfTheEngines(t *testing.T) {
 		}
 	}
 }
+
+// caps/5.0.0 over spend.weekly/3.0.0, decision by decision, against a live
+// Python run at the commit it names (testdata/parity/generate_caps_v5.py).
+// Four configurations:
+//   - pack: the frozen 0.3.5, compared in full (outcome, every constraint's
+//     result and evidence digest, per_action_basis and limit_sources byte
+//     for byte, and each rule's own result). An authorised maximum above
+//     the capture is read; one below it, or none, falls back to the
+//     capture; 3000 trips the 2500 limit. Each purchase here is from a new
+//     merchant, so counterparty_seen_before fails it and, money.purchase
+//     having an approver from taxonomy 3, it escalates, as in Python.
+//   - pack_036: the same actions under 0.3.6's caps, which the shipped 0.3.7 cites (caps/5.1.0 over
+//     spend.weekly/3.1.0), compared in full the same way: the same results,
+//     the evidence naming the 3.1.0 fold.
+//   - bare_2500 and per_action_500: GuardEngines with caps alone for
+//     money.purchase (2500 or 500 per action, 10000 per 7 days), mirrored by
+//     the shipped engine with those limits and no limit_sources; caps alone
+//     is compared, and each step enters the ledger with Python's outcome, so
+//     both see the same history. bare_2500 fills the window (the total sums
+//     captures: 9500 then a 454 capture with 954 authorised is 9954, under
+//     10000); per_action_500 denies 954 authorised on a 454 capture.
+func TestCapsV5MatchesPythonDecisions(t *testing.T) {
+	var p struct {
+		CapsuleEngineCommit string `json:"capsule_engine_commit"`
+		Scenarios           []struct {
+			Config string `json:"config"`
+			parityScenario
+		} `json:"scenarios"`
+	}
+	if err := json.Unmarshal(readFile(t, "testdata", "parity", "caps-v5-parity.json"), &p); err != nil {
+		t.Fatal(err)
+	}
+	if p.CapsuleEngineCommit != "a710636c29814ce67e838c673026fd2063d913f8" {
+		t.Fatalf("caps/5.0.0 parity run at %s", p.CapsuleEngineCommit)
+	}
+	bare := func(perAction int64) *Engine {
+		e := capsV5Engine(t)
+		e.capsMinor = map[string]int64{"money.purchase": 10000}
+		e.perActionMinor = map[string]int64{"money.purchase": perAction}
+		e.limitSources = false
+		return e
+	}
+	engines := map[string]*Engine{"pack": capsV5Engine(t), "pack_036": shippedCapsEngine(t), "bare_2500": bare(2500), "per_action_500": bare(500)}
+	ledgers := map[string][]Record{}
+	outcomes := map[string]Decision{}
+	for _, s := range p.Scenarios {
+		e, ok := engines[s.Config]
+		if !ok {
+			t.Fatalf("%s: config %q", s.Scenario, s.Config)
+		}
+		a, err := DecodeAction(bytes.NewReader(s.Action))
+		if err != nil {
+			t.Fatalf("%s: %v", s.Scenario, err)
+		}
+		d, err := e.Check(a, ledgers[s.Config])
+		if err != nil {
+			t.Fatalf("%s: %v", s.Scenario, err)
+		}
+		if s.Config == "pack" || s.Config == "pack_036" {
+			compareToPython(t, s.Scenario, e, a, d, s.parityScenario)
+			compareRulesToPython(t, s.Scenario, e, a, d, s.parityScenario)
+		} else {
+			caps, _ := d.Constraint("caps")
+			var py *parityConstraint
+			for i := range s.Constraints {
+				if s.Constraints[i].ID == "caps" {
+					py = &s.Constraints[i]
+				}
+			}
+			digest, _, err := caps.EvidenceDigest()
+			if err != nil {
+				t.Fatal(err)
+			}
+			if py == nil || string(caps.Result) != py.Result || py.EvidenceDigest == nil || digest != *py.EvidenceDigest {
+				t.Errorf("%s: Go caps %s %s, Python %+v", s.Scenario, caps.Result, digest, py)
+			}
+		}
+		outcomes[s.Scenario] = d
+		ledgers[s.Config] = append(ledgers[s.Config], RecordFor(a, Decision{Outcome: s.Outcome}))
+	}
+	for name, want := range map[string]struct {
+		caps, field string
+		fellBack    bool
+		projected   int64
+	}{
+		"authorised-above-capture":      {"pass", "spend_authorized_minor", false, 454},
+		"authorised-below-capture":      {"pass", "spend_minor", true, 454},
+		"authorised-absent":             {"pass", "spend_minor", true, 454},
+		"authorised-over-limit":         {"fail", "spend_authorized_minor", false, 454},
+		"booking-over-limit":            {"fail", "spend_minor", true, 55880},
+		"window-authorised-under-total": {"pass", "spend_authorized_minor", false, 9954},
+		"v4-purchase-over-window":       {"fail", "spend_minor", true, 10100},
+		"authorised-954-limit-500":      {"fail", "spend_authorized_minor", false, 454},
+		"absent-limit-500":              {"pass", "spend_minor", true, 454},
+	} {
+		caps, _ := outcomes[name].Constraint("caps")
+		f, ok := caps.Caps()
+		if string(caps.Result) != want.caps || !ok || f.Basis == nil || f.Basis.Field != want.field || f.Basis.FellBack != want.fellBack || f.ProjectedMinor != want.projected {
+			t.Errorf("%s: caps %s, basis %+v, projected %d; want %+v", name, caps.Result, f.Basis, f.ProjectedMinor, want)
+		}
+	}
+}

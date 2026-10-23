@@ -7,8 +7,8 @@
 // point it decides. The pack is the authority: an engine is built from a
 // loaded pack and refuses one whose definitions are not the ones ported.
 //
-// Comments cite four rulings by name. All are on buyer acts that are not a
-// pay, from 2026-10-09:
+// Comments cite these rulings by name. All are from 2026-10-09; the first
+// five are on buyer acts that are not a pay:
 //   - ruling (a): an unchecked act (one capsulectl sealed as taken without a
 //     sealed approval) is unauthorized but real, so it counts as spend;
 //   - ruling (b): an act in history with no recorded decision could be
@@ -16,7 +16,15 @@
 //   - the G3 ruling: an executed act with no recorded decision but a sealed
 //     spend counts at that spend instead, superseding ruling (b) for it;
 //   - the ruling on F1 (capsule-engine #130): an act that states money moved
-//     in can never add to the window, so ruling (b) does not reach it.
+//     in can never add to the window, so ruling (b) does not reach it;
+//   - the ruling on the G3 vectors, which refines the G3 ruling: an act whose
+//     spend cannot be read holds the window only when it falls inside it
+//     (rule 5), and the spend counted is the act's own sealed record's
+//     spend_minor, never its check's and never its amount_minor (point 2);
+//   - the old-taxonomy ruling: a history act is read under the taxonomy it
+//     was sealed at (rule 2), and a check whose record was sealed at another
+//     taxonomy than the engine's is refused where it would otherwise allow
+//     (rule 1).
 package guard
 
 import (

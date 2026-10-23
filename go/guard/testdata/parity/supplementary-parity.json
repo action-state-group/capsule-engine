@@ -1,0 +1,1643 @@
+{
+  "capsule_engine_commit": "7339028ab2117d6c7adec89a26cd5022b8ac7140",
+  "scenarios": [
+    {
+      "action": {
+        "action_class": "money.transfer",
+        "action_id": "make_payment/supplementary-window-fill-1",
+        "action_type": "decide",
+        "amount_minor": 2500,
+        "counterparty_account_ref": "acct-ref-window-fill-1",
+        "currency": "USD",
+        "developer": "assistant-a@v1",
+        "operator": "household-window",
+        "rail": "card",
+        "recurrence": "one_time",
+        "target": "merchant/window-fill-1",
+        "timestamp": "2026-08-11T09:01:00Z",
+        "verb": "make_payment"
+      },
+      "caps_evidence": {
+        "amount_minor": 2500,
+        "cap_minor": 10000,
+        "fold": "f379cd4b2b12284fa5d682845f23bcd7ab1ae8b8d1dd827cd9b5dd7069735997",
+        "fold_key": {
+          "path": "operator",
+          "value": "household-window"
+        },
+        "limit_sources": {
+          "per_action": {
+            "limit_source": "definition_default"
+          },
+          "window": {
+            "limit_source": "definition_default"
+          }
+        },
+        "per_action_basis": {
+          "fell_back": true,
+          "field": "spend_minor",
+          "observed_minor": 2500
+        },
+        "per_action_cap_minor": 2500,
+        "projected_minor": 2500,
+        "reversals": {
+          "linked_count": 0,
+          "linked_minor": 0,
+          "unlinked_count": 0
+        },
+        "tripped": [],
+        "weekly_spend_minor": 0
+      },
+      "constraints": [
+        {
+          "evidence_digest": "b62191b15a154765c146f057b1e6c843789e98fe2eac00664894e78fe49e5f3f",
+          "id": "dedupe",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "c14efa34dbb09920bbdab9b236bd9a9091161542213f7cbc0b79264c1a01f3c3",
+          "id": "caps",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+          "id": "verify_before_dispatch",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "2a086a76fd66071dbaf9ef4291790efc9ef582f67b332bb614304f4a26c6065b",
+          "id": "destination_rail",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "870b0a3e1636cab6902013f7742c0b36dfd72f324d1ff9ee3cd0976aa6d19241",
+          "id": "counterparty_identity_change",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827",
+          "id": "credential_pattern",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "43af1b8606bacae4ee313f677b1a9bbb27af291ed567d9fed0db0b2b9fbbf8d2",
+          "id": "recurring_charge",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "93594fc3973062b88c37e6949b10f34f202dc75ada097c69b83d201e0cb51701",
+          "id": "action_class_gate",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "029cd64fa2475bae9a0fd960a7a61c5df24d383fdf1683885fafa87ec448486e",
+          "id": "counterparty_seen_before",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+          "id": "recipient_role",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "63ed140230dd41863e13b6a44656b979f95538b41335ba6a621a9a3309d17c7c",
+          "id": "refundability",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "4d41d27620699ff9c802a768a08bdd1634fca6935adc57992c158a12db114783",
+          "id": "material_fields_changed",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "1cb0e3e6b77f138625772200c1ad9d3cd608aca57978f80f386bd9a668020bab",
+          "id": "offer_fields_changed",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "c7a84acb724ca272de76e7ed4c699268414ba4327cd140a72c429dd565287d53",
+          "id": "recipient_seen_before",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "bef9155d229a6f9868a6f51d37852b3f54a22d43fb3afdfb335a873e5bd30e97",
+          "id": "channel_change",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "6286d6f31789beb7de36237b614325f4a23103d7a4e035b5a23e84972b442123",
+          "id": "upfront_amount",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "3c94a44812b9f227f1da0e8ed27510ad37fccfa3b7c3035fbd75b52901b160fb",
+          "id": "task_authority",
+          "result": "n/a"
+        }
+      ],
+      "outcome": "allow",
+      "scenario": "window-fill-1"
+    },
+    {
+      "action": {
+        "action_class": "money.transfer",
+        "action_id": "make_payment/supplementary-window-fill-2",
+        "action_type": "decide",
+        "amount_minor": 2500,
+        "counterparty_account_ref": "acct-ref-window-fill-2",
+        "currency": "USD",
+        "developer": "assistant-a@v1",
+        "operator": "household-window",
+        "rail": "card",
+        "recurrence": "one_time",
+        "target": "merchant/window-fill-2",
+        "timestamp": "2026-08-11T09:02:00Z",
+        "verb": "make_payment"
+      },
+      "caps_evidence": {
+        "amount_minor": 2500,
+        "cap_minor": 10000,
+        "fold": "f379cd4b2b12284fa5d682845f23bcd7ab1ae8b8d1dd827cd9b5dd7069735997",
+        "fold_key": {
+          "path": "operator",
+          "value": "household-window"
+        },
+        "limit_sources": {
+          "per_action": {
+            "limit_source": "definition_default"
+          },
+          "window": {
+            "limit_source": "definition_default"
+          }
+        },
+        "per_action_basis": {
+          "fell_back": true,
+          "field": "spend_minor",
+          "observed_minor": 2500
+        },
+        "per_action_cap_minor": 2500,
+        "projected_minor": 5000,
+        "reversals": {
+          "linked_count": 0,
+          "linked_minor": 0,
+          "unlinked_count": 0
+        },
+        "tripped": [],
+        "weekly_spend_minor": 2500
+      },
+      "constraints": [
+        {
+          "evidence_digest": "8ba920c481da16db9a46aadb2e29cab21e7ff26b892b08a17a59399d3379c21c",
+          "id": "dedupe",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "6b43231b06270622cc33579a1537db6c7b525db9c21eee9fe37cc1168c8176af",
+          "id": "caps",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+          "id": "verify_before_dispatch",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "2a086a76fd66071dbaf9ef4291790efc9ef582f67b332bb614304f4a26c6065b",
+          "id": "destination_rail",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "870b0a3e1636cab6902013f7742c0b36dfd72f324d1ff9ee3cd0976aa6d19241",
+          "id": "counterparty_identity_change",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827",
+          "id": "credential_pattern",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "43af1b8606bacae4ee313f677b1a9bbb27af291ed567d9fed0db0b2b9fbbf8d2",
+          "id": "recurring_charge",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "93594fc3973062b88c37e6949b10f34f202dc75ada097c69b83d201e0cb51701",
+          "id": "action_class_gate",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "029cd64fa2475bae9a0fd960a7a61c5df24d383fdf1683885fafa87ec448486e",
+          "id": "counterparty_seen_before",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+          "id": "recipient_role",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "63ed140230dd41863e13b6a44656b979f95538b41335ba6a621a9a3309d17c7c",
+          "id": "refundability",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "4d41d27620699ff9c802a768a08bdd1634fca6935adc57992c158a12db114783",
+          "id": "material_fields_changed",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "1cb0e3e6b77f138625772200c1ad9d3cd608aca57978f80f386bd9a668020bab",
+          "id": "offer_fields_changed",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "c7a84acb724ca272de76e7ed4c699268414ba4327cd140a72c429dd565287d53",
+          "id": "recipient_seen_before",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "bef9155d229a6f9868a6f51d37852b3f54a22d43fb3afdfb335a873e5bd30e97",
+          "id": "channel_change",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "6286d6f31789beb7de36237b614325f4a23103d7a4e035b5a23e84972b442123",
+          "id": "upfront_amount",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "3c94a44812b9f227f1da0e8ed27510ad37fccfa3b7c3035fbd75b52901b160fb",
+          "id": "task_authority",
+          "result": "n/a"
+        }
+      ],
+      "outcome": "allow",
+      "scenario": "window-fill-2"
+    },
+    {
+      "action": {
+        "action_class": "money.transfer",
+        "action_id": "make_payment/supplementary-window-fill-3",
+        "action_type": "decide",
+        "amount_minor": 2500,
+        "counterparty_account_ref": "acct-ref-window-fill-3",
+        "currency": "USD",
+        "developer": "assistant-a@v1",
+        "operator": "household-window",
+        "rail": "card",
+        "recurrence": "one_time",
+        "target": "merchant/window-fill-3",
+        "timestamp": "2026-08-11T09:03:00Z",
+        "verb": "make_payment"
+      },
+      "caps_evidence": {
+        "amount_minor": 2500,
+        "cap_minor": 10000,
+        "fold": "f379cd4b2b12284fa5d682845f23bcd7ab1ae8b8d1dd827cd9b5dd7069735997",
+        "fold_key": {
+          "path": "operator",
+          "value": "household-window"
+        },
+        "limit_sources": {
+          "per_action": {
+            "limit_source": "definition_default"
+          },
+          "window": {
+            "limit_source": "definition_default"
+          }
+        },
+        "per_action_basis": {
+          "fell_back": true,
+          "field": "spend_minor",
+          "observed_minor": 2500
+        },
+        "per_action_cap_minor": 2500,
+        "projected_minor": 7500,
+        "reversals": {
+          "linked_count": 0,
+          "linked_minor": 0,
+          "unlinked_count": 0
+        },
+        "tripped": [],
+        "weekly_spend_minor": 5000
+      },
+      "constraints": [
+        {
+          "evidence_digest": "55b84a940777c90c0f54d18bc5a34550b4c95a9b42c472352ea3962a2900e21b",
+          "id": "dedupe",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "c379515e0c8182b1556291e02d19f41fedfa45b19b342ca82d7cdfb1d456daef",
+          "id": "caps",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+          "id": "verify_before_dispatch",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "2a086a76fd66071dbaf9ef4291790efc9ef582f67b332bb614304f4a26c6065b",
+          "id": "destination_rail",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "870b0a3e1636cab6902013f7742c0b36dfd72f324d1ff9ee3cd0976aa6d19241",
+          "id": "counterparty_identity_change",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827",
+          "id": "credential_pattern",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "43af1b8606bacae4ee313f677b1a9bbb27af291ed567d9fed0db0b2b9fbbf8d2",
+          "id": "recurring_charge",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "93594fc3973062b88c37e6949b10f34f202dc75ada097c69b83d201e0cb51701",
+          "id": "action_class_gate",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "029cd64fa2475bae9a0fd960a7a61c5df24d383fdf1683885fafa87ec448486e",
+          "id": "counterparty_seen_before",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+          "id": "recipient_role",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "63ed140230dd41863e13b6a44656b979f95538b41335ba6a621a9a3309d17c7c",
+          "id": "refundability",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "4d41d27620699ff9c802a768a08bdd1634fca6935adc57992c158a12db114783",
+          "id": "material_fields_changed",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "1cb0e3e6b77f138625772200c1ad9d3cd608aca57978f80f386bd9a668020bab",
+          "id": "offer_fields_changed",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "c7a84acb724ca272de76e7ed4c699268414ba4327cd140a72c429dd565287d53",
+          "id": "recipient_seen_before",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "bef9155d229a6f9868a6f51d37852b3f54a22d43fb3afdfb335a873e5bd30e97",
+          "id": "channel_change",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "6286d6f31789beb7de36237b614325f4a23103d7a4e035b5a23e84972b442123",
+          "id": "upfront_amount",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "3c94a44812b9f227f1da0e8ed27510ad37fccfa3b7c3035fbd75b52901b160fb",
+          "id": "task_authority",
+          "result": "n/a"
+        }
+      ],
+      "outcome": "allow",
+      "scenario": "window-fill-3"
+    },
+    {
+      "action": {
+        "action_class": "money.transfer",
+        "action_id": "make_payment/supplementary-window-fill-4",
+        "action_type": "decide",
+        "amount_minor": 2500,
+        "counterparty_account_ref": "acct-ref-window-fill-4",
+        "currency": "USD",
+        "developer": "assistant-a@v1",
+        "operator": "household-window",
+        "rail": "card",
+        "recurrence": "one_time",
+        "target": "merchant/window-fill-4",
+        "timestamp": "2026-08-11T09:04:00Z",
+        "verb": "make_payment"
+      },
+      "caps_evidence": {
+        "amount_minor": 2500,
+        "cap_minor": 10000,
+        "fold": "f379cd4b2b12284fa5d682845f23bcd7ab1ae8b8d1dd827cd9b5dd7069735997",
+        "fold_key": {
+          "path": "operator",
+          "value": "household-window"
+        },
+        "limit_sources": {
+          "per_action": {
+            "limit_source": "definition_default"
+          },
+          "window": {
+            "limit_source": "definition_default"
+          }
+        },
+        "per_action_basis": {
+          "fell_back": true,
+          "field": "spend_minor",
+          "observed_minor": 2500
+        },
+        "per_action_cap_minor": 2500,
+        "projected_minor": 10000,
+        "reversals": {
+          "linked_count": 0,
+          "linked_minor": 0,
+          "unlinked_count": 0
+        },
+        "tripped": [],
+        "weekly_spend_minor": 7500
+      },
+      "constraints": [
+        {
+          "evidence_digest": "62bd450428ce26bfb5754f80bc082e8a01bb20e405ad3fd5ab2c08195a2f8bbe",
+          "id": "dedupe",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "5334e9ec6072e236ddc3f404de00334c837723107a6187a0bb5f8e8906682855",
+          "id": "caps",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+          "id": "verify_before_dispatch",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "2a086a76fd66071dbaf9ef4291790efc9ef582f67b332bb614304f4a26c6065b",
+          "id": "destination_rail",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "870b0a3e1636cab6902013f7742c0b36dfd72f324d1ff9ee3cd0976aa6d19241",
+          "id": "counterparty_identity_change",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827",
+          "id": "credential_pattern",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "43af1b8606bacae4ee313f677b1a9bbb27af291ed567d9fed0db0b2b9fbbf8d2",
+          "id": "recurring_charge",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "93594fc3973062b88c37e6949b10f34f202dc75ada097c69b83d201e0cb51701",
+          "id": "action_class_gate",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "029cd64fa2475bae9a0fd960a7a61c5df24d383fdf1683885fafa87ec448486e",
+          "id": "counterparty_seen_before",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+          "id": "recipient_role",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "63ed140230dd41863e13b6a44656b979f95538b41335ba6a621a9a3309d17c7c",
+          "id": "refundability",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "4d41d27620699ff9c802a768a08bdd1634fca6935adc57992c158a12db114783",
+          "id": "material_fields_changed",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "1cb0e3e6b77f138625772200c1ad9d3cd608aca57978f80f386bd9a668020bab",
+          "id": "offer_fields_changed",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "c7a84acb724ca272de76e7ed4c699268414ba4327cd140a72c429dd565287d53",
+          "id": "recipient_seen_before",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "bef9155d229a6f9868a6f51d37852b3f54a22d43fb3afdfb335a873e5bd30e97",
+          "id": "channel_change",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "6286d6f31789beb7de36237b614325f4a23103d7a4e035b5a23e84972b442123",
+          "id": "upfront_amount",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "3c94a44812b9f227f1da0e8ed27510ad37fccfa3b7c3035fbd75b52901b160fb",
+          "id": "task_authority",
+          "result": "n/a"
+        }
+      ],
+      "outcome": "allow",
+      "scenario": "window-fill-4-at-limit"
+    },
+    {
+      "action": {
+        "action_class": "money.transfer",
+        "action_id": "make_payment/supplementary-window-over",
+        "action_type": "decide",
+        "amount_minor": 100,
+        "counterparty_account_ref": "acct-ref-window-over",
+        "currency": "USD",
+        "developer": "assistant-b@v2",
+        "operator": "household-window",
+        "rail": "card",
+        "recurrence": "one_time",
+        "target": "merchant/window-over",
+        "timestamp": "2026-08-11T09:05:00Z",
+        "verb": "make_payment"
+      },
+      "caps_evidence": {
+        "amount_minor": 100,
+        "cap_minor": 10000,
+        "fold": "f379cd4b2b12284fa5d682845f23bcd7ab1ae8b8d1dd827cd9b5dd7069735997",
+        "fold_key": {
+          "path": "operator",
+          "value": "household-window"
+        },
+        "limit_sources": {
+          "per_action": {
+            "limit_source": "definition_default"
+          },
+          "window": {
+            "limit_source": "definition_default"
+          }
+        },
+        "per_action_basis": {
+          "fell_back": true,
+          "field": "spend_minor",
+          "observed_minor": 100
+        },
+        "per_action_cap_minor": 2500,
+        "projected_minor": 10100,
+        "reversals": {
+          "linked_count": 0,
+          "linked_minor": 0,
+          "unlinked_count": 0
+        },
+        "tripped": [
+          {
+            "limit": "window",
+            "observed_minor": 10100,
+            "threshold_minor": 10000
+          }
+        ],
+        "weekly_spend_minor": 10000
+      },
+      "constraints": [
+        {
+          "evidence_digest": "86c9c9b3743d0e7a8ca5cebd46e7403873e24de1407e9f283afb248999df75f4",
+          "id": "dedupe",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "c386f1310d5dcd80464a030a2c0aba740ecae04eba1d5d7c64d4df295f8c72c5",
+          "id": "caps",
+          "result": "fail"
+        },
+        {
+          "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+          "id": "verify_before_dispatch",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "2a086a76fd66071dbaf9ef4291790efc9ef582f67b332bb614304f4a26c6065b",
+          "id": "destination_rail",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "870b0a3e1636cab6902013f7742c0b36dfd72f324d1ff9ee3cd0976aa6d19241",
+          "id": "counterparty_identity_change",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827",
+          "id": "credential_pattern",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "43af1b8606bacae4ee313f677b1a9bbb27af291ed567d9fed0db0b2b9fbbf8d2",
+          "id": "recurring_charge",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "93594fc3973062b88c37e6949b10f34f202dc75ada097c69b83d201e0cb51701",
+          "id": "action_class_gate",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "029cd64fa2475bae9a0fd960a7a61c5df24d383fdf1683885fafa87ec448486e",
+          "id": "counterparty_seen_before",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+          "id": "recipient_role",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "63ed140230dd41863e13b6a44656b979f95538b41335ba6a621a9a3309d17c7c",
+          "id": "refundability",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "4d41d27620699ff9c802a768a08bdd1634fca6935adc57992c158a12db114783",
+          "id": "material_fields_changed",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "1cb0e3e6b77f138625772200c1ad9d3cd608aca57978f80f386bd9a668020bab",
+          "id": "offer_fields_changed",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "c7a84acb724ca272de76e7ed4c699268414ba4327cd140a72c429dd565287d53",
+          "id": "recipient_seen_before",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "bef9155d229a6f9868a6f51d37852b3f54a22d43fb3afdfb335a873e5bd30e97",
+          "id": "channel_change",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "6286d6f31789beb7de36237b614325f4a23103d7a4e035b5a23e84972b442123",
+          "id": "upfront_amount",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "3c94a44812b9f227f1da0e8ed27510ad37fccfa3b7c3035fbd75b52901b160fb",
+          "id": "task_authority",
+          "result": "n/a"
+        }
+      ],
+      "outcome": "escalate",
+      "scenario": "window-over-other-developer"
+    },
+    {
+      "action": {
+        "action_class": "money.purchase",
+        "action_id": "buy/supplementary-window-purchase",
+        "action_type": "decide",
+        "amount_minor": 100,
+        "counterparty_account_ref": "acct-ref-window-purchase",
+        "currency": "USD",
+        "developer": "assistant-a@v1",
+        "operator": "household-window",
+        "rail": "card",
+        "recurrence": "one_time",
+        "target": "merchant/window-purchase",
+        "timestamp": "2026-08-11T09:06:00Z",
+        "verb": "buy"
+      },
+      "caps_evidence": {
+        "amount_minor": 100,
+        "cap_minor": 10000,
+        "fold": "f379cd4b2b12284fa5d682845f23bcd7ab1ae8b8d1dd827cd9b5dd7069735997",
+        "fold_key": {
+          "path": "operator",
+          "value": "household-window"
+        },
+        "limit_sources": {
+          "per_action": {
+            "limit_source": "definition_default"
+          },
+          "window": {
+            "limit_source": "definition_default"
+          }
+        },
+        "per_action_basis": {
+          "fell_back": true,
+          "field": "spend_minor",
+          "observed_minor": 100
+        },
+        "per_action_cap_minor": 2500,
+        "projected_minor": 10100,
+        "reversals": {
+          "linked_count": 0,
+          "linked_minor": 0,
+          "unlinked_count": 0
+        },
+        "tripped": [
+          {
+            "limit": "window",
+            "observed_minor": 10100,
+            "threshold_minor": 10000
+          }
+        ],
+        "weekly_spend_minor": 10000
+      },
+      "constraints": [
+        {
+          "evidence_digest": "5e96624b67aba1c3ca133300f63aef1f3588497bc98d5f3df6803beb236ffbce",
+          "id": "dedupe",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "c386f1310d5dcd80464a030a2c0aba740ecae04eba1d5d7c64d4df295f8c72c5",
+          "id": "caps",
+          "result": "fail"
+        },
+        {
+          "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+          "id": "verify_before_dispatch",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+          "id": "destination_rail",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "870b0a3e1636cab6902013f7742c0b36dfd72f324d1ff9ee3cd0976aa6d19241",
+          "id": "counterparty_identity_change",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827",
+          "id": "credential_pattern",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "ed761a48bede343570feeba08dd105fb225b9caf75b52392ea84550fdcc7b0b2",
+          "id": "recurring_charge",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "93594fc3973062b88c37e6949b10f34f202dc75ada097c69b83d201e0cb51701",
+          "id": "action_class_gate",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "b72a152ff39444e6add434a1aaa8a2a73606127d97f6c9d0377927d3ec7a143f",
+          "id": "counterparty_seen_before",
+          "result": "fail"
+        },
+        {
+          "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+          "id": "recipient_role",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "63ed140230dd41863e13b6a44656b979f95538b41335ba6a621a9a3309d17c7c",
+          "id": "refundability",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "4d41d27620699ff9c802a768a08bdd1634fca6935adc57992c158a12db114783",
+          "id": "material_fields_changed",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "1cb0e3e6b77f138625772200c1ad9d3cd608aca57978f80f386bd9a668020bab",
+          "id": "offer_fields_changed",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "c7a84acb724ca272de76e7ed4c699268414ba4327cd140a72c429dd565287d53",
+          "id": "recipient_seen_before",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "bef9155d229a6f9868a6f51d37852b3f54a22d43fb3afdfb335a873e5bd30e97",
+          "id": "channel_change",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "6286d6f31789beb7de36237b614325f4a23103d7a4e035b5a23e84972b442123",
+          "id": "upfront_amount",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "3c94a44812b9f227f1da0e8ed27510ad37fccfa3b7c3035fbd75b52901b160fb",
+          "id": "task_authority",
+          "result": "n/a"
+        }
+      ],
+      "outcome": "escalate",
+      "scenario": "window-over-pooled-purchase"
+    },
+    {
+      "action": {
+        "action_class": "booking.create",
+        "action_id": "create_booking/supplementary-booking-a",
+        "action_type": "decide",
+        "amount_minor": 55880,
+        "counterparty_account_ref": "acct-ref-booking-a",
+        "currency": "USD",
+        "developer": "assistant-a@v1",
+        "operator": "household-booking",
+        "rail": "card",
+        "recurrence": "one_time",
+        "target": "merchant/booking-a",
+        "timestamp": "2026-08-11T09:07:00Z",
+        "verb": "create_booking"
+      },
+      "caps_evidence": {
+        "amount_minor": 55880,
+        "cap_minor": 10000,
+        "fold": "f379cd4b2b12284fa5d682845f23bcd7ab1ae8b8d1dd827cd9b5dd7069735997",
+        "fold_key": {
+          "path": "operator",
+          "value": "household-booking"
+        },
+        "limit_sources": {
+          "per_action": {
+            "limit_source": "definition_default"
+          },
+          "window": {
+            "limit_source": "definition_default"
+          }
+        },
+        "per_action_basis": {
+          "fell_back": true,
+          "field": "spend_minor",
+          "observed_minor": 55880
+        },
+        "per_action_cap_minor": 2500,
+        "projected_minor": 55880,
+        "reversals": {
+          "linked_count": 0,
+          "linked_minor": 0,
+          "unlinked_count": 0
+        },
+        "tripped": [
+          {
+            "limit": "per_action",
+            "observed_minor": 55880,
+            "threshold_minor": 2500
+          },
+          {
+            "limit": "window",
+            "observed_minor": 55880,
+            "threshold_minor": 10000
+          }
+        ],
+        "weekly_spend_minor": 0
+      },
+      "constraints": [
+        {
+          "evidence_digest": "2c8cd2ff2f0e2787dc6a128b8ea37df037d01eb74599a9602d17f5a2ca7ee670",
+          "id": "dedupe",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "45ada181b873ba7c7f7091d65091ba77120d9d0436b0115c5b112187c728e0b8",
+          "id": "caps",
+          "result": "fail"
+        },
+        {
+          "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+          "id": "verify_before_dispatch",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+          "id": "destination_rail",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "870b0a3e1636cab6902013f7742c0b36dfd72f324d1ff9ee3cd0976aa6d19241",
+          "id": "counterparty_identity_change",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827",
+          "id": "credential_pattern",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "ed761a48bede343570feeba08dd105fb225b9caf75b52392ea84550fdcc7b0b2",
+          "id": "recurring_charge",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "0d8fc57f6edbcab8e0f6b2bdf3553e6d42fb68e6f08201220d2d8d3dde20e6a6",
+          "id": "action_class_gate",
+          "result": "fail"
+        },
+        {
+          "evidence_digest": "029cd64fa2475bae9a0fd960a7a61c5df24d383fdf1683885fafa87ec448486e",
+          "id": "counterparty_seen_before",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+          "id": "recipient_role",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "63ed140230dd41863e13b6a44656b979f95538b41335ba6a621a9a3309d17c7c",
+          "id": "refundability",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "4d41d27620699ff9c802a768a08bdd1634fca6935adc57992c158a12db114783",
+          "id": "material_fields_changed",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "1cb0e3e6b77f138625772200c1ad9d3cd608aca57978f80f386bd9a668020bab",
+          "id": "offer_fields_changed",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "c7a84acb724ca272de76e7ed4c699268414ba4327cd140a72c429dd565287d53",
+          "id": "recipient_seen_before",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "bef9155d229a6f9868a6f51d37852b3f54a22d43fb3afdfb335a873e5bd30e97",
+          "id": "channel_change",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "6286d6f31789beb7de36237b614325f4a23103d7a4e035b5a23e84972b442123",
+          "id": "upfront_amount",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "3c94a44812b9f227f1da0e8ed27510ad37fccfa3b7c3035fbd75b52901b160fb",
+          "id": "task_authority",
+          "result": "n/a"
+        }
+      ],
+      "outcome": "escalate",
+      "scenario": "booking-over-per-action"
+    },
+    {
+      "action": {
+        "action_class": "money.purchase",
+        "action_id": "buy/supplementary-cancel-fill-1",
+        "action_type": "decide",
+        "amount_minor": 2500,
+        "counterparty_account_ref": "acct-ref-cancel-fill-1",
+        "currency": "USD",
+        "developer": "assistant-a@v1",
+        "operator": "household-cancel",
+        "rail": "card",
+        "recurrence": "one_time",
+        "target": "merchant/cancel-fill-1",
+        "timestamp": "2026-08-11T09:08:00Z",
+        "verb": "buy"
+      },
+      "caps_evidence": {
+        "amount_minor": 2500,
+        "cap_minor": 10000,
+        "fold": "f379cd4b2b12284fa5d682845f23bcd7ab1ae8b8d1dd827cd9b5dd7069735997",
+        "fold_key": {
+          "path": "operator",
+          "value": "household-cancel"
+        },
+        "limit_sources": {
+          "per_action": {
+            "limit_source": "definition_default"
+          },
+          "window": {
+            "limit_source": "definition_default"
+          }
+        },
+        "per_action_basis": {
+          "fell_back": true,
+          "field": "spend_minor",
+          "observed_minor": 2500
+        },
+        "per_action_cap_minor": 2500,
+        "projected_minor": 2500,
+        "reversals": {
+          "linked_count": 0,
+          "linked_minor": 0,
+          "unlinked_count": 0
+        },
+        "tripped": [],
+        "weekly_spend_minor": 0
+      },
+      "constraints": [
+        {
+          "evidence_digest": "500fd608b9bf16baf98798a3e61e8bdcec909a9a0b1dedc10c00bdf77f329049",
+          "id": "dedupe",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "72551516dd503a4925061b2e6973e4e3d6b4d562715a6c3fceb9eb6991483722",
+          "id": "caps",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+          "id": "verify_before_dispatch",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+          "id": "destination_rail",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "870b0a3e1636cab6902013f7742c0b36dfd72f324d1ff9ee3cd0976aa6d19241",
+          "id": "counterparty_identity_change",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827",
+          "id": "credential_pattern",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "ed761a48bede343570feeba08dd105fb225b9caf75b52392ea84550fdcc7b0b2",
+          "id": "recurring_charge",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "93594fc3973062b88c37e6949b10f34f202dc75ada097c69b83d201e0cb51701",
+          "id": "action_class_gate",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "f55fe0428c8ef9c19e991bd95689cd4917b8cc33c1b7d4149b0edd86b77478ae",
+          "id": "counterparty_seen_before",
+          "result": "fail"
+        },
+        {
+          "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+          "id": "recipient_role",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "63ed140230dd41863e13b6a44656b979f95538b41335ba6a621a9a3309d17c7c",
+          "id": "refundability",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "4d41d27620699ff9c802a768a08bdd1634fca6935adc57992c158a12db114783",
+          "id": "material_fields_changed",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "1cb0e3e6b77f138625772200c1ad9d3cd608aca57978f80f386bd9a668020bab",
+          "id": "offer_fields_changed",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "c7a84acb724ca272de76e7ed4c699268414ba4327cd140a72c429dd565287d53",
+          "id": "recipient_seen_before",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "bef9155d229a6f9868a6f51d37852b3f54a22d43fb3afdfb335a873e5bd30e97",
+          "id": "channel_change",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "6286d6f31789beb7de36237b614325f4a23103d7a4e035b5a23e84972b442123",
+          "id": "upfront_amount",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "3c94a44812b9f227f1da0e8ed27510ad37fccfa3b7c3035fbd75b52901b160fb",
+          "id": "task_authority",
+          "result": "n/a"
+        }
+      ],
+      "outcome": "escalate",
+      "scenario": "cancel-fill-1"
+    },
+    {
+      "action": {
+        "action_class": "money.purchase",
+        "action_id": "buy/supplementary-cancel-fill-2",
+        "action_type": "decide",
+        "amount_minor": 2500,
+        "counterparty_account_ref": "acct-ref-cancel-fill-2",
+        "currency": "USD",
+        "developer": "assistant-a@v1",
+        "operator": "household-cancel",
+        "rail": "card",
+        "recurrence": "one_time",
+        "target": "merchant/cancel-fill-2",
+        "timestamp": "2026-08-11T09:09:00Z",
+        "verb": "buy"
+      },
+      "caps_evidence": {
+        "amount_minor": 2500,
+        "cap_minor": 10000,
+        "fold": "f379cd4b2b12284fa5d682845f23bcd7ab1ae8b8d1dd827cd9b5dd7069735997",
+        "fold_key": {
+          "path": "operator",
+          "value": "household-cancel"
+        },
+        "limit_sources": {
+          "per_action": {
+            "limit_source": "definition_default"
+          },
+          "window": {
+            "limit_source": "definition_default"
+          }
+        },
+        "per_action_basis": {
+          "fell_back": true,
+          "field": "spend_minor",
+          "observed_minor": 2500
+        },
+        "per_action_cap_minor": 2500,
+        "projected_minor": 2500,
+        "reversals": {
+          "linked_count": 0,
+          "linked_minor": 0,
+          "unlinked_count": 0
+        },
+        "tripped": [],
+        "weekly_spend_minor": 0
+      },
+      "constraints": [
+        {
+          "evidence_digest": "59528630ecb75dbb013cbb24e1533f3a27b36f422ea671925f57e9d20c6f0d86",
+          "id": "dedupe",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "72551516dd503a4925061b2e6973e4e3d6b4d562715a6c3fceb9eb6991483722",
+          "id": "caps",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+          "id": "verify_before_dispatch",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+          "id": "destination_rail",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "870b0a3e1636cab6902013f7742c0b36dfd72f324d1ff9ee3cd0976aa6d19241",
+          "id": "counterparty_identity_change",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827",
+          "id": "credential_pattern",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "ed761a48bede343570feeba08dd105fb225b9caf75b52392ea84550fdcc7b0b2",
+          "id": "recurring_charge",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "93594fc3973062b88c37e6949b10f34f202dc75ada097c69b83d201e0cb51701",
+          "id": "action_class_gate",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "3e54e110c1d3b72fcb25bbc1432a038bce5e3f6f1bab4d31d4e3d9f652a70d97",
+          "id": "counterparty_seen_before",
+          "result": "fail"
+        },
+        {
+          "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+          "id": "recipient_role",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "63ed140230dd41863e13b6a44656b979f95538b41335ba6a621a9a3309d17c7c",
+          "id": "refundability",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "4d41d27620699ff9c802a768a08bdd1634fca6935adc57992c158a12db114783",
+          "id": "material_fields_changed",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "1cb0e3e6b77f138625772200c1ad9d3cd608aca57978f80f386bd9a668020bab",
+          "id": "offer_fields_changed",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "c7a84acb724ca272de76e7ed4c699268414ba4327cd140a72c429dd565287d53",
+          "id": "recipient_seen_before",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "bef9155d229a6f9868a6f51d37852b3f54a22d43fb3afdfb335a873e5bd30e97",
+          "id": "channel_change",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "6286d6f31789beb7de36237b614325f4a23103d7a4e035b5a23e84972b442123",
+          "id": "upfront_amount",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "3c94a44812b9f227f1da0e8ed27510ad37fccfa3b7c3035fbd75b52901b160fb",
+          "id": "task_authority",
+          "result": "n/a"
+        }
+      ],
+      "outcome": "escalate",
+      "scenario": "cancel-fill-2"
+    },
+    {
+      "action": {
+        "action_class": "money.purchase",
+        "action_id": "buy/supplementary-cancel-fill-3",
+        "action_type": "decide",
+        "amount_minor": 2500,
+        "counterparty_account_ref": "acct-ref-cancel-fill-3",
+        "currency": "USD",
+        "developer": "assistant-a@v1",
+        "operator": "household-cancel",
+        "rail": "card",
+        "recurrence": "one_time",
+        "target": "merchant/cancel-fill-3",
+        "timestamp": "2026-08-11T09:10:00Z",
+        "verb": "buy"
+      },
+      "caps_evidence": {
+        "amount_minor": 2500,
+        "cap_minor": 10000,
+        "fold": "f379cd4b2b12284fa5d682845f23bcd7ab1ae8b8d1dd827cd9b5dd7069735997",
+        "fold_key": {
+          "path": "operator",
+          "value": "household-cancel"
+        },
+        "limit_sources": {
+          "per_action": {
+            "limit_source": "definition_default"
+          },
+          "window": {
+            "limit_source": "definition_default"
+          }
+        },
+        "per_action_basis": {
+          "fell_back": true,
+          "field": "spend_minor",
+          "observed_minor": 2500
+        },
+        "per_action_cap_minor": 2500,
+        "projected_minor": 2500,
+        "reversals": {
+          "linked_count": 0,
+          "linked_minor": 0,
+          "unlinked_count": 0
+        },
+        "tripped": [],
+        "weekly_spend_minor": 0
+      },
+      "constraints": [
+        {
+          "evidence_digest": "3150945d70beab2395be33e75c1319ab5260911b17894c9760b91ba39bf3885b",
+          "id": "dedupe",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "72551516dd503a4925061b2e6973e4e3d6b4d562715a6c3fceb9eb6991483722",
+          "id": "caps",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+          "id": "verify_before_dispatch",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+          "id": "destination_rail",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "870b0a3e1636cab6902013f7742c0b36dfd72f324d1ff9ee3cd0976aa6d19241",
+          "id": "counterparty_identity_change",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827",
+          "id": "credential_pattern",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "ed761a48bede343570feeba08dd105fb225b9caf75b52392ea84550fdcc7b0b2",
+          "id": "recurring_charge",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "93594fc3973062b88c37e6949b10f34f202dc75ada097c69b83d201e0cb51701",
+          "id": "action_class_gate",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "be7dd3c531275bf2463aa8693314a0f77e7bf35abf0f4ce8d05046d7656b92e3",
+          "id": "counterparty_seen_before",
+          "result": "fail"
+        },
+        {
+          "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+          "id": "recipient_role",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "63ed140230dd41863e13b6a44656b979f95538b41335ba6a621a9a3309d17c7c",
+          "id": "refundability",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "4d41d27620699ff9c802a768a08bdd1634fca6935adc57992c158a12db114783",
+          "id": "material_fields_changed",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "1cb0e3e6b77f138625772200c1ad9d3cd608aca57978f80f386bd9a668020bab",
+          "id": "offer_fields_changed",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "c7a84acb724ca272de76e7ed4c699268414ba4327cd140a72c429dd565287d53",
+          "id": "recipient_seen_before",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "bef9155d229a6f9868a6f51d37852b3f54a22d43fb3afdfb335a873e5bd30e97",
+          "id": "channel_change",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "6286d6f31789beb7de36237b614325f4a23103d7a4e035b5a23e84972b442123",
+          "id": "upfront_amount",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "3c94a44812b9f227f1da0e8ed27510ad37fccfa3b7c3035fbd75b52901b160fb",
+          "id": "task_authority",
+          "result": "n/a"
+        }
+      ],
+      "outcome": "escalate",
+      "scenario": "cancel-fill-3"
+    },
+    {
+      "action": {
+        "action_class": "booking.cancel",
+        "action_id": "cancel_booking/supplementary-cancel-booking",
+        "action_type": "decide",
+        "amount_minor": 2500,
+        "counterparty_account_ref": "acct-ref-cancel-booking",
+        "currency": "USD",
+        "developer": "assistant-a@v1",
+        "operator": "household-cancel",
+        "rail": "card",
+        "recurrence": "one_time",
+        "target": "merchant/cancel-booking",
+        "timestamp": "2026-08-11T09:11:00Z",
+        "verb": "cancel_booking"
+      },
+      "caps_evidence": null,
+      "constraints": [
+        {
+          "evidence_digest": "17671e75bc204d222a27e9257ceeba59718b7a27301b9abe1b4860efa490541d",
+          "id": "dedupe",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+          "id": "caps",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+          "id": "verify_before_dispatch",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+          "id": "destination_rail",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "870b0a3e1636cab6902013f7742c0b36dfd72f324d1ff9ee3cd0976aa6d19241",
+          "id": "counterparty_identity_change",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827",
+          "id": "credential_pattern",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "ed761a48bede343570feeba08dd105fb225b9caf75b52392ea84550fdcc7b0b2",
+          "id": "recurring_charge",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "a9537eecc66dae26d8a7880bce64c2e32f919618ccd7271c9d34124984f8abbf",
+          "id": "action_class_gate",
+          "result": "fail"
+        },
+        {
+          "evidence_digest": "029cd64fa2475bae9a0fd960a7a61c5df24d383fdf1683885fafa87ec448486e",
+          "id": "counterparty_seen_before",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+          "id": "recipient_role",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "7471f20fa8882393d42d3d4b38107a7be30b40e2b10ba838b30f7cc58dea0a5c",
+          "id": "refundability",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "e510562f4fe422536148c0153efabe41e40dffbd58bf33a9badc88d6258d49c8",
+          "id": "material_fields_changed",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "5301c7f61cebf5b8c57025b54c441a38f5dab35b558c0896995e00f3ee596629",
+          "id": "offer_fields_changed",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "c7a84acb724ca272de76e7ed4c699268414ba4327cd140a72c429dd565287d53",
+          "id": "recipient_seen_before",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "0ad91372036802d3b0b5b0baedeea673d02aa73cabedfe8f7c1dd774ddeb3e9e",
+          "id": "channel_change",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "0d0e8ae7a25e36254dd52de0a64abd81a2bbaa53230e320b8f73ebba253d54e2",
+          "id": "upfront_amount",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "c41e4b3a2077a40320e10ad50ccbfe5cc0efe57bd2d3dfe235357c61e8d051b9",
+          "id": "task_authority",
+          "result": "n/a"
+        }
+      ],
+      "outcome": "escalate",
+      "scenario": "cancel-with-amount"
+    },
+    {
+      "action": {
+        "action_class": "money.purchase",
+        "action_id": "buy/supplementary-after-cancel",
+        "action_type": "decide",
+        "amount_minor": 100,
+        "counterparty_account_ref": "acct-ref-after-cancel",
+        "currency": "USD",
+        "developer": "assistant-a@v1",
+        "operator": "household-cancel",
+        "rail": "card",
+        "recurrence": "one_time",
+        "target": "merchant/after-cancel",
+        "timestamp": "2026-08-11T09:12:00Z",
+        "verb": "buy"
+      },
+      "caps_evidence": {
+        "amount_minor": 100,
+        "cap_minor": 10000,
+        "fold": "f379cd4b2b12284fa5d682845f23bcd7ab1ae8b8d1dd827cd9b5dd7069735997",
+        "fold_key": {
+          "path": "operator",
+          "value": "household-cancel"
+        },
+        "limit_sources": {
+          "per_action": {
+            "limit_source": "definition_default"
+          },
+          "window": {
+            "limit_source": "definition_default"
+          }
+        },
+        "per_action_basis": {
+          "fell_back": true,
+          "field": "spend_minor",
+          "observed_minor": 100
+        },
+        "per_action_cap_minor": 2500,
+        "projected_minor": 100,
+        "reversals": {
+          "linked_count": 0,
+          "linked_minor": 0,
+          "unlinked_count": 0
+        },
+        "tripped": [],
+        "weekly_spend_minor": 0
+      },
+      "constraints": [
+        {
+          "evidence_digest": "be9e86778214c34d3de8a5d04402d5b1e3c1cee21815391ffdd26941d392a9fe",
+          "id": "dedupe",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "9624d2f133c62f55a215df6433b76c091574a4bb3780e7f2b6a4b0dbb444e10a",
+          "id": "caps",
+          "result": "pass"
+        },
+        {
+          "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+          "id": "verify_before_dispatch",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+          "id": "destination_rail",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "870b0a3e1636cab6902013f7742c0b36dfd72f324d1ff9ee3cd0976aa6d19241",
+          "id": "counterparty_identity_change",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827",
+          "id": "credential_pattern",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "ed761a48bede343570feeba08dd105fb225b9caf75b52392ea84550fdcc7b0b2",
+          "id": "recurring_charge",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "93594fc3973062b88c37e6949b10f34f202dc75ada097c69b83d201e0cb51701",
+          "id": "action_class_gate",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "44c42349d55307ec3df7d5be047e4abc3029bcbacffdecea41e6c4af2543a8ae",
+          "id": "counterparty_seen_before",
+          "result": "fail"
+        },
+        {
+          "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+          "id": "recipient_role",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "63ed140230dd41863e13b6a44656b979f95538b41335ba6a621a9a3309d17c7c",
+          "id": "refundability",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "4d41d27620699ff9c802a768a08bdd1634fca6935adc57992c158a12db114783",
+          "id": "material_fields_changed",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "1cb0e3e6b77f138625772200c1ad9d3cd608aca57978f80f386bd9a668020bab",
+          "id": "offer_fields_changed",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "c7a84acb724ca272de76e7ed4c699268414ba4327cd140a72c429dd565287d53",
+          "id": "recipient_seen_before",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "bef9155d229a6f9868a6f51d37852b3f54a22d43fb3afdfb335a873e5bd30e97",
+          "id": "channel_change",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "6286d6f31789beb7de36237b614325f4a23103d7a4e035b5a23e84972b442123",
+          "id": "upfront_amount",
+          "result": "n/a"
+        },
+        {
+          "evidence_digest": "3c94a44812b9f227f1da0e8ed27510ad37fccfa3b7c3035fbd75b52901b160fb",
+          "id": "task_authority",
+          "result": "n/a"
+        }
+      ],
+      "outcome": "escalate",
+      "scenario": "after-unlinked-cancel"
+    }
+  ],
+  "source": "go/guard/testdata/parity/generate_supplementary.py"
+}

@@ -64,8 +64,12 @@ it touches:
 - **Kept back (§12).** `testdata/actions` and the two `parity` outputs that carry a real name and
   booking (`caps-v5-parity.json`, `supplementary-parity.json`, with their generators) are kept
   back. So are the three tests that read them (`TestCapsV5MatchesPythonDecisions`,
-  the booking gate-rule test in `selectors_test.go`, `TestLeg3SupplementaryParity`). A later PR here
-  regenerates them synthetically before the switch-over.
+  the booking gate-rule test in `selectors_test.go`, `TestLeg3SupplementaryParity`). A later PR
+  regenerated the two parity outputs with neutral names, each by its own generator at the engine
+  commit it names. The unmodified generator first reproduced the committed file byte for byte,
+  and the renamed run changed only the renamed ids and the evidence digests over them. That PR
+  also restored the three tests. `testdata/actions` stays in Muse as Muse's own testdata, since
+  only Muse's tests read it.
 
 ## 0. Problem, and what this note does not do
 
