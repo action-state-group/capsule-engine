@@ -389,7 +389,7 @@
    "input": "go/guard/testdata/emit/pay-history-5-days.json",
    "input_sha256": "a708348e8a98ca4001942441f4890c71c74af2e0039374560656fb307e1cbc4d",
    "expected": {
-    "outcome": "allow",
+    "outcome": "escalate",
     "constraints": [
      {
       "id": "dedupe",
@@ -399,9 +399,10 @@
      },
      {
       "id": "caps",
-      "result": "pass",
+      "result": "n/a",
       "method": "spend.weekly/3.1.0",
-      "evidence_digest": "a2876dd7815a39a3127ed03e33d7b6cda2c130581b7b9aef58fbad452be05531"
+      "evidence_digest": "306cbe702bf8108912dcdfcc47af77628c97570517ffc2193a614f9f097a5f24",
+      "reason": "the history supplied reaches back 5 day(s); the 7d total needs 7d"
      },
      {
       "id": "verify_before_dispatch",
@@ -1408,7 +1409,7 @@
    "input": "go/guard/testdata/emit/pay-history-taxonomy-1-acts.json",
    "input_sha256": "190395b9287ec4ca5779f65969c92e2b7ddecc93fd5378fcf9d49da2149cb1b5",
    "expected": {
-    "outcome": "allow",
+    "outcome": "escalate",
     "constraints": [
      {
       "id": "dedupe",
@@ -1418,9 +1419,10 @@
      },
      {
       "id": "caps",
-      "result": "pass",
+      "result": "n/a",
       "method": "spend.weekly/3.1.0",
-      "evidence_digest": "a2876dd7815a39a3127ed03e33d7b6cda2c130581b7b9aef58fbad452be05531"
+      "evidence_digest": "306cbe702bf8108912dcdfcc47af77628c97570517ffc2193a614f9f097a5f24",
+      "reason": "3 earlier act(s) were classed under another taxonomy version than the engine's (6), so the 7d total cannot be computed"
      },
      {
       "id": "verify_before_dispatch",

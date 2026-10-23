@@ -80,6 +80,7 @@ __all__ = [
     "load_taxonomy_table",
     "record_taxonomy_version",
     "resolve",
+    "same_classes",
     "trigger_class",
 ]
 
@@ -318,6 +319,14 @@ def carried_taxonomy(version: object) -> TaxonomyTable | None:
     """The table for taxonomy ``version`` as it shipped, or None when this
     engine does not carry it (only a string names a version)."""
     return _CARRIED.get(version) if isinstance(version, str) else None
+
+
+def same_classes(version: object) -> bool:
+    """Whether a record sealed under taxonomy ``version`` names its class
+    from a table with exactly the engine's class names, in its order: the
+    engine's own version, or a carried one that differs only in approvers."""
+    table = ENGINE_TAXONOMY if version == ENGINE_TAXONOMY.version else carried_taxonomy(version)
+    return table is not None and tuple(table.classes) == tuple(ENGINE_TAXONOMY.classes)
 
 
 def resolve(action_class: str) -> ActionClass | None:

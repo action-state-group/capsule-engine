@@ -77,7 +77,7 @@ from ...folds.engine import EvaluationTrace, ReversalSummary, evaluate_one
 from ..action import Action
 from ..capsule import ConstraintOutcome, not_applicable_evidence
 from ..classes import resolve
-from ..history_state import INCOMPLETE, history_state
+from ..history_state import INCOMPLETE, WINDOW_HELD, history_state
 from .base import CheckOutcome
 
 __all__ = [
@@ -279,6 +279,16 @@ def _operator_history_incomplete(ledger: LedgerAPI, action: Action) -> bool:
     return any(history_state(r.capsule) == INCOMPLETE for r in ledger.scan(ScanQuery(counterparty=action.operator)))
 
 
+def _window_held(records: list[dict]) -> str | None:
+    """The reason a live history's ``window_held`` record gives, when one of
+    ``records`` is that record."""
+    for capsule in records:
+        if history_state(capsule) == WINDOW_HELD:
+            reason = (capsule.get("asg_payload") or {}).get("held_reason")
+            return reason if isinstance(reason, str) and reason else "the history cannot decide the window"
+    return None
+
+
 def history_incomplete_reason(definition: FoldDefinition) -> str:
     """Why the window total is not known on a history that may be missing
     acts, naming the fold's window (``7d``)."""
@@ -342,6 +352,8 @@ def check_caps(
     # Under a fold keyed by operator the records read already hold the operator's marker.
     incomplete = (any(history_state(capsule) == INCOMPLETE for capsule in records) if definition.key == "operator"
                   else _operator_history_incomplete(ledger, action))
+    held = _window_held(records if definition.key == "operator"
+                        else [r.capsule for r in ledger.scan(ScanQuery(counterparty=action.operator))])
     weekly_spend = trace.result or 0
     projected = weekly_spend + action.amount_minor
     envelope = trace.to_envelope()
@@ -370,6 +382,8 @@ def check_caps(
         if not any(t["limit"] == "per_action" for t in tripped):
             if incomplete:
                 return _history_incomplete_outcome(definition, trace)
+            if held is not None:
+                return _held_outcome(definition, trace, held)
             if unreadable:
                 return _window_unreadable(definition, envelope)
         two_limit = TwoLimitCapsEvidence(**evidence, per_action_cap_minor=per_action_cap_minor, tripped=tripped)
@@ -389,6 +403,8 @@ def check_caps(
 
     if incomplete:
         return _history_incomplete_outcome(definition, trace)
+    if held is not None:
+        return _held_outcome(definition, trace, held)
     if unreadable:
         return _window_unreadable(definition, envelope)
     if projected <= cap_minor:
@@ -442,6 +458,24 @@ def _history_incomplete_outcome(definition: FoldDefinition, trace: EvaluationTra
             id="caps",
             result="n/a",
             reason=history_incomplete_reason(definition),
+            evidence=not_applicable_evidence("caps", in_scope=True),
+            check_type="policy",
+            method=definition.fold_id,
+        ),
+        fold_envelopes=(trace.to_envelope(),),
+        asks_when_unevaluated=True,
+    )
+
+
+def _held_outcome(definition: FoldDefinition, trace: EvaluationTrace, reason: str) -> CheckOutcome:
+    """``n/a`` in scope, no missing field: a complete history the window
+    cannot be summed over (``window_held``), so the total is not known. The
+    engine asks rather than allows."""
+    return CheckOutcome(
+        constraint=ConstraintOutcome(
+            id="caps",
+            result="n/a",
+            reason=reason,
             evidence=not_applicable_evidence("caps", in_scope=True),
             check_type="policy",
             method=definition.fold_id,
