@@ -11,6 +11,9 @@ The first release of the module `github.com/action-state-group/capsule-engine/go
 Go guard, moved into this repository unchanged apart from the caller-side parameters in
 `README.md` ("What the caller decides").
 
+The module carries its own `LICENSE` (Apache-2.0, the repository's), since a Go module zip
+holds only the files under `go/`.
+
 - Packs: asg/everyday/0.3.4-0.3.8 and asg/seller/0.1.0-0.1.5, at the digests
   in their PROVENANCE.json.
 - Definitions: the 48 (id, digest) pairs in `portedDefinitions`.
