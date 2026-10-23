@@ -20,9 +20,9 @@ from cll.ledger import LedgerStore
 from capsule_engine.guards.checks.caps import WINDOW_UNREADABLE_REASON
 from capsule_engine.guards.classes import ENGINE_TAXONOMY, same_classes
 from capsule_engine.guards.history_state import WINDOW_HELD, history_state
-from capsule_engine.packs import load_pack_dir
+from capsule_engine.packs import install_pack, load_pack_dir
 from capsule_engine.report.live_check import decide_check_input
-from capsule_engine.report.live_history import _act_taxonomy_version, history_ledger
+from capsule_engine.report.live_history import _act_taxonomy_version, history_ledger, window_held_reason
 
 ROOT = Path(__file__).resolve().parent.parent
 REPO_ROOT = ROOT.parent
@@ -246,6 +246,54 @@ def test_an_act_whose_capsule_does_not_bind_its_input_has_no_spend_to_read():
     envelope["history"][0]["model_attestation"]["compute_attestation"]["agent_input_digest"] = "0" * 64
     _, caps = _caps(envelope, ACCEPTED_ONLY)
     assert caps.reason == UNDECIDED_REASON.format(1)
+
+
+def test_an_outcome_stating_its_attempted_act_is_unchecked_and_does_not_hold():
+    envelope = _envelope("pay-history-under")
+    entry = _undecided(envelope["history"][0])
+    entry["agent_input"] = {"type": "action-outcome/v0", "body": {
+        "action_class": "money.purchase", "taxonomy_version": "6", "attempted": entry["agent_input"]["body"]}}
+    _rebound(entry)
+    _, caps = _caps(envelope, ACCEPTED_ONLY)
+    assert caps.result == "pass"
+
+
+def test_a_checked_record_with_no_time_holds_every_undecided_act():
+    envelope = _with_undecided(0, 2)
+    del envelope["record"]["timestamp"]
+    _, caps = _caps(envelope, ACCEPTED_ONLY)
+    assert caps.reason == UNDECIDED_REASON.format(2)
+
+
+def test_a_checked_record_whose_time_cannot_be_read_holds_every_undecided_act(tmp_path):
+    # caps refuses such a check itself; the hold counts every undecided act,
+    # in the window or not, as the Go guard's windowCoverage does.
+    envelope = _with_undecided(0, 2)
+    caps_fold = install_pack(ACCEPTED_ONLY, project_dir=tmp_path / "project", mode="observe").resolved.caps_fold()
+    reason = window_held_reason(envelope["history_scope"], envelope["history"], caps_fold,
+                                {**envelope["record"], "timestamp": "not a time"})
+    assert reason == UNDECIDED_REASON.format(2)
+
+
+def _transfer(envelope: dict) -> dict:
+    """``envelope`` with its checked record classed ``money.transfer``, the
+    one class seller 0.1.0 and 0.1.1's caps/1.0.0 limits."""
+    record = envelope["record"]
+    record["agent_input"]["body"]["action_class"] = "money.transfer"
+    record["model_attestation"]["compute_attestation"]["agent_input_digest"] = json_digest(record["agent_input"])
+    return envelope
+
+
+@pytest.mark.parametrize("version", ["seller-0.1.0", "seller-0.1.1"])
+def test_under_a_fold_keyed_by_developer_only_the_checks_developer_holds(version):
+    # spend.weekly/1.0.0 sums accepted acts by developer.
+    pack = load_pack_dir(ROOT / "tests" / "fixtures" / "packs" / version)
+    _, caps = _caps(_transfer(_with_undecided(0)), pack)
+    assert (caps.method, caps.reason) == ("spend.weekly/1.0.0", UNDECIDED_REASON.format(1))
+    envelope = _transfer(_with_undecided(0))
+    envelope["history"][0]["developer"] = "another-developer"
+    _, caps = _caps(envelope, pack)
+    assert caps.result == "pass"
 
 
 def test_under_a_fold_that_counts_executed_acts_the_window_names_the_unreadable_spend():
