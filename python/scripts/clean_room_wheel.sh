@@ -29,4 +29,8 @@ wheel="$(ls "$work"/dist/capsule_engine-*.whl)"
 "$work/venv/bin/python" -m pip install --quiet "$wheel" "$@"
 
 cd "$work"
+# The installed command runs, and reports the wheel's own version.
+want="$("$work/venv/bin/python" -c 'from importlib.metadata import version; print(version("capsule-engine"))')"
+"$work/venv/bin/capsule-engine" --help >/dev/null
+test "$("$work/venv/bin/capsule-engine" --version)" = "$want"
 "$work/venv/bin/python" "$repo/scripts/clean_room_wheel_check.py" "$repo/../examples/contracts"
