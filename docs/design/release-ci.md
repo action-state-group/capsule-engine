@@ -37,8 +37,8 @@ All three use the same setup, and `.github/release.py` is a byte-identical copy 
 
 ## What aligning means here
 
-Matching the siblings for a repo that releases only Go is short, because the siblings have no
-Go release automation either:
+For the Go module, matching the siblings is short, because the siblings have no Go release
+automation either:
 
 1. **Tag rulesets, as in the siblings.** `release tags` and `go release tags`, with the same
    rules and the same bypass (repository admin), are a repository setting an admin applies. They
