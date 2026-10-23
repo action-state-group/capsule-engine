@@ -5,12 +5,14 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "capsule-engine"
-version = "0.0.1"
+version = "0.1.0"
 description = "The thin single-node engine: guard, append-only fold compute, packs, policy activation, and the local console/report/bundle-viewer runtime for AI agent actions."
 readme = "README.md"
-requires-python = ">=3.10"
-license = "Apache-2.0"
-license-files = ["LICENSE"]
+# typing.NotRequired (PEP 655) is 3.11 and later.
+requires-python = ">=3.11"
+# The tau2-bench data under examples/data/tau2_airline is MIT (Sierra Research).
+license = "Apache-2.0 AND MIT"
+license-files = ["LICENSE", "capsule_engine/examples/data/tau2_airline/LICENSE-tau2-bench"]
 authors = [{ name = "Action State Group" }]
 keywords = ["agent", "guard", "fold", "capsule", "engine"]
 classifiers = [

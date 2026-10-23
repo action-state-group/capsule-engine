@@ -6,4 +6,12 @@ checkpointed-local-log (``cll.ledger``); the action-class registry is this
 package's own ``registry``.
 """
 
-__version__ = "0.0.1"
+from importlib.metadata import PackageNotFoundError as _PackageNotFoundError
+from importlib.metadata import version as _metadata_version
+
+# pyproject.toml is the one version source (Release · Prepare bumps only it);
+# read it from the installed distribution instead of repeating it here.
+try:
+    __version__ = _metadata_version("capsule-engine")
+except _PackageNotFoundError:  # imported from a source tree that is not installed
+    __version__ = "0+unknown"
