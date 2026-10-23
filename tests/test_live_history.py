@@ -39,7 +39,6 @@ from pathlib import Path
 from typing import TypedDict
 
 import pytest
-from cll.ledger import LedgerStore
 
 import capsule_engine
 from capsule_engine.folds.loader import load_definition_file as load_fold
@@ -57,9 +56,9 @@ from capsule_engine.guards.history_state import (
 )
 from capsule_engine.guards.wickets import load_definition_file
 from capsule_engine.packs import install_pack, load_pack_dir
-from capsule_engine.packs.install import engine_ask_sets
 from capsule_engine.packs.obligation_results import obligation_results
-from capsule_engine.report.live_history import HistoryLedger, history_ledger
+from capsule_engine.report.live_check import decide_check_input
+from capsule_engine.report.live_history import HistoryLedger
 from capsule_engine.report.replay import (
     action_for_check_input,
     action_for_history_entry,
@@ -195,35 +194,13 @@ class Live:
     written: HistoryLedger
 
 
-def _live_engine(store: LedgerStore, tmp: str) -> GuardEngine:
-    installed = install_pack(PACK, project_dir=Path(tmp) / "live-project", mode="observe")
-    resolved = installed.resolved
-    wickets = resolved.configured_wickets(RUNNABLE_CHECKS)
-    gates, asks = engine_ask_sets(installed.pack, wickets)
-    signer = LocalSigner(key_id="live-history", secret=b"live-history-fixture")
-    return GuardEngine(
-        ledger=store, caps_fold=resolved.caps_fold(), signer_provider=lambda: signer,
-        caps_minor=resolved.caps_minor() or {}, manifest_digest=resolved.manifest_digest, wickets=wickets,
-        ask_gate_selectors=gates, ask_wickets=asks, evaluate_under_record_taxonomy=True,
-    )
-
-
 def _decide(envelope: dict, *, with_history: bool = True) -> Live:
     """The decision on one check input under the seller pack, by a fresh
     engine whose ledger is the input's history (``history_ledger``), or empty
     when ``with_history`` is false (the live path before it)."""
-    with tempfile.TemporaryDirectory() as tmp, LedgerStore(Path(tmp) / "ledger") as store:
-        engine = _live_engine(store, tmp)
-        written = history_ledger(envelope, store) if with_history else HistoryLedger(True, 0, 0, 0)
-        ledger = [r.capsule for r in store.scan()]
-        action = action_for_check_input(envelope["record"], item_ref=envelope.get("item_ref"))
-        decision = engine.check(
-            action,
-            task_authority_record=envelope.get("task_authority_record"),
-            commercial_bounds_opening=envelope.get("commercial_bounds_opening"),
-            representing_opening=envelope["record"].get("representing_opening"),
-        )
-        return Live(decision=decision, ledger=ledger, written=written)
+    signer = LocalSigner(key_id="live-history", secret=b"live-history-fixture")
+    live = decide_check_input(PACK, envelope, with_history=with_history, signer=signer)
+    return Live(decision=live.decision, ledger=live.ledger, written=live.written)
 
 
 @cache

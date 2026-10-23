@@ -1,0 +1,10 @@
+{
+ "note": "Definitions a current pack cites that no conformance case can run, each with why. The coverage gate (scripts/conformance_vectors.py --check) skips only these.",
+ "exempt": [
+  {
+   "definition": "verify_before_dispatch/1.0.0",
+   "why": "the Go guard has no capsule verifier: checkVerifyBeforeDispatch is always n/a, and an action that cites a mandate is refused with ErrCitedMandate before any check runs",
+   "issue": "https://github.com/action-state-group/capsule-engine/issues/210"
+  }
+ ]
+}

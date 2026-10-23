@@ -1,0 +1,30 @@
+{
+ "steps": [
+  {
+   "operator": "household-c",
+   "developer": "assistant-c@v1",
+   "action_type": "decide",
+   "currency": "USD",
+   "taxonomy_version": "6",
+   "verb": "send",
+   "action_class": "communication.send",
+   "action_id": "send/conformance-m2",
+   "timestamp": "2026-10-20T10:06:00Z",
+   "target": "recipient-b",
+   "outgoing_content": "See you at noon."
+  },
+  {
+   "operator": "household-c",
+   "developer": "assistant-c@v1",
+   "action_type": "decide",
+   "currency": "USD",
+   "taxonomy_version": "6",
+   "verb": "send",
+   "action_class": "communication.send",
+   "action_id": "send/conformance-m3",
+   "timestamp": "2026-10-20T10:07:00Z",
+   "target": "recipient-b",
+   "outgoing_content": "Running five minutes late."
+  }
+ ]
+}

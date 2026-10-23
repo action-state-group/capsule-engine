@@ -49,7 +49,9 @@ GOWORK=off go test ./...
 ```
 
 From the repository root, `python scripts/generate_go_packs.py --check`
-checks the embedded tree against the catalog. CI runs both on every pull
+checks the embedded tree against the catalog, and
+`python scripts/conformance_vectors.py --check` holds the Python engine to the
+shared vectors that `guard/conformance_test.go` holds this module to. CI runs both on every pull
 request (`.github/workflows/conformance.yml`).
 
 ## Versions
