@@ -19,7 +19,7 @@ module has its own changelog, `go/CHANGELOG.md`.
   approver for the class, is its outcome, `escalate`, no longer `not_evaluable`. With no
   approver the decision is still refused (`deny`) and its verdict is still `not_evaluable`.
   Outcomes and sealed capsules do not change.
-- Changed (capsule-engine#214 hold A, #233, Steven's ruling A, ops 5053da83): what the caps window
+- Changed (capsule-engine#214 hold A, #233, Steven's ruling A): what the caps window
   counts for an accepted act in a live check's history, where it can now only rise.
   - An accepted act that seals no `spend_minor` counts at its stated `amount_minor`, never below
     0, under every fold. Under the frozen spend.weekly/3.0.0 and 1.0.0 (everyday 0.3.4 and 0.3.5,
