@@ -76,3 +76,52 @@ def test_a_fold_counts_only_when_a_case_ran_it():
     sets = [json.loads(p.read_text()) for p in sorted(tool.VECTORS.glob("*.json")) if not p.name[0].isupper()]
     missing = tool.coverage(sets, set())
     assert sum("no case runs the fold" in m for m in missing) == len(_fold_digests(tool)), missing
+
+
+def _one_case(tool, set_name: str, case_name: str) -> Path:
+    """A copy of one case of ``set_name`` as the only set beside the tool's
+    copied ones."""
+    data = json.loads((_tool().VECTORS / set_name).read_text())
+    data["cases"] = [c for c in data["cases"] if c["case"] == case_name]
+    path = tool.VECTORS / set_name
+    path.write_text(json.dumps(data, indent=1) + "\n")
+    return path
+
+
+def test_a_frozen_case_keeps_its_pack(tool_copy):
+    path = _one_case(tool_copy, "undecided-act-everyday-0.3.5.json", "held")
+    assert json.loads(path.read_text())["cases"][0]["frozen"] is True
+    assert tool_copy.main(["--check"]) == 0
+    assert tool_copy.main(["--write"]) == 0
+    (case,) = json.loads(path.read_text())["cases"]
+    assert case["pack"] == "everyday-0.3.5"
+
+
+def test_an_unflagged_case_on_an_older_pack_is_moved_to_the_current_one(tool_copy, capsys):
+    path = _one_case(tool_copy, "undecided-act-everyday-0.3.5.json", "held")
+    data = json.loads(path.read_text())
+    del data["cases"][0]["frozen"]
+    path.write_text(json.dumps(data))
+    assert tool_copy.main(["--check"]) == 1
+    assert "not the current" in capsys.readouterr().err
+    assert tool_copy.main(["--write"]) == 0
+    (case,) = json.loads(path.read_text())["cases"]
+    assert case["pack"] == tool_copy._current()["everyday"]
+
+
+def test_a_case_frozen_on_a_pack_that_is_not_embedded_is_found(tool_copy, capsys):
+    path = _one_case(tool_copy, "undecided-act-everyday-0.3.5.json", "held")
+    data = json.loads(path.read_text())
+    data["cases"][0]["pack"] = "everyday-0.0.1"
+    path.write_text(json.dumps(data))
+    assert tool_copy.main(["--check"]) == 1
+    assert "not an embedded pack" in capsys.readouterr().err
+
+
+def test_seeding_with_a_pack_freezes_every_case_on_it(tool_copy):
+    out = tool_copy.seed(ROOT / "conformance-vectors" / "guard" / "v0" / "inputs" / "caps-held", "everyday-0.3.5")
+    assert out.name == "caps-held-everyday-0.3.5.json"
+    cases = json.loads(out.read_text())["cases"]
+    assert cases and all(c["pack"] == "everyday-0.3.5" and c["frozen"] is True for c in cases)
+    with pytest.raises(ValueError):
+        tool_copy.seed(ROOT / "conformance-vectors" / "guard" / "v0" / "inputs" / "caps-held", "everyday-0.0.1")
