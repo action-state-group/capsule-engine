@@ -150,17 +150,7 @@ func conformanceEngines(t *testing.T) map[string]*Engine {
 // decideCase is this port's decision on one case, in the vectors' shape.
 func decideCase(t *testing.T, engines map[string]*Engine, c conformanceCase) conformanceDecision {
 	t.Helper()
-	e, ok := engines[c.Pack]
-	if !ok {
-		t.Fatalf("%s: pack %s is not embedded", c.Case, c.Pack)
-	}
-	raw, err := os.ReadFile(filepath.Join(conformanceRoot, filepath.FromSlash(c.Input)))
-	if err != nil {
-		t.Fatal(err)
-	}
-	if sum := sha256.Sum256(raw); hex.EncodeToString(sum[:]) != c.InputSHA256 {
-		t.Fatalf("%s: %s is not the input pinned", c.Case, c.Input)
-	}
+	e, raw := caseInput(t, engines, c)
 	switch c.Kind {
 	case "check-input":
 		a, h, err := DecodeCheckInput(raw)
@@ -173,56 +163,19 @@ func decideCase(t *testing.T, engines map[string]*Engine, c conformanceCase) con
 		}
 		return decisionShape(t, c.Case, d)
 	case "action-ledger":
-		var in struct {
-			Steps []json.RawMessage `json:"steps"`
+		steps, refused := ledgerSteps(t, e, c, raw)
+		if refused != "" {
+			return conformanceDecision{Error: refused}
 		}
-		if err := json.Unmarshal(raw, &in); err != nil {
-			t.Fatalf("%s: %v", c.Case, err)
-		}
-		var ledger []Record
 		out := conformanceDecision{}
-		for i, step := range in.Steps {
-			a, err := DecodeAction(bytes.NewReader(step))
-			if err != nil {
-				return conformanceDecision{Error: "decode: " + err.Error()}
-			}
-			d, err := e.Check(a, ledger)
-			if err != nil {
-				return conformanceDecision{Error: "check: " + err.Error()}
-			}
-			got := decisionShape(t, c.Case, d)
-			r := RecordFor(a, d)
-			if i < len(c.Expected.Steps) {
-				got.CapsuleID = c.Expected.Steps[i].CapsuleID
-				r.CapsuleID = got.CapsuleID
-			}
+		for _, step := range steps {
+			got := step.decision
+			got.CapsuleID = step.id
 			out.Steps = append(out.Steps, got)
-			ledger = append(ledger, r)
 		}
 		return out
 	case "sale-bundle":
-		var in struct {
-			SaleBundle string `json:"sale_bundle"`
-			Verify     string `json:"verify"`
-		}
-		if err := json.Unmarshal(raw, &in); err != nil {
-			t.Fatalf("%s: %v", c.Case, err)
-		}
-		bundlePath := filepath.Join(conformanceRoot, filepath.FromSlash(in.SaleBundle))
-		verifyPath := filepath.Join(conformanceRoot, filepath.FromSlash(in.Verify))
-		if !strings.HasPrefix(verifyPath, filepath.Join(filepath.Dir(bundlePath), "verify")+string(filepath.Separator)) &&
-			!strings.HasPrefix(verifyPath, filepath.Join(filepath.Dir(filepath.Dir(bundlePath)), "verify")+string(filepath.Separator)) {
-			t.Fatalf("%s: the verify report is not under its fixture's verify/", c.Case)
-		}
-		bundle, err := os.ReadFile(bundlePath)
-		if err != nil {
-			t.Fatal(err)
-		}
-		verify, err := os.ReadFile(verifyPath)
-		if err != nil {
-			t.Fatal(err)
-		}
-		sale, err := ReadSaleBundle(bundle, verifiedBy(t, verify, bundle))
+		sale, err := caseSale(t, c, raw)
 		if err != nil {
 			return conformanceDecision{Error: "decode: " + err.Error()}
 		}
@@ -230,15 +183,7 @@ func decideCase(t *testing.T, engines map[string]*Engine, c conformanceCase) con
 		if out.Sale.Findings == nil {
 			out.Sale.Findings = []string{}
 		}
-		// The engine's replay seals a decision of its own for each check, and
-		// a later check's evidence names it; the caller seals in Go, so the
-		// replay here gives each decided record that capsule's id.
-		sealed := map[string]string{}
-		for _, step := range c.Expected.Steps {
-			if step.SealedCapsuleID != "" {
-				sealed[step.CapsuleID] = step.SealedCapsuleID
-			}
-		}
+		sealed := sealedIDs(c)
 		// Which checks are decided, and in what order, is this port's own:
 		// the replay walks the records in seal order with the replay ledger's
 		// own skips, so a check one side decides and the other does not is a
@@ -254,8 +199,110 @@ func decideCase(t *testing.T, engines map[string]*Engine, c conformanceCase) con
 	return conformanceDecision{}
 }
 
+// caseInput is the engine a case is decided under and its pinned input.
+func caseInput(t *testing.T, engines map[string]*Engine, c conformanceCase) (*Engine, []byte) {
+	t.Helper()
+	e, ok := engines[c.Pack]
+	if !ok {
+		t.Fatalf("%s: pack %s is not embedded", c.Case, c.Pack)
+	}
+	raw, err := os.ReadFile(filepath.Join(conformanceRoot, filepath.FromSlash(c.Input)))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if sum := sha256.Sum256(raw); hex.EncodeToString(sum[:]) != c.InputSHA256 {
+		t.Fatalf("%s: %s is not the input pinned", c.Case, c.Input)
+	}
+	return e, raw
+}
+
+// ledgerSteps decides an action-ledger case's steps in order, each step's
+// record in the ledger before the next. A step's id is the capsule the engine
+// sealed for it (the caller seals in Go; "" past the steps Python decided),
+// which the record appended takes, so a later step's evidence naming an
+// earlier decision names the same capsule.
+// A step this port refuses ends the case: refused is the refusal, and no
+// step is returned.
+func ledgerSteps(t *testing.T, e *Engine, c conformanceCase, raw []byte) (steps []replayStep, refused string) {
+	t.Helper()
+	var in struct {
+		Steps []json.RawMessage `json:"steps"`
+	}
+	if err := json.Unmarshal(raw, &in); err != nil {
+		t.Fatalf("%s: %v", c.Case, err)
+	}
+	var ledger []Record
+	for i, step := range in.Steps {
+		a, err := DecodeAction(bytes.NewReader(step))
+		if err != nil {
+			return nil, "decode: " + err.Error()
+		}
+		d, err := e.Check(a, ledger)
+		if err != nil {
+			return nil, "check: " + err.Error()
+		}
+		id := ""
+		r := RecordFor(a, d)
+		if i < len(c.Expected.Steps) {
+			id = c.Expected.Steps[i].CapsuleID
+			r.CapsuleID = id
+		}
+		steps = append(steps, replayStep{id: id, action: a, raw: d, decision: decisionShape(t, c.Case, d)})
+		ledger = append(ledger, r)
+	}
+	return steps, ""
+}
+
+// caseSale is a sale-bundle case's sale, read with the states its verify
+// report gives.
+func caseSale(t *testing.T, c conformanceCase, raw []byte) (SaleBundle, error) {
+	t.Helper()
+	var in struct {
+		SaleBundle string `json:"sale_bundle"`
+		Verify     string `json:"verify"`
+	}
+	if err := json.Unmarshal(raw, &in); err != nil {
+		t.Fatalf("%s: %v", c.Case, err)
+	}
+	bundlePath := filepath.Join(conformanceRoot, filepath.FromSlash(in.SaleBundle))
+	verifyPath := filepath.Join(conformanceRoot, filepath.FromSlash(in.Verify))
+	if !strings.HasPrefix(verifyPath, filepath.Join(filepath.Dir(bundlePath), "verify")+string(filepath.Separator)) &&
+		!strings.HasPrefix(verifyPath, filepath.Join(filepath.Dir(filepath.Dir(bundlePath)), "verify")+string(filepath.Separator)) {
+		t.Fatalf("%s: the verify report is not under its fixture's verify/", c.Case)
+	}
+	bundle, err := os.ReadFile(bundlePath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	verify, err := os.ReadFile(verifyPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return ReadSaleBundle(bundle, verifiedBy(t, verify, bundle))
+}
+
+// sealedIDs is the decision capsule the engine's replay sealed for each
+// checked record of a sale-bundle case, by that record's id. The replay
+// seals a decision of its own for each check, and a later check's evidence
+// names it; the caller seals in Go, so the replay here gives each decided
+// record that capsule's id.
+func sealedIDs(c conformanceCase) map[string]string {
+	sealed := map[string]string{}
+	for _, step := range c.Expected.Steps {
+		if step.SealedCapsuleID != "" {
+			sealed[step.CapsuleID] = step.SealedCapsuleID
+		}
+	}
+	return sealed
+}
+
+// replayStep is one decided step of a multi-step case: the action checked
+// and this port's decision on it, raw and in the vectors' shape. A step
+// whose check this port refused holds only its id and the refusal.
 type replayStep struct {
 	id       string
+	action   Action
+	raw      Decision
 	decision conformanceDecision
 }
 
@@ -292,10 +339,10 @@ func replaySteps(t *testing.T, e *Engine, s SaleBundle, sealed map[string]string
 		}
 		d, err := e.CheckSale(a, ledger, h)
 		if err != nil {
-			steps = append(steps, replayStep{id, conformanceDecision{Error: "check: " + err.Error()}})
+			steps = append(steps, replayStep{id: id, decision: conformanceDecision{Error: "check: " + err.Error()}})
 			continue
 		}
-		steps = append(steps, replayStep{id, decisionShape(t, id, d)})
+		steps = append(steps, replayStep{id: id, action: a, raw: d, decision: decisionShape(t, id, d)})
 		rec := RecordFor(a, d)
 		rec.CapsuleID, rec.DryRun = id, ptr(true)
 		if as, ok := sealed[id]; ok {
