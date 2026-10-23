@@ -1,6 +1,8 @@
 package guard
 
 import (
+	"bytes"
+	"encoding/json"
 	"testing"
 )
 
@@ -129,5 +131,44 @@ func TestASKDeclaredGateRulesAskOnlyWhereTheClassHasAnApprover(t *testing.T) {
 		if d.Outcome != Escalate {
 			t.Errorf("%s (%s): outcome %s, want escalate", id, class, d.Outcome)
 		}
+	}
+}
+
+// PER-RULE SELECTORS (0.3.2): A booking (booking.create, 558.80, the
+// caps-v5 parity scenario booking-over-limit) fails r16 and no other gate rule.
+// Under 0.3.1 every rule citing action_class_gate took the gate's one result,
+// so the booking also failed r11, r12, r15, r17 and r18.
+func TestABookingOverItsLimitFailsOnlyItsOwnGateRule(t *testing.T) {
+	var p struct {
+		Scenarios []parityScenario `json:"scenarios"`
+	}
+	if err := json.Unmarshal(readFile(t, "testdata", "parity", "caps-v5-parity.json"), &p); err != nil {
+		t.Fatal(err)
+	}
+	var booking Action
+	for _, s := range p.Scenarios {
+		if s.Scenario == "booking-over-limit" {
+			a, err := DecodeAction(bytes.NewReader(s.Action))
+			if err != nil {
+				t.Fatal(err)
+			}
+			booking = a
+		}
+	}
+	if booking.ActionClass == nil || *booking.ActionClass != "booking.create" {
+		t.Fatalf("no booking-over-limit scenario: %+v", booking)
+	}
+	_, rules := reportOf(t, shippedCapsEngine(t), booking, nil)
+	for id := range gateRules {
+		want := VerdictNotApplicable
+		if id == "r16-booking-with-a-commitment" {
+			want = VerdictFail
+		}
+		if r := rules[id]; r.Verdict != want {
+			t.Errorf("%s: %s (%s), want %s", id, r.Verdict, r.Reason, want)
+		}
+	}
+	if r := rules["r11-home-address-to-an-individual"]; r.Reason != "action class booking.create did not match selector personal_disclosure" {
+		t.Errorf("r11 reason %q", r.Reason)
 	}
 }
