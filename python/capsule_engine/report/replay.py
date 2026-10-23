@@ -116,6 +116,7 @@ __all__ = [
     "action_for_check_input",
     "action_for_history_entry",
     "deal_claim_statements",
+    "names_two_deals",
     "replay",
     "statement_for_history_entry",
     "statement_record",
@@ -590,6 +591,12 @@ def _deal_id(shown: dict) -> _DealId:
     if stated and chained and block["deal_id"] != shown["chain_id"]:
         return _DealId(value=None, conflict=True)
     return _DealId(value=_text(block["deal_id"]) if stated else _text(shown.get("chain_id")))
+
+
+def names_two_deals(shown: dict) -> bool:
+    """Whether the record ``shown`` names two deals (``_deal_id``), so it is
+    in none."""
+    return _deal_id(shown).conflict
 
 
 def _bridge_deal_check(

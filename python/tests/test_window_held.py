@@ -1,10 +1,12 @@
 # SPDX-License-Identifier: Apache-2.0
 """A complete history the caps window cannot be summed over is held, and the
 engine asks rather than allows (capsule-engine#214 group 3; Sherlock2, ops
-u504): a history that reaches back fewer days than the window, or one with
-acts classed under a taxonomy whose classes are not the engine's. The Go
-guard holds the same window with the same reasons (go/guard/engine.go
-windowCoverage)."""
+u504): a history that reaches back fewer days than the window, one with an
+act in the window that carries no recorded decision and a spend that cannot
+be read (under a fold that counts accepted acts only), or one with acts
+classed under a taxonomy whose classes are not the engine's. The Go guard
+holds the same window with the same reasons, in the same order
+(go/guard/engine.go windowCoverage)."""
 from __future__ import annotations
 
 import copy
@@ -12,8 +14,10 @@ import json
 from pathlib import Path
 
 import pytest
+from agent_action_capsule import json_digest
 from cll.ledger import LedgerStore
 
+from capsule_engine.guards.checks.caps import WINDOW_UNREADABLE_REASON
 from capsule_engine.guards.classes import ENGINE_TAXONOMY, same_classes
 from capsule_engine.guards.history_state import WINDOW_HELD, history_state
 from capsule_engine.packs import load_pack_dir
@@ -24,14 +28,19 @@ ROOT = Path(__file__).resolve().parent.parent
 REPO_ROOT = ROOT.parent
 EMIT = REPO_ROOT / "go" / "guard" / "testdata" / "emit"
 PACK = load_pack_dir(ROOT / "capsule_engine" / "packs" / "catalog" / "everyday")
+# The frozen everyday 0.3.5, whose caps fold (spend.weekly/3.0.0, keyed by
+# operator) counts accepted acts only: the fold an undecided act holds.
+ACCEPTED_ONLY = load_pack_dir(ROOT / "tests" / "fixtures" / "packs" / "everyday-0.3.5")
+G3 = REPO_ROOT / "go" / "guard" / "testdata" / "g3-executed-acts-vectors" / "inputs"
+STATEMENTS = REPO_ROOT / "go" / "guard" / "testdata" / "statement-window-vectors" / "inputs"
 
 
 def _envelope(name: str) -> dict:
     return json.loads((EMIT / f"{name}.json").read_text())
 
 
-def _caps(envelope: dict):
-    decision = decide_check_input(PACK, envelope).decision
+def _caps(envelope: dict, pack=PACK):
+    decision = decide_check_input(pack, envelope).decision
     (caps,) = [c for c in decision.constraints if c.id == "caps"]
     return decision, caps
 
@@ -122,3 +131,158 @@ def test_the_marker_changes_no_check_but_caps():
 )
 def test_an_act_names_its_taxonomy_in_the_member_that_records_it(shown, version):
     assert _act_taxonomy_version(shown) == version
+
+
+# -- an act with no recorded decision -----------------------------------------
+
+UNDECIDED_REASON = ("{} earlier act(s) carry no recorded decision; the 7d total as the engine computes it counts "
+                    "accepted acts only, so it cannot be computed")
+
+
+def _rebound(entry: dict) -> dict:
+    """``entry`` with its capsule binding its edited ``agent_input`` again."""
+    entry["model_attestation"]["compute_attestation"]["agent_input_digest"] = json_digest(entry["agent_input"])
+    return entry
+
+
+def _undecided(entry: dict, **body) -> dict:
+    """``entry`` with no recorded decision and no ``spend_minor``, its body
+    then given ``body`` (a ``None`` removes the member)."""
+    entry.pop("disposition", None)
+    shown = entry["agent_input"]["body"]
+    shown.pop("spend_minor", None)
+    for name, value in body.items():
+        if value is None:
+            shown.pop(name, None)
+        else:
+            shown[name] = value
+    return _rebound(entry)
+
+
+def _with_undecided(*indexes: int, **body) -> dict:
+    """``pay-history-under`` (accepted acts on 10-06, 10-03 and, outside the
+    window, 09-20; checked on 10-07) with the acts at ``indexes`` undecided."""
+    envelope = _envelope("pay-history-under")
+    for index in indexes:
+        _undecided(envelope["history"][index], **body)
+    return envelope
+
+
+def test_an_undecided_act_whose_spend_cannot_be_read_holds_the_window():
+    decision, caps = _caps(_with_undecided(0), ACCEPTED_ONLY)
+    assert caps.result == "n/a"
+    assert caps.reason == UNDECIDED_REASON.format(1)
+    assert caps.method == "spend.weekly/3.0.0"
+    assert caps.evidence == {"constraint_id": "caps", "in_scope": True, "missing_field": None}
+    assert decision.outcome == "escalate"
+    assert decision.verdict == "not_evaluable"
+
+
+def test_the_same_history_with_its_decisions_is_allowed():
+    decision, caps = _caps(_envelope("pay-history-under"), ACCEPTED_ONLY)
+    assert caps.result == "pass"
+    assert decision.outcome == "allow"
+
+
+def test_every_undecided_act_in_the_window_is_counted():
+    _, caps = _caps(_with_undecided(0, 1), ACCEPTED_ONLY)
+    assert caps.reason == UNDECIDED_REASON.format(2)
+
+
+@pytest.mark.parametrize("spend", [-1, "3000", {"minor": 3000}, True])
+def test_a_spend_in_another_shape_cannot_be_read(spend):
+    _, caps = _caps(_with_undecided(0, spend_minor=spend), ACCEPTED_ONLY)
+    assert caps.reason == UNDECIDED_REASON.format(1)
+
+
+def test_an_undecided_act_outside_the_window_does_not_hold_it():
+    decision, caps = _caps(_with_undecided(2), ACCEPTED_ONLY)
+    assert caps.result == "pass"
+    assert decision.outcome == "allow"
+
+
+def test_an_undecided_act_under_another_operator_does_not_hold_it():
+    envelope = _with_undecided(0)
+    envelope["history"][0]["operator"] = "another-operator"
+    _, caps = _caps(envelope, ACCEPTED_ONLY)
+    assert caps.result == "pass"
+
+
+@pytest.mark.parametrize(
+    "edit",
+    [
+        pytest.param(lambda e: _undecided(e, spend_minor=0), id="spend-0"),
+        pytest.param(lambda e: _undecided(e, spend_minor=3000), id="readable-spend"),
+        pytest.param(lambda e: _undecided(e, direction="in"), id="money-in"),
+        pytest.param(lambda e: {**_undecided(e), "disposition": {"decision": "reject"}}, id="decided"),
+        pytest.param(lambda e: _rebound({**_undecided(e), "agent_input": {**e["agent_input"], "chain_id": "another"}}),
+                     id="names-two-deals"),
+        pytest.param(lambda e: _rebound({**_undecided(e), "agent_input": {**e["agent_input"], "body": {
+            "action_class": "money.purchase", "taxonomy_version": "6", "unchecked": e["agent_input"]["body"]}}}),
+            id="unchecked"),
+    ],
+)
+def test_an_act_the_window_counts_or_leaves_out_does_not_hold_it(edit):
+    envelope = _envelope("pay-history-under")
+    envelope["history"][0] = edit(envelope["history"][0])
+    _, caps = _caps(envelope, ACCEPTED_ONLY)
+    assert caps.result == "pass"
+
+
+def test_a_statement_is_not_an_undecided_act():
+    claim = json.loads((STATEMENTS / "statement-in-history" / "step-2.input.json").read_text())["history"][0]
+    envelope = _envelope("pay-history-under")
+    envelope["history"].insert(0, {**claim, "timestamp": "2026-10-07T00:00:00Z", "operator": "deal"})
+    written = decide_check_input(ACCEPTED_ONLY, envelope).written
+    assert written.statement == 1
+    _, caps = _caps(envelope, ACCEPTED_ONLY)
+    assert caps.result == "pass"
+
+
+def test_an_act_whose_capsule_does_not_bind_its_input_has_no_spend_to_read():
+    # The Go guard refuses such a history (capsule-engine#214 group 5); the
+    # engine reads it, and its spend, as unread.
+    envelope = _with_undecided(0)
+    envelope["history"][0]["model_attestation"]["compute_attestation"]["agent_input_digest"] = "0" * 64
+    _, caps = _caps(envelope, ACCEPTED_ONLY)
+    assert caps.reason == UNDECIDED_REASON.format(1)
+
+
+def test_under_a_fold_that_counts_executed_acts_the_window_names_the_unreadable_spend():
+    _, caps = _caps(_with_undecided(0))
+    assert caps.reason == WINDOW_UNREADABLE_REASON
+    assert caps.evidence["missing_field"] == "spend_minor"
+
+
+def test_a_short_history_is_held_before_an_undecided_act():
+    envelope = _with_undecided(0)
+    envelope["history_scope"]["days"] = 5
+    _, caps = _caps(envelope, ACCEPTED_ONLY)
+    assert caps.reason == "the history supplied reaches back 5 day(s); the 7d total needs 7d"
+
+
+def test_an_undecided_act_is_held_before_a_foreign_taxonomy():
+    envelope = _with_undecided(0)
+    other = envelope["history"][1]
+    other["agent_input"]["body"]["taxonomy_version"] = "1"
+    _rebound(other)
+    _, caps = _caps(envelope, ACCEPTED_ONLY)
+    assert caps.reason == UNDECIDED_REASON.format(1)
+    _undecided(envelope["history"][0], spend_minor=3000)
+    _, caps = _caps(envelope, ACCEPTED_ONLY)
+    assert caps.reason.startswith("1 earlier act(s) were classed under another taxonomy version")
+
+
+# The G3 vectors' unreadable steps, which the Go guard holds with this reason
+# under everyday 0.3.5 (go/guard/g3_executed_acts_test.go); the one outside
+# the window it does not hold.
+@pytest.mark.parametrize("sequence", ["unreadable-no-amount-at-all", "unreadable-no-spend-minor",
+                                      "unreadable-spend-a-string", "unreadable-spend-an-object",
+                                      "unreadable-spend-negative", "unreadable-window-edge",
+                                      "unreadable-outside-the-window"])
+def test_the_g3_unreadable_steps_are_held_as_the_go_guard_holds_them(sequence):
+    _, caps = _caps(json.loads((G3 / sequence / "step-2.input.json").read_text()), ACCEPTED_ONLY)
+    if sequence == "unreadable-outside-the-window":
+        assert caps.result == "pass"
+    else:
+        assert caps.reason == UNDECIDED_REASON.format(1)
