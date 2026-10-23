@@ -30492,7 +30492,7 @@
   {
    "case": "history-spend-everyday-0.3.5.json:no-spend",
    "issue": "https://github.com/action-state-group/capsule-engine/issues/214",
-   "why": "hold A, frozen spend.weekly/3.0.0 only: an accepted history act that seals no spend_minor. The engine's history copy of the act carries the spend its deal bridge takes as amount_minor, so with no spend_minor it has none and the fold skips it: the window leaves out an accepted act and the engine allows (2000 + 1299). The Go guard counts the act at its stated amount_minor (8000 + 2000 + 1299 > 10000) and asks. Sherlock2's acceptance condition on hold A is that such an act is never dropped from the window silently, as an under-count could allow, so Go is not loosened to match. Under spend.weekly/3.1.0 (everyday 0.3.8) both count it at its amount_minor and agree (history-spend.json:no-spend)",
+   "why": "hold A, frozen spend.weekly/3.0.0 only: an accepted history act that seals no spend_minor. The engine's history copy of the act carries the spend its deal bridge takes as amount_minor, so with no spend_minor it has none and the fold skips it: the window leaves out an accepted act and the engine allows (2000 + 1299). The Go guard counts the act at its stated amount_minor (8000 + 2000 + 1299 > 10000) and asks. Sherlock2's acceptance condition on hold A is that such an act is never dropped from the window silently, as an under-count could allow, so Go is not loosened to match. Under spend.weekly/3.1.0 (everyday 0.3.8) both count it at its amount_minor and agree (history-spend.json:no-spend) Pending Steven's ruling: buzz://message?channel=0d760ea3-529d-4dec-b309-24184967f8e0&id=b4d0b4b6b94d5c2997e6667c640837367d05c11b6b8be07ec44fd3622d26f550",
    "python": {
     "outcome": "allow",
     "constraints": [
@@ -30724,7 +30724,7 @@
   {
    "case": "history-spend.json:spend-above-amount",
    "issue": "https://github.com/action-state-group/capsule-engine/issues/214",
-   "why": "hold A, spend.weekly/3.1.0: an accepted history act whose spend (9000) is above its stated amount_minor (3000). The engine's record of the executed act counts an accepted act at its body's amount_minor (report/replay.py _executed_spend), below the spend its own decision sealed as amount_minor, so its total (3000 + 2000 + 1299) passes and it allows. The Go guard counts the act at its spend (9000 + 2000 + 1299 > 10000) and asks: under Sherlock2's acceptance condition on hold A an under-count could allow, so Go is not loosened to match. Below its stated amount (history-spend.json:spend-below-amount) both count the stated amount and agree",
+   "why": "hold A, spend.weekly/3.1.0: an accepted history act whose spend (9000) is above its stated amount_minor (3000). The engine's record of the executed act counts an accepted act at its body's amount_minor (report/replay.py _executed_spend), below the spend its own decision sealed as amount_minor, so its total (3000 + 2000 + 1299) passes and it allows. The Go guard counts the act at its spend (9000 + 2000 + 1299 > 10000) and asks: under Sherlock2's acceptance condition on hold A an under-count could allow, so Go is not loosened to match. Below its stated amount (history-spend.json:spend-below-amount) both count the stated amount and agree Pending Steven's ruling: buzz://message?channel=0d760ea3-529d-4dec-b309-24184967f8e0&id=b4d0b4b6b94d5c2997e6667c640837367d05c11b6b8be07ec44fd3622d26f550",
    "python": {
     "outcome": "allow",
     "constraints": [
