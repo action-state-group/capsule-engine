@@ -1,17 +1,19 @@
 [build-system]
-requires = ["setuptools>=68"]
+# >=77.0.3 for PEP 639 `license` and `license-files`, as in the sibling repos.
+requires = ["setuptools>=77.0.3"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "capsule-engine"
 version = "0.0.1"
 description = "The thin single-node engine: guard, append-only fold compute, packs, policy activation, and the local console/report/bundle-viewer runtime for AI agent actions."
+readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "Apache-2.0" }
+license = "Apache-2.0"
+license-files = ["LICENSE"]
 authors = [{ name = "Action State Group" }]
 keywords = ["agent", "guard", "fold", "capsule", "engine"]
 classifiers = [
-    "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python :: 3",
     "Development Status :: 2 - Pre-Alpha",
 ]

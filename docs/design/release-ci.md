@@ -1,6 +1,6 @@
 # Release CI aligned with the sibling repos
 
-Status: proposal (capsule-engine#210 follow-up, before the first `go/v*` tag).
+Status: built (capsule-engine#222, the python/ move #223 and the PyPI lane), before the first `go/v*` or `python/v*` tag.
 
 capsule-engine's release process should match agent-action-capsule, capsule-emit and
 checkpointed-local-log. This note maps each piece of their release CI (read at their `main`
@@ -11,7 +11,7 @@ publishes and what the PR that follows it changes.
 
 All three use the same setup, and `.github/release.py` is a byte-identical copy in each:
 
-| Piece | Siblings | capsule-engine today |
+| Piece | Siblings | capsule-engine before #222 |
 |---|---|---|
 | Release PR | `prepare-release.yml` (dispatch: package and bump) pushes `release/<pkg>-v<ver>` with a signed-off bump. A person opens the PR and adds the CHANGELOG entry. Merging it is the approval. | none |
 | Tag | `tag-release.yml` runs on push to `main`. `release.py changed` finds each manifest whose version moved, then it runs `release.py check`, `gh release create`, and dispatches the publisher | none |
@@ -30,14 +30,15 @@ All three use the same setup, and `.github/release.py` is a byte-identical copy 
 
 - **The Go module** `github.com/action-state-group/capsule-engine/go`: a pushed `go/v*` tag, as
   in the siblings. This is what `go/v0.1.0` releases.
-- **The Python package** `capsule-engine` (pyproject `0.0.1`) is not on PyPI, and the name is
-  unclaimed there. Whether to publish it is a product and packaging decision, not part of this
-  work. This note does not decide it, and the PR below does not change it.
+- **The Python package** `capsule-engine`, from `python/`, on PyPI under `python/v*` tags.
+  Ethan decided on 2026-10-22 to publish it (company OSS, Apache-2.0). The PyPI trusted
+  publisher for `publish-python.yml` in environment `pypi` is registered, and the first
+  release claims the name.
 
 ## What aligning means here
 
-Matching the siblings for a repo that releases only Go is short, because the siblings have no
-Go release automation either:
+For the Go module, matching the siblings is short, because the siblings have no Go release
+automation either:
 
 1. **Tag rulesets, as in the siblings.** `release tags` and `go release tags`, with the same
    rules and the same bypass (repository admin), are a repository setting an admin applies. They
@@ -53,20 +54,25 @@ Go release automation either:
 3. **RELEASING.md in the siblings' shape.** Name both rulesets under Safeguards, say the version
    is fetchable as soon as the tag exists, and add the check after tagging (below).
 
-**If Python publishing is approved later,** the Python lane is the siblings': copy
-`.github/release.py` byte for byte, add `.github/releases.json` with a single `python` entry
-(`python/pyproject.toml`, `python/v`, `publish-python.yml`), copy `tag-release.yml`, and copy
-`prepare-release.yml` with its package choice cut to `python`. Take `publish-python.yml` from
-agent-action-capsule (its separate build job runs `twine check`) with its `python/` working
-directory, `python/dist/` artifact path and `python/**` path filter as they are. Before the first upload, an admin creates the `pypi` environment (tag
-rule `python/v*`) and registers the PyPI trusted publisher.
+**The Python lane is the siblings'.** `.github/release.py` and `.github/test_release.py` are
+byte-for-byte copies. `.github/releases.json` has a single `python` entry
+(`python/pyproject.toml`, `python/v`, `publish-python.yml`). `tag-release.yml` is copied, and
+`prepare-release.yml` is copied with its package choice cut to `python`. `publish-python.yml`
+is agent-action-capsule's: its build job runs `twine check`, and its publish job uploads with
+PEP 740 attestations from the `pypi` environment, which an admin created with the siblings'
+rule (tag `python/v*`, no reviewers). The package gains `python/README.md` (the PyPI
+description), `python/CHANGELOG.md` and the siblings' PEP 639 license metadata.
 
 ## What this does not add
 
 Go attestations, an automated "main is green" gate before a Go tag, and post-publish jobs
-against proxy.golang.org and sum.golang.org or a PyPI byte-compare: none of the siblings has
-them. Adding them here alone would make capsule-engine the odd one out, which is what aligning
-is meant to stop. If they are wanted, they belong in all four repos together.
+against proxy.golang.org and sum.golang.org: none of the siblings has them. Adding them here
+alone would make capsule-engine the odd one out, which is what aligning is meant to stop. If
+they are wanted, they belong in all four repos together.
+
+One automated check does go beyond the siblings, at Ethan's direction: `publish-python.yml`'s
+`verify` job compares the sha256 of each file PyPI serves for the new version with the files
+its build job made.
 
 One manual step goes beyond the siblings, whose Go sections say only that an admin pushes the
 tag. After tagging, RELEASING.md has the admin fetch the version through proxy.golang.org and
