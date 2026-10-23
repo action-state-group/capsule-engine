@@ -816,6 +816,12 @@ type Decision struct {
 	// action is refused (Deny), and with no constraint failed the report's
 	// verdict is not_evaluable.
 	notEvaluated []string
+	// askedUnevaluated are the checks that could not be evaluated and ask
+	// (GuardDecision.asked_unevaluated_checks: caps over a window the
+	// history cannot decide): the action is never allowed (Escalate, or Deny
+	// with no approver), and with no constraint failed the report's verdict
+	// is not_evaluable, as the engine labels it.
+	askedUnevaluated []string
 }
 
 // anyFailed is whether any constraint failed.
@@ -1105,7 +1111,32 @@ func (e *Engine) checkWith(a Action, ledger []Record, in checkInputs) (Decision,
 	if len(notEvaluated) > 0 {
 		outcome = Deny
 	}
-	return Decision{Outcome: outcome, Constraints: cs, refusedForTaxonomy: refused, notEvaluated: notEvaluated}, nil
+	// engine.py check (78098ff): a caps result the window could not decide
+	// (CheckOutcome.asks_when_unevaluated: the history is not known to hold
+	// every act, or an act in the window has no readable spend) is never
+	// allowed on. It asks when the class has an approver and is refused
+	// otherwise. A class held only by its taxonomy was refused above.
+	var askedUnevaluated []string
+	if outcome == Allow && capsHeld(cs) {
+		askedUnevaluated = []string{"caps"}
+		outcome = Deny
+		if approver {
+			outcome = Escalate
+		}
+	}
+	return Decision{Outcome: outcome, Constraints: cs, refusedForTaxonomy: refused, notEvaluated: notEvaluated,
+		askedUnevaluated: askedUnevaluated}, nil
+}
+
+// capsHeld is whether caps is an n/a its window could not decide: the caps
+// check ran (it carries its facts) and left a limit pending.
+func capsHeld(cs []Constraint) bool {
+	for _, c := range cs {
+		if c.ID == "caps" && c.Result == NotApplicable && c.caps != nil && c.pending != "" {
+			return true
+		}
+	}
+	return false
 }
 
 // constraintFor is one check's result for a, before the taxonomy comparison

@@ -189,6 +189,12 @@ func (e *Engine) Report(a Action, d Decision) CheckReport {
 	if r.Decision == Allow && blocked {
 		r.Decision = VerdictNotEvaluable
 	}
+	if len(d.askedUnevaluated) > 0 && !d.anyFailed() {
+		// GuardDecision.verdict: asked about only because caps could not
+		// be evaluated, with nothing failed. Its label is not_evaluable; a
+		// class with no approver is refused, which Refused carries.
+		r.Decision, r.Refused = VerdictNotEvaluable, d.Outcome == Deny
+	}
 	if len(d.notEvaluated) > 0 && !d.anyFailed() {
 		// GuardDecision.verdict (#137): refused only because a check that
 		// fails closed could not be evaluated; the engine seals a reject,
