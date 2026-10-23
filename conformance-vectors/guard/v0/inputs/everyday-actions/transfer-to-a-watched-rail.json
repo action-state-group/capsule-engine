@@ -1,0 +1,21 @@
+{
+ "steps": [
+  {
+   "operator": "household-c",
+   "developer": "assistant-c@v1",
+   "action_type": "decide",
+   "currency": "USD",
+   "taxonomy_version": "6",
+   "verb": "transfer",
+   "action_class": "money.transfer",
+   "action_id": "transfer/conformance-t1",
+   "timestamp": "2026-10-20T10:01:00Z",
+   "amount_minor": 1000,
+   "target": "payee-a",
+   "rail": "p2p",
+   "recurrence": "one_time",
+   "counterparty_account_ref": "acct-a",
+   "refundable": true
+  }
+ ]
+}

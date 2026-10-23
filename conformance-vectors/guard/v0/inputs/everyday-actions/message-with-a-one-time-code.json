@@ -1,0 +1,17 @@
+{
+ "steps": [
+  {
+   "operator": "household-c",
+   "developer": "assistant-c@v1",
+   "action_type": "decide",
+   "currency": "USD",
+   "taxonomy_version": "6",
+   "verb": "send",
+   "action_class": "communication.send",
+   "action_id": "send/conformance-m1",
+   "timestamp": "2026-10-20T10:05:00Z",
+   "target": "recipient-a",
+   "outgoing_content": "Your verification code is 482913"
+  }
+ ]
+}

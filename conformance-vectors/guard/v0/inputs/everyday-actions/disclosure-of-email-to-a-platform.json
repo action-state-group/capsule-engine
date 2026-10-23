@@ -1,0 +1,20 @@
+{
+ "steps": [
+  {
+   "operator": "household-c",
+   "developer": "assistant-c@v1",
+   "action_type": "decide",
+   "currency": "USD",
+   "taxonomy_version": "6",
+   "verb": "disclose",
+   "action_class": "disclosure.personal",
+   "action_id": "disclose/conformance-d2",
+   "timestamp": "2026-10-20T10:09:00Z",
+   "target": "platform-a",
+   "recipient_role": "platform",
+   "disclosed_classes": [
+    "email"
+   ]
+  }
+ ]
+}

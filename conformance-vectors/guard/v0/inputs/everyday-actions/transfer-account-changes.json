@@ -1,0 +1,38 @@
+{
+ "steps": [
+  {
+   "operator": "household-c",
+   "developer": "assistant-c@v1",
+   "action_type": "decide",
+   "currency": "USD",
+   "taxonomy_version": "6",
+   "verb": "transfer",
+   "action_class": "money.transfer",
+   "action_id": "transfer/conformance-t3",
+   "timestamp": "2026-10-20T10:03:00Z",
+   "amount_minor": 1000,
+   "target": "payee-c",
+   "rail": "card",
+   "recurrence": "one_time",
+   "counterparty_account_ref": "acct-c1",
+   "refundable": true
+  },
+  {
+   "operator": "household-c",
+   "developer": "assistant-c@v1",
+   "action_type": "decide",
+   "currency": "USD",
+   "taxonomy_version": "6",
+   "verb": "transfer",
+   "action_class": "money.transfer",
+   "action_id": "transfer/conformance-t4",
+   "timestamp": "2026-10-20T10:04:00Z",
+   "amount_minor": 1100,
+   "target": "payee-c",
+   "rail": "card",
+   "recurrence": "one_time",
+   "counterparty_account_ref": "acct-c2",
+   "refundable": true
+  }
+ ]
+}

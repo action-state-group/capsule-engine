@@ -1,0 +1,135 @@
+{
+ "source": "go/guard/testdata/real-rc13-lockstep",
+ "cases": [
+  {
+   "case": "rc13-pay.input",
+   "kind": "check-input",
+   "pack": "everyday-0.3.8",
+   "input": "go/guard/testdata/real-rc13-lockstep/rc13-pay.input.json",
+   "input_sha256": "41abed962dcebbfc30e204a931deaf0d1c869f7fdc962c5dbc086f1aee34fb01",
+   "expected": {
+    "outcome": "deny",
+    "constraints": [
+     {
+      "id": "dedupe",
+      "result": "pass",
+      "method": "exact_match_index_v0",
+      "evidence_digest": "2e8e7a49517989475acb224ab68dc59362d2e50cada22824750b2062dd4776af"
+     },
+     {
+      "id": "caps",
+      "result": "n/a",
+      "method": "spend.weekly/3.1.0",
+      "evidence_digest": "b19281cc9387a2c4f46ae39fa7d67acdca877874c7f2d5842faddbbd518f53f3",
+      "reason": "taxonomy_version 5 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
+     },
+     {
+      "id": "verify_before_dispatch",
+      "result": "n/a",
+      "method": "agent_action_capsule.verify",
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
+     },
+     {
+      "id": "destination_rail",
+      "result": "n/a",
+      "method": "set_membership_v0",
+      "evidence_digest": "ef76466fa7feb8dfbfb6e44752316513abef2312f7e55d780a89823923ee7d00",
+      "reason": "taxonomy_version 5 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
+     },
+     {
+      "id": "counterparty_identity_change",
+      "result": "n/a",
+      "method": "prior_recorded_value_v0",
+      "evidence_digest": "91990225f457341ac74b825e75b15272395197528820e6b5f0c39527be5b31ee",
+      "reason": "taxonomy_version 5 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
+     },
+     {
+      "id": "credential_pattern",
+      "result": "n/a",
+      "method": "regex_match_v0",
+      "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827",
+      "reason": "the action sends no outgoing content"
+     },
+     {
+      "id": "recurring_charge",
+      "result": "n/a",
+      "method": "structured_field_v0",
+      "evidence_digest": "e218c576958eca76e703bc68a836b3ac279e177d9568b2add7537474c680057e",
+      "reason": "taxonomy_version 5 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
+     },
+     {
+      "id": "action_class_gate",
+      "result": "n/a",
+      "method": "taxonomy_selector_v0",
+      "evidence_digest": "510f1ac32e9f0a133ae883e6ac54a88dfdf7647815f69a557a6f4434f3441ba6",
+      "reason": "taxonomy_version 5 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
+     },
+     {
+      "id": "counterparty_seen_before",
+      "result": "n/a",
+      "method": "counterparty.seen_before/3.0.0",
+      "evidence_digest": "66ace9a0f7981541bc45e08bd0882db3e9a1be2561b785740dbabe9ec2568c8f",
+      "reason": "taxonomy_version 5 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
+     },
+     {
+      "id": "recipient_role",
+      "result": "n/a",
+      "method": "set_membership_v0",
+      "evidence_digest": "d85204126e6e5213a81d144adbce18ac9f825df291df695a95017f57960c2059",
+      "reason": "taxonomy_version 5 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
+     },
+     {
+      "id": "refundability",
+      "result": "n/a",
+      "method": "declared_boolean_v0",
+      "evidence_digest": "7f24537d5d98db4add0ed8d35b3f315b1028c2cbd6bae454daeab31dd25cacbe",
+      "reason": "taxonomy_version 5 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
+     },
+     {
+      "id": "material_fields_changed",
+      "result": "n/a",
+      "method": "pinned_field_count_v0",
+      "evidence_digest": "85f8a44ccbc5909b6628c5612cd21018854fd44e981c8fc93c9947b6ba201504",
+      "reason": "taxonomy_version 5 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
+     },
+     {
+      "id": "offer_fields_changed",
+      "result": "n/a",
+      "method": "pinned_field_count_v0",
+      "evidence_digest": "55d413cf5fe9c333655e94d26cd889da594b737e34645b2cec78163b8140259d",
+      "reason": "taxonomy_version 5 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
+     },
+     {
+      "id": "recipient_seen_before",
+      "result": "n/a",
+      "method": "counterparty.seen_before/2.0.0",
+      "evidence_digest": "f4feec4b3d4307646caaa27c18fbcc3438c55d71399b165cad0fac4f15364f1f",
+      "reason": "taxonomy_version 5 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
+     },
+     {
+      "id": "channel_change",
+      "result": "n/a",
+      "method": "same_record_v0",
+      "evidence_digest": "daa5b6e468ac920a7c315c6450dfc194fed8cd6dce155990d21b39fdd5457bd5",
+      "reason": "taxonomy_version 5 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
+     },
+     {
+      "id": "upfront_amount",
+      "result": "n/a",
+      "method": "upfront_threshold_v0",
+      "evidence_digest": "49c02198055d43dd404066874d1d5e9cd8b3e3e583d002b06feb39a7f89399bd",
+      "reason": "taxonomy_version 5 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
+     },
+     {
+      "id": "task_authority",
+      "result": "n/a",
+      "method": "bound_plan_containment_v0",
+      "evidence_digest": "0bb1d80ba9e8105248fbb911caaffc5cb2d50cd17c22cc4793285d86438171d9",
+      "reason": "taxonomy_version 5 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
+     }
+    ]
+   }
+  }
+ ]
+}

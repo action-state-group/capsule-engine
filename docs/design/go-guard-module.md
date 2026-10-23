@@ -1,6 +1,6 @@
 # Design note: the Go guard moves into this repo as a `go/` module
 
-Status: v4, as built in PR A, 2026-10-22. Converged as v3. Ethan's agent. Reviewers: Codex, a
+Status: v5, as built in PR A and PR B, 2026-10-22. Converged as v3. Ethan's agent. Reviewers: Codex, a
 `claude -p --permission-mode plan` stand-in for Kimi, and Sherlock2 (this
 note moves code ownership between ASG repositories).
 
@@ -70,6 +70,54 @@ it touches:
   and the renamed run changed only the renamed ids and the evidence digests over them. That PR
   also restored the three tests. `testdata/actions` stays in Muse as Muse's own testdata, since
   only Muse's tests read it.
+
+**v5, as built in PR B.** The shared vectors changed in these points against §5 and §7:
+
+- **What is compared.** Each decision is compared as its outcome and, per constraint in order, its
+  id, result, method and evidence digest. The evidence is the structured reason. The free-text
+  `reason` string is compared only for an n/a (see below). The Python engine writes one for
+  every constraint, but the Go guard keeps no such string: it composes wording only for some
+  failures, and its per-rule text lives in `Report`. Python's `severity`, `blocking` and
+  `check_type` have no Go counterpart.
+- **Kinds.** Two kinds are built.
+  - `check-input` is decided by `capsule_engine.report.live_check.decide_check_input`, the one
+    library function a live check now goes through. It is wired as `build_engine` wires an
+    install, and `tests/test_live_history.py` calls it.
+  - `action-ledger` is decided by `decide_steps`. Its expected steps carry the capsule id the
+    engine sealed, and the Go runner gives that id to the record it appends.
+
+  `sale-bundle` is not built yet. Sale bundles stay Go-only tests at their frozen expectations
+  until a follow-up adds the kind.
+- **Seed.** Every external-check-input/v0 envelope under `go/guard/testdata` is decided under the
+  current pack for its party role, at HEAD. That makes 503 cases from 23 sets. Eight synthetic
+  `action-ledger` cases are added for the everyday checks that no deal record reaches
+  (`inputs/everyday-actions`).
+- **Known differences.** Ten cases differ, and each is pinned with both sides' decisions. They
+  fall into five groups, tracked in capsule-engine#214.
+- **n/a reasons.** An n/a's evidence often says only "in scope, nothing missing", so an n/a also
+  carries Python's reason. The Go guard compares it wherever it keeps one: `Pending()`, or the
+  note that puts a check out of scope. In the first run all 77 such reasons agreed. For the other
+  results, the reason stays presentation.
+- **Live wiring.** A live check never evaluates a record under its own taxonomy (9ac3722, only a
+  replay does). An early draft of `decide_check_input` set that replay flag. That made two
+  old-taxonomy records look like a divergence that a live check does not have.
+- **The coverage gate.** A fold counts as covered only when some case's evidence names its digest,
+  which a check writes only when it ran the fold. `--write` also moves each case to the current
+  pack for its input, so after a pack cut the vectors follow the new version.
+- **Pins.** A pin holds an error to its stage (`decode` or `check` in Go, the exception type in
+  Python). Across languages, any two refusals agree.
+- **Not built yet, against §5 and §7:**
+  - cases carry no `pack_digest` (the `packs` job checks the embedded digests instead);
+  - the catalog fixtures are not cases yet;
+  - `action-ledger` steps carry Action fields only, with no task-authority or approval records,
+    and Go runs them through `Check`;
+  - a set is one file of cases whose inputs are referenced by path and sha256, not
+    `<set>/<case>.json` with the input inline;
+  - a failure prints the differing constraints with both sides' digests and n/a reasons, not the
+    evidence itself.
+- **Tools.** The writer, the checker and the coverage gate are `scripts/conformance_vectors.py`
+  (where this note says `tools.conformance_vectors`). `COVERAGE-EXEMPT.json` exempts only
+  `verify_before_dispatch/1.0.0`.
 
 ## 0. Problem, and what this note does not do
 
@@ -299,7 +347,7 @@ for an action that cites a mandate, the case pins the Go side as `{"error": "<se
 in `KNOWN-DIFFERENCES.json` beside Python's decision.
 
 **Python writes, Go checks.** Only Python writes `expected`:
-`python -m tools.conformance_vectors --write` runs each case through its kind's Python entry
+`python scripts/conformance_vectors.py --write` runs each case through its kind's Python entry
 point. CI runs the writer in check mode and the Go runner over the same files. There are three
 possible failures:
 
@@ -350,7 +398,7 @@ no path filter, because a Python-only change can diverge from Go as easily as a 
 1. **`go`**: in `go/` with `GOWORK=off`, `go vet ./...`, `gofmt -l` (must be empty), and
    `go test ./...`. This runs the moved parity tests and the v0 runners.
 2. **`vectors`**:
-   - install the Python package and run `python -m tools.conformance_vectors --check`, so Python
+   - install the Python package and run `python scripts/conformance_vectors.py --check`, so Python
      reproduces every committed `expected`;
    - run the Go v0 runners over the same files;
    - check `KNOWN-DIFFERENCES.json` pin by pin;

@@ -1,0 +1,19 @@
+{
+ "steps": [
+  {
+   "operator": "household-c",
+   "developer": "assistant-c@v1",
+   "action_type": "decide",
+   "currency": "USD",
+   "taxonomy_version": "6",
+   "verb": "buy",
+   "action_class": "money.purchase",
+   "action_id": "buy/conformance-p1",
+   "timestamp": "2026-10-20T10:10:00Z",
+   "amount_minor": 2000,
+   "upfront_amount_minor": 1800,
+   "target": "merchant-a",
+   "refundable": true
+  }
+ ]
+}

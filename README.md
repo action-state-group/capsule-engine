@@ -106,8 +106,8 @@ record-query verbs; the default is `full`. Run any command with `--help`.
 
 `go/` is the Go module `github.com/action-state-group/capsule-engine/go`, the
 Go implementation of the guard for the everyday and seller packs. The Python
-guard above is the reference. CI checks the Go guard against the engine's vectors and the
-catalog. A job that runs both on the same vectors at every PR's head is still to come. See
+guard above is the reference, and CI decides the shared vectors in
+`conformance-vectors/guard/v0` with both on every pull request. See
 [go/README.md](go/README.md).
 
 For the parts you can use on their own (the Evidence Contract schema and
