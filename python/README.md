@@ -8,7 +8,8 @@ console/report/bundle-viewer runtime.
 pip install capsule-engine
 ```
 
-It installs the `capsule_engine` package and the `capsule-engine` command. Its dependencies,
+It installs the `capsule_engine` package, the `capsule-engine` command and `capsulectl-engine`, a
+capsulectl plugin (`capsulectl engine check --ruleset FILE`). Its dependencies,
 `agent-action-capsule`, `checkpointed-local-log`, `capsule-emit`, `jsonschema` and `pyyaml`, come
 from PyPI.
 

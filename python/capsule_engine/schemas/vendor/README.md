@@ -32,3 +32,24 @@ IANA creates its registry, the interim registry is agent-action-capsule
 `spec/REGISTRY.md` section 17. Its provenance is recorded inside the file (the
 `$comment` and `source` fields), because no machine-readable copy exists
 upstream to copy byte-for-byte.
+
+## `external-check-input-v0.json` and `external-check-result-v0.json`
+
+- **Owner:** capsule-cli, `skills/deal/profile/external-check-input-v0.schema.json` and
+  `skills/deal/profile/external-check-result-v0.schema.json` (the result is byte-identical to the
+  copy capsulectl embeds, `plugins/internal/plugin/assets/external-check-result-v0.schema.json`).
+- **Copied from:** the `v0.1.0-rc22` release, commit `e66369627c41ff54a8318b39b7d835c16181beba`.
+- **Copied on:** 2026-10-23
+- **sha256:** input `468d77cc2492b3888385c582aaaa3a4c44df3eaf01ad6ef612338e6ddb380a39`, result
+  `61e5ffe59b2abc8390e69228c7d7e5ba86562c6550a59008c15fb3990a24dd4d` (pinned by
+  `tests/test_engine_plugin.py`)
+- **Form:** the files are byte-for-byte, with no local additions. The checker applies the input
+  schema in memory without any `additionalProperties: false` (below), so it does not behave
+  exactly as shipped there.
+- **Why it is vendored:** `capsulectl engine check` (`capsule_engine/rulesets/`) validates what it
+  reads and what it prints against them. A finding carries only the members the result schema
+  lists, because capsulectl refuses any other. Re-vendor the result schema from a capsulectl
+  release that ships capsule-cli#257 to print `limit_source` and `profile_digest`. That is a
+  breaking change for capsulectl releases before it, which refuse both, so it ships in an
+  engine release that says so. The input schema is applied with every `additionalProperties: false`
+  dropped: a member a later capsulectl adds, at the top or inside, is no reason to refuse.

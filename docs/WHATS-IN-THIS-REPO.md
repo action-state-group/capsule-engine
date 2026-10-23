@@ -66,10 +66,65 @@ one per failure: a missing or unknown profile, a malformed clause or principal
 reference, an empty requirement list, and so on. They are a useful test set
 for any other implementation of the schema.
 
+## `capsulectl engine check` and the ruleset format
+
+`capsulectl-engine` is a [capsulectl](https://github.com/action-state-group/capsule-cli) plugin
+(`cli-plugin/v1`). The package installs it as a console script; put it on a trusted plugin root
+with `capsulectl plugin install <path to capsulectl-engine>`. Then:
+
+```
+capsulectl engine check --ruleset FILE < input.json
+```
+
+reads one `external-check-input/v0` on stdin and prints one `external-check-result/v0` with
+`tier: recomputed` and one finding per clause, in the ruleset's order. Exit 0 means a result was
+printed, whatever its verdict; any other exit is a refusal, named on stderr, with nothing on
+stdout. That is capsulectl's rules-checker contract too, so the same file pins as a deal profile's
+rules checker, with `{"command": ["<root>/capsulectl-engine", "check", "--ruleset", "FILE"]}` and
+`FILE` an absolute path. capsulectl pins the launcher's bytes, and the launcher is a small stub that
+runs the installed `capsule-engine` package, which the pin does not cover, and the
+`definition_digest` below covers the ruleset, not the engine code. So what a released check
+(such as `record_type_coverage/1`) decides never changes: a change to it is a new version of the
+check, a new entry beside the old one. Both
+schemas are capsulectl's, vendored from its v0.1.0-rc22 release in
+`python/capsule_engine/schemas/vendor/`.
+
+`FILE` is an `engine-ruleset/v0` JSON document. Its JSON Schema is
+`python/capsule_engine/schemas/engine-ruleset-v0.json`, and members it does not list are refused:
+
+- `schema`: `engine-ruleset/v0`. A later format is a new value here, never a new reading of v0.
+- `ruleset_id`: the name and version the result reports.
+- `clauses`: at most 200. Each has an `id` (unique, the finding's id), a `check` (the engine check it runs, as
+  name/version), a `disposition` (`ask` or `deny`: what a failing clause does) and the check's
+  `params`.
+
+No string in a ruleset holds a control character.
+
+The `definition_digest` the result reports is the lowercase-hex SHA-256 of the RFC 8785 (JCS)
+bytes of the document. Any change to the file other than its spelling (member order, whitespace,
+escapes) is a new digest, so a profile or a contract can pin it. A member given twice in one
+object, NaN, Infinity and an unpaired surrogate are refused.
+
+The one check today is `record_type_coverage/1`: whether each of `registered_kinds` appears as the
+string at `kind_field` (a dotted path) in some entry of the input's `history`.
+
+| history                                 | finding          |
+|-----------------------------------------|------------------|
+| every declared kind is in it            | `pass`           |
+| complete, and a declared kind is not    | `fail`           |
+| incomplete, and a declared kind is not  | `not_evaluable`  |
+| `registered_kinds` is empty             | `not_applicable` |
+
+`not_applicable` is an exclusion: it moves no verdict, so a ruleset whose every finding is
+`not_applicable` reports `allow`. The result's verdict is `deny` if a `deny`
+clause fails, else `escalate` if an `ask` clause fails, else `not_evaluable` if any finding is,
+else `allow`. A finding's `limit` is the number of kinds declared and its `value` the number seen.
+`examples/rulesets/everyday-history-coverage.json` is an example.
+
 ## Install
 
-See [the README](../README.md#install). `python/tests/test_evidence_contract_schema.py`
-and `python/tests/test_register_*.py` exercise all of the above.
+See [the README](../README.md#install). `python/tests/test_evidence_contract_schema.py`,
+`python/tests/test_register_*.py` and `python/tests/test_engine_plugin.py` exercise all of the above.
 
 ## License
 

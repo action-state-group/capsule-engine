@@ -33,4 +33,13 @@ cd "$work"
 want="$("$work/venv/bin/python" -c 'from importlib.metadata import version; print(version("capsule-engine"))')"
 "$work/venv/bin/capsule-engine" --help >/dev/null
 test "$("$work/venv/bin/capsule-engine" --version)" = "$want"
+# The capsulectl plugin answers its handshake, and checks with the schemas the
+# wheel carries.
+"$work/venv/bin/capsulectl-engine" cli-plugin-metadata | grep -q '"plugin_api": "cli-plugin/v1"'
+# As capsulectl runs a pinned rules checker: a copy of the launcher in another
+# directory, with only PATH and HOME set.
+mkdir "$work/pinned" && cp "$work/venv/bin/capsulectl-engine" "$work/pinned/"
+env -i PATH="$PATH" HOME="$HOME" "$work/pinned/capsulectl-engine" check \
+  --ruleset "$repo/../examples/rulesets/everyday-history-coverage.json" \
+  <"$repo/../go/guard/testdata/real-fyi-act/purchase-commit-repeat.input.json" | grep -q '"tier":"recomputed"'
 "$work/venv/bin/python" "$repo/scripts/clean_room_wheel_check.py" "$repo/../examples/contracts"
