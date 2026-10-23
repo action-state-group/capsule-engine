@@ -45,7 +45,7 @@ func TestAHeldCapsWindowIsNeverAllowed(t *testing.T) {
 		if d.Outcome != Escalate {
 			t.Errorf("%s: outcome %s, want escalate", name, d.Outcome)
 		}
-		if r := e.Report(a, d); r.Decision != Escalate || r.Refused {
+		if r := e.Report(a, d); r.Decision != Escalate || r.Refused || r.RefusedFor != "" {
 			t.Errorf("%s: report decision %s refused=%v, want escalate, not refused", name, r.Decision, r.Refused)
 		}
 	}
@@ -83,8 +83,16 @@ func TestAHeldCapsWindowWithNoApproverIsRefused(t *testing.T) {
 	if d.Outcome != Deny {
 		t.Errorf("outcome %s, want deny", d.Outcome)
 	}
-	if r := e.Report(a, d); r.Decision != VerdictNotEvaluable || !r.Refused {
-		t.Errorf("report decision %s refused=%v, want not_evaluable, refused", r.Decision, r.Refused)
+	if r := e.Report(a, d); r.Decision != VerdictNotEvaluable || !r.Refused || r.RefusedFor != RefusedHeldCaps {
+		t.Errorf("report decision %s refused=%v for %q, want not_evaluable, refused for %q", r.Decision, r.Refused, r.RefusedFor, RefusedHeldCaps)
+	}
+	// The same held window on a record in no single deal is refused for the
+	// deal (#127): RefusedFor names the cause a caller shows. A check that
+	// fails closed is covered in sale_acceptance_test.go.
+	inNoDeal := a
+	inNoDeal.dealIDConflict = true
+	if r := e.Report(inNoDeal, d); !r.Refused || r.RefusedFor != RefusedDealConflict {
+		t.Errorf("record in no deal: refused=%v for %q, want refused for %q", r.Refused, r.RefusedFor, RefusedDealConflict)
 	}
 }
 

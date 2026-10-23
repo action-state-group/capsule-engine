@@ -29,13 +29,34 @@ type CheckReport struct {
 	Decision string       `json:"decision"`
 	Rules    []RuleResult `json:"rules"`
 	Inputs   Inputs       `json:"inputs"`
-	// Refused is set when the check is refused though no rule failed: a
-	// would-allow held only by a record sealed at another action taxonomy,
-	// which the engine seals reject. Decision is then the engine's verdict
-	// label, not_evaluable; what a caller shows the user is a refusal. It is
-	// not part of the written report.
+	// Refused is set when the check is refused though no rule failed, for
+	// one of the causes RefusedFor names (the Refused* constants). Decision
+	// is then the engine's verdict label, not_evaluable; what a caller shows
+	// the user is a refusal. It is not part of the written report.
 	Refused bool `json:"-"`
+	// RefusedFor is why the check is refused when Refused is set, one of the
+	// Refused* causes, so a caller can name the reason; "" otherwise. Like
+	// Refused, it is not part of the written report.
+	RefusedFor string `json:"-"`
 }
+
+// The causes of a refusal with no rule failed (CheckReport.RefusedFor).
+const (
+	// RefusedHeldCaps: caps could not be evaluated over the history, and
+	// the class has no approver to ask (capsule-engine #216).
+	RefusedHeldCaps = "held_caps_no_approver"
+	// RefusedNotEvaluated: a check that fails closed could not be evaluated
+	// (capsule-engine #137).
+	RefusedNotEvaluated = "not_evaluated"
+	// RefusedTaxonomy: the record was sealed at another action taxonomy
+	// than the rules'.
+	RefusedTaxonomy = "taxonomy"
+	// RefusedDealConflict: the record is in no single deal (capsule-engine
+	// #127), caps could not be evaluated over the history, and the class has
+	// no approver. A would-allow in no deal with nothing held is not refused
+	// here: its Decision is not_evaluable and Refused is false.
+	RefusedDealConflict = "deal_id_conflict"
+)
 
 // Inputs are the action body's fields: those a rule consulted for this
 // action, and those it carried that no rule read. Both sorted; never null.
@@ -197,18 +218,24 @@ func (e *Engine) Report(a Action, d Decision) CheckReport {
 		// carries. A record in no deal is refused by the engine whatever
 		// caps asks (#127), so its label stays not_evaluable.
 		r.Decision, r.Refused = VerdictNotEvaluable, d.Outcome == Deny
+		if r.Refused {
+			r.RefusedFor = RefusedHeldCaps
+			if a.dealIDConflict {
+				r.RefusedFor = RefusedDealConflict
+			}
+		}
 	}
 	if len(d.notEvaluated) > 0 && !d.anyFailed() {
 		// GuardDecision.verdict (#137): refused only because a check that
 		// fails closed could not be evaluated; the engine seals a reject,
 		// which Refused carries to the plugin.
-		r.Decision, r.Refused = VerdictNotEvaluable, true
+		r.Decision, r.Refused, r.RefusedFor = VerdictNotEvaluable, true, RefusedNotEvaluated
 	}
 	if d.refusedForTaxonomy {
 		// The engine's verdict label for a would-allow refused only by the
 		// record's taxonomy (DecisionResult.verdict); its sealed decision is
 		// a reject, which Refused carries to the plugin.
-		r.Decision, r.Refused = VerdictNotEvaluable, true
+		r.Decision, r.Refused, r.RefusedFor = VerdictNotEvaluable, true, RefusedTaxonomy
 	}
 	if a.dealIDConflict {
 		// capsule-engine #127: a would-allow on a record in no deal is
