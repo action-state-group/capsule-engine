@@ -90,10 +90,19 @@ it touches:
     by `decide_sale_bundle`, which reads and verifies the bundle and replays it (`replay_sale`).
     On the Go side, `ReadSaleBundle` takes the states capsulectl's `verify --bundle` reported,
     then each check runs through `Check` and `CheckSale`, on the replay ledger the Go parity
-    tests already build. The sale's completeness and findings are compared too. The engine's
-    replay seals a decision of its own for each check, and a later check's evidence names it.
-    Each expected step therefore carries that `sealed_capsule_id`, and the Go replay ledger
-    takes it as the record's id. The five sale bundles under `go/guard/testdata` are the cases.
+    tests already build. The Go runner works out its own steps in seal order, so a check one
+    side decides and the other does not shows as a difference. The sale's completeness and
+    findings are compared too.
+    - The engine's replay seals a decision of its own for each check, and a later check's
+      evidence names it. So in a `sale-bundle` step, `capsule_id` is the checked record's own
+      id (in an `action-ledger` step it is the sealed decision), and `sealed_capsule_id` is the
+      decision the replay sealed. The Go replay ledger takes that as the record's id.
+    - The cases are the five sale bundles under `go/guard/testdata`, the withheld-thread sale
+      and the twelve tampered sales of `sale-replay-vectors`.
+    - On the tampered sales the two sides verify differently. The Go guard takes capsulectl's
+      `verify --bundle` states, and the engine verifies with `check_evidence_file`, so their
+      findings differ (`KNOWN-DIFFERENCES.json` group 6). The steps agree.
+    - The ledger records each side builds are compared only through the decisions they lead to.
     The product's own replay loop (its plugin) is not covered by these vectors, only the
     module's pieces it calls.
 - **Seed.** Every external-check-input/v0 envelope under `go/guard/testdata` is decided under the

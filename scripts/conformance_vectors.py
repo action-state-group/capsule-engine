@@ -26,10 +26,13 @@ Kinds:
   ``decide_sale_bundle`` (Go: ``ReadSaleBundle`` with the verify report's
   states, then each check's ``Check`` and ``CheckSale`` on the replay's
   ledger). Its expected decision is ``{"sale": {"complete", "findings"},
-  "steps": [<decision with capsule_id>, ...]}``, one step per check the
-  replay decides, in its order, each with the ``sealed_capsule_id`` of the
-  decision the replay sealed for it, which the Go runner's replay ledger
-  takes as that record's id.
+  "steps": [<decision>, ...]}``, one step per check the replay decides, in
+  its order. Here a step's ``capsule_id`` is the checked record's own (in an
+  ``action-ledger`` step it is the capsule the engine sealed), and its
+  ``sealed_capsule_id`` is the decision the replay sealed for it, which the
+  Go runner's replay ledger takes as that record's id. The Go runner works
+  out its own step list, in seal order, so a check one side decides and the
+  other does not is a difference.
 
 A decision is compared as its outcome and, per constraint in order, its id,
 result, method ("" when it has none) and the JCS-SHA256 of its evidence, which

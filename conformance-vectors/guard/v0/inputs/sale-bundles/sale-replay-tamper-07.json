@@ -1,0 +1,4 @@
+{
+ "sale_bundle": "go/guard/testdata/sale-replay-vectors/tamper/07.bundle.json",
+ "verify": "go/guard/testdata/sale-replay-vectors/verify/tamper-07.verify.json"
+}
