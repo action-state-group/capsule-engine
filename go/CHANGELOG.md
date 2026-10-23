@@ -14,5 +14,5 @@ parameters in `README.md` ("What the caller decides").
 - Fixed, against the Python reference (capsule-engine#214, groups 3 and 4):
   a purchase whose caps window the history cannot decide is no longer
   allowed. With nothing else failing, the engine escalates when the class
-  has an approver and refuses otherwise. `Report` then gives that decision
-  where it gave `not_evaluable`.
+  has an approver and refuses otherwise. `Report` still labels it
+  `not_evaluable`, as the engine's `GuardDecision.verdict` does.

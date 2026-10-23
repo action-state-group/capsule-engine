@@ -10,7 +10,9 @@ import (
 // A purchase whose caps window the history cannot decide is never allowed on
 // it (engine.py check, CheckOutcome.asks_when_unevaluated; capsule-engine #214
 // groups 3 and 4): with nothing else failing, a class with an approver
-// escalates, and the report's decision is that escalation, not an allow.
+// escalates. The report labels it not_evaluable, as GuardDecision.verdict
+// does (asked_unevaluated_checks), so a caller reading the report sees the
+// same label as before and one reading the outcome never sees an allow.
 func TestAHeldCapsWindowIsNeverAllowed(t *testing.T) {
 	p, err := pack.LoadEveryday038()
 	if err != nil {
@@ -43,8 +45,8 @@ func TestAHeldCapsWindowIsNeverAllowed(t *testing.T) {
 		if d.Outcome != Escalate {
 			t.Errorf("%s: outcome %s, want escalate", name, d.Outcome)
 		}
-		if r := e.Report(a, d); r.Decision != Escalate {
-			t.Errorf("%s: report decision %s, want escalate", name, r.Decision)
+		if r := e.Report(a, d); r.Decision != VerdictNotEvaluable || r.Refused {
+			t.Errorf("%s: report decision %s refused=%v, want not_evaluable, not refused", name, r.Decision, r.Refused)
 		}
 	}
 }
