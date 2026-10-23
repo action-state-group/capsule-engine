@@ -47,5 +47,7 @@ upstream to copy byte-for-byte.
 - **Why it is vendored:** `capsulectl engine check` (`capsule_engine/rulesets/`) validates what it
   reads and what it prints against them. A finding carries only the members the result schema
   lists, because capsulectl refuses any other. Re-vendor the result schema from a capsulectl
-  release that ships capsule-cli#257 to print `limit_source` and `profile_digest`; a release
-  before it refuses both.
+  release that ships capsule-cli#257 to print `limit_source` and `profile_digest`. That is a
+  breaking change for capsulectl releases before it, which refuse both, so it ships in an
+  engine release that says so. The input schema is applied with its top-level
+  `additionalProperties` dropped: a member a later capsulectl adds is no reason to refuse.

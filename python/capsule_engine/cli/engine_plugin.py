@@ -10,7 +10,13 @@ was printed, whatever its verdict; any other exit is a refusal, named on
 stderr, with nothing on stdout. That is capsule-cli #137's rules-checker
 contract too, so the same launcher pins as a deal profile's
 `--rules-checker` with the command
-`["<root>/capsulectl-engine", "check", "--ruleset", "FILE"]`.
+`["<root>/capsulectl-engine", "check", "--ruleset", "FILE"]`, FILE an
+absolute path (capsulectl does not set the checker's working directory).
+
+capsulectl pins this launcher's bytes, and the launcher is a console-script
+stub: the code it runs is the installed capsule-engine package, which the pin
+does not cover. So a check's name/version (``record_type_coverage/1``) is
+frozen once released, and a change to what it decides is a new version.
 
 Install: `capsulectl plugin install ./capsulectl-engine`, pointing at the
 console script the package installs.
@@ -32,16 +38,24 @@ METADATA_ARG = "cli-plugin-metadata"
 NAME = "engine"
 
 
+class _Parser(argparse.ArgumentParser):
+    """A usage error is one line: capsulectl keeps a refusing checker's first
+    stderr line as its reason, and a usage block would start with "usage:"."""
+
+    def error(self, message: str):
+        self.exit(2, f"{self.prog}: {message}\n")
+
+
 def _parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog=f"capsulectl {NAME}", description="Recompute a ruleset's clauses on a record.")
-    sub = parser.add_subparsers(dest="command", required=True)
+    parser = _Parser(prog=f"capsulectl {NAME}", description="Recompute a ruleset's clauses on a record.")
+    sub = parser.add_subparsers(dest="command", required=True, parser_class=_Parser)
     c = sub.add_parser(
         "check",
         help="check one external-check-input/v0 (stdin) against a ruleset",
         description="Read one external-check-input/v0 on stdin and print one external-check-result/v0, "
         "tier recomputed, with a finding for every clause of the ruleset.",
     )
-    c.add_argument("--ruleset", required=True, metavar="FILE", help="an engine-ruleset/v0 file (YAML or JSON)")
+    c.add_argument("--ruleset", required=True, metavar="FILE", help="an engine-ruleset/v0 file (JSON)")
     return parser
 
 
@@ -63,7 +77,10 @@ def main(argv: list[str] | None = None) -> int:
     except Refusal as exc:
         print(f"capsulectl {NAME} check: {exc}", file=sys.stderr)
         return 1
-    sys.stdout.write(json.dumps(result, separators=(",", ":")) + "\n")
+    # UTF-8 bytes, not \u escapes (up to 12 bytes a character), whatever the
+    # locale: capsulectl reads at most 1 MiB.
+    sys.stdout.buffer.write((json.dumps(result, separators=(",", ":"), ensure_ascii=False) + "\n").encode())
+    sys.stdout.flush()
     return 0
 
 

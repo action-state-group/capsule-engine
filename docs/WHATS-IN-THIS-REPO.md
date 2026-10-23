@@ -80,23 +80,28 @@ reads one `external-check-input/v0` on stdin and prints one `external-check-resu
 `tier: recomputed` and one finding per clause, in the ruleset's order. Exit 0 means a result was
 printed, whatever its verdict; any other exit is a refusal, named on stderr, with nothing on
 stdout. That is capsulectl's rules-checker contract too, so the same file pins as a deal profile's
-rules checker, with `{"command": ["<root>/capsulectl-engine", "check", "--ruleset", "FILE"]}`. Both
+rules checker, with `{"command": ["<root>/capsulectl-engine", "check", "--ruleset", "FILE"]}` and
+`FILE` an absolute path. capsulectl pins the launcher's bytes, and the launcher is a small stub that
+runs the installed `capsule-engine` package, which the pin does not cover, and the
+`definition_digest` below covers the ruleset, not the engine code. So what a released check
+(such as `record_type_coverage/1`) decides never changes: a change to it is a new version of the
+check, a new entry beside the old one. Both
 schemas are capsulectl's, vendored from its v0.1.0-rc22 release in
 `python/capsule_engine/schemas/vendor/`.
 
-`FILE` is an `engine-ruleset/v0` document, in YAML or JSON. Its JSON Schema is
+`FILE` is an `engine-ruleset/v0` JSON document. Its JSON Schema is
 `python/capsule_engine/schemas/engine-ruleset-v0.json`, and members it does not list are refused:
 
 - `schema`: `engine-ruleset/v0`. A later format is a new value here, never a new reading of v0.
 - `ruleset_id`: the name and version the result reports.
-- `clauses`: each has an `id` (unique, the finding's id), a `check` (the engine check it runs, as
+- `clauses`: at most 200. Each has an `id` (unique, the finding's id), a `check` (the engine check it runs, as
   name/version), a `disposition` (`ask` or `deny`: what a failing clause does) and the check's
   `params`.
 
 The `definition_digest` the result reports is the lowercase-hex SHA-256 of the RFC 8785 (JCS)
-bytes of the document as parsed. Any change to the file other than its spelling (key order,
-whitespace, YAML or JSON) is a new digest, so a profile or a contract can pin it. A YAML key given
-twice is refused.
+bytes of the document. Any change to the file other than its spelling (member order, whitespace,
+escapes) is a new digest, so a profile or a contract can pin it. A member given twice in one
+object, NaN, Infinity and an unpaired surrogate are refused.
 
 The one check today is `record_type_coverage/1`: whether each of `registered_kinds` appears as the
 string at `kind_field` (a dotted path) in some entry of the input's `history`.
@@ -108,10 +113,11 @@ string at `kind_field` (a dotted path) in some entry of the input's `history`.
 | incomplete, and a declared kind is not  | `not_evaluable`  |
 | `registered_kinds` is empty             | `not_applicable` |
 
-`not_applicable` is an exclusion: it moves no verdict. The result's verdict is `deny` if a `deny`
+`not_applicable` is an exclusion: it moves no verdict, so a ruleset whose every finding is
+`not_applicable` reports `allow`. The result's verdict is `deny` if a `deny`
 clause fails, else `escalate` if an `ask` clause fails, else `not_evaluable` if any finding is,
 else `allow`. A finding's `limit` is the number of kinds declared and its `value` the number seen.
-`examples/rulesets/everyday-history-coverage.yaml` is an example.
+`examples/rulesets/everyday-history-coverage.json` is an example.
 
 ## Install
 

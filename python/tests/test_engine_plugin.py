@@ -43,7 +43,7 @@ def ruleset_doc(*clauses: dict) -> dict:
     return {"schema": "engine-ruleset/v0", "ruleset_id": "test/coverage/1.0.0", "clauses": list(clauses)}
 
 
-def write(tmp_path: Path, doc: dict | str, name: str = "rules.yaml") -> Path:
+def write(tmp_path: Path, doc: dict | str, name: str = "rules.json") -> Path:
     path = tmp_path / name
     path.write_text(doc if isinstance(doc, str) else json.dumps(doc))
     return path
@@ -119,40 +119,43 @@ def test_a_refusal_exits_nonzero_with_nothing_on_stdout(tmp_path, monkeypatch, c
     assert engine_plugin.main(["check", "--ruleset", str(path)]) == 1
     out = capsys.readouterr()
     assert out.out == ""
-    assert out.err.startswith("capsulectl engine check: the input is not one external-check-input/v0")
+    assert out.err == "capsulectl engine check: the input is not JSON (line 1, column 1)\n"
 
 
-def test_check_needs_a_ruleset(capsys):
+def test_a_usage_error_is_one_line(capsys):
+    # capsulectl keeps a refusing checker's first stderr line as its reason.
     with pytest.raises(SystemExit) as exc:
         engine_plugin.main(["check"])
     assert exc.value.code == 2
-    assert capsys.readouterr().out == ""
+    out = capsys.readouterr()
+    assert out.out == ""
+    assert out.err == "capsulectl engine check: the following arguments are required: --ruleset\n"
 
 
 # -- the ruleset format and its digest ----------------------------------------
 
 
 def test_the_digest_is_jcs_sha256_of_the_document_whatever_its_spelling(tmp_path):
-    doc = ruleset_doc(clause("a", ["money.purchase", "money.refund"]))
-    as_json = load_ruleset(write(tmp_path, doc, "r.json"))
-    as_yaml = load_ruleset(
-        write(
-            tmp_path,
-            "ruleset_id: test/coverage/1.0.0\n"
-            "schema: engine-ruleset/v0\n"
-            "clauses:\n"
-            "  - params: {registered_kinds: [money.purchase, money.refund], kind_field: agent_input.body.action_class}\n"
-            "    disposition: deny\n"
-            "    check: record_type_coverage/1\n"
-            "    id: a\n",
-        )
-    )
+    doc = ruleset_doc(clause("a", ["money.purchase", "money.r\u00e9fund"]))
+    compact = load_ruleset(write(tmp_path, json.dumps(doc, separators=(",", ":"), ensure_ascii=False), "a.json"))
+    # Members reordered, spaced out, and every non-ASCII character escaped.
+    spelled = json.dumps(dict(reversed(list(doc.items()))), indent=4, ensure_ascii=True)
+    assert "\\u00e9" in spelled
+    loose = load_ruleset(write(tmp_path, spelled, "b.json"))
     expected = hashlib.sha256(
-        b'{"clauses":[{"check":"record_type_coverage/1","disposition":"deny","id":"a","params":'
-        b'{"kind_field":"agent_input.body.action_class","registered_kinds":["money.purchase","money.refund"]}}],'
-        b'"ruleset_id":"test/coverage/1.0.0","schema":"engine-ruleset/v0"}'
+        '{"clauses":[{"check":"record_type_coverage/1","disposition":"deny","id":"a","params":'
+        '{"kind_field":"agent_input.body.action_class","registered_kinds":["money.purchase","money.r\u00e9fund"]}}],'
+        '"ruleset_id":"test/coverage/1.0.0","schema":"engine-ruleset/v0"}'.encode()
     ).hexdigest()
-    assert as_json.definition_digest == as_yaml.definition_digest == expected
+    assert compact.definition_digest == loose.definition_digest == expected
+
+
+def test_an_escaped_surrogate_pair_is_the_character_it_spells(tmp_path):
+    escaped = load_ruleset(write(tmp_path, json.dumps(ruleset_doc(clause("a", ["\U0001f600"]))), "a.json"))
+    literal = load_ruleset(
+        write(tmp_path, json.dumps(ruleset_doc(clause("a", ["\U0001f600"])), ensure_ascii=False), "b.json")
+    )
+    assert escaped.definition_digest == literal.definition_digest
 
 
 @pytest.mark.parametrize(
@@ -183,12 +186,15 @@ def test_any_change_is_a_new_digest(tmp_path, change):
         (json.dumps(ruleset_doc({**clause("a", ["x"]), "check": "caps/1"})), "$.clauses[0].check: enum"),
         (json.dumps(ruleset_doc({k: v for k, v in clause("a", ["x"]).items() if k != "disposition"})), "required"),
         (json.dumps(ruleset_doc()), "$.clauses: minItems"),
+        (json.dumps(ruleset_doc(*(clause(f"c{i}", ["x"]) for i in range(201)))), "$.clauses: maxItems"),
         (json.dumps(ruleset_doc(clause("a", ["x"]), clause("a", ["y"]))), "names a clause id more than once: a"),
         (json.dumps(ruleset_doc(clause("a", ["x", "x"]))), "uniqueItems"),
         (json.dumps(ruleset_doc(clause("a", [1.5]))), "registered_kinds[0]: type"),
-        ("schema: engine-ruleset/v0\nruleset_id: 2026-10-23\nclauses: []\n", "$.ruleset_id: type"),
-        ("schema: engine-ruleset/v0\nschema: engine-ruleset/v0\nruleset_id: x\nclauses: []\n", "appears twice"),
-        ("[", "is not YAML or JSON"),
+        ('{"schema": "engine-ruleset/v0", "schema": "engine-ruleset/v0"}', "is not JSON: a member appears twice"),
+        (json.dumps(ruleset_doc(clause("a", ["x"]))).replace('"x"', "NaN"), "is not JSON"),
+        (json.dumps(ruleset_doc(clause("a", ["x"]))).replace('"x"', '"\\ud800"'), "an unpaired surrogate"),
+        ("schema: engine-ruleset/v0\n", "is not JSON (line 1, column 1)"),
+        ('{"schema": "engine-ruleset/v0", "ruleset_id": [PRIVATE-VALUE', "is not JSON (line 1, column 48)"),
     ],
 )
 def test_a_ruleset_that_does_not_fit_is_refused(tmp_path, text, says):
@@ -199,16 +205,20 @@ def test_a_ruleset_that_does_not_fit_is_refused(tmp_path, text, says):
 
 def test_a_missing_ruleset_is_refused(tmp_path):
     with pytest.raises(Refusal, match="cannot be read"):
-        load_ruleset(tmp_path / "absent.yaml")
+        load_ruleset(tmp_path / "absent.json")
 
 
 # -- findings and the verdict -------------------------------------------------
 
 
-def test_an_exclusion_is_not_applicable_and_never_a_pass_or_a_verdict(tmp_path):
+def test_an_exclusion_is_not_applicable_and_moves_no_verdict(tmp_path):
+    # Not a pass (nothing was measured), and nothing in the ruleset stands
+    # against the action, so it adds nothing to the verdict.
     result = run(tmp_path, ruleset_doc(clause("none", [])), envelope([]))
     assert result["findings"][0]["verdict"] == "not_applicable"
     assert result["verdict"] == "allow"
+    deny = run(tmp_path, ruleset_doc(clause("none", []), clause("a", ["money.refund"])), envelope([]))
+    assert deny["verdict"] == "deny"
 
 
 def test_a_kind_missing_from_a_complete_history_fails(tmp_path):
@@ -247,12 +257,13 @@ def test_the_verdict_is_the_strictest_finding(tmp_path, clauses, verdict):
     assert run(tmp_path, ruleset_doc(*clauses), envelope(["money.purchase"]))["verdict"] == verdict
 
 
-def test_a_failing_ask_clause_outranks_a_not_evaluable_one(tmp_path):
-    doc = ruleset_doc(clause("a", ["money.refund"], "ask"), clause("b", ["money.refund"]))
-    env = envelope(["money.purchase"], complete=True)
-    assert run(tmp_path, doc, env)["verdict"] == "deny"
-    env["history_scope"]["complete"] = False
-    assert run(tmp_path, ruleset_doc(clause("a", ["money.refund"], "ask")), env)["verdict"] == "not_evaluable"
+def test_a_failing_ask_clause_outranks_a_not_evaluable_one():
+    findings = [
+        {"id": "a", "verdict": "fail", "disposition": "ask"},
+        {"id": "b", "verdict": "not_evaluable", "disposition": "deny"},
+    ]
+    assert check_module._verdict(findings) == "escalate"
+    assert check_module._verdict(findings[1:]) == "not_evaluable"
 
 
 # -- the input ---------------------------------------------------------------
@@ -263,8 +274,8 @@ def test_a_failing_ask_clause_outranks_a_not_evaluable_one(tmp_path):
     [
         (b"[]", "is not external-check-input/v0"),
         (b'{"schema": "external-check-input/v1"}', "is not external-check-input/v0"),
-        (b'{"schema": "external-check-input/v0", "history_scope": NaN}', "is not one external-check-input/v0"),
-        (b"\xff", "is not one external-check-input/v0"),
+        (b'{"schema": "external-check-input/v0", "history_scope": NaN}', "the input is not JSON"),
+        (b"\xff", "the input is not JSON"),
     ],
 )
 def test_an_input_that_is_not_v0_is_refused(tmp_path, raw, says):
@@ -282,6 +293,30 @@ def test_a_refusal_names_where_the_input_failed_never_a_value(tmp_path):
     assert "$.item_ref: pattern" in message
     assert "$.history_scope.days: minimum" in message
     assert "PRIVATE" not in message
+
+
+def test_a_key_of_an_open_map_is_not_named_in_a_refusal(tmp_path):
+    env = envelope(["money.purchase"])
+    env["history"][0]["counterparty"] = {"fp_alg": "hmac-sha256-deal-key", "ids": {"PRIVATE-ACCOUNT": "not-hex"}}
+    with pytest.raises(Refusal) as exc:
+        check(load_ruleset(write(tmp_path, ruleset_doc(clause("a", ["x"])))), json.dumps(env).encode())
+    assert "$.history[0].counterparty.ids.*: pattern" in str(exc.value)
+    assert "PRIVATE" not in str(exc.value)
+
+
+def test_an_input_member_a_later_capsulectl_adds_is_read_past(tmp_path):
+    env = {**envelope(["money.purchase"]), "a_later_member": {"x": 1}}
+    assert run(tmp_path, ruleset_doc(clause("a", ["money.purchase"])), env)["verdict"] == "allow"
+
+
+def test_the_largest_result_stays_under_capsulectls_output_limit(tmp_path):
+    # 200 clauses, each failing on 100 declared kinds of 64 four-byte characters.
+    kinds = [f"{i:02d}" + "\U0001f600" * 62 for i in range(100)]
+    doc = ruleset_doc(*(clause(f"c{i:03d}-" + "x" * 190, kinds) for i in range(200)))
+    result = run(tmp_path, doc, envelope([]))
+    assert all(len(f["reason"]) == 1000 for f in result["findings"])
+    printed = json.dumps(result, separators=(",", ":"), ensure_ascii=False) + "\n"
+    assert len(printed.encode()) < 1 << 20  # capsule-cli RulesMaxOutput
 
 
 # -- capsule-cli#257's members ------------------------------------------------
@@ -316,7 +351,7 @@ def test_257_members_are_printed_only_once_the_vendored_schema_lists_them(tmp_pa
 
 
 def test_the_example_ruleset_loads_and_checks_the_real_input():
-    ruleset = load_ruleset(REPO / "examples" / "rulesets" / "everyday-history-coverage.yaml")
+    ruleset = load_ruleset(REPO / "examples" / "rulesets" / "everyday-history-coverage.json")
     result = check(ruleset, REAL_INPUT.read_bytes())
     assert [f["verdict"] for f in result["findings"]] == ["pass"]
     assert result["verdict"] == "allow"

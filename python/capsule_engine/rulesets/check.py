@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: Apache-2.0
 """Load an engine-ruleset/v0 and check one external-check-input/v0 against it.
 
-The ruleset's identity is its ``definition_digest``: the lowercase-hex
-SHA-256 of the RFC 8785 (JCS) bytes of the document as parsed, the same
+A ruleset is a JSON file. Its identity is its ``definition_digest``: the
+lowercase-hex SHA-256 of the RFC 8785 (JCS) bytes of the document, the same
 ``json_digest`` a fold definition's digest uses. A profile or a contract pins
 it, so the ruleset file carries its own format id (``schema``) from v0 on:
 a later format is a new id, never a new reading of these bytes. A clause kind
@@ -30,7 +30,6 @@ from importlib import resources
 from pathlib import Path
 from typing import Any
 
-import yaml
 from agent_action_capsule.canonical import json_digest
 from jsonschema import Draft202012Validator
 
@@ -62,47 +61,87 @@ class Ruleset:
 @cache
 def _validator(name: str) -> Draft202012Validator:
     text = (resources.files("capsule_engine") / "schemas" / name).read_text(encoding="utf-8")
-    return Draft202012Validator(json.loads(text))
+    schema = json.loads(text)
+    if name == _INPUT_SCHEMA_FILE:
+        # capsulectl adds optional input members between releases (party_role,
+        # item_ref, ...). The checks read only history and history_scope, so a
+        # member this copy does not know yet is no reason to refuse a check.
+        schema.pop("additionalProperties")
+    return Draft202012Validator(schema)
+
+
+_INPUT_SCHEMA_FILE = "vendor/external-check-input-v0.json"
+_RESULT_SCHEMA_FILE = "vendor/external-check-result-v0.json"
 
 
 def _finding_members() -> frozenset[str]:
-    items = _validator("vendor/external-check-result-v0.json").schema["properties"]["findings"]["items"]
+    items = _validator(_RESULT_SCHEMA_FILE).schema["properties"]["findings"]["items"]
     return frozenset(items["properties"])
+
+
+def _member_names(schema: Any) -> frozenset[str]:
+    """Every member name a schema declares, at any depth."""
+    names: set[str] = set()
+    stack = [schema]
+    while stack:
+        node = stack.pop()
+        if isinstance(node, dict):
+            names.update(node.get("properties", {}))
+            stack.extend(node.values())
+        elif isinstance(node, list):
+            stack.extend(node)
+    return frozenset(names)
 
 
 def _failures(validator: Draft202012Validator, doc: Any) -> list[str]:
     """Each failure's location and the schema keyword that failed, sorted,
-    with no value."""
-    return sorted({f"{e.json_path}: {e.validator}" for e in validator.iter_errors(doc)})
+    with no value. A location step that is not a member the schema declares
+    (a key of an open map, such as a counterparty's ids) is a value too, and
+    reads ``*``."""
+    known = _member_names(validator.schema)
+
+    def where(error) -> str:
+        steps = (f"[{s}]" if isinstance(s, int) else f".{s}" if s in known else ".*" for s in error.absolute_path)
+        return "$" + "".join(steps)
+
+    return sorted({f"{where(e)}: {e.validator}" for e in validator.iter_errors(doc)})
 
 
-class _UniqueKeyLoader(yaml.SafeLoader):
-    """A YAML mapping with a key twice is refused: the digest is over the
-    parsed document, and a repeated key would make the file say two things."""
+class _Repeated(ValueError):
+    pass
 
 
-def _mapping(loader: _UniqueKeyLoader, node: yaml.MappingNode, deep: bool = False) -> dict:
-    seen = set()
-    for key_node, _ in node.value:
-        key = loader.construct_object(key_node, deep=deep)
-        if key in seen:
-            raise yaml.constructor.ConstructorError(None, None, f"key {key!r} appears twice", key_node.start_mark)
-        seen.add(key)
-    return loader.construct_mapping(node, deep=deep)
+def _decode_json(raw: bytes, what: str) -> Any:
+    """One JSON value: no member twice in one object, no NaN or Infinity. A
+    refusal says where the text stopped parsing, never what it holds."""
 
+    def refuse_constant(name: str) -> None:
+        raise ValueError(name)
 
-_UniqueKeyLoader.add_constructor(yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, _mapping)
+    def unique(pairs: list[tuple[str, Any]]) -> dict:
+        obj = dict(pairs)
+        if len(obj) != len(pairs):
+            raise _Repeated
+        return obj
+
+    try:
+        return json.loads(raw, parse_constant=refuse_constant, object_pairs_hook=unique)
+    except json.JSONDecodeError as exc:
+        raise Refusal(f"{what} is not JSON (line {exc.lineno}, column {exc.colno})") from exc
+    except _Repeated as exc:
+        raise Refusal(f"{what} is not JSON: a member appears twice in one object") from exc
+    except (ValueError, UnicodeDecodeError) as exc:
+        raise Refusal(f"{what} is not JSON") from exc
 
 
 def load_ruleset(path: str | Path) -> Ruleset:
-    """Read and validate an engine-ruleset/v0 file (YAML or JSON)."""
+    """Read and validate an engine-ruleset/v0 file (JSON)."""
     where = f"the ruleset {path}"
     try:
-        doc = yaml.load(Path(path).read_text(encoding="utf-8"), Loader=_UniqueKeyLoader)
+        raw = Path(path).read_bytes()
     except OSError as exc:
         raise Refusal(f"{where} cannot be read: {exc.strerror}") from exc
-    except (yaml.YAMLError, UnicodeDecodeError) as exc:
-        raise Refusal(f"{where} is not YAML or JSON: {exc}") from exc
+    doc = _decode_json(raw, where)
     if not isinstance(doc, dict) or doc.get("schema") != RULESET_FORMAT:
         raise Refusal(f"{where} is not {RULESET_FORMAT} (its schema member must be {RULESET_FORMAT!r})")
     failures = _failures(_validator("engine-ruleset-v0.json"), doc)
@@ -112,7 +151,12 @@ def load_ruleset(path: str | Path) -> Ruleset:
     repeated = sorted({i for i in ids if ids.count(i) > 1})
     if repeated:
         raise Refusal(f"{where} names a clause id more than once: {', '.join(repeated)}")
-    return Ruleset(document=doc, definition_digest=json_digest(doc))
+    try:
+        digest = json_digest(doc)
+    except UnicodeEncodeError as exc:
+        # A \ud800 escape with no pair: valid JSON text, but no UTF-8 bytes.
+        raise Refusal(f"{where} holds a string with an unpaired surrogate") from exc
+    return Ruleset(document=doc, definition_digest=digest)
 
 
 def _record_type_coverage(params: dict, envelope: dict) -> Finding:
@@ -146,16 +190,10 @@ def _verdict(findings: list[dict]) -> str:
 
 
 def _decode_input(raw: bytes) -> dict:
-    def refuse_constant(name: str) -> None:
-        raise ValueError(name)
-
-    try:
-        doc = json.loads(raw, parse_constant=refuse_constant)
-    except (ValueError, UnicodeDecodeError) as exc:
-        raise Refusal(f"the input is not one {INPUT_SCHEMA} JSON object") from exc
+    doc = _decode_json(raw, "the input")
     if not isinstance(doc, dict) or doc.get("schema") != INPUT_SCHEMA:
         raise Refusal(f"the input is not {INPUT_SCHEMA}")
-    failures = _failures(_validator("vendor/external-check-input-v0.json"), doc)
+    failures = _failures(_validator(_INPUT_SCHEMA_FILE), doc)
     if failures:
         raise Refusal(f"the input does not fit {INPUT_SCHEMA}: " + "; ".join(failures))
     return doc
@@ -189,7 +227,7 @@ def check(ruleset: Ruleset, raw_input: bytes) -> dict:
         "tier": "recomputed",
         "findings": findings,
     }
-    failures = _failures(_validator("vendor/external-check-result-v0.json"), result)
+    failures = _failures(_validator(_RESULT_SCHEMA_FILE), result)
     if failures:
         # A defect here, not a fault in the input or the ruleset.
         raise RuntimeError(f"the result built does not fit {RESULT_SCHEMA}: " + "; ".join(failures))
