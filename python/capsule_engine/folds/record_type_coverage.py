@@ -47,7 +47,9 @@ def evaluate_record_type_coverage(
     seen: set[str] = set()
     for record in records:
         kind = get_path(record, kind_field, None)
-        if kind is not None:
+        # Only a string is a kind: a declared kind is one, and an object or
+        # list at the path (a foreign record) cannot be hashed into the set.
+        if isinstance(kind, str):
             seen.add(kind)
 
     present = frozenset(seen) & registered_kinds

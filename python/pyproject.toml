@@ -59,6 +59,8 @@ trace = ["agentrust-trace>=0.10.0"]
 
 [project.scripts]
 capsule-engine = "capsule_engine.cli:main"
+# A capsulectl plugin (cli-plugin/v1): `capsulectl engine check --ruleset FILE`.
+capsulectl-engine = "capsule_engine.cli.engine_plugin:main"
 
 [tool.setuptools.packages.find]
 where = ["."]

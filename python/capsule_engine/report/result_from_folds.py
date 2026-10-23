@@ -11,6 +11,12 @@ until a real, non-stub, offline-verified witness stamp lands, then
 that is the module's whole point -- "grade read from the bundle's
 witness/countersign state, never asserted".
 
+The ``finding_from_*`` adapters project the same fold outputs onto an
+external-check-result/v0 finding (``Finding``) instead, for
+``capsulectl engine check`` (``rulesets/``): met -> pass, not_met -> fail,
+not_evaluable -> not_evaluable, and an exclusion -> not_applicable. A
+finding's not_applicable is the exclusion only and never becomes a verdict.
+
 ``tier`` is always ``"recomputed"`` in this module: every fold in
 ``capsule_engine/folds/`` is a deterministic recomputation over sealed
 records (this repo's own report/build.py docstring: "nothing in this module
@@ -23,6 +29,7 @@ has one.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Literal
 
 from agent_action_capsule import json_digest
 from capsule_emit.chain_segment import ChainSegment
@@ -32,9 +39,11 @@ from ..folds.retention_continuity import RetentionContinuityResult
 from .result import Claim, DigestRef, DisclosureCarrier, ProofRef
 
 __all__ = [
+    "Finding",
     "GuardProjection",
     "claim_from_guard_constraint",
     "claim_from_retention_continuity",
+    "finding_from_record_type_coverage",
     "is_excluded_not_applicable",
     "project_guard_constraint",
 ]
@@ -101,6 +110,47 @@ def is_excluded_not_applicable(result: RecordTypeCoverageResult) -> bool:
     check coverage against"), so this is a pure read, not a second judgment.
     """
     return not result.applicable
+
+
+@dataclass(frozen=True)
+class Finding:
+    """One external-check-result/v0 finding, before ``rulesets.check`` names
+    it (id, check, disposition). ``limit_source`` and ``profile_digest`` are
+    capsule-cli#257's members: printed only once the vendored result schema
+    lists them (``rulesets/check.py``), since an older capsulectl refuses a
+    member its schema does not list."""
+
+    verdict: Literal["pass", "fail", "not_applicable", "not_evaluable"]
+    reason: str | None = None
+    limit: int | str | None = None
+    value: int | str | None = None
+    limit_source: str | None = None
+    profile_digest: str | None = None
+
+
+def finding_from_record_type_coverage(result: RecordTypeCoverageResult, *, complete: bool) -> Finding:
+    """Project one ``evaluate_record_type_coverage`` call into a finding.
+    ``complete`` is whether the records it read are all there were
+    (external-check-input/v0 ``history_scope.complete``). A kind seen is seen
+    whatever else is missing, so an incomplete history still passes when every
+    declared kind is in it; a kind not seen in an incomplete history may be in
+    the part left out, so that is not_evaluable, never a fail. ``limit`` is
+    the number of kinds declared and ``value`` the number seen."""
+    if is_excluded_not_applicable(result):
+        return Finding(verdict="not_applicable", reason="no record kinds are declared")
+    declared = len(result.present) + len(result.missing)
+    counts = {"limit": declared, "value": len(result.present)}
+    if result.verdict == "met":
+        return Finding(verdict="pass", **counts)
+    missing = ", ".join(sorted(result.missing))
+    if not complete:
+        return Finding(verdict="not_evaluable", reason=_clip(f"the history is incomplete and does not show: {missing}"), **counts)
+    return Finding(verdict="fail", reason=_clip(f"not in the history: {missing}"), **counts)
+
+
+def _clip(reason: str) -> str:
+    # external-check-result/v0 caps a reason at 1000 characters.
+    return reason if len(reason) <= 1000 else reason[:997] + "..."
 
 
 # A guard constraint record's result (pass | fail | n/a) projected onto the

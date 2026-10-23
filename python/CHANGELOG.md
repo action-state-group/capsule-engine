@@ -5,6 +5,15 @@ module has its own changelog, `go/CHANGELOG.md`.
 
 ## Unreleased
 
+- Added (capsule-engine#162): `capsulectl-engine`, a capsulectl plugin (`cli-plugin/v1`).
+  `capsulectl engine check --ruleset FILE` reads one external-check-input/v0 on stdin and prints
+  one external-check-result/v0, tier `recomputed`, with a finding per clause of an
+  `engine-ruleset/v0` file (`schemas/engine-ruleset-v0.json`). The result's `definition_digest`
+  is SHA-256 over the JCS bytes of the ruleset. The same launcher pins as a deal profile's rules
+  checker. The first check is `record_type_coverage/1` over the history; an empty declaration is
+  `not_applicable`, never a verdict. See docs/WHATS-IN-THIS-REPO.md.
+- Changed: `evaluate_record_type_coverage` counts only a string as a kind. An object or a list at
+  `kind_field` raised `TypeError`; it is now not a kind.
 - Changed (capsule-engine#217): `GuardDecision.verdict` of a decision held only because the
   caps window could not be evaluated (`asked_unevaluated_checks`), with nothing failed and an
   approver for the class, is its outcome, `escalate`, no longer `not_evaluable`. With no

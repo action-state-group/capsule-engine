@@ -1,0 +1,13 @@
+# An engine-ruleset/v0 example: one clause, run by `capsulectl engine check`
+# on the external-check-input/v0 a deal check hands its rules checker. It
+# passes when an everyday purchase (action class money.purchase) is among the
+# profile's earlier acts in the history, and asks the person otherwise.
+schema: engine-ruleset/v0
+ruleset_id: example/everyday-history-coverage/0.1.0
+clauses:
+  - id: purchase-in-history
+    check: record_type_coverage/1
+    disposition: ask
+    params:
+      kind_field: agent_input.body.action_class
+      registered_kinds: [money.purchase]

@@ -33,4 +33,9 @@ cd "$work"
 want="$("$work/venv/bin/python" -c 'from importlib.metadata import version; print(version("capsule-engine"))')"
 "$work/venv/bin/capsule-engine" --help >/dev/null
 test "$("$work/venv/bin/capsule-engine" --version)" = "$want"
+# The capsulectl plugin answers its handshake, and checks with the schemas the
+# wheel carries.
+"$work/venv/bin/capsulectl-engine" cli-plugin-metadata | grep -q '"plugin_api": "cli-plugin/v1"'
+"$work/venv/bin/capsulectl-engine" check --ruleset "$repo/../examples/rulesets/everyday-history-coverage.yaml" \
+  <"$repo/../go/guard/testdata/real-fyi-act/purchase-commit-repeat.input.json" | grep -q '"tier":"recomputed"'
 "$work/venv/bin/python" "$repo/scripts/clean_room_wheel_check.py" "$repo/../examples/contracts"
