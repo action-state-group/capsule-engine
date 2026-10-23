@@ -389,7 +389,7 @@
    "input": "conformance-vectors/guard/v0/inputs/history-spend/spend-above-amount.json",
    "input_sha256": "7780b88128c6c7d631bbe187c0a9cc303c0b81371590973a771373b1f6830457",
    "expected": {
-    "outcome": "allow",
+    "outcome": "escalate",
     "constraints": [
      {
       "id": "dedupe",
@@ -399,9 +399,9 @@
      },
      {
       "id": "caps",
-      "result": "pass",
+      "result": "fail",
       "method": "spend.weekly/3.1.0",
-      "evidence_digest": "a2876dd7815a39a3127ed03e33d7b6cda2c130581b7b9aef58fbad452be05531"
+      "evidence_digest": "be8a6a608f9f507cd8f6e232fdb9283685c853520f14c4044c772301cbc40a18"
      },
      {
       "id": "verify_before_dispatch",

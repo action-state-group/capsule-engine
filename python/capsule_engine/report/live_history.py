@@ -41,6 +41,10 @@ history is missing, is not a list, is not declared complete, or holds an
 entry with no readable time or an ``item_ref`` in another shape, one
 ``incomplete`` record is written after the acts.
 
+An act that seals no ``spend_minor`` has no amount in its record, as its
+deal bridge takes none, so the record also carries the amount the act states
+(``STATED_AMOUNT``), which a caps window counts in its place (#214 hold A).
+
 Under a caps fold that counts executed acts (``spend.weekly/3.1.0``), each act
 is also written as the spend window's record of it (``ExecutedActs``), right
 after it: every history entry is an executed act, counted once. An entry
@@ -74,6 +78,7 @@ from ..guards.history_state import (
     INCOMPLETE,
     LIVE_HISTORY,
     NO_DISPOSITION,
+    STATED_AMOUNT,
     STATEMENT,
     THREAD_COUNTERPARTY,
     UNREAD,
@@ -246,6 +251,9 @@ def _act_record(entry: dict) -> _HistoryRecord:
             payload["item_ref"] = item_ref
     else:
         payload = history_act_payload(action, sealed_disposition=decision is not None)
+        stated = _stated_amount(entry) if "amount_minor" not in payload else None
+        if stated is not None:
+            payload[STATED_AMOUNT] = stated
     capsule_id = entry.get("capsule_id")
     record = _HistoryRecord(
         capsule_id=capsule_id if isinstance(capsule_id, str) and capsule_id else json_digest(entry),
@@ -259,6 +267,16 @@ def _act_record(entry: dict) -> _HistoryRecord:
     if decision is not None:
         record["disposition"] = _Disposition(decision=decision)
     return record
+
+
+def _stated_amount(entry: dict) -> int | None:
+    """The ``amount_minor`` a history act's body states, an integer, or
+    ``None``: read where the act seals no ``spend_minor``, so its history
+    copy carries no amount, for a caps window to count in its place
+    (``STATED_AMOUNT``)."""
+    acted, unchecked = _act_member(bound_agent_input(entry))
+    amount = acted.get("amount_minor") if acted is not None and not unchecked else None
+    return amount if isinstance(amount, int) and not isinstance(amount, bool) else None
 
 
 def history_act_payload(action: Action, *, sealed_disposition: bool) -> dict[str, object]:

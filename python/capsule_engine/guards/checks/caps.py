@@ -54,6 +54,13 @@ asks rather than allows (``CheckOutcome.asks_when_unevaluated``). A per-action
 limit the action exceeds still fails, and its evidence adds
 ``window_unreadable_count``.
 
+A live check's history ledger writes a copy of an act that seals no
+``spend_minor`` with no ``amount_minor``, and the stated amount beside it
+(``STATED_AMOUNT``). The window reads that copy at the stated amount, never
+below 0 (``_window_record``), so under a fold that reads the copy
+(``spend.weekly/3.0.0`` and ``1.0.0``) an accepted act is never dropped from
+the total (capsule-engine#214 hold A, ruling A).
+
 A live check's history ledger that is not known to hold every act writes an
 ``incomplete`` record (``guards/history_state.py``) under the checked
 record's operator. With one in the ledger the window total may leave out acts
@@ -77,7 +84,7 @@ from ...folds.engine import EvaluationTrace, ReversalSummary, evaluate_one
 from ..action import Action
 from ..capsule import ConstraintOutcome, not_applicable_evidence
 from ..classes import resolve
-from ..history_state import INCOMPLETE, WINDOW_HELD, history_state
+from ..history_state import INCOMPLETE, STATED_AMOUNT, WINDOW_HELD, history_state
 from .base import CheckOutcome
 
 __all__ = [
@@ -253,6 +260,20 @@ def counts_executed_acts(definition: FoldDefinition | None) -> bool:
     return False
 
 
+def _window_record(capsule: dict) -> dict:
+    """``capsule`` as the window reads it. A live history's copy of an act
+    that seals no ``spend_minor`` carries no ``amount_minor`` (its deal bridge
+    takes none), and a fold that reads that copy would skip it, leaving an
+    accepted act out of the total, where an under-count could allow. It is
+    read at the amount the act states (``STATED_AMOUNT``), never below 0
+    (capsule-engine#214 hold A, ruling A: under every fold, including the
+    frozen spend.weekly/3.0.0). Every other record is read as it is."""
+    payload = capsule.get("asg_payload")
+    if not isinstance(payload, dict) or "amount_minor" in payload or STATED_AMOUNT not in payload:
+        return capsule
+    return {**capsule, "asg_payload": {**payload, "amount_minor": max(payload[STATED_AMOUNT], 0)}}
+
+
 def _unreadable_in_window(definition: FoldDefinition, records: list[dict], key_value: str | None, as_of: str) -> int:
     """How many executed acts with a spend that could not be read fall in
     ``definition``'s window under ``key_value``: the same key, window and
@@ -357,7 +378,7 @@ def check_caps(
         )
 
     key_value, query = _fold_key(action, definition.key, since)
-    records = [r.capsule for r in ledger.scan(query)]
+    records = [_window_record(r.capsule) for r in ledger.scan(query)]
     anchor = as_of or action.resolved_timestamp()
     trace = evaluate_one(definition, records, key_value=key_value, as_of=anchor)
     unreadable = _unreadable_in_window(definition, records, key_value, anchor) if counts_executed_acts(definition) else 0
