@@ -10,6 +10,21 @@ module has its own changelog, `go/CHANGELOG.md`.
   approver for the class, is its outcome, `escalate`, no longer `not_evaluable`. With no
   approver the decision is still refused (`deny`) and its verdict is still `not_evaluable`.
   Outcomes and sealed capsules do not change.
+- Changed (capsule-engine#214 hold A, Steven's ruling A, ops 5053da83): what the caps window
+  counts for an accepted act in a live check's history, where it can now only rise.
+  - An accepted act that seals no `spend_minor` counts at its stated `amount_minor`, never below
+    0, under every fold. Under the frozen spend.weekly/3.0.0 and 1.0.0 (everyday 0.3.4 and 0.3.5,
+    seller 0.1.0 and 0.1.1) it was left out of the total.
+  - Under spend.weekly/3.1.0 (everyday 0.3.6 to 0.3.8) an accepted act counts at the larger of
+    its stated `amount_minor` and its `spend_minor`, in a live check's history and in a replay's
+    record of an executed act. It counted at the stated amount, so a spend above it was left out.
+    A partial charge (spend below the stated amount) still counts at the stated amount.
+  - Under 3.0.0 and 1.0.0 an act that seals a `spend_minor` still counts at it.
+
+  Outcome change: such a check can move from allow to escalate (asking for approval), or to deny
+  with no approver for the class. The engine now decides as the Go guard (go/v0.1.3) does. A live
+  history's record of such an act carries the stated amount as `stated_amount_minor` (ledger
+  state, never sealed, never read by dedupe).
 
 ## 0.1.0 — 2026-10-23
 

@@ -48,6 +48,7 @@ __all__ = [
     "LIVE_HISTORY",
     "NO_DISPOSITION",
     "RULES_HISTORY_DAYS",
+    "STATED_AMOUNT",
     "STATEMENT",
     "CHECK_FP_ALGS",
     "COUNTERPARTY_KINDS",
@@ -69,6 +70,14 @@ STATEMENT = "statement"
 INCOMPLETE = "incomplete"
 WINDOW_HELD = "window_held"
 THREAD_COUNTERPARTY = "thread_counterparty"
+# The amount a history act states (its body's amount_minor) when it seals no
+# spend_minor: the history copy's own amount_minor is the spend its deal
+# bridge takes, so it has none, and a caps window that reads the copy counts
+# this in its place (caps.py, capsule-engine#214 hold A, ruling A: an
+# accepted act with no spend_minor counts at its stated amount under every
+# fold). Like THREAD_COUNTERPARTY it is this ledger's own state, never in
+# act_payload, so no decision seals it and dedupe never reads it.
+STATED_AMOUNT = "stated_amount_minor"
 # How far back a live check's history reaches: capsulectl sends the acts
 # sealed in the last 31 days (capsule-cli internal/cli RulesHistoryDays,
 # plugins/internal/plugin/rules_checker.go rulesHistory). A replay of a sale

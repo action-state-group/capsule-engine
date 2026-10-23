@@ -265,7 +265,7 @@
    "input_sha256": "8df70f18f8214fbfe802bbe9e4ee098ea379894b1191b2202c8b07d4011fa9c8",
    "frozen": true,
    "expected": {
-    "outcome": "allow",
+    "outcome": "escalate",
     "constraints": [
      {
       "id": "dedupe",
@@ -275,9 +275,9 @@
      },
      {
       "id": "caps",
-      "result": "pass",
+      "result": "fail",
       "method": "spend.weekly/3.0.0",
-      "evidence_digest": "ac51fedbf415ff9657793ecfe4a54f821ebe86bf5fdda04719bef8e76bd62c7e"
+      "evidence_digest": "2f1ba7b85ebab54da36526f9ac01d84e9c1e92f74ca9e38216a53aaa79843bae"
      },
      {
       "id": "verify_before_dispatch",

@@ -1334,17 +1334,23 @@ def _taken(shown: dict, *, every_record_is_an_act: bool) -> tuple[dict, bool] | 
 def _executed_spend(body: dict, *, unchecked: bool, accepted: bool) -> int | None:
     """The spend the act ``body`` states took, or ``None`` when it cannot be
     read. Money moved in (``MONEY_IN``) is ``0``, decided or not, and a
-    disclosure moves none. An accepted act is counted at its
-    ``amount_minor``, as the fold counts an accepted decision. An act taken
+    disclosure moves none. An accepted act is counted at the larger of its
+    stated ``amount_minor`` and its ``spend_minor``, and at its
+    ``amount_minor``, never below 0, when it seals no ``spend_minor``
+    (capsule-engine#214 hold A, ruling A): a partial charge keeps its stated
+    amount, and a spend above it is never left out. An act taken
     without a check is sealed before its spend is classed, so its
     ``amount_minor`` stands in for a missing ``spend_minor``. Any other act
     is counted at its ``spend_minor``, which must be an integer of at least
     0."""
     if body.get("direction") == MONEY_IN or _DISCLOSED in body:
         return 0
-    if accepted:
-        return _minor(body.get("amount_minor"))
     spend = _minor(body.get("spend_minor"))
+    if accepted:
+        amount = _minor(body.get("amount_minor"))
+        if amount is None:
+            return None
+        return max(amount, 0) if spend is None else max(amount, spend)
     if unchecked:
         return spend if spend is not None else _minor(body.get("amount_minor"))
     return spend if spend is not None and spend >= 0 else None
