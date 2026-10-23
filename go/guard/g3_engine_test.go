@@ -227,14 +227,15 @@ func TestExecutedRecordsOnALedgerMatchTheEngine(t *testing.T) {
 	}
 }
 
-// KNOWN DIFFERENCE, pinned until the engine reads history_scope (the engine side's
-// open follow-up to #138): caps.py does not read history_scope.complete, so
-// on the plugin's two envelopes declaring an incomplete history the
-// engine's live check evaluates the 7-day window (scope-results.json,
-// scope_cases.py at a710636c), where this port leaves it not evaluable:
-// the history may hold fewer acts than were carried out. When the engine
-// reads it, regenerate scope-results.json: this test then fails, and the
-// difference is retired by holding the engine's window to this port's.
+// KNOWN DIFFERENCE, as the engine was at a710636c (scope-results.json,
+// scope_cases.py): caps.py did not read history_scope.complete, so on the
+// plugin's two envelopes declaring an incomplete history the engine's live
+// check evaluated the 7-day window, where this port leaves it not evaluable:
+// the history may hold fewer acts than were carried out. The engine reads it
+// now, and at HEAD both sides hold caps n/a on those envelopes; what still
+// differs is the outcome one of them maps it to, pinned in the shared vectors
+// (conformance-vectors/guard/v0/KNOWN-DIFFERENCES.json, capsule-engine #214
+// group 4). This test keeps the frozen a710636c results as they were.
 func TestKnownDifferenceTheEngineCountsAnIncompleteHistory(t *testing.T) {
 	var py struct {
 		Commit string `json:"capsule_engine_commit"`

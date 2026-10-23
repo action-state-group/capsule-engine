@@ -26,37 +26,43 @@
       "id": "verify_before_dispatch",
       "result": "n/a",
       "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
      },
      {
       "id": "destination_rail",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09"
+      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "counterparty_identity_change",
       "result": "n/a",
       "method": "prior_recorded_value_v0",
-      "evidence_digest": "870b0a3e1636cab6902013f7742c0b36dfd72f324d1ff9ee3cd0976aa6d19241"
+      "evidence_digest": "870b0a3e1636cab6902013f7742c0b36dfd72f324d1ff9ee3cd0976aa6d19241",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "credential_pattern",
       "result": "n/a",
       "method": "regex_match_v0",
-      "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827"
+      "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827",
+      "reason": "the action sends no outgoing content"
      },
      {
       "id": "recurring_charge",
       "result": "n/a",
       "method": "structured_field_v0",
-      "evidence_digest": "ed761a48bede343570feeba08dd105fb225b9caf75b52392ea84550fdcc7b0b2"
+      "evidence_digest": "ed761a48bede343570feeba08dd105fb225b9caf75b52392ea84550fdcc7b0b2",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "action_class_gate",
       "result": "n/a",
       "method": "taxonomy_selector_v0",
-      "evidence_digest": "93594fc3973062b88c37e6949b10f34f202dc75ada097c69b83d201e0cb51701"
+      "evidence_digest": "93594fc3973062b88c37e6949b10f34f202dc75ada097c69b83d201e0cb51701",
+      "reason": "no selector names this action class"
      },
      {
       "id": "counterparty_seen_before",
@@ -68,7 +74,8 @@
       "id": "recipient_role",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "refundability",
@@ -92,7 +99,8 @@
       "id": "recipient_seen_before",
       "result": "n/a",
       "method": "counterparty.seen_before/2.0.0",
-      "evidence_digest": "c7a84acb724ca272de76e7ed4c699268414ba4327cd140a72c429dd565287d53"
+      "evidence_digest": "c7a84acb724ca272de76e7ed4c699268414ba4327cd140a72c429dd565287d53",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "channel_change",
@@ -104,13 +112,15 @@
       "id": "upfront_amount",
       "result": "n/a",
       "method": "upfront_threshold_v0",
-      "evidence_digest": "6286d6f31789beb7de36237b614325f4a23103d7a4e035b5a23e84972b442123"
+      "evidence_digest": "6286d6f31789beb7de36237b614325f4a23103d7a4e035b5a23e84972b442123",
+      "reason": "the action carries no upfront_amount_minor; it could not be checked"
      },
      {
       "id": "task_authority",
       "result": "n/a",
       "method": "bound_plan_containment_v0",
-      "evidence_digest": "3c94a44812b9f227f1da0e8ed27510ad37fccfa3b7c3035fbd75b52901b160fb"
+      "evidence_digest": "3c94a44812b9f227f1da0e8ed27510ad37fccfa3b7c3035fbd75b52901b160fb",
+      "reason": "the action carries no task_authority_ref; the task's bounds could not be checked"
      }
     ]
    }
@@ -140,37 +150,43 @@
       "id": "verify_before_dispatch",
       "result": "n/a",
       "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
      },
      {
       "id": "destination_rail",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09"
+      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "counterparty_identity_change",
       "result": "n/a",
       "method": "prior_recorded_value_v0",
-      "evidence_digest": "870b0a3e1636cab6902013f7742c0b36dfd72f324d1ff9ee3cd0976aa6d19241"
+      "evidence_digest": "870b0a3e1636cab6902013f7742c0b36dfd72f324d1ff9ee3cd0976aa6d19241",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "credential_pattern",
       "result": "n/a",
       "method": "regex_match_v0",
-      "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827"
+      "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827",
+      "reason": "the action sends no outgoing content"
      },
      {
       "id": "recurring_charge",
       "result": "n/a",
       "method": "structured_field_v0",
-      "evidence_digest": "ed761a48bede343570feeba08dd105fb225b9caf75b52392ea84550fdcc7b0b2"
+      "evidence_digest": "ed761a48bede343570feeba08dd105fb225b9caf75b52392ea84550fdcc7b0b2",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "action_class_gate",
       "result": "n/a",
       "method": "taxonomy_selector_v0",
-      "evidence_digest": "93594fc3973062b88c37e6949b10f34f202dc75ada097c69b83d201e0cb51701"
+      "evidence_digest": "93594fc3973062b88c37e6949b10f34f202dc75ada097c69b83d201e0cb51701",
+      "reason": "no selector names this action class"
      },
      {
       "id": "counterparty_seen_before",
@@ -182,7 +198,8 @@
       "id": "recipient_role",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "refundability",
@@ -206,7 +223,8 @@
       "id": "recipient_seen_before",
       "result": "n/a",
       "method": "counterparty.seen_before/2.0.0",
-      "evidence_digest": "c7a84acb724ca272de76e7ed4c699268414ba4327cd140a72c429dd565287d53"
+      "evidence_digest": "c7a84acb724ca272de76e7ed4c699268414ba4327cd140a72c429dd565287d53",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "channel_change",
@@ -218,13 +236,15 @@
       "id": "upfront_amount",
       "result": "n/a",
       "method": "upfront_threshold_v0",
-      "evidence_digest": "6286d6f31789beb7de36237b614325f4a23103d7a4e035b5a23e84972b442123"
+      "evidence_digest": "6286d6f31789beb7de36237b614325f4a23103d7a4e035b5a23e84972b442123",
+      "reason": "the action carries no upfront_amount_minor; it could not be checked"
      },
      {
       "id": "task_authority",
       "result": "n/a",
       "method": "bound_plan_containment_v0",
-      "evidence_digest": "3c94a44812b9f227f1da0e8ed27510ad37fccfa3b7c3035fbd75b52901b160fb"
+      "evidence_digest": "3c94a44812b9f227f1da0e8ed27510ad37fccfa3b7c3035fbd75b52901b160fb",
+      "reason": "the action carries no task_authority_ref; the task's bounds could not be checked"
      }
     ]
    }
@@ -254,37 +274,43 @@
       "id": "verify_before_dispatch",
       "result": "n/a",
       "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
      },
      {
       "id": "destination_rail",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09"
+      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "counterparty_identity_change",
       "result": "n/a",
       "method": "prior_recorded_value_v0",
-      "evidence_digest": "870b0a3e1636cab6902013f7742c0b36dfd72f324d1ff9ee3cd0976aa6d19241"
+      "evidence_digest": "870b0a3e1636cab6902013f7742c0b36dfd72f324d1ff9ee3cd0976aa6d19241",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "credential_pattern",
       "result": "n/a",
       "method": "regex_match_v0",
-      "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827"
+      "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827",
+      "reason": "the action sends no outgoing content"
      },
      {
       "id": "recurring_charge",
       "result": "n/a",
       "method": "structured_field_v0",
-      "evidence_digest": "ed761a48bede343570feeba08dd105fb225b9caf75b52392ea84550fdcc7b0b2"
+      "evidence_digest": "ed761a48bede343570feeba08dd105fb225b9caf75b52392ea84550fdcc7b0b2",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "action_class_gate",
       "result": "n/a",
       "method": "taxonomy_selector_v0",
-      "evidence_digest": "93594fc3973062b88c37e6949b10f34f202dc75ada097c69b83d201e0cb51701"
+      "evidence_digest": "93594fc3973062b88c37e6949b10f34f202dc75ada097c69b83d201e0cb51701",
+      "reason": "no selector names this action class"
      },
      {
       "id": "counterparty_seen_before",
@@ -296,7 +322,8 @@
       "id": "recipient_role",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "refundability",
@@ -320,7 +347,8 @@
       "id": "recipient_seen_before",
       "result": "n/a",
       "method": "counterparty.seen_before/2.0.0",
-      "evidence_digest": "c7a84acb724ca272de76e7ed4c699268414ba4327cd140a72c429dd565287d53"
+      "evidence_digest": "c7a84acb724ca272de76e7ed4c699268414ba4327cd140a72c429dd565287d53",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "channel_change",
@@ -332,13 +360,15 @@
       "id": "upfront_amount",
       "result": "n/a",
       "method": "upfront_threshold_v0",
-      "evidence_digest": "6286d6f31789beb7de36237b614325f4a23103d7a4e035b5a23e84972b442123"
+      "evidence_digest": "6286d6f31789beb7de36237b614325f4a23103d7a4e035b5a23e84972b442123",
+      "reason": "the action carries no upfront_amount_minor; it could not be checked"
      },
      {
       "id": "task_authority",
       "result": "n/a",
       "method": "bound_plan_containment_v0",
-      "evidence_digest": "3c94a44812b9f227f1da0e8ed27510ad37fccfa3b7c3035fbd75b52901b160fb"
+      "evidence_digest": "3c94a44812b9f227f1da0e8ed27510ad37fccfa3b7c3035fbd75b52901b160fb",
+      "reason": "the action carries no task_authority_ref; the task's bounds could not be checked"
      }
     ]
    }

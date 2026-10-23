@@ -74,8 +74,8 @@ it touches:
 **v5, as built in PR B.** The shared vectors changed in these points against §5 and §7:
 
 - **What is compared.** Each decision is compared as its outcome and, per constraint in order, its
-  id, result, method and evidence digest. The evidence is the structured reason, so the reason is
-  compared there. The free-text `reason` string is not compared. The Python engine writes one for
+  id, result, method and evidence digest. The evidence is the structured reason. The free-text
+  `reason` string is compared only for an n/a (see below). The Python engine writes one for
   every constraint, but the Go guard keeps no such string: it composes wording only for some
   failures, and its per-rule text lives in `Report`. Python's `severity`, `blocking` and
   `check_type` have no Go counterpart.
@@ -94,6 +94,27 @@ it touches:
   (`inputs/everyday-actions`).
 - **Known differences.** Ten cases differ, and each is pinned with both sides' decisions. They
   fall into five groups, tracked in capsule-engine#214.
+- **n/a reasons.** An n/a's evidence often says only "in scope, nothing missing", so an n/a also
+  carries Python's reason. The Go guard compares it wherever it keeps one: `Pending()`, or the
+  note that puts a check out of scope. In the first run all 77 such reasons agreed. For the other
+  results, the reason stays presentation.
+- **Live wiring.** A live check never evaluates a record under its own taxonomy (9ac3722, only a
+  replay does). An early draft of `decide_check_input` set that replay flag. That made two
+  old-taxonomy records look like a divergence that a live check does not have.
+- **The coverage gate.** A fold counts as covered only when some case's evidence names its digest,
+  which a check writes only when it ran the fold. `--write` also moves each case to the current
+  pack for its input, so after a pack cut the vectors follow the new version.
+- **Pins.** A pin holds an error to its stage (`decode` or `check` in Go, the exception type in
+  Python). Across languages, any two refusals agree.
+- **Not built yet, against §5 and §7:**
+  - cases carry no `pack_digest` (the `packs` job checks the embedded digests instead);
+  - the catalog fixtures are not cases yet;
+  - `action-ledger` steps carry Action fields only, with no task-authority or approval records,
+    and Go runs them through `Check`;
+  - a set is one file of cases whose inputs are referenced by path and sha256, not
+    `<set>/<case>.json` with the input inline;
+  - a failure prints the differing constraints with both sides' digests and n/a reasons, not the
+    evidence itself.
 - **Tools.** The writer, the checker and the coverage gate are `scripts/conformance_vectors.py`
   (where this note says `tools.conformance_vectors`). `COVERAGE-EXEMPT.json` exempts only
   `verify_before_dispatch/1.0.0`.

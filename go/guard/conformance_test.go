@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"slices"
+	"strings"
 	"testing"
 
 	"github.com/action-state-group/capsule-engine/go/pack"
@@ -53,6 +54,10 @@ type conformanceConstraint struct {
 	Result         string `json:"result"`
 	Method         string `json:"method"`
 	EvidenceDigest string `json:"evidence_digest"`
+	// Reason is an n/a's reason. Python writes one for every n/a; this port
+	// keeps one only where it composes it (Pending, or an out-of-scope
+	// note), and that one must be Python's.
+	Reason string `json:"reason,omitempty"`
 }
 
 // knownDifference is one case Go decides differently by design: the Python
@@ -203,26 +208,55 @@ func decisionShape(t *testing.T, name string, d Decision) conformanceDecision {
 		if err != nil {
 			t.Fatalf("%s: %s evidence: %v", name, cs.ID, err)
 		}
-		out.Constraints = append(out.Constraints, conformanceConstraint{ID: cs.ID, Result: string(cs.Result), Method: cs.Method, EvidenceDigest: digest})
+		reason := ""
+		if cs.Result == NotApplicable {
+			reason = cs.pending
+			if reason == "" {
+				reason = cs.scopeNote
+			}
+		}
+		out.Constraints = append(out.Constraints, conformanceConstraint{ID: cs.ID, Result: string(cs.Result), Method: cs.Method, EvidenceDigest: digest, Reason: reason})
 	}
 	return out
 }
 
-// sameDecision is whether two decisions agree. An error agrees with an
-// error: the sides name their refusals differently.
-func sameDecision(a, b conformanceDecision) bool {
+// errorStage is where a refusal happened: an exception's type for the
+// engine, and "decode" or "check" for this port.
+func errorStage(e string) string {
+	stage, _, _ := strings.Cut(e, ":")
+	return stage
+}
+
+// sameConstraint is whether two constraints agree. A Go side that keeps no
+// reason for an n/a agrees with any.
+func sameConstraint(g, p conformanceConstraint) bool {
+	if g.Reason == "" {
+		g.Reason = p.Reason
+	}
+	return g == p
+}
+
+// sameDecision is whether a's decision is b's. Across the two languages an
+// error agrees with an error, since the sides name their refusals
+// differently; a pin (exact) holds an error to its stage.
+func sameDecision(a, b conformanceDecision) bool { return agrees(a, b, false) }
+
+func agrees(a, b conformanceDecision, exact bool) bool {
 	if a.Error != "" || b.Error != "" {
+		if exact {
+			return errorStage(a.Error) == errorStage(b.Error)
+		}
 		return a.Error != "" && b.Error != ""
 	}
 	if len(a.Steps) != len(b.Steps) {
 		return false
 	}
 	for i := range a.Steps {
-		if !sameDecision(a.Steps[i], b.Steps[i]) {
+		if !agrees(a.Steps[i], b.Steps[i], exact) {
 			return false
 		}
 	}
-	return a.Outcome == b.Outcome && slices.Equal(a.Constraints, b.Constraints)
+	return a.Outcome == b.Outcome && slices.EqualFunc(a.Constraints, b.Constraints, sameConstraint)
 }
 
 func describe(d conformanceDecision) string {
@@ -243,10 +277,10 @@ func TestConformanceVectors(t *testing.T) {
 			got := decideCase(t, engines, c)
 			if k, ok := known[id]; ok {
 				seen[id] = true
-				if !sameDecision(k.Python, c.Expected) {
+				if !agrees(k.Python, c.Expected, true) {
 					t.Errorf("%s: Python now decides %s, not the pinned %s: re-pin or close %s", id, describe(c.Expected), describe(k.Python), k.Issue)
 				}
-				if !sameDecision(k.Go, got) {
+				if !agrees(got, k.Go, true) {
 					t.Errorf("%s: Go now decides %s, not the pinned %s: re-pin or close %s", id, describe(got), describe(k.Go), k.Issue)
 				}
 				continue
@@ -290,8 +324,8 @@ func difference(g, p conformanceDecision) string {
 		return out + fmt.Sprintf("Go %d constraints, Python %d", len(g.Constraints), len(p.Constraints))
 	}
 	for i, gc := range g.Constraints {
-		if pc := p.Constraints[i]; gc != pc {
-			out += fmt.Sprintf("%s Go %s/%s/%.12s, Python %s/%s/%.12s; ", gc.ID, gc.Result, gc.Method, gc.EvidenceDigest, pc.Result, pc.Method, pc.EvidenceDigest)
+		if pc := p.Constraints[i]; !sameConstraint(gc, pc) {
+			out += fmt.Sprintf("%s Go %s/%s/%s %q, Python %s/%s/%s %q; ", gc.ID, gc.Result, gc.Method, gc.EvidenceDigest, gc.Reason, pc.Result, pc.Method, pc.EvidenceDigest, pc.Reason)
 		}
 	}
 	return out

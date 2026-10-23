@@ -20,19 +20,22 @@
       "id": "caps",
       "result": "n/a",
       "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c"
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
      },
      {
       "id": "verify_before_dispatch",
       "result": "n/a",
       "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
      },
      {
       "id": "recipient_role",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "price_floor",
@@ -44,13 +47,15 @@
       "id": "promise_requires_approval",
       "result": "n/a",
       "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9"
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "promise_never",
       "result": "n/a",
       "method": "class_membership_v0",
-      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14"
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "required_disclosure",
@@ -86,7 +91,8 @@
       "id": "release_on_acceptance",
       "result": "n/a",
       "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb"
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the rule is not configured for this action class"
      }
     ]
    }
@@ -110,19 +116,22 @@
       "id": "caps",
       "result": "n/a",
       "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c"
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
      },
      {
       "id": "verify_before_dispatch",
       "result": "n/a",
       "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
      },
      {
       "id": "recipient_role",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "price_floor",
@@ -134,13 +143,15 @@
       "id": "promise_requires_approval",
       "result": "n/a",
       "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9"
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "promise_never",
       "result": "n/a",
       "method": "class_membership_v0",
-      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14"
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "required_disclosure",
@@ -176,7 +187,8 @@
       "id": "release_on_acceptance",
       "result": "n/a",
       "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb"
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the rule is not configured for this action class"
      }
     ]
    }
@@ -200,19 +212,22 @@
       "id": "caps",
       "result": "n/a",
       "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c"
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
      },
      {
       "id": "verify_before_dispatch",
       "result": "n/a",
       "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
      },
      {
       "id": "recipient_role",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "price_floor",
@@ -224,13 +239,15 @@
       "id": "promise_requires_approval",
       "result": "n/a",
       "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9"
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "promise_never",
       "result": "n/a",
       "method": "class_membership_v0",
-      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14"
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "required_disclosure",
@@ -266,7 +283,8 @@
       "id": "release_on_acceptance",
       "result": "n/a",
       "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb"
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the rule is not configured for this action class"
      }
     ]
    }
@@ -290,19 +308,22 @@
       "id": "caps",
       "result": "n/a",
       "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c"
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
      },
      {
       "id": "verify_before_dispatch",
       "result": "n/a",
       "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
      },
      {
       "id": "recipient_role",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "price_floor",
@@ -314,13 +335,15 @@
       "id": "promise_requires_approval",
       "result": "n/a",
       "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9"
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "promise_never",
       "result": "n/a",
       "method": "class_membership_v0",
-      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14"
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "required_disclosure",
@@ -356,7 +379,8 @@
       "id": "release_on_acceptance",
       "result": "n/a",
       "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb"
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the rule is not configured for this action class"
      }
     ]
    }
@@ -380,19 +404,22 @@
       "id": "caps",
       "result": "n/a",
       "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c"
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
      },
      {
       "id": "verify_before_dispatch",
       "result": "n/a",
       "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
      },
      {
       "id": "recipient_role",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "price_floor",
@@ -404,13 +431,15 @@
       "id": "promise_requires_approval",
       "result": "n/a",
       "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9"
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "promise_never",
       "result": "n/a",
       "method": "class_membership_v0",
-      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14"
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "required_disclosure",
@@ -446,7 +475,8 @@
       "id": "release_on_acceptance",
       "result": "n/a",
       "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb"
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the rule is not configured for this action class"
      }
     ]
    }
@@ -470,19 +500,22 @@
       "id": "caps",
       "result": "n/a",
       "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c"
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
      },
      {
       "id": "verify_before_dispatch",
       "result": "n/a",
       "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
      },
      {
       "id": "recipient_role",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "price_floor",
@@ -494,13 +527,15 @@
       "id": "promise_requires_approval",
       "result": "n/a",
       "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9"
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "promise_never",
       "result": "n/a",
       "method": "class_membership_v0",
-      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14"
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "required_disclosure",
@@ -536,7 +571,8 @@
       "id": "release_on_acceptance",
       "result": "n/a",
       "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb"
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the rule is not configured for this action class"
      }
     ]
    }
@@ -560,19 +596,22 @@
       "id": "caps",
       "result": "n/a",
       "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c"
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
      },
      {
       "id": "verify_before_dispatch",
       "result": "n/a",
       "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
      },
      {
       "id": "recipient_role",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "price_floor",
@@ -584,13 +623,15 @@
       "id": "promise_requires_approval",
       "result": "n/a",
       "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9"
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "promise_never",
       "result": "n/a",
       "method": "class_membership_v0",
-      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14"
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "required_disclosure",
@@ -626,7 +667,8 @@
       "id": "release_on_acceptance",
       "result": "n/a",
       "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb"
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the rule is not configured for this action class"
      }
     ]
    }
@@ -650,19 +692,22 @@
       "id": "caps",
       "result": "n/a",
       "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c"
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
      },
      {
       "id": "verify_before_dispatch",
       "result": "n/a",
       "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
      },
      {
       "id": "recipient_role",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "price_floor",
@@ -674,13 +719,15 @@
       "id": "promise_requires_approval",
       "result": "n/a",
       "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9"
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "promise_never",
       "result": "n/a",
       "method": "class_membership_v0",
-      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14"
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "required_disclosure",
@@ -716,7 +763,8 @@
       "id": "release_on_acceptance",
       "result": "n/a",
       "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb"
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the rule is not configured for this action class"
      }
     ]
    }
@@ -740,19 +788,22 @@
       "id": "caps",
       "result": "n/a",
       "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c"
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
      },
      {
       "id": "verify_before_dispatch",
       "result": "n/a",
       "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
      },
      {
       "id": "recipient_role",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "price_floor",
@@ -764,13 +815,15 @@
       "id": "promise_requires_approval",
       "result": "n/a",
       "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9"
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "promise_never",
       "result": "n/a",
       "method": "class_membership_v0",
-      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14"
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "required_disclosure",
@@ -806,7 +859,8 @@
       "id": "release_on_acceptance",
       "result": "n/a",
       "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb"
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the rule is not configured for this action class"
      }
     ]
    }
@@ -830,19 +884,22 @@
       "id": "caps",
       "result": "n/a",
       "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c"
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
      },
      {
       "id": "verify_before_dispatch",
       "result": "n/a",
       "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
      },
      {
       "id": "recipient_role",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "price_floor",
@@ -854,13 +911,15 @@
       "id": "promise_requires_approval",
       "result": "n/a",
       "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9"
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "promise_never",
       "result": "n/a",
       "method": "class_membership_v0",
-      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14"
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "required_disclosure",
@@ -896,7 +955,8 @@
       "id": "release_on_acceptance",
       "result": "n/a",
       "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb"
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the rule is not configured for this action class"
      }
     ]
    }
@@ -920,19 +980,22 @@
       "id": "caps",
       "result": "n/a",
       "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c"
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
      },
      {
       "id": "verify_before_dispatch",
       "result": "n/a",
       "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
      },
      {
       "id": "recipient_role",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "price_floor",
@@ -944,13 +1007,15 @@
       "id": "promise_requires_approval",
       "result": "n/a",
       "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9"
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "promise_never",
       "result": "n/a",
       "method": "class_membership_v0",
-      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14"
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "required_disclosure",
@@ -986,7 +1051,8 @@
       "id": "release_on_acceptance",
       "result": "n/a",
       "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb"
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the rule is not configured for this action class"
      }
     ]
    }
@@ -1010,19 +1076,22 @@
       "id": "caps",
       "result": "n/a",
       "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c"
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
      },
      {
       "id": "verify_before_dispatch",
       "result": "n/a",
       "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
      },
      {
       "id": "recipient_role",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "price_floor",
@@ -1034,13 +1103,15 @@
       "id": "promise_requires_approval",
       "result": "n/a",
       "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9"
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "promise_never",
       "result": "n/a",
       "method": "class_membership_v0",
-      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14"
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "required_disclosure",
@@ -1076,7 +1147,8 @@
       "id": "release_on_acceptance",
       "result": "n/a",
       "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb"
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the rule is not configured for this action class"
      }
     ]
    }
@@ -1100,19 +1172,22 @@
       "id": "caps",
       "result": "n/a",
       "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c"
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
      },
      {
       "id": "verify_before_dispatch",
       "result": "n/a",
       "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
      },
      {
       "id": "recipient_role",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "price_floor",
@@ -1124,13 +1199,15 @@
       "id": "promise_requires_approval",
       "result": "n/a",
       "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9"
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "promise_never",
       "result": "n/a",
       "method": "class_membership_v0",
-      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14"
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "required_disclosure",
@@ -1166,7 +1243,8 @@
       "id": "release_on_acceptance",
       "result": "n/a",
       "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb"
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the rule is not configured for this action class"
      }
     ]
    }
@@ -1190,19 +1268,22 @@
       "id": "caps",
       "result": "n/a",
       "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c"
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
      },
      {
       "id": "verify_before_dispatch",
       "result": "n/a",
       "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
      },
      {
       "id": "recipient_role",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "price_floor",
@@ -1214,13 +1295,15 @@
       "id": "promise_requires_approval",
       "result": "n/a",
       "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9"
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "promise_never",
       "result": "n/a",
       "method": "class_membership_v0",
-      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14"
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "required_disclosure",
@@ -1256,7 +1339,8 @@
       "id": "release_on_acceptance",
       "result": "n/a",
       "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb"
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the rule is not configured for this action class"
      }
     ]
    }
@@ -1280,19 +1364,22 @@
       "id": "caps",
       "result": "n/a",
       "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c"
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
      },
      {
       "id": "verify_before_dispatch",
       "result": "n/a",
       "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
      },
      {
       "id": "recipient_role",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "price_floor",
@@ -1304,13 +1391,15 @@
       "id": "promise_requires_approval",
       "result": "n/a",
       "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9"
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "promise_never",
       "result": "n/a",
       "method": "class_membership_v0",
-      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14"
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "required_disclosure",
@@ -1346,7 +1435,8 @@
       "id": "release_on_acceptance",
       "result": "n/a",
       "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb"
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the rule is not configured for this action class"
      }
     ]
    }
@@ -1370,19 +1460,22 @@
       "id": "caps",
       "result": "n/a",
       "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c"
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
      },
      {
       "id": "verify_before_dispatch",
       "result": "n/a",
       "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
      },
      {
       "id": "recipient_role",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "price_floor",
@@ -1394,13 +1487,15 @@
       "id": "promise_requires_approval",
       "result": "n/a",
       "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9"
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "promise_never",
       "result": "n/a",
       "method": "class_membership_v0",
-      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14"
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "required_disclosure",
@@ -1436,7 +1531,8 @@
       "id": "release_on_acceptance",
       "result": "n/a",
       "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb"
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the rule is not configured for this action class"
      }
     ]
    }
@@ -1460,19 +1556,22 @@
       "id": "caps",
       "result": "n/a",
       "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c"
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
      },
      {
       "id": "verify_before_dispatch",
       "result": "n/a",
       "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
      },
      {
       "id": "recipient_role",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "price_floor",
@@ -1484,13 +1583,15 @@
       "id": "promise_requires_approval",
       "result": "n/a",
       "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9"
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "promise_never",
       "result": "n/a",
       "method": "class_membership_v0",
-      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14"
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "required_disclosure",
@@ -1526,7 +1627,8 @@
       "id": "release_on_acceptance",
       "result": "n/a",
       "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb"
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the rule is not configured for this action class"
      }
     ]
    }
@@ -1550,19 +1652,22 @@
       "id": "caps",
       "result": "n/a",
       "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c"
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
      },
      {
       "id": "verify_before_dispatch",
       "result": "n/a",
       "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
      },
      {
       "id": "recipient_role",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "price_floor",
@@ -1574,13 +1679,15 @@
       "id": "promise_requires_approval",
       "result": "n/a",
       "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9"
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "promise_never",
       "result": "n/a",
       "method": "class_membership_v0",
-      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14"
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "required_disclosure",
@@ -1616,7 +1723,8 @@
       "id": "release_on_acceptance",
       "result": "n/a",
       "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb"
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the rule is not configured for this action class"
      }
     ]
    }
@@ -1640,19 +1748,22 @@
       "id": "caps",
       "result": "n/a",
       "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c"
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
      },
      {
       "id": "verify_before_dispatch",
       "result": "n/a",
       "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
      },
      {
       "id": "recipient_role",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "price_floor",
@@ -1664,13 +1775,15 @@
       "id": "promise_requires_approval",
       "result": "n/a",
       "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9"
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "promise_never",
       "result": "n/a",
       "method": "class_membership_v0",
-      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14"
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "required_disclosure",
@@ -1706,7 +1819,8 @@
       "id": "release_on_acceptance",
       "result": "n/a",
       "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb"
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the rule is not configured for this action class"
      }
     ]
    }
@@ -1730,19 +1844,22 @@
       "id": "caps",
       "result": "n/a",
       "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c"
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
      },
      {
       "id": "verify_before_dispatch",
       "result": "n/a",
       "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
      },
      {
       "id": "recipient_role",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "price_floor",
@@ -1754,13 +1871,15 @@
       "id": "promise_requires_approval",
       "result": "n/a",
       "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9"
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "promise_never",
       "result": "n/a",
       "method": "class_membership_v0",
-      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14"
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "required_disclosure",
@@ -1796,7 +1915,8 @@
       "id": "release_on_acceptance",
       "result": "n/a",
       "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb"
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the rule is not configured for this action class"
      }
     ]
    }
@@ -1820,19 +1940,22 @@
       "id": "caps",
       "result": "n/a",
       "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c"
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
      },
      {
       "id": "verify_before_dispatch",
       "result": "n/a",
       "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
      },
      {
       "id": "recipient_role",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "price_floor",
@@ -1844,13 +1967,15 @@
       "id": "promise_requires_approval",
       "result": "n/a",
       "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9"
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "promise_never",
       "result": "n/a",
       "method": "class_membership_v0",
-      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14"
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "required_disclosure",
@@ -1874,7 +1999,8 @@
       "id": "destination_rail",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09"
+      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "task_authority",
@@ -1886,7 +2012,8 @@
       "id": "release_on_acceptance",
       "result": "n/a",
       "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb"
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the rule is not configured for this action class"
      }
     ]
    }
@@ -1910,19 +2037,22 @@
       "id": "caps",
       "result": "n/a",
       "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c"
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
      },
      {
       "id": "verify_before_dispatch",
       "result": "n/a",
       "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
      },
      {
       "id": "recipient_role",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "price_floor",
@@ -1934,13 +2064,15 @@
       "id": "promise_requires_approval",
       "result": "n/a",
       "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9"
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "promise_never",
       "result": "n/a",
       "method": "class_membership_v0",
-      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14"
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "required_disclosure",
@@ -1964,7 +2096,8 @@
       "id": "destination_rail",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09"
+      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "task_authority",
@@ -1976,7 +2109,8 @@
       "id": "release_on_acceptance",
       "result": "n/a",
       "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb"
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the rule is not configured for this action class"
      }
     ]
    }
@@ -2000,19 +2134,22 @@
       "id": "caps",
       "result": "n/a",
       "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c"
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
      },
      {
       "id": "verify_before_dispatch",
       "result": "n/a",
       "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
      },
      {
       "id": "recipient_role",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "price_floor",
@@ -2024,13 +2161,15 @@
       "id": "promise_requires_approval",
       "result": "n/a",
       "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9"
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "promise_never",
       "result": "n/a",
       "method": "class_membership_v0",
-      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14"
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "required_disclosure",
@@ -2054,7 +2193,8 @@
       "id": "destination_rail",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09"
+      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "task_authority",
@@ -2066,7 +2206,8 @@
       "id": "release_on_acceptance",
       "result": "n/a",
       "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb"
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the rule is not configured for this action class"
      }
     ]
    }
@@ -2090,19 +2231,22 @@
       "id": "caps",
       "result": "n/a",
       "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c"
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
      },
      {
       "id": "verify_before_dispatch",
       "result": "n/a",
       "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
      },
      {
       "id": "recipient_role",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "price_floor",
@@ -2114,13 +2258,15 @@
       "id": "promise_requires_approval",
       "result": "n/a",
       "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9"
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "promise_never",
       "result": "n/a",
       "method": "class_membership_v0",
-      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14"
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "required_disclosure",
@@ -2144,7 +2290,8 @@
       "id": "destination_rail",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09"
+      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "task_authority",
@@ -2156,7 +2303,8 @@
       "id": "release_on_acceptance",
       "result": "n/a",
       "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb"
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the rule is not configured for this action class"
      }
     ]
    }
@@ -2180,19 +2328,22 @@
       "id": "caps",
       "result": "n/a",
       "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c"
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
      },
      {
       "id": "verify_before_dispatch",
       "result": "n/a",
       "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
      },
      {
       "id": "recipient_role",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "price_floor",
@@ -2204,13 +2355,15 @@
       "id": "promise_requires_approval",
       "result": "n/a",
       "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9"
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "promise_never",
       "result": "n/a",
       "method": "class_membership_v0",
-      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14"
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "required_disclosure",
@@ -2234,7 +2387,8 @@
       "id": "destination_rail",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09"
+      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "task_authority",
@@ -2246,7 +2400,8 @@
       "id": "release_on_acceptance",
       "result": "n/a",
       "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb"
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the rule is not configured for this action class"
      }
     ]
    }
@@ -2270,19 +2425,22 @@
       "id": "caps",
       "result": "n/a",
       "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c"
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
      },
      {
       "id": "verify_before_dispatch",
       "result": "n/a",
       "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
      },
      {
       "id": "recipient_role",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "price_floor",
@@ -2294,13 +2452,15 @@
       "id": "promise_requires_approval",
       "result": "n/a",
       "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9"
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "promise_never",
       "result": "n/a",
       "method": "class_membership_v0",
-      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14"
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "required_disclosure",
@@ -2324,7 +2484,8 @@
       "id": "destination_rail",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09"
+      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "task_authority",
@@ -2336,7 +2497,8 @@
       "id": "release_on_acceptance",
       "result": "n/a",
       "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb"
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the rule is not configured for this action class"
      }
     ]
    }
@@ -2360,19 +2522,22 @@
       "id": "caps",
       "result": "n/a",
       "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c"
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
      },
      {
       "id": "verify_before_dispatch",
       "result": "n/a",
       "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
      },
      {
       "id": "recipient_role",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "price_floor",
@@ -2384,13 +2549,15 @@
       "id": "promise_requires_approval",
       "result": "n/a",
       "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9"
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "promise_never",
       "result": "n/a",
       "method": "class_membership_v0",
-      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14"
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "required_disclosure",
@@ -2414,7 +2581,8 @@
       "id": "destination_rail",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09"
+      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "task_authority",
@@ -2426,7 +2594,8 @@
       "id": "release_on_acceptance",
       "result": "n/a",
       "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb"
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the rule is not configured for this action class"
      }
     ]
    }
@@ -2450,19 +2619,22 @@
       "id": "caps",
       "result": "n/a",
       "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c"
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
      },
      {
       "id": "verify_before_dispatch",
       "result": "n/a",
       "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
      },
      {
       "id": "recipient_role",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "price_floor",
@@ -2474,13 +2646,15 @@
       "id": "promise_requires_approval",
       "result": "n/a",
       "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9"
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "promise_never",
       "result": "n/a",
       "method": "class_membership_v0",
-      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14"
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "required_disclosure",
@@ -2504,7 +2678,8 @@
       "id": "destination_rail",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09"
+      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "task_authority",
@@ -2516,7 +2691,8 @@
       "id": "release_on_acceptance",
       "result": "n/a",
       "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb"
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the rule is not configured for this action class"
      }
     ]
    }
@@ -2540,19 +2716,22 @@
       "id": "caps",
       "result": "n/a",
       "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c"
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
      },
      {
       "id": "verify_before_dispatch",
       "result": "n/a",
       "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
      },
      {
       "id": "recipient_role",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "price_floor",
@@ -2564,13 +2743,15 @@
       "id": "promise_requires_approval",
       "result": "n/a",
       "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9"
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "promise_never",
       "result": "n/a",
       "method": "class_membership_v0",
-      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14"
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "required_disclosure",
@@ -2594,7 +2775,8 @@
       "id": "destination_rail",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09"
+      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "task_authority",
@@ -2606,7 +2788,8 @@
       "id": "release_on_acceptance",
       "result": "n/a",
       "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb"
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the rule is not configured for this action class"
      }
     ]
    }
@@ -2630,19 +2813,22 @@
       "id": "caps",
       "result": "n/a",
       "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c"
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
      },
      {
       "id": "verify_before_dispatch",
       "result": "n/a",
       "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
      },
      {
       "id": "recipient_role",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "price_floor",
@@ -2654,13 +2840,15 @@
       "id": "promise_requires_approval",
       "result": "n/a",
       "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9"
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "promise_never",
       "result": "n/a",
       "method": "class_membership_v0",
-      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14"
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "required_disclosure",
@@ -2684,7 +2872,8 @@
       "id": "destination_rail",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09"
+      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "task_authority",
@@ -2696,7 +2885,8 @@
       "id": "release_on_acceptance",
       "result": "n/a",
       "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb"
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the rule is not configured for this action class"
      }
     ]
    }
@@ -2720,19 +2910,22 @@
       "id": "caps",
       "result": "n/a",
       "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c"
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
      },
      {
       "id": "verify_before_dispatch",
       "result": "n/a",
       "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
      },
      {
       "id": "recipient_role",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "price_floor",
@@ -2744,13 +2937,15 @@
       "id": "promise_requires_approval",
       "result": "n/a",
       "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9"
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "promise_never",
       "result": "n/a",
       "method": "class_membership_v0",
-      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14"
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "required_disclosure",
@@ -2774,7 +2969,8 @@
       "id": "destination_rail",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09"
+      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "task_authority",
@@ -2786,7 +2982,8 @@
       "id": "release_on_acceptance",
       "result": "n/a",
       "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb"
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the rule is not configured for this action class"
      }
     ]
    }
@@ -2810,19 +3007,22 @@
       "id": "caps",
       "result": "n/a",
       "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c"
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
      },
      {
       "id": "verify_before_dispatch",
       "result": "n/a",
       "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
      },
      {
       "id": "recipient_role",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "price_floor",
@@ -2834,13 +3034,15 @@
       "id": "promise_requires_approval",
       "result": "n/a",
       "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9"
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "promise_never",
       "result": "n/a",
       "method": "class_membership_v0",
-      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14"
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "required_disclosure",
@@ -2864,7 +3066,8 @@
       "id": "destination_rail",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09"
+      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "task_authority",
@@ -2876,7 +3079,8 @@
       "id": "release_on_acceptance",
       "result": "n/a",
       "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb"
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the rule is not configured for this action class"
      }
     ]
    }
@@ -2900,19 +3104,22 @@
       "id": "caps",
       "result": "n/a",
       "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c"
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
      },
      {
       "id": "verify_before_dispatch",
       "result": "n/a",
       "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
      },
      {
       "id": "recipient_role",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "price_floor",
@@ -2924,13 +3131,15 @@
       "id": "promise_requires_approval",
       "result": "n/a",
       "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9"
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "promise_never",
       "result": "n/a",
       "method": "class_membership_v0",
-      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14"
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "required_disclosure",
@@ -2954,7 +3163,8 @@
       "id": "destination_rail",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09"
+      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "task_authority",
@@ -2966,7 +3176,8 @@
       "id": "release_on_acceptance",
       "result": "n/a",
       "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb"
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the rule is not configured for this action class"
      }
     ]
    }
@@ -2990,19 +3201,22 @@
       "id": "caps",
       "result": "n/a",
       "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c"
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
      },
      {
       "id": "verify_before_dispatch",
       "result": "n/a",
       "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
      },
      {
       "id": "recipient_role",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "price_floor",
@@ -3014,13 +3228,15 @@
       "id": "promise_requires_approval",
       "result": "n/a",
       "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9"
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "promise_never",
       "result": "n/a",
       "method": "class_membership_v0",
-      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14"
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "required_disclosure",
@@ -3044,7 +3260,8 @@
       "id": "destination_rail",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09"
+      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "task_authority",
@@ -3056,7 +3273,8 @@
       "id": "release_on_acceptance",
       "result": "n/a",
       "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb"
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the rule is not configured for this action class"
      }
     ]
    }
@@ -3080,19 +3298,22 @@
       "id": "caps",
       "result": "n/a",
       "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c"
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
      },
      {
       "id": "verify_before_dispatch",
       "result": "n/a",
       "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
      },
      {
       "id": "recipient_role",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "price_floor",
@@ -3104,13 +3325,15 @@
       "id": "promise_requires_approval",
       "result": "n/a",
       "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9"
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "promise_never",
       "result": "n/a",
       "method": "class_membership_v0",
-      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14"
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "required_disclosure",
@@ -3134,7 +3357,8 @@
       "id": "destination_rail",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09"
+      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "task_authority",
@@ -3146,7 +3370,8 @@
       "id": "release_on_acceptance",
       "result": "n/a",
       "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb"
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the rule is not configured for this action class"
      }
     ]
    }
@@ -3170,19 +3395,22 @@
       "id": "caps",
       "result": "n/a",
       "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c"
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
      },
      {
       "id": "verify_before_dispatch",
       "result": "n/a",
       "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
      },
      {
       "id": "recipient_role",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "price_floor",
@@ -3194,13 +3422,15 @@
       "id": "promise_requires_approval",
       "result": "n/a",
       "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9"
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "promise_never",
       "result": "n/a",
       "method": "class_membership_v0",
-      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14"
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "required_disclosure",
@@ -3224,7 +3454,8 @@
       "id": "destination_rail",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09"
+      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "task_authority",
@@ -3236,7 +3467,8 @@
       "id": "release_on_acceptance",
       "result": "n/a",
       "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb"
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the rule is not configured for this action class"
      }
     ]
    }
@@ -3260,19 +3492,22 @@
       "id": "caps",
       "result": "n/a",
       "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c"
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
      },
      {
       "id": "verify_before_dispatch",
       "result": "n/a",
       "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
      },
      {
       "id": "recipient_role",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "price_floor",
@@ -3284,13 +3519,15 @@
       "id": "promise_requires_approval",
       "result": "n/a",
       "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9"
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "promise_never",
       "result": "n/a",
       "method": "class_membership_v0",
-      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14"
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "required_disclosure",
@@ -3314,7 +3551,8 @@
       "id": "destination_rail",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09"
+      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "task_authority",
@@ -3326,7 +3564,8 @@
       "id": "release_on_acceptance",
       "result": "n/a",
       "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb"
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the rule is not configured for this action class"
      }
     ]
    }
@@ -3350,19 +3589,22 @@
       "id": "caps",
       "result": "n/a",
       "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c"
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
      },
      {
       "id": "verify_before_dispatch",
       "result": "n/a",
       "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
      },
      {
       "id": "recipient_role",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "price_floor",
@@ -3374,13 +3616,15 @@
       "id": "promise_requires_approval",
       "result": "n/a",
       "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9"
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "promise_never",
       "result": "n/a",
       "method": "class_membership_v0",
-      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14"
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "required_disclosure",
@@ -3404,7 +3648,8 @@
       "id": "destination_rail",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09"
+      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "task_authority",
@@ -3416,7 +3661,8 @@
       "id": "release_on_acceptance",
       "result": "n/a",
       "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb"
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the rule is not configured for this action class"
      }
     ]
    }
@@ -3440,19 +3686,22 @@
       "id": "caps",
       "result": "n/a",
       "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c"
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
      },
      {
       "id": "verify_before_dispatch",
       "result": "n/a",
       "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
      },
      {
       "id": "recipient_role",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "price_floor",
@@ -3464,13 +3713,15 @@
       "id": "promise_requires_approval",
       "result": "n/a",
       "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9"
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "promise_never",
       "result": "n/a",
       "method": "class_membership_v0",
-      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14"
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "required_disclosure",
@@ -3494,7 +3745,8 @@
       "id": "destination_rail",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09"
+      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "task_authority",
@@ -3506,7 +3758,8 @@
       "id": "release_on_acceptance",
       "result": "n/a",
       "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb"
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the rule is not configured for this action class"
      }
     ]
    }
@@ -3530,19 +3783,22 @@
       "id": "caps",
       "result": "n/a",
       "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c"
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no caps definition is configured"
      },
      {
       "id": "verify_before_dispatch",
       "result": "n/a",
       "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
      },
      {
       "id": "recipient_role",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "price_floor",
@@ -3554,13 +3810,15 @@
       "id": "promise_requires_approval",
       "result": "n/a",
       "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9"
+      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "promise_never",
       "result": "n/a",
       "method": "class_membership_v0",
-      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14"
+      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
+      "reason": "the action carries no representation_class; the statement could not be classed"
      },
      {
       "id": "required_disclosure",
@@ -3584,7 +3842,8 @@
       "id": "destination_rail",
       "result": "n/a",
       "method": "set_membership_v0",
-      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09"
+      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+      "reason": "the rule is not configured for this action class"
      },
      {
       "id": "task_authority",
@@ -3596,7 +3855,8 @@
       "id": "release_on_acceptance",
       "result": "n/a",
       "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb"
+      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
+      "reason": "the rule is not configured for this action class"
      }
     ]
    }

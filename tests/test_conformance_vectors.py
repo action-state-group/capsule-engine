@@ -32,7 +32,7 @@ def tool_copy(tmp_path, monkeypatch):
     for name in ("KNOWN-DIFFERENCES.json", "COVERAGE-EXEMPT.json", "everyday-actions.json"):
         shutil.copyfile(tool.VECTORS / name, vectors / name)
     monkeypatch.setattr(tool, "VECTORS", vectors)
-    monkeypatch.setattr(tool, "coverage", lambda sets: [])
+    monkeypatch.setattr(tool, "coverage", lambda sets, strings: [])
     return tool
 
 
@@ -54,13 +54,25 @@ def test_an_input_that_is_not_the_one_pinned_is_found(tool_copy):
     assert tool_copy.main(["--check"]) == 1
 
 
+def _fold_digests(tool) -> set[str]:
+    out = set()
+    for directory in tool._current().values():
+        out |= set(json.loads((tool.PACKS / directory / "PROVENANCE.json").read_text())["fold_digests"].values())
+    return out
+
+
 def test_the_coverage_gate_finds_a_definition_no_case_runs():
     tool = _tool()
     sets = [json.loads(p.read_text()) for p in sorted(tool.VECTORS.glob("*.json")) if not p.name[0].isupper()]
-    assert tool.coverage(sets) == []
-    kept = [
-        {**s, "cases": [c for c in s["cases"] if "upfront" not in c["case"]]}
-        for s in sets
-    ]
-    missing = tool.coverage(kept)
+    folds = _fold_digests(tool)
+    assert tool.coverage(sets, folds) == []
+    kept = [{**s, "cases": [c for c in s["cases"] if "upfront" not in c["case"]]} for s in sets]
+    missing = tool.coverage(kept, folds)
     assert any("upfront_amount" in m for m in missing), missing
+
+
+def test_a_fold_counts_only_when_a_case_ran_it():
+    tool = _tool()
+    sets = [json.loads(p.read_text()) for p in sorted(tool.VECTORS.glob("*.json")) if not p.name[0].isupper()]
+    missing = tool.coverage(sets, set())
+    assert sum("no case runs the fold" in m for m in missing) == len(_fold_digests(tool)), missing

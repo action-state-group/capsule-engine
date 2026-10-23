@@ -6,8 +6,7 @@ check. ``decide_check_input`` decides one envelope under one pack: it installs
 the pack in observe mode, builds the engine from the installed manifest as
 ``build_engine`` does (its runnable checks and ask sets, the caps limits read
 from the ledger's activation records, so each limit names its source, and
-the per-action reads), evaluates a record sealed at another action taxonomy
-under its own, writes the envelope's history into a throwaway ledger
+the per-action reads), writes the envelope's history into a throwaway ledger
 (``history_ledger``, with the pack's caps fold), and checks the record entry
 (``action_for_check_input``) with what capsulectl passes beside it: the
 task-authority record, the floor opening, and the record entry's
@@ -55,8 +54,9 @@ def _default_signer() -> LocalSigner:
 
 def live_engine(pack: PackDefinition, store: LedgerStore, project_dir: str | Path, *, signer=None) -> GuardEngine:
     """The engine a live check runs over ``store``: ``pack`` installed in
-    observe mode under ``project_dir``, wired as ``build_engine`` wires it, and
-    records sealed at another action taxonomy evaluated under their own."""
+    observe mode under ``project_dir``, wired as ``build_engine`` wires it. A
+    live decision never evaluates an action's class under another taxonomy
+    than the engine's (``guards/engine.py``); only a replay does."""
     return _wired(install_pack(pack, project_dir=project_dir, mode="observe"), store, signer)
 
 
@@ -70,7 +70,7 @@ def _wired(installed, store: LedgerStore, signer) -> GuardEngine:
         caps_limits=lambda s: read_caps_limits(resolved, store, s),
         per_action_reads=resolved.per_action_reads(), signer_provider=lambda: signer,
         manifest_digest=resolved.manifest_digest, wickets=wickets,
-        ask_gate_selectors=gates, ask_wickets=asks, evaluate_under_record_taxonomy=True,
+        ask_gate_selectors=gates, ask_wickets=asks,
     )
 
 
