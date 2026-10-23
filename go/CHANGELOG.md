@@ -23,7 +23,8 @@ the packs and definitions are those of 0.1.0.
   header has no model_attestation.compute_attestation.agent_input_digest". Every other
   refusal of a history act also leads with its reason and names the act after it, as
   "a history act's capsule header has no operator (act ID)".
-  A record of a sale bundle's deal reads "the body of a record of the deal is not the one its
+  Another record of the same deal in a bundle (any bundle input with `records` and a
+  deal, not only a sale bundle) reads "the body of a record of the deal is not the one its
   capsule seals (record ID): ..." in place of "record ID of the deal: record: ...".
 - Changed (capsule-engine#217): `Report` labels a held caps window with an approver, where
   nothing failed, with the escalation: `CheckReport.Decision` is `escalate` (it asks for
