@@ -30,6 +30,8 @@ jobs:
         run: ruff check --config python/pyproject.toml .
       - name: pytest
         run: pytest -q
+      - name: release helper tests
+        run: pytest -q ../.github/test_release.py
 
   # Every job above tests the editable install, where the checkout is on disk
   # whatever the wheel ships. This one builds the wheel, installs it into a

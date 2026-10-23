@@ -1,0 +1,116 @@
+# SPDX-License-Identifier: Apache-2.0
+# PyPI release for the `python/` package via OIDC Trusted Publishing.
+# No API token lives in this repo — pypa/gh-action-pypi-publish exchanges a
+# short-lived GitHub Actions OIDC token for a PyPI upload token at publish time.
+# See RELEASING.md for the one-time PyPI Trusted-Publisher configuration this
+# depends on (done by a PyPI project Owner, not by this workflow).
+name: Release · Publish Python
+
+on:
+  release:
+    types: [published]
+  # tag-release.yml dispatches this on the python/v<version> tag it creates.
+  # Dispatched on a branch, it builds and stops: a dry run.
+  workflow_dispatch: {}
+  # Path-scoped so every PR touching the package exercises the same build +
+  # twine check the release will run — catches packaging regressions before
+  # a tag exists. `publish` below needs a python/v tag, so this never uploads.
+  push:
+    paths: ["python/**"]
+  pull_request:
+    paths: ["python/**"]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - name: install build + twine
+        run: python -m pip install build twine
+      - name: build sdist + wheel
+        working-directory: python
+        run: python -m build
+      - name: twine check
+        working-directory: python
+        run: python -m twine check dist/*
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: dist
+          path: python/dist/
+
+  # Only a python/v tag publishes: a published GitHub Release for it, or a
+  # dispatch on it (as tag-release.yml does). Anything else stops after build.
+  publish:
+    # Python releases use python/v<version> tags. Every other namespace
+    # (go/v*) belongs to another artifact
+    # and must not publish Python; the guard below refuses anything the prefix
+    # lets through.
+    if: >-
+      (github.event_name == 'release' && startsWith(github.event.release.tag_name, 'python/v')) ||
+      (github.event_name == 'workflow_dispatch' && startsWith(github.ref, 'refs/tags/python/v'))
+    needs: build
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      contents: read
+      id-token: write  # OIDC — no token stored
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.release.tag_name || github.ref_name }}
+          fetch-depth: 0
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - name: require a matching tag on main
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name || github.ref_name }}
+        run: python .github/release.py check python "$RELEASE_TAG"
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
+        with:
+          packages-dir: dist/
+
+  # After the upload (beyond the siblings, at Ethan's direction): the files
+  # PyPI serves for this version are byte for byte the ones the build job
+  # made, compared by sha256 against PyPI's JSON API. PyPI can take a moment
+  # to list a new upload, so it retries for up to five minutes.
+  verify:
+    needs: [build, publish]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: dist
+          path: dist/
+      - name: compare PyPI's files with the built ones
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name || github.ref_name }}
+        run: |
+          set -euo pipefail
+          version="${RELEASE_TAG#python/v}"
+          (cd dist && sha256sum -- *) | sort -k2 > "$RUNNER_TEMP/built.txt"
+          for _ in $(seq 10); do
+            if curl -fsS "https://pypi.org/pypi/capsule-engine/$version/json" -o "$RUNNER_TEMP/release.json"; then
+              jq -r '.urls[] | "\(.digests.sha256)  \(.filename)"' "$RUNNER_TEMP/release.json" | sort -k2 > "$RUNNER_TEMP/served.txt"
+              if cmp -s "$RUNNER_TEMP/built.txt" "$RUNNER_TEMP/served.txt"; then
+                echo "PyPI serves capsule-engine $version byte for byte as built." >> "$GITHUB_STEP_SUMMARY"
+                exit 0
+              fi
+            fi
+            sleep 30
+          done
+          echo "::error::PyPI's files for capsule-engine $version differ from the build" >&2
+          diff "$RUNNER_TEMP/built.txt" "$RUNNER_TEMP/served.txt" || true
+          exit 1
