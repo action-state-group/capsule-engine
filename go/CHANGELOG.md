@@ -15,8 +15,10 @@ packs and definitions are those of 0.1.1.
   the history and the class has no approver, #216), `RefusedNotEvaluated` (a check that
   fails closed could not be evaluated, #137), `RefusedTaxonomy` (the record was sealed at
   another action taxonomy than the rules') and `RefusedDealConflict` (the record is in no
-  single deal, #127). Like `Refused`, it is not part of the written report. A caller can now
-  show the real reason for a refusal without inferring it from the rules.
+  single deal, #127, with caps held and no approver; a would-allow in no deal with nothing
+  held is not_evaluable and not refused). Like `Refused`, it is not part of the written
+  report. A caller can now show the real reason for a refusal without inferring it from the
+  rules.
 
 ## 0.1.1 — 2026-10-23
 

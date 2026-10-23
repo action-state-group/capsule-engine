@@ -29,11 +29,10 @@ type CheckReport struct {
 	Decision string       `json:"decision"`
 	Rules    []RuleResult `json:"rules"`
 	Inputs   Inputs       `json:"inputs"`
-	// Refused is set when the check is refused though no rule failed: a
-	// would-allow held only by a record sealed at another action taxonomy,
-	// which the engine seals reject. Decision is then the engine's verdict
-	// label, not_evaluable; what a caller shows the user is a refusal. It is
-	// not part of the written report.
+	// Refused is set when the check is refused though no rule failed, for
+	// one of the causes RefusedFor names (the Refused* constants). Decision
+	// is then the engine's verdict label, not_evaluable; what a caller shows
+	// the user is a refusal. It is not part of the written report.
 	Refused bool `json:"-"`
 	// RefusedFor is why the check is refused when Refused is set, one of the
 	// Refused* causes, so a caller can name the reason; "" otherwise. Like
@@ -53,7 +52,9 @@ const (
 	// than the rules'.
 	RefusedTaxonomy = "taxonomy"
 	// RefusedDealConflict: the record is in no single deal (capsule-engine
-	// #127), and caps, held, asked.
+	// #127), caps could not be evaluated over the history, and the class has
+	// no approver. A would-allow in no deal with nothing held is not refused
+	// here: its Decision is not_evaluable and Refused is false.
 	RefusedDealConflict = "deal_id_conflict"
 )
 

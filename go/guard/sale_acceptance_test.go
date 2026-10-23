@@ -129,8 +129,8 @@ func TestARefusalOnlyByAFailClosedCheckIsNotEvaluable(t *testing.T) {
 		t.Fatal(err)
 	}
 	rep := e.Report(a, d)
-	if d.Outcome != Deny || d.anyFailed() || rep.Decision != VerdictNotEvaluable || !rep.Refused {
-		t.Errorf("outcome %s, failed %v, report %s refused %v", d.Outcome, d.anyFailed(), rep.Decision, rep.Refused)
+	if d.Outcome != Deny || d.anyFailed() || rep.Decision != VerdictNotEvaluable || !rep.Refused || rep.RefusedFor != RefusedNotEvaluated {
+		t.Errorf("outcome %s, failed %v, report %s refused %v for %q", d.Outcome, d.anyFailed(), rep.Decision, rep.Refused, rep.RefusedFor)
 	}
 }
 

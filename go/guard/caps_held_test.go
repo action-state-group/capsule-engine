@@ -87,17 +87,12 @@ func TestAHeldCapsWindowWithNoApproverIsRefused(t *testing.T) {
 		t.Errorf("report decision %s refused=%v for %q, want not_evaluable, refused for %q", r.Decision, r.Refused, r.RefusedFor, RefusedHeldCaps)
 	}
 	// The same held window on a record in no single deal is refused for the
-	// deal (#127), and one held by a check that fails closed for that check
-	// (#137): RefusedFor names the cause a caller shows.
+	// deal (#127): RefusedFor names the cause a caller shows. A check that
+	// fails closed is covered in sale_acceptance_test.go.
 	inNoDeal := a
 	inNoDeal.dealIDConflict = true
 	if r := e.Report(inNoDeal, d); !r.Refused || r.RefusedFor != RefusedDealConflict {
 		t.Errorf("record in no deal: refused=%v for %q, want refused for %q", r.Refused, r.RefusedFor, RefusedDealConflict)
-	}
-	failsClosed := d
-	failsClosed.askedUnevaluated, failsClosed.notEvaluated = nil, []string{"caps"}
-	if r := e.Report(a, failsClosed); !r.Refused || r.RefusedFor != RefusedNotEvaluated {
-		t.Errorf("fails closed: refused=%v for %q, want refused for %q", r.Refused, r.RefusedFor, RefusedNotEvaluated)
 	}
 }
 
