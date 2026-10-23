@@ -54,11 +54,21 @@ has a constraint that is not n/a in some case, and every fold it cites is
 named in some case's evidence (a check writes a fold's digest only when it
 ran it), apart from the exemptions in ``COVERAGE-EXEMPT.json``.
 
+A case marked ``"frozen": true`` is decided under the embedded pack it names
+and stays there: a deal's records pin the pack they were checked under, and a
+replay, ``check --record`` or an older pack named with ``--pack`` re-decides
+them under it, so the two engines must agree on a pack after it is no longer
+served. ``--write`` never moves such a case, and ``--check`` does not ask
+it to be on the current pack. The coverage gate measures the current packs
+only, so a case frozen on another pack covers nothing there. ``--seed <dir> --pack <pack>`` adds a set of frozen
+cases, all under that pack, named ``<dir>-<pack>.json``.
+
 Usage::
 
     python scripts/conformance_vectors.py --check
     python scripts/conformance_vectors.py --write
     python scripts/conformance_vectors.py --seed go/guard/testdata/promise-11-vectors
+    python scripts/conformance_vectors.py --seed go/guard/testdata/emit --pack everyday-0.3.5
 """
 from __future__ import annotations
 
@@ -223,8 +233,12 @@ def _kind_and_pack(data) -> tuple[str, str] | None:
     return None
 
 
-def seed(directory: Path) -> Path:
-    """A new set from every input under ``directory``."""
+def seed(directory: Path, pack: str | None = None) -> Path:
+    """A new set from every input under ``directory``: each case on the
+    current pack for its input, or, given ``pack``, frozen on that embedded
+    pack."""
+    if pack is not None and not (PACKS / pack / "pack.yaml").is_file():
+        raise ValueError(f"{pack} is not an embedded pack (a directory of {PACKS.relative_to(ROOT)})")
     cases = []
     for path in sorted(directory.rglob("*.json")):
         try:
@@ -234,18 +248,20 @@ def seed(directory: Path) -> Path:
         found = _kind_and_pack(data)
         if found is None:
             continue
-        kind, pack = found
+        kind, current = found
         rel = path.relative_to(ROOT).as_posix()
         case = {
             "case": path.relative_to(directory).with_suffix("").as_posix(),
             "kind": kind,
-            "pack": pack,
+            "pack": pack or current,
             "input": rel,
             "input_sha256": _sha256(path),
         }
+        if pack is not None:
+            case["frozen"] = True
         case["expected"] = decision_of(case)
         cases.append(case)
-    out = VECTORS / f"{directory.name}.json"
+    out = VECTORS / (f"{directory.name}-{pack}.json" if pack is not None else f"{directory.name}.json")
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps({"source": directory.relative_to(ROOT).as_posix(), "cases": cases}, indent=1) + "\n")
     return out
@@ -257,9 +273,12 @@ def main(argv: list[str] | None = None) -> int:
     mode.add_argument("--check", action="store_true", help="write nothing; fail on any difference")
     mode.add_argument("--write", action="store_true", help="rewrite every case's expected decision")
     mode.add_argument("--seed", type=Path, help="add a set from the envelopes under this directory")
+    parser.add_argument("--pack", help="with --seed: freeze every case on this embedded pack (a go/packs directory)")
     args = parser.parse_args(argv)
+    if args.pack and not args.seed:
+        parser.error("--pack goes with --seed")
     if args.seed:
-        print(seed(args.seed.resolve()).relative_to(ROOT))
+        print(seed(args.seed.resolve(), args.pack).relative_to(ROOT))
         return 0
     problems: list[str] = []
     sets = []
@@ -277,15 +296,21 @@ def main(argv: list[str] | None = None) -> int:
                 problems.append(f"{name}: the input is not the one pinned")
                 continue
             # When a served pack cuts a new version, every case moves to it:
-            # a case is decided under the current pack for its input.
+            # a case is decided under the current pack for its input, unless
+            # it is frozen on the pack it names.
             _, pack = _kind_and_pack(json.loads(source.read_text()))
-            if pack != case["pack"]:
+            if case.get("frozen") is True:
+                if not (PACKS / case["pack"] / "pack.yaml").is_file():
+                    problems.append(f"{name}: frozen on {case['pack']}, which is not an embedded pack")
+                    continue
+            elif pack != case["pack"]:
                 if args.check:
                     problems.append(f"{name}: decided under {case['pack']}, not the current {pack}")
                     continue
                 case["pack"], changed = pack, True
             want, seen = decide(case)
-            evidence_strings |= seen
+            if case["pack"] in _current().values():
+                evidence_strings |= seen
             if want != case["expected"]:
                 if args.check:
                     problems.append(f"{name}: the engine decides {json.dumps(want)}, not {json.dumps(case['expected'])}")

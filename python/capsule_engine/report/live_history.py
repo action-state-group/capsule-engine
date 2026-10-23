@@ -67,7 +67,7 @@ from ..folds.definition import FoldDefinition
 from ..folds.duration import parse_duration_seconds
 from ..guards.action import Action
 from ..guards.capsule import act_payload
-from ..guards.checks.caps import counts_executed_acts
+from ..guards.checks.caps import counts_executed_acts, in_window_count
 from ..guards.classes import ENGINE_TAXONOMY, same_classes
 from ..guards.history_state import (
     DISPOSITION,
@@ -82,10 +82,12 @@ from ..guards.history_state import (
 )
 from ..guards.statements import StatementRecord, claim_of
 from .replay import (
+    MONEY_IN,
     ExecutedActs,
     action_for_history_entry,
     bound_agent_input,
     deal_claim_statements,
+    names_two_deals,
     statement_for_history_entry,
 )
 
@@ -187,7 +189,7 @@ def history_ledger(envelope: dict, ledger: LedgerAPI, *, caps_fold: FoldDefiniti
     if not complete:
         ledger.append(_incomplete_record(envelope.get("record")), consequential=False)
     else:
-        held = window_held_reason(scope, [entry for _, _, entry in dated], caps_fold)
+        held = window_held_reason(scope, [entry for _, _, entry in dated], caps_fold, checked)
         if held is not None:
             ledger.append(_window_held_record(envelope.get("record"), held), consequential=False)
     return HistoryLedger(
@@ -286,14 +288,21 @@ def _incomplete_record(checked: object) -> dict:
     return {**body, "capsule_id": json_digest(body)}
 
 
-def window_held_reason(scope: dict, entries: list[dict], caps_fold: FoldDefinition | None) -> str | None:
+def window_held_reason(scope: dict, entries: list[dict], caps_fold: FoldDefinition | None,
+                       checked: object) -> str | None:
     """Why a complete history cannot decide the caps window, or None: it
     reaches back fewer days (``history_scope.days``, 0 when absent) than the
-    window, or some act names a taxonomy version whose classes are not the
-    engine's. A history that holds an act it reaches back over is no proof
-    that the acts before its first are absent, so a short one is held; an act
-    classed under other names cannot be summed against this engine's limits.
-    With no caps fold there is no window to hold."""
+    window, some act the window would count carries no recorded decision and
+    a spend that cannot be read, or some act names a taxonomy version whose
+    classes are not the engine's. A history that holds an act it reaches back
+    over is no proof that the acts before its first are absent, so a short one
+    is held; an undecided act's spend is not in a total that counts accepted
+    acts only, and when it cannot be read the total is not known (Sherlock2,
+    ops u504); an act classed under other names cannot be summed against this
+    engine's limits. ``checked`` is the record being checked, whose key and
+    time place the window. With no caps fold there is no window to hold. The
+    Go guard holds the same window with the same reasons, in this order
+    (go/guard/engine.go windowCoverage)."""
     if caps_fold is None or caps_fold.window is None or not caps_fold.window.duration:
         return None
     window = caps_fold.window.duration
@@ -301,13 +310,23 @@ def window_held_reason(scope: dict, entries: list[dict], caps_fold: FoldDefiniti
     days = days if isinstance(days, int) and not isinstance(days, bool) else 0
     if days * 86400 < parse_duration_seconds(window):
         return f"the history supplied reaches back {days} day(s); the {window} total needs {window}"
+    undecided: list[dict] = []
     other = 0
     for entry in entries:
         if _statement_record(entry) is not None:
             continue
-        version = _act_taxonomy_version(bound_agent_input(entry))
+        shown = bound_agent_input(entry)
+        if not counts_executed_acts(caps_fold) and _undecided_unreadable(entry, shown):
+            undecided.append(entry)
+        version = _act_taxonomy_version(shown)
         if version is not None and not same_classes(version):
             other += 1
+    held = _in_window(caps_fold, undecided, checked)
+    if held:
+        return (
+            f"{held} earlier act(s) carry no recorded decision; the {window} total as the engine computes it "
+            "counts accepted acts only, so it cannot be computed"
+        )
     if other:
         return (
             f"{other} earlier act(s) were classed under another taxonomy version than the engine's "
@@ -316,22 +335,72 @@ def window_held_reason(scope: dict, entries: list[dict], caps_fold: FoldDefiniti
     return None
 
 
+def _undecided_unreadable(entry: dict, shown: dict | None) -> bool:
+    """Whether a history act is one the window cannot leave out: checked,
+    with no recorded decision, not moving money in, and with a spend that
+    cannot be read. As the Go guard reads it (``DecodeHistoryAct``,
+    ``windowCoverage``): a decision is any ``disposition.decision`` the
+    capsule seals, and an act naming two deals is decided (refused); an act
+    taken without a check is counted as spend, and one that moved money in
+    never adds to the window; the spend is the act's ``spend_minor``, an
+    integer of at least 0. A capsule that does not bind its ``agent_input``
+    states no spend that can be read. Under a fold that counts executed acts
+    the window's own records decide this instead (``ExecutedActs``), so it
+    is not read there."""
+    disposition = entry.get("disposition")
+    if isinstance(disposition, dict) and disposition.get("decision") is not None:
+        return False
+    acted, unchecked = _act_member(shown)
+    if acted is None:
+        return True
+    if unchecked or names_two_deals(shown) or acted.get("direction") == MONEY_IN:
+        return False
+    spend = acted.get("spend_minor")
+    return not (isinstance(spend, int) and not isinstance(spend, bool) and spend >= 0)
+
+
+def _in_window(caps_fold: FoldDefinition, acts: list[dict], checked: object) -> int:
+    """How many of ``acts`` the caps window would count, by key and time
+    alone: under the checked record's value for the fold's key, in the window
+    as of its time (``caps.in_window_count``). When the checked record's time
+    cannot be read, every one: caps cannot place the window."""
+    if not acts:
+        return 0
+    checked = checked if isinstance(checked, dict) else {}
+    if _time(checked.get("timestamp")) is None:
+        return len(acts)
+    key_value = checked.get(caps_fold.key, "") if caps_fold.key is not None else None
+    placed = [{"timestamp": act.get("timestamp"), "developer": act.get("developer"), "operator": act.get("operator")}
+              for act in acts]
+    return in_window_count(caps_fold, placed, key_value, checked["timestamp"])
+
+
+def _act_member(shown: object) -> tuple[dict | None, bool]:
+    """The member of a disclosed act that records the act, and whether it
+    was taken without a check, as the Go guard reads it
+    (``DecodeHistoryAct``): ``body.attempted`` of a typed
+    ``action-outcome/v0`` or ``body.unchecked``, else the body itself;
+    ``(None, False)`` when there is no body."""
+    body = shown.get("body") if isinstance(shown, dict) else None
+    if not isinstance(body, dict):
+        return None, False
+    if shown.get("type") == "action-outcome/v0" and isinstance(body.get("attempted"), dict):
+        return body["attempted"], True
+    if isinstance(body.get("unchecked"), dict):
+        return body["unchecked"], True
+    return body, False
+
+
 def _act_taxonomy_version(shown: object) -> object:
     """The taxonomy version an act names, as the Go guard reads it
     (``DecodeHistoryAct``): an act taken without a check names it in the
-    member that records the act, ``body.attempted`` of a typed
-    ``action-outcome/v0`` or ``body.unchecked``, and the body's own stands in
-    when that member names none."""
-    body = shown.get("body") if isinstance(shown, dict) else None
-    if not isinstance(body, dict):
+    member that records the act (``_act_member``), and the body's own stands
+    in when that member names none."""
+    acted, unchecked = _act_member(shown)
+    if acted is None:
         return None
-    acted = None
-    if shown.get("type") == "action-outcome/v0" and isinstance(body.get("attempted"), dict):
-        acted = body["attempted"]
-    elif isinstance(body.get("unchecked"), dict):
-        acted = body["unchecked"]
-    version = acted.get("taxonomy_version") if acted is not None else None
-    return version if version is not None else body.get("taxonomy_version")
+    version = acted.get("taxonomy_version") if unchecked else None
+    return version if version is not None else shown["body"].get("taxonomy_version")
 
 
 def _window_held_record(checked: object, reason: str) -> dict:

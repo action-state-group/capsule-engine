@@ -138,9 +138,13 @@ it touches:
   `go/guard/testdata/report-goldens.json` (`-update-report-goldens` rewrites it). A wording change
   shows in review as a change to that file.
 - **Pack versions covered.** Cases are decided under the current version of each served pack
-  (everyday 0.3.8, seller 0.1.5), and `--write` moves them along. Frozen versions such as seller
-  0.1.4, which still loads under `--pack`, are covered only by the moved Go parity tests at the
-  commits they name, not by shared vectors.
+  (everyday 0.3.8, seller 0.1.5), and `--write` moves them along. A case marked `"frozen": true`
+  stays on the embedded pack it names, because a deal's records pin the pack they were checked
+  under and a replay, `check --record` or `--pack` re-decides them there; `--seed <dir> --pack
+  <pack>` writes such a set as `<dir>-<pack>.json`. The frozen sets today cover everyday 0.3.4 and
+  0.3.5 (the G3, emit and undecided-act inputs) and seller 0.1.0 and 0.1.1 (the emit and
+  undecided-act inputs). The coverage gate measures the current packs only. Other frozen
+  versions are covered only by the moved Go parity tests at the commits they name.
 - **Tools.** The writer, the checker and the coverage gate are `scripts/conformance_vectors.py`
   (where this note says `tools.conformance_vectors`). `COVERAGE-EXEMPT.json` exempts only
   `verify_before_dispatch/1.0.0`.

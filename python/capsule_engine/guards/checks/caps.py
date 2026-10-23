@@ -99,6 +99,7 @@ __all__ = [
     "check_caps",
     "counts_executed_acts",
     "history_incomplete_reason",
+    "in_window_count",
     "require_per_action_reads",
     "resolve_caps_minor",
 ]
@@ -256,19 +257,30 @@ def _unreadable_in_window(definition: FoldDefinition, records: list[dict], key_v
     """How many executed acts with a spend that could not be read fall in
     ``definition``'s window under ``key_value``: the same key, window and
     anchor the total was read under, counted instead of summed."""
-    reads = [ReadField(path="timestamp", erasure_class="commitment-ok"),
-             ReadField(path=_DECISION_PATH, erasure_class="commitment-ok"),
-             ReadField(path=_UNREADABLE_PATH, erasure_class="commitment-ok", default=False, has_default=True)]
-    if definition.key is not None:
-        reads.append(ReadField(path=definition.key, erasure_class="commitment-ok"))
-    probe = replace(
-        definition,
-        reads=tuple(reads),
+    return _count_in_window(
+        definition, records, key_value, as_of,
+        reads=(ReadField(path=_DECISION_PATH, erasure_class="commitment-ok"),
+               ReadField(path=_UNREADABLE_PATH, erasure_class="commitment-ok", default=False, has_default=True)),
         filter=(FilterClause(field=_DECISION_PATH, op="eq", value=EXECUTED_DECISION),
                 FilterClause(field=_UNREADABLE_PATH, op="eq", value=True)),
-        reduce=Reduce(reducer="count"),
-        reversal=None,
     )
+
+
+def in_window_count(definition: FoldDefinition, records: list[dict], key_value: str | None, as_of: str) -> int:
+    """How many of ``records`` the window would count by their key and time
+    alone: under ``key_value`` for ``definition``'s key, in its window as of
+    ``as_of``, read as the total is read."""
+    return _count_in_window(definition, records, key_value, as_of, reads=(), filter=())
+
+
+def _count_in_window(definition: FoldDefinition, records: list[dict], key_value: str | None, as_of: str, *,
+                     reads: tuple[ReadField, ...], filter: tuple[FilterClause, ...]) -> int:
+    """How many of ``records`` pass ``filter`` (over ``reads``) and fall in
+    ``definition``'s window under ``key_value``, counted instead of summed."""
+    probe_reads = [ReadField(path="timestamp", erasure_class="commitment-ok"), *reads]
+    if definition.key is not None:
+        probe_reads.append(ReadField(path=definition.key, erasure_class="commitment-ok"))
+    probe = replace(definition, reads=tuple(probe_reads), filter=filter, reduce=Reduce(reducer="count"), reversal=None)
     return evaluate_one(probe, records, key_value=key_value, as_of=as_of).result or 0
 
 
