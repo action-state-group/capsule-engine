@@ -82,7 +82,7 @@ func TestPlatformRoleVectorsAgreeWithTheEngine(t *testing.T) {
 	if v.Commit != platformRoleCommit || len(v.Packs) != 2 {
 		t.Fatalf("vectors at %s for %d packs", v.Commit, len(v.Packs))
 	}
-	engines := map[string]func(*testing.T) (*Engine, pack.Pack){"everyday": everydayEngine, "seller": seller014Engine}
+	engines := map[string]func(*testing.T) (*Engine, pack.Pack){"everyday": everyday037Engine, "seller": seller014Engine}
 	n := 0
 	for name, want := range v.Packs {
 		e, p := engines[name](t)

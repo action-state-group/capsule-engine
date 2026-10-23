@@ -15,7 +15,10 @@ import tempfile
 from pathlib import Path
 
 from agent_action_capsule import json_digest
-from capsule_ledger.ledger import LedgerStore
+try:  # capsule-engine #170 on: cll owns the ledger (capsule-ledger was archived)
+    from cll.ledger import LedgerStore
+except ImportError:
+    from capsule_ledger.ledger import LedgerStore
 
 sys.path.insert(0, ".")
 from tests.test_pack_everyday_acceptance import PACK_DIR, _scenarios, _signer  # noqa: E402
@@ -38,7 +41,9 @@ NORMALIZED = ("verb", "operator", "developer", "action_class", "action_id", "act
               "channel", "first_contact_channel", "material_fields_changed", "material_fields_basis",
               "offer_fields_changed", "offer_fields_basis", "refundable", "upfront_amount_minor", "recipient_role", "task_authority_ref",
               # The classes a disclosure gives (capsule-engine #173).
-              "disclosed_classes")
+              "disclosed_classes",
+              # What the producer reports as told before (action_class_gate/1.2.0, 0c93a58).
+              "repeat_disclosures", "recipient_told_before")
 
 
 def main(sha: str) -> None:
@@ -65,7 +70,7 @@ def main(sha: str) -> None:
                 out["scenarios"].append({
                     **obligations,
                     "scenario": name,
-                    "action": {k: fields[k] for k in NORMALIZED if fields[k] is not None},
+                    "action": {k: fields[k] for k in NORMALIZED if fields.get(k) is not None},
                     "outcome": decision.outcome,
                     "expected": expected,
                     "capsule_id": decision.capsule["capsule_id"],

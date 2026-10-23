@@ -1,0 +1,9 @@
+{
+  "file": "python-parity.json",
+  "sha256": "8bdb4816404267d0e3c93c324132ef3aaeffabaf8aa427bd869a12f91d4b6108",
+  "generator": "../parity/generate_python_parity.py, run as: cd <capsule-engine@0c93a58> && <venv>/bin/python -I <generator> 0c93a58fccb6d39797d55ec7174aae16d24f0923",
+  "capsule_engine_commit": "0c93a58fccb6d39797d55ec7174aae16d24f0923",
+  "capsule_engine_ref": "capsule-engine main 0c93a58, the rc21 pack cut (asg/everyday/0.3.8)",
+  "environment": "the engine tree exported with git archive 0c93a58, installed with its dev extras into a uv venv (agent-action-capsule 0.12.0); tests/test_pack_everyday_acceptance.py passed there (9 tests) before the run",
+  "why": "asg/everyday/0.3.8 is the default pack in the consuming product: the fixtures038 set holds it to the engine's own fixtures and live run at the commit that cut it"
+}

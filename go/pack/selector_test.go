@@ -16,7 +16,7 @@ func loadEdited(t *testing.T, old, new string) (Pack, error) {
 	if !strings.Contains(y, old) {
 		t.Fatalf("the vendored pack.yaml has no %q", old)
 	}
-	return Load([]byte(strings.Replace(y, old, new, 1)), packs.Everyday037, packs.Everyday037Dir)
+	return Load([]byte(strings.Replace(y, old, new, 1)), packs.Everyday038, packs.Everyday038Dir)
 }
 
 // capsule-engine packs/loader.py _obligation_selector at a5e9e30: an
@@ -39,16 +39,17 @@ func TestObligationSelectorIsRequiredAndClosed(t *testing.T) {
 	}
 }
 
-// The selector is part of the definition: the same pack with r16 measured
-// by another selector digests to what capsule-engine computes for that edit
-// at 7339028 (load_pack_dir on the edited copy), not to the vendored pin.
+// The selector is part of the definition: asg/everyday/0.3.7 with r16
+// measured by another selector digests to what capsule-engine computes for
+// that edit at 7339028 (load_pack_dir on the edited copy), not to its pin.
 func TestTheSelectorIsDigestCovered(t *testing.T) {
 	const engineDigest = "f82ef8375dc152e04e0a56d107821b88c3240f076b64fb96739ca4cfd71e2261"
-	p, err := loadEdited(t, "selector: booking_create", "selector: booking_cancel")
+	y := string(everyday037PackYAML(t))
+	p, err := Load([]byte(strings.Replace(y, "selector: booking_create", "selector: booking_cancel", 1)), packs.Everyday037, packs.Everyday037Dir)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if p.DefinitionDigest != engineDigest || p.DefinitionDigest == readEverydayProvenance(t).EngineDefinitionDigest {
+	if p.DefinitionDigest != engineDigest || p.DefinitionDigest == "c1cea374102bba60de82e16663c550a278ee07a399c5faeb285fe1ea1ea27d4d" {
 		t.Fatalf("r16 moved to booking_cancel digests to %s, the engine to %s", p.DefinitionDigest, engineDigest)
 	}
 	if r, _ := p.Rule("r16-booking-with-a-commitment"); r.Selector != "booking_cancel" {
@@ -109,7 +110,7 @@ func TestFrozen035IsPinned(t *testing.T) {
 
 func retiredIDIsPinned(t *testing.T, id, digest string) {
 	t.Helper()
-	y := strings.Replace(string(vendoredPackYAML(t)), "pack_id: asg/everyday/0.3.7", "pack_id: "+id, 1)
+	y := strings.Replace(string(vendoredPackYAML(t)), "pack_id: asg/everyday/0.3.8", "pack_id: "+id, 1)
 	_, err := LoadPath(writePack(t, []byte(y)), builtInCatalog)
 	var pe *PinnedDigestError
 	if !errors.As(err, &pe) || pe.PackID != id || pe.Pinned != digest || pe.Digest == pe.Pinned {

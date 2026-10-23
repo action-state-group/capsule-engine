@@ -11,6 +11,7 @@ func TestTheRC21PacksLoadAtTheCutDigests(t *testing.T) {
 		id, digest string
 	}{
 		{LoadSeller015, "asg/seller/0.1.5", "81013aedbc3d930dcb9a4871d932373eca9de6968e5cff9fb450158d1fcc576a"},
+		{LoadEveryday037, "asg/everyday/0.3.7", "c1cea374102bba60de82e16663c550a278ee07a399c5faeb285fe1ea1ea27d4d"},
 		{LoadEveryday038, "asg/everyday/0.3.8", "ac7697061fd1c50177000648e2458f6236068679fc67ae924870ee8fb1cd8488"},
 	} {
 		p, err := c.load()

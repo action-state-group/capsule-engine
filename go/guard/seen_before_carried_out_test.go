@@ -112,7 +112,7 @@ func TestSeenBeforeV3CountsACarriedOutActAsTheEngineDoes(t *testing.T) {
 	}
 }
 
-// THE SHIPPED r02/r06 READ /3.0.0: asg/everyday/0.3.7 cites
+// THE SHIPPED r02/r06 READ /3.0.0: asg/everyday/0.3.8 cites
 // counterparty_seen_before/4.0.0, whose fold is counterparty.seen_before/3.0.0,
 // while recipient_seen_before/1.0.0 still reads /2.0.0 from the catalog.
 func TestTheShippedSeenBeforeChecksReadTheirFolds(t *testing.T) {

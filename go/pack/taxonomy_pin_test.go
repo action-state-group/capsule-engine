@@ -9,11 +9,11 @@ import (
 	"github.com/action-state-group/capsule-engine/go/packs"
 )
 
-// asg/everyday/0.3.7 pins the action taxonomy (capsule-engine packs/loader.py
+// asg/everyday/0.3.8 pins the action taxonomy (capsule-engine packs/loader.py
 // _parse_taxonomy_pin, 47c58cd): version 6 at the SHA-256 over its JCS bytes,
 // the vendored packs/engine/action_taxonomy.json.
 func TestShippedPackPinsTheVendoredTaxonomy(t *testing.T) {
-	p, err := LoadEveryday037()
+	p, err := LoadEveryday038()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -27,11 +27,12 @@ func TestShippedPackPinsTheVendoredTaxonomy(t *testing.T) {
 	}
 }
 
-// The pin is inside the definition digest: the same pack without it digests
-// to what capsule-engine computes for that edit at 7339028, not to the pin.
+// The pin is inside the definition digest: asg/everyday/0.3.7 without it
+// digests to what capsule-engine computes for that edit at 7339028, not to
+// its pin.
 func TestTheTaxonomyPinIsDigestCovered(t *testing.T) {
 	const engineDigest = "70e850ae7bc561d198710be4d94d023cfc97686bbd13469c45478a16cfd02db7"
-	y := string(vendoredPackYAML(t))
+	y := string(everyday037PackYAML(t))
 	i := strings.Index(y, "\n# The action taxonomy this pack was authored against.")
 	j := strings.Index(y, "\nbootstrap:")
 	if i < 0 || j < i {

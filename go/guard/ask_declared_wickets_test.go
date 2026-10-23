@@ -61,11 +61,11 @@ func TestASKDeclaredChecksMatchTheEngine(t *testing.T) {
 	if err := json.Unmarshal(readFile(t, "testdata", "parity", "ask-declared-wickets-parity.json"), &py); err != nil {
 		t.Fatal(err)
 	}
-	_, shippedPack := everydayEngine(t)
-	if py.CapsuleEngineCommit != parity(t, shipped).CapsuleEngineCommit || py.PackDefinitionDigest != shippedPack.DefinitionDigest ||
-		corpus.PackID != shippedPack.ID {
-		t.Fatalf("vectors at %s for %s %s; the shipped pack is %s %s", py.CapsuleEngineCommit, corpus.PackID,
-			py.PackDefinitionDigest, shippedPack.ID, shippedPack.DefinitionDigest)
+	_, vectorPack := everyday037Engine(t)
+	if py.CapsuleEngineCommit != parity(t, fixtures037).CapsuleEngineCommit || py.PackDefinitionDigest != vectorPack.DefinitionDigest ||
+		corpus.PackID != vectorPack.ID {
+		t.Fatalf("vectors at %s for %s %s; Go runs %s %s", py.CapsuleEngineCommit, corpus.PackID,
+			py.PackDefinitionDigest, vectorPack.ID, vectorPack.DefinitionDigest)
 	}
 	if len(corpus.Cases) != 48 || len(py.Decisions) != 48 {
 		t.Fatalf("%d cases, %d decisions; the engine side's set is 48", len(corpus.Cases), len(py.Decisions))
@@ -79,7 +79,7 @@ func TestASKDeclaredChecksMatchTheEngine(t *testing.T) {
 		if !ok {
 			t.Fatalf("%s: no engine decision", c.Name)
 		}
-		p := shippedPack
+		p := vectorPack
 		p.Rules = slices.Clone(p.Rules)
 		for i, r := range p.Rules {
 			if d, ok := c.Redeclare[r.ID]; ok {

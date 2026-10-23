@@ -27,11 +27,11 @@ func TestLeg3SupplementaryParity(t *testing.T) {
 	if err := json.Unmarshal(readFile(t, "testdata", "parity", "supplementary-parity.json"), &p); err != nil {
 		t.Fatal(err)
 	}
-	if p.CapsuleEngineCommit != parity(t, shipped).CapsuleEngineCommit {
-		t.Fatalf("supplementary run at %s, parity run at %s", p.CapsuleEngineCommit, parity(t, shipped).CapsuleEngineCommit)
+	if p.CapsuleEngineCommit != parity(t, fixtures037).CapsuleEngineCommit {
+		t.Fatalf("supplementary run at %s, parity run at %s", p.CapsuleEngineCommit, parity(t, fixtures037).CapsuleEngineCommit)
 	}
 	e, _ := everydayEngine(t)
-	ledger := miniLedger(t, shipped)[:1]
+	ledger := miniLedger(t, fixtures037)[:1]
 	outcomes := map[string]string{}
 	for _, s := range p.Scenarios {
 		a, err := DecodeAction(bytes.NewReader(s.Action))

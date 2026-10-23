@@ -15,6 +15,17 @@ import (
 
 func vendoredPackYAML(t *testing.T) []byte {
 	t.Helper()
+	b, err := fs.ReadFile(packs.Everyday038, path.Join(packs.Everyday038Dir, "pack.yaml"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	return b
+}
+
+// everyday037PackYAML is the frozen asg/everyday/0.3.7 pack.yaml: the
+// engine digests of its edited copies were computed at 7339028.
+func everyday037PackYAML(t *testing.T) []byte {
+	t.Helper()
 	b, err := fs.ReadFile(packs.Everyday037, path.Join(packs.Everyday037Dir, "pack.yaml"))
 	if err != nil {
 		t.Fatal(err)
@@ -36,7 +47,7 @@ func writePack(t *testing.T, data []byte) string {
 // from the embedded copy and from a byte-identical copy on disk.
 func TestLoadFromAndLoadPathGiveTheVendoredDigest(t *testing.T) {
 	want := readEverydayProvenance(t).EngineDefinitionDigest
-	fromFS, err := LoadFrom(packs.Everyday037, packs.Everyday037Dir)
+	fromFS, err := LoadFrom(packs.Everyday038, packs.Everyday038Dir)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -59,7 +70,7 @@ func TestLoadPathLoadsTheTestFixturePack(t *testing.T) {
 	}
 }
 
-// A copy of asg/everyday/0.3.7 with one edited byte is refused, and the
+// A copy of asg/everyday/0.3.8 with one edited byte is refused, and the
 // error names the pack_id, the digest the copy has, and the pinned digest.
 func TestEditedCopyOfAPinnedPackIsRefused(t *testing.T) {
 	pinned := readEverydayProvenance(t).EngineDefinitionDigest
@@ -67,16 +78,16 @@ func TestEditedCopyOfAPinnedPackIsRefused(t *testing.T) {
 	if bytes.Equal(edited, vendoredPackYAML(t)) {
 		t.Fatal("edit did not apply")
 	}
-	unpinned, err := Load(edited, packs.Everyday037, packs.Everyday037Dir)
+	unpinned, err := Load(edited, packs.Everyday038, packs.Everyday038Dir)
 	if err != nil {
 		t.Fatal(err)
 	}
 	_, err = LoadPath(writePack(t, edited), builtInCatalog)
 	var pe *PinnedDigestError
 	if !errors.As(err, &pe) {
-		t.Fatalf("an edited copy of asg/everyday/0.3.7: %v", err)
+		t.Fatalf("an edited copy of asg/everyday/0.3.8: %v", err)
 	}
-	if want := (PinnedDigestError{PackID: "asg/everyday/0.3.7", Digest: unpinned.DefinitionDigest, Pinned: pinned}); *pe != want {
+	if want := (PinnedDigestError{PackID: "asg/everyday/0.3.8", Digest: unpinned.DefinitionDigest, Pinned: pinned}); *pe != want {
 		t.Fatalf("refusal names %+v, expected %+v", *pe, want)
 	}
 }
@@ -90,7 +101,7 @@ func TestEditedCitationIsRefused(t *testing.T) {
 	if !errors.As(err, &ce) {
 		t.Fatalf("edited citation: %v", err)
 	}
-	if want := (CitationDigestError{PackID: "asg/everyday/0.3.7", Field: "constraints[1]", Ref: "dedupe/1.0.0",
+	if want := (CitationDigestError{PackID: "asg/everyday/0.3.8", Field: "constraints[1]", Ref: "dedupe/1.0.0",
 		Cited:    "28ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb",
 		Computed: "18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb"}); *ce != want {
 		t.Fatalf("refusal names %+v, expected %+v", *ce, want)
@@ -107,7 +118,7 @@ func TestLoadPathWithoutAPack(t *testing.T) {
 // wickets/, folds/) to disk, applying edit to one file.
 func copyVendoredPack(t *testing.T, editFile string, edit func([]byte) []byte) string {
 	t.Helper()
-	return copyPackDir(t, packs.Everyday037, packs.Everyday037Dir, editFile, edit)
+	return copyPackDir(t, packs.Everyday038, packs.Everyday038Dir, editFile, edit)
 }
 
 // copyPackDir is copyVendoredPack for the pack in dir of fsys.
@@ -171,14 +182,14 @@ func TestEditedWicketFileIsRefused(t *testing.T) {
 	if !errors.As(err, &ce) {
 		t.Fatalf("edited caps wicket: %v", err)
 	}
-	if want := (CitationDigestError{PackID: "asg/everyday/0.3.7", Field: "constraints[0]", Ref: "caps/5.1.0",
+	if want := (CitationDigestError{PackID: "asg/everyday/0.3.8", Field: "constraints[0]", Ref: "caps/5.1.0",
 		Cited: "7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8", Computed: edited["caps/5.1.0"].digest}); *ce != want {
 		t.Fatalf("refusal names %+v, expected %+v", *ce, want)
 	}
 }
 
 // An edited wicket whose citation is edited to match makes a different pack,
-// which the asg/everyday/0.3.7 pin refuses.
+// which the asg/everyday/0.3.8 pin refuses.
 func TestEditedWicketWithMatchingCitationFailsThePin(t *testing.T) {
 	dir := copyVendoredPack(t, "wickets/caps.v5.1.yaml", replace("money.transfer: 10000", "money.transfer: 10001"))
 	edited, err := loadWickets(os.DirFS(dir), "wickets")
@@ -195,7 +206,7 @@ func TestEditedWicketWithMatchingCitationFailsThePin(t *testing.T) {
 	}
 	_, err = LoadPath(dir, builtInCatalog)
 	var pe *PinnedDigestError
-	if !errors.As(err, &pe) || pe.PackID != "asg/everyday/0.3.7" || pe.Pinned != readEverydayProvenance(t).EngineDefinitionDigest || pe.Digest == pe.Pinned {
+	if !errors.As(err, &pe) || pe.PackID != "asg/everyday/0.3.8" || pe.Pinned != readEverydayProvenance(t).EngineDefinitionDigest || pe.Digest == pe.Pinned {
 		t.Fatalf("re-cited edited wicket: %v", err)
 	}
 }
@@ -213,15 +224,15 @@ func TestEditedFoldFileIsRefused(t *testing.T) {
 	if !errors.As(err, &ce) {
 		t.Fatalf("edited fold: %v", err)
 	}
-	if want := (CitationDigestError{PackID: "asg/everyday/0.3.7", Field: "folds[0]", Ref: "spend.weekly/3.1.0",
+	if want := (CitationDigestError{PackID: "asg/everyday/0.3.8", Field: "folds[0]", Ref: "spend.weekly/3.1.0",
 		Cited: "f379cd4b2b12284fa5d682845f23bcd7ab1ae8b8d1dd827cd9b5dd7069735997", Computed: edited["spend.weekly/3.1.0"].Digest}); *ce != want {
 		t.Fatalf("refusal names %+v, expected %+v", *ce, want)
 	}
 }
 
 // builtInCatalog is the catalog a pack.yaml-only source resolves against in
-// these tests: asg/everyday/0.3.7's definitions.
-var builtInCatalog = Catalog{FS: packs.Everyday037, Dir: packs.Everyday037Dir}
+// these tests: asg/everyday/0.3.8's definitions.
+var builtInCatalog = Catalog{FS: packs.Everyday038, Dir: packs.Everyday038Dir}
 
 // Without a fallback catalog, a pack.yaml-only source's citations resolve
 // against nothing.

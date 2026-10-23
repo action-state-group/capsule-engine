@@ -28,7 +28,7 @@ func capsV5Engine(t *testing.T) *Engine {
 	return e
 }
 
-// shippedCapsEngine is the engine over the shipped pack, asg/everyday/0.3.7 (0.3.6's caps):
+// shippedCapsEngine is the engine over the shipped pack, asg/everyday/0.3.8 (0.3.6's caps):
 // caps/5.1.0 over spend.weekly/3.1.0, caps/5.0.0's limits and per-action
 // reading over a fold that also counts an executed act.
 func shippedCapsEngine(t *testing.T) *Engine {
@@ -151,7 +151,7 @@ func TestPerActionReadsIsOneOfTheEngines(t *testing.T) {
 //     capture; 3000 trips the 2500 limit. Each purchase here is from a new
 //     merchant, so counterparty_seen_before fails it and, money.purchase
 //     having an approver from taxonomy 3, it escalates, as in Python.
-//   - pack_036: the same actions under 0.3.6's caps, which the shipped 0.3.7 cites (caps/5.1.0 over
+//   - pack_036: the same actions under 0.3.6's caps, which the shipped 0.3.8 cites (caps/5.1.0 over
 //     spend.weekly/3.1.0), compared in full the same way: the same results,
 //     the evidence naming the 3.1.0 fold.
 //   - bare_2500 and per_action_500: GuardEngines with caps alone for

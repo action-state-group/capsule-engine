@@ -30,8 +30,8 @@ func TestRollupVerdictIsTheEngineDecision(t *testing.T) {
 	if err := json.Unmarshal(readFile(t, "testdata", "parity", "rollup-parity.json"), &p); err != nil {
 		t.Fatal(err)
 	}
-	if p.CapsuleEngineCommit != parity(t, shipped).CapsuleEngineCommit {
-		t.Fatalf("roll-up run at %s, parity run at %s", p.CapsuleEngineCommit, parity(t, shipped).CapsuleEngineCommit)
+	if p.CapsuleEngineCommit != parity(t, fixtures037).CapsuleEngineCommit {
+		t.Fatalf("roll-up run at %s, parity run at %s", p.CapsuleEngineCommit, parity(t, fixtures037).CapsuleEngineCommit)
 	}
 	e, _ := everydayEngine(t)
 	verdicts := map[string]CheckReport{}

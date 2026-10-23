@@ -170,8 +170,8 @@ var portedDefinitions = map[string]string{
 // any other class is n/a, out of scope; unportedScope); within them its rule
 // is not_evaluable, "not yet run by this plugin", never a pass.
 //
-// None now: every vendored pack, asg/everyday/0.3.4 to 0.3.7 and
-// asg/seller/0.1.0 to 0.1.4, cites only definitions this port runs. A
+// None now: every vendored pack, asg/everyday/0.3.4 to 0.3.8 and
+// asg/seller/0.1.0 to 0.1.5, cites only definitions this port runs. A
 // later pack's new check is pinned here until it is ported.
 var unportedDefinitions = map[string]string{}
 
@@ -253,7 +253,7 @@ func (e *Engine) AskWickets() []string {
 }
 
 // implementedChecks are the checks NewEngine configures and check runs.
-// Every check asg/everyday/0.3.7 cites is one of them (unported_test.go), so
+// Every check asg/everyday/0.3.8 cites is one of them (unported_test.go), so
 // no rule of the shipped pack is "not yet run by this plugin"; a later pack
 // citing any other check reaches that fallback.
 var implementedChecks = []string{"caps", "dedupe", "destination_rail", "counterparty_identity_change", "credential_pattern",
@@ -264,7 +264,7 @@ var implementedChecks = []string{"caps", "dedupe", "destination_rail", "counterp
 
 // NotYetRunRules are the rules of p whose check this port does not run, by
 // rule id: their result is not_evaluable, NotYetRun, and a listing must say
-// so rather than call them a rule check. Empty for asg/everyday/0.3.7. A
+// so rather than call them a rule check. Empty for asg/everyday/0.3.8. A
 // check is not run when it is not implemented or when the definition p
 // cites for it is pinned as unported.
 func NotYetRunRules(p pack.Pack) map[string]bool {

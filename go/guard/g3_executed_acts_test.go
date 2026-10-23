@@ -109,7 +109,7 @@ func TestAnExecutedActWithNoReadableSpendStillBlocksTheWindow(t *testing.T) {
 
 // unreadableWindowPacks are the two everyday packs' engines with the
 // reason and sealed evidence each gives a window an unreadable act holds:
-// the frozen 0.3.5's own (spend.weekly/3.0.0), and the shipped 0.3.7's (0.3.6's caps),
+// the frozen 0.3.5's own (spend.weekly/3.0.0), and the shipped 0.3.8's (0.3.6's caps),
 // which are caps.py _window_unreadable's.
 func unreadableWindowPacks(t *testing.T) []struct {
 	engine                 *Engine
@@ -129,7 +129,7 @@ func unreadableWindowPacks(t *testing.T) []struct {
 	}{
 		{refundVectorEngine(t, 1000), "spend.weekly/3.0.0",
 			"1 earlier act(s) carry no recorded decision; the 7d total as the engine computes it counts accepted acts only, so it cannot be computed", digest("")},
-		{refundVectorEngineOf(t, 1000, pack.LoadEveryday037, "spend.weekly/3.1.0"), "spend.weekly/3.1.0", WindowUnreadable, digest("spend_minor")},
+		{refundVectorEngineOf(t, 1000, pack.LoadEveryday038, "spend.weekly/3.1.0"), "spend.weekly/3.1.0", WindowUnreadable, digest("spend_minor")},
 	}
 }
 
@@ -346,7 +346,7 @@ func TestAnExecutedActsSpendIsItsOwnSealedSpend(t *testing.T) {
 // neither is reported among the executed acts the window counted; an
 // ordinary executed act still is.
 func TestUnder031NoSpendActsAreNotCountedExecutedActs(t *testing.T) {
-	e := refundVectorEngineOf(t, 1000, pack.LoadEveryday037, "spend.weekly/3.1.0")
+	e := refundVectorEngineOf(t, 1000, pack.LoadEveryday038, "spend.weekly/3.1.0")
 	in := executedAct("2", new(int64(0)))
 	in.Direction = new(moneyIn)
 	cancel := executedAct("3", new(int64(700)))
