@@ -36,8 +36,15 @@ so.
   act in its window is now decided on the total, so it passes (allow) or fails the window
   limit, where it was held before. Two cases stay stricter than the engine, which leaves
   spend out of the total there, and are pinned in `KNOWN-DIFFERENCES.json`: an accepted act
-  with no `spend_minor` is counted at its stated amount under any fold, and under
-  spend.weekly/3.1.0 an act whose spend is above its stated amount is counted at its spend.
+  with no `spend_minor` is counted at its stated amount (0 when that is negative) under any
+  fold, and under spend.weekly/3.1.0 an act whose spend is above its stated amount is counted
+  at its spend.
+- Fixed: a history cancel or refund whose capsule chains `supersedes` to a charge no longer
+  takes that charge back out of the window. The engine's records of a history act carry no
+  chain, so it reads every such reversal as unlinked; Go read the capsule's chain and linked
+  it. Outcome change: the window total no longer drops by the reversal, so a check that
+  passed on the lowered total can now fail the window limit (escalate, or refused with no
+  approver). A ledger capsule's own chain is read as before.
 - Fixed: the caps window reads times to the microsecond, as the engine's Python datetimes
   do. An act within the same microsecond as either end of the window was counted by one and
   not the other when its timestamp carried more than six fractional digits. No capsulectl or

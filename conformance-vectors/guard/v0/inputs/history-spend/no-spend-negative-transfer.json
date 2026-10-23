@@ -1,0 +1,331 @@
+{
+ "history": [
+  {
+   "action_id": "deal-0000000000000001/action",
+   "action_type": "decide",
+   "agent_input": {
+    "body": {
+     "action": "pay",
+     "action_class": "money.purchase",
+     "amount_minor": -5000,
+     "currency": "USD",
+     "direction": "out",
+     "rail": "card",
+     "reference_commitment": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "taxonomy_version": "6"
+    },
+    "x-deal-v0": {
+     "at": "2026-10-06T09:00:00Z",
+     "baseline_ref": {
+      "digest": "1111111111111111111111111111111111111111111111111111111111111111",
+      "digest_alg": "sha-256",
+      "type": "deal-record"
+     },
+     "canonicalization": "jcs",
+     "counterparty": {
+      "fp_alg": "hmac-sha256-deal-key",
+      "ids": {
+       "payee": "9999999999999999999999999999999999999999999999999999999999999999"
+      }
+     },
+     "deal_id": "deal-0000000000000001",
+     "prev": {
+      "digest": "2222222222222222222222222222222222222222222222222222222222222222",
+      "digest_alg": "sha-256",
+      "type": "deal-record"
+     },
+     "producer": {
+      "commit": "3333333333333333333333333333333333333333",
+      "name": "capsulectl",
+      "version": "v0.1.0-rc9"
+     },
+     "profile": "x-deal-v0",
+     "record_type": "action",
+     "seq": 1
+    }
+   },
+   "assurance": {
+    "attestation_mode": "self_attested",
+    "effect_mode": "dispatched_unconfirmed",
+    "ledger_mode": "chained"
+   },
+   "canonicalization_id": "jcs",
+   "capsule_id": "1111111111111111111111111111111111111111111111111111111111111111",
+   "chain": {
+    "parent_capsule_id": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "relation": "follows"
+   },
+   "developer": "capsulectl-deal",
+   "disposition": {
+    "approver": "human",
+    "decision": "accept",
+    "human_disposed": true,
+    "verdict_class": "executed"
+   },
+   "effect": {
+    "effect_attestation": "example-receipt",
+    "irreversibility_class": "one_way_recoverable",
+    "status": "dispatched",
+    "type": "send_payment"
+   },
+   "format_version": "4",
+   "key_id": "4444444444444444444444444444444444444444444444444444444444444444",
+   "model_attestation": {
+    "compute_attestation": {
+     "agent_input_digest": "50ce5fae31f78e9d223c326792dd0255b723426ec22592ce452d328a0136736b"
+    }
+   },
+   "operator": "deal",
+   "signature": "55555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555",
+   "spec_version": "draft-mih-scitt-agent-action-capsule-05",
+   "timestamp": "2026-10-06T09:00:00Z"
+  },
+  {
+   "action_id": "deal-0000000000000002/action",
+   "action_type": "decide",
+   "agent_input": {
+    "body": {
+     "action": "pay",
+     "action_class": "money.purchase",
+     "amount_minor": 2000,
+     "currency": "USD",
+     "direction": "out",
+     "rail": "card",
+     "reference_commitment": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "spend_minor": 2000,
+     "taxonomy_version": "6"
+    },
+    "x-deal-v0": {
+     "at": "2026-10-03T18:30:00Z",
+     "baseline_ref": {
+      "digest": "1111111111111111111111111111111111111111111111111111111111111111",
+      "digest_alg": "sha-256",
+      "type": "deal-record"
+     },
+     "canonicalization": "jcs",
+     "counterparty": {
+      "fp_alg": "hmac-sha256-deal-key",
+      "ids": {
+       "payee": "9999999999999999999999999999999999999999999999999999999999999999"
+      }
+     },
+     "deal_id": "deal-0000000000000001",
+     "prev": {
+      "digest": "2222222222222222222222222222222222222222222222222222222222222222",
+      "digest_alg": "sha-256",
+      "type": "deal-record"
+     },
+     "producer": {
+      "commit": "3333333333333333333333333333333333333333",
+      "name": "capsulectl",
+      "version": "v0.1.0-rc9"
+     },
+     "profile": "x-deal-v0",
+     "record_type": "action",
+     "seq": 2
+    }
+   },
+   "assurance": {
+    "attestation_mode": "self_attested",
+    "effect_mode": "dispatched_unconfirmed",
+    "ledger_mode": "chained"
+   },
+   "canonicalization_id": "jcs",
+   "capsule_id": "2222222222222222222222222222222222222222222222222222222222222222",
+   "chain": {
+    "parent_capsule_id": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "relation": "follows"
+   },
+   "developer": "capsulectl-deal",
+   "disposition": {
+    "approver": "human",
+    "decision": "accept",
+    "human_disposed": true,
+    "verdict_class": "executed"
+   },
+   "effect": {
+    "effect_attestation": "example-receipt",
+    "irreversibility_class": "one_way_recoverable",
+    "status": "dispatched",
+    "type": "send_payment"
+   },
+   "format_version": "4",
+   "key_id": "4444444444444444444444444444444444444444444444444444444444444444",
+   "model_attestation": {
+    "compute_attestation": {
+     "agent_input_digest": "cfe64f99cf06f52e30780758d1d5b5b8c692ac4fe94e2b3aac43fc01afa0cac0"
+    }
+   },
+   "operator": "deal",
+   "signature": "55555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555",
+   "spec_version": "draft-mih-scitt-agent-action-capsule-05",
+   "timestamp": "2026-10-03T18:30:00Z"
+  },
+  {
+   "action_id": "deal-0000000000000003/action",
+   "action_type": "decide",
+   "agent_input": {
+    "body": {
+     "action": "pay",
+     "action_class": "money.purchase",
+     "amount_minor": 9000,
+     "currency": "USD",
+     "direction": "out",
+     "rail": "card",
+     "reference_commitment": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "spend_minor": 9000,
+     "taxonomy_version": "6"
+    },
+    "x-deal-v0": {
+     "at": "2026-09-20T12:00:00Z",
+     "baseline_ref": {
+      "digest": "1111111111111111111111111111111111111111111111111111111111111111",
+      "digest_alg": "sha-256",
+      "type": "deal-record"
+     },
+     "canonicalization": "jcs",
+     "counterparty": {
+      "fp_alg": "hmac-sha256-deal-key",
+      "ids": {
+       "payee": "9999999999999999999999999999999999999999999999999999999999999999"
+      }
+     },
+     "deal_id": "deal-0000000000000001",
+     "prev": {
+      "digest": "2222222222222222222222222222222222222222222222222222222222222222",
+      "digest_alg": "sha-256",
+      "type": "deal-record"
+     },
+     "producer": {
+      "commit": "3333333333333333333333333333333333333333",
+      "name": "capsulectl",
+      "version": "v0.1.0-rc9"
+     },
+     "profile": "x-deal-v0",
+     "record_type": "action",
+     "seq": 3
+    }
+   },
+   "assurance": {
+    "attestation_mode": "self_attested",
+    "effect_mode": "dispatched_unconfirmed",
+    "ledger_mode": "chained"
+   },
+   "canonicalization_id": "jcs",
+   "capsule_id": "3333333333333333333333333333333333333333333333333333333333333333",
+   "chain": {
+    "parent_capsule_id": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "relation": "follows"
+   },
+   "developer": "capsulectl-deal",
+   "disposition": {
+    "approver": "human",
+    "decision": "accept",
+    "human_disposed": true,
+    "verdict_class": "executed"
+   },
+   "effect": {
+    "effect_attestation": "example-receipt",
+    "irreversibility_class": "one_way_recoverable",
+    "status": "dispatched",
+    "type": "send_payment"
+   },
+   "format_version": "4",
+   "key_id": "4444444444444444444444444444444444444444444444444444444444444444",
+   "model_attestation": {
+    "compute_attestation": {
+     "agent_input_digest": "93cc0cd0827a6676e90602074318f0ff5a577f5985d25a8039867b80beb34d53"
+    }
+   },
+   "operator": "deal",
+   "signature": "55555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555",
+   "spec_version": "draft-mih-scitt-agent-action-capsule-05",
+   "timestamp": "2026-09-20T12:00:00Z"
+  }
+ ],
+ "history_scope": {
+  "complete": true,
+  "days": 31,
+  "max_records": 1000
+ },
+ "record": {
+  "action_id": "deal-0000000000000001/check",
+  "action_type": "fyi",
+  "agent_input": {
+   "body": {
+    "action": "pay",
+    "action_class": "money.transfer",
+    "amount_minor": 1299,
+    "currency": "USD",
+    "description_commitment": "6666666666666666666666666666666666666666666666666666666666666666",
+    "recourse": {
+     "rail": "card",
+     "refundable": true
+    },
+    "spend_minor": 1299,
+    "taxonomy_version": "6",
+    "terms": {
+     "currency": "USD",
+     "item": "Example item",
+     "price_minor": 1299,
+     "quantity": 1
+    }
+   },
+   "x-deal-v0": {
+    "at": "2026-10-07T21:39:00Z",
+    "baseline_ref": {
+     "digest": "1111111111111111111111111111111111111111111111111111111111111111",
+     "digest_alg": "sha-256",
+     "type": "deal-record"
+    },
+    "canonicalization": "jcs",
+    "counterparty": {
+     "fp_alg": "hmac-sha256-deal-key",
+     "ids": {
+      "domain": "7777777777777777777777777777777777777777777777777777777777777777",
+      "name": "8888888888888888888888888888888888888888888888888888888888888888",
+      "payee": "9999999999999999999999999999999999999999999999999999999999999999"
+     }
+    },
+    "deal_id": "deal-0000000000000001",
+    "prev": {
+     "digest": "2222222222222222222222222222222222222222222222222222222222222222",
+     "digest_alg": "sha-256",
+     "type": "deal-record"
+    },
+    "producer": {
+     "commit": "3333333333333333333333333333333333333333",
+     "name": "capsulectl",
+     "version": "v0.1.0-rc9"
+    },
+    "profile": "x-deal-v0",
+    "record_type": "check",
+    "seq": 4
+   }
+  },
+  "assurance": {
+   "attestation_mode": "self_attested",
+   "effect_mode": "not_applicable",
+   "ledger_mode": "chained"
+  },
+  "canonicalization_id": "jcs",
+  "capsule_id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "chain": {
+   "parent_capsule_id": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+   "relation": "follows"
+  },
+  "developer": "capsulectl-deal",
+  "format_version": "4",
+  "key_id": "4444444444444444444444444444444444444444444444444444444444444444",
+  "model_attestation": {
+   "compute_attestation": {
+    "agent_input_digest": "47cffa09e77b8ec4fbd1eaf41e88e1a280a5b5f016dedf08dd34ee8ddfef25af"
+   }
+  },
+  "operator": "deal",
+  "signature": "55555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555",
+  "spec_version": "draft-mih-scitt-agent-action-capsule-05",
+  "timestamp": "2026-10-07T21:40:00Z"
+ },
+ "schema": "external-check-input/v0"
+}

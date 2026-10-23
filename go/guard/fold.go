@@ -110,9 +110,17 @@ func recordValue(r Record, path string) value {
 			return nonEmpty(r.Stated.Class)
 		}
 		return nonEmpty(r.Stated.SourceKind)
-	case "chain.parent_capsule_id":
-		return strValue(r.ChainParent)
-	case "chain.relation":
+	case "chain.parent_capsule_id", "chain.relation":
+		// The engine's records of a history act (live_history.py
+		// _HistoryRecord, replay.py _ExecutedBody) carry no chain block, so a
+		// history cancel or refund cites no charge: it is unlinked and takes
+		// nothing back. Only a ledger capsule's own chain is read.
+		if r.live != "" {
+			return value{}
+		}
+		if path == "chain.parent_capsule_id" {
+			return strValue(r.ChainParent)
+		}
 		return strValue(r.ChainRelation)
 	case "asg_payload.checkpoint.dry_run":
 		if r.DryRun == nil {
@@ -498,13 +506,18 @@ func (f fold) within(vals map[string]value, anchor time.Time) bool {
 // condition on capsule-engine#214; both are pinned in
 // KNOWN-DIFFERENCES.json): an act sealing no spend_minor, which the
 // engine's history copy carries no amount for, is counted at its stated
-// amount, and under the first kind of fold an act whose spend is above its
-// stated amount is counted at its spend, the amount a decision on it seals.
+// amount (0 when that is negative), and under the first kind of fold an
+// act whose spend is above its stated amount is counted at its spend, the
+// amount a decision on it seals.
 func (f fold) summed(r Record, amount int64) int64 {
 	spend := r.keyAmount()
 	switch {
-	case r.live == "" || spend == nil:
+	case r.live == "":
 		return amount
+	case spend == nil:
+		// Never below 0: a negative stated amount would lower the total where
+		// the engine, leaving the act out, adds nothing.
+		return max(amount, 0)
 	case f.countsExecuted():
 		return max(amount, *spend)
 	}
