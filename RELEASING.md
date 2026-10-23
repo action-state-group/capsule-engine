@@ -14,7 +14,16 @@ pushed tag itself, with no workflow in between:
    guard to the Python reference.
 2. `go/CHANGELOG.md` has the version's entry. Its pack and definition lists come from the diff of
    `go/packs/*/PROVENANCE.json` and `portedDefinitions` since the last tag.
-3. An admin pushes `go/vX.Y.Z` at that commit.
+3. An admin pushes `go/vX.Y.Z` at that commit. The version is fetchable as soon as the tag
+   exists, and proxy.golang.org and sum.golang.org keep it as first fetched.
+4. Confirm the release from outside the checkout, with the default `GOPROXY` and `GOSUMDB`:
+
+   ```bash
+   go mod download -json github.com/action-state-group/capsule-engine/go@vX.Y.Z
+   ```
+
+   It must succeed, which verifies the module against sum.golang.org, and its `Origin.Hash`
+   must be the tagged commit.
 
 **Version bumps, while on v0:**
 
@@ -27,5 +36,7 @@ pushed tag itself, with no workflow in between:
 
 **Safeguards:**
 
-- Creating, moving and deleting `go/v*` tags is admin-only, by a tag ruleset.
-- A bad release can only be withdrawn with a `retract` directive in a later version.
+- **Tags.** As in agent-action-capsule, capsule-emit and checkpointed-local-log, the
+  `release tags` ruleset lets only admins move or delete any tag, and the `go release tags`
+  ruleset lets only admins create `go/v*` tags.
+- **Withdrawal.** A bad release can only be withdrawn with a `retract` directive in a later version.
