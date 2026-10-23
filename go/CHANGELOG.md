@@ -15,4 +15,6 @@ parameters in `README.md` ("What the caller decides").
   a purchase whose caps window the history cannot decide is no longer
   allowed. With nothing else failing, the engine escalates when the class
   has an approver and refuses otherwise. `Report` still labels it
-  `not_evaluable`, as the engine's `GuardDecision.verdict` does.
+  `not_evaluable`, as the engine's `GuardDecision.verdict` does; when the
+  class has no approver (`external_commitment.other`), the refusal sets
+  `CheckReport.Refused`.
