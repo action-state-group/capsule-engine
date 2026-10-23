@@ -3,7 +3,7 @@
 // credential_pattern, recurring_charge) and the decision they compose into.
 // The semantics are the vendored wicket and fold definitions'; where a
 // definition leaves something open, capsule-engine 559288d0f61a's
-// implementation (python/capsule_engine/guards/...) was read and is cited at the
+// implementation (capsule_engine/guards/...) was read and is cited at the
 // point it decides. The pack is the authority: an engine is built from a
 // loaded pack and refuses one whose definitions are not the ones ported.
 //
