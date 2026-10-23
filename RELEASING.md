@@ -16,14 +16,16 @@ pushed tag itself, with no workflow in between:
    `go/packs/*/PROVENANCE.json` and `portedDefinitions` since the last tag.
 3. An admin pushes `go/vX.Y.Z` at that commit. The version is fetchable as soon as the tag
    exists, and proxy.golang.org and sum.golang.org keep it as first fetched.
-4. Confirm the release from outside the checkout, with the default `GOPROXY` and `GOSUMDB`:
+4. Confirm the release from an empty directory and module cache, through proxy.golang.org only,
+   with every setting that would skip it or sum.golang.org cleared:
 
    ```bash
-   go mod download -json github.com/action-state-group/capsule-engine/go@vX.Y.Z
+   cd "$(mktemp -d)" && GOENV=off GOFLAGS= GOPROXY=https://proxy.golang.org GOSUMDB=sum.golang.org GOPRIVATE= GONOPROXY= GONOSUMDB= GOMODCACHE="$PWD/mod" go mod download -json github.com/action-state-group/capsule-engine/go@vX.Y.Z
    ```
 
    It must succeed, which verifies the module against sum.golang.org, and its `Origin.Hash`
-   must be the tagged commit.
+   must equal `git rev-parse go/vX.Y.Z^{commit}`. (For an annotated tag, `git ls-remote` shows
+   the tag object first, not the commit.)
 
 **Version bumps, while on v0:**
 

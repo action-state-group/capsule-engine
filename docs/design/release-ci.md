@@ -20,10 +20,11 @@ All three use the same setup, and `.github/release.py` is a byte-identical copy 
 | npm / crates.io | OIDC trusted publishing from `npm` and `crates-io` | not applicable |
 | Go | Tag only. An admin pushes `go/vX.Y.Z`. No workflow, and no automated check that `main` CI is green | same, by RELEASING.md |
 | Environments | `pypi`, `npm`, `crates-io` with tag-pattern branch policies. No required reviewers | none |
-| Tag rulesets | `release tags` (all tags: update and deletion are admin-only) and `go release tags` (`refs/tags/go/v*`: creation is admin-only) | **none**, although RELEASING.md says one exists |
-| Attestations | none (npm adds its own provenance) | none |
+| Tag rulesets | `release tags` (all tags: update and deletion are admin-only) and `go release tags` (`refs/tags/go/v*`: creation is admin-only) | the same two, created on 2026-10-22 (rulesets 25692594 and 25692595) |
+| Branch ruleset | capsule-emit and checkpointed-local-log: `dco` on the default branch (no deletion, no force push, `dco` required). agent-action-capsule: none | none, and `main` has no branch protection |
+| Attestations | PyPI: PEP 740 attestations, which the pinned `gh-action-pypi-publish` uploads by default with trusted publishing. npm: its own provenance. Go and crates.io: none | none |
 | Post-publish checks | Before upload only: npm `gitHead` or already-published, and crates.io availability. After it, "confirm the run and the new version on the registry". No proxy.golang.org, sum.golang.org or PyPI byte-compare | none |
-| Action pinning | full SHA with the version in a trailing comment. `permissions: contents: read` at the top. CI concurrency `ci-${{ github.workflow }}-${{ github.ref }}` | version tags (`@v4`), no permissions blocks, no concurrency |
+| Action pinning | full SHA with the version in a trailing comment, in every workflow. `permissions: contents: read` in most, though not all. CI concurrency `ci-${{ github.workflow }}-${{ github.ref }}` only in the Go and TS CI of capsule-emit and checkpointed-local-log | version tags (`@v4`) apart from `dco.yml`. `ci.yml` and `vendor-drift.yml` have no permissions block. No concurrency |
 
 ## What capsule-engine publishes
 
@@ -38,34 +39,39 @@ All three use the same setup, and `.github/release.py` is a byte-identical copy 
 Matching the siblings for a repo that releases only Go is short, because the siblings have no
 Go release automation either:
 
-1. **Tag rulesets, as in the siblings.** Create `release tags` and `go release tags` with the
-   same rules and the same bypass (repository admin). This is a repository setting that only an
-   admin can apply, so it is not in the PR. It is the one piece the first tag waits on, because
-   without it any writer can push `go/v0.1.0`, and the proxy and sumdb keep whatever was pushed.
+1. **Tag rulesets, as in the siblings.** `release tags` and `go release tags`, with the same
+   rules and the same bypass (repository admin), are a repository setting an admin applies. They
+   now exist. The first tag needed them, because without them any writer could push
+   `go/v0.1.0`, and the proxy and sumdb keep whatever was pushed first.
+   A `dco` branch ruleset, as two of the siblings have, is a further admin setting. It is not a
+   release prerequisite: step 1 of RELEASING.md checks by hand that every check is green on the
+   tagged commit.
 2. **Workflow hygiene, in a PR.** Pin every action to a full SHA with a version comment, at the
    versions the siblings use. Give every workflow `permissions: contents: read` (`ci.yml` and
-   `vendor-drift.yml` have none today), and give every push-and-PR workflow the siblings' CI
-   concurrency group.
+   `vendor-drift.yml` have none today), and give every push-and-PR workflow the concurrency group
+   that the siblings' Go and TS CI use.
 3. **RELEASING.md in the siblings' shape.** Name both rulesets under Safeguards, say the version
    is fetchable as soon as the tag exists, and add the check after tagging (below).
 
-**If Python publishing is approved later,** the Python lane is a copy, not a design: copy
-`.github/release.py` byte for byte, add `.github/releases.json` with a single
-`python` entry (`pyproject.toml`, `python/v`, `publish-python.yml`), copy `prepare-release.yml`
-and `tag-release.yml`, and take `publish-python.yml` from agent-action-capsule (its separate build
-job runs `twine check`). Before the first upload, an admin creates the `pypi` environment (tag
+**If Python publishing is approved later,** the Python lane is the siblings' with this repo's
+layout: copy `.github/release.py` byte for byte, add `.github/releases.json` with a single
+`python` entry (`pyproject.toml`, `python/v`, `publish-python.yml`), copy `tag-release.yml`,
+and copy `prepare-release.yml` with its package choice cut to `python`. Take
+`publish-python.yml` from agent-action-capsule (its separate build job runs `twine check`), with
+its `python/` working directory, `python/dist/` artifact path and `python/**` path filter moved
+to the repository root, where this `pyproject.toml` is. Before the first upload, an admin creates the `pypi` environment (tag
 rule `python/v*`) and registers the PyPI trusted publisher.
 
 ## What this does not add
 
-Build attestations, an automated "main is green" gate before a Go tag, and post-publish
-checks against proxy.golang.org and sum.golang.org or a PyPI byte-compare: none of the siblings
-has them. Adding them here alone would make capsule-engine the odd one out, which is what
-aligning is meant to stop. If they are wanted, they belong in all four repos together, so
-they are left out here.
+Go attestations, an automated "main is green" gate before a Go tag, and post-publish jobs
+against proxy.golang.org and sum.golang.org or a PyPI byte-compare: none of the siblings has
+them. Adding them here alone would make capsule-engine the odd one out, which is what aligning
+is meant to stop. If they are wanted, they belong in all four repos together.
 
-The first Go release still checks by hand what the siblings check by hand. Before tagging,
-`conformance` and every other check must be green on the tagged commit. After tagging,
-`go mod download -json github.com/action-state-group/capsule-engine/go@v0.1.0`, with the default
-`GOPROXY` and `GOSUMDB`, must fetch the version from proxy.golang.org and verify it against
-sum.golang.org, and its `Origin` must name the tagged commit. RELEASING.md gives the command.
+One manual step goes beyond the siblings, whose Go sections say only that an admin pushes the
+tag. After tagging, RELEASING.md has the admin fetch the version through proxy.golang.org and
+verify it against sum.golang.org, from an empty module cache with every setting that could
+bypass either one cleared, and compare its `Origin.Hash` with the tagged commit. It costs one
+command and shows that what the proxy and sumdb recorded is the intended commit. It is proposed for the siblings'
+RELEASING.md too.
