@@ -48,6 +48,14 @@ func TestAHeldCapsWindowIsNeverAllowed(t *testing.T) {
 		if r := e.Report(a, d); r.Decision != Escalate || r.Refused || r.RefusedFor != "" {
 			t.Errorf("%s: report decision %s refused=%v, want escalate, not refused", name, r.Decision, r.Refused)
 		}
+		// On a record in no single deal the engine refuses whatever caps
+		// asks (#127), so the label stays not_evaluable, never the
+		// escalation, and nothing is refused for the deal: the class asks.
+		inNoDeal := a
+		inNoDeal.dealIDConflict = true
+		if r := e.Report(inNoDeal, d); r.Decision != VerdictNotEvaluable || r.Refused || r.RefusedFor != "" {
+			t.Errorf("%s in no deal: report decision %s refused=%v for %q, want not_evaluable, not refused", name, r.Decision, r.Refused, r.RefusedFor)
+		}
 	}
 }
 
