@@ -86,8 +86,16 @@ it touches:
   - `action-ledger` is decided by `decide_steps`. Its expected steps carry the capsule id the
     engine sealed, and the Go runner gives that id to the record it appends.
 
-  `sale-bundle` is not built yet. Sale bundles stay Go-only tests at their frozen expectations
-  until a follow-up adds the kind.
+  - `sale-bundle`, added after PR B (Sherlock2: a gate before sellers switch over), is decided
+    by `decide_sale_bundle`, which reads and verifies the bundle and replays it (`replay_sale`).
+    On the Go side, `ReadSaleBundle` takes the states capsulectl's `verify --bundle` reported,
+    then each check runs through `Check` and `CheckSale`, on the replay ledger the Go parity
+    tests already build. The sale's completeness and findings are compared too. The engine's
+    replay seals a decision of its own for each check, and a later check's evidence names it.
+    Each expected step therefore carries that `sealed_capsule_id`, and the Go replay ledger
+    takes it as the record's id. The five sale bundles under `go/guard/testdata` are the cases.
+    The product's own replay loop (its plugin) is not covered by these vectors, only the
+    module's pieces it calls.
 - **Seed.** Every external-check-input/v0 envelope under `go/guard/testdata` is decided under the
   current pack for its party role, at HEAD. That makes 503 cases from 23 sets. Eight synthetic
   `action-ledger` cases are added for the everyday checks that no deal record reaches

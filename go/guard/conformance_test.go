@@ -44,9 +44,15 @@ type conformanceDecision struct {
 	Constraints []conformanceConstraint `json:"constraints,omitempty"`
 	// Steps are an action-ledger case's decisions, one per step.
 	Steps []conformanceDecision `json:"steps,omitempty"`
-	// CapsuleID is the capsule the Python engine sealed for a step. The
-	// caller seals in Go, so the runner gives the record it appends this id.
+	// CapsuleID is the capsule the Python engine sealed for an
+	// action-ledger step (the caller seals in Go, so the runner gives the
+	// record it appends this id), or a sale-bundle step's checked record.
 	CapsuleID string `json:"capsule_id,omitempty"`
+	// SealedCapsuleID is the decision capsule the engine's replay sealed for
+	// a sale-bundle step.
+	SealedCapsuleID string `json:"sealed_capsule_id,omitempty"`
+	// Sale is a sale-bundle case's sale.
+	Sale *conformanceSale `json:"sale,omitempty"`
 }
 
 type conformanceConstraint struct {
@@ -194,9 +200,62 @@ func decideCase(t *testing.T, engines map[string]*Engine, c conformanceCase) con
 			ledger = append(ledger, r)
 		}
 		return out
+	case "sale-bundle":
+		var in struct {
+			SaleBundle string `json:"sale_bundle"`
+			Verify     string `json:"verify"`
+		}
+		if err := json.Unmarshal(raw, &in); err != nil {
+			t.Fatalf("%s: %v", c.Case, err)
+		}
+		dir := filepath.Join(conformanceRoot, filepath.FromSlash(filepath.Dir(in.SaleBundle)))
+		if filepath.Join(dir, "verify", "sale.verify.json") != filepath.Join(conformanceRoot, filepath.FromSlash(in.Verify)) {
+			t.Fatalf("%s: the verify report is not the bundle's verify/sale.verify.json", c.Case)
+		}
+		bundle := readFile(t, dir, "sale.bundle.json")
+		sale, err := ReadSaleBundle(bundle, verifiedIn(t, dir, bundle))
+		if err != nil {
+			return conformanceDecision{Error: "decode: " + err.Error()}
+		}
+		out := conformanceDecision{Sale: &conformanceSale{Complete: sale.Complete(), Findings: sale.Findings}}
+		if out.Sale.Findings == nil {
+			out.Sale.Findings = []string{}
+		}
+		// The engine's replay seals a decision of its own for each check, and
+		// a later check's evidence names it; the caller seals in Go, so the
+		// replay ledger here gives each decided record that capsule's id.
+		sealed := map[string]string{}
+		for _, step := range c.Expected.Steps {
+			if step.SealedCapsuleID != "" {
+				sealed[step.CapsuleID] = step.SealedCapsuleID
+			}
+		}
+		for _, step := range c.Expected.Steps {
+			a, h, err := sale.Check(step.CapsuleID)
+			if err != nil {
+				out.Steps = append(out.Steps, conformanceDecision{Error: "check: " + err.Error(), CapsuleID: step.CapsuleID})
+				continue
+			}
+			d, err := e.CheckSale(a, replayLedgerSealed(t, e, sale, step.CapsuleID, sealed), h)
+			if err != nil {
+				out.Steps = append(out.Steps, conformanceDecision{Error: "check: " + err.Error(), CapsuleID: step.CapsuleID})
+				continue
+			}
+			got := decisionShape(t, c.Case, d)
+			got.CapsuleID, got.SealedCapsuleID = step.CapsuleID, step.SealedCapsuleID
+			out.Steps = append(out.Steps, got)
+		}
+		return out
 	}
 	t.Fatalf("%s: unknown kind %q", c.Case, c.Kind)
 	return conformanceDecision{}
+}
+
+// conformanceSale is a sale-bundle case's sale: whether the replay holds
+// every thread, and each link that does not hold.
+type conformanceSale struct {
+	Complete bool     `json:"complete"`
+	Findings []string `json:"findings"`
 }
 
 // decisionShape is a decision in the vectors' shape.
@@ -247,6 +306,9 @@ func agrees(a, b conformanceDecision, exact bool) bool {
 			return errorStage(a.Error) == errorStage(b.Error)
 		}
 		return a.Error != "" && b.Error != ""
+	}
+	if (a.Sale == nil) != (b.Sale == nil) || a.Sale != nil && (a.Sale.Complete != b.Sale.Complete || !slices.Equal(a.Sale.Findings, b.Sale.Findings)) {
+		return false
 	}
 	if len(a.Steps) != len(b.Steps) {
 		return false
@@ -303,6 +365,9 @@ func TestConformanceVectors(t *testing.T) {
 func difference(g, p conformanceDecision) string {
 	if g.Error != "" || p.Error != "" {
 		return fmt.Sprintf("Go error %q, Python error %q", g.Error, p.Error)
+	}
+	if g.Sale != nil && p.Sale != nil && (g.Sale.Complete != p.Sale.Complete || !slices.Equal(g.Sale.Findings, p.Sale.Findings)) {
+		return fmt.Sprintf("sale Go %+v, Python %+v", *g.Sale, *p.Sale)
 	}
 	if len(g.Steps) > 0 || len(p.Steps) > 0 {
 		if len(g.Steps) != len(p.Steps) {

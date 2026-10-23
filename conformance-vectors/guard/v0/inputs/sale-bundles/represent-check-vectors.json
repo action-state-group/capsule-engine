@@ -1,0 +1,4 @@
+{
+ "sale_bundle": "go/guard/testdata/represent-check-vectors/sale.bundle.json",
+ "verify": "go/guard/testdata/represent-check-vectors/verify/sale.verify.json"
+}

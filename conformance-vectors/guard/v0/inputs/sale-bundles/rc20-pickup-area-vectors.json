@@ -1,0 +1,4 @@
+{
+ "sale_bundle": "go/guard/testdata/rc20-pickup-area-vectors/sale.bundle.json",
+ "verify": "go/guard/testdata/rc20-pickup-area-vectors/verify/sale.verify.json"
+}

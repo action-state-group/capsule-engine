@@ -35,7 +35,7 @@ from ..policy.limits import read_caps_limits
 from .live_history import HistoryLedger, history_ledger
 from .replay import action_for_check_input
 
-__all__ = ["LiveCheck", "decide_check_input", "decide_steps", "live_engine"]
+__all__ = ["LiveCheck", "decide_check_input", "decide_sale_bundle", "decide_steps", "live_engine"]
 
 
 @dataclass(frozen=True)
@@ -105,3 +105,22 @@ def decide_steps(pack: PackDefinition, steps: list[dict], *, signer=None) -> lis
     with tempfile.TemporaryDirectory() as tmp, LedgerStore(Path(tmp) / "ledger") as store:
         engine = _wired(install_pack(pack, project_dir=Path(tmp) / "live-project", mode="observe"), store, signer)
         return [engine.check(Action(**{k: tuple(v) if isinstance(v, list) else v for k, v in step.items()})) for step in steps]
+
+
+def decide_sale_bundle(pack: PackDefinition, bundle: dict):
+    """A sale bundle read and verified (``read_sale_bundle``) and replayed
+    under ``pack`` (``replay_sale``), as a replay of a sale decides each of
+    its checks: the sale, and the replay's result."""
+    from .sale_bundle import read_sale_bundle, replay_sale
+
+    sale = read_sale_bundle(bundle)
+    with tempfile.TemporaryDirectory() as tmp:
+        installed = install_pack(pack, project_dir=Path(tmp) / "replay-project", mode="observe")
+        resolved = installed.resolved
+        result = replay_sale(
+            sale, caps_fold=resolved.caps_fold(), caps_minor=resolved.caps_minor(),
+            per_action_minor=resolved.per_action_minor(), per_action_reads=resolved.per_action_reads(),
+            manifest_digest=resolved.manifest_digest, wickets=resolved.configured_wickets(RUNNABLE_CHECKS),
+            pack=installed.pack,
+        )
+    return sale, result
