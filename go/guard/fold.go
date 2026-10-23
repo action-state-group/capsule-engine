@@ -263,30 +263,6 @@ func (f fold) resolve(r Record) (map[string]value, bool) {
 	return vals, true
 }
 
-// disagreeing counts the records evaluate would read for keyValue in the
-// window that carry a spend_minor differing from their amount_minor (or no
-// amount_minor). The fold sums amount_minor, so on such a record (a refund
-// or cancel body) its total may count a refund as spend.
-func (f fold) disagreeing(records []Record, keyValue string, anchor time.Time) int {
-	n := 0
-	for _, r := range records {
-		if r.SpendMinor == nil {
-			continue
-		}
-		vals, ok := f.resolve(r)
-		if !ok || !f.within(vals, anchor) || !f.passes(vals) {
-			continue
-		}
-		if k := vals[f.key]; k.kind != str || k.s != keyValue {
-			continue
-		}
-		if r.AmountMinor == nil || *r.AmountMinor != *r.SpendMinor {
-			n++
-		}
-	}
-	return n
-}
-
 // outsideTheFold is the acts carrying keyValue under the fold's key in its
 // window as of anchor that moved money and that the fold never sums, as it
 // sums only accepted acts, each with the spend it took, or nil when there
@@ -484,6 +460,12 @@ func (f fold) passes(vals map[string]value) bool {
 }
 
 // within is engine.py _within_window: [anchor - duration, anchor], inclusive.
+// Both times are read to the microsecond, as the engine reads them: a Python
+// datetime holds microseconds, and datetime.fromisoformat drops any digit
+// past the sixth. RFC 3339 allows more, though no capsulectl or capsule-emit
+// release writes them; read to the nanosecond, an act in the same
+// microsecond as either end could fall outside the window here and inside
+// it there (conformance-vectors/guard/v0/window-edge.json).
 func (f fold) within(vals map[string]value, anchor time.Time) bool {
 	if f.window == 0 {
 		return true
@@ -493,7 +475,40 @@ func (f fold) within(vals map[string]value, anchor time.Time) bool {
 		return false
 	}
 	t, err := parseInstant(ts.s)
+	t, anchor = t.Truncate(time.Microsecond), anchor.Truncate(time.Microsecond)
 	return err == nil && !t.Before(anchor.Add(-f.window)) && !t.After(anchor)
+}
+
+// summed is the amount the sum reducer counts for r, which the fold read
+// as asg_payload.amount_minor (amount). A history act from a check input
+// (r.live) is read as capsule-engine's live check writes it
+// (report/live_history.py):
+//
+//   - under a fold that counts executed acts (spend.weekly/3.1.0) the
+//     history's copy of an act is left out, and the engine's record of the
+//     executed act counts an accepted act at its body's amount_minor
+//     (report/replay.py _executed_spend), which is amount;
+//   - under any other fold the window reads the history's copy, whose
+//     amount_minor is the spend the deal bridge takes (keyAmount;
+//     history_act_payload), so a spend that differs from the stated amount
+//     is summed, never the amount.
+//
+// Where the engine's value would leave spend out of the total, this port
+// does not follow it, as an under-count could allow (Sherlock2's acceptance
+// condition on capsule-engine#214; both are pinned in
+// KNOWN-DIFFERENCES.json): an act sealing no spend_minor, which the
+// engine's history copy carries no amount for, is counted at its stated
+// amount, and under the first kind of fold an act whose spend is above its
+// stated amount is counted at its spend, the amount a decision on it seals.
+func (f fold) summed(r Record, amount int64) int64 {
+	spend := r.keyAmount()
+	switch {
+	case r.live == "" || spend == nil:
+		return amount
+	case f.countsExecuted():
+		return max(amount, *spend)
+	}
+	return *spend
 }
 
 // evaluate is engine.py evaluate_one for keyValue, as of anchor: the
@@ -527,7 +542,7 @@ func (f fold) evaluate(records []Record, keyValue string, anchor time.Time) (int
 			acc++
 			continue
 		}
-		amount := vals[f.sumField].i
+		amount := f.summed(r, vals[f.sumField].i)
 		rv := f.reversal
 		if rv == nil {
 			acc += amount

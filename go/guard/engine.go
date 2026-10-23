@@ -12,6 +12,7 @@ import (
 
 	"gopkg.in/yaml.v3"
 
+	"github.com/action-state-group/capsule-engine/go/canon"
 	"github.com/action-state-group/capsule-engine/go/pack"
 )
 
@@ -1226,10 +1227,14 @@ func requirePerActionReads(s string) error {
 	return nil
 }
 
-// classKeyed are the checks that read action_class.
-var classKeyed = []string{"caps", "destination_rail", "counterparty_identity_change", "recurring_charge", "counterparty_seen_before", "recipient_seen_before", "action_class_gate",
-	"channel_change", "material_fields_changed", "offer_fields_changed", "refundability", "upfront_amount", "recipient_role", "task_authority",
-	"promise_never", "promise_requires_approval", "required_disclosure"}
+// neverHeld is engine.py _NEVER_HELD_CHECKS: the checks a taxonomy
+// mismatch never holds. credential_pattern and plan_containment read no
+// action_class, and an integrity check refuses whatever the taxonomy says
+// (dedupe, single_commitment and promise_never compare the class name as
+// sealed). Every other check is keyed on the class, so a mismatch leaves it
+// unevaluated (compareTaxonomy), including any check added later.
+var neverHeld = []string{"dedupe", "verify_before_dispatch", "single_commitment", "promise_never", "release_on_acceptance",
+	"credential_pattern", "plan_containment"}
 
 // compareTaxonomy holds the action's taxonomy_version against the vendored
 // action taxonomy's. A different version leaves every check that reads
@@ -1254,11 +1259,22 @@ func (e *Engine) compareTaxonomy(a Action, cs []Constraint) []Constraint {
 		out[i] = c
 		// With no caps definition, caps reads nothing keyed on the class, so
 		// a taxonomy mismatch does not hold it (engine.py check, e0e664d).
-		if !slices.Contains(classKeyed, c.ID) || c.ID == "caps" && e.capsFold == nil {
+		if slices.Contains(neverHeld, c.ID) || c.ID == "caps" && e.capsFold == nil {
 			continue
 		}
 		if reason != "" {
 			n := notEvaluable(c.ID, c.Method, reason)
+			if a.TaxonomyVersion != nil {
+				// engine.py _taxonomy_held: TaxonomyHeldEvidence, the n/a
+				// evidence with the versions it was held on. The engine's deal
+				// bridge reads no action from a body with no taxonomy_version
+				// (report/replay.py), so that hold has no engine evidence to
+				// match and keeps the plain n/a.
+				n.evidence = canon.Obj(canon.M("constraint_id", canon.Str(c.ID)), canon.M("in_scope", canon.Bool(true)),
+					canon.M("missing_field", canon.Null()), canon.M("taxonomy_mismatch", canon.Obj(
+						canon.M("record_taxonomy_version", canon.Str(*a.TaxonomyVersion)),
+						canon.M("engine_taxonomy_version", canon.Str(e.tax.version)))))
+			}
 			n.read = &Read{Field: "taxonomy_version", Value: shown}
 			n.reads = []string{"action_class", "taxonomy_version"}
 			out[i] = n

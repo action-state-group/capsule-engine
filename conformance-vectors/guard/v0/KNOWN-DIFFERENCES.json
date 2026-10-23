@@ -2,1043 +2,6 @@
  "note": "Cases the Go guard decides differently from the Python engine, each with both sides' decisions pinned. CI fails when either side moves; resolve a case by fixing the wrong side and removing its entry.",
  "cases": [
   {
-   "case": "real-seller-131.json:real-seller/check-inputs/b-offer-1500",
-   "issue": "https://github.com/action-state-group/capsule-engine/issues/214",
-   "why": "group 1: dedupe's matched_amount_minor differs on the same matched capsule (Go 190000, Python 0)",
-   "python": {
-    "outcome": "deny",
-    "constraints": [
-     {
-      "id": "dedupe",
-      "result": "fail",
-      "method": "exact_match_index_v0",
-      "evidence_digest": "48378cb702faf604a6417580adf60aa63f023fd4a315661d4986996ce88856b4"
-     },
-     {
-      "id": "caps",
-      "result": "n/a",
-      "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
-      "reason": "no caps definition is configured"
-     },
-     {
-      "id": "verify_before_dispatch",
-      "result": "n/a",
-      "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
-      "reason": "action cites no mandate capsule"
-     },
-     {
-      "id": "recipient_role",
-      "result": "n/a",
-      "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
-      "reason": "the rule is not configured for this action class"
-     },
-     {
-      "id": "price_floor",
-      "result": "n/a",
-      "method": "committed_floor_threshold_v1",
-      "evidence_digest": "9d548b915de1ff97c046aa15d2f13fae31884894ff36be4ddba1fc9106988bed",
-      "reason": "the rule is not configured for this action class"
-     },
-     {
-      "id": "promise_requires_approval",
-      "result": "n/a",
-      "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "26999f1f990a56334d343c6c31f6f042c162eef0f2c012d019db39d6826b45af",
-      "reason": "the rule is not configured for this action class"
-     },
-     {
-      "id": "promise_never",
-      "result": "n/a",
-      "method": "class_membership_v0",
-      "evidence_digest": "ff0cab0c159ae1d81c52b65a17e63d9b88fe9bd2aab205cbe60102796beaf77b",
-      "reason": "the rule is not configured for this action class"
-     },
-     {
-      "id": "required_disclosure",
-      "result": "n/a",
-      "method": "disclosure.class_seen/1.0.0",
-      "evidence_digest": "46a692401917ddcf0644832f8a53756b6b2b04dc87e1d4a4625d428ca911e5b5",
-      "reason": "the rule is not configured for this action class"
-     },
-     {
-      "id": "offer_expiry",
-      "result": "n/a",
-      "method": "age_threshold_v0",
-      "evidence_digest": "299fbc9f7e6847eba5f93de60e12976aaef8f28c0cd4a303096c49daa495e0be",
-      "reason": "the rule is not configured for this action class"
-     },
-     {
-      "id": "single_commitment",
-      "result": "pass",
-      "method": "first_sealed_acceptance_v1",
-      "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e"
-     },
-     {
-      "id": "destination_rail",
-      "result": "n/a",
-      "method": "set_membership_v0",
-      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
-      "reason": "the rule is not configured for this action class"
-     },
-     {
-      "id": "task_authority",
-      "result": "pass",
-      "method": "bound_plan_containment_v0",
-      "evidence_digest": "3c2cfb74a38c1e90c4411707393630f128c0c2c08a7fe5b084e4b6329c9c3521"
-     },
-     {
-      "id": "release_on_acceptance",
-      "result": "n/a",
-      "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
-      "reason": "the rule is not configured for this action class"
-     }
-    ]
-   },
-   "go": {
-    "outcome": "deny",
-    "constraints": [
-     {
-      "id": "dedupe",
-      "result": "fail",
-      "method": "exact_match_index_v0",
-      "evidence_digest": "33d786d4da9fc1f56700736cb9961b49ddf171d5d1503f5982a08f2c181637dc"
-     },
-     {
-      "id": "caps",
-      "result": "n/a",
-      "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c"
-     },
-     {
-      "id": "verify_before_dispatch",
-      "result": "n/a",
-      "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
-     },
-     {
-      "id": "recipient_role",
-      "result": "n/a",
-      "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
-     },
-     {
-      "id": "price_floor",
-      "result": "n/a",
-      "method": "committed_floor_threshold_v1",
-      "evidence_digest": "9d548b915de1ff97c046aa15d2f13fae31884894ff36be4ddba1fc9106988bed"
-     },
-     {
-      "id": "promise_requires_approval",
-      "result": "n/a",
-      "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "26999f1f990a56334d343c6c31f6f042c162eef0f2c012d019db39d6826b45af"
-     },
-     {
-      "id": "promise_never",
-      "result": "n/a",
-      "method": "class_membership_v0",
-      "evidence_digest": "ff0cab0c159ae1d81c52b65a17e63d9b88fe9bd2aab205cbe60102796beaf77b"
-     },
-     {
-      "id": "required_disclosure",
-      "result": "n/a",
-      "method": "disclosure.class_seen/1.0.0",
-      "evidence_digest": "46a692401917ddcf0644832f8a53756b6b2b04dc87e1d4a4625d428ca911e5b5"
-     },
-     {
-      "id": "offer_expiry",
-      "result": "n/a",
-      "method": "age_threshold_v0",
-      "evidence_digest": "299fbc9f7e6847eba5f93de60e12976aaef8f28c0cd4a303096c49daa495e0be"
-     },
-     {
-      "id": "single_commitment",
-      "result": "pass",
-      "method": "first_sealed_acceptance_v1",
-      "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e"
-     },
-     {
-      "id": "destination_rail",
-      "result": "n/a",
-      "method": "set_membership_v0",
-      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09"
-     },
-     {
-      "id": "task_authority",
-      "result": "pass",
-      "method": "bound_plan_containment_v0",
-      "evidence_digest": "3c2cfb74a38c1e90c4411707393630f128c0c2c08a7fe5b084e4b6329c9c3521"
-     },
-     {
-      "id": "release_on_acceptance",
-      "result": "n/a",
-      "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb"
-     }
-    ]
-   }
-  },
-  {
-   "case": "real-seller-131.json:real-seller/check-inputs/c-commit-1600",
-   "issue": "https://github.com/action-state-group/capsule-engine/issues/214",
-   "why": "group 1: dedupe's matched_amount_minor differs on the same matched capsule (Go 190000, Python 0)",
-   "python": {
-    "outcome": "escalate",
-    "constraints": [
-     {
-      "id": "dedupe",
-      "result": "fail",
-      "method": "exact_match_index_v0",
-      "evidence_digest": "9b99f17a68642aca7d8af50753658cb63245fed37ce3e01cacc60b6209007106"
-     },
-     {
-      "id": "caps",
-      "result": "n/a",
-      "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
-      "reason": "no caps definition is configured"
-     },
-     {
-      "id": "verify_before_dispatch",
-      "result": "n/a",
-      "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
-      "reason": "action cites no mandate capsule"
-     },
-     {
-      "id": "recipient_role",
-      "result": "n/a",
-      "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
-      "reason": "the rule is not configured for this action class"
-     },
-     {
-      "id": "price_floor",
-      "result": "fail",
-      "method": "committed_floor_threshold_v1",
-      "evidence_digest": "de2593950711d3cc6f96ffa6fafd65d7e4d062eb8f7d765b2d6fa09e7588a1ae"
-     },
-     {
-      "id": "promise_requires_approval",
-      "result": "n/a",
-      "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9",
-      "reason": "the action carries no representation_class; the statement could not be classed"
-     },
-     {
-      "id": "promise_never",
-      "result": "n/a",
-      "method": "class_membership_v0",
-      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14",
-      "reason": "the action carries no representation_class; the statement could not be classed"
-     },
-     {
-      "id": "required_disclosure",
-      "result": "fail",
-      "method": "disclosure.class_seen/1.0.0",
-      "evidence_digest": "fec002c82d9d7d6a81ac90a10750efe0e9d0e17da52074c9be8de458f30cba07"
-     },
-     {
-      "id": "offer_expiry",
-      "result": "fail",
-      "method": "age_threshold_v0",
-      "evidence_digest": "7392286ba24565ff03fb9cb5e3e97f8a6cb4b1b4bc38672d31c54f3661cd6fd5"
-     },
-     {
-      "id": "single_commitment",
-      "result": "pass",
-      "method": "first_sealed_acceptance_v1",
-      "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e"
-     },
-     {
-      "id": "destination_rail",
-      "result": "fail",
-      "method": "set_membership_v0",
-      "evidence_digest": "ff3bda465a0217e17ba0b0b1119e667484d988bf359a777232b48fd8f6826c3a"
-     },
-     {
-      "id": "task_authority",
-      "result": "pass",
-      "method": "bound_plan_containment_v0",
-      "evidence_digest": "d6772b542de858e4f04395af92ec4eb8ed7fb16cf7836b6c5d44b4f92e94e00d"
-     },
-     {
-      "id": "release_on_acceptance",
-      "result": "n/a",
-      "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
-      "reason": "the rule is not configured for this action class"
-     }
-    ]
-   },
-   "go": {
-    "outcome": "escalate",
-    "constraints": [
-     {
-      "id": "dedupe",
-      "result": "fail",
-      "method": "exact_match_index_v0",
-      "evidence_digest": "14711b9a0913b47574c6e66e68e2d50e7f8ec89b63b6e6bbe4ac93709b250596"
-     },
-     {
-      "id": "caps",
-      "result": "n/a",
-      "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c"
-     },
-     {
-      "id": "verify_before_dispatch",
-      "result": "n/a",
-      "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
-     },
-     {
-      "id": "recipient_role",
-      "result": "n/a",
-      "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
-     },
-     {
-      "id": "price_floor",
-      "result": "fail",
-      "method": "committed_floor_threshold_v1",
-      "evidence_digest": "de2593950711d3cc6f96ffa6fafd65d7e4d062eb8f7d765b2d6fa09e7588a1ae"
-     },
-     {
-      "id": "promise_requires_approval",
-      "result": "n/a",
-      "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "4d730d21c4879986c36c681b0042ec72b4514a656cacffbd6d5a32a4c0dfaab9"
-     },
-     {
-      "id": "promise_never",
-      "result": "n/a",
-      "method": "class_membership_v0",
-      "evidence_digest": "81ca98d61cdab44eed72a5e139d3502261236a48630d26dfc09568d12a922f14"
-     },
-     {
-      "id": "required_disclosure",
-      "result": "fail",
-      "method": "disclosure.class_seen/1.0.0",
-      "evidence_digest": "fec002c82d9d7d6a81ac90a10750efe0e9d0e17da52074c9be8de458f30cba07"
-     },
-     {
-      "id": "offer_expiry",
-      "result": "fail",
-      "method": "age_threshold_v0",
-      "evidence_digest": "7392286ba24565ff03fb9cb5e3e97f8a6cb4b1b4bc38672d31c54f3661cd6fd5"
-     },
-     {
-      "id": "single_commitment",
-      "result": "pass",
-      "method": "first_sealed_acceptance_v1",
-      "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e"
-     },
-     {
-      "id": "destination_rail",
-      "result": "fail",
-      "method": "set_membership_v0",
-      "evidence_digest": "ff3bda465a0217e17ba0b0b1119e667484d988bf359a777232b48fd8f6826c3a"
-     },
-     {
-      "id": "task_authority",
-      "result": "pass",
-      "method": "bound_plan_containment_v0",
-      "evidence_digest": "d6772b542de858e4f04395af92ec4eb8ed7fb16cf7836b6c5d44b4f92e94e00d"
-     },
-     {
-      "id": "release_on_acceptance",
-      "result": "n/a",
-      "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb"
-     }
-    ]
-   }
-  },
-  {
-   "case": "real-seller-131.json:real-seller/check-inputs/c-offer-1600",
-   "issue": "https://github.com/action-state-group/capsule-engine/issues/214",
-   "why": "group 1: dedupe's matched_amount_minor differs on the same matched capsule (Go 190000, Python 0)",
-   "python": {
-    "outcome": "deny",
-    "constraints": [
-     {
-      "id": "dedupe",
-      "result": "fail",
-      "method": "exact_match_index_v0",
-      "evidence_digest": "48378cb702faf604a6417580adf60aa63f023fd4a315661d4986996ce88856b4"
-     },
-     {
-      "id": "caps",
-      "result": "n/a",
-      "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
-      "reason": "no caps definition is configured"
-     },
-     {
-      "id": "verify_before_dispatch",
-      "result": "n/a",
-      "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
-      "reason": "action cites no mandate capsule"
-     },
-     {
-      "id": "recipient_role",
-      "result": "n/a",
-      "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
-      "reason": "the rule is not configured for this action class"
-     },
-     {
-      "id": "price_floor",
-      "result": "n/a",
-      "method": "committed_floor_threshold_v1",
-      "evidence_digest": "9d548b915de1ff97c046aa15d2f13fae31884894ff36be4ddba1fc9106988bed",
-      "reason": "the rule is not configured for this action class"
-     },
-     {
-      "id": "promise_requires_approval",
-      "result": "n/a",
-      "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "26999f1f990a56334d343c6c31f6f042c162eef0f2c012d019db39d6826b45af",
-      "reason": "the rule is not configured for this action class"
-     },
-     {
-      "id": "promise_never",
-      "result": "n/a",
-      "method": "class_membership_v0",
-      "evidence_digest": "ff0cab0c159ae1d81c52b65a17e63d9b88fe9bd2aab205cbe60102796beaf77b",
-      "reason": "the rule is not configured for this action class"
-     },
-     {
-      "id": "required_disclosure",
-      "result": "n/a",
-      "method": "disclosure.class_seen/1.0.0",
-      "evidence_digest": "46a692401917ddcf0644832f8a53756b6b2b04dc87e1d4a4625d428ca911e5b5",
-      "reason": "the rule is not configured for this action class"
-     },
-     {
-      "id": "offer_expiry",
-      "result": "n/a",
-      "method": "age_threshold_v0",
-      "evidence_digest": "299fbc9f7e6847eba5f93de60e12976aaef8f28c0cd4a303096c49daa495e0be",
-      "reason": "the rule is not configured for this action class"
-     },
-     {
-      "id": "single_commitment",
-      "result": "pass",
-      "method": "first_sealed_acceptance_v1",
-      "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e"
-     },
-     {
-      "id": "destination_rail",
-      "result": "n/a",
-      "method": "set_membership_v0",
-      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
-      "reason": "the rule is not configured for this action class"
-     },
-     {
-      "id": "task_authority",
-      "result": "pass",
-      "method": "bound_plan_containment_v0",
-      "evidence_digest": "d6772b542de858e4f04395af92ec4eb8ed7fb16cf7836b6c5d44b4f92e94e00d"
-     },
-     {
-      "id": "release_on_acceptance",
-      "result": "n/a",
-      "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
-      "reason": "the rule is not configured for this action class"
-     }
-    ]
-   },
-   "go": {
-    "outcome": "deny",
-    "constraints": [
-     {
-      "id": "dedupe",
-      "result": "fail",
-      "method": "exact_match_index_v0",
-      "evidence_digest": "33d786d4da9fc1f56700736cb9961b49ddf171d5d1503f5982a08f2c181637dc"
-     },
-     {
-      "id": "caps",
-      "result": "n/a",
-      "method": "",
-      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c"
-     },
-     {
-      "id": "verify_before_dispatch",
-      "result": "n/a",
-      "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
-     },
-     {
-      "id": "recipient_role",
-      "result": "n/a",
-      "method": "set_membership_v0",
-      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
-     },
-     {
-      "id": "price_floor",
-      "result": "n/a",
-      "method": "committed_floor_threshold_v1",
-      "evidence_digest": "9d548b915de1ff97c046aa15d2f13fae31884894ff36be4ddba1fc9106988bed"
-     },
-     {
-      "id": "promise_requires_approval",
-      "result": "n/a",
-      "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "26999f1f990a56334d343c6c31f6f042c162eef0f2c012d019db39d6826b45af"
-     },
-     {
-      "id": "promise_never",
-      "result": "n/a",
-      "method": "class_membership_v0",
-      "evidence_digest": "ff0cab0c159ae1d81c52b65a17e63d9b88fe9bd2aab205cbe60102796beaf77b"
-     },
-     {
-      "id": "required_disclosure",
-      "result": "n/a",
-      "method": "disclosure.class_seen/1.0.0",
-      "evidence_digest": "46a692401917ddcf0644832f8a53756b6b2b04dc87e1d4a4625d428ca911e5b5"
-     },
-     {
-      "id": "offer_expiry",
-      "result": "n/a",
-      "method": "age_threshold_v0",
-      "evidence_digest": "299fbc9f7e6847eba5f93de60e12976aaef8f28c0cd4a303096c49daa495e0be"
-     },
-     {
-      "id": "single_commitment",
-      "result": "pass",
-      "method": "first_sealed_acceptance_v1",
-      "evidence_digest": "83e820d32bee27e17d5125b25eb4c2263947bff5812e1f5e87a7c06dbff30b9e"
-     },
-     {
-      "id": "destination_rail",
-      "result": "n/a",
-      "method": "set_membership_v0",
-      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09"
-     },
-     {
-      "id": "task_authority",
-      "result": "pass",
-      "method": "bound_plan_containment_v0",
-      "evidence_digest": "d6772b542de858e4f04395af92ec4eb8ed7fb16cf7836b6c5d44b4f92e94e00d"
-     },
-     {
-      "id": "release_on_acceptance",
-      "result": "n/a",
-      "method": "same_deal_same_buyer_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb"
-     }
-    ]
-   }
-  },
-  {
-   "case": "emit.json:pay-taxonomy-2",
-   "issue": "https://github.com/action-state-group/capsule-engine/issues/214",
-   "why": "group 2: a record sealed at an older action taxonomy is refused by both (deny), but the Go guard's held checks carry no taxonomy_mismatch member in their evidence, which the engine's do (capsule-engine 9ac3722)",
-   "python": {
-    "outcome": "deny",
-    "constraints": [
-     {
-      "id": "dedupe",
-      "result": "pass",
-      "method": "exact_match_index_v0",
-      "evidence_digest": "20c5066b50631ecd59795a259a6bd8a3f3c4f0c478614cadf1c30648de512195"
-     },
-     {
-      "id": "caps",
-      "result": "n/a",
-      "method": "spend.weekly/3.1.0",
-      "evidence_digest": "e8e343fc1ee947df83b1dcf6de38b58af5daac9dc132b91cf25baca2eafb0e70",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "verify_before_dispatch",
-      "result": "n/a",
-      "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
-      "reason": "action cites no mandate capsule"
-     },
-     {
-      "id": "destination_rail",
-      "result": "n/a",
-      "method": "set_membership_v0",
-      "evidence_digest": "a2233ff3a9bdc8a37ba1a77914e3816d164ccd36eec50177569bebe51a2dac51",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "counterparty_identity_change",
-      "result": "n/a",
-      "method": "prior_recorded_value_v0",
-      "evidence_digest": "c534c4662234ae1d8541e24a4103e3bf494471645f19f9508cb6a0812ea41026",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "credential_pattern",
-      "result": "n/a",
-      "method": "regex_match_v0",
-      "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827",
-      "reason": "the action sends no outgoing content"
-     },
-     {
-      "id": "recurring_charge",
-      "result": "n/a",
-      "method": "structured_field_v0",
-      "evidence_digest": "b10e0f056341507f1f930a94d104ab9215a6282b35f6168108fdcb6af334877b",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "action_class_gate",
-      "result": "n/a",
-      "method": "taxonomy_selector_v0",
-      "evidence_digest": "b12572b136d78e52fdd5f38f1bfd6e485b736d4fb74c15fad58234e0f716a4a8",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "counterparty_seen_before",
-      "result": "n/a",
-      "method": "counterparty.seen_before/3.0.0",
-      "evidence_digest": "efcf6a921a84cf7e24e6406d858f0a395de21abc1bbb15025abdc8f3c76083c1",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "recipient_role",
-      "result": "n/a",
-      "method": "set_membership_v0",
-      "evidence_digest": "698b6f618725e677a701d804112a58dd81e886c63ab9caccdbef167cfca2af73",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "refundability",
-      "result": "n/a",
-      "method": "declared_boolean_v0",
-      "evidence_digest": "2c46b72808e409753d2c20baeedd2649155ab734d2cc9d5181d3e3736203e2bd",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "material_fields_changed",
-      "result": "n/a",
-      "method": "pinned_field_count_v0",
-      "evidence_digest": "245b025bef137ba48c6103b765ff0753f320181b0986a80bf97701f25a908404",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "offer_fields_changed",
-      "result": "n/a",
-      "method": "pinned_field_count_v0",
-      "evidence_digest": "e16f0a12d85530d153846cf5e528bf8b3fad4bbce1b679dcd06db28d56677abc",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "recipient_seen_before",
-      "result": "n/a",
-      "method": "counterparty.seen_before/2.0.0",
-      "evidence_digest": "d19d516182f0e6e47b98b13c70d4878a2d0ee2efa90edaad4a3f106daf8f34d4",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "channel_change",
-      "result": "n/a",
-      "method": "same_record_v0",
-      "evidence_digest": "4bbccd4b19c15cad952279c798817e057f4b3fd1548a28c7399fb30f55543a55",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "upfront_amount",
-      "result": "n/a",
-      "method": "upfront_threshold_v0",
-      "evidence_digest": "13536b73b879fc4341478682856b120c7ccfff3d9c0b8da708972fe715bb84dd",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "task_authority",
-      "result": "n/a",
-      "method": "bound_plan_containment_v0",
-      "evidence_digest": "a15dc3e2a227ea05f3375b1f147d2d31e0b053e63b84b3c15b26392b0502bba9",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     }
-    ]
-   },
-   "go": {
-    "outcome": "deny",
-    "constraints": [
-     {
-      "id": "dedupe",
-      "result": "pass",
-      "method": "exact_match_index_v0",
-      "evidence_digest": "20c5066b50631ecd59795a259a6bd8a3f3c4f0c478614cadf1c30648de512195"
-     },
-     {
-      "id": "caps",
-      "result": "n/a",
-      "method": "spend.weekly/3.1.0",
-      "evidence_digest": "306cbe702bf8108912dcdfcc47af77628c97570517ffc2193a614f9f097a5f24",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "verify_before_dispatch",
-      "result": "n/a",
-      "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
-     },
-     {
-      "id": "destination_rail",
-      "result": "n/a",
-      "method": "set_membership_v0",
-      "evidence_digest": "3a42267c63f41f1343ed900949b9dec7b8b08c6fc39873fb969e80ffbb42bec0",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "counterparty_identity_change",
-      "result": "n/a",
-      "method": "prior_recorded_value_v0",
-      "evidence_digest": "573a44c4e0b833f16903cb8670754f0f328f994c3632e95aa708c95119119e05",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "credential_pattern",
-      "result": "n/a",
-      "method": "regex_match_v0",
-      "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827"
-     },
-     {
-      "id": "recurring_charge",
-      "result": "n/a",
-      "method": "structured_field_v0",
-      "evidence_digest": "54c39273b46c37c435fb2c926b5cdc971d0c8ada747e50bcb2f325d8a538d875",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "action_class_gate",
-      "result": "n/a",
-      "method": "taxonomy_selector_v0",
-      "evidence_digest": "076c9d5b5855e8ffb051caa3e8f8046bb2592265b1492838f22845348fbe9a6c",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "counterparty_seen_before",
-      "result": "n/a",
-      "method": "counterparty.seen_before/3.0.0",
-      "evidence_digest": "90382202d7551bb2079331b08e0d20af65e725c5a4bda427020369a44037fc57",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "recipient_role",
-      "result": "n/a",
-      "method": "set_membership_v0",
-      "evidence_digest": "597276da1b80860cc6eea7d73128281376dea9921554684850abe01603b47a26",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "refundability",
-      "result": "n/a",
-      "method": "declared_boolean_v0",
-      "evidence_digest": "6a2d32836b0d4c8f7ec091dc90d497ef0f9805630e228113796e736ddac4a240",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "material_fields_changed",
-      "result": "n/a",
-      "method": "pinned_field_count_v0",
-      "evidence_digest": "30665464f636b283a65709ef03917928e827a3d6a351a16a666a2aa929805bc6",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "offer_fields_changed",
-      "result": "n/a",
-      "method": "pinned_field_count_v0",
-      "evidence_digest": "dba1e40b90675339c4686fc7a978adb42674eef6e4f781b3bf12a76912d9b7cc",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "recipient_seen_before",
-      "result": "n/a",
-      "method": "counterparty.seen_before/2.0.0",
-      "evidence_digest": "cecd6a5edbddebe5472e617a9af1d92c847573b82abd2120702c856eb9c096c0",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "channel_change",
-      "result": "n/a",
-      "method": "same_record_v0",
-      "evidence_digest": "fb4b41668517756d28aa6ce89bb9fe5a0a1b3ed32b2c9698744e6ebb9fe66a36",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "upfront_amount",
-      "result": "n/a",
-      "method": "upfront_threshold_v0",
-      "evidence_digest": "e3c343689ba0722e180b8009c2bd3d0c543f028d5e17f98f1960b8605a673ada",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "task_authority",
-      "result": "n/a",
-      "method": "bound_plan_containment_v0",
-      "evidence_digest": "3a6d4a5dabcecf57739ee26a4ea805948867281f8ee9d7d83a9c08fa4e5ee85a",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     }
-    ]
-   }
-  },
-  {
-   "case": "real-rc13-lockstep.json:rc13-pay.input",
-   "issue": "https://github.com/action-state-group/capsule-engine/issues/214",
-   "why": "group 2: a record sealed at an older action taxonomy is refused by both (deny), but the Go guard's held checks carry no taxonomy_mismatch member in their evidence, which the engine's do (capsule-engine 9ac3722)",
-   "python": {
-    "outcome": "deny",
-    "constraints": [
-     {
-      "id": "dedupe",
-      "result": "pass",
-      "method": "exact_match_index_v0",
-      "evidence_digest": "2e8e7a49517989475acb224ab68dc59362d2e50cada22824750b2062dd4776af"
-     },
-     {
-      "id": "caps",
-      "result": "n/a",
-      "method": "spend.weekly/3.1.0",
-      "evidence_digest": "b19281cc9387a2c4f46ae39fa7d67acdca877874c7f2d5842faddbbd518f53f3",
-      "reason": "taxonomy_version 5 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "verify_before_dispatch",
-      "result": "n/a",
-      "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
-      "reason": "action cites no mandate capsule"
-     },
-     {
-      "id": "destination_rail",
-      "result": "n/a",
-      "method": "set_membership_v0",
-      "evidence_digest": "ef76466fa7feb8dfbfb6e44752316513abef2312f7e55d780a89823923ee7d00",
-      "reason": "taxonomy_version 5 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "counterparty_identity_change",
-      "result": "n/a",
-      "method": "prior_recorded_value_v0",
-      "evidence_digest": "91990225f457341ac74b825e75b15272395197528820e6b5f0c39527be5b31ee",
-      "reason": "taxonomy_version 5 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "credential_pattern",
-      "result": "n/a",
-      "method": "regex_match_v0",
-      "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827",
-      "reason": "the action sends no outgoing content"
-     },
-     {
-      "id": "recurring_charge",
-      "result": "n/a",
-      "method": "structured_field_v0",
-      "evidence_digest": "e218c576958eca76e703bc68a836b3ac279e177d9568b2add7537474c680057e",
-      "reason": "taxonomy_version 5 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "action_class_gate",
-      "result": "n/a",
-      "method": "taxonomy_selector_v0",
-      "evidence_digest": "510f1ac32e9f0a133ae883e6ac54a88dfdf7647815f69a557a6f4434f3441ba6",
-      "reason": "taxonomy_version 5 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "counterparty_seen_before",
-      "result": "n/a",
-      "method": "counterparty.seen_before/3.0.0",
-      "evidence_digest": "66ace9a0f7981541bc45e08bd0882db3e9a1be2561b785740dbabe9ec2568c8f",
-      "reason": "taxonomy_version 5 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "recipient_role",
-      "result": "n/a",
-      "method": "set_membership_v0",
-      "evidence_digest": "d85204126e6e5213a81d144adbce18ac9f825df291df695a95017f57960c2059",
-      "reason": "taxonomy_version 5 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "refundability",
-      "result": "n/a",
-      "method": "declared_boolean_v0",
-      "evidence_digest": "7f24537d5d98db4add0ed8d35b3f315b1028c2cbd6bae454daeab31dd25cacbe",
-      "reason": "taxonomy_version 5 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "material_fields_changed",
-      "result": "n/a",
-      "method": "pinned_field_count_v0",
-      "evidence_digest": "85f8a44ccbc5909b6628c5612cd21018854fd44e981c8fc93c9947b6ba201504",
-      "reason": "taxonomy_version 5 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "offer_fields_changed",
-      "result": "n/a",
-      "method": "pinned_field_count_v0",
-      "evidence_digest": "55d413cf5fe9c333655e94d26cd889da594b737e34645b2cec78163b8140259d",
-      "reason": "taxonomy_version 5 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "recipient_seen_before",
-      "result": "n/a",
-      "method": "counterparty.seen_before/2.0.0",
-      "evidence_digest": "f4feec4b3d4307646caaa27c18fbcc3438c55d71399b165cad0fac4f15364f1f",
-      "reason": "taxonomy_version 5 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "channel_change",
-      "result": "n/a",
-      "method": "same_record_v0",
-      "evidence_digest": "daa5b6e468ac920a7c315c6450dfc194fed8cd6dce155990d21b39fdd5457bd5",
-      "reason": "taxonomy_version 5 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "upfront_amount",
-      "result": "n/a",
-      "method": "upfront_threshold_v0",
-      "evidence_digest": "49c02198055d43dd404066874d1d5e9cd8b3e3e583d002b06feb39a7f89399bd",
-      "reason": "taxonomy_version 5 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "task_authority",
-      "result": "n/a",
-      "method": "bound_plan_containment_v0",
-      "evidence_digest": "0bb1d80ba9e8105248fbb911caaffc5cb2d50cd17c22cc4793285d86438171d9",
-      "reason": "taxonomy_version 5 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     }
-    ]
-   },
-   "go": {
-    "outcome": "deny",
-    "constraints": [
-     {
-      "id": "dedupe",
-      "result": "pass",
-      "method": "exact_match_index_v0",
-      "evidence_digest": "2e8e7a49517989475acb224ab68dc59362d2e50cada22824750b2062dd4776af"
-     },
-     {
-      "id": "caps",
-      "result": "n/a",
-      "method": "spend.weekly/3.1.0",
-      "evidence_digest": "306cbe702bf8108912dcdfcc47af77628c97570517ffc2193a614f9f097a5f24",
-      "reason": "taxonomy_version 5 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "verify_before_dispatch",
-      "result": "n/a",
-      "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
-     },
-     {
-      "id": "destination_rail",
-      "result": "n/a",
-      "method": "set_membership_v0",
-      "evidence_digest": "3a42267c63f41f1343ed900949b9dec7b8b08c6fc39873fb969e80ffbb42bec0",
-      "reason": "taxonomy_version 5 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "counterparty_identity_change",
-      "result": "n/a",
-      "method": "prior_recorded_value_v0",
-      "evidence_digest": "573a44c4e0b833f16903cb8670754f0f328f994c3632e95aa708c95119119e05",
-      "reason": "taxonomy_version 5 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "credential_pattern",
-      "result": "n/a",
-      "method": "regex_match_v0",
-      "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827"
-     },
-     {
-      "id": "recurring_charge",
-      "result": "n/a",
-      "method": "structured_field_v0",
-      "evidence_digest": "54c39273b46c37c435fb2c926b5cdc971d0c8ada747e50bcb2f325d8a538d875",
-      "reason": "taxonomy_version 5 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "action_class_gate",
-      "result": "n/a",
-      "method": "taxonomy_selector_v0",
-      "evidence_digest": "076c9d5b5855e8ffb051caa3e8f8046bb2592265b1492838f22845348fbe9a6c",
-      "reason": "taxonomy_version 5 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "counterparty_seen_before",
-      "result": "n/a",
-      "method": "counterparty.seen_before/3.0.0",
-      "evidence_digest": "90382202d7551bb2079331b08e0d20af65e725c5a4bda427020369a44037fc57",
-      "reason": "taxonomy_version 5 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "recipient_role",
-      "result": "n/a",
-      "method": "set_membership_v0",
-      "evidence_digest": "597276da1b80860cc6eea7d73128281376dea9921554684850abe01603b47a26",
-      "reason": "taxonomy_version 5 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "refundability",
-      "result": "n/a",
-      "method": "declared_boolean_v0",
-      "evidence_digest": "6a2d32836b0d4c8f7ec091dc90d497ef0f9805630e228113796e736ddac4a240",
-      "reason": "taxonomy_version 5 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "material_fields_changed",
-      "result": "n/a",
-      "method": "pinned_field_count_v0",
-      "evidence_digest": "30665464f636b283a65709ef03917928e827a3d6a351a16a666a2aa929805bc6",
-      "reason": "taxonomy_version 5 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "offer_fields_changed",
-      "result": "n/a",
-      "method": "pinned_field_count_v0",
-      "evidence_digest": "dba1e40b90675339c4686fc7a978adb42674eef6e4f781b3bf12a76912d9b7cc",
-      "reason": "taxonomy_version 5 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "recipient_seen_before",
-      "result": "n/a",
-      "method": "counterparty.seen_before/2.0.0",
-      "evidence_digest": "cecd6a5edbddebe5472e617a9af1d92c847573b82abd2120702c856eb9c096c0",
-      "reason": "taxonomy_version 5 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "channel_change",
-      "result": "n/a",
-      "method": "same_record_v0",
-      "evidence_digest": "fb4b41668517756d28aa6ce89bb9fe5a0a1b3ed32b2c9698744e6ebb9fe66a36",
-      "reason": "taxonomy_version 5 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "upfront_amount",
-      "result": "n/a",
-      "method": "upfront_threshold_v0",
-      "evidence_digest": "e3c343689ba0722e180b8009c2bd3d0c543f028d5e17f98f1960b8605a673ada",
-      "reason": "taxonomy_version 5 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "task_authority",
-      "result": "n/a",
-      "method": "bound_plan_containment_v0",
-      "evidence_digest": "3a6d4a5dabcecf57739ee26a4ea805948867281f8ee9d7d83a9c08fa4e5ee85a",
-      "reason": "taxonomy_version 5 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     }
-    ]
-   }
-  },
-  {
    "case": "emit.json:pay-history-tampered",
    "issue": "https://github.com/action-state-group/capsule-engine/issues/214",
    "why": "group 5: a tampered record or history act: Go refuses the input at decode, Python decides it",
@@ -13158,255 +12121,6 @@
    }
   },
   {
-   "case": "emit-everyday-0.3.4.json:pay-taxonomy-2",
-   "issue": "https://github.com/action-state-group/capsule-engine/issues/214",
-   "why": "group 2: a record sealed at an older action taxonomy is refused by both (deny), but the Go guard's held checks carry no taxonomy_mismatch member in their evidence, which the engine's do (capsule-engine 9ac3722)",
-   "python": {
-    "outcome": "deny",
-    "constraints": [
-     {
-      "id": "dedupe",
-      "result": "pass",
-      "method": "exact_match_index_v0",
-      "evidence_digest": "20c5066b50631ecd59795a259a6bd8a3f3c4f0c478614cadf1c30648de512195"
-     },
-     {
-      "id": "caps",
-      "result": "n/a",
-      "method": "spend.weekly/3.0.0",
-      "evidence_digest": "e8e343fc1ee947df83b1dcf6de38b58af5daac9dc132b91cf25baca2eafb0e70",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "verify_before_dispatch",
-      "result": "n/a",
-      "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
-      "reason": "action cites no mandate capsule"
-     },
-     {
-      "id": "destination_rail",
-      "result": "n/a",
-      "method": "set_membership_v0",
-      "evidence_digest": "a2233ff3a9bdc8a37ba1a77914e3816d164ccd36eec50177569bebe51a2dac51",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "counterparty_identity_change",
-      "result": "n/a",
-      "method": "prior_recorded_value_v0",
-      "evidence_digest": "c534c4662234ae1d8541e24a4103e3bf494471645f19f9508cb6a0812ea41026",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "credential_pattern",
-      "result": "n/a",
-      "method": "regex_match_v0",
-      "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827",
-      "reason": "the action sends no outgoing content"
-     },
-     {
-      "id": "recurring_charge",
-      "result": "n/a",
-      "method": "structured_field_v0",
-      "evidence_digest": "b10e0f056341507f1f930a94d104ab9215a6282b35f6168108fdcb6af334877b",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "action_class_gate",
-      "result": "n/a",
-      "method": "taxonomy_selector_v0",
-      "evidence_digest": "b12572b136d78e52fdd5f38f1bfd6e485b736d4fb74c15fad58234e0f716a4a8",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "counterparty_seen_before",
-      "result": "n/a",
-      "method": "counterparty.seen_before/3.0.0",
-      "evidence_digest": "efcf6a921a84cf7e24e6406d858f0a395de21abc1bbb15025abdc8f3c76083c1",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "recipient_role",
-      "result": "n/a",
-      "method": "set_membership_v0",
-      "evidence_digest": "698b6f618725e677a701d804112a58dd81e886c63ab9caccdbef167cfca2af73",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "refundability",
-      "result": "n/a",
-      "method": "declared_boolean_v0",
-      "evidence_digest": "2c46b72808e409753d2c20baeedd2649155ab734d2cc9d5181d3e3736203e2bd",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "material_fields_changed",
-      "result": "n/a",
-      "method": "pinned_field_count_v0",
-      "evidence_digest": "245b025bef137ba48c6103b765ff0753f320181b0986a80bf97701f25a908404",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "offer_fields_changed",
-      "result": "n/a",
-      "method": "pinned_field_count_v0",
-      "evidence_digest": "e16f0a12d85530d153846cf5e528bf8b3fad4bbce1b679dcd06db28d56677abc",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "recipient_seen_before",
-      "result": "n/a",
-      "method": "counterparty.seen_before/2.0.0",
-      "evidence_digest": "d19d516182f0e6e47b98b13c70d4878a2d0ee2efa90edaad4a3f106daf8f34d4",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "channel_change",
-      "result": "n/a",
-      "method": "same_record_v0",
-      "evidence_digest": "4bbccd4b19c15cad952279c798817e057f4b3fd1548a28c7399fb30f55543a55",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "upfront_amount",
-      "result": "n/a",
-      "method": "upfront_threshold_v0",
-      "evidence_digest": "13536b73b879fc4341478682856b120c7ccfff3d9c0b8da708972fe715bb84dd",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "task_authority",
-      "result": "n/a",
-      "method": "bound_plan_containment_v0",
-      "evidence_digest": "a15dc3e2a227ea05f3375b1f147d2d31e0b053e63b84b3c15b26392b0502bba9",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     }
-    ]
-   },
-   "go": {
-    "outcome": "deny",
-    "constraints": [
-     {
-      "id": "dedupe",
-      "result": "pass",
-      "method": "exact_match_index_v0",
-      "evidence_digest": "20c5066b50631ecd59795a259a6bd8a3f3c4f0c478614cadf1c30648de512195"
-     },
-     {
-      "id": "caps",
-      "result": "n/a",
-      "method": "spend.weekly/3.0.0",
-      "evidence_digest": "306cbe702bf8108912dcdfcc47af77628c97570517ffc2193a614f9f097a5f24",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "verify_before_dispatch",
-      "result": "n/a",
-      "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
-     },
-     {
-      "id": "destination_rail",
-      "result": "n/a",
-      "method": "set_membership_v0",
-      "evidence_digest": "3a42267c63f41f1343ed900949b9dec7b8b08c6fc39873fb969e80ffbb42bec0",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "counterparty_identity_change",
-      "result": "n/a",
-      "method": "prior_recorded_value_v0",
-      "evidence_digest": "573a44c4e0b833f16903cb8670754f0f328f994c3632e95aa708c95119119e05",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "credential_pattern",
-      "result": "n/a",
-      "method": "regex_match_v0",
-      "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827"
-     },
-     {
-      "id": "recurring_charge",
-      "result": "n/a",
-      "method": "structured_field_v0",
-      "evidence_digest": "54c39273b46c37c435fb2c926b5cdc971d0c8ada747e50bcb2f325d8a538d875",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "action_class_gate",
-      "result": "n/a",
-      "method": "taxonomy_selector_v0",
-      "evidence_digest": "076c9d5b5855e8ffb051caa3e8f8046bb2592265b1492838f22845348fbe9a6c",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "counterparty_seen_before",
-      "result": "n/a",
-      "method": "counterparty.seen_before/3.0.0",
-      "evidence_digest": "90382202d7551bb2079331b08e0d20af65e725c5a4bda427020369a44037fc57",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "recipient_role",
-      "result": "n/a",
-      "method": "set_membership_v0",
-      "evidence_digest": "597276da1b80860cc6eea7d73128281376dea9921554684850abe01603b47a26",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "refundability",
-      "result": "n/a",
-      "method": "declared_boolean_v0",
-      "evidence_digest": "6a2d32836b0d4c8f7ec091dc90d497ef0f9805630e228113796e736ddac4a240",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "material_fields_changed",
-      "result": "n/a",
-      "method": "pinned_field_count_v0",
-      "evidence_digest": "30665464f636b283a65709ef03917928e827a3d6a351a16a666a2aa929805bc6",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "offer_fields_changed",
-      "result": "n/a",
-      "method": "pinned_field_count_v0",
-      "evidence_digest": "dba1e40b90675339c4686fc7a978adb42674eef6e4f781b3bf12a76912d9b7cc",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "recipient_seen_before",
-      "result": "n/a",
-      "method": "counterparty.seen_before/2.0.0",
-      "evidence_digest": "cecd6a5edbddebe5472e617a9af1d92c847573b82abd2120702c856eb9c096c0",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "channel_change",
-      "result": "n/a",
-      "method": "same_record_v0",
-      "evidence_digest": "fb4b41668517756d28aa6ce89bb9fe5a0a1b3ed32b2c9698744e6ebb9fe66a36",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "upfront_amount",
-      "result": "n/a",
-      "method": "upfront_threshold_v0",
-      "evidence_digest": "e3c343689ba0722e180b8009c2bd3d0c543f028d5e17f98f1960b8605a673ada",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "task_authority",
-      "result": "n/a",
-      "method": "bound_plan_containment_v0",
-      "evidence_digest": "3a6d4a5dabcecf57739ee26a4ea805948867281f8ee9d7d83a9c08fa4e5ee85a",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     }
-    ]
-   }
-  },
-  {
    "case": "emit-everyday-0.3.5.json:pay-history-tampered",
    "issue": "https://github.com/action-state-group/capsule-engine/issues/214",
    "why": "group 5: a tampered record or history act: Go refuses the input at decode, Python decides it",
@@ -13897,255 +12611,6 @@
    }
   },
   {
-   "case": "emit-everyday-0.3.5.json:pay-taxonomy-2",
-   "issue": "https://github.com/action-state-group/capsule-engine/issues/214",
-   "why": "group 2: a record sealed at an older action taxonomy is refused by both (deny), but the Go guard's held checks carry no taxonomy_mismatch member in their evidence, which the engine's do (capsule-engine 9ac3722)",
-   "python": {
-    "outcome": "deny",
-    "constraints": [
-     {
-      "id": "dedupe",
-      "result": "pass",
-      "method": "exact_match_index_v0",
-      "evidence_digest": "20c5066b50631ecd59795a259a6bd8a3f3c4f0c478614cadf1c30648de512195"
-     },
-     {
-      "id": "caps",
-      "result": "n/a",
-      "method": "spend.weekly/3.0.0",
-      "evidence_digest": "e8e343fc1ee947df83b1dcf6de38b58af5daac9dc132b91cf25baca2eafb0e70",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "verify_before_dispatch",
-      "result": "n/a",
-      "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
-      "reason": "action cites no mandate capsule"
-     },
-     {
-      "id": "destination_rail",
-      "result": "n/a",
-      "method": "set_membership_v0",
-      "evidence_digest": "a2233ff3a9bdc8a37ba1a77914e3816d164ccd36eec50177569bebe51a2dac51",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "counterparty_identity_change",
-      "result": "n/a",
-      "method": "prior_recorded_value_v0",
-      "evidence_digest": "c534c4662234ae1d8541e24a4103e3bf494471645f19f9508cb6a0812ea41026",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "credential_pattern",
-      "result": "n/a",
-      "method": "regex_match_v0",
-      "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827",
-      "reason": "the action sends no outgoing content"
-     },
-     {
-      "id": "recurring_charge",
-      "result": "n/a",
-      "method": "structured_field_v0",
-      "evidence_digest": "b10e0f056341507f1f930a94d104ab9215a6282b35f6168108fdcb6af334877b",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "action_class_gate",
-      "result": "n/a",
-      "method": "taxonomy_selector_v0",
-      "evidence_digest": "b12572b136d78e52fdd5f38f1bfd6e485b736d4fb74c15fad58234e0f716a4a8",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "counterparty_seen_before",
-      "result": "n/a",
-      "method": "counterparty.seen_before/3.0.0",
-      "evidence_digest": "efcf6a921a84cf7e24e6406d858f0a395de21abc1bbb15025abdc8f3c76083c1",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "recipient_role",
-      "result": "n/a",
-      "method": "set_membership_v0",
-      "evidence_digest": "698b6f618725e677a701d804112a58dd81e886c63ab9caccdbef167cfca2af73",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "refundability",
-      "result": "n/a",
-      "method": "declared_boolean_v0",
-      "evidence_digest": "2c46b72808e409753d2c20baeedd2649155ab734d2cc9d5181d3e3736203e2bd",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "material_fields_changed",
-      "result": "n/a",
-      "method": "pinned_field_count_v0",
-      "evidence_digest": "245b025bef137ba48c6103b765ff0753f320181b0986a80bf97701f25a908404",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "offer_fields_changed",
-      "result": "n/a",
-      "method": "pinned_field_count_v0",
-      "evidence_digest": "e16f0a12d85530d153846cf5e528bf8b3fad4bbce1b679dcd06db28d56677abc",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "recipient_seen_before",
-      "result": "n/a",
-      "method": "counterparty.seen_before/2.0.0",
-      "evidence_digest": "d19d516182f0e6e47b98b13c70d4878a2d0ee2efa90edaad4a3f106daf8f34d4",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "channel_change",
-      "result": "n/a",
-      "method": "same_record_v0",
-      "evidence_digest": "4bbccd4b19c15cad952279c798817e057f4b3fd1548a28c7399fb30f55543a55",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "upfront_amount",
-      "result": "n/a",
-      "method": "upfront_threshold_v0",
-      "evidence_digest": "13536b73b879fc4341478682856b120c7ccfff3d9c0b8da708972fe715bb84dd",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "task_authority",
-      "result": "n/a",
-      "method": "bound_plan_containment_v0",
-      "evidence_digest": "a15dc3e2a227ea05f3375b1f147d2d31e0b053e63b84b3c15b26392b0502bba9",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     }
-    ]
-   },
-   "go": {
-    "outcome": "deny",
-    "constraints": [
-     {
-      "id": "dedupe",
-      "result": "pass",
-      "method": "exact_match_index_v0",
-      "evidence_digest": "20c5066b50631ecd59795a259a6bd8a3f3c4f0c478614cadf1c30648de512195"
-     },
-     {
-      "id": "caps",
-      "result": "n/a",
-      "method": "spend.weekly/3.0.0",
-      "evidence_digest": "306cbe702bf8108912dcdfcc47af77628c97570517ffc2193a614f9f097a5f24",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "verify_before_dispatch",
-      "result": "n/a",
-      "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
-     },
-     {
-      "id": "destination_rail",
-      "result": "n/a",
-      "method": "set_membership_v0",
-      "evidence_digest": "3a42267c63f41f1343ed900949b9dec7b8b08c6fc39873fb969e80ffbb42bec0",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "counterparty_identity_change",
-      "result": "n/a",
-      "method": "prior_recorded_value_v0",
-      "evidence_digest": "573a44c4e0b833f16903cb8670754f0f328f994c3632e95aa708c95119119e05",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "credential_pattern",
-      "result": "n/a",
-      "method": "regex_match_v0",
-      "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827"
-     },
-     {
-      "id": "recurring_charge",
-      "result": "n/a",
-      "method": "structured_field_v0",
-      "evidence_digest": "54c39273b46c37c435fb2c926b5cdc971d0c8ada747e50bcb2f325d8a538d875",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "action_class_gate",
-      "result": "n/a",
-      "method": "taxonomy_selector_v0",
-      "evidence_digest": "076c9d5b5855e8ffb051caa3e8f8046bb2592265b1492838f22845348fbe9a6c",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "counterparty_seen_before",
-      "result": "n/a",
-      "method": "counterparty.seen_before/3.0.0",
-      "evidence_digest": "90382202d7551bb2079331b08e0d20af65e725c5a4bda427020369a44037fc57",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "recipient_role",
-      "result": "n/a",
-      "method": "set_membership_v0",
-      "evidence_digest": "597276da1b80860cc6eea7d73128281376dea9921554684850abe01603b47a26",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "refundability",
-      "result": "n/a",
-      "method": "declared_boolean_v0",
-      "evidence_digest": "6a2d32836b0d4c8f7ec091dc90d497ef0f9805630e228113796e736ddac4a240",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "material_fields_changed",
-      "result": "n/a",
-      "method": "pinned_field_count_v0",
-      "evidence_digest": "30665464f636b283a65709ef03917928e827a3d6a351a16a666a2aa929805bc6",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "offer_fields_changed",
-      "result": "n/a",
-      "method": "pinned_field_count_v0",
-      "evidence_digest": "dba1e40b90675339c4686fc7a978adb42674eef6e4f781b3bf12a76912d9b7cc",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "recipient_seen_before",
-      "result": "n/a",
-      "method": "counterparty.seen_before/2.0.0",
-      "evidence_digest": "cecd6a5edbddebe5472e617a9af1d92c847573b82abd2120702c856eb9c096c0",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "channel_change",
-      "result": "n/a",
-      "method": "same_record_v0",
-      "evidence_digest": "fb4b41668517756d28aa6ce89bb9fe5a0a1b3ed32b2c9698744e6ebb9fe66a36",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "upfront_amount",
-      "result": "n/a",
-      "method": "upfront_threshold_v0",
-      "evidence_digest": "e3c343689ba0722e180b8009c2bd3d0c543f028d5e17f98f1960b8605a673ada",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "task_authority",
-      "result": "n/a",
-      "method": "bound_plan_containment_v0",
-      "evidence_digest": "3a6d4a5dabcecf57739ee26a4ea805948867281f8ee9d7d83a9c08fa4e5ee85a",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     }
-    ]
-   }
-  },
-  {
    "case": "emit-seller-0.1.0.json:pay-history-tampered",
    "issue": "https://github.com/action-state-group/capsule-engine/issues/214",
    "why": "group 5: a tampered record or history act: Go refuses the input at decode, Python decides it",
@@ -14351,197 +12816,6 @@
    }
   },
   {
-   "case": "emit-seller-0.1.0.json:pay-taxonomy-2",
-   "issue": "https://github.com/action-state-group/capsule-engine/issues/214",
-   "why": "group 2: a record sealed at an older action taxonomy is refused by both (deny), but the Go guard's held checks carry no taxonomy_mismatch member in their evidence, which the engine's do (capsule-engine 9ac3722)",
-   "python": {
-    "outcome": "deny",
-    "constraints": [
-     {
-      "id": "dedupe",
-      "result": "pass",
-      "method": "exact_match_index_v0",
-      "evidence_digest": "20c5066b50631ecd59795a259a6bd8a3f3c4f0c478614cadf1c30648de512195"
-     },
-     {
-      "id": "caps",
-      "result": "n/a",
-      "method": "spend.weekly/1.0.0",
-      "evidence_digest": "e8e343fc1ee947df83b1dcf6de38b58af5daac9dc132b91cf25baca2eafb0e70",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "verify_before_dispatch",
-      "result": "n/a",
-      "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
-      "reason": "action cites no mandate capsule"
-     },
-     {
-      "id": "action_class_gate",
-      "result": "n/a",
-      "method": "taxonomy_selector_v0",
-      "evidence_digest": "b12572b136d78e52fdd5f38f1bfd6e485b736d4fb74c15fad58234e0f716a4a8",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "recipient_role",
-      "result": "n/a",
-      "method": "set_membership_v0",
-      "evidence_digest": "698b6f618725e677a701d804112a58dd81e886c63ab9caccdbef167cfca2af73",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "price_floor",
-      "result": "n/a",
-      "method": "committed_floor_threshold_v1",
-      "evidence_digest": "9f699298994b12aa256fbc20a8d8bbbf2e27b37fdc8ffd78ecd4f3d301d1c9a9",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "promise_requires_approval",
-      "result": "n/a",
-      "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "e4e3a3cf4be674ceb3cbcacc0602665238643fe18ec8c0c99393c706c8ae26c7",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "promise_never",
-      "result": "n/a",
-      "method": "class_membership_v0",
-      "evidence_digest": "ff0cab0c159ae1d81c52b65a17e63d9b88fe9bd2aab205cbe60102796beaf77b",
-      "reason": "the rule is not configured for this action class"
-     },
-     {
-      "id": "required_disclosure",
-      "result": "n/a",
-      "method": "disclosure.class_seen/1.0.0",
-      "evidence_digest": "65a5203db66bf4ab797e9f311fa5fc26ffedda91cb8197da8df1e46b9078a9bf",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "offer_expiry",
-      "result": "n/a",
-      "method": "age_threshold_v0",
-      "evidence_digest": "844c0ff7083c24abcc4fa406c80ee42902a4ea83de5f1129476d94087a72f374",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "single_commitment",
-      "result": "n/a",
-      "method": "first_sealed_acceptance_v1",
-      "evidence_digest": "39ec56c6c92be9834f1042500b15fcf814b928782821ff1879834e29066f65df",
-      "reason": "the rule is not configured for this action class"
-     },
-     {
-      "id": "destination_rail",
-      "result": "n/a",
-      "method": "set_membership_v0",
-      "evidence_digest": "a2233ff3a9bdc8a37ba1a77914e3816d164ccd36eec50177569bebe51a2dac51",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "task_authority",
-      "result": "n/a",
-      "method": "bound_plan_containment_v0",
-      "evidence_digest": "a15dc3e2a227ea05f3375b1f147d2d31e0b053e63b84b3c15b26392b0502bba9",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     }
-    ]
-   },
-   "go": {
-    "outcome": "deny",
-    "constraints": [
-     {
-      "id": "dedupe",
-      "result": "pass",
-      "method": "exact_match_index_v0",
-      "evidence_digest": "20c5066b50631ecd59795a259a6bd8a3f3c4f0c478614cadf1c30648de512195"
-     },
-     {
-      "id": "caps",
-      "result": "n/a",
-      "method": "spend.weekly/1.0.0",
-      "evidence_digest": "306cbe702bf8108912dcdfcc47af77628c97570517ffc2193a614f9f097a5f24",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "verify_before_dispatch",
-      "result": "n/a",
-      "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
-     },
-     {
-      "id": "action_class_gate",
-      "result": "n/a",
-      "method": "taxonomy_selector_v0",
-      "evidence_digest": "076c9d5b5855e8ffb051caa3e8f8046bb2592265b1492838f22845348fbe9a6c",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "recipient_role",
-      "result": "n/a",
-      "method": "set_membership_v0",
-      "evidence_digest": "597276da1b80860cc6eea7d73128281376dea9921554684850abe01603b47a26",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "price_floor",
-      "result": "n/a",
-      "method": "committed_floor_threshold_v1",
-      "evidence_digest": "9d548b915de1ff97c046aa15d2f13fae31884894ff36be4ddba1fc9106988bed"
-     },
-     {
-      "id": "promise_requires_approval",
-      "result": "n/a",
-      "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "5732ef0d54a1ac4d088fe3af630fea0bab832ee662e0887aebfe26884788f0c5",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "promise_never",
-      "result": "n/a",
-      "method": "class_membership_v0",
-      "evidence_digest": "4e0ec03d93744c792ce5b2b282c65b18002baba59724044ab217a2dafad01fef",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "required_disclosure",
-      "result": "n/a",
-      "method": "disclosure.class_seen/1.0.0",
-      "evidence_digest": "c664ef933d5377a35cd30236f8fe94b42407482af9d2e61af7e957aa28cc328a",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "offer_expiry",
-      "result": "n/a",
-      "method": "age_threshold_v0",
-      "evidence_digest": "299fbc9f7e6847eba5f93de60e12976aaef8f28c0cd4a303096c49daa495e0be"
-     },
-     {
-      "id": "single_commitment",
-      "result": "n/a",
-      "method": "first_sealed_acceptance_v1",
-      "evidence_digest": "39ec56c6c92be9834f1042500b15fcf814b928782821ff1879834e29066f65df"
-     },
-     {
-      "id": "destination_rail",
-      "result": "n/a",
-      "method": "set_membership_v0",
-      "evidence_digest": "3a42267c63f41f1343ed900949b9dec7b8b08c6fc39873fb969e80ffbb42bec0",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "task_authority",
-      "result": "n/a",
-      "method": "bound_plan_containment_v0",
-      "evidence_digest": "3a6d4a5dabcecf57739ee26a4ea805948867281f8ee9d7d83a9c08fa4e5ee85a",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     }
-    ]
-   }
-  },
-  {
    "case": "emit-seller-0.1.1.json:pay-history-tampered",
    "issue": "https://github.com/action-state-group/capsule-engine/issues/214",
    "why": "group 5: a tampered record or history act: Go refuses the input at decode, Python decides it",
@@ -14744,196 +13018,6 @@
    },
    "go": {
     "error": "decode"
-   }
-  },
-  {
-   "case": "emit-seller-0.1.1.json:pay-taxonomy-2",
-   "issue": "https://github.com/action-state-group/capsule-engine/issues/214",
-   "why": "group 2: a record sealed at an older action taxonomy is refused by both (deny), but the Go guard's held checks carry no taxonomy_mismatch member in their evidence, which the engine's do (capsule-engine 9ac3722)",
-   "python": {
-    "outcome": "deny",
-    "constraints": [
-     {
-      "id": "dedupe",
-      "result": "pass",
-      "method": "exact_match_index_v0",
-      "evidence_digest": "20c5066b50631ecd59795a259a6bd8a3f3c4f0c478614cadf1c30648de512195"
-     },
-     {
-      "id": "caps",
-      "result": "n/a",
-      "method": "spend.weekly/1.0.0",
-      "evidence_digest": "e8e343fc1ee947df83b1dcf6de38b58af5daac9dc132b91cf25baca2eafb0e70",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "verify_before_dispatch",
-      "result": "n/a",
-      "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
-      "reason": "action cites no mandate capsule"
-     },
-     {
-      "id": "recipient_role",
-      "result": "n/a",
-      "method": "set_membership_v0",
-      "evidence_digest": "698b6f618725e677a701d804112a58dd81e886c63ab9caccdbef167cfca2af73",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "price_floor",
-      "result": "n/a",
-      "method": "committed_floor_threshold_v1",
-      "evidence_digest": "9f699298994b12aa256fbc20a8d8bbbf2e27b37fdc8ffd78ecd4f3d301d1c9a9",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "promise_requires_approval",
-      "result": "n/a",
-      "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "e4e3a3cf4be674ceb3cbcacc0602665238643fe18ec8c0c99393c706c8ae26c7",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "promise_never",
-      "result": "n/a",
-      "method": "class_membership_v0",
-      "evidence_digest": "ff0cab0c159ae1d81c52b65a17e63d9b88fe9bd2aab205cbe60102796beaf77b",
-      "reason": "the rule is not configured for this action class"
-     },
-     {
-      "id": "required_disclosure",
-      "result": "n/a",
-      "method": "disclosure.class_seen/1.0.0",
-      "evidence_digest": "65a5203db66bf4ab797e9f311fa5fc26ffedda91cb8197da8df1e46b9078a9bf",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "offer_expiry",
-      "result": "n/a",
-      "method": "age_threshold_v0",
-      "evidence_digest": "844c0ff7083c24abcc4fa406c80ee42902a4ea83de5f1129476d94087a72f374",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "single_commitment",
-      "result": "n/a",
-      "method": "first_sealed_acceptance_v1",
-      "evidence_digest": "39ec56c6c92be9834f1042500b15fcf814b928782821ff1879834e29066f65df",
-      "reason": "the rule is not configured for this action class"
-     },
-     {
-      "id": "destination_rail",
-      "result": "n/a",
-      "method": "set_membership_v0",
-      "evidence_digest": "a2233ff3a9bdc8a37ba1a77914e3816d164ccd36eec50177569bebe51a2dac51",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "task_authority",
-      "result": "n/a",
-      "method": "bound_plan_containment_v0",
-      "evidence_digest": "a15dc3e2a227ea05f3375b1f147d2d31e0b053e63b84b3c15b26392b0502bba9",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "release_on_acceptance",
-      "result": "n/a",
-      "method": "cited_sealed_acceptance_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb",
-      "reason": "the rule is not configured for this action class"
-     }
-    ]
-   },
-   "go": {
-    "outcome": "deny",
-    "constraints": [
-     {
-      "id": "dedupe",
-      "result": "pass",
-      "method": "exact_match_index_v0",
-      "evidence_digest": "20c5066b50631ecd59795a259a6bd8a3f3c4f0c478614cadf1c30648de512195"
-     },
-     {
-      "id": "caps",
-      "result": "n/a",
-      "method": "spend.weekly/1.0.0",
-      "evidence_digest": "306cbe702bf8108912dcdfcc47af77628c97570517ffc2193a614f9f097a5f24",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "verify_before_dispatch",
-      "result": "n/a",
-      "method": "agent_action_capsule.verify",
-      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
-     },
-     {
-      "id": "recipient_role",
-      "result": "n/a",
-      "method": "set_membership_v0",
-      "evidence_digest": "597276da1b80860cc6eea7d73128281376dea9921554684850abe01603b47a26",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "price_floor",
-      "result": "n/a",
-      "method": "committed_floor_threshold_v1",
-      "evidence_digest": "9d548b915de1ff97c046aa15d2f13fae31884894ff36be4ddba1fc9106988bed"
-     },
-     {
-      "id": "promise_requires_approval",
-      "result": "n/a",
-      "method": "authority_or_bound_approval_v0",
-      "evidence_digest": "5732ef0d54a1ac4d088fe3af630fea0bab832ee662e0887aebfe26884788f0c5",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "promise_never",
-      "result": "n/a",
-      "method": "class_membership_v0",
-      "evidence_digest": "4e0ec03d93744c792ce5b2b282c65b18002baba59724044ab217a2dafad01fef",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "required_disclosure",
-      "result": "n/a",
-      "method": "disclosure.class_seen/1.0.0",
-      "evidence_digest": "c664ef933d5377a35cd30236f8fe94b42407482af9d2e61af7e957aa28cc328a",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "offer_expiry",
-      "result": "n/a",
-      "method": "age_threshold_v0",
-      "evidence_digest": "299fbc9f7e6847eba5f93de60e12976aaef8f28c0cd4a303096c49daa495e0be"
-     },
-     {
-      "id": "single_commitment",
-      "result": "n/a",
-      "method": "first_sealed_acceptance_v1",
-      "evidence_digest": "39ec56c6c92be9834f1042500b15fcf814b928782821ff1879834e29066f65df"
-     },
-     {
-      "id": "destination_rail",
-      "result": "n/a",
-      "method": "set_membership_v0",
-      "evidence_digest": "3a42267c63f41f1343ed900949b9dec7b8b08c6fc39873fb969e80ffbb42bec0",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "task_authority",
-      "result": "n/a",
-      "method": "bound_plan_containment_v0",
-      "evidence_digest": "3a6d4a5dabcecf57739ee26a4ea805948867281f8ee9d7d83a9c08fa4e5ee85a",
-      "reason": "taxonomy_version 2 on the action; the engine's action taxonomy is version 6: action_class is not evaluated against a different table"
-     },
-     {
-      "id": "release_on_acceptance",
-      "result": "n/a",
-      "method": "cited_sealed_acceptance_v1",
-      "evidence_digest": "6fb788d0c526ae16081bf5e85ee3b1dc4d96c64fbbf99a2c48fda13ba7f0d7bb"
-     }
-    ]
    }
   },
   {
@@ -32403,6 +30487,470 @@
    },
    "go": {
     "error": "decode"
+   }
+  },
+  {
+   "case": "history-spend-everyday-0.3.5.json:no-spend",
+   "issue": "https://github.com/action-state-group/capsule-engine/issues/214",
+   "why": "hold A, frozen spend.weekly/3.0.0 only: an accepted history act that seals no spend_minor. The engine's history copy of the act carries the spend its deal bridge takes as amount_minor, so with no spend_minor it has none and the fold skips it: the window leaves out an accepted act and the engine allows (2000 + 1299). The Go guard counts the act at its stated amount_minor (8000 + 2000 + 1299 > 10000) and asks. Sherlock2's acceptance condition on hold A is that such an act is never dropped from the window silently, as an under-count could allow, so Go is not loosened to match. Under spend.weekly/3.1.0 (everyday 0.3.8) both count it at its amount_minor and agree (history-spend.json:no-spend)",
+   "python": {
+    "outcome": "allow",
+    "constraints": [
+     {
+      "id": "dedupe",
+      "result": "pass",
+      "method": "exact_match_index_v0",
+      "evidence_digest": "20c5066b50631ecd59795a259a6bd8a3f3c4f0c478614cadf1c30648de512195"
+     },
+     {
+      "id": "caps",
+      "result": "pass",
+      "method": "spend.weekly/3.0.0",
+      "evidence_digest": "ac51fedbf415ff9657793ecfe4a54f821ebe86bf5fdda04719bef8e76bd62c7e"
+     },
+     {
+      "id": "verify_before_dispatch",
+      "result": "n/a",
+      "method": "agent_action_capsule.verify",
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
+     },
+     {
+      "id": "destination_rail",
+      "result": "n/a",
+      "method": "set_membership_v0",
+      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "counterparty_identity_change",
+      "result": "n/a",
+      "method": "prior_recorded_value_v0",
+      "evidence_digest": "870b0a3e1636cab6902013f7742c0b36dfd72f324d1ff9ee3cd0976aa6d19241",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "credential_pattern",
+      "result": "n/a",
+      "method": "regex_match_v0",
+      "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827",
+      "reason": "the action sends no outgoing content"
+     },
+     {
+      "id": "recurring_charge",
+      "result": "n/a",
+      "method": "structured_field_v0",
+      "evidence_digest": "ed761a48bede343570feeba08dd105fb225b9caf75b52392ea84550fdcc7b0b2",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "action_class_gate",
+      "result": "n/a",
+      "method": "taxonomy_selector_v0",
+      "evidence_digest": "93594fc3973062b88c37e6949b10f34f202dc75ada097c69b83d201e0cb51701",
+      "reason": "no selector names this action class"
+     },
+     {
+      "id": "counterparty_seen_before",
+      "result": "pass",
+      "method": "counterparty.seen_before/3.0.0",
+      "evidence_digest": "3bd4cb603cd00f49687b2e724403fcb1a7e3694425e1a676d42205bb70bd000f"
+     },
+     {
+      "id": "recipient_role",
+      "result": "n/a",
+      "method": "set_membership_v0",
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "refundability",
+      "result": "pass",
+      "method": "declared_boolean_v0",
+      "evidence_digest": "6ca8fce7ec08407d52d05d853229e4513f4974da697c4a99117cc706fed406a9"
+     },
+     {
+      "id": "material_fields_changed",
+      "result": "n/a",
+      "method": "pinned_field_count_v0",
+      "evidence_digest": "4d41d27620699ff9c802a768a08bdd1634fca6935adc57992c158a12db114783",
+      "reason": "the action carries no material_fields_changed; it could not be checked"
+     },
+     {
+      "id": "offer_fields_changed",
+      "result": "n/a",
+      "method": "pinned_field_count_v0",
+      "evidence_digest": "1cb0e3e6b77f138625772200c1ad9d3cd608aca57978f80f386bd9a668020bab",
+      "reason": "the action carries no offer_fields_changed; it could not be checked"
+     },
+     {
+      "id": "recipient_seen_before",
+      "result": "n/a",
+      "method": "counterparty.seen_before/2.0.0",
+      "evidence_digest": "c7a84acb724ca272de76e7ed4c699268414ba4327cd140a72c429dd565287d53",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "channel_change",
+      "result": "n/a",
+      "method": "same_record_v0",
+      "evidence_digest": "bef9155d229a6f9868a6f51d37852b3f54a22d43fb3afdfb335a873e5bd30e97",
+      "reason": "the action carries no channel; the channels could not be compared"
+     },
+     {
+      "id": "upfront_amount",
+      "result": "n/a",
+      "method": "upfront_threshold_v0",
+      "evidence_digest": "6286d6f31789beb7de36237b614325f4a23103d7a4e035b5a23e84972b442123",
+      "reason": "the action carries no upfront_amount_minor; it could not be checked"
+     },
+     {
+      "id": "task_authority",
+      "result": "n/a",
+      "method": "bound_plan_containment_v0",
+      "evidence_digest": "3c94a44812b9f227f1da0e8ed27510ad37fccfa3b7c3035fbd75b52901b160fb",
+      "reason": "the action carries no task_authority_ref; the task's bounds could not be checked"
+     }
+    ]
+   },
+   "go": {
+    "outcome": "escalate",
+    "constraints": [
+     {
+      "id": "dedupe",
+      "result": "pass",
+      "method": "exact_match_index_v0",
+      "evidence_digest": "20c5066b50631ecd59795a259a6bd8a3f3c4f0c478614cadf1c30648de512195"
+     },
+     {
+      "id": "caps",
+      "result": "fail",
+      "method": "spend.weekly/3.0.0",
+      "evidence_digest": "2f1ba7b85ebab54da36526f9ac01d84e9c1e92f74ca9e38216a53aaa79843bae"
+     },
+     {
+      "id": "verify_before_dispatch",
+      "result": "n/a",
+      "method": "agent_action_capsule.verify",
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+     },
+     {
+      "id": "destination_rail",
+      "result": "n/a",
+      "method": "set_membership_v0",
+      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09"
+     },
+     {
+      "id": "counterparty_identity_change",
+      "result": "n/a",
+      "method": "prior_recorded_value_v0",
+      "evidence_digest": "870b0a3e1636cab6902013f7742c0b36dfd72f324d1ff9ee3cd0976aa6d19241"
+     },
+     {
+      "id": "credential_pattern",
+      "result": "n/a",
+      "method": "regex_match_v0",
+      "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827"
+     },
+     {
+      "id": "recurring_charge",
+      "result": "n/a",
+      "method": "structured_field_v0",
+      "evidence_digest": "ed761a48bede343570feeba08dd105fb225b9caf75b52392ea84550fdcc7b0b2"
+     },
+     {
+      "id": "action_class_gate",
+      "result": "n/a",
+      "method": "taxonomy_selector_v0",
+      "evidence_digest": "93594fc3973062b88c37e6949b10f34f202dc75ada097c69b83d201e0cb51701"
+     },
+     {
+      "id": "counterparty_seen_before",
+      "result": "pass",
+      "method": "counterparty.seen_before/3.0.0",
+      "evidence_digest": "3bd4cb603cd00f49687b2e724403fcb1a7e3694425e1a676d42205bb70bd000f"
+     },
+     {
+      "id": "recipient_role",
+      "result": "n/a",
+      "method": "set_membership_v0",
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+     },
+     {
+      "id": "refundability",
+      "result": "pass",
+      "method": "declared_boolean_v0",
+      "evidence_digest": "6ca8fce7ec08407d52d05d853229e4513f4974da697c4a99117cc706fed406a9"
+     },
+     {
+      "id": "material_fields_changed",
+      "result": "n/a",
+      "method": "pinned_field_count_v0",
+      "evidence_digest": "4d41d27620699ff9c802a768a08bdd1634fca6935adc57992c158a12db114783"
+     },
+     {
+      "id": "offer_fields_changed",
+      "result": "n/a",
+      "method": "pinned_field_count_v0",
+      "evidence_digest": "1cb0e3e6b77f138625772200c1ad9d3cd608aca57978f80f386bd9a668020bab"
+     },
+     {
+      "id": "recipient_seen_before",
+      "result": "n/a",
+      "method": "counterparty.seen_before/2.0.0",
+      "evidence_digest": "c7a84acb724ca272de76e7ed4c699268414ba4327cd140a72c429dd565287d53"
+     },
+     {
+      "id": "channel_change",
+      "result": "n/a",
+      "method": "same_record_v0",
+      "evidence_digest": "bef9155d229a6f9868a6f51d37852b3f54a22d43fb3afdfb335a873e5bd30e97"
+     },
+     {
+      "id": "upfront_amount",
+      "result": "n/a",
+      "method": "upfront_threshold_v0",
+      "evidence_digest": "6286d6f31789beb7de36237b614325f4a23103d7a4e035b5a23e84972b442123"
+     },
+     {
+      "id": "task_authority",
+      "result": "n/a",
+      "method": "bound_plan_containment_v0",
+      "evidence_digest": "3c94a44812b9f227f1da0e8ed27510ad37fccfa3b7c3035fbd75b52901b160fb"
+     }
+    ]
+   }
+  },
+  {
+   "case": "history-spend.json:spend-above-amount",
+   "issue": "https://github.com/action-state-group/capsule-engine/issues/214",
+   "why": "hold A, spend.weekly/3.1.0: an accepted history act whose spend (9000) is above its stated amount_minor (3000). The engine's record of the executed act counts an accepted act at its body's amount_minor (report/replay.py _executed_spend), below the spend its own decision sealed as amount_minor, so its total (3000 + 2000 + 1299) passes and it allows. The Go guard counts the act at its spend (9000 + 2000 + 1299 > 10000) and asks: under Sherlock2's acceptance condition on hold A an under-count could allow, so Go is not loosened to match. Below its stated amount (history-spend.json:spend-below-amount) both count the stated amount and agree",
+   "python": {
+    "outcome": "allow",
+    "constraints": [
+     {
+      "id": "dedupe",
+      "result": "pass",
+      "method": "exact_match_index_v0",
+      "evidence_digest": "20c5066b50631ecd59795a259a6bd8a3f3c4f0c478614cadf1c30648de512195"
+     },
+     {
+      "id": "caps",
+      "result": "pass",
+      "method": "spend.weekly/3.1.0",
+      "evidence_digest": "a2876dd7815a39a3127ed03e33d7b6cda2c130581b7b9aef58fbad452be05531"
+     },
+     {
+      "id": "verify_before_dispatch",
+      "result": "n/a",
+      "method": "agent_action_capsule.verify",
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
+     },
+     {
+      "id": "destination_rail",
+      "result": "n/a",
+      "method": "set_membership_v0",
+      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "counterparty_identity_change",
+      "result": "n/a",
+      "method": "prior_recorded_value_v0",
+      "evidence_digest": "870b0a3e1636cab6902013f7742c0b36dfd72f324d1ff9ee3cd0976aa6d19241",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "credential_pattern",
+      "result": "n/a",
+      "method": "regex_match_v0",
+      "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827",
+      "reason": "the action sends no outgoing content"
+     },
+     {
+      "id": "recurring_charge",
+      "result": "n/a",
+      "method": "structured_field_v0",
+      "evidence_digest": "ed761a48bede343570feeba08dd105fb225b9caf75b52392ea84550fdcc7b0b2",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "action_class_gate",
+      "result": "n/a",
+      "method": "taxonomy_selector_v0",
+      "evidence_digest": "93594fc3973062b88c37e6949b10f34f202dc75ada097c69b83d201e0cb51701",
+      "reason": "no selector names this action class"
+     },
+     {
+      "id": "counterparty_seen_before",
+      "result": "pass",
+      "method": "counterparty.seen_before/3.0.0",
+      "evidence_digest": "3bd4cb603cd00f49687b2e724403fcb1a7e3694425e1a676d42205bb70bd000f"
+     },
+     {
+      "id": "recipient_role",
+      "result": "n/a",
+      "method": "set_membership_v0",
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "refundability",
+      "result": "pass",
+      "method": "declared_boolean_v0",
+      "evidence_digest": "6ca8fce7ec08407d52d05d853229e4513f4974da697c4a99117cc706fed406a9"
+     },
+     {
+      "id": "material_fields_changed",
+      "result": "n/a",
+      "method": "pinned_field_count_v0",
+      "evidence_digest": "4d41d27620699ff9c802a768a08bdd1634fca6935adc57992c158a12db114783",
+      "reason": "the action carries no material_fields_changed; it could not be checked"
+     },
+     {
+      "id": "offer_fields_changed",
+      "result": "n/a",
+      "method": "pinned_field_count_v0",
+      "evidence_digest": "1cb0e3e6b77f138625772200c1ad9d3cd608aca57978f80f386bd9a668020bab",
+      "reason": "the action carries no offer_fields_changed; it could not be checked"
+     },
+     {
+      "id": "recipient_seen_before",
+      "result": "n/a",
+      "method": "counterparty.seen_before/2.0.0",
+      "evidence_digest": "c7a84acb724ca272de76e7ed4c699268414ba4327cd140a72c429dd565287d53",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "channel_change",
+      "result": "n/a",
+      "method": "same_record_v0",
+      "evidence_digest": "bef9155d229a6f9868a6f51d37852b3f54a22d43fb3afdfb335a873e5bd30e97",
+      "reason": "the action carries no channel; the channels could not be compared"
+     },
+     {
+      "id": "upfront_amount",
+      "result": "n/a",
+      "method": "upfront_threshold_v0",
+      "evidence_digest": "6286d6f31789beb7de36237b614325f4a23103d7a4e035b5a23e84972b442123",
+      "reason": "the action carries no upfront_amount_minor; it could not be checked"
+     },
+     {
+      "id": "task_authority",
+      "result": "n/a",
+      "method": "bound_plan_containment_v0",
+      "evidence_digest": "3c94a44812b9f227f1da0e8ed27510ad37fccfa3b7c3035fbd75b52901b160fb",
+      "reason": "the action carries no task_authority_ref; the task's bounds could not be checked"
+     }
+    ]
+   },
+   "go": {
+    "outcome": "escalate",
+    "constraints": [
+     {
+      "id": "dedupe",
+      "result": "pass",
+      "method": "exact_match_index_v0",
+      "evidence_digest": "20c5066b50631ecd59795a259a6bd8a3f3c4f0c478614cadf1c30648de512195"
+     },
+     {
+      "id": "caps",
+      "result": "fail",
+      "method": "spend.weekly/3.1.0",
+      "evidence_digest": "be8a6a608f9f507cd8f6e232fdb9283685c853520f14c4044c772301cbc40a18"
+     },
+     {
+      "id": "verify_before_dispatch",
+      "result": "n/a",
+      "method": "agent_action_capsule.verify",
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d"
+     },
+     {
+      "id": "destination_rail",
+      "result": "n/a",
+      "method": "set_membership_v0",
+      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09"
+     },
+     {
+      "id": "counterparty_identity_change",
+      "result": "n/a",
+      "method": "prior_recorded_value_v0",
+      "evidence_digest": "870b0a3e1636cab6902013f7742c0b36dfd72f324d1ff9ee3cd0976aa6d19241"
+     },
+     {
+      "id": "credential_pattern",
+      "result": "n/a",
+      "method": "regex_match_v0",
+      "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827"
+     },
+     {
+      "id": "recurring_charge",
+      "result": "n/a",
+      "method": "structured_field_v0",
+      "evidence_digest": "ed761a48bede343570feeba08dd105fb225b9caf75b52392ea84550fdcc7b0b2"
+     },
+     {
+      "id": "action_class_gate",
+      "result": "n/a",
+      "method": "taxonomy_selector_v0",
+      "evidence_digest": "93594fc3973062b88c37e6949b10f34f202dc75ada097c69b83d201e0cb51701"
+     },
+     {
+      "id": "counterparty_seen_before",
+      "result": "pass",
+      "method": "counterparty.seen_before/3.0.0",
+      "evidence_digest": "3bd4cb603cd00f49687b2e724403fcb1a7e3694425e1a676d42205bb70bd000f"
+     },
+     {
+      "id": "recipient_role",
+      "result": "n/a",
+      "method": "set_membership_v0",
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb"
+     },
+     {
+      "id": "refundability",
+      "result": "pass",
+      "method": "declared_boolean_v0",
+      "evidence_digest": "6ca8fce7ec08407d52d05d853229e4513f4974da697c4a99117cc706fed406a9"
+     },
+     {
+      "id": "material_fields_changed",
+      "result": "n/a",
+      "method": "pinned_field_count_v0",
+      "evidence_digest": "4d41d27620699ff9c802a768a08bdd1634fca6935adc57992c158a12db114783"
+     },
+     {
+      "id": "offer_fields_changed",
+      "result": "n/a",
+      "method": "pinned_field_count_v0",
+      "evidence_digest": "1cb0e3e6b77f138625772200c1ad9d3cd608aca57978f80f386bd9a668020bab"
+     },
+     {
+      "id": "recipient_seen_before",
+      "result": "n/a",
+      "method": "counterparty.seen_before/2.0.0",
+      "evidence_digest": "c7a84acb724ca272de76e7ed4c699268414ba4327cd140a72c429dd565287d53"
+     },
+     {
+      "id": "channel_change",
+      "result": "n/a",
+      "method": "same_record_v0",
+      "evidence_digest": "bef9155d229a6f9868a6f51d37852b3f54a22d43fb3afdfb335a873e5bd30e97"
+     },
+     {
+      "id": "upfront_amount",
+      "result": "n/a",
+      "method": "upfront_threshold_v0",
+      "evidence_digest": "6286d6f31789beb7de36237b614325f4a23103d7a4e035b5a23e84972b442123"
+     },
+     {
+      "id": "task_authority",
+      "result": "n/a",
+      "method": "bound_plan_containment_v0",
+      "evidence_digest": "3c94a44812b9f227f1da0e8ed27510ad37fccfa3b7c3035fbd75b52901b160fb"
+     }
+    ]
    }
   }
  ]

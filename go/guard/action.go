@@ -424,8 +424,10 @@ type Record struct {
 	DryRun        *bool
 	ChainParent   *string
 	ChainRelation *string
-	// SpendMinor is asg_payload.spend_minor, which the fold does not read:
-	// caps uses it only to tell whether the window total can be trusted.
+	// SpendMinor is asg_payload.spend_minor, or a history act's body
+	// spend_minor: the amount dedupe keys a history act on (keyAmount), and
+	// the one the window sums for it under a fold that counts accepted acts
+	// only (fold.summed). The fold never reads it on any other record.
 	SpendMinor *int64
 	// TaxonomyVersion is a history act's deal body taxonomy_version
 	// (DecodeHistoryAct), or a ledger capsule's asg_payload.taxonomy_version.
