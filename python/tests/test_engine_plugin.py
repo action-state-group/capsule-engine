@@ -193,6 +193,11 @@ def test_any_change_is_a_new_digest(tmp_path, change):
         (json.dumps(ruleset_doc(clause("a", ["x\u0001"]))), "registered_kinds[0]: pattern"),
         (json.dumps(ruleset_doc(clause("a\u001f", ["x"]))), "$.clauses[0].id: pattern"),
         (json.dumps({**ruleset_doc(clause("a", ["x"])), "ruleset_id": "r\u007f"}), "$.ruleset_id: pattern"),
+        # Python's $ also matches before a final newline; the patterns end with (?![\s\S]).
+        (json.dumps({**ruleset_doc(clause("a", ["x"])), "ruleset_id": "r\n"}), "$.ruleset_id: pattern"),
+        (json.dumps(ruleset_doc(clause("a\n", ["x"]))), "$.clauses[0].id: pattern"),
+        (json.dumps(ruleset_doc(clause("a", ["x\n"]))), "registered_kinds[0]: pattern"),
+        (json.dumps(ruleset_doc({**clause("a", ["x"]), "params": {"kind_field": "a.b\n", "registered_kinds": ["x"]}})), "kind_field: pattern"),
         ('{"schema": "engine-ruleset/v0", "schema": "engine-ruleset/v0"}', "is not JSON: a member appears twice"),
         (json.dumps(ruleset_doc(clause("a", ["x"]))).replace('"x"', "NaN"), "is not JSON"),
         (json.dumps(ruleset_doc(clause("a", ["x"]))).replace('"x"', '"\\ud800"'), "an unpaired surrogate"),

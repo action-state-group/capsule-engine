@@ -16,7 +16,7 @@
       "type": "string",
       "minLength": 1,
       "maxLength": 200,
-      "pattern": "^[^\\u0000-\\u001f\\u007f]+$"
+      "pattern": "^[^\\u0000-\\u001f\\u007f]+(?![\\s\\S])"
     },
     "clauses": {
       "description": "One finding per clause, in this order. Clause ids are unique. At most 200, so with no control character in any string (each would print as a 6-byte escape) a result of every clause failing with its longest reason stays under capsulectl's 1 MiB output limit.",
@@ -36,7 +36,7 @@
           "type": "string",
           "minLength": 1,
           "maxLength": 200,
-          "pattern": "^[^\\s\\u0000-\\u001f\\u007f]+$"
+          "pattern": "^[^\\s\\u0000-\\u001f\\u007f]+(?![\\s\\S])"
         },
         "check": {
           "description": "The engine check the clause runs, name/version.",
@@ -73,13 +73,13 @@
           "type": "array",
           "uniqueItems": true,
           "maxItems": 100,
-          "items": { "type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[^\\u0000-\\u001f\\u007f]+$" }
+          "items": { "type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[^\\u0000-\\u001f\\u007f]+(?![\\s\\S])" }
         },
         "kind_field": {
           "type": "string",
           "minLength": 1,
           "maxLength": 200,
-          "pattern": "^[^.\\u0000-\\u001f\\u007f]+(\\.[^.\\u0000-\\u001f\\u007f]+)*$"
+          "pattern": "^[^.\\u0000-\\u001f\\u007f]+(\\.[^.\\u0000-\\u001f\\u007f]+)*(?![\\s\\S])"
         }
       }
     }
