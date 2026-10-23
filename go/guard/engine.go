@@ -819,8 +819,10 @@ type Decision struct {
 	// askedUnevaluated are the checks that could not be evaluated and ask
 	// (GuardDecision.asked_unevaluated_checks: caps over a window the
 	// history cannot decide): the action is never allowed (Escalate, or Deny
-	// with no approver), and with no constraint failed the report's verdict
-	// is not_evaluable, as the engine labels it.
+	// with no approver), and with no constraint failed the report labels
+	// it as the engine's GuardDecision.verdict does: escalate when it asks,
+	// not_evaluable with Refused when it is denied for want of an approver,
+	// and not_evaluable when the record is in no deal.
 	askedUnevaluated []string
 }
 

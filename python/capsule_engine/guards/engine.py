@@ -36,8 +36,8 @@ A check that could not be evaluated and asks (``CheckOutcome.asks_when_unevaluat
 is recorded ``n/a`` in scope, and an action that would be allowed is asked
 about instead, or refused when its class names no approver. It is never
 allowed on a total that is not known, and it is not refused for that alone.
-With no constraint failed its ``verdict`` is ``not_evaluable``
-(``GuardDecision.asked_unevaluated_checks``).
+With no constraint failed its ``verdict`` is the escalation when it asks, and
+``not_evaluable`` when it is refused (``GuardDecision.asked_unevaluated_checks``).
 """
 from __future__ import annotations
 
@@ -155,16 +155,18 @@ class GuardDecision:
     def verdict(self) -> str:
         """``outcome``, except that a decision refused only because its
         class-keyed checks were left unevaluated (``taxonomy_mismatch``), its
-        deal could not be read (``deal_id_conflict``) or a check that fails
-        closed could not be evaluated (``not_evaluated_checks``), or a decision
-        asked about because a check could not be evaluated
-        (``asked_unevaluated_checks``), with no
-        constraint failed, is ``not_evaluable``."""
-        unevaluated = (
-            self.taxonomy_mismatch is not None or self.deal_id_conflict is not None or bool(self.not_evaluated_checks)
-            or bool(self.asked_unevaluated_checks)
-        )
-        if unevaluated and not any(c.result == "fail" for c in self.constraints):
+        deal could not be read (``deal_id_conflict``), a check that fails
+        closed could not be evaluated (``not_evaluated_checks``) or a check
+        that asks could not be evaluated (``asked_unevaluated_checks``) and
+        its class names no approver, with no constraint failed, is
+        ``not_evaluable``. A decision asked about only because a check that
+        asks could not be evaluated keeps its outcome, ``escalate``: it asks
+        for approval (#217)."""
+        if any(c.result == "fail" for c in self.constraints):
+            return self.outcome
+        if self.taxonomy_mismatch is not None or self.deal_id_conflict is not None or self.not_evaluated_checks:
+            return NOT_EVALUABLE
+        if self.asked_unevaluated_checks and self.outcome != ESCALATE:
             return NOT_EVALUABLE
         return self.outcome
 

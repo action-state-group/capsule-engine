@@ -189,10 +189,13 @@ func (e *Engine) Report(a Action, d Decision) CheckReport {
 	if r.Decision == Allow && blocked {
 		r.Decision = VerdictNotEvaluable
 	}
-	if len(d.askedUnevaluated) > 0 && !d.anyFailed() {
-		// GuardDecision.verdict: asked about only because caps could not
-		// be evaluated, with nothing failed. Its label is not_evaluable; a
-		// class with no approver is refused, which Refused carries.
+	if len(d.askedUnevaluated) > 0 && !d.anyFailed() && (d.Outcome != Escalate || a.dealIDConflict) {
+		// GuardDecision.verdict (capsule-engine #217): held only because
+		// caps could not be evaluated, with nothing failed. A class with an
+		// approver asks, and the escalation is the label; a class with no
+		// approver is refused (#216), labelled not_evaluable, which Refused
+		// carries. A record in no deal is refused by the engine whatever
+		// caps asks (#127), so its label stays not_evaluable.
 		r.Decision, r.Refused = VerdictNotEvaluable, d.Outcome == Deny
 	}
 	if len(d.notEvaluated) > 0 && !d.anyFailed() {
