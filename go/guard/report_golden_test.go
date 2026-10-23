@@ -23,20 +23,21 @@ var updateReportGoldens = flag.Bool("update-report-goldens", false, "rewrite tes
 // a reason, a value or a refusal shows in review as a change to this file.
 func TestReportGoldens(t *testing.T) {
 	engines := conformanceEngines(t)
-	// golden is one case's report, with Refused, which the report's JSON
+	// golden is one case's report, with Refused and RefusedFor, which the report's JSON
 	// leaves out and a caller reads; a multi-step case holds one per step.
 	// A case or step this port refuses has no report; its golden holds the
 	// refusal, so one that starts or stops being refused shows in review.
 	type golden struct {
-		Error   string       `json:"error,omitempty"`
-		Report  *CheckReport `json:"report,omitempty"`
-		Refused bool         `json:"refused,omitempty"`
+		Error      string       `json:"error,omitempty"`
+		Report     *CheckReport `json:"report,omitempty"`
+		Refused    bool         `json:"refused,omitempty"`
+		RefusedFor string       `json:"refused_for,omitempty"`
 		// Steps is set for every multi-step case, [] when it decides no step.
 		Steps *[]golden `json:"steps,omitempty"`
 	}
 	reportOf := func(e *Engine, a Action, d Decision) golden {
 		r := e.Report(a, d)
-		return golden{Report: &r, Refused: r.Refused}
+		return golden{Report: &r, Refused: r.Refused, RefusedFor: r.RefusedFor}
 	}
 	stepsOf := func(e *Engine, steps []replayStep) golden {
 		out := []golden{}

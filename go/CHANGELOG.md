@@ -5,6 +5,19 @@ and `portedDefinitions` (`guard/engine.go`).
 
 ## Unreleased
 
+## 0.1.2 — 2026-10-23
+
+An additive API change. No outcome, constraint, label or written report changes, and the
+packs and definitions are those of 0.1.1.
+
+- Added: `CheckReport.RefusedFor`, the cause of a refusal with no rule failed, set whenever
+  `CheckReport.Refused` is. It is one of `RefusedHeldCaps` (caps could not be evaluated over
+  the history and the class has no approver, #216), `RefusedNotEvaluated` (a check that
+  fails closed could not be evaluated, #137), `RefusedTaxonomy` (the record was sealed at
+  another action taxonomy than the rules') and `RefusedDealConflict` (the record is in no
+  single deal, #127). Like `Refused`, it is not part of the written report. A caller can now
+  show the real reason for a refusal without inferring it from the rules.
+
 ## 0.1.1 — 2026-10-23
 
 Both changes are to wording and labels. No outcome, constraint or exported API changes, and
