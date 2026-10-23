@@ -61,6 +61,14 @@ profile-wide and capped at 1,000 acts, and past the cap it reads
 incomplete, so the acceptance is unknown. A share refused live for a
 truncated history may therefore pass on replay of a complete bundle.
 
+Live and replay can also differ by design under the frozen spend.weekly/3.0.0
+(everyday 0.3.4/0.3.5): the live guard also counted readable undecided and
+unchecked acts in the caps window, and replay follows the pinned text,
+accepted acts only, so a cap failed live may pass on replay. Anything that
+shows a user both must word that case as the live guard being stricter than
+the pinned rule, never as a mismatch or as replay finding an error
+(capsule-engine#214, Sherlock2's ruling, ops 3febd921).
+
 ``_bridge_transfer_funds`` is the other non-default action mapping, and it
 mirrors the pattern already established by ``tests/test_guard_dry_run.py``
 and ``tests/test_guard_eur150k_bridge.py``: ``transfer_funds`` capsules in

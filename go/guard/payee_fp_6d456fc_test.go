@@ -18,9 +18,8 @@ import (
 // field: deal 1's would-allow at taxonomy 4 is refused (reject), as the
 // engine's record-taxonomy gate rules; deal 2 is refused where
 // nothing else fails and asks where dedupe does (with-profile: escalate).
-// One library-level difference is pinned and fails when it closes: r06's
-// not-evaluable evidence is the port's own shape, not the engine's sealed
-// {constraint_id, in_scope, missing_field, taxonomy_mismatch}.
+// r06's not-evaluable evidence is the engine's sealed {constraint_id,
+// in_scope, missing_field, taxonomy_mismatch} (capsule-engine#214 group 2).
 // vectors-97a2aff.json stays as the historical file the other payee-fp
 // tests are pinned to.
 func TestPayeeProfileLiveChecksAtEngineMain(t *testing.T) {
@@ -77,15 +76,8 @@ func TestPayeeProfileLiveChecksAtEngineMain(t *testing.T) {
 			t.Errorf("%s: r06 %s dedupe %s %s; engine r06 %s dedupe %s %s", name, sb.Result, dd.Result, ddDigest,
 				c.SeenBeforeResult, c.DedupeResult, c.DedupeEvidence)
 		}
-		var mismatch struct {
-			TaxonomyMismatch struct {
-				Engine string `json:"engine_taxonomy_version"`
-				Record string `json:"record_taxonomy_version"`
-			} `json:"taxonomy_mismatch"`
-		}
-		_ = json.Unmarshal(c.SeenBeforeEvidence, &mismatch)
-		if sbDigest == jcsDigest(t, c.SeenBeforeEvidence) || mismatch.TaxonomyMismatch.Engine != "6" || mismatch.TaxonomyMismatch.Record != "4" {
-			t.Errorf("%s: r06 evidence %s agrees with the engine's %s, or the engine's no longer names 4 vs 6: update the pin", name, sbDigest, c.SeenBeforeEvidence)
+		if sbDigest != jcsDigest(t, c.SeenBeforeEvidence) {
+			t.Errorf("%s: r06 evidence %s, not the engine's %s", name, sbDigest, c.SeenBeforeEvidence)
 		}
 		if got := outcomes[d2.Outcome]; got != c.Outcome {
 			t.Errorf("%s: outcome Go %s engine %s", name, got, c.Outcome)

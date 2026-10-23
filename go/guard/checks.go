@@ -223,7 +223,7 @@ func (e *Engine) checkDedupe(a Action, ledger []Record, at time.Time) (c Constra
 			canon.M("equivalence_key", canon.Str(key)),
 			canon.M("repeat", canon.Str("other_deal")),
 			canon.M("matched_capsule_id", canon.Str(other.CapsuleID)),
-			canon.M("matched_amount_minor", intOrNull(other.AmountMinor)),
+			canon.M("matched_amount_minor", intOrNull(other.keyAmount())),
 			canon.M("matched_currency", strOrNull(other.Currency)),
 			canon.M("matched_at", canon.Str(other.Timestamp)),
 		))
@@ -308,9 +308,8 @@ func (e *Engine) checkCaps(a Action, ledger []Record, at time.Time, in checkInpu
 			canon.M("linked_minor", canon.Int(reversals.linkedMinor)), canon.M("unlinked_count", canon.Int(reversals.unlinkedCount)))))
 	}
 	// amount is the engine's (engineAmount): on a deal record, the spend its
-	// deal bridge takes, so caps decides on it as the engine does. A ledger
-	// record in the window whose spend_minor differs from its amount leaves
-	// the window limit unevaluated: the fold may count a refund as spend.
+	// deal bridge takes, so caps decides on it as the engine does; the window
+	// reads a history act's amount as the engine does too (fold.summed).
 	// agrees is reported only (value.spend_minor_agrees): whether the body's
 	// spend_minor equals its amount_minor; no limit reads it.
 	var windowPending string
@@ -318,9 +317,6 @@ func (e *Engine) checkCaps(a Action, ledger []Record, at time.Time, in checkInpu
 	if a.SpendMinor != nil && a.AmountMinor != nil {
 		same := *a.SpendMinor == *a.AmountMinor
 		agrees = &same
-	}
-	if n := e.capsFold.disagreeing(ledger, keyValue, at); n > 0 {
-		windowPending = fmt.Sprintf("%d record(s) in the window carry a spend (spend_minor) that differs from their amount (amount_minor); the window total reads amount_minor and may count a refund as spend", n)
 	}
 	if unreadable > 0 {
 		windowPending = WindowUnreadable

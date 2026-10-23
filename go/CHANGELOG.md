@@ -5,6 +5,51 @@ and `portedDefinitions` (`guard/engine.go`).
 
 ## Unreleased
 
+## 0.1.3 — 2026-10-23
+
+Fixes toward the Python engine, the reference (capsule-engine#214). No exported API changes,
+and the packs and definitions are those of 0.1.2. Outcomes move only where a fix below says
+so.
+
+- Fixed (group 1): when dedupe matches the same act in another deal, its evidence's
+  `matched_amount_minor` is the matched history act's spend, the amount dedupe keyed it on
+  (`keyAmount`), as the engine reports it. It was the act's stated `amount_minor`. Only the
+  evidence digest changes.
+- Fixed (group 2): a check held because the record names another action taxonomy carries the
+  engine's evidence, `{constraint_id, in_scope, missing_field, taxonomy_mismatch:
+  {record_taxonomy_version, engine_taxonomy_version}}`. The checks held are now the engine's:
+  every check but dedupe, verify_before_dispatch, single_commitment, promise_never,
+  release_on_acceptance, credential_pattern and plan_containment. So the seller packs'
+  `price_floor` and `offer_expiry` are now held, and `promise_never` is no longer held: it
+  runs and decides. A record at another taxonomy can change outcome: one whose only failure
+  was `price_floor` or `offer_expiry` is now refused (`deny`, `RefusedTaxonomy`) where it
+  failed that check before, and one that fails `promise_never` is now denied on that failure.
+  Their report rules move the same way (`not_evaluable` for the two newly held, and
+  `promise_never`'s own verdict). A record at the engine's taxonomy is unchanged.
+- Fixed (hold A): the caps window no longer holds when a record in it carries a
+  `spend_minor` that differs from its `amount_minor`. That hold (caps `not_evaluable`, so the
+  check escalated with an approver and was refused without one) covered Go's own reading of
+  the stated amount. The window now sums a history act as the engine does: under a fold that
+  counts executed acts (spend.weekly/3.1.0, everyday 0.3.6 to 0.3.8) at its stated
+  `amount_minor`, and under any other fold (spend.weekly/3.0.0 and 1.0.0: everyday 0.3.4 and
+  0.3.5, seller 0.1.0 and 0.1.1) at its `spend_minor`. Outcome change: a check with such an
+  act in its window is now decided on the total, so it passes (allow) or fails the window
+  limit, where it was held before. Two cases stay stricter than the engine, which leaves
+  spend out of the total there, and are pinned in `KNOWN-DIFFERENCES.json`: an accepted act
+  with no `spend_minor` is counted at its stated amount (0 when that is negative) under any
+  fold, and under spend.weekly/3.1.0 an act whose spend is above its stated amount is counted
+  at its spend.
+- Fixed: a history cancel or refund whose capsule chains `supersedes` to a charge no longer
+  takes that charge back out of the window. The engine's records of a history act carry no
+  chain, so it reads every such reversal as unlinked; Go read the capsule's chain and linked
+  it. Outcome change: the window total no longer drops by the reversal, so a check that
+  passed on the lowered total can now fail the window limit (escalate, or refused with no
+  approver). A ledger capsule's own chain is read as before.
+- Fixed: the caps window reads times to the microsecond, as the engine's Python datetimes
+  do. An act within the same microsecond as either end of the window was counted by one and
+  not the other when its timestamp carried more than six fractional digits. No capsulectl or
+  capsule-emit release writes more than six, so no capsulectl check changes.
+
 ## 0.1.2 — 2026-10-23
 
 An additive API change. No outcome, constraint, label or written report changes, and the
