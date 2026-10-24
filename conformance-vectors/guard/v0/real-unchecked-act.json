@@ -4,7 +4,7 @@
   {
    "case": "typed-check-1.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/real-unchecked-act/typed-check-1.input.json",
    "input_sha256": "19ff66e1e2aeadb09773ba39c4f6e9f7ddd816fca8ad3596f1592e443e63385a",
    "expected": {
@@ -127,7 +127,7 @@
   {
    "case": "typed-check-2.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/real-unchecked-act/typed-check-2.input.json",
    "input_sha256": "cc000c83e43c084957787154c59811512da2b366e8cec23b4459cd935e7be6be",
    "expected": {
@@ -250,7 +250,7 @@
   {
    "case": "x-deal-v0-check-2.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/real-unchecked-act/x-deal-v0-check-2.input.json",
    "input_sha256": "6ab9a6883a422a09db3518bc4a52e9adfb14b02a655492d1daaf952f80300451",
    "expected": {

@@ -4,7 +4,7 @@
   {
    "case": "rc13-pay.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/real-rc13-lockstep/rc13-pay.input.json",
    "input_sha256": "41abed962dcebbfc30e204a931deaf0d1c869f7fdc962c5dbc086f1aee34fb01",
    "expected": {

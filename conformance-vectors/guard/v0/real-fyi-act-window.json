@@ -4,7 +4,7 @@
   {
    "case": "l1-commit-default.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/real-fyi-act-window/l1-commit-default.input.json",
    "input_sha256": "3dc9c1c9b0831f5e39e6f3a2d825e93d170b5c203df55bcb6ba8e089b63b359a",
    "expected": {
@@ -128,7 +128,7 @@
   {
    "case": "l4-commit-x3.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/real-fyi-act-window/l4-commit-x3.input.json",
    "input_sha256": "4c86622b3d337ad00630bde353fe533db94e2b73e31c26e81a6cacf30318c348",
    "expected": {
@@ -252,7 +252,7 @@
   {
    "case": "l4-commit-x5.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/real-fyi-act-window/l4-commit-x5.input.json",
    "input_sha256": "94775e98bfa9fc5bcec64ed71868dc2aab81270892b2edceadcc3d2196b0fd83",
    "expected": {

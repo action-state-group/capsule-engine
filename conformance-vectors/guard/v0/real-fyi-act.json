@@ -4,7 +4,7 @@
   {
    "case": "purchase-commit-repeat.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/real-fyi-act/purchase-commit-repeat.input.json",
    "input_sha256": "ddfd4bcca22fb701eb39a86d1e4e856fb13ef69fc60b48f5fd3da3587ad37c8f",
    "expected": {

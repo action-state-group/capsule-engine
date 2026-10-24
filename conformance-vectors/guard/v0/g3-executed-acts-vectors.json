@@ -4,7 +4,7 @@
   {
    "case": "inputs/accepted-and-fyi-same-act/step-0.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/accepted-and-fyi-same-act/step-0.input.json",
    "input_sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703",
    "expected": {
@@ -128,7 +128,7 @@
   {
    "case": "inputs/accepted-and-fyi-same-act/step-1.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/accepted-and-fyi-same-act/step-1.input.json",
    "input_sha256": "fca2ba13d3dfd76b6a832496fbfea6993d6a666baeda43aa1ce62a8feca6f065",
    "expected": {
@@ -252,7 +252,7 @@
   {
    "case": "inputs/accepted-and-fyi-same-act/step-2.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/accepted-and-fyi-same-act/step-2.input.json",
    "input_sha256": "620a05d4637bdb6a9c2850949e8f3ddd0b6d55f3bc97beec3538209926746b83",
    "expected": {
@@ -376,7 +376,7 @@
   {
    "case": "inputs/accepted-and-fyi-same-act/step-3.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/accepted-and-fyi-same-act/step-3.input.json",
    "input_sha256": "0fd63ffff5ba68bc39acb147a7d27f1299bb8d6bfc030400ea38de898bf08bd5",
    "expected": {
@@ -500,7 +500,7 @@
   {
    "case": "inputs/accepted-and-fyi-same-act/step-4.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/accepted-and-fyi-same-act/step-4.input.json",
    "input_sha256": "652e0b39c04895e235d71c2de13e9769e4e7cb0d288d55f8fff203c15badfd28",
    "expected": {
@@ -624,7 +624,7 @@
   {
    "case": "inputs/accepted-and-fyi-same-act/step-5.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/accepted-and-fyi-same-act/step-5.input.json",
    "input_sha256": "e54c1b0fb61616595319a0de5278f7df207b2ad6318370e6d4f8f7351ffda9ee",
    "expected": {
@@ -748,7 +748,7 @@
   {
    "case": "inputs/accepted-and-fyi-same-act/step-6.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/accepted-and-fyi-same-act/step-6.input.json",
    "input_sha256": "369693f73b471ebf97019f1379b5fb89a9d6c2f9a9d92919830dbec355a6d98f",
    "expected": {
@@ -872,7 +872,7 @@
   {
    "case": "inputs/decided-pay/step-0.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/decided-pay/step-0.input.json",
    "input_sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703",
    "expected": {
@@ -996,7 +996,7 @@
   {
    "case": "inputs/decided-pay/step-1.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/decided-pay/step-1.input.json",
    "input_sha256": "3f8cee2013eeb2463dd6fd2a5e1a2a9693fb9aeedeef69d132d7488a6c47b039",
    "expected": {
@@ -1120,7 +1120,7 @@
   {
    "case": "inputs/decided-pay/step-2.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/decided-pay/step-2.input.json",
    "input_sha256": "a83dbda80902f7396e4196a791591d7dbffe1f48d6241aed33145b68484d576e",
    "expected": {
@@ -1244,7 +1244,7 @@
   {
    "case": "inputs/decided-pay/step-3.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/decided-pay/step-3.input.json",
    "input_sha256": "859dcff8d7f0ce6fafe1b8ecce7029e8bdc65ca91610635b4a67b11a7401182f",
    "expected": {
@@ -1368,7 +1368,7 @@
   {
    "case": "inputs/decided-pay/step-4.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/decided-pay/step-4.input.json",
    "input_sha256": "886979610046a84c69cf13ee367d0e9d5f65682a7406d87d3215b7cf02346efa",
    "expected": {
@@ -1492,7 +1492,7 @@
   {
    "case": "inputs/decided-pay/step-5.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/decided-pay/step-5.input.json",
    "input_sha256": "d100ccd97e80db6f1d15a9f80b7ac3eab0f29516009d23b83cad8e002b5ac856",
    "expected": {
@@ -1616,7 +1616,7 @@
   {
    "case": "inputs/fyi-commit/step-0.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/fyi-commit/step-0.input.json",
    "input_sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703",
    "expected": {
@@ -1740,7 +1740,7 @@
   {
    "case": "inputs/fyi-commit/step-1.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/fyi-commit/step-1.input.json",
    "input_sha256": "1b0a6ce746343360ed04d44e7d2aec383492cb7c0b6573668cf230b085de994c",
    "expected": {
@@ -1864,7 +1864,7 @@
   {
    "case": "inputs/fyi-commit/step-2.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/fyi-commit/step-2.input.json",
    "input_sha256": "dd11ff86d2361b71bed6e234a38813a125d3d632edae2670bd646d57beb1c566",
    "expected": {
@@ -1988,7 +1988,7 @@
   {
    "case": "inputs/fyi-commit/step-3.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/fyi-commit/step-3.input.json",
    "input_sha256": "e0fc75ba5689d0b218b23ed1a8da42a9e4a83009692a5c726d06f5d9c0dd3f56",
    "expected": {
@@ -2112,7 +2112,7 @@
   {
    "case": "inputs/fyi-commit/step-4.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/fyi-commit/step-4.input.json",
    "input_sha256": "84b0654ab54edf4291b6da9da6b77fbc5384ac608d22a62f3e2ff66c9da3a9be",
    "expected": {
@@ -2236,7 +2236,7 @@
   {
    "case": "inputs/fyi-commit/step-5.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/fyi-commit/step-5.input.json",
    "input_sha256": "fa743eb9d6f109bf3dbfc7ef41e519dad0e77d644925f2f05f4b02a708080b20",
    "expected": {
@@ -2360,7 +2360,7 @@
   {
    "case": "inputs/fyi-commit-typed/step-0.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/fyi-commit-typed/step-0.input.json",
    "input_sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703",
    "expected": {
@@ -2484,7 +2484,7 @@
   {
    "case": "inputs/fyi-commit-typed/step-1.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/fyi-commit-typed/step-1.input.json",
    "input_sha256": "6802d6877eb951b37ed01a4f9f688e8a960f734d8a906e743d98b0e07949fba1",
    "expected": {
@@ -2608,7 +2608,7 @@
   {
    "case": "inputs/fyi-commit-typed/step-2.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/fyi-commit-typed/step-2.input.json",
    "input_sha256": "a238be25c883cd7d84a3f644adcc0134a3924e041015f6e3db21a3fe2f5f5e1e",
    "expected": {
@@ -2732,7 +2732,7 @@
   {
    "case": "inputs/fyi-commit-typed/step-3.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/fyi-commit-typed/step-3.input.json",
    "input_sha256": "85e94a1a79eb2b19f83feaef42707c703f54410dbe567501ddfd2e353190db93",
    "expected": {
@@ -2856,7 +2856,7 @@
   {
    "case": "inputs/fyi-commit-typed/step-4.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/fyi-commit-typed/step-4.input.json",
    "input_sha256": "9e4b1bc05048d3243623f9d4c430d626baeb89c7b381213081735781b3bdd83a",
    "expected": {
@@ -2980,7 +2980,7 @@
   {
    "case": "inputs/fyi-commit-typed/step-5.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/fyi-commit-typed/step-5.input.json",
    "input_sha256": "26c8fc1e45cde099f673258fc5d7d018d4b19ed25e8a06f5bbe611a738c38afd",
    "expected": {
@@ -3104,7 +3104,7 @@
   {
    "case": "inputs/fyi-sign/step-0.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/fyi-sign/step-0.input.json",
    "input_sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703",
    "expected": {
@@ -3228,7 +3228,7 @@
   {
    "case": "inputs/fyi-sign/step-1.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/fyi-sign/step-1.input.json",
    "input_sha256": "c604f7f09ba973b12872d049242187e6d2efec3f1559b7dee0fbb83b2eb4a50d",
    "expected": {
@@ -3352,7 +3352,7 @@
   {
    "case": "inputs/fyi-sign/step-2.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/fyi-sign/step-2.input.json",
    "input_sha256": "3d60191573354019f719b1d809a39ec0ff50bb03dfb39e2954d3b6af5f5e3f7c",
    "expected": {
@@ -3476,7 +3476,7 @@
   {
    "case": "inputs/fyi-sign/step-3.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/fyi-sign/step-3.input.json",
    "input_sha256": "4767e704997e2050acaec737910b0ed6b1d686317fb17dc4cd1dd68084cee37c",
    "expected": {
@@ -3600,7 +3600,7 @@
   {
    "case": "inputs/fyi-sign/step-4.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/fyi-sign/step-4.input.json",
    "input_sha256": "a92b3d15fbb7e1f6b6ea5d8f03bbfb695c79436883b3a154677273dd4cedaade",
    "expected": {
@@ -3724,7 +3724,7 @@
   {
    "case": "inputs/fyi-sign/step-5.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/fyi-sign/step-5.input.json",
    "input_sha256": "8bfb551dda0b3d637151491e5c893a28ee37b9ccece5fb847d8805197466bbe0",
    "expected": {
@@ -3848,7 +3848,7 @@
   {
    "case": "inputs/mixed-to-the-limit/step-0.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/mixed-to-the-limit/step-0.input.json",
    "input_sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703",
    "expected": {
@@ -3972,7 +3972,7 @@
   {
    "case": "inputs/mixed-to-the-limit/step-1.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/mixed-to-the-limit/step-1.input.json",
    "input_sha256": "89bb884b1779510fe02ed482581ae0f4378e34dbf1dfb6d17f3d06d639d91d66",
    "expected": {
@@ -4096,7 +4096,7 @@
   {
    "case": "inputs/mixed-to-the-limit/step-2.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/mixed-to-the-limit/step-2.input.json",
    "input_sha256": "1d77d941ca8c2896b9fcf76baed4540e2c7bbb4adb099bb79b3181040422f165",
    "expected": {
@@ -4220,7 +4220,7 @@
   {
    "case": "inputs/mixed-to-the-limit/step-3.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/mixed-to-the-limit/step-3.input.json",
    "input_sha256": "4bb47d1fa7456113898f8ae3171084f8889f0f7412b25200cf77bb57c10d7b9c",
    "expected": {
@@ -4344,7 +4344,7 @@
   {
    "case": "inputs/mixed-to-the-limit/step-4.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/mixed-to-the-limit/step-4.input.json",
    "input_sha256": "dbda40802928b6cc1a317515d9bf76a776e739e006020a79e0e032f97c917105",
    "expected": {
@@ -4468,7 +4468,7 @@
   {
    "case": "inputs/mixed-to-the-limit/step-5.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/mixed-to-the-limit/step-5.input.json",
    "input_sha256": "213eadf809a81de7ac317454e39301fc146ec59b31366b884e3fa015862d6d5d",
    "expected": {
@@ -4592,7 +4592,7 @@
   {
    "case": "inputs/mixed-to-the-limit/step-6.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/mixed-to-the-limit/step-6.input.json",
    "input_sha256": "8e486ca3a13c086ba1b0eb3b60f880c0f824baaae90436e9ed66f8586873756f",
    "expected": {
@@ -4716,7 +4716,7 @@
   {
    "case": "inputs/money-in-fyi/step-0.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/money-in-fyi/step-0.input.json",
    "input_sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703",
    "expected": {
@@ -4840,7 +4840,7 @@
   {
    "case": "inputs/money-in-fyi/step-1.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/money-in-fyi/step-1.input.json",
    "input_sha256": "424ebf9ffe59f2518b5e706c7008db268126a058a1697df5c4746d2a63d6145c",
    "expected": {
@@ -4964,7 +4964,7 @@
   {
    "case": "inputs/money-in-fyi/step-2.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/money-in-fyi/step-2.input.json",
    "input_sha256": "d802931972d14e171e2ac6b3d489d7bfeb679257c222a76c807cc0d4c4aaacc1",
    "expected": {
@@ -5088,7 +5088,7 @@
   {
    "case": "inputs/money-in-fyi/step-3.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/money-in-fyi/step-3.input.json",
    "input_sha256": "5a4edcd9655e469df50dcda5d3d444f2cee0b2bb37284ccb70ac8bda24c193c0",
    "expected": {
@@ -5212,7 +5212,7 @@
   {
    "case": "inputs/money-in-fyi/step-4.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/money-in-fyi/step-4.input.json",
    "input_sha256": "5cda0ba8a35147f7a1da3168f6a00dc5499277ed843c3baa445efe98249fa3d8",
    "expected": {
@@ -5336,7 +5336,7 @@
   {
    "case": "inputs/spend-read-no-amount-minor/step-0.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/spend-read-no-amount-minor/step-0.input.json",
    "input_sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703",
    "expected": {
@@ -5460,7 +5460,7 @@
   {
    "case": "inputs/spend-read-no-amount-minor/step-1.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/spend-read-no-amount-minor/step-1.input.json",
    "input_sha256": "f2b5a51f899e780d66795d6fa80d6b7d8697c3bcced57ecc0ca74ee8769ac11a",
    "expected": {
@@ -5584,7 +5584,7 @@
   {
    "case": "inputs/unchecked/step-0.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/unchecked/step-0.input.json",
    "input_sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703",
    "expected": {
@@ -5708,7 +5708,7 @@
   {
    "case": "inputs/unchecked/step-1.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/unchecked/step-1.input.json",
    "input_sha256": "92e6c1b6661183c26849d740603cbc946378abb9bc743ea09196445d7b585bdf",
    "expected": {
@@ -5832,7 +5832,7 @@
   {
    "case": "inputs/unchecked/step-2.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/unchecked/step-2.input.json",
    "input_sha256": "c6f8714d9be0e64f12395921f96a95be08c811b33650d1061e76f547a6fc8730",
    "expected": {
@@ -5956,7 +5956,7 @@
   {
    "case": "inputs/unchecked/step-3.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/unchecked/step-3.input.json",
    "input_sha256": "030672d65bd56a35dd0459df4f0b413c50bb38d756e8abaa8fe3ed2a3bcde003",
    "expected": {
@@ -6080,7 +6080,7 @@
   {
    "case": "inputs/unchecked/step-4.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/unchecked/step-4.input.json",
    "input_sha256": "a818d5bb093ce898b8ea9988c94b19b18478c978ebb4c5a24b1ba6b92913ddfa",
    "expected": {
@@ -6204,7 +6204,7 @@
   {
    "case": "inputs/unchecked/step-5.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/unchecked/step-5.input.json",
    "input_sha256": "43d417507bb8078aa9ff0e2668d0226f7eba1debf5dc252d3404bf2815d9615e",
    "expected": {
@@ -6328,7 +6328,7 @@
   {
    "case": "inputs/unreadable-no-amount-at-all/step-0.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/unreadable-no-amount-at-all/step-0.input.json",
    "input_sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703",
    "expected": {
@@ -6452,7 +6452,7 @@
   {
    "case": "inputs/unreadable-no-amount-at-all/step-1.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/unreadable-no-amount-at-all/step-1.input.json",
    "input_sha256": "9936a194ca170d130a7c3595a605f3a7b8b689196a6d6a2a44d3e1d5c03c0dda",
    "expected": {
@@ -6576,7 +6576,7 @@
   {
    "case": "inputs/unreadable-no-amount-at-all/step-2.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/unreadable-no-amount-at-all/step-2.input.json",
    "input_sha256": "3ca961e4f6de4af7ecec009cd217dd9ca18bea95cfb12a34ade6233069329f64",
    "expected": {
@@ -6701,7 +6701,7 @@
   {
    "case": "inputs/unreadable-no-spend-minor/step-0.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/unreadable-no-spend-minor/step-0.input.json",
    "input_sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703",
    "expected": {
@@ -6825,7 +6825,7 @@
   {
    "case": "inputs/unreadable-no-spend-minor/step-1.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/unreadable-no-spend-minor/step-1.input.json",
    "input_sha256": "6ec659d749a8117b17008affc4434636d219e2d58b52411c363b208e99336294",
    "expected": {
@@ -6949,7 +6949,7 @@
   {
    "case": "inputs/unreadable-no-spend-minor/step-2.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/unreadable-no-spend-minor/step-2.input.json",
    "input_sha256": "eb9f2de4b0e743ec1cf22d38a6946178d7b8152b24a3ea7044ab5be70b027200",
    "expected": {
@@ -7074,7 +7074,7 @@
   {
    "case": "inputs/unreadable-outside-the-window/step-0.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/unreadable-outside-the-window/step-0.input.json",
    "input_sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703",
    "expected": {
@@ -7198,7 +7198,7 @@
   {
    "case": "inputs/unreadable-outside-the-window/step-1.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/unreadable-outside-the-window/step-1.input.json",
    "input_sha256": "0714d40d6c7ada4fe1331e97b18ab5c62190e2abec3c379477292a9c53b5f86d",
    "expected": {
@@ -7322,7 +7322,7 @@
   {
    "case": "inputs/unreadable-outside-the-window/step-2.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/unreadable-outside-the-window/step-2.input.json",
    "input_sha256": "a6b07c19829913edd2bf22fe321aa32ae095d418c5edd6050920a72f82d2c395",
    "expected": {
@@ -7446,7 +7446,7 @@
   {
    "case": "inputs/unreadable-spend-a-string/step-0.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/unreadable-spend-a-string/step-0.input.json",
    "input_sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703",
    "expected": {
@@ -7570,7 +7570,7 @@
   {
    "case": "inputs/unreadable-spend-a-string/step-1.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/unreadable-spend-a-string/step-1.input.json",
    "input_sha256": "a3c006d7bac0b1b9d16d8ca1546e64fe70469433b7025f921e1f8d5e7d4e826e",
    "expected": {
@@ -7694,7 +7694,7 @@
   {
    "case": "inputs/unreadable-spend-a-string/step-2.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/unreadable-spend-a-string/step-2.input.json",
    "input_sha256": "0e32e8e021c65b7feae646c7ad2e521a151d42ad052992d41e36671380d64797",
    "expected": {
@@ -7819,7 +7819,7 @@
   {
    "case": "inputs/unreadable-spend-an-object/step-0.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/unreadable-spend-an-object/step-0.input.json",
    "input_sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703",
    "expected": {
@@ -7943,7 +7943,7 @@
   {
    "case": "inputs/unreadable-spend-an-object/step-1.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/unreadable-spend-an-object/step-1.input.json",
    "input_sha256": "31745e4d91995ff0ab7ad5eaca2a90ff580899036a685e2ab00ec9a341fc1073",
    "expected": {
@@ -8067,7 +8067,7 @@
   {
    "case": "inputs/unreadable-spend-an-object/step-2.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/unreadable-spend-an-object/step-2.input.json",
    "input_sha256": "b82ed7374a558a015a6b132c497e2996458b6f0b70ec7e7e6d1b28d274f545c0",
    "expected": {
@@ -8192,7 +8192,7 @@
   {
    "case": "inputs/unreadable-spend-negative/step-0.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/unreadable-spend-negative/step-0.input.json",
    "input_sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703",
    "expected": {
@@ -8316,7 +8316,7 @@
   {
    "case": "inputs/unreadable-spend-negative/step-1.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/unreadable-spend-negative/step-1.input.json",
    "input_sha256": "6514218310fb7891ed02c5b95ed5843fcf711a22a69ef1c4b0dda70c7e6a6941",
    "expected": {
@@ -8440,7 +8440,7 @@
   {
    "case": "inputs/unreadable-spend-negative/step-2.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/unreadable-spend-negative/step-2.input.json",
    "input_sha256": "c57dbaea89ee007d2ff5370c5855002437049479870dd2d306de56220bd5605b",
    "expected": {
@@ -8565,7 +8565,7 @@
   {
    "case": "inputs/unreadable-window-edge/step-0.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/unreadable-window-edge/step-0.input.json",
    "input_sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703",
    "expected": {
@@ -8689,7 +8689,7 @@
   {
    "case": "inputs/unreadable-window-edge/step-1.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/unreadable-window-edge/step-1.input.json",
    "input_sha256": "92221cdebe19800251a95306303ba9171bb631ac7e5d31b39efba2f434b2481b",
    "expected": {
@@ -8813,7 +8813,7 @@
   {
    "case": "inputs/unreadable-window-edge/step-2.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/unreadable-window-edge/step-2.input.json",
    "input_sha256": "3d8fc69099939694330a029c38ca5eb79dbe9879aead6ee249c85cc5d9dabab8",
    "expected": {
@@ -8938,7 +8938,7 @@
   {
    "case": "inputs/window-edge/step-0.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/window-edge/step-0.input.json",
    "input_sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703",
    "expected": {
@@ -9062,7 +9062,7 @@
   {
    "case": "inputs/window-edge/step-1.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/window-edge/step-1.input.json",
    "input_sha256": "a471d9f98b3bde3e54fc5969759ddfd11132bec90b5fa9eef1ae76ed5b192a29",
    "expected": {
@@ -9186,7 +9186,7 @@
   {
    "case": "inputs/window-edge/step-2.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/window-edge/step-2.input.json",
    "input_sha256": "85a469ae0cbff6c2b587a7d4b70995c4b4ee6b124e677f9af83a9277c78cb061",
    "expected": {
@@ -9310,7 +9310,7 @@
   {
    "case": "inputs/window-edge/step-3.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/inputs/window-edge/step-3.input.json",
    "input_sha256": "6f4cfed8733b4404be02a4564781789cf203492918ab5a14a40cc91da0c8fa8a",
    "expected": {
@@ -9434,7 +9434,7 @@
   {
    "case": "templates/check",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/g3-executed-acts-vectors/templates/check.json",
    "input_sha256": "656455dd5f0deb157bc8d63934a948bd66f1c5f081e79fbcbd6bc5645ad47223",
    "expected": {

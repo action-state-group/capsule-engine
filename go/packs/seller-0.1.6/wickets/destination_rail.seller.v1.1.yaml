@@ -1,0 +1,32 @@
+# seller.destination_rail/1.1.0: seller.destination_rail/1.0.0
+# (destination_rail.seller.yaml) run at the seller's commit too
+# (agreement.accept, the class a seller's commit carries; no deal record
+# carries marketplace.sale), with cash allowed when the item is handed over
+# in person, the common payment apps counted as p2p, and a commit that
+# states no rail failing (capsule-engine#192). The aliases are here, under
+# this digest, so a sealed rail token keeps the token the producer wrote and
+# this definition says what it counts as. 1.0.0 stays as it was for the
+# records and packs that pin it.
+wicket_id: seller.destination_rail/1.1.0
+check: destination_rail
+semantics: >-
+  For an action in action_classes, the rail is first counted as its entry in
+  rail_aliases, if it has one. A rail counted as one of allowed_rails passes.
+  A rail counted as one of in_person_rails passes only when the action's
+  handover is in_person, and fails with any other handover or none. Any other
+  rail fails. An action that carries no rail fails when missing_rail maps its
+  action class to fail, with the reason "payment method not stated", and is
+  otherwise not applicable, in scope. Any other action class is not
+  applicable. The evidence records the rail read, what it was counted as,
+  the allowed and in-person rails and the handover, never who pays or where.
+config:
+  action_classes: [agreement.accept, marketplace.sale]
+  allowed_rails: [card, p2p]
+  in_person_rails: [cash]
+  rail_aliases:
+    venmo: p2p
+    zelle: p2p
+    cash_app: p2p
+    paypal: p2p
+  missing_rail:
+    agreement.accept: fail

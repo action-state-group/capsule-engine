@@ -10,7 +10,7 @@ import "embed"
 
 // All is the whole pack tree: every version directory and engine/.
 //
-//go:embed engine everyday-0.3.4 everyday-0.3.5 everyday-0.3.6 everyday-0.3.7 everyday-0.3.8 seller-0.1.0 seller-0.1.1 seller-0.1.2 seller-0.1.3 seller-0.1.4 seller-0.1.5
+//go:embed engine everyday-0.3.4 everyday-0.3.5 everyday-0.3.6 everyday-0.3.7 everyday-0.3.8 everyday-0.3.9 seller-0.1.0 seller-0.1.1 seller-0.1.2 seller-0.1.3 seller-0.1.4 seller-0.1.5 seller-0.1.6
 var All embed.FS
 
 // Everyday034 is asg/everyday/0.3.4: its pack.yaml, the definitions it cites, and
@@ -57,6 +57,15 @@ var Everyday038 embed.FS
 
 // Everyday038Dir is the directory of asg/everyday/0.3.8 inside Everyday038.
 const Everyday038Dir = "everyday-0.3.8"
+
+// Everyday039 is asg/everyday/0.3.9: its pack.yaml, the definitions it cites, and
+// PROVENANCE.json.
+//
+//go:embed everyday-0.3.9
+var Everyday039 embed.FS
+
+// Everyday039Dir is the directory of asg/everyday/0.3.9 inside Everyday039.
+const Everyday039Dir = "everyday-0.3.9"
 
 // Seller010 is asg/seller/0.1.0: its pack.yaml, the definitions it cites, and
 // PROVENANCE.json.
@@ -111,6 +120,15 @@ var Seller015 embed.FS
 
 // Seller015Dir is the directory of asg/seller/0.1.5 inside Seller015.
 const Seller015Dir = "seller-0.1.5"
+
+// Seller016 is asg/seller/0.1.6: its pack.yaml, the definitions it cites, and
+// PROVENANCE.json.
+//
+//go:embed seller-0.1.6
+var Seller016 embed.FS
+
+// Seller016Dir is the directory of asg/seller/0.1.6 inside Seller016.
+const Seller016Dir = "seller-0.1.6"
 
 // ActionTaxonomy is capsule-engine's action-class table
 // (guards/action_taxonomy.json): each class's approver_role and legacy

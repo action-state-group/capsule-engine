@@ -696,6 +696,9 @@ func checkRecipientRole(a Action, c roleConfig) (out Constraint) {
 	result := func(r Result, note string) Constraint {
 		out := decided(id, method, r, evidence)
 		out.read = &Read{Field: "recipient_role", Value: role}
+		if c.RoleClasses != nil {
+			out.recorded = &recordedShare{role: role, classes: slices.Clone(a.DisclosedClasses)}
+		}
 		if r == Fail {
 			out.failNote = note
 		}

@@ -28,7 +28,7 @@ from capsule_engine.packs import (
 
 PACK_DIR = Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog" / "everyday"
 PACK = load_pack_dir(PACK_DIR)
-PACK_DIGEST = "ac7697061fd1c50177000648e2458f6236068679fc67ae924870ee8fb1cd8488"
+PACK_DIGEST = "acb8a0f7073b872e0a1cc367997ace49dd69fd4e63fe60996c328d8b324ac4a7"
 
 SELECTOR = {
     "r01-research-and-prepare": "non_consequential",
@@ -112,7 +112,7 @@ def _gate_table(pack, decisions) -> dict[str, dict[str, str]]:
 
 
 def test_each_gate_rule_names_its_selector_and_the_digest_is_recorded():
-    assert PACK.pack_id == "asg/everyday/0.3.8"
+    assert PACK.pack_id == "asg/everyday/0.3.9"
     assert {o.id: o.selector for o in PACK.obligations if o.check == "action_class_gate"} == SELECTOR
     assert all(o.selector is None for o in PACK.obligations if o.check != "action_class_gate")
     assert PACK.definition_digest() == PACK_DIGEST
@@ -133,7 +133,7 @@ def test_a_booking_fails_only_the_booking_rule_and_says_why_the_others_do_not_ap
     for rule in set(GATE_RULES) - {"r16-booking-with-a-commitment"}:
         result, reason = results[rule]
         assert result == "n/a", rule
-        assert reason == f"action class 'booking.create' did not match selector {SELECTOR[rule]!r}", rule
+        assert reason == "This rule does not apply to this action.", rule
 
 
 def test_public_posting_fails_exactly_the_public_posting_rule(decisions):

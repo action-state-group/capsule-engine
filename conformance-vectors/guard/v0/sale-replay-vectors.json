@@ -4,7 +4,7 @@
   {
    "case": "check-inputs/a-commit-1900",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/sale-replay-vectors/check-inputs/a-commit-1900.json",
    "input_sha256": "384d7d9d8d93a61b66610f92acacb3c0a381aa9455b64dd3b7b28baac49e6e24",
    "expected": {
@@ -100,7 +100,7 @@
   {
    "case": "check-inputs/a-commit-again-1900",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/sale-replay-vectors/check-inputs/a-commit-again-1900.json",
    "input_sha256": "5249332dae104838405995cc741bd1bab3a75484347221eda044b5178703a403",
    "expected": {
@@ -197,7 +197,7 @@
   {
    "case": "check-inputs/a-offer-1900",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/sale-replay-vectors/check-inputs/a-offer-1900.json",
    "input_sha256": "c30d3e57ee1f3339f5880ebf2414e6a2b1d3c04467e897a5195324e73fe5def1",
    "expected": {
@@ -294,7 +294,7 @@
   {
    "case": "check-inputs/b-commit-1850",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/sale-replay-vectors/check-inputs/b-commit-1850.json",
    "input_sha256": "02771f9c209aff888ba1f61eeedea48ed4803e3e8c1eb1e89f6293bd7a501380",
    "expected": {
@@ -391,7 +391,7 @@
   {
    "case": "check-inputs/b-offer-1850",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/sale-replay-vectors/check-inputs/b-offer-1850.json",
    "input_sha256": "389f5d85f0cc3a40c905cb087f8edb072eb23e0c73cd63955a145c947be76919",
    "expected": {

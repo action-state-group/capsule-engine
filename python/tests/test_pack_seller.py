@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""The seller pack, asg/seller/0.1.5: what it cites, at which digest, and
+"""The seller pack, asg/seller/0.1.6: what it cites, at which digest, and
 what each rule declares. 0.1.0 to 0.1.4 are kept byte for byte under
 ``tests/fixtures/packs/seller-0.1.0`` to ``seller-0.1.4`` and still load at
 their digests. 0.1.2 is 0.1.1 without the spending limit
@@ -109,7 +109,7 @@ DECLARED = {
 
 
 def test_the_pack_id_and_taxonomy_pin():
-    assert PACK.pack_id == "asg/seller/0.1.5"
+    assert PACK.pack_id == "asg/seller/0.1.6"
     assert PACK.taxonomy.taxonomy_version == TAXONOMY_VERSION == "6"
 
 

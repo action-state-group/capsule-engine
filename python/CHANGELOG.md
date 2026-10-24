@@ -16,6 +16,19 @@ module has its own changelog, `go/CHANGELOG.md`.
   record (`report/replay.py` `_history_freed`). The caps evidence still counts such a reversal
   as unlinked. Frozen folds (spend.weekly/3.0.0 and 1.0.0) are unchanged. Go does the same
   (go/CHANGELOG.md); new vectors in `history-spend.json`.
+- Changed (capsule-engine#182): `packs.obligation_results` words an `action_class_gate` rule's reason
+  without a selector or an action-class name. Rules 11 and 12 read "Asks: first time sharing your
+  {class} with {party}", filled from the role and classes the `recipient_role` check recorded
+  (a sentence about "your details" and "this recipient" when it recorded none); every other gate
+  rule says "This rule does not apply to this action.", "Asks: this kind of action needs your
+  approval first." or "The rules do not recognise this kind of action, so it is held.". A rule's
+  result and the sealed constraint reasons and evidence do not change.
+- Added (capsule-engine#182): catalog packs `asg/everyday/0.3.9` and `asg/seller/0.1.6`, wording
+  only. Rule 3's statement leads with "Your details go only to the merchant filling your order, a
+  listing platform, or you", and both packs define a platform once: the marketplace, booking site or mail
+  relay between you and the other party. Ids, checks and definitions are unchanged, so no rule decides
+  differently; the definition digests move (everyday `acb8a0f7...`, seller `5e112a7f...`). 0.3.8 and
+  0.1.5 stay frozen under `tests/fixtures/packs` and `go/packs`.
 
 ## 0.2.0 — 2026-10-23
 

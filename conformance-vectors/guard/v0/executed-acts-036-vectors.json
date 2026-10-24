@@ -4,7 +4,7 @@
   {
    "case": "inputs/accepted-and-unreadable-same-action/step-0.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/executed-acts-036-vectors/inputs/accepted-and-unreadable-same-action/step-0.input.json",
    "input_sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703",
    "expected": {
@@ -128,7 +128,7 @@
   {
    "case": "inputs/accepted-and-unreadable-same-action/step-1.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/executed-acts-036-vectors/inputs/accepted-and-unreadable-same-action/step-1.input.json",
    "input_sha256": "cdb4eedf90cb215e07d8d6b9f0f05c11fb2cee36edce0978d7a6ddbeb6c4d35c",
    "expected": {
@@ -252,7 +252,7 @@
   {
    "case": "inputs/accepted-and-unreadable-same-action/step-2.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/executed-acts-036-vectors/inputs/accepted-and-unreadable-same-action/step-2.input.json",
    "input_sha256": "d29637d81cd1304f3cd0d774926d5c0ee12d99854d54ef94f21003eb4a87b57e",
    "expected": {
@@ -376,7 +376,7 @@
   {
    "case": "inputs/accepted-and-unreadable-same-capsule/step-0.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/executed-acts-036-vectors/inputs/accepted-and-unreadable-same-capsule/step-0.input.json",
    "input_sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703",
    "expected": {
@@ -500,7 +500,7 @@
   {
    "case": "inputs/accepted-and-unreadable-same-capsule/step-1.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/executed-acts-036-vectors/inputs/accepted-and-unreadable-same-capsule/step-1.input.json",
    "input_sha256": "0b286c3ac987a15c92c33e574a32220ed661e13152fd6d82f85721fc69f00f3a",
    "expected": {
@@ -624,7 +624,7 @@
   {
    "case": "inputs/accepted-and-unreadable-same-capsule/step-2.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/executed-acts-036-vectors/inputs/accepted-and-unreadable-same-capsule/step-2.input.json",
    "input_sha256": "d00bb26176babef8fc153819349789c584b40c1a0f3ee13e0c4858ddce4003e6",
    "expected": {
@@ -748,7 +748,7 @@
   {
    "case": "inputs/commit-cancel-class/step-0.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/executed-acts-036-vectors/inputs/commit-cancel-class/step-0.input.json",
    "input_sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703",
    "expected": {
@@ -872,7 +872,7 @@
   {
    "case": "inputs/commit-cancel-class/step-1.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/executed-acts-036-vectors/inputs/commit-cancel-class/step-1.input.json",
    "input_sha256": "8235d77cac03b68b42bb595937b481dc13d04441f5ccab78c22bfc15fc97ec9a",
    "expected": {
@@ -996,7 +996,7 @@
   {
    "case": "inputs/commit-money-in/step-0.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/executed-acts-036-vectors/inputs/commit-money-in/step-0.input.json",
    "input_sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703",
    "expected": {
@@ -1120,7 +1120,7 @@
   {
    "case": "inputs/commit-money-in/step-1.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/executed-acts-036-vectors/inputs/commit-money-in/step-1.input.json",
    "input_sha256": "c2869a1bdf016b54180e78735bd2233329e6f845c7b08078dac6d5abe3be600b",
    "expected": {
@@ -1244,7 +1244,7 @@
   {
    "case": "inputs/pay-accept-refund-class/step-0.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/executed-acts-036-vectors/inputs/pay-accept-refund-class/step-0.input.json",
    "input_sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703",
    "expected": {
@@ -1368,7 +1368,7 @@
   {
    "case": "inputs/pay-accept-refund-class/step-1.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/executed-acts-036-vectors/inputs/pay-accept-refund-class/step-1.input.json",
    "input_sha256": "215818a862d5fcb9cffd682cbe1daf13974f1f1b72751732b4d34dd729185e46",
    "expected": {
@@ -1492,7 +1492,7 @@
   {
    "case": "inputs/pay-escalate/step-0.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/executed-acts-036-vectors/inputs/pay-escalate/step-0.input.json",
    "input_sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703",
    "expected": {
@@ -1616,7 +1616,7 @@
   {
    "case": "inputs/pay-escalate/step-1.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/executed-acts-036-vectors/inputs/pay-escalate/step-1.input.json",
    "input_sha256": "5d111abb6befffbc81cb6c87369c6b62cc49ded0104f8834fe3462a160fbd81f",
    "expected": {
@@ -1740,7 +1740,7 @@
   {
    "case": "inputs/pay-escalate-unreadable/step-0.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/executed-acts-036-vectors/inputs/pay-escalate-unreadable/step-0.input.json",
    "input_sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703",
    "expected": {
@@ -1864,7 +1864,7 @@
   {
    "case": "inputs/pay-escalate-unreadable/step-1.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/executed-acts-036-vectors/inputs/pay-escalate-unreadable/step-1.input.json",
    "input_sha256": "3ddb4eef848cc856d01976b86e7399c4bb2710609805d2ef45fbae83520ac0bd",
    "expected": {
@@ -1989,7 +1989,7 @@
   {
    "case": "inputs/pay-no-decision/step-0.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/executed-acts-036-vectors/inputs/pay-no-decision/step-0.input.json",
    "input_sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703",
    "expected": {
@@ -2113,7 +2113,7 @@
   {
    "case": "inputs/pay-no-decision/step-1.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/executed-acts-036-vectors/inputs/pay-no-decision/step-1.input.json",
    "input_sha256": "2e79a239a5d31e0960384bf9582df278717c00efa3dbde283e7659196159d3c0",
    "expected": {
@@ -2237,7 +2237,7 @@
   {
    "case": "inputs/pay-reject/step-0.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/executed-acts-036-vectors/inputs/pay-reject/step-0.input.json",
    "input_sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703",
    "expected": {
@@ -2361,7 +2361,7 @@
   {
    "case": "inputs/pay-reject/step-1.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/executed-acts-036-vectors/inputs/pay-reject/step-1.input.json",
    "input_sha256": "f6c67524bf831f18fd4141936cd36f73f26b3ceb07dad1644528e9a2182154fc",
    "expected": {
@@ -2485,7 +2485,7 @@
   {
    "case": "inputs/per-action-over-unreadable/step-0.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/executed-acts-036-vectors/inputs/per-action-over-unreadable/step-0.input.json",
    "input_sha256": "91a1772c12ed63df4cf5102ec34e51be428c26f24a55697b0e2534b2e936b503",
    "expected": {
@@ -2609,7 +2609,7 @@
   {
    "case": "inputs/per-action-over-unreadable/step-1.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/executed-acts-036-vectors/inputs/per-action-over-unreadable/step-1.input.json",
    "input_sha256": "fcc9dee6a1024644021557f166d759750115e9682702f4b769635eeb6b2ba023",
    "expected": {
@@ -2733,7 +2733,7 @@
   {
    "case": "inputs/refund-out-spend/step-0.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/executed-acts-036-vectors/inputs/refund-out-spend/step-0.input.json",
    "input_sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703",
    "expected": {
@@ -2857,7 +2857,7 @@
   {
    "case": "inputs/refund-out-spend/step-1.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/executed-acts-036-vectors/inputs/refund-out-spend/step-1.input.json",
    "input_sha256": "6e7cbae75bc1623483b6e43292a4a3073211cabd4581b2dc8bb7a437ba5ce3f0",
    "expected": {
@@ -2981,7 +2981,7 @@
   {
    "case": "inputs/refund-out-spend/step-2.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/executed-acts-036-vectors/inputs/refund-out-spend/step-2.input.json",
    "input_sha256": "bf4de00d821c1c4b9f869da44c86b27c0332c9e54fa2e004c9ff02ed3870b0b3",
    "expected": {
@@ -3105,7 +3105,7 @@
   {
    "case": "inputs/same-action-across-window-edge/step-0.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/executed-acts-036-vectors/inputs/same-action-across-window-edge/step-0.input.json",
    "input_sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703",
    "expected": {
@@ -3229,7 +3229,7 @@
   {
    "case": "inputs/same-action-across-window-edge/step-1.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/executed-acts-036-vectors/inputs/same-action-across-window-edge/step-1.input.json",
    "input_sha256": "68f94f374cfc45d91d669d312a47ce1b28e3a8904998a537e9a20980c625909e",
    "expected": {
@@ -3353,7 +3353,7 @@
   {
    "case": "inputs/same-action-across-window-edge/step-2.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/executed-acts-036-vectors/inputs/same-action-across-window-edge/step-2.input.json",
    "input_sha256": "953a5e1e9d7a94ba3d1c15b595f1ebd7c1437e0fa24b109bec68c2f0e6420365",
    "expected": {
@@ -3477,7 +3477,7 @@
   {
    "case": "inputs/two-fyi-same-action-different-spend/step-0.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/executed-acts-036-vectors/inputs/two-fyi-same-action-different-spend/step-0.input.json",
    "input_sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703",
    "expected": {
@@ -3601,7 +3601,7 @@
   {
    "case": "inputs/two-fyi-same-action-different-spend/step-1.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/executed-acts-036-vectors/inputs/two-fyi-same-action-different-spend/step-1.input.json",
    "input_sha256": "000774eae07fa48d71c994af6349fbf7f80473385ba76829c0d75d33f17f59bc",
    "expected": {
@@ -3725,7 +3725,7 @@
   {
    "case": "inputs/two-fyi-same-action-different-spend/step-2.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/executed-acts-036-vectors/inputs/two-fyi-same-action-different-spend/step-2.input.json",
    "input_sha256": "a530d9426373586f1335e53e9b25d387c0726454251b48404bd8f664209719ff",
    "expected": {
@@ -3849,7 +3849,7 @@
   {
    "case": "inputs/unchecked-cancel-class/step-0.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/executed-acts-036-vectors/inputs/unchecked-cancel-class/step-0.input.json",
    "input_sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703",
    "expected": {
@@ -3973,7 +3973,7 @@
   {
    "case": "inputs/unchecked-cancel-class/step-1.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/executed-acts-036-vectors/inputs/unchecked-cancel-class/step-1.input.json",
    "input_sha256": "9269c0465c45214fc68a2e9c129f82de54b3a2574cb077c475e428f70e2c3689",
    "expected": {
@@ -4097,7 +4097,7 @@
   {
    "case": "inputs/unreadable-then-readable-same-action/step-0.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/executed-acts-036-vectors/inputs/unreadable-then-readable-same-action/step-0.input.json",
    "input_sha256": "91396a6f52d57100f09338ae617bf41512cd649d0b8a9b9a0cbc652639c8d703",
    "expected": {
@@ -4221,7 +4221,7 @@
   {
    "case": "inputs/unreadable-then-readable-same-action/step-1.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/executed-acts-036-vectors/inputs/unreadable-then-readable-same-action/step-1.input.json",
    "input_sha256": "b143f0168686456f90fc104fb6e65fb20bd967acf015196d32715af1f6b739c5",
    "expected": {
@@ -4346,7 +4346,7 @@
   {
    "case": "inputs/unreadable-then-readable-same-action/step-2.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/executed-acts-036-vectors/inputs/unreadable-then-readable-same-action/step-2.input.json",
    "input_sha256": "e149720f8641350f0209b19896b31aa83f3ea3f48082febed37e3c8ee3283cd9",
    "expected": {

@@ -4,7 +4,7 @@
   {
    "case": "real/acc-probe-purchase-after-a-refund",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/refund-never-blocks-vectors/real/acc-probe-purchase-after-a-refund.json",
    "input_sha256": "722d9d5955a160b53edc768e581e1e3ecf28f69b5b400e741afcbf84cdc8cd42",
    "expected": {
@@ -128,7 +128,7 @@
   {
    "case": "real/acc-refund-repeat-same-reversed-act",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/refund-never-blocks-vectors/real/acc-refund-repeat-same-reversed-act.json",
    "input_sha256": "da5e8c24b8f07282b7520aa7eec48211fd7726c92b537a09adbc5faa9f6d6793",
    "expected": {

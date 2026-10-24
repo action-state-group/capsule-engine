@@ -123,7 +123,13 @@
 # bundle"), refused but never recorded as a failure. The sentence marks
 # are every Unicode 17.0 sentence terminator and every line break.
 # capsulectl asks the user before every such claim. No other rule changes.
-pack_id: asg/seller/0.1.5
+#
+# 0.1.6 changes wording only (capsule-engine#182); no rule decides differently.
+# s01's statement defines a platform as in the everyday pack: the marketplace,
+# booking site or mail relay between you and the other party. Every id, check and
+# definition is 0.1.5's; only the statement and so the pack's definition
+# digest move, and 0.1.5 stays frozen at its own.
+pack_id: asg/seller/0.1.6
 
 obligations:
   # -- DO ------------------------------------------------------------------
@@ -132,7 +138,8 @@ obligations:
       Checks who receives a personal-data disclosure (disclosure.personal):
       buyer, platform, third_party or self (the user). It passes for a buyer
       or self; other rules decide which data a buyer may get. For a platform
-      (the marketplace, booking site or mail relay the sale is listed on), it
+      (the marketplace, booking site or mail relay between you and the other
+      party), it
       passes only when every class the disclosure names is email or
       pickup_area, the listing's public area and never the exact spot.
       Otherwise it refuses. It records the role and the class names, never

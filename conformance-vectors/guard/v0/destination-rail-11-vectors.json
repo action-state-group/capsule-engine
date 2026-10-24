@@ -4,7 +4,7 @@
   {
    "case": "inputs/agreement.accept----in_person",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/destination-rail-11-vectors/inputs/agreement.accept----in_person.json",
    "input_sha256": "6e19f21d49ef22d473e5a0b464a1030b6009162a25c2699326c9cb2b03255a32",
    "expected": {
@@ -100,7 +100,7 @@
   {
    "case": "inputs/agreement.accept--card--drone",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/destination-rail-11-vectors/inputs/agreement.accept--card--drone.json",
    "input_sha256": "63617157987a8bb853f1177a208db79bb6d20fb19f46779c0dcdfaea58cba935",
    "expected": {
@@ -196,7 +196,7 @@
   {
    "case": "inputs/agreement.accept--card--in_person",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/destination-rail-11-vectors/inputs/agreement.accept--card--in_person.json",
    "input_sha256": "edbc5c5bb1b38602e7ca2e52b6e7581910b718f0b41bddb2fd79e13dcdd097e5",
    "expected": {
@@ -292,7 +292,7 @@
   {
    "case": "inputs/agreement.accept--card--no-handover",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/destination-rail-11-vectors/inputs/agreement.accept--card--no-handover.json",
    "input_sha256": "25df4bc790c4c50e49a4b518e340ee4e2435e1d769bb774354ed0a5739efbc7d",
    "expected": {
@@ -388,7 +388,7 @@
   {
    "case": "inputs/agreement.accept--card--shipped",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/destination-rail-11-vectors/inputs/agreement.accept--card--shipped.json",
    "input_sha256": "bc0d648b29e4a758567bdc69b0b6bd1b68a750b1e2720c875f475f1614880ef7",
    "expected": {
@@ -484,7 +484,7 @@
   {
    "case": "inputs/agreement.accept--cash--drone",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/destination-rail-11-vectors/inputs/agreement.accept--cash--drone.json",
    "input_sha256": "5dad8ebe602ac7e968b26cf34e712d745a6ad77b428458513acddd0ec20685db",
    "expected": {
@@ -580,7 +580,7 @@
   {
    "case": "inputs/agreement.accept--cash--in_person",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/destination-rail-11-vectors/inputs/agreement.accept--cash--in_person.json",
    "input_sha256": "de4c898387b8d6497d1b24f68926da06e1b98a09eff7ca294f5565bbbbe51fad",
    "expected": {
@@ -676,7 +676,7 @@
   {
    "case": "inputs/agreement.accept--cash--no-handover",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/destination-rail-11-vectors/inputs/agreement.accept--cash--no-handover.json",
    "input_sha256": "44e800b51f5e9d64850e4b75572072550ec4d4caa65c791f7ee24bb01dc34fb1",
    "expected": {
@@ -772,7 +772,7 @@
   {
    "case": "inputs/agreement.accept--cash--shipped",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/destination-rail-11-vectors/inputs/agreement.accept--cash--shipped.json",
    "input_sha256": "8196cd1506bd8cf5f7536ef0951cc195c8fe260cd58c986a8a1d0e0a9bf503c4",
    "expected": {
@@ -868,7 +868,7 @@
   {
    "case": "inputs/agreement.accept--cash_app--no-handover",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/destination-rail-11-vectors/inputs/agreement.accept--cash_app--no-handover.json",
    "input_sha256": "2dbb6f6f6f2da4b9310fe50c15df5dadab538aac59a7b41482bc42f15d2729bf",
    "expected": {
@@ -964,7 +964,7 @@
   {
    "case": "inputs/agreement.accept--crypto--no-handover",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/destination-rail-11-vectors/inputs/agreement.accept--crypto--no-handover.json",
    "input_sha256": "c292876e3a6652fd6fe80cd6fb69b51a8ca1fc229e0a26a3a398b31d12f61d4d",
    "expected": {
@@ -1060,7 +1060,7 @@
   {
    "case": "inputs/agreement.accept--none--drone",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/destination-rail-11-vectors/inputs/agreement.accept--none--drone.json",
    "input_sha256": "b8b7086d2e2a37b459d3e3f31485d1c9c3a0a37399aeefb0ac14c1122c270cdd",
    "expected": {
@@ -1156,7 +1156,7 @@
   {
    "case": "inputs/agreement.accept--none--in_person",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/destination-rail-11-vectors/inputs/agreement.accept--none--in_person.json",
    "input_sha256": "808be10af69971f1d6f0f9a91dbc8f60cc5a00f2b861d80edc69964ee0e6a643",
    "expected": {
@@ -1252,7 +1252,7 @@
   {
    "case": "inputs/agreement.accept--none--no-handover",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/destination-rail-11-vectors/inputs/agreement.accept--none--no-handover.json",
    "input_sha256": "f3abed53e62c8252ccd65a6b11157079678813aa01ed1e6582dfe2023a1a6d79",
    "expected": {
@@ -1348,7 +1348,7 @@
   {
    "case": "inputs/agreement.accept--none--shipped",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/destination-rail-11-vectors/inputs/agreement.accept--none--shipped.json",
    "input_sha256": "d7b8e70991c5756a33c8b0d8f1bd85ff400fe4f7d0c3bebc051f2a4bf72220e5",
    "expected": {
@@ -1444,7 +1444,7 @@
   {
    "case": "inputs/agreement.accept--p2p--no-handover",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/destination-rail-11-vectors/inputs/agreement.accept--p2p--no-handover.json",
    "input_sha256": "514f03335457746e496f861f0227af4c23eaf20a863a064c398c589b78b236d6",
    "expected": {
@@ -1540,7 +1540,7 @@
   {
    "case": "inputs/agreement.accept--paypal--no-handover",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/destination-rail-11-vectors/inputs/agreement.accept--paypal--no-handover.json",
    "input_sha256": "cd4e3a72bb77f369321e25ade10abbb4922f63cd4c90a8f8be865281f0d7b2ae",
    "expected": {
@@ -1636,7 +1636,7 @@
   {
    "case": "inputs/agreement.accept--recourse-cash--in_person",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/destination-rail-11-vectors/inputs/agreement.accept--recourse-cash--in_person.json",
    "input_sha256": "5e08511c5b6993978ce05f980a1ebe9d10b615598bc350f2f673a32d8c603012",
    "expected": {
@@ -1732,7 +1732,7 @@
   {
    "case": "inputs/agreement.accept--recourse-venmo--no-handover",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/destination-rail-11-vectors/inputs/agreement.accept--recourse-venmo--no-handover.json",
    "input_sha256": "bb5446fb6e3906959a6da62025d8cb1e579492070602deee37738c81437b9876",
    "expected": {
@@ -1828,7 +1828,7 @@
   {
    "case": "inputs/agreement.accept--venmo--no-handover",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/destination-rail-11-vectors/inputs/agreement.accept--venmo--no-handover.json",
    "input_sha256": "d3b5a54511f97ed9cb98d597f91d7d29b5ffcaaa0fd4f06af7180a79c872feea",
    "expected": {
@@ -1924,7 +1924,7 @@
   {
    "case": "inputs/agreement.accept--zelle--no-handover",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/destination-rail-11-vectors/inputs/agreement.accept--zelle--no-handover.json",
    "input_sha256": "6140f98abb42a6aa2cc75cdfdf3a3931b514ebd45bc67ed71e654f93cf34d81b",
    "expected": {
@@ -2020,7 +2020,7 @@
   {
    "case": "inputs/marketplace.offer--cash--no-handover",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/destination-rail-11-vectors/inputs/marketplace.offer--cash--no-handover.json",
    "input_sha256": "6eb20a719c06d376f2a72ade7b2c03e0f8559d0fde112f912d5ef318a0a1d355",
    "expected": {
@@ -2117,7 +2117,7 @@
   {
    "case": "inputs/marketplace.sale--card--drone",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/destination-rail-11-vectors/inputs/marketplace.sale--card--drone.json",
    "input_sha256": "1560ea3ba9a432944f77b18fa934de1f0db65600d3cfc0fdcae3882fa396d5cb",
    "expected": {
@@ -2213,7 +2213,7 @@
   {
    "case": "inputs/marketplace.sale--card--in_person",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/destination-rail-11-vectors/inputs/marketplace.sale--card--in_person.json",
    "input_sha256": "8def592bdd990564471fc39e40613e34ec1d0c438b1d9e7f8616f83a36216497",
    "expected": {
@@ -2309,7 +2309,7 @@
   {
    "case": "inputs/marketplace.sale--card--no-handover",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/destination-rail-11-vectors/inputs/marketplace.sale--card--no-handover.json",
    "input_sha256": "eb82510a49e327f4652ac74b333c3e0fb2319dbec4da8a52bf912a83b3e401e4",
    "expected": {
@@ -2405,7 +2405,7 @@
   {
    "case": "inputs/marketplace.sale--card--shipped",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/destination-rail-11-vectors/inputs/marketplace.sale--card--shipped.json",
    "input_sha256": "0f52fa3db8fcb164023cb406d338ddd1b740e60d468fa10219c54f000996a2f4",
    "expected": {
@@ -2501,7 +2501,7 @@
   {
    "case": "inputs/marketplace.sale--cash--drone",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/destination-rail-11-vectors/inputs/marketplace.sale--cash--drone.json",
    "input_sha256": "beb1e2efee05d5c57157c1a0534947d7c846940d8435695b6fabc529d1c1ad31",
    "expected": {
@@ -2597,7 +2597,7 @@
   {
    "case": "inputs/marketplace.sale--cash--in_person",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/destination-rail-11-vectors/inputs/marketplace.sale--cash--in_person.json",
    "input_sha256": "85af0c3e13ed51d677c27fbc288e2dc97ef4ca785b3d2b8434844152cf7a03fb",
    "expected": {
@@ -2693,7 +2693,7 @@
   {
    "case": "inputs/marketplace.sale--cash--no-handover",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/destination-rail-11-vectors/inputs/marketplace.sale--cash--no-handover.json",
    "input_sha256": "63ae659541ec0978eb01350d6b637a23b473f80bcbe35c2d46a22cdc1b051b9e",
    "expected": {
@@ -2789,7 +2789,7 @@
   {
    "case": "inputs/marketplace.sale--cash--shipped",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/destination-rail-11-vectors/inputs/marketplace.sale--cash--shipped.json",
    "input_sha256": "af56a1665d7eda2d266d2c29b6ec4f442a54006e5dfb7fd503e298b59069a6b0",
    "expected": {
@@ -2885,7 +2885,7 @@
   {
    "case": "inputs/marketplace.sale--cash_app--no-handover",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/destination-rail-11-vectors/inputs/marketplace.sale--cash_app--no-handover.json",
    "input_sha256": "1c0ddf4f4eebf543e1c7327e6f02571ed3acb256b967f59ffe2f7226e36db3f1",
    "expected": {
@@ -2981,7 +2981,7 @@
   {
    "case": "inputs/marketplace.sale--crypto--no-handover",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/destination-rail-11-vectors/inputs/marketplace.sale--crypto--no-handover.json",
    "input_sha256": "e82bc922666f79f7a17f55efdf9afff3d76286a90b58a58aaa6d1951231391f7",
    "expected": {
@@ -3077,7 +3077,7 @@
   {
    "case": "inputs/marketplace.sale--none--drone",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/destination-rail-11-vectors/inputs/marketplace.sale--none--drone.json",
    "input_sha256": "434b0931162f39451cd546dd3d7d01973b5531f8489ea4f0ad3992f7f58f7fb9",
    "expected": {
@@ -3174,7 +3174,7 @@
   {
    "case": "inputs/marketplace.sale--none--in_person",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/destination-rail-11-vectors/inputs/marketplace.sale--none--in_person.json",
    "input_sha256": "64d6a729391baeed0abf3cd26728396097ffd1cd3dd2ec9c0fb46b2dc874ce69",
    "expected": {
@@ -3271,7 +3271,7 @@
   {
    "case": "inputs/marketplace.sale--none--no-handover",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/destination-rail-11-vectors/inputs/marketplace.sale--none--no-handover.json",
    "input_sha256": "785d356c7e58e5a584fe5d0baef1a8fd1e29a4ba422afb10a31cfa04d6e423c9",
    "expected": {
@@ -3368,7 +3368,7 @@
   {
    "case": "inputs/marketplace.sale--none--shipped",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/destination-rail-11-vectors/inputs/marketplace.sale--none--shipped.json",
    "input_sha256": "6a5baf93d3dcf9cf1f7b42f1554e9b6fc8f2395c8c7da507c3e3860ebf80c966",
    "expected": {
@@ -3465,7 +3465,7 @@
   {
    "case": "inputs/marketplace.sale--p2p--no-handover",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/destination-rail-11-vectors/inputs/marketplace.sale--p2p--no-handover.json",
    "input_sha256": "1ef38b1847c026140843e9cf74320789a02bda7174d6fbfdc45d55fdc89ce7f1",
    "expected": {
@@ -3561,7 +3561,7 @@
   {
    "case": "inputs/marketplace.sale--paypal--no-handover",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/destination-rail-11-vectors/inputs/marketplace.sale--paypal--no-handover.json",
    "input_sha256": "8d4b4e17534a3328c17a7b6525a65c5154118319323432978494c2068ad6b95d",
    "expected": {
@@ -3657,7 +3657,7 @@
   {
    "case": "inputs/marketplace.sale--venmo--no-handover",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/destination-rail-11-vectors/inputs/marketplace.sale--venmo--no-handover.json",
    "input_sha256": "2b102b3d3a9d2f818d7c5d85dc9130d5c862000651e33e03b556a0fa39d89f0c",
    "expected": {
@@ -3753,7 +3753,7 @@
   {
    "case": "inputs/marketplace.sale--zelle--no-handover",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/destination-rail-11-vectors/inputs/marketplace.sale--zelle--no-handover.json",
    "input_sha256": "44845dc8c058becc5f4c00aa0541345370997dcecd69d3a005d70f3fb0dc0f56",
    "expected": {

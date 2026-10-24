@@ -1,7 +1,7 @@
 {
   "current": {
-    "everyday": "everyday-0.3.8",
-    "seller": "seller-0.1.5"
+    "everyday": "everyday-0.3.9",
+    "seller": "seller-0.1.6"
   },
   "folds": {
     "actions.count_by_developer/1.0.0": "9574753ce2967f281067e0a12d9ae279763ccfe50040e1156eba444f97a21bc6",

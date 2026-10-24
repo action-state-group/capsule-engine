@@ -4,7 +4,7 @@
   {
    "case": "end-1us-after",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "conformance-vectors/guard/v0/inputs/window-edge/end-1us-after.json",
    "input_sha256": "fb7561d9f1f8eb6a0574423b3db2317b2baa069bef8ada4222255f08a819721e",
    "expected": {
@@ -131,7 +131,7 @@
   {
    "case": "end-exact",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "conformance-vectors/guard/v0/inputs/window-edge/end-exact.json",
    "input_sha256": "d998f7c83e3ed5f1d5804420476a932bbb135b383b31e8ffc4be0ea83185d0c3",
    "expected": {
@@ -258,7 +258,7 @@
   {
    "case": "end-sub-us",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "conformance-vectors/guard/v0/inputs/window-edge/end-sub-us.json",
    "input_sha256": "9639ce686648f99294805cfc64cb43bc16a567d6fa48aae472c12e7b4065290d",
    "expected": {
@@ -385,7 +385,7 @@
   {
    "case": "start-1us-after",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "conformance-vectors/guard/v0/inputs/window-edge/start-1us-after.json",
    "input_sha256": "53898f13eb913c02f64409672dcc00e3f46328fb26a0fbb4aefeb338d528dd4a",
    "expected": {
@@ -512,7 +512,7 @@
   {
    "case": "start-1us-before",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "conformance-vectors/guard/v0/inputs/window-edge/start-1us-before.json",
    "input_sha256": "a4282e02611a06c47430f0a2b356805926aa7cb0dccdccb3c60af7a090f0b39c",
    "expected": {
@@ -639,7 +639,7 @@
   {
    "case": "start-exact",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "conformance-vectors/guard/v0/inputs/window-edge/start-exact.json",
    "input_sha256": "ebdac33ba2a007c0d23d3a57ebb652f3b005ec393e333f8fe722c6c5a10b3170",
    "expected": {
@@ -766,7 +766,7 @@
   {
    "case": "start-sub-us",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "conformance-vectors/guard/v0/inputs/window-edge/start-sub-us.json",
    "input_sha256": "ec4eed6960352bdaed53a24c4230ca8398bc61038af216ec286ba9b05f3c4de5",
    "expected": {

@@ -1,0 +1,17 @@
+{
+ "note": "The sentences an action_class_gate rule shows the user (capsule-engine#182). Python (packs/obligation_results.py) and Go (go/guard/report.go) each hold them as constants; their tests both read this file, so a change in one language alone fails. Nothing here names a selector or an action class.",
+ "not_applicable": "This rule does not apply to this action.",
+ "flagged": "Asks: this kind of action needs your approval first.",
+ "unrecognised": "The rules do not recognise this kind of action, so it is held.",
+ "first_share_unknown": "Asks: first time sharing your details with this recipient.",
+ "first_share": [
+  {"role": "fulfilling_merchant", "classes": ["phone"], "reason": "Asks: first time sharing your phone with the merchant."},
+  {"role": "fulfilling_merchant", "classes": ["email", "phone"], "reason": "Asks: first time sharing your email and phone with the merchant."},
+  {"role": "third_party", "classes": ["email", "home_address", "phone"], "reason": "Asks: first time sharing your email, home address and phone with a third party."},
+  {"role": "buyer", "classes": ["phone"], "reason": "Asks: first time sharing your phone with the buyer."},
+  {"role": "platform", "classes": ["email"], "reason": "Asks: first time sharing your email with the platform."},
+  {"role": "self", "classes": ["email"], "reason": "Asks: first time sharing your email with your own account."},
+  {"role": "somebody_new", "classes": ["phone"], "reason": "Asks: first time sharing your phone with this recipient."},
+  {"role": "buyer", "classes": [], "reason": "Asks: first time sharing your details with this recipient."}
+ ]
+}

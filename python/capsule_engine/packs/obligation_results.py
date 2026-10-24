@@ -9,7 +9,8 @@ the obligation does not apply to this action and is ``n/a`` -- never a fail
 and never a pass. When the check could not resolve the action's class, its
 evidence lists no selectors and the check failed closed; every obligation
 bound to one of its selectors fails with it, because none of them can be
-ruled out.
+ruled out. An ``action_class_gate`` obligation's reason names neither a selector
+nor an action class (capsule-engine#182); see ``_gate_result``.
 
 The constraint records sealed on a capsule carry an evidence digest, not
 the evidence, so this reads the ``ConstraintOutcome`` objects of the
@@ -31,6 +32,72 @@ class ObligationResult:
     obligation_id: str
     result: str  # "pass" | "fail" | "n/a"
     reason: str | None
+
+
+# The reasons an action_class_gate rule shows the user. None names a selector
+# or an action class (capsule-engine#182): those stay in the check's evidence.
+# go/guard/report.go words the same sentences; conformance-vectors/guard/reasons/
+# gate-reasons.json is the one table that this module's tests and the Go tests
+# both read, so a change in one language alone fails.
+GATE_NOT_APPLICABLE = "This rule does not apply to this action."
+GATE_FLAGGED = "Asks: this kind of action needs your approval first."
+GATE_UNRECOGNISED = "The rules do not recognise this kind of action, so it is held."
+GATE_FIRST_SHARE_UNKNOWN = "Asks: first time sharing your details with this recipient."
+# Selectors that ask on the first telling of a class, or to a new party.
+_FIRST_SHARE_SELECTORS = frozenset({"personal_disclosure_new_class", "personal_disclosure_new_party"})
+_PARTY_WORDS = {
+    "fulfilling_merchant": "the merchant",
+    "platform": "the platform",
+    "buyer": "the buyer",
+    "third_party": "a third party",
+    "self": "your own account",
+}
+
+
+def _words(names: Sequence[str]) -> str:
+    """``a``, ``a and b``, ``a, b and c``, with underscores read as spaces."""
+    spoken = [n.replace("_", " ") for n in names]
+    return spoken[0] if len(spoken) == 1 else f"{', '.join(spoken[:-1])} and {spoken[-1]}"
+
+
+def first_share_reason(role: object, classes: object) -> str:
+    """The ruled reason for r11/r12 (capsule-engine#182), filled from the role
+    and data classes the recipient_role check recorded; the generic sentence
+    when either was not recorded."""
+    if not isinstance(role, str) or not isinstance(classes, list) or not classes:
+        return GATE_FIRST_SHARE_UNKNOWN
+    if not all(isinstance(c, str) for c in classes):
+        return GATE_FIRST_SHARE_UNKNOWN
+    party = _PARTY_WORDS.get(role, "this recipient")
+    return f"Asks: first time sharing your {_words(sorted(classes))} with {party}."
+
+
+def _gate_result(
+    obligation_id: str, selector: str | None, on_match: str, outcome: ConstraintOutcome, recorded: ConstraintOutcome | None
+) -> ObligationResult:
+    """An action_class_gate obligation's result, with a reason that carries no
+    selector or class name."""
+    evidence = outcome.evidence or {}
+    matched = evidence.get("matched_selectors")
+    if matched is None:
+        if outcome.result == "fail":
+            return ObligationResult(obligation_id, "fail", GATE_UNRECOGNISED)
+        if evidence.get("taxonomy_mismatch") is not None:
+            # Held, not out of scope: the check's own reason names only the two
+            # taxonomy versions, as Go's not_evaluable reason does.
+            return ObligationResult(obligation_id, "n/a", outcome.reason)
+        return ObligationResult(obligation_id, "n/a", GATE_NOT_APPLICABLE)
+    if selector is not None and selector not in matched:
+        return ObligationResult(obligation_id, "n/a", GATE_NOT_APPLICABLE)
+    result = on_match if selector is not None else outcome.result
+    if result != "fail":
+        return ObligationResult(obligation_id, result, None)
+    if selector in _FIRST_SHARE_SELECTORS:
+        seen = (recorded.evidence or {}) if recorded is not None else {}
+        return ObligationResult(
+            obligation_id, "fail", first_share_reason(seen.get("recipient_role"), seen.get("disclosed_classes"))
+        )
+    return ObligationResult(obligation_id, "fail", GATE_FLAGGED)
 
 
 def _selector_result(obligation_id: str, selector: str, on_match: str, outcome: ConstraintOutcome) -> ObligationResult:
@@ -64,9 +131,11 @@ def obligation_results(pack: PackDefinition, constraints: Sequence[ConstraintOut
         outcome = by_id.get(o.check)
         if outcome is None:
             raise ValueError(f"obligation {o.id!r} cites check {o.check!r}, which has no outcome in this decision")
-        if o.selector is None:
+        on_match = selectors[o.check][o.selector]["on_match"] if o.selector is not None else outcome.result
+        if o.check == "action_class_gate":
+            results.append(_gate_result(o.id, o.selector, on_match, outcome, by_id.get("recipient_role")))
+        elif o.selector is None:
             results.append(ObligationResult(o.id, outcome.result, outcome.reason))
         else:
-            on_match = selectors[o.check][o.selector]["on_match"]
             results.append(_selector_result(o.id, o.selector, on_match, outcome))
     return tuple(results)

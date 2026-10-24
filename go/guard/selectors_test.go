@@ -169,7 +169,7 @@ func TestABookingOverItsLimitFailsOnlyItsOwnGateRule(t *testing.T) {
 			t.Errorf("%s: %s (%s), want %s", id, r.Verdict, r.Reason, want)
 		}
 	}
-	if r := rules["r11-home-address-to-an-individual"]; r.Reason != "action class booking.create did not match selector personal_disclosure_new_class" {
+	if r := rules["r11-home-address-to-an-individual"]; r.Reason != gateNotApplicable {
 		t.Errorf("r11 reason %q", r.Reason)
 	}
 }

@@ -182,15 +182,20 @@ func comparePlatformDecision(t *testing.T, packName string, e *Engine, p pack.Pa
 			t.Errorf("%s: %s Go %s, engine %s", at, o.ID, r.Verdict, o.Result)
 		}
 	}
-	// A rule whose check the engine leaves out for a platform (r11, r12,
-	// s13) reports the engine's reason word for word.
+	// A rule whose check the engine leaves out for a platform (s13) reports
+	// the engine's reason word for word. A gate rule (r11, r12) says the
+	// generic sentence: the engine's names an action class (#182).
 	for _, pc := range s.Constraints {
 		if pc.Result != "n/a" || !(strings.Contains(pc.Reason, "leave out recipient_role") || strings.Contains(pc.Reason, "not a buyer")) {
 			continue
 		}
 		for _, rule := range p.Rules {
-			if rule.Check == pc.ID && rules[rule.ID].Reason != pc.Reason {
-				t.Errorf("%s: %s reason %q, engine %q", at, rule.ID, rules[rule.ID].Reason, pc.Reason)
+			want := pc.Reason
+			if pc.ID == "action_class_gate" {
+				want = gateNotApplicable
+			}
+			if rule.Check == pc.ID && rules[rule.ID].Reason != want {
+				t.Errorf("%s: %s reason %q, want %q", at, rule.ID, rules[rule.ID].Reason, want)
 			}
 		}
 	}

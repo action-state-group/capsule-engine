@@ -4,7 +4,7 @@
   {
    "case": "inputs/a-commit-1900--as-written",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/release-history-vectors/inputs/a-commit-1900--as-written.json",
    "input_sha256": "e2ac7ee41d93777677a065022a64760ebcf00be5a125eb3fa171ed3a6ec5c8b6",
    "expected": {
@@ -100,7 +100,7 @@
   {
    "case": "inputs/a-share-phone--another-deal",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/release-history-vectors/inputs/a-share-phone--another-deal.json",
    "input_sha256": "c88c046bab3a09978d8e68b2cc0f7f358b2f93fc5b0dac9b5c5277da456491aa",
    "expected": {
@@ -200,7 +200,7 @@
   {
    "case": "inputs/a-share-phone--another-profile",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/release-history-vectors/inputs/a-share-phone--another-profile.json",
    "input_sha256": "0a6646a723e295db82b2b16c0916405c9bc416c7f806336a75ec70699cd8b123",
    "expected": {
@@ -300,7 +300,7 @@
   {
    "case": "inputs/a-share-phone--as-written",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/release-history-vectors/inputs/a-share-phone--as-written.json",
    "input_sha256": "0c05f48c402c3bcebb091ea11245250f336409d316940694ea471d5ea138475f",
    "expected": {
@@ -400,7 +400,7 @@
   {
    "case": "inputs/a-share-phone--commit-counterparty-malformed",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/release-history-vectors/inputs/a-share-phone--commit-counterparty-malformed.json",
    "input_sha256": "66788a9b88ab22b81be4fff0316ed6fc57168c79076ee4d3c29abc665c52eb33",
    "expected": {
@@ -500,7 +500,7 @@
   {
    "case": "inputs/a-share-phone--commit-counterparty-none",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/release-history-vectors/inputs/a-share-phone--commit-counterparty-none.json",
    "input_sha256": "182b27771e1828f9e04c4d4f77b7ddc2933e6dd7a905a8aa22d61030d1d8a415",
    "expected": {
@@ -600,7 +600,7 @@
   {
    "case": "inputs/a-share-phone--commit-counterparty-upper-case-keys",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/release-history-vectors/inputs/a-share-phone--commit-counterparty-upper-case-keys.json",
    "input_sha256": "fdaf569420263018893efb35ce92f813e4912331a251c201631831889ea47f90",
    "expected": {
@@ -700,7 +700,7 @@
   {
    "case": "inputs/a-share-phone--commit-in-another-deal",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/release-history-vectors/inputs/a-share-phone--commit-in-another-deal.json",
    "input_sha256": "1490a8002691a1d9730f010d6788346c5385d749ccb5926c8eeb4934896abe43",
    "expected": {
@@ -800,7 +800,7 @@
   {
    "case": "inputs/a-share-phone--commit-of-another-item",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/release-history-vectors/inputs/a-share-phone--commit-of-another-item.json",
    "input_sha256": "55b6d1ad67adab05e50400b53df4b6580340d621dba3d1ab4d1adf8f3ab696b5",
    "expected": {
@@ -900,7 +900,7 @@
   {
    "case": "inputs/a-share-phone--commit-rejected",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/release-history-vectors/inputs/a-share-phone--commit-rejected.json",
    "input_sha256": "599f634e645392f2bacb379e9cf17a993664b1235d13598318a4fb8978c50f1d",
    "expected": {
@@ -1000,7 +1000,7 @@
   {
    "case": "inputs/a-share-phone--commit-with-no-disposition",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/release-history-vectors/inputs/a-share-phone--commit-with-no-disposition.json",
    "input_sha256": "25ea374e90518b672ff5a4179fb960c44544565426c719213fd27fd2cd6acd98",
    "expected": {
@@ -1100,7 +1100,7 @@
   {
    "case": "inputs/a-share-phone--counterparty-another-algorithm",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/release-history-vectors/inputs/a-share-phone--counterparty-another-algorithm.json",
    "input_sha256": "21e10345768e6f99c51250f2c6f22161c1287ffd8d59df7db9567024a295ca24",
    "expected": {
@@ -1200,7 +1200,7 @@
   {
    "case": "inputs/a-share-phone--counterparty-not-hex",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/release-history-vectors/inputs/a-share-phone--counterparty-not-hex.json",
    "input_sha256": "57492fe6b8bcc891517516e2b38b860b8b2d70750f684d720c18b30d06b3fc52",
    "expected": {
@@ -1300,7 +1300,7 @@
   {
    "case": "inputs/a-share-phone--counterparty-unknown-algorithm",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/release-history-vectors/inputs/a-share-phone--counterparty-unknown-algorithm.json",
    "input_sha256": "6be85159c1f968ff57d8533af651cf9ac949556fc1a155bb27e0abc07e670f52",
    "expected": {
@@ -1400,7 +1400,7 @@
   {
    "case": "inputs/a-share-phone--counterparty-upper-case-keys",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/release-history-vectors/inputs/a-share-phone--counterparty-upper-case-keys.json",
    "input_sha256": "dc4b95be50cc4e1f640c972bb883905826dcdf79aa2feb082c959956a7e277e5",
    "expected": {
@@ -1500,7 +1500,7 @@
   {
    "case": "inputs/a-share-phone--counterparty-upper-case-kind",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/release-history-vectors/inputs/a-share-phone--counterparty-upper-case-kind.json",
    "input_sha256": "d297ea97582c90c2d96743a3774441239e56785b51552c6a4229693830308ebb",
    "expected": {
@@ -1600,7 +1600,7 @@
   {
    "case": "inputs/a-share-phone--counterparty-with-another-kind",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/release-history-vectors/inputs/a-share-phone--counterparty-with-another-kind.json",
    "input_sha256": "86f2f340dcbf30372846cae8efe482857fb486f5c174ddbf515e4feb335ab671",
    "expected": {
@@ -1700,7 +1700,7 @@
   {
    "case": "inputs/a-share-phone--credential",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/release-history-vectors/inputs/a-share-phone--credential.json",
    "input_sha256": "83e4927b09cbdd91a3b4e601077332baf964459fb81b4766f7c16498a7a390c0",
    "expected": {
@@ -1800,7 +1800,7 @@
   {
    "case": "inputs/a-share-phone--email-both-sides-equal",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/release-history-vectors/inputs/a-share-phone--email-both-sides-equal.json",
    "input_sha256": "575eb06bdf51620e1bf4d03dc57bbce50b3bf56c3dae0a801896e197dcfb27a1",
    "expected": {
@@ -1900,7 +1900,7 @@
   {
    "case": "inputs/a-share-phone--empty-classes",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/release-history-vectors/inputs/a-share-phone--empty-classes.json",
    "input_sha256": "d269aeb5fb5acdf16abf9f04e22ede037c34a0b3b2d7a1ae8cabfcb6811bbffb",
    "expected": {
@@ -2000,7 +2000,7 @@
   {
    "case": "inputs/a-share-phone--every-contact-class",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/release-history-vectors/inputs/a-share-phone--every-contact-class.json",
    "input_sha256": "b7ea26da54f7373d1124e04d15c9ac50c73a51e63d2c017e24331f6addf9a737",
    "expected": {
@@ -2100,7 +2100,7 @@
   {
    "case": "inputs/a-share-phone--history-incomplete",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/release-history-vectors/inputs/a-share-phone--history-incomplete.json",
    "input_sha256": "23f046a2ad572d00e3b85fbd0f9bf2b070e1ecebca4a24aa780b6ac46b54c5d3",
    "expected": {
@@ -2200,7 +2200,7 @@
   {
    "case": "inputs/a-share-phone--name-and-domain-equal",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/release-history-vectors/inputs/a-share-phone--name-and-domain-equal.json",
    "input_sha256": "496bead4ae08d59970efcb4306b5116089c74237259d4445bb3f5e035f74f1e1",
    "expected": {
@@ -2300,7 +2300,7 @@
   {
    "case": "inputs/a-share-phone--name-and-domain-other-domain",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/release-history-vectors/inputs/a-share-phone--name-and-domain-other-domain.json",
    "input_sha256": "48282a3b6b032e32fb3bf93262b4ec72ad3f5b806f6442dc9d080325f5adf1f3",
    "expected": {
@@ -2400,7 +2400,7 @@
   {
    "case": "inputs/a-share-phone--no-classes",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/release-history-vectors/inputs/a-share-phone--no-classes.json",
    "input_sha256": "c92f81d9d24b3babe65736050d05ddcb2726a2011cc6a57afba678c6ec395140",
    "expected": {
@@ -2500,7 +2500,7 @@
   {
    "case": "inputs/a-share-phone--no-commit-in-history",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/release-history-vectors/inputs/a-share-phone--no-commit-in-history.json",
    "input_sha256": "2531cf1e81bbe569f4ba89f46bac90a0019cd475b36c3a659cb122c485bb0219",
    "expected": {
@@ -2600,7 +2600,7 @@
   {
    "case": "inputs/a-share-phone--no-counterparty",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/release-history-vectors/inputs/a-share-phone--no-counterparty.json",
    "input_sha256": "85e9ce7dc77bc750c405c3930d8e3e31d2cabb04642488814bcd36e455590a4f",
    "expected": {
@@ -2700,7 +2700,7 @@
   {
    "case": "inputs/a-share-phone--no-item-ref",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/release-history-vectors/inputs/a-share-phone--no-item-ref.json",
    "input_sha256": "16a0357e2361b9f7eaa742f6dec4add03c11d1eb652ec459b78a92e516d43516",
    "expected": {
@@ -2800,7 +2800,7 @@
   {
    "case": "inputs/a-share-phone--phone-and-payment-card",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/release-history-vectors/inputs/a-share-phone--phone-and-payment-card.json",
    "input_sha256": "1d345a7cf985946bcc0957c52108593763e6480b7e0d9da59f7f4b348d8f0652",
    "expected": {
@@ -2900,7 +2900,7 @@
   {
    "case": "inputs/a-share-phone--phone-and-pickup-area",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/release-history-vectors/inputs/a-share-phone--phone-and-pickup-area.json",
    "input_sha256": "30f5855461411dba380a294ed96e32621c2451df15e1865a7dabc888c294aca6",
    "expected": {
@@ -3000,7 +3000,7 @@
   {
    "case": "inputs/a-share-phone--profile-on-one-side-only",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/release-history-vectors/inputs/a-share-phone--profile-on-one-side-only.json",
    "input_sha256": "ff5985e1092b6a284b46a25c80f41388dd787df7792ca8645cad565024801b17",
    "expected": {
@@ -3100,7 +3100,7 @@
   {
    "case": "inputs/a-share-phone--to-a-platform",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/release-history-vectors/inputs/a-share-phone--to-a-platform.json",
    "input_sha256": "8a3dae584e7285417554111a304e5b7f392223c2f223b396f39be3f0434183c4",
    "expected": {
@@ -3201,7 +3201,7 @@
   {
    "case": "inputs/a-share-pickup-area--as-written",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/release-history-vectors/inputs/a-share-pickup-area--as-written.json",
    "input_sha256": "2f8ec7820569e0bf82d8e9a71c7ab371d0eeb08dd3ce45503032d079c3faea80",
    "expected": {
@@ -3301,7 +3301,7 @@
   {
    "case": "inputs/b-share-phone--as-written",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/release-history-vectors/inputs/b-share-phone--as-written.json",
    "input_sha256": "622fb757df1804efd921cf33d4762c5fdce54e12e585a7a4f4bdb7a1916e2792",
    "expected": {
@@ -3401,7 +3401,7 @@
   {
    "case": "inputs/b-share-phone--pickup-area-to-b",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/release-history-vectors/inputs/b-share-phone--pickup-area-to-b.json",
    "input_sha256": "89a3037a9cb5f09791bb1899fa1a97a7b5c989434f0a26b6e586b67763a7db2b",
    "expected": {
@@ -3501,7 +3501,7 @@
   {
    "case": "inputs/b-share-pickup-area--as-written",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/release-history-vectors/inputs/b-share-pickup-area--as-written.json",
    "input_sha256": "c3e2f45a5ba99732b43d1cd7e479f71da49d964db3ca07899158ca75ad5ae2db",
    "expected": {
