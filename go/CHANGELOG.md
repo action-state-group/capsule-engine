@@ -12,6 +12,17 @@ and `portedDefinitions` (`guard/engine.go`).
   moved in, cite the charge's capsule id under `supersedes`, carry its operator and developer,
   and be sealed between the charge and the check. Any other cancel or refund frees nothing. No
   exported API, pack or definition changes; frozen folds are unchanged.
+- Changed (capsule-engine#182): `Report` words an `action_class_gate` rule's reason without a
+  selector or an action-class name, as the Python reference does. Rules 11 and 12 read "Asks: first
+  time sharing your {class} with {party}", filled from the role and classes `recipient_role`
+  recorded; every other gate rule says "This rule does not apply to this action.", "Asks: this kind
+  of action needs your approval first." or "The rules do not recognise this kind of action, so it is
+  held.". Verdicts, outcomes, evidence digests and sealed reasons do not change.
+- Added (capsule-engine#182): packs `asg/everyday/0.3.9` (`LoadEveryday039`, definition digest
+  `acb8a0f7073b872e0a1cc367997ace49dd69fd4e63fe60996c328d8b324ac4a7`) and `asg/seller/0.1.6`
+  (`LoadSeller016`, `5e112a7f5136e2193adb177605dfad10b7b0753a2de93ed72e446695b7acc56a`): wording
+  only (rule 3's statement and the one platform definition in r03 and s01). Every wicket and fold is
+  0.3.8's and 0.1.5's. The shared conformance vectors move to them; 0.3.8 and 0.1.5 stay embedded.
 
 ## 0.1.3 — 2026-10-23
 

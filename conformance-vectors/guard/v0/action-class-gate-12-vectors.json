@@ -4,7 +4,7 @@
   {
    "case": "inputs/a-commit-1900--none--no-class--no-repeat--no-told",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/action-class-gate-12-vectors/inputs/a-commit-1900--none--no-class--no-repeat--no-told.json",
    "input_sha256": "f3abed53e62c8252ccd65a6b11157079678813aa01ed1e6582dfe2023a1a6d79",
    "expected": {
@@ -100,7 +100,7 @@
   {
    "case": "inputs/a-commit-1900--none--no-class--repeat-phone--told",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/action-class-gate-12-vectors/inputs/a-commit-1900--none--no-class--repeat-phone--told.json",
    "input_sha256": "f2b8acc5aeb19f5fe88b65c0f8be8412e4ce7631cdf889163cbf97dc2c1b3583",
    "expected": {
@@ -196,7 +196,7 @@
   {
    "case": "inputs/a-share-phone--buyer--email-phone--repeat-phone--no-told",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/action-class-gate-12-vectors/inputs/a-share-phone--buyer--email-phone--repeat-phone--no-told.json",
    "input_sha256": "e80e332052dd89b27f6b6ef1695114b8db95146675b2567ac406480300536660",
    "expected": {
@@ -296,7 +296,7 @@
   {
    "case": "inputs/a-share-phone--buyer--email-phone--repeat-phone--told",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/action-class-gate-12-vectors/inputs/a-share-phone--buyer--email-phone--repeat-phone--told.json",
    "input_sha256": "e85a12906dbbadec0d8f7d2e37b1fe9fa216a35a40969bde96ef412ef665913b",
    "expected": {
@@ -396,7 +396,7 @@
   {
    "case": "inputs/a-share-phone--buyer--email-phone--repeat-phone-email--no-told",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/action-class-gate-12-vectors/inputs/a-share-phone--buyer--email-phone--repeat-phone-email--no-told.json",
    "input_sha256": "3a61d6118e16b5ed06d7664fbf005c9b156f0bba584035db874217273af536fb",
    "expected": {
@@ -496,7 +496,7 @@
   {
    "case": "inputs/a-share-phone--buyer--email-phone--repeat-phone-email--told",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/action-class-gate-12-vectors/inputs/a-share-phone--buyer--email-phone--repeat-phone-email--told.json",
    "input_sha256": "d79f11a7f49c600e020aeb7e4b201e7b26e881b7d288a51956911073371809e7",
    "expected": {
@@ -596,7 +596,7 @@
   {
    "case": "inputs/a-share-phone--buyer--no-class--repeat-phone--told",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/action-class-gate-12-vectors/inputs/a-share-phone--buyer--no-class--repeat-phone--told.json",
    "input_sha256": "f1933be54f1ce625d3f356a9d9b98ef2c7eaf6feca72256121d87025f052cacf",
    "expected": {
@@ -696,7 +696,7 @@
   {
    "case": "inputs/a-share-phone--buyer--phone--no-repeat--no-told",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/action-class-gate-12-vectors/inputs/a-share-phone--buyer--phone--no-repeat--no-told.json",
    "input_sha256": "d2dc56a377dada61c8891cdc28d985b73d9f6f1cf2784a4f0a3294ef9ff741ce",
    "expected": {
@@ -796,7 +796,7 @@
   {
    "case": "inputs/a-share-phone--buyer--phone--no-repeat--not-told",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/action-class-gate-12-vectors/inputs/a-share-phone--buyer--phone--no-repeat--not-told.json",
    "input_sha256": "ec24e4a1fbc5f331c72783f30c2d48c9d9d368461e877966bfdf774c68fc8210",
    "expected": {
@@ -896,7 +896,7 @@
   {
    "case": "inputs/a-share-phone--buyer--phone--no-repeat--told-string",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/action-class-gate-12-vectors/inputs/a-share-phone--buyer--phone--no-repeat--told-string.json",
    "input_sha256": "d8e9331f5e27190e767ec1a311dd0efd603153e5ef6bcb8dabfe4b9c931f8fd2",
    "expected": {
@@ -996,7 +996,7 @@
   {
    "case": "inputs/a-share-phone--buyer--phone--no-repeat--told",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/action-class-gate-12-vectors/inputs/a-share-phone--buyer--phone--no-repeat--told.json",
    "input_sha256": "121277a350e28b6a50839347206be66fbc4ec4641bf9ca4a738c93d899f20b5f",
    "expected": {
@@ -1096,7 +1096,7 @@
   {
    "case": "inputs/a-share-phone--buyer--phone--repeat-email--no-told",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/action-class-gate-12-vectors/inputs/a-share-phone--buyer--phone--repeat-email--no-told.json",
    "input_sha256": "ca33bd22c8384af77aa9924dae3898be7acc1851eaede318155326233f262511",
    "expected": {
@@ -1196,7 +1196,7 @@
   {
    "case": "inputs/a-share-phone--buyer--phone--repeat-email--not-told",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/action-class-gate-12-vectors/inputs/a-share-phone--buyer--phone--repeat-email--not-told.json",
    "input_sha256": "dff01daa6353721f97d6748387db8a0c5487f893557b00a4cd30cc3c650477c9",
    "expected": {
@@ -1296,7 +1296,7 @@
   {
    "case": "inputs/a-share-phone--buyer--phone--repeat-email--told-string",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/action-class-gate-12-vectors/inputs/a-share-phone--buyer--phone--repeat-email--told-string.json",
    "input_sha256": "28dd7383b83600bba4ad090f2e105e5bb8a97097f3a81f09c1c733b3e2be33a1",
    "expected": {
@@ -1396,7 +1396,7 @@
   {
    "case": "inputs/a-share-phone--buyer--phone--repeat-email--told",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/action-class-gate-12-vectors/inputs/a-share-phone--buyer--phone--repeat-email--told.json",
    "input_sha256": "5c1e89ea300fe305fc6d40233582d07733700357dfc43c34abe9ab809c5346a3",
    "expected": {
@@ -1496,7 +1496,7 @@
   {
    "case": "inputs/a-share-phone--buyer--phone--repeat-empty--no-told",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/action-class-gate-12-vectors/inputs/a-share-phone--buyer--phone--repeat-empty--no-told.json",
    "input_sha256": "3af51edcb2d8a928b0237f52a85e02aa0f7eb123b398fd008eacf88d527e264f",
    "expected": {
@@ -1596,7 +1596,7 @@
   {
    "case": "inputs/a-share-phone--buyer--phone--repeat-empty--not-told",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/action-class-gate-12-vectors/inputs/a-share-phone--buyer--phone--repeat-empty--not-told.json",
    "input_sha256": "c6b31bb26148d6b0df05588c0ef5284f80ebe352a34884efdc34e86f0d160b77",
    "expected": {
@@ -1696,7 +1696,7 @@
   {
    "case": "inputs/a-share-phone--buyer--phone--repeat-empty--told-string",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/action-class-gate-12-vectors/inputs/a-share-phone--buyer--phone--repeat-empty--told-string.json",
    "input_sha256": "9e5743e53105c7916972e409835fbc03738c5fc48b4cbc1352bbf7433660b3a2",
    "expected": {
@@ -1796,7 +1796,7 @@
   {
    "case": "inputs/a-share-phone--buyer--phone--repeat-empty--told",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/action-class-gate-12-vectors/inputs/a-share-phone--buyer--phone--repeat-empty--told.json",
    "input_sha256": "1fefded6c2102663634ca4b7affe2800737ea112fc3556bc5c1f2e83feae8558",
    "expected": {
@@ -1896,7 +1896,7 @@
   {
    "case": "inputs/a-share-phone--buyer--phone--repeat-phone--no-told",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/action-class-gate-12-vectors/inputs/a-share-phone--buyer--phone--repeat-phone--no-told.json",
    "input_sha256": "14f977dd6cfe8c3de270bab0e05231ed9bf3c9e5450c5050801d6676ca012a21",
    "expected": {
@@ -1996,7 +1996,7 @@
   {
    "case": "inputs/a-share-phone--buyer--phone--repeat-phone--not-told",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/action-class-gate-12-vectors/inputs/a-share-phone--buyer--phone--repeat-phone--not-told.json",
    "input_sha256": "816beeaf70d60bc1e37902546ff5ee6b8ef9dfa7a8cf09818ccedb38a84972c5",
    "expected": {
@@ -2096,7 +2096,7 @@
   {
    "case": "inputs/a-share-phone--buyer--phone--repeat-phone--told-string",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/action-class-gate-12-vectors/inputs/a-share-phone--buyer--phone--repeat-phone--told-string.json",
    "input_sha256": "ee92b19e253b04b083e8977af70c1127d0bf8e812629582e57583f3bbd7f9699",
    "expected": {
@@ -2196,7 +2196,7 @@
   {
    "case": "inputs/a-share-phone--buyer--phone--repeat-phone--told",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/action-class-gate-12-vectors/inputs/a-share-phone--buyer--phone--repeat-phone--told.json",
    "input_sha256": "19bf673b646ca7c3e44bccd6792e9b3f76c85f62855e09599a7c51cab173cfd3",
    "expected": {
@@ -2296,7 +2296,7 @@
   {
    "case": "inputs/a-share-phone--buyer--phone--repeat-phone-email--no-told",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/action-class-gate-12-vectors/inputs/a-share-phone--buyer--phone--repeat-phone-email--no-told.json",
    "input_sha256": "8e3029d9fd25d1665959224eb9a43a24a9699462469d3b3be7b1ce3081f5b724",
    "expected": {
@@ -2396,7 +2396,7 @@
   {
    "case": "inputs/a-share-phone--buyer--phone--repeat-phone-email--not-told",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/action-class-gate-12-vectors/inputs/a-share-phone--buyer--phone--repeat-phone-email--not-told.json",
    "input_sha256": "41a86006866aea7b213d7bcade6520d1efe0443d81ca22fd26ecc7c4dffeda99",
    "expected": {
@@ -2496,7 +2496,7 @@
   {
    "case": "inputs/a-share-phone--buyer--phone--repeat-phone-email--told-string",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/action-class-gate-12-vectors/inputs/a-share-phone--buyer--phone--repeat-phone-email--told-string.json",
    "input_sha256": "845f2e1d3b8d4dc1d3f8fb4c6c6e49f8b36dd3839a1c41bf1b3e97d7aaa5131a",
    "expected": {
@@ -2596,7 +2596,7 @@
   {
    "case": "inputs/a-share-phone--buyer--phone--repeat-phone-email--told",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/action-class-gate-12-vectors/inputs/a-share-phone--buyer--phone--repeat-phone-email--told.json",
    "input_sha256": "74bf201870bc3bf8cfb684999046891c9c0a895c067bd444f60aa0d0962baa5f",
    "expected": {
@@ -2696,7 +2696,7 @@
   {
    "case": "inputs/a-share-phone--buyer--phone--repeat-string--no-told",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/action-class-gate-12-vectors/inputs/a-share-phone--buyer--phone--repeat-string--no-told.json",
    "input_sha256": "2467f40f1e63c6bf9a317e5b458cc1d2ff44316e7abd2c82148e5ba6702e53bb",
    "expected": {
@@ -2796,7 +2796,7 @@
   {
    "case": "inputs/a-share-phone--buyer--phone--repeat-string--not-told",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/action-class-gate-12-vectors/inputs/a-share-phone--buyer--phone--repeat-string--not-told.json",
    "input_sha256": "04cf3c2ab240e310a1eac5c2f4e59156fb91ea7fdb138b9baa665974633497d0",
    "expected": {
@@ -2896,7 +2896,7 @@
   {
    "case": "inputs/a-share-phone--buyer--phone--repeat-string--told-string",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/action-class-gate-12-vectors/inputs/a-share-phone--buyer--phone--repeat-string--told-string.json",
    "input_sha256": "7647c8f789d5e4220f78308141fbdeb44c5eb25037ff0cab95017b3487692a79",
    "expected": {
@@ -2996,7 +2996,7 @@
   {
    "case": "inputs/a-share-phone--buyer--phone--repeat-string--told",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/action-class-gate-12-vectors/inputs/a-share-phone--buyer--phone--repeat-string--told.json",
    "input_sha256": "8f23fde8e50819229864c5b699464bdb56ee7cbba9aaf9c8637c8459d5e052bc",
    "expected": {
@@ -3096,7 +3096,7 @@
   {
    "case": "inputs/a-share-phone--buyer--phone--repeat-unknown--no-told",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/action-class-gate-12-vectors/inputs/a-share-phone--buyer--phone--repeat-unknown--no-told.json",
    "input_sha256": "69126dc06b31584afd8040434dbe50f60b1e5da4dc14663581c23d6a7e8f2e33",
    "expected": {
@@ -3196,7 +3196,7 @@
   {
    "case": "inputs/a-share-phone--buyer--phone--repeat-unknown--not-told",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/action-class-gate-12-vectors/inputs/a-share-phone--buyer--phone--repeat-unknown--not-told.json",
    "input_sha256": "989241632e284d0fd1b70e8fd25bb4016c13b6c3f704b71331f2f2938dc8003d",
    "expected": {
@@ -3296,7 +3296,7 @@
   {
    "case": "inputs/a-share-phone--buyer--phone--repeat-unknown--told-string",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/action-class-gate-12-vectors/inputs/a-share-phone--buyer--phone--repeat-unknown--told-string.json",
    "input_sha256": "cf3ce3c35c44179aa99949ab09c3da535e295299f3cdb7f08364e1bae9e7c196",
    "expected": {
@@ -3396,7 +3396,7 @@
   {
    "case": "inputs/a-share-phone--buyer--phone--repeat-unknown--told",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/action-class-gate-12-vectors/inputs/a-share-phone--buyer--phone--repeat-unknown--told.json",
    "input_sha256": "a41e961edae3d5b9beb9f7996d22dc905c932bc8af879c6bf89ef518e2b4f2ad",
    "expected": {
@@ -3496,7 +3496,7 @@
   {
    "case": "inputs/a-share-phone--platform--email--no-repeat--no-told",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/action-class-gate-12-vectors/inputs/a-share-phone--platform--email--no-repeat--no-told.json",
    "input_sha256": "6d8a6426486f7ed8466d47418cc73fd729d9956415ac714c0a21e5d4875ff427",
    "expected": {
@@ -3597,7 +3597,7 @@
   {
    "case": "inputs/a-share-phone--platform--email--no-repeat--told",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/action-class-gate-12-vectors/inputs/a-share-phone--platform--email--no-repeat--told.json",
    "input_sha256": "bb091fc101834fa5ddeadbf77440c4cd5d08a22ffd4d3dadfddb3f3a19984852",
    "expected": {
@@ -3698,7 +3698,7 @@
   {
    "case": "inputs/a-share-phone--platform--email--repeat-email--no-told",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/action-class-gate-12-vectors/inputs/a-share-phone--platform--email--repeat-email--no-told.json",
    "input_sha256": "2a3c8ebe07a16430759a0482431613566d6f2ba60d6201e69990bc5f34ca45da",
    "expected": {
@@ -3799,7 +3799,7 @@
   {
    "case": "inputs/a-share-phone--platform--email--repeat-email--told",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/action-class-gate-12-vectors/inputs/a-share-phone--platform--email--repeat-email--told.json",
    "input_sha256": "05d736765864deed6cce9ec305e26e0f82517a69d0af048191fb28bd8040473c",
    "expected": {

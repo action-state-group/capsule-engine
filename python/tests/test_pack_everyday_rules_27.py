@@ -78,7 +78,7 @@ OTHER_PACK_DIGESTS = {
     "eu-ai-act": "9d3197935b6b002ccd4682c7cfa2bacf01d9dbc2b3b04811e94dd50e6a2b9cfa",
     "eu-ai-act-deterministic": "b6f6b62454380c6ab4fc1c11fd4418045cc310b95f6a7cbbf2ea23bf54ca5609",
     "payments-safety": "81278051db5ca3755956b7adeaea727d333d12a0c14c51c7e030f15ea8b9666f",
-    "seller": "81013aedbc3d930dcb9a4871d932373eca9de6968e5cff9fb450158d1fcc576a",
+    "seller": "5e112a7f5136e2193adb177605dfad10b7b0753a2de93ed72e446695b7acc56a",
     "standard-vendor": "9ae420d59ebfb1f87ecd740c948be4d0df16cefac97d8640da24934302359ae2",
 }
 
@@ -90,7 +90,7 @@ def _rule_number(obligation_id: str) -> int:
 
 
 def test_the_pack_is_version_0_3_8_with_exactly_27_rules_numbered_1_to_27():
-    assert PACK.pack_id == "asg/everyday/0.3.8"
+    assert PACK.pack_id == "asg/everyday/0.3.9"
     assert len(PACK.obligations) == 27
     assert sorted(_rule_number(o.id) for o in PACK.obligations) == list(range(1, 28))
 

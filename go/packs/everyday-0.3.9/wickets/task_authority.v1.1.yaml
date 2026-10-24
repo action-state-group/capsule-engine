@@ -1,0 +1,20 @@
+# task_authority wicket, version 1.1: task_authority/1.0.0's config with
+# marketplace.sale added to action_classes (guards/checks/task_authority.py).
+# The rule itself is the `semantics` field below: it is inside the digested
+# body, so rewording it moves the digest. task_authority/1.0.0
+# (task_authority.yaml) stays as it was for the packs that pin it.
+wicket_id: task_authority/1.1.0
+check: task_authority
+semantics: >-
+  For an action in action_classes, Action.task_authority_ref is the SHA-256
+  over the JCS bytes of the whole task-authority record the action cites. The
+  record supplied with the decision is read only when its digest equals that
+  reference, and the plan at its body, in guards/plan.py's shape, decides by
+  plan containment: an action inside the plan passes, one outside it fails.
+  It is not applicable, naming task_authority_ref, when the action carries
+  none, and naming task_authority_record when no record is supplied, the
+  supplied record is not the one the reference names or has no digest, or
+  the record carries no plan that parses. marketplace.sale is in scope. Any
+  other action class is out of scope.
+config:
+  action_classes: [money.purchase, money.transfer, money.subscription, booking.create, booking.modify, agreement.accept, marketplace.offer, external_commitment.other, marketplace.sale]

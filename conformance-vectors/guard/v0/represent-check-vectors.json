@@ -4,7 +4,7 @@
   {
    "case": "check-inputs/a-represent-approval-class",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/represent-check-vectors/check-inputs/a-represent-approval-class.json",
    "input_sha256": "0ab2b6596174987b448abe3f54a00d364af2ae8cb16085f7fbec5a497a9e9495",
    "expected": {
@@ -104,7 +104,7 @@
   {
    "case": "check-inputs/a-represent-authenticity",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/represent-check-vectors/check-inputs/a-represent-authenticity.json",
    "input_sha256": "97f84dd478fdddcecd7c88d6756433a6828ced30a2a22d2c07ae11a1d1f39098",
    "expected": {
@@ -204,7 +204,7 @@
   {
    "case": "check-inputs/a-represent-class-empty",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/represent-check-vectors/check-inputs/a-represent-class-empty.json",
    "input_sha256": "5352cc57ec777a6ad82d2eef2dd9102e21a371e8aa50016b46dcbf8f282babd1",
    "expected": {
@@ -304,7 +304,7 @@
   {
    "case": "check-inputs/a-represent-class-missing",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/represent-check-vectors/check-inputs/a-represent-class-missing.json",
    "input_sha256": "b604e39ac71f8aeedec35991a8762ec585137a20dcceb8665bbece8b0d2cdf35",
    "expected": {
@@ -404,7 +404,7 @@
   {
    "case": "check-inputs/a-represent-class-number",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/represent-check-vectors/check-inputs/a-represent-class-number.json",
    "input_sha256": "40ded3271c9e7bd837436e589a9758945ed493266a75ef90afbb9adf4de836f8",
    "expected": {
@@ -504,7 +504,7 @@
   {
    "case": "check-inputs/a-represent-condition",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/represent-check-vectors/check-inputs/a-represent-condition.json",
    "input_sha256": "8b5fc64b4d3877a52c7a6e33dd7fbfebd91ff45c41dea24e331a53ac550b62f5",
    "expected": {
@@ -604,7 +604,7 @@
   {
    "case": "check-inputs/a-represent-features",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/represent-check-vectors/check-inputs/a-represent-features.json",
    "input_sha256": "c78634f71e13a6101efa59b4fdf8df02ee1d9311811f234f13403260689006f1",
    "expected": {
@@ -704,7 +704,7 @@
   {
    "case": "check-inputs/a-represent-no-representing",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/represent-check-vectors/check-inputs/a-represent-no-representing.json",
    "input_sha256": "b479573777a6165de6c537e41a03c1a420fd97eac5cd87199354ce2fc431dda0",
    "expected": {
@@ -804,7 +804,7 @@
   {
    "case": "check-inputs/a-represent-representing-list",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/represent-check-vectors/check-inputs/a-represent-representing-list.json",
    "input_sha256": "b39331f71e7bf4fd71b91d65f74413bcdd4db04fc647ba7f3329588d31a59057",
    "expected": {
@@ -904,7 +904,7 @@
   {
    "case": "check-inputs/b-represent-approval-class",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/represent-check-vectors/check-inputs/b-represent-approval-class.json",
    "input_sha256": "12182bb9dfa0a04699b6f868e0987adc67b29bb3c7c598e010df2b81e8657b0a",
    "expected": {

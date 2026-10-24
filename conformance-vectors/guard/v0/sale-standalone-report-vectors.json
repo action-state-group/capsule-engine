@@ -4,7 +4,7 @@
   {
    "case": "check-inputs/a-commit-1900",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/sale-standalone-report-vectors/check-inputs/a-commit-1900.json",
    "input_sha256": "f04d5cd9a1101e61f1510b345e008cdfe1c2f63e46023ba383eac94a16d15f39",
    "expected": {
@@ -100,7 +100,7 @@
   {
    "case": "check-inputs/a-share-phone",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/sale-standalone-report-vectors/check-inputs/a-share-phone.json",
    "input_sha256": "38df4e2be992c62b3a26aad81170983c20fc8a60968f574068f0f07584bc3c22",
    "expected": {
@@ -200,7 +200,7 @@
   {
    "case": "check-inputs/a-share-pickup-area",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/sale-standalone-report-vectors/check-inputs/a-share-pickup-area.json",
    "input_sha256": "7df78e5bdbe5ecec58784c6d2b9ae1f19cbe8b5106e84be4ced75910a5a6cdf9",
    "expected": {
@@ -300,7 +300,7 @@
   {
    "case": "check-inputs/b-share-phone",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/sale-standalone-report-vectors/check-inputs/b-share-phone.json",
    "input_sha256": "a5c9c527b31be17876ab8b8a1ed35c4846d5f6c57e57a5f79096932f9a6c6e98",
    "expected": {
@@ -400,7 +400,7 @@
   {
    "case": "check-inputs/b-share-pickup-area",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/sale-standalone-report-vectors/check-inputs/b-share-pickup-area.json",
    "input_sha256": "26cb338177e3e7384e922124a6be222d0430525d6bcc2e9cf8a7c70a47e4f3cc",
    "expected": {

@@ -106,9 +106,9 @@ catalog):
    reason "no payee named".
 9. `recipient_role` (`recipient_role/1.1.0`) -- a personal-data disclosure
    passes for the fulfilling merchant or the user and is flagged for a third
-   party; a role outside the set is flagged. A disclosure to a platform (a
-   marketplace, booking site or mail relay acting between the user and the
-   counterparty) passes only when every class of data it names is email, and
+   party; a role outside the set is flagged. A disclosure to a platform (the
+   marketplace, booking site or mail relay between you and the other party)
+   passes only when every class of data it names is email, and
    is flagged when it gives anything else or names no class. The first email
    to a platform is paused by the producer, which knows who the platform is.
 10. `refundability` (`refundability/1.1.0`) -- a payment or sale declared

@@ -4,7 +4,7 @@
   {
    "case": "real-seller/check-inputs/a-commit-1900",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/real-seller-131/real-seller/check-inputs/a-commit-1900.json",
    "input_sha256": "736205088e5bde569cc6b5837f3601c22520ad99857a2177b730ed9fd3bb6c28",
    "expected": {
@@ -100,7 +100,7 @@
   {
    "case": "real-seller/check-inputs/a-offer-1900",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/real-seller-131/real-seller/check-inputs/a-offer-1900.json",
    "input_sha256": "790ca35c37b0e6356e841e07d7578c4a6948fa0f8d9a25b0edcddbd0aa80fc2f",
    "expected": {
@@ -200,7 +200,7 @@
   {
    "case": "real-seller/check-inputs/b-offer-1500",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/real-seller-131/real-seller/check-inputs/b-offer-1500.json",
    "input_sha256": "9f6b600f29c799027021992080680293916cf4a9f00027153447507d555678f3",
    "expected": {
@@ -300,7 +300,7 @@
   {
    "case": "real-seller/check-inputs/c-commit-1600",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/real-seller-131/real-seller/check-inputs/c-commit-1600.json",
    "input_sha256": "6f109b631ae6edee9aec7b280b26b34683b1955583996bd10c3d73d31a1a985c",
    "expected": {
@@ -396,7 +396,7 @@
   {
    "case": "real-seller/check-inputs/c-offer-1600",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/real-seller-131/real-seller/check-inputs/c-offer-1600.json",
    "input_sha256": "24e0879b98f0d89655e98fc4b4dcf6a0a78fdde5f98029c4e8917850ccb10977",
    "expected": {

@@ -198,6 +198,10 @@ func (e *Engine) Report(a Action, d Decision) CheckReport {
 		if rule.Selector != "" {
 			res = selectorResult(rule.Selector, res, c)
 		}
+		if rule.Check == "action_class_gate" {
+			recipient, _ := d.Constraint("recipient_role")
+			res = gateReason(rule.Selector, res, c, recipient.recorded)
+		}
 		blocked = blocked || blocks
 		r.Rules = append(r.Rules, res)
 	}
@@ -272,6 +276,78 @@ func selectorResult(selector string, res RuleResult, c Constraint) RuleResult {
 		return res
 	}
 	res.Verdict, res.Reason = VerdictPass, ""
+	return res
+}
+
+// The reasons an action_class_gate rule shows the user. None names a selector
+// or an action class (capsule-engine#182): those stay in the check's evidence.
+// packs/obligation_results.py words the same sentences.
+const (
+	gateNotApplicable     = "This rule does not apply to this action."
+	gateFlagged           = "Asks: this kind of action needs your approval first."
+	gateUnrecognised      = "The rules do not recognise this kind of action, so it is held."
+	gateFirstShareUnknown = "Asks: first time sharing your details with this recipient."
+	selectorNewClass      = "personal_disclosure_new_class"
+	selectorNewParty      = "personal_disclosure_new_party"
+)
+
+// partyWords is how a recipient role reads in a reason; a role not listed
+// reads "this recipient".
+var partyWords = map[string]string{
+	"fulfilling_merchant": "the merchant",
+	"platform":            "the platform",
+	"buyer":               "the buyer",
+	"third_party":         "a third party",
+	"self":                "your own account",
+}
+
+// recordedShare is what recipient_role recorded: the recipient's role and the
+// classes the disclosure names (nil when it names none).
+type recordedShare struct {
+	role    string
+	classes []string
+}
+
+// shareReason is the ruled reason for r11 and r12 (capsule-engine#182),
+// worded from what recipient_role recorded; the generic sentence when it
+// recorded no role and class.
+func shareReason(r *recordedShare) string {
+	if r == nil || len(r.classes) == 0 {
+		return gateFirstShareUnknown
+	}
+	party, ok := partyWords[r.role]
+	if !ok {
+		party = "this recipient"
+	}
+	classes := slices.Sorted(slices.Values(r.classes))
+	for i, c := range classes {
+		classes[i] = strings.ReplaceAll(c, "_", " ")
+	}
+	named := classes[0]
+	if len(classes) > 1 {
+		named = strings.Join(classes[:len(classes)-1], ", ") + " and " + classes[len(classes)-1]
+	}
+	return fmt.Sprintf("Asks: first time sharing your %s with %s.", named, party)
+}
+
+// gateReason rewrites the reason of an action_class_gate rule's result so it
+// carries no selector or action-class name. A pass has no reason.
+func gateReason(selector string, res RuleResult, c Constraint, recorded *recordedShare) RuleResult {
+	switch res.Verdict {
+	case VerdictNotApplicable:
+		res.Reason = gateNotApplicable
+	case VerdictPass:
+		res.Reason = ""
+	case VerdictFail:
+		switch {
+		case c.gate == nil:
+			res.Reason = gateUnrecognised
+		case selector == selectorNewClass || selector == selectorNewParty:
+			res.Reason = shareReason(recorded)
+		default:
+			res.Reason = gateFlagged
+		}
+	}
 	return res
 }
 

@@ -4,7 +4,7 @@
   {
    "case": "engine-0ab20965/check-inputs/a-commit-1900",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-0ab20965/check-inputs/a-commit-1900.json",
    "input_sha256": "5ef77bc9658cc2f3bc90d2f7fd7f327a7255f9c91674940c481e144b23d4737c",
    "expected": {
@@ -100,7 +100,7 @@
   {
    "case": "engine-0ab20965/check-inputs/a-commit-again-1900",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-0ab20965/check-inputs/a-commit-again-1900.json",
    "input_sha256": "20616bf8fc12431279c60a3778fd59da4e35d2ed64f3c3d113dd77ed698c88db",
    "expected": {
@@ -197,7 +197,7 @@
   {
    "case": "engine-0ab20965/check-inputs/a-offer-1900",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-0ab20965/check-inputs/a-offer-1900.json",
    "input_sha256": "37de8286f546fa148d97d174b94585ef73ff1330f4421202f85d7b518bd4dbcb",
    "expected": {
@@ -294,7 +294,7 @@
   {
    "case": "engine-0ab20965/check-inputs/b-commit-1850",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-0ab20965/check-inputs/b-commit-1850.json",
    "input_sha256": "4e60577005185eddb8ff811daa9c0d188a7abd8955c002ee2ed5f4804b33fe9b",
    "expected": {
@@ -391,7 +391,7 @@
   {
    "case": "engine-0ab20965/check-inputs/b-offer-1850",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-0ab20965/check-inputs/b-offer-1850.json",
    "input_sha256": "0228cdb51b67133b900ba0ec2258a87d952f11f51f630cd396e6075482787df0",
    "expected": {
@@ -489,7 +489,7 @@
   {
    "case": "engine-b455063a/history-act-counterparty/given/typed/other-merchant.as-sealed",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/history-act-counterparty/given/typed/other-merchant.as-sealed.json",
    "input_sha256": "8f0e2a732fb1bc1a4abcc8ace0613843fffc3d4248d53a4f8754f6d79dd1f791",
    "expected": {
@@ -613,7 +613,7 @@
   {
    "case": "engine-b455063a/history-act-counterparty/given/typed/other-merchant.disposition-accept-no-profile-malformed",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/history-act-counterparty/given/typed/other-merchant.disposition-accept-no-profile-malformed.json",
    "input_sha256": "2a66540336523e8f11a65e6427a50eaa5e8b47699a1649a9246e6fc194fe71d7",
    "expected": {
@@ -737,7 +737,7 @@
   {
    "case": "engine-b455063a/history-act-counterparty/given/typed/other-merchant.disposition-accept-no-profile-no-counterparty",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/history-act-counterparty/given/typed/other-merchant.disposition-accept-no-profile-no-counterparty.json",
    "input_sha256": "7f9ede1b0e977131c971e4115b91e36b8148d47ddd0e7828e6aea9c226b594af",
    "expected": {
@@ -861,7 +861,7 @@
   {
    "case": "engine-b455063a/history-act-counterparty/given/typed/other-merchant.disposition-accept-no-profile",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/history-act-counterparty/given/typed/other-merchant.disposition-accept-no-profile.json",
    "input_sha256": "60c62c6c100515172822135118fabc5cee9c377d5c6ac1b11b2397fa04a3bda0",
    "expected": {
@@ -985,7 +985,7 @@
   {
    "case": "engine-b455063a/history-act-counterparty/given/typed/other-merchant.disposition-accept",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/history-act-counterparty/given/typed/other-merchant.disposition-accept.json",
    "input_sha256": "10b31348eb3b19aa052b3388bc5b5fa19bb59cddc4045b5bc7a27aafee482fc0",
    "expected": {
@@ -1109,7 +1109,7 @@
   {
    "case": "engine-b455063a/history-act-counterparty/given/typed/repeat-in-one-deal.as-sealed",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/history-act-counterparty/given/typed/repeat-in-one-deal.as-sealed.json",
    "input_sha256": "43c63ba52c1b3e7550b18113e12b673fc5f4462313dd2c04da03559b446b2081",
    "expected": {
@@ -1233,7 +1233,7 @@
   {
    "case": "engine-b455063a/history-act-counterparty/given/typed/repeat-in-one-deal.disposition-accept-no-profile-malformed",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/history-act-counterparty/given/typed/repeat-in-one-deal.disposition-accept-no-profile-malformed.json",
    "input_sha256": "4434242a1a7074716d9a7532805cd83fd87a789c73e2bae60c99ecf5f1585482",
    "expected": {
@@ -1357,7 +1357,7 @@
   {
    "case": "engine-b455063a/history-act-counterparty/given/typed/repeat-in-one-deal.disposition-accept-no-profile-no-counterparty",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/history-act-counterparty/given/typed/repeat-in-one-deal.disposition-accept-no-profile-no-counterparty.json",
    "input_sha256": "bbd4d1a16c705e36a0b6c13f671b4f30d5274b60345b23eb664e1e65fea59651",
    "expected": {
@@ -1481,7 +1481,7 @@
   {
    "case": "engine-b455063a/history-act-counterparty/given/typed/repeat-in-one-deal.disposition-accept-no-profile",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/history-act-counterparty/given/typed/repeat-in-one-deal.disposition-accept-no-profile.json",
    "input_sha256": "0066dd959a7d0d62fca24d9da6965ad022144e8c644e6c2435f8f1ce7734daae",
    "expected": {
@@ -1605,7 +1605,7 @@
   {
    "case": "engine-b455063a/history-act-counterparty/given/typed/repeat-in-one-deal.disposition-accept",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/history-act-counterparty/given/typed/repeat-in-one-deal.disposition-accept.json",
    "input_sha256": "3158b90125f1a8e4465b1001379aa63fcdf1115a932521b04dfdafa63d28de83",
    "expected": {
@@ -1729,7 +1729,7 @@
   {
    "case": "engine-b455063a/history-act-counterparty/given/x-deal-v0/other-merchant.as-sealed",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/history-act-counterparty/given/x-deal-v0/other-merchant.as-sealed.json",
    "input_sha256": "88f7879011dfec5481e7152138dce791b9b08096cfdbdb5e1c76f96d52c7bd63",
    "expected": {
@@ -1854,7 +1854,7 @@
   {
    "case": "engine-b455063a/history-act-counterparty/given/x-deal-v0/other-merchant.disposition-accept-no-profile-malformed",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/history-act-counterparty/given/x-deal-v0/other-merchant.disposition-accept-no-profile-malformed.json",
    "input_sha256": "a99701af96e969fadbf6cf7e0209936fb2ebe8c7b869788f789c24345f2337a3",
    "expected": {
@@ -1979,7 +1979,7 @@
   {
    "case": "engine-b455063a/history-act-counterparty/given/x-deal-v0/other-merchant.disposition-accept-no-profile-no-counterparty",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/history-act-counterparty/given/x-deal-v0/other-merchant.disposition-accept-no-profile-no-counterparty.json",
    "input_sha256": "b7abeda0412aa43c3ccd7b816913d1e5a780d333dd7b9db333ca985096e55289",
    "expected": {
@@ -2104,7 +2104,7 @@
   {
    "case": "engine-b455063a/history-act-counterparty/given/x-deal-v0/other-merchant.disposition-accept-no-profile",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/history-act-counterparty/given/x-deal-v0/other-merchant.disposition-accept-no-profile.json",
    "input_sha256": "048f143dfeb58fc47efabe658e3faf305570788dd17a789c6bd45cabd3e31630",
    "expected": {
@@ -2229,7 +2229,7 @@
   {
    "case": "engine-b455063a/history-act-counterparty/given/x-deal-v0/other-merchant.disposition-accept",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/history-act-counterparty/given/x-deal-v0/other-merchant.disposition-accept.json",
    "input_sha256": "58eedcaf6bf5a48fe21dc25302721cb1206c543930dfd1bb039f28d4f8ffbd1f",
    "expected": {
@@ -2354,7 +2354,7 @@
   {
    "case": "engine-b455063a/history-act-counterparty/given/x-deal-v0/repeat-in-one-deal.as-sealed",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/history-act-counterparty/given/x-deal-v0/repeat-in-one-deal.as-sealed.json",
    "input_sha256": "71a63bc4ac5cfef23b13237a6daec11ef5f962e566e5f8ebb0c33a5cc6a003b2",
    "expected": {
@@ -2479,7 +2479,7 @@
   {
    "case": "engine-b455063a/history-act-counterparty/given/x-deal-v0/repeat-in-one-deal.disposition-accept-no-profile-malformed",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/history-act-counterparty/given/x-deal-v0/repeat-in-one-deal.disposition-accept-no-profile-malformed.json",
    "input_sha256": "4551634dbc23c4fb1d1bf244d2029f087722852b0dc0e27521af0258ce73d6f0",
    "expected": {
@@ -2604,7 +2604,7 @@
   {
    "case": "engine-b455063a/history-act-counterparty/given/x-deal-v0/repeat-in-one-deal.disposition-accept-no-profile-no-counterparty",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/history-act-counterparty/given/x-deal-v0/repeat-in-one-deal.disposition-accept-no-profile-no-counterparty.json",
    "input_sha256": "ff99d8413e5277e64597010d3c460ede1d107212bf02128a91912bc1648b1962",
    "expected": {
@@ -2729,7 +2729,7 @@
   {
    "case": "engine-b455063a/history-act-counterparty/given/x-deal-v0/repeat-in-one-deal.disposition-accept-no-profile",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/history-act-counterparty/given/x-deal-v0/repeat-in-one-deal.disposition-accept-no-profile.json",
    "input_sha256": "bf83fed21456beb99a7be838aadfc73c9b672f9c1fd1fe5b339f0e2c88ef440a",
    "expected": {
@@ -2854,7 +2854,7 @@
   {
    "case": "engine-b455063a/history-act-counterparty/given/x-deal-v0/repeat-in-one-deal.disposition-accept",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/history-act-counterparty/given/x-deal-v0/repeat-in-one-deal.disposition-accept.json",
    "input_sha256": "50c09b5b78672367a5534e5c8f3b419b9fb7c9a151cb81cccc27f772ac35655d",
    "expected": {
@@ -2979,7 +2979,7 @@
   {
    "case": "engine-b455063a/history-act-counterparty/inputs/typed/other-merchant.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/history-act-counterparty/inputs/typed/other-merchant.input.json",
    "input_sha256": "a11ca0ae8cb71e0ad98cdb05a750050c633d75268f8af0596c5c570589d75c13",
    "expected": {
@@ -3103,7 +3103,7 @@
   {
    "case": "engine-b455063a/history-act-counterparty/inputs/typed/repeat-in-one-deal.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/history-act-counterparty/inputs/typed/repeat-in-one-deal.input.json",
    "input_sha256": "f87c759254528ba5c9fb1532e2d06148fe34aedca2452fa048940200de2a4212",
    "expected": {
@@ -3227,7 +3227,7 @@
   {
    "case": "engine-b455063a/history-act-counterparty/inputs/x-deal-v0/other-merchant.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/history-act-counterparty/inputs/x-deal-v0/other-merchant.input.json",
    "input_sha256": "0c4b707dc8b44243596bae40435837b268d76169e6bf41d605fc3b923b17c7e8",
    "expected": {
@@ -3352,7 +3352,7 @@
   {
    "case": "engine-b455063a/history-act-counterparty/inputs/x-deal-v0/repeat-in-one-deal.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/history-act-counterparty/inputs/x-deal-v0/repeat-in-one-deal.input.json",
    "input_sha256": "ac32f3312d8c7b19695c95378d0cfd5eeccef8c09d1cb0a23ca66bb1b34d395a",
    "expected": {
@@ -3477,7 +3477,7 @@
   {
    "case": "engine-b455063a/live-history/given/a-commit-1900.absent",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/live-history/given/a-commit-1900.absent.json",
    "input_sha256": "99942cec84135fd98d675519f5cd1c4ddbc0566e4b0bc918e9734cdec725601c",
    "expected": {
@@ -3574,7 +3574,7 @@
   {
    "case": "engine-b455063a/live-history/given/a-commit-1900.as-sealed",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/live-history/given/a-commit-1900.as-sealed.json",
    "input_sha256": "4f2fab9c1f8a8a80b0b605733a142999ac9eba757d32b8da427a035be2a066a1",
    "expected": {
@@ -3670,7 +3670,7 @@
   {
    "case": "engine-b455063a/live-history/given/a-commit-1900.disposition-accept-claims-in-history",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/live-history/given/a-commit-1900.disposition-accept-claims-in-history.json",
    "input_sha256": "0ff8aec0b12fd9bb86747f369c23ddb352bca5c64aeb6061a9c759be78e414eb",
    "expected": {
@@ -3766,7 +3766,7 @@
   {
    "case": "engine-b455063a/live-history/given/a-commit-1900.disposition-accept-commit-names-no-item",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/live-history/given/a-commit-1900.disposition-accept-commit-names-no-item.json",
    "input_sha256": "bc953a456a79c07653820d1727d55a382699a395c79b02c850268fab867b16e8",
    "expected": {
@@ -3862,7 +3862,7 @@
   {
    "case": "engine-b455063a/live-history/given/a-commit-1900.disposition-accept-record-deal-claims",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/live-history/given/a-commit-1900.disposition-accept-record-deal-claims.json",
    "input_sha256": "72d3603141b23bfa41d720fe9087bb8174cfc5f91e83c77cab2d7476d6cbd5d6",
    "expected": {
@@ -3958,7 +3958,7 @@
   {
    "case": "engine-b455063a/live-history/given/a-commit-1900.disposition-accept-record-names-no-item",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/live-history/given/a-commit-1900.disposition-accept-record-names-no-item.json",
    "input_sha256": "2b93e88213e5d422559acf0caf0908a757faafd44d6b68dc820f5ed3925a5bde",
    "expected": {
@@ -4055,7 +4055,7 @@
   {
    "case": "engine-b455063a/live-history/given/a-commit-1900.disposition-accept",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/live-history/given/a-commit-1900.disposition-accept.json",
    "input_sha256": "bc953a456a79c07653820d1727d55a382699a395c79b02c850268fab867b16e8",
    "expected": {
@@ -4151,7 +4151,7 @@
   {
    "case": "engine-b455063a/live-history/given/a-commit-again-1900.absent",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/live-history/given/a-commit-again-1900.absent.json",
    "input_sha256": "8c3ad6f887bf7fd8ca0e2e9986f760453b8fca2b5fd819693595060f60221d43",
    "expected": {
@@ -4248,7 +4248,7 @@
   {
    "case": "engine-b455063a/live-history/given/a-commit-again-1900.as-sealed",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/live-history/given/a-commit-again-1900.as-sealed.json",
    "input_sha256": "d98e444a391b07ac6f392f9313b6bac3da4f176d5f78b14fdb4a3c82d14ba6d7",
    "expected": {
@@ -4345,7 +4345,7 @@
   {
    "case": "engine-b455063a/live-history/given/a-commit-again-1900.disposition-accept-claims-in-history",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/live-history/given/a-commit-again-1900.disposition-accept-claims-in-history.json",
    "input_sha256": "dc6b434cd1573c07fb4499a7cf0d2452ebdd77f15b7b1f75357d54c42444663f",
    "expected": {
@@ -4441,7 +4441,7 @@
   {
    "case": "engine-b455063a/live-history/given/a-commit-again-1900.disposition-accept-commit-names-no-item",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/live-history/given/a-commit-again-1900.disposition-accept-commit-names-no-item.json",
    "input_sha256": "e7ba0210f09cd4486e3c8d796db3ecaf2f18d184c32bb4b8f54b56e18fecbadb",
    "expected": {
@@ -4538,7 +4538,7 @@
   {
    "case": "engine-b455063a/live-history/given/a-commit-again-1900.disposition-accept-record-deal-claims",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/live-history/given/a-commit-again-1900.disposition-accept-record-deal-claims.json",
    "input_sha256": "7cebe4cf163b53906b5b6d5cf9b4559911108e11a415dffd562e031012d11c57",
    "expected": {
@@ -4634,7 +4634,7 @@
   {
    "case": "engine-b455063a/live-history/given/a-commit-again-1900.disposition-accept-record-names-no-item",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/live-history/given/a-commit-again-1900.disposition-accept-record-names-no-item.json",
    "input_sha256": "c963eef386e3cd18f3ab4a54e32ab26ad72df8d4b28f5a95834c60751da1b221",
    "expected": {
@@ -4731,7 +4731,7 @@
   {
    "case": "engine-b455063a/live-history/given/a-commit-again-1900.disposition-accept",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/live-history/given/a-commit-again-1900.disposition-accept.json",
    "input_sha256": "bcc5cdc6ebd0f28d65bbdb6c99f9adafc914575fcf0aacaea68a313ba7ce923d",
    "expected": {
@@ -4827,7 +4827,7 @@
   {
    "case": "engine-b455063a/live-history/given/a-offer-1900.absent",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/live-history/given/a-offer-1900.absent.json",
    "input_sha256": "7e0dfe8bf1d55e0721009d7db89be1df120738371c0fa4cac882b8e36d5c0e39",
    "expected": {
@@ -4925,7 +4925,7 @@
   {
    "case": "engine-b455063a/live-history/given/a-offer-1900.as-sealed",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/live-history/given/a-offer-1900.as-sealed.json",
    "input_sha256": "a911ae9566e7d12bf2d653dca2edaa34ab42c4c064ef5d34ddaeea1cabb9c3a8",
    "expected": {
@@ -5022,7 +5022,7 @@
   {
    "case": "engine-b455063a/live-history/given/a-offer-1900.disposition-accept-claims-in-history",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/live-history/given/a-offer-1900.disposition-accept-claims-in-history.json",
    "input_sha256": "73d8653c97061d3db4ef9a7b2af66d663657b2a310657083cd26266138ce422f",
    "expected": {
@@ -5119,7 +5119,7 @@
   {
    "case": "engine-b455063a/live-history/given/a-offer-1900.disposition-accept-commit-names-no-item",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/live-history/given/a-offer-1900.disposition-accept-commit-names-no-item.json",
    "input_sha256": "a911ae9566e7d12bf2d653dca2edaa34ab42c4c064ef5d34ddaeea1cabb9c3a8",
    "expected": {
@@ -5216,7 +5216,7 @@
   {
    "case": "engine-b455063a/live-history/given/a-offer-1900.disposition-accept-record-deal-claims",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/live-history/given/a-offer-1900.disposition-accept-record-deal-claims.json",
    "input_sha256": "0e0cb60d78a7e1cb976ea5ea43152bf90d8e0d239adef4e4b81856162ef5a09a",
    "expected": {
@@ -5313,7 +5313,7 @@
   {
    "case": "engine-b455063a/live-history/given/a-offer-1900.disposition-accept-record-names-no-item",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/live-history/given/a-offer-1900.disposition-accept-record-names-no-item.json",
    "input_sha256": "0420dbd5730e1f8f67e392c2241f923a900f0749022a111ca9ec4f6821d619d3",
    "expected": {
@@ -5411,7 +5411,7 @@
   {
    "case": "engine-b455063a/live-history/given/a-offer-1900.disposition-accept",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/live-history/given/a-offer-1900.disposition-accept.json",
    "input_sha256": "a911ae9566e7d12bf2d653dca2edaa34ab42c4c064ef5d34ddaeea1cabb9c3a8",
    "expected": {
@@ -5508,7 +5508,7 @@
   {
    "case": "engine-b455063a/live-history/given/b-commit-1850.absent",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/live-history/given/b-commit-1850.absent.json",
    "input_sha256": "2a020dd248e8c6e799e9c970867d41805380c49b0222b69689be43886270a94e",
    "expected": {
@@ -5605,7 +5605,7 @@
   {
    "case": "engine-b455063a/live-history/given/b-commit-1850.as-sealed",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/live-history/given/b-commit-1850.as-sealed.json",
    "input_sha256": "520f4f9cc9ae140d3679a0948afccb067b9ed79c9aee3185a70077184d0ade4b",
    "expected": {
@@ -5702,7 +5702,7 @@
   {
    "case": "engine-b455063a/live-history/given/b-commit-1850.disposition-accept-claims-in-history",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/live-history/given/b-commit-1850.disposition-accept-claims-in-history.json",
    "input_sha256": "0384a58fbda8b6a0e5bb29dea7ae0195125f4807389692d277a5557381e54f08",
    "expected": {
@@ -5798,7 +5798,7 @@
   {
    "case": "engine-b455063a/live-history/given/b-commit-1850.disposition-accept-commit-names-no-item",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/live-history/given/b-commit-1850.disposition-accept-commit-names-no-item.json",
    "input_sha256": "d3d23cf4bbc24deb41b635132c5d46ae33d07c13103b1ec963bbdb8c43082220",
    "expected": {
@@ -5895,7 +5895,7 @@
   {
    "case": "engine-b455063a/live-history/given/b-commit-1850.disposition-accept-record-deal-claims",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/live-history/given/b-commit-1850.disposition-accept-record-deal-claims.json",
    "input_sha256": "34f90e8aa6cd3642c0b52ae95906f5c74339897066b53bfc1f7f211601c9e7db",
    "expected": {
@@ -5991,7 +5991,7 @@
   {
    "case": "engine-b455063a/live-history/given/b-commit-1850.disposition-accept-record-names-no-item",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/live-history/given/b-commit-1850.disposition-accept-record-names-no-item.json",
    "input_sha256": "49a2cd6cf2c113975017dd8b62ee1ae9c29a9ef8aeb2aa28aa44f546869ec413",
    "expected": {
@@ -6088,7 +6088,7 @@
   {
    "case": "engine-b455063a/live-history/given/b-commit-1850.disposition-accept",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/live-history/given/b-commit-1850.disposition-accept.json",
    "input_sha256": "58cc294a7dbb61083d3301d4b5b0c9326059c57ddc2230133c55a52b07793e22",
    "expected": {
@@ -6184,7 +6184,7 @@
   {
    "case": "engine-b455063a/live-history/given/b-offer-1850.absent",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/live-history/given/b-offer-1850.absent.json",
    "input_sha256": "0906f5f2eeac5031be05d080a672f66ced46c2ff0895e7e1ec56c9d051dddebd",
    "expected": {
@@ -6282,7 +6282,7 @@
   {
    "case": "engine-b455063a/live-history/given/b-offer-1850.as-sealed",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/live-history/given/b-offer-1850.as-sealed.json",
    "input_sha256": "5be9da8eeb0f395517099a0894b9bcbfcdba8a689b1e9854999e0fc14938f51f",
    "expected": {
@@ -6380,7 +6380,7 @@
   {
    "case": "engine-b455063a/live-history/given/b-offer-1850.disposition-accept-claims-in-history",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/live-history/given/b-offer-1850.disposition-accept-claims-in-history.json",
    "input_sha256": "3dc6441bc743e5642ca650a8a3520e0a7e3123d976f420b86abdf881fb306144",
    "expected": {
@@ -6477,7 +6477,7 @@
   {
    "case": "engine-b455063a/live-history/given/b-offer-1850.disposition-accept-commit-names-no-item",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/live-history/given/b-offer-1850.disposition-accept-commit-names-no-item.json",
    "input_sha256": "fabdff65e144348ff226ee380add5fde47a94e2d477ef54b5454a8b3fabb24a4",
    "expected": {
@@ -6575,7 +6575,7 @@
   {
    "case": "engine-b455063a/live-history/given/b-offer-1850.disposition-accept-record-deal-claims",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/live-history/given/b-offer-1850.disposition-accept-record-deal-claims.json",
    "input_sha256": "9593e99a9ddbaade7ce45495fda8a9795117a90486285542e2cdf172ece8f8df",
    "expected": {
@@ -6672,7 +6672,7 @@
   {
    "case": "engine-b455063a/live-history/given/b-offer-1850.disposition-accept-record-names-no-item",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/live-history/given/b-offer-1850.disposition-accept-record-names-no-item.json",
    "input_sha256": "97211a314c21a3e042574f5f6edd6c646038e13e2f42df3d47bad6e9a279752b",
    "expected": {
@@ -6770,7 +6770,7 @@
   {
    "case": "engine-b455063a/live-history/given/b-offer-1850.disposition-accept",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/live-history/given/b-offer-1850.disposition-accept.json",
    "input_sha256": "cf1f98f6aa8b089c925fedea8b50a1a1e571feb1c7e9afe0aa95de9cc5d0b770",
    "expected": {
@@ -6867,7 +6867,7 @@
   {
    "case": "engine-b455063a/live-history-untyped-acts/main-2214b0f/booking-at-another-merchant.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/live-history-untyped-acts/main-2214b0f/booking-at-another-merchant.input.json",
    "input_sha256": "bb749b6787c9699c7fa09940e771784c7471b37b04a626cbb4de21ce0c770c2f",
    "expected": {
@@ -6991,7 +6991,7 @@
   {
    "case": "engine-b455063a/live-history-untyped-acts/main-2214b0f/pay-a-merchant-paid-before.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/live-history-untyped-acts/main-2214b0f/pay-a-merchant-paid-before.input.json",
    "input_sha256": "02d4522f418f7e871c7f90c0dbed8871c02e13cac1781e18ef06db83912fb689",
    "expected": {
@@ -7115,7 +7115,7 @@
   {
    "case": "engine-b455063a/live-history-untyped-acts/main-2214b0f/pay-after-a-partial-cancel.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/live-history-untyped-acts/main-2214b0f/pay-after-a-partial-cancel.input.json",
    "input_sha256": "d78581ab9927925f8a38d5bfcb32c07cd4ad808241b8a1e90f91edb7118ea107",
    "expected": {
@@ -7239,7 +7239,7 @@
   {
    "case": "engine-b455063a/live-history-untyped-acts/main-2214b0f/pay-after-an-unchecked-act.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/live-history-untyped-acts/main-2214b0f/pay-after-an-unchecked-act.input.json",
    "input_sha256": "ca8c36d1c76c8c6ca0b0b44a69e880e4a3df5c2651179c7206ec131a1a61a49d",
    "expected": {
@@ -7363,7 +7363,7 @@
   {
    "case": "engine-b455063a/live-history-untyped-acts/main-2214b0f/repeat-booking-in-the-same-deal.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/live-history-untyped-acts/main-2214b0f/repeat-booking-in-the-same-deal.input.json",
    "input_sha256": "df5b10bcd493fca08b4731edf5fbc8228253cedeebb6245f7492e8eb1758149f",
    "expected": {
@@ -7487,7 +7487,7 @@
   {
    "case": "engine-b455063a/live-history-untyped-acts/main-2214b0f/repeat-pay-in-another-deal.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/live-history-untyped-acts/main-2214b0f/repeat-pay-in-another-deal.input.json",
    "input_sha256": "45a63b3945aba886b7724fd1cf4b6f3d55f8af4ffebf8f57138070f04197fe4f",
    "expected": {
@@ -7611,7 +7611,7 @@
   {
    "case": "engine-b455063a/live-history-untyped-acts/main-2214b0f/repeat-pay-in-the-same-deal.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/live-history-untyped-acts/main-2214b0f/repeat-pay-in-the-same-deal.input.json",
    "input_sha256": "214474f8e95f450de8bb09bdaccc4b974330ecf44aa376cfe9a93938723530c2",
    "expected": {
@@ -7735,7 +7735,7 @@
   {
    "case": "engine-b455063a/live-history-untyped-acts/rc14/repeat-pay-in-the-same-deal.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/live-history-ledger-vectors/engine-b455063a/live-history-untyped-acts/rc14/repeat-pay-in-the-same-deal.input.json",
    "input_sha256": "adde8e8cc11a1f562c578beaaffcd1c5c15774e862c3aa2d23f824f835780f23",
    "expected": {
@@ -7859,7 +7859,7 @@
   {
    "case": "seal-disposition-213/booked-merchant-then-pay/typed/booking.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/live-history-ledger-vectors/seal-disposition-213/booked-merchant-then-pay/typed/booking.input.json",
    "input_sha256": "cff42f4596cb907ef67b7dade2082a4a4be5e281e4a64d910318af9700a8e5b0",
    "expected": {
@@ -7983,7 +7983,7 @@
   {
    "case": "seal-disposition-213/booked-merchant-then-pay/typed/pay-booked-merchant.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/live-history-ledger-vectors/seal-disposition-213/booked-merchant-then-pay/typed/pay-booked-merchant.input.json",
    "input_sha256": "b0a722e2d864bbd1f338c46bab6913727d2ffdc4226ed933940ae651bbdbfc16",
    "expected": {
@@ -8108,7 +8108,7 @@
   {
    "case": "seal-disposition-213/booked-merchant-then-pay/x-deal-v0/booking.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/live-history-ledger-vectors/seal-disposition-213/booked-merchant-then-pay/x-deal-v0/booking.input.json",
    "input_sha256": "4090586c4502a6d534bcda86be242d6696cf516c7bce6be3114b5450d9bede93",
    "expected": {
@@ -8233,7 +8233,7 @@
   {
    "case": "seal-disposition-213/booked-merchant-then-pay/x-deal-v0/pay-booked-merchant.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/live-history-ledger-vectors/seal-disposition-213/booked-merchant-then-pay/x-deal-v0/pay-booked-merchant.input.json",
    "input_sha256": "6f62b67d73208b2881e46b8316956f8ef8bdb94059cea158151329008a0c15f7",
    "expected": {
@@ -8359,7 +8359,7 @@
   {
    "case": "seal-disposition-213/history-act-counterparty/typed/other-merchant.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/live-history-ledger-vectors/seal-disposition-213/history-act-counterparty/typed/other-merchant.input.json",
    "input_sha256": "27193209543df19f01ee04ffd3797501f94ad6fcb67f326996e4472c1297c64f",
    "expected": {
@@ -8483,7 +8483,7 @@
   {
    "case": "seal-disposition-213/history-act-counterparty/typed/repeat-in-one-deal.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/live-history-ledger-vectors/seal-disposition-213/history-act-counterparty/typed/repeat-in-one-deal.input.json",
    "input_sha256": "75c1e1e8f2302118da231fa7072d5aac8fc89a64259a73010226aa4c8aa32b4f",
    "expected": {
@@ -8607,7 +8607,7 @@
   {
    "case": "seal-disposition-213/history-act-counterparty/x-deal-v0/other-merchant.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/live-history-ledger-vectors/seal-disposition-213/history-act-counterparty/x-deal-v0/other-merchant.input.json",
    "input_sha256": "eb1d1f9011698995fdffe6c001204f8fbe870ef8eaded0fc0899c966f1456cb1",
    "expected": {
@@ -8732,7 +8732,7 @@
   {
    "case": "seal-disposition-213/history-act-counterparty/x-deal-v0/repeat-in-one-deal.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/live-history-ledger-vectors/seal-disposition-213/history-act-counterparty/x-deal-v0/repeat-in-one-deal.input.json",
    "input_sha256": "316ad3c2b2eedcc555c5daa2a80bf88863fcebfddff31101fbad4f701073df84",
    "expected": {
@@ -8857,7 +8857,7 @@
   {
    "case": "seal-disposition-213/live-history/check-inputs/a-commit-1900",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/seal-disposition-213/live-history/check-inputs/a-commit-1900.json",
    "input_sha256": "a05a01cec70883b18682cf260f755dad639e9e95aa9f13c70f85ae1495953ed0",
    "expected": {
@@ -8953,7 +8953,7 @@
   {
    "case": "seal-disposition-213/live-history/check-inputs/a-commit-again-1900",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/seal-disposition-213/live-history/check-inputs/a-commit-again-1900.json",
    "input_sha256": "b2c80e8ea003334b624290025aa3b01a6df96b2434405a4bf6c753109840192b",
    "expected": {
@@ -9049,7 +9049,7 @@
   {
    "case": "seal-disposition-213/live-history/check-inputs/a-offer-1900",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/seal-disposition-213/live-history/check-inputs/a-offer-1900.json",
    "input_sha256": "4d4dc3bc5daff292556ad6ff049bb7a20813a689c4d824f077e8b9d1c437233f",
    "expected": {
@@ -9146,7 +9146,7 @@
   {
    "case": "seal-disposition-213/live-history/check-inputs/b-commit-1850",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/seal-disposition-213/live-history/check-inputs/b-commit-1850.json",
    "input_sha256": "dbdc75d585f1fc0cbab95f442db5c4bb86d93b8cfc00feb740745f134e0d47a6",
    "expected": {
@@ -9242,7 +9242,7 @@
   {
    "case": "seal-disposition-213/live-history/check-inputs/b-offer-1850",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/live-history-ledger-vectors/seal-disposition-213/live-history/check-inputs/b-offer-1850.json",
    "input_sha256": "d983271bed9d11e10e902b973a5de11f66bfeacdcfb6839b7c72928ab2c44637",
    "expected": {

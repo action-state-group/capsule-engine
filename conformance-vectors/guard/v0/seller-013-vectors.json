@@ -4,7 +4,7 @@
   {
    "case": "go-vectors/check-inputs/a-commit-1900.claims-in-history",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/seller-013-vectors/go-vectors/check-inputs/a-commit-1900.claims-in-history.json",
    "input_sha256": "ea0ee90d6f8e1b9fe9b269bbc2e4386a1b0894db3a5105c54dc25d86beaf7af5",
    "expected": {
@@ -100,7 +100,7 @@
   {
    "case": "go-vectors/check-inputs/a-commit-again-1900.claims-in-history",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/seller-013-vectors/go-vectors/check-inputs/a-commit-again-1900.claims-in-history.json",
    "input_sha256": "b9a0f96f16913dedcc2143ab6823d09c1222a22710a5de829ca0f89d5c665a2a",
    "expected": {
@@ -196,7 +196,7 @@
   {
    "case": "go-vectors/check-inputs/a-offer-1900.claims-in-history",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/seller-013-vectors/go-vectors/check-inputs/a-offer-1900.claims-in-history.json",
    "input_sha256": "fbf2981367e324133e3d8d3d124628f809d8bc9b63fc746cc57421056066ca67",
    "expected": {
@@ -293,7 +293,7 @@
   {
    "case": "go-vectors/check-inputs/b-commit-1850.claims-in-history",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/seller-013-vectors/go-vectors/check-inputs/b-commit-1850.claims-in-history.json",
    "input_sha256": "a7a219898a3d33fbf60ff5440f10606421b02a862d7bc68555a1dc915c9f22cd",
    "expected": {
@@ -389,7 +389,7 @@
   {
    "case": "go-vectors/check-inputs/b-offer-1850.claims-in-history",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/seller-013-vectors/go-vectors/check-inputs/b-offer-1850.claims-in-history.json",
    "input_sha256": "9578bea80608d578d6a8f0e301336968ffd0f427fc5709aa5b824d1bb1a213a8",
    "expected": {

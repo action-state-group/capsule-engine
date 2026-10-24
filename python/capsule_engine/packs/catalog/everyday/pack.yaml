@@ -49,7 +49,20 @@
 # (recipient_told_before). With either input missing or malformed, its rule
 # flags as in 0.3.7. The pack binds one gate version, so rules 1, 4 and 15-18
 # cite 1.2.0 too, with the same selectors and outcomes.
-pack_id: asg/everyday/0.3.8
+#
+# 0.3.9 changes wording only (capsule-engine#182); no rule decides differently.
+# Rule 3's statement ends with the ruled title, "Your details go only to the
+# merchant filling your order, a listing platform, or you" (a statement
+# opens with its verb, so the title closes it), and a platform is defined
+# once, here and in the seller pack: the marketplace, booking site or mail
+# relay between you and the other party. Every id, check and definition is
+# 0.3.8's; only the pack's statements and so its definition digest move, and
+# 0.3.8 stays frozen at its own. The checker's reason for rules 11 and 12 no
+# longer names a selector or an action class: "Asks: first time sharing your
+# {class} with {party}", worded from the role and classes rule 3's check
+# recorded, and every other gate rule's reason is a sentence that names
+# neither.
+pack_id: asg/everyday/0.3.9
 
 obligations:
   # -- DO ------------------------------------------------------------------
@@ -77,11 +90,12 @@ obligations:
       Checks the role of whoever receives a personal-data disclosure
       (disclosure.personal), from the closed set fulfilling_merchant,
       platform, third_party or self, and records the role it read. It passes
-      for the fulfilling merchant or the user, and for a platform (a
-      marketplace, booking site or mail relay acting between the user and
-      the counterparty) only when every class of data the disclosure names
-      is email; it records those class names, never who the recipient is or
-      what the disclosure contains.
+      for the fulfilling merchant or the user, and for a platform (the
+      marketplace, booking site or mail relay between you and the other
+      party) only when every class of data the disclosure names is email; it
+      records those class names, never who the recipient is or what the disclosure
+      contains. Your details go only to the merchant filling your order, a
+      listing platform, or you.
     check: recipient_role
     default_disposition: DO
   - id: r04-prepare-without-committing

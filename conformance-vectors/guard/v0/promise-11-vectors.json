@@ -4,7 +4,7 @@
   {
    "case": "check-inputs/a-attributed-class-features",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/promise-11-vectors/check-inputs/a-attributed-class-features.json",
    "input_sha256": "210cdbca8a8e915c5b58f7bc56a172a5c41b79d042aaa64bbc89e1a6563e4444",
    "expected": {
@@ -104,7 +104,7 @@
   {
    "case": "check-inputs/a-attributed-ellipsis",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/promise-11-vectors/check-inputs/a-attributed-ellipsis.json",
    "input_sha256": "020a3cec54f19dea4dc891a45e8233dfebc3a68dfc4bc447cd128c52c4286998",
    "expected": {
@@ -204,7 +204,7 @@
   {
    "case": "check-inputs/a-attributed-line-separator",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/promise-11-vectors/check-inputs/a-attributed-line-separator.json",
    "input_sha256": "d6041b1c62b6ff4be977e3d2dcbef7fa09264ead545a28b812e55f932f8557ed",
    "expected": {
@@ -304,7 +304,7 @@
   {
    "case": "check-inputs/a-attributed-list-opening",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/promise-11-vectors/check-inputs/a-attributed-list-opening.json",
    "input_sha256": "6cc7b69eb9edf79ddcc443244440ae8e7cedef478e067726a3af44d8366e5d7a",
    "expected": {
@@ -404,7 +404,7 @@
   {
    "case": "check-inputs/a-attributed-lone-surrogate",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/promise-11-vectors/check-inputs/a-attributed-lone-surrogate.json",
    "input_sha256": "8f11fd33c986ccb5e0707382f8f4381b0b4849b48fe18e75f6191934c443f420",
    "expected": {
@@ -504,7 +504,7 @@
   {
    "case": "check-inputs/a-attributed-malformed-commitment",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/promise-11-vectors/check-inputs/a-attributed-malformed-commitment.json",
    "input_sha256": "5927d3d11be9a15f91ca55c7347537d15b197eb2e2fceab8a41bbcdab3eeda97",
    "expected": {
@@ -604,7 +604,7 @@
   {
    "case": "check-inputs/a-attributed-nbsp-blank",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/promise-11-vectors/check-inputs/a-attributed-nbsp-blank.json",
    "input_sha256": "6ab39e1f5e00ca743dc96ddce5b6b4760d1a25083eb4908121e9d126ba9eefb0",
    "expected": {
@@ -704,7 +704,7 @@
   {
    "case": "check-inputs/a-attributed-no-commitment",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/promise-11-vectors/check-inputs/a-attributed-no-commitment.json",
    "input_sha256": "d73b1a2e9b9b6c9af7923f229f75643b7fcaf964641a02a9645c039d34ca1b74",
    "expected": {
@@ -804,7 +804,7 @@
   {
    "case": "check-inputs/a-attributed-no-opening",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/promise-11-vectors/check-inputs/a-attributed-no-opening.json",
    "input_sha256": "2f99d5159da772e2d67ce8aff29d79c8279436648afef7d46cf7cf6e2f349588",
    "expected": {
@@ -904,7 +904,7 @@
   {
    "case": "check-inputs/a-attributed-no-suffix",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/promise-11-vectors/check-inputs/a-attributed-no-suffix.json",
    "input_sha256": "86b121ad69c3d77a4ad4ba6b4afc00904170bd27f2bcac63faffc3454cfcba06",
    "expected": {
@@ -1004,7 +1004,7 @@
   {
    "case": "check-inputs/a-attributed-null-commitment",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/promise-11-vectors/check-inputs/a-attributed-null-commitment.json",
    "input_sha256": "0cbfd334ea6af69d09d73c501f455bab0898063728154e69afb37d0cafb3503b",
    "expected": {
@@ -1104,7 +1104,7 @@
   {
    "case": "check-inputs/a-attributed-null-opening",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/promise-11-vectors/check-inputs/a-attributed-null-opening.json",
    "input_sha256": "dfad38f60ef506a3343797426ca37aa93170755799cb668949855bbf200999f4",
    "expected": {
@@ -1204,7 +1204,7 @@
   {
    "case": "check-inputs/a-attributed-other-script",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/promise-11-vectors/check-inputs/a-attributed-other-script.json",
    "input_sha256": "5b8d44c3e7a585b56139e738d466e328be41a7e34a8ac16f4751783f8a175c74",
    "expected": {
@@ -1304,7 +1304,7 @@
   {
    "case": "check-inputs/a-attributed-prefix-only",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/promise-11-vectors/check-inputs/a-attributed-prefix-only.json",
    "input_sha256": "5a0de7e95ce84d4abaa396ad1856341890e9c57f39a9029661d27b9d3c7e8bba",
    "expected": {
@@ -1404,7 +1404,7 @@
   {
    "case": "check-inputs/a-attributed-to-other",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/promise-11-vectors/check-inputs/a-attributed-to-other.json",
    "input_sha256": "d1e85b956cde5e64e5c6f753abc6946182a4b6a108a7754ec8e59ee8194d1000",
    "expected": {
@@ -1504,7 +1504,7 @@
   {
    "case": "check-inputs/a-attributed-two-sentences",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/promise-11-vectors/check-inputs/a-attributed-two-sentences.json",
    "input_sha256": "27bd761e93719c4733edd104a97be48a8bbf330a05c6aa65595840ae68dd47c3",
    "expected": {
@@ -1604,7 +1604,7 @@
   {
    "case": "check-inputs/a-attributed-unit-separator-blank",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/promise-11-vectors/check-inputs/a-attributed-unit-separator-blank.json",
    "input_sha256": "9ca641bc266369ab59155f09b36d6f1d5be310e58a1d8fd101a4f74a033b4ca1",
    "expected": {
@@ -1704,7 +1704,7 @@
   {
    "case": "check-inputs/a-attributed-wrong-nonce",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/promise-11-vectors/check-inputs/a-attributed-wrong-nonce.json",
    "input_sha256": "242ac70ad6a82c52a0b9035bc6161d0ebb4d635bdb34974b42529a446a5248cd",
    "expected": {
@@ -1804,7 +1804,7 @@
   {
    "case": "check-inputs/a-attributed",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/promise-11-vectors/check-inputs/a-attributed.json",
    "input_sha256": "af7243e79b99031290b83e64f49b73f27eb729f577f175ec9b88d06034e82f5a",
    "expected": {
@@ -1904,7 +1904,7 @@
   {
    "case": "check-inputs/a-condition",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/promise-11-vectors/check-inputs/a-condition.json",
    "input_sha256": "810ebe8871eecc40324bea6c31a7af5af18c5590405e27c43fcf7896d8b93ba2",
    "expected": {
@@ -2004,7 +2004,7 @@
   {
    "case": "check-inputs/a-ordered-empty",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/promise-11-vectors/check-inputs/a-ordered-empty.json",
    "input_sha256": "a3be18def6b5043e69bd68c2984cb4c0e61ce7f39509f57ecdf4c69f61e864ef",
    "expected": {
@@ -2104,7 +2104,7 @@
   {
    "case": "check-inputs/a-ordered-list-with-number",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/promise-11-vectors/check-inputs/a-ordered-list-with-number.json",
    "input_sha256": "29124519518a249e98266d95398f5b5f3892b5eed13b41f7e91718f2b4e3c7c6",
    "expected": {
@@ -2204,7 +2204,7 @@
   {
    "case": "check-inputs/a-ordered-list-with-unknown",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/promise-11-vectors/check-inputs/a-ordered-list-with-unknown.json",
    "input_sha256": "4c17bef5f8c26e071d7d57ac6c567cbbd6b657ce549d6ad9f7ab82db70695378",
    "expected": {
@@ -2304,7 +2304,7 @@
   {
    "case": "check-inputs/a-ordered-no-task-authority",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/promise-11-vectors/check-inputs/a-ordered-no-task-authority.json",
    "input_sha256": "2c0f4b0d00d42d5ea079f498a3411d3fc917804335dcf4b72923de4b81c88dfa",
    "expected": {
@@ -2404,7 +2404,7 @@
   {
    "case": "check-inputs/a-ordered-not-a-list",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/promise-11-vectors/check-inputs/a-ordered-not-a-list.json",
    "input_sha256": "cec4dae10e0783103b6ba6a9858bea4d44cfe40edd8594e96df3529218949574",
    "expected": {
@@ -2504,7 +2504,7 @@
   {
    "case": "check-inputs/a-ordered",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/promise-11-vectors/check-inputs/a-ordered.json",
    "input_sha256": "c58666442e2778e2b673f706f9cdcf131360f311844d772ece3035177c47a3b9",
    "expected": {
@@ -2604,7 +2604,7 @@
   {
    "case": "check-inputs/a-own-authenticity",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/promise-11-vectors/check-inputs/a-own-authenticity.json",
    "input_sha256": "ea4ad92151862a4a76672d3864830a2b217d3cc2c5b3fc538b6b1da85089fd27",
    "expected": {
@@ -2704,7 +2704,7 @@
   {
    "case": "check-inputs/a-unordered-no-task-authority",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/promise-11-vectors/check-inputs/a-unordered-no-task-authority.json",
    "input_sha256": "ee967c80ffa167ece4c413a822ec05e25a7df9b6f18613dc8cf99687a67156c5",
    "expected": {
@@ -2804,7 +2804,7 @@
   {
    "case": "check-inputs/a-unordered",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/promise-11-vectors/check-inputs/a-unordered.json",
    "input_sha256": "89f134b9cb7cc8acb8a019ca495f6efb8c0805409f7617d89f8ce5dc58d7ad86",
    "expected": {
@@ -2904,7 +2904,7 @@
   {
    "case": "check-inputs/b-attributed",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/promise-11-vectors/check-inputs/b-attributed.json",
    "input_sha256": "3b138083e47244ee661ccbc79d507bacbc5a7bbe7eb13659e02dfc97ac7026b5",
    "expected": {
@@ -3004,7 +3004,7 @@
   {
    "case": "check-inputs/b-ordered",
    "kind": "check-input",
-   "pack": "seller-0.1.5",
+   "pack": "seller-0.1.6",
    "input": "go/guard/testdata/promise-11-vectors/check-inputs/b-ordered.json",
    "input_sha256": "4b852ad6c889a193ac2638c8f0227c1e4d1306b8c3db78eb4ae8ff191c9d2061",
    "expected": {

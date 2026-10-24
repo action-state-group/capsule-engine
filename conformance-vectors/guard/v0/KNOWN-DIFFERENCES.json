@@ -265,12 +265,6 @@
    "issue": "https://github.com/action-state-group/capsule-engine/issues/214",
    "why": "group 6: the sale's verification. The Go guard takes it from capsulectl's verify --bundle report and adds sale_bundle_not_valid and thread_not_valid where that report fails the bundle or a thread; the engine verifies the bundle itself (check_evidence_file) and does not. Both read the sale as incomplete, and every step agrees",
    "python": {
-    "sale": {
-     "complete": false,
-     "findings": [
-      "thread_not_shown"
-     ]
-    },
     "steps": [
      {
       "outcome": "deny",
@@ -364,7 +358,7 @@
        }
       ],
       "capsule_id": "305a8f657b0acea5a072b1b1587d86a18510f5c4fa375d3b2e5e6647ee15b22f",
-      "sealed_capsule_id": "053bd049ecb29154be8d060867cd25300e3d16f9ef2427869061aba1caf9e335"
+      "sealed_capsule_id": "95712ca2be4348d5887bc3c90f262b08431afc9b71f4dade6238ff2319c11f75"
      },
      {
       "outcome": "deny",
@@ -457,7 +451,7 @@
        }
       ],
       "capsule_id": "5908babb7728def54017622e1dc883860dab085574b8faff83cffb1cd1ea7d7a",
-      "sealed_capsule_id": "788f17ca558dccdd85d0b2bf330ac505f0aef5f4e11949b7753a31bfb21f70fa"
+      "sealed_capsule_id": "dea40ba91a37f4b00f1606b9a138ddc30a799e1a94f2feb8d93b3649aaf1c6ce"
      },
      {
       "outcome": "deny",
@@ -466,7 +460,7 @@
         "id": "dedupe",
         "result": "fail",
         "method": "exact_match_index_v0",
-        "evidence_digest": "c1347973ffd701d139d5a429965d6060e2522c12d2f26992dd504ff2dfd3d66e"
+        "evidence_digest": "12edd649a1fe4cfdc3557424665f40982b258544f3d397f98805c9438d9f6c4a"
        },
        {
         "id": "caps",
@@ -550,9 +544,15 @@
        }
       ],
       "capsule_id": "e7c0ad26ce151e9df13673098357ae6c941f9d22cacd3590c804b1f895e7f835",
-      "sealed_capsule_id": "3adca47655c40eef3465eb8bb1d4dc83c48b20da99187d74b0f3de71433d6b4a"
+      "sealed_capsule_id": "40e9b70d85cb5996be0cc3342e38e351e450e919380a501124df8183c7cd1671"
      }
-    ]
+    ],
+    "sale": {
+     "complete": false,
+     "findings": [
+      "thread_not_shown"
+     ]
+    }
    },
    "go": {
     "steps": [
@@ -641,7 +641,7 @@
        }
       ],
       "capsule_id": "305a8f657b0acea5a072b1b1587d86a18510f5c4fa375d3b2e5e6647ee15b22f",
-      "sealed_capsule_id": "053bd049ecb29154be8d060867cd25300e3d16f9ef2427869061aba1caf9e335"
+      "sealed_capsule_id": "95712ca2be4348d5887bc3c90f262b08431afc9b71f4dade6238ff2319c11f75"
      },
      {
       "outcome": "deny",
@@ -728,7 +728,7 @@
        }
       ],
       "capsule_id": "5908babb7728def54017622e1dc883860dab085574b8faff83cffb1cd1ea7d7a",
-      "sealed_capsule_id": "788f17ca558dccdd85d0b2bf330ac505f0aef5f4e11949b7753a31bfb21f70fa"
+      "sealed_capsule_id": "dea40ba91a37f4b00f1606b9a138ddc30a799e1a94f2feb8d93b3649aaf1c6ce"
      },
      {
       "outcome": "deny",
@@ -737,7 +737,7 @@
         "id": "dedupe",
         "result": "fail",
         "method": "exact_match_index_v0",
-        "evidence_digest": "c1347973ffd701d139d5a429965d6060e2522c12d2f26992dd504ff2dfd3d66e"
+        "evidence_digest": "12edd649a1fe4cfdc3557424665f40982b258544f3d397f98805c9438d9f6c4a"
        },
        {
         "id": "caps",
@@ -815,7 +815,7 @@
        }
       ],
       "capsule_id": "e7c0ad26ce151e9df13673098357ae6c941f9d22cacd3590c804b1f895e7f835",
-      "sealed_capsule_id": "3adca47655c40eef3465eb8bb1d4dc83c48b20da99187d74b0f3de71433d6b4a"
+      "sealed_capsule_id": "40e9b70d85cb5996be0cc3342e38e351e450e919380a501124df8183c7cd1671"
      }
     ],
     "sale": {
@@ -833,12 +833,6 @@
    "issue": "https://github.com/action-state-group/capsule-engine/issues/214",
    "why": "group 6: the sale's verification. The Go guard takes it from capsulectl's verify --bundle report and adds sale_bundle_not_valid and thread_not_valid where that report fails the bundle or a thread; the engine verifies the bundle itself (check_evidence_file) and does not. Both read the sale as incomplete, and every step agrees",
    "python": {
-    "sale": {
-     "complete": false,
-     "findings": [
-      "thread_not_whole_at_the_cut"
-     ]
-    },
     "steps": [
      {
       "outcome": "deny",
@@ -932,7 +926,7 @@
        }
       ],
       "capsule_id": "305a8f657b0acea5a072b1b1587d86a18510f5c4fa375d3b2e5e6647ee15b22f",
-      "sealed_capsule_id": "053bd049ecb29154be8d060867cd25300e3d16f9ef2427869061aba1caf9e335"
+      "sealed_capsule_id": "95712ca2be4348d5887bc3c90f262b08431afc9b71f4dade6238ff2319c11f75"
      },
      {
       "outcome": "deny",
@@ -1025,7 +1019,7 @@
        }
       ],
       "capsule_id": "5908babb7728def54017622e1dc883860dab085574b8faff83cffb1cd1ea7d7a",
-      "sealed_capsule_id": "788f17ca558dccdd85d0b2bf330ac505f0aef5f4e11949b7753a31bfb21f70fa"
+      "sealed_capsule_id": "dea40ba91a37f4b00f1606b9a138ddc30a799e1a94f2feb8d93b3649aaf1c6ce"
      },
      {
       "outcome": "deny",
@@ -1119,7 +1113,7 @@
        }
       ],
       "capsule_id": "8402d1f476b8251f967d74af4a9865e47462e2ee60f3438d8412b6262cb80502",
-      "sealed_capsule_id": "9bcc0dcb224a60f071b233b019cae84abea24b583f1215cd70e959636b533b70"
+      "sealed_capsule_id": "5f8a74836199c3cdb107aea753431325ee7e5d7027e3adb7eef002976b4530d4"
      },
      {
       "outcome": "deny",
@@ -1212,7 +1206,7 @@
        }
       ],
       "capsule_id": "56db7ac69e21c6fc4be4f7af4e6a22705a725324ce5cc9d7f0ba008de2ae553a",
-      "sealed_capsule_id": "125ec6823486e9e95ec13dfb1bb707c17abea0ed81388b5c72dbdc197e75826a"
+      "sealed_capsule_id": "3db314cfb400704e0cddee0547ddd7605a12070e378fb360cc4da924d22c4f3f"
      },
      {
       "outcome": "deny",
@@ -1221,7 +1215,7 @@
         "id": "dedupe",
         "result": "fail",
         "method": "exact_match_index_v0",
-        "evidence_digest": "c1347973ffd701d139d5a429965d6060e2522c12d2f26992dd504ff2dfd3d66e"
+        "evidence_digest": "12edd649a1fe4cfdc3557424665f40982b258544f3d397f98805c9438d9f6c4a"
        },
        {
         "id": "caps",
@@ -1305,9 +1299,15 @@
        }
       ],
       "capsule_id": "e7c0ad26ce151e9df13673098357ae6c941f9d22cacd3590c804b1f895e7f835",
-      "sealed_capsule_id": "559dcb5949bce6d048eda14776b766f004c8b0f763a229724003968c6b10bf2c"
+      "sealed_capsule_id": "2c66afa7ceb31031b0140394d33b62adf3f36c5d77a43ab2718c735237db07b2"
      }
-    ]
+    ],
+    "sale": {
+     "complete": false,
+     "findings": [
+      "thread_not_whole_at_the_cut"
+     ]
+    }
    },
    "go": {
     "steps": [
@@ -1396,7 +1396,7 @@
        }
       ],
       "capsule_id": "305a8f657b0acea5a072b1b1587d86a18510f5c4fa375d3b2e5e6647ee15b22f",
-      "sealed_capsule_id": "053bd049ecb29154be8d060867cd25300e3d16f9ef2427869061aba1caf9e335"
+      "sealed_capsule_id": "95712ca2be4348d5887bc3c90f262b08431afc9b71f4dade6238ff2319c11f75"
      },
      {
       "outcome": "deny",
@@ -1483,7 +1483,7 @@
        }
       ],
       "capsule_id": "5908babb7728def54017622e1dc883860dab085574b8faff83cffb1cd1ea7d7a",
-      "sealed_capsule_id": "788f17ca558dccdd85d0b2bf330ac505f0aef5f4e11949b7753a31bfb21f70fa"
+      "sealed_capsule_id": "dea40ba91a37f4b00f1606b9a138ddc30a799e1a94f2feb8d93b3649aaf1c6ce"
      },
      {
       "outcome": "deny",
@@ -1570,7 +1570,7 @@
        }
       ],
       "capsule_id": "8402d1f476b8251f967d74af4a9865e47462e2ee60f3438d8412b6262cb80502",
-      "sealed_capsule_id": "9bcc0dcb224a60f071b233b019cae84abea24b583f1215cd70e959636b533b70"
+      "sealed_capsule_id": "5f8a74836199c3cdb107aea753431325ee7e5d7027e3adb7eef002976b4530d4"
      },
      {
       "outcome": "deny",
@@ -1657,7 +1657,7 @@
        }
       ],
       "capsule_id": "56db7ac69e21c6fc4be4f7af4e6a22705a725324ce5cc9d7f0ba008de2ae553a",
-      "sealed_capsule_id": "125ec6823486e9e95ec13dfb1bb707c17abea0ed81388b5c72dbdc197e75826a"
+      "sealed_capsule_id": "3db314cfb400704e0cddee0547ddd7605a12070e378fb360cc4da924d22c4f3f"
      },
      {
       "outcome": "deny",
@@ -1666,7 +1666,7 @@
         "id": "dedupe",
         "result": "fail",
         "method": "exact_match_index_v0",
-        "evidence_digest": "c1347973ffd701d139d5a429965d6060e2522c12d2f26992dd504ff2dfd3d66e"
+        "evidence_digest": "12edd649a1fe4cfdc3557424665f40982b258544f3d397f98805c9438d9f6c4a"
        },
        {
         "id": "caps",
@@ -1744,7 +1744,7 @@
        }
       ],
       "capsule_id": "e7c0ad26ce151e9df13673098357ae6c941f9d22cacd3590c804b1f895e7f835",
-      "sealed_capsule_id": "559dcb5949bce6d048eda14776b766f004c8b0f763a229724003968c6b10bf2c"
+      "sealed_capsule_id": "2c66afa7ceb31031b0140394d33b62adf3f36c5d77a43ab2718c735237db07b2"
      }
     ],
     "sale": {
@@ -1762,12 +1762,6 @@
    "issue": "https://github.com/action-state-group/capsule-engine/issues/214",
    "why": "group 6: the sale's verification. The Go guard takes it from capsulectl's verify --bundle report and adds sale_bundle_not_valid and thread_not_valid where that report fails the bundle or a thread; the engine verifies the bundle itself (check_evidence_file) and does not. Both read the sale as incomplete, and every step agrees",
    "python": {
-    "sale": {
-     "complete": false,
-     "findings": [
-      "thread_not_whole_at_the_cut"
-     ]
-    },
     "steps": [
      {
       "outcome": "deny",
@@ -1861,7 +1855,7 @@
        }
       ],
       "capsule_id": "305a8f657b0acea5a072b1b1587d86a18510f5c4fa375d3b2e5e6647ee15b22f",
-      "sealed_capsule_id": "053bd049ecb29154be8d060867cd25300e3d16f9ef2427869061aba1caf9e335"
+      "sealed_capsule_id": "95712ca2be4348d5887bc3c90f262b08431afc9b71f4dade6238ff2319c11f75"
      },
      {
       "outcome": "deny",
@@ -1954,7 +1948,7 @@
        }
       ],
       "capsule_id": "5908babb7728def54017622e1dc883860dab085574b8faff83cffb1cd1ea7d7a",
-      "sealed_capsule_id": "788f17ca558dccdd85d0b2bf330ac505f0aef5f4e11949b7753a31bfb21f70fa"
+      "sealed_capsule_id": "dea40ba91a37f4b00f1606b9a138ddc30a799e1a94f2feb8d93b3649aaf1c6ce"
      },
      {
       "outcome": "deny",
@@ -2048,7 +2042,7 @@
        }
       ],
       "capsule_id": "8402d1f476b8251f967d74af4a9865e47462e2ee60f3438d8412b6262cb80502",
-      "sealed_capsule_id": "9bcc0dcb224a60f071b233b019cae84abea24b583f1215cd70e959636b533b70"
+      "sealed_capsule_id": "5f8a74836199c3cdb107aea753431325ee7e5d7027e3adb7eef002976b4530d4"
      },
      {
       "outcome": "deny",
@@ -2141,7 +2135,7 @@
        }
       ],
       "capsule_id": "56db7ac69e21c6fc4be4f7af4e6a22705a725324ce5cc9d7f0ba008de2ae553a",
-      "sealed_capsule_id": "125ec6823486e9e95ec13dfb1bb707c17abea0ed81388b5c72dbdc197e75826a"
+      "sealed_capsule_id": "3db314cfb400704e0cddee0547ddd7605a12070e378fb360cc4da924d22c4f3f"
      },
      {
       "outcome": "deny",
@@ -2150,7 +2144,7 @@
         "id": "dedupe",
         "result": "fail",
         "method": "exact_match_index_v0",
-        "evidence_digest": "c1347973ffd701d139d5a429965d6060e2522c12d2f26992dd504ff2dfd3d66e"
+        "evidence_digest": "12edd649a1fe4cfdc3557424665f40982b258544f3d397f98805c9438d9f6c4a"
        },
        {
         "id": "caps",
@@ -2234,9 +2228,15 @@
        }
       ],
       "capsule_id": "e7c0ad26ce151e9df13673098357ae6c941f9d22cacd3590c804b1f895e7f835",
-      "sealed_capsule_id": "559dcb5949bce6d048eda14776b766f004c8b0f763a229724003968c6b10bf2c"
+      "sealed_capsule_id": "2c66afa7ceb31031b0140394d33b62adf3f36c5d77a43ab2718c735237db07b2"
      }
-    ]
+    ],
+    "sale": {
+     "complete": false,
+     "findings": [
+      "thread_not_whole_at_the_cut"
+     ]
+    }
    },
    "go": {
     "steps": [
@@ -2325,7 +2325,7 @@
        }
       ],
       "capsule_id": "305a8f657b0acea5a072b1b1587d86a18510f5c4fa375d3b2e5e6647ee15b22f",
-      "sealed_capsule_id": "053bd049ecb29154be8d060867cd25300e3d16f9ef2427869061aba1caf9e335"
+      "sealed_capsule_id": "95712ca2be4348d5887bc3c90f262b08431afc9b71f4dade6238ff2319c11f75"
      },
      {
       "outcome": "deny",
@@ -2412,7 +2412,7 @@
        }
       ],
       "capsule_id": "5908babb7728def54017622e1dc883860dab085574b8faff83cffb1cd1ea7d7a",
-      "sealed_capsule_id": "788f17ca558dccdd85d0b2bf330ac505f0aef5f4e11949b7753a31bfb21f70fa"
+      "sealed_capsule_id": "dea40ba91a37f4b00f1606b9a138ddc30a799e1a94f2feb8d93b3649aaf1c6ce"
      },
      {
       "outcome": "deny",
@@ -2499,7 +2499,7 @@
        }
       ],
       "capsule_id": "8402d1f476b8251f967d74af4a9865e47462e2ee60f3438d8412b6262cb80502",
-      "sealed_capsule_id": "9bcc0dcb224a60f071b233b019cae84abea24b583f1215cd70e959636b533b70"
+      "sealed_capsule_id": "5f8a74836199c3cdb107aea753431325ee7e5d7027e3adb7eef002976b4530d4"
      },
      {
       "outcome": "deny",
@@ -2586,7 +2586,7 @@
        }
       ],
       "capsule_id": "56db7ac69e21c6fc4be4f7af4e6a22705a725324ce5cc9d7f0ba008de2ae553a",
-      "sealed_capsule_id": "125ec6823486e9e95ec13dfb1bb707c17abea0ed81388b5c72dbdc197e75826a"
+      "sealed_capsule_id": "3db314cfb400704e0cddee0547ddd7605a12070e378fb360cc4da924d22c4f3f"
      },
      {
       "outcome": "deny",
@@ -2595,7 +2595,7 @@
         "id": "dedupe",
         "result": "fail",
         "method": "exact_match_index_v0",
-        "evidence_digest": "c1347973ffd701d139d5a429965d6060e2522c12d2f26992dd504ff2dfd3d66e"
+        "evidence_digest": "12edd649a1fe4cfdc3557424665f40982b258544f3d397f98805c9438d9f6c4a"
        },
        {
         "id": "caps",
@@ -2673,7 +2673,7 @@
        }
       ],
       "capsule_id": "e7c0ad26ce151e9df13673098357ae6c941f9d22cacd3590c804b1f895e7f835",
-      "sealed_capsule_id": "559dcb5949bce6d048eda14776b766f004c8b0f763a229724003968c6b10bf2c"
+      "sealed_capsule_id": "2c66afa7ceb31031b0140394d33b62adf3f36c5d77a43ab2718c735237db07b2"
      }
     ],
     "sale": {
@@ -2691,12 +2691,6 @@
    "issue": "https://github.com/action-state-group/capsule-engine/issues/214",
    "why": "group 6: the sale's verification. The Go guard takes it from capsulectl's verify --bundle report and adds sale_bundle_not_valid and thread_not_valid where that report fails the bundle or a thread; the engine verifies the bundle itself (check_evidence_file) and does not. Both read the sale as incomplete, and every step agrees",
    "python": {
-    "sale": {
-     "complete": false,
-     "findings": [
-      "thread_not_whole_at_the_cut"
-     ]
-    },
     "steps": [
      {
       "outcome": "deny",
@@ -2790,7 +2784,7 @@
        }
       ],
       "capsule_id": "305a8f657b0acea5a072b1b1587d86a18510f5c4fa375d3b2e5e6647ee15b22f",
-      "sealed_capsule_id": "053bd049ecb29154be8d060867cd25300e3d16f9ef2427869061aba1caf9e335"
+      "sealed_capsule_id": "95712ca2be4348d5887bc3c90f262b08431afc9b71f4dade6238ff2319c11f75"
      },
      {
       "outcome": "deny",
@@ -2883,7 +2877,7 @@
        }
       ],
       "capsule_id": "5908babb7728def54017622e1dc883860dab085574b8faff83cffb1cd1ea7d7a",
-      "sealed_capsule_id": "788f17ca558dccdd85d0b2bf330ac505f0aef5f4e11949b7753a31bfb21f70fa"
+      "sealed_capsule_id": "dea40ba91a37f4b00f1606b9a138ddc30a799e1a94f2feb8d93b3649aaf1c6ce"
      },
      {
       "outcome": "deny",
@@ -2977,7 +2971,7 @@
        }
       ],
       "capsule_id": "8402d1f476b8251f967d74af4a9865e47462e2ee60f3438d8412b6262cb80502",
-      "sealed_capsule_id": "9bcc0dcb224a60f071b233b019cae84abea24b583f1215cd70e959636b533b70"
+      "sealed_capsule_id": "5f8a74836199c3cdb107aea753431325ee7e5d7027e3adb7eef002976b4530d4"
      },
      {
       "outcome": "deny",
@@ -3070,7 +3064,7 @@
        }
       ],
       "capsule_id": "56db7ac69e21c6fc4be4f7af4e6a22705a725324ce5cc9d7f0ba008de2ae553a",
-      "sealed_capsule_id": "125ec6823486e9e95ec13dfb1bb707c17abea0ed81388b5c72dbdc197e75826a"
+      "sealed_capsule_id": "3db314cfb400704e0cddee0547ddd7605a12070e378fb360cc4da924d22c4f3f"
      },
      {
       "outcome": "deny",
@@ -3079,7 +3073,7 @@
         "id": "dedupe",
         "result": "fail",
         "method": "exact_match_index_v0",
-        "evidence_digest": "c1347973ffd701d139d5a429965d6060e2522c12d2f26992dd504ff2dfd3d66e"
+        "evidence_digest": "12edd649a1fe4cfdc3557424665f40982b258544f3d397f98805c9438d9f6c4a"
        },
        {
         "id": "caps",
@@ -3163,9 +3157,15 @@
        }
       ],
       "capsule_id": "e7c0ad26ce151e9df13673098357ae6c941f9d22cacd3590c804b1f895e7f835",
-      "sealed_capsule_id": "559dcb5949bce6d048eda14776b766f004c8b0f763a229724003968c6b10bf2c"
+      "sealed_capsule_id": "2c66afa7ceb31031b0140394d33b62adf3f36c5d77a43ab2718c735237db07b2"
      }
-    ]
+    ],
+    "sale": {
+     "complete": false,
+     "findings": [
+      "thread_not_whole_at_the_cut"
+     ]
+    }
    },
    "go": {
     "steps": [
@@ -3254,7 +3254,7 @@
        }
       ],
       "capsule_id": "305a8f657b0acea5a072b1b1587d86a18510f5c4fa375d3b2e5e6647ee15b22f",
-      "sealed_capsule_id": "053bd049ecb29154be8d060867cd25300e3d16f9ef2427869061aba1caf9e335"
+      "sealed_capsule_id": "95712ca2be4348d5887bc3c90f262b08431afc9b71f4dade6238ff2319c11f75"
      },
      {
       "outcome": "deny",
@@ -3341,7 +3341,7 @@
        }
       ],
       "capsule_id": "5908babb7728def54017622e1dc883860dab085574b8faff83cffb1cd1ea7d7a",
-      "sealed_capsule_id": "788f17ca558dccdd85d0b2bf330ac505f0aef5f4e11949b7753a31bfb21f70fa"
+      "sealed_capsule_id": "dea40ba91a37f4b00f1606b9a138ddc30a799e1a94f2feb8d93b3649aaf1c6ce"
      },
      {
       "outcome": "deny",
@@ -3428,7 +3428,7 @@
        }
       ],
       "capsule_id": "8402d1f476b8251f967d74af4a9865e47462e2ee60f3438d8412b6262cb80502",
-      "sealed_capsule_id": "9bcc0dcb224a60f071b233b019cae84abea24b583f1215cd70e959636b533b70"
+      "sealed_capsule_id": "5f8a74836199c3cdb107aea753431325ee7e5d7027e3adb7eef002976b4530d4"
      },
      {
       "outcome": "deny",
@@ -3515,7 +3515,7 @@
        }
       ],
       "capsule_id": "56db7ac69e21c6fc4be4f7af4e6a22705a725324ce5cc9d7f0ba008de2ae553a",
-      "sealed_capsule_id": "125ec6823486e9e95ec13dfb1bb707c17abea0ed81388b5c72dbdc197e75826a"
+      "sealed_capsule_id": "3db314cfb400704e0cddee0547ddd7605a12070e378fb360cc4da924d22c4f3f"
      },
      {
       "outcome": "deny",
@@ -3524,7 +3524,7 @@
         "id": "dedupe",
         "result": "fail",
         "method": "exact_match_index_v0",
-        "evidence_digest": "c1347973ffd701d139d5a429965d6060e2522c12d2f26992dd504ff2dfd3d66e"
+        "evidence_digest": "12edd649a1fe4cfdc3557424665f40982b258544f3d397f98805c9438d9f6c4a"
        },
        {
         "id": "caps",
@@ -3602,7 +3602,7 @@
        }
       ],
       "capsule_id": "e7c0ad26ce151e9df13673098357ae6c941f9d22cacd3590c804b1f895e7f835",
-      "sealed_capsule_id": "559dcb5949bce6d048eda14776b766f004c8b0f763a229724003968c6b10bf2c"
+      "sealed_capsule_id": "2c66afa7ceb31031b0140394d33b62adf3f36c5d77a43ab2718c735237db07b2"
      }
     ],
     "sale": {
@@ -3620,14 +3620,6 @@
    "issue": "https://github.com/action-state-group/capsule-engine/issues/214",
    "why": "group 6: the sale's verification. The Go guard takes it from capsulectl's verify --bundle report and adds sale_bundle_not_valid and thread_not_valid where that report fails the bundle or a thread; the engine verifies the bundle itself (check_evidence_file) and does not. Both read the sale as incomplete, and every step agrees",
    "python": {
-    "sale": {
-     "complete": false,
-     "findings": [
-      "thread_not_valid",
-      "thread_does_not_cover_its_log",
-      "thread_is_not_under_this_sale"
-     ]
-    },
     "steps": [
      {
       "outcome": "deny",
@@ -3721,7 +3713,7 @@
        }
       ],
       "capsule_id": "305a8f657b0acea5a072b1b1587d86a18510f5c4fa375d3b2e5e6647ee15b22f",
-      "sealed_capsule_id": "053bd049ecb29154be8d060867cd25300e3d16f9ef2427869061aba1caf9e335"
+      "sealed_capsule_id": "95712ca2be4348d5887bc3c90f262b08431afc9b71f4dade6238ff2319c11f75"
      },
      {
       "outcome": "deny",
@@ -3814,7 +3806,7 @@
        }
       ],
       "capsule_id": "5908babb7728def54017622e1dc883860dab085574b8faff83cffb1cd1ea7d7a",
-      "sealed_capsule_id": "788f17ca558dccdd85d0b2bf330ac505f0aef5f4e11949b7753a31bfb21f70fa"
+      "sealed_capsule_id": "dea40ba91a37f4b00f1606b9a138ddc30a799e1a94f2feb8d93b3649aaf1c6ce"
      },
      {
       "outcome": "deny",
@@ -3908,7 +3900,7 @@
        }
       ],
       "capsule_id": "8402d1f476b8251f967d74af4a9865e47462e2ee60f3438d8412b6262cb80502",
-      "sealed_capsule_id": "9bcc0dcb224a60f071b233b019cae84abea24b583f1215cd70e959636b533b70"
+      "sealed_capsule_id": "5f8a74836199c3cdb107aea753431325ee7e5d7027e3adb7eef002976b4530d4"
      },
      {
       "outcome": "deny",
@@ -4001,7 +3993,7 @@
        }
       ],
       "capsule_id": "56db7ac69e21c6fc4be4f7af4e6a22705a725324ce5cc9d7f0ba008de2ae553a",
-      "sealed_capsule_id": "125ec6823486e9e95ec13dfb1bb707c17abea0ed81388b5c72dbdc197e75826a"
+      "sealed_capsule_id": "3db314cfb400704e0cddee0547ddd7605a12070e378fb360cc4da924d22c4f3f"
      },
      {
       "outcome": "deny",
@@ -4010,7 +4002,7 @@
         "id": "dedupe",
         "result": "fail",
         "method": "exact_match_index_v0",
-        "evidence_digest": "c1347973ffd701d139d5a429965d6060e2522c12d2f26992dd504ff2dfd3d66e"
+        "evidence_digest": "12edd649a1fe4cfdc3557424665f40982b258544f3d397f98805c9438d9f6c4a"
        },
        {
         "id": "caps",
@@ -4094,9 +4086,17 @@
        }
       ],
       "capsule_id": "e7c0ad26ce151e9df13673098357ae6c941f9d22cacd3590c804b1f895e7f835",
-      "sealed_capsule_id": "559dcb5949bce6d048eda14776b766f004c8b0f763a229724003968c6b10bf2c"
+      "sealed_capsule_id": "2c66afa7ceb31031b0140394d33b62adf3f36c5d77a43ab2718c735237db07b2"
      }
-    ]
+    ],
+    "sale": {
+     "complete": false,
+     "findings": [
+      "thread_not_valid",
+      "thread_does_not_cover_its_log",
+      "thread_is_not_under_this_sale"
+     ]
+    }
    },
    "go": {
     "steps": [
@@ -4185,7 +4185,7 @@
        }
       ],
       "capsule_id": "305a8f657b0acea5a072b1b1587d86a18510f5c4fa375d3b2e5e6647ee15b22f",
-      "sealed_capsule_id": "053bd049ecb29154be8d060867cd25300e3d16f9ef2427869061aba1caf9e335"
+      "sealed_capsule_id": "95712ca2be4348d5887bc3c90f262b08431afc9b71f4dade6238ff2319c11f75"
      },
      {
       "outcome": "deny",
@@ -4272,7 +4272,7 @@
        }
       ],
       "capsule_id": "5908babb7728def54017622e1dc883860dab085574b8faff83cffb1cd1ea7d7a",
-      "sealed_capsule_id": "788f17ca558dccdd85d0b2bf330ac505f0aef5f4e11949b7753a31bfb21f70fa"
+      "sealed_capsule_id": "dea40ba91a37f4b00f1606b9a138ddc30a799e1a94f2feb8d93b3649aaf1c6ce"
      },
      {
       "outcome": "deny",
@@ -4359,7 +4359,7 @@
        }
       ],
       "capsule_id": "8402d1f476b8251f967d74af4a9865e47462e2ee60f3438d8412b6262cb80502",
-      "sealed_capsule_id": "9bcc0dcb224a60f071b233b019cae84abea24b583f1215cd70e959636b533b70"
+      "sealed_capsule_id": "5f8a74836199c3cdb107aea753431325ee7e5d7027e3adb7eef002976b4530d4"
      },
      {
       "outcome": "deny",
@@ -4446,7 +4446,7 @@
        }
       ],
       "capsule_id": "56db7ac69e21c6fc4be4f7af4e6a22705a725324ce5cc9d7f0ba008de2ae553a",
-      "sealed_capsule_id": "125ec6823486e9e95ec13dfb1bb707c17abea0ed81388b5c72dbdc197e75826a"
+      "sealed_capsule_id": "3db314cfb400704e0cddee0547ddd7605a12070e378fb360cc4da924d22c4f3f"
      },
      {
       "outcome": "deny",
@@ -4455,7 +4455,7 @@
         "id": "dedupe",
         "result": "fail",
         "method": "exact_match_index_v0",
-        "evidence_digest": "c1347973ffd701d139d5a429965d6060e2522c12d2f26992dd504ff2dfd3d66e"
+        "evidence_digest": "12edd649a1fe4cfdc3557424665f40982b258544f3d397f98805c9438d9f6c4a"
        },
        {
         "id": "caps",
@@ -4533,7 +4533,7 @@
        }
       ],
       "capsule_id": "e7c0ad26ce151e9df13673098357ae6c941f9d22cacd3590c804b1f895e7f835",
-      "sealed_capsule_id": "559dcb5949bce6d048eda14776b766f004c8b0f763a229724003968c6b10bf2c"
+      "sealed_capsule_id": "2c66afa7ceb31031b0140394d33b62adf3f36c5d77a43ab2718c735237db07b2"
      }
     ],
     "sale": {
@@ -4552,12 +4552,6 @@
    "issue": "https://github.com/action-state-group/capsule-engine/issues/214",
    "why": "group 6: the sale's verification. The Go guard takes it from capsulectl's verify --bundle report and adds sale_bundle_not_valid and thread_not_valid where that report fails the bundle or a thread; the engine verifies the bundle itself (check_evidence_file) and does not. Both read the sale as incomplete, and every step agrees",
    "python": {
-    "sale": {
-     "complete": false,
-     "findings": [
-      "opening_does_not_match_the_thread"
-     ]
-    },
     "steps": [
      {
       "outcome": "deny",
@@ -4651,7 +4645,7 @@
        }
       ],
       "capsule_id": "305a8f657b0acea5a072b1b1587d86a18510f5c4fa375d3b2e5e6647ee15b22f",
-      "sealed_capsule_id": "053bd049ecb29154be8d060867cd25300e3d16f9ef2427869061aba1caf9e335"
+      "sealed_capsule_id": "95712ca2be4348d5887bc3c90f262b08431afc9b71f4dade6238ff2319c11f75"
      },
      {
       "outcome": "deny",
@@ -4744,7 +4738,7 @@
        }
       ],
       "capsule_id": "5908babb7728def54017622e1dc883860dab085574b8faff83cffb1cd1ea7d7a",
-      "sealed_capsule_id": "788f17ca558dccdd85d0b2bf330ac505f0aef5f4e11949b7753a31bfb21f70fa"
+      "sealed_capsule_id": "dea40ba91a37f4b00f1606b9a138ddc30a799e1a94f2feb8d93b3649aaf1c6ce"
      },
      {
       "outcome": "deny",
@@ -4838,7 +4832,7 @@
        }
       ],
       "capsule_id": "8402d1f476b8251f967d74af4a9865e47462e2ee60f3438d8412b6262cb80502",
-      "sealed_capsule_id": "9bcc0dcb224a60f071b233b019cae84abea24b583f1215cd70e959636b533b70"
+      "sealed_capsule_id": "5f8a74836199c3cdb107aea753431325ee7e5d7027e3adb7eef002976b4530d4"
      },
      {
       "outcome": "deny",
@@ -4931,7 +4925,7 @@
        }
       ],
       "capsule_id": "56db7ac69e21c6fc4be4f7af4e6a22705a725324ce5cc9d7f0ba008de2ae553a",
-      "sealed_capsule_id": "125ec6823486e9e95ec13dfb1bb707c17abea0ed81388b5c72dbdc197e75826a"
+      "sealed_capsule_id": "3db314cfb400704e0cddee0547ddd7605a12070e378fb360cc4da924d22c4f3f"
      },
      {
       "outcome": "deny",
@@ -4940,7 +4934,7 @@
         "id": "dedupe",
         "result": "fail",
         "method": "exact_match_index_v0",
-        "evidence_digest": "c1347973ffd701d139d5a429965d6060e2522c12d2f26992dd504ff2dfd3d66e"
+        "evidence_digest": "12edd649a1fe4cfdc3557424665f40982b258544f3d397f98805c9438d9f6c4a"
        },
        {
         "id": "caps",
@@ -5024,9 +5018,15 @@
        }
       ],
       "capsule_id": "e7c0ad26ce151e9df13673098357ae6c941f9d22cacd3590c804b1f895e7f835",
-      "sealed_capsule_id": "559dcb5949bce6d048eda14776b766f004c8b0f763a229724003968c6b10bf2c"
+      "sealed_capsule_id": "2c66afa7ceb31031b0140394d33b62adf3f36c5d77a43ab2718c735237db07b2"
      }
-    ]
+    ],
+    "sale": {
+     "complete": false,
+     "findings": [
+      "opening_does_not_match_the_thread"
+     ]
+    }
    },
    "go": {
     "steps": [
@@ -5115,7 +5115,7 @@
        }
       ],
       "capsule_id": "305a8f657b0acea5a072b1b1587d86a18510f5c4fa375d3b2e5e6647ee15b22f",
-      "sealed_capsule_id": "053bd049ecb29154be8d060867cd25300e3d16f9ef2427869061aba1caf9e335"
+      "sealed_capsule_id": "95712ca2be4348d5887bc3c90f262b08431afc9b71f4dade6238ff2319c11f75"
      },
      {
       "outcome": "deny",
@@ -5202,7 +5202,7 @@
        }
       ],
       "capsule_id": "5908babb7728def54017622e1dc883860dab085574b8faff83cffb1cd1ea7d7a",
-      "sealed_capsule_id": "788f17ca558dccdd85d0b2bf330ac505f0aef5f4e11949b7753a31bfb21f70fa"
+      "sealed_capsule_id": "dea40ba91a37f4b00f1606b9a138ddc30a799e1a94f2feb8d93b3649aaf1c6ce"
      },
      {
       "outcome": "deny",
@@ -5289,7 +5289,7 @@
        }
       ],
       "capsule_id": "8402d1f476b8251f967d74af4a9865e47462e2ee60f3438d8412b6262cb80502",
-      "sealed_capsule_id": "9bcc0dcb224a60f071b233b019cae84abea24b583f1215cd70e959636b533b70"
+      "sealed_capsule_id": "5f8a74836199c3cdb107aea753431325ee7e5d7027e3adb7eef002976b4530d4"
      },
      {
       "outcome": "deny",
@@ -5376,7 +5376,7 @@
        }
       ],
       "capsule_id": "56db7ac69e21c6fc4be4f7af4e6a22705a725324ce5cc9d7f0ba008de2ae553a",
-      "sealed_capsule_id": "125ec6823486e9e95ec13dfb1bb707c17abea0ed81388b5c72dbdc197e75826a"
+      "sealed_capsule_id": "3db314cfb400704e0cddee0547ddd7605a12070e378fb360cc4da924d22c4f3f"
      },
      {
       "outcome": "deny",
@@ -5385,7 +5385,7 @@
         "id": "dedupe",
         "result": "fail",
         "method": "exact_match_index_v0",
-        "evidence_digest": "c1347973ffd701d139d5a429965d6060e2522c12d2f26992dd504ff2dfd3d66e"
+        "evidence_digest": "12edd649a1fe4cfdc3557424665f40982b258544f3d397f98805c9438d9f6c4a"
        },
        {
         "id": "caps",
@@ -5463,7 +5463,7 @@
        }
       ],
       "capsule_id": "e7c0ad26ce151e9df13673098357ae6c941f9d22cacd3590c804b1f895e7f835",
-      "sealed_capsule_id": "559dcb5949bce6d048eda14776b766f004c8b0f763a229724003968c6b10bf2c"
+      "sealed_capsule_id": "2c66afa7ceb31031b0140394d33b62adf3f36c5d77a43ab2718c735237db07b2"
      }
     ],
     "sale": {
@@ -5481,12 +5481,6 @@
    "issue": "https://github.com/action-state-group/capsule-engine/issues/214",
    "why": "group 6: the sale's verification. The Go guard takes it from capsulectl's verify --bundle report and adds sale_bundle_not_valid and thread_not_valid where that report fails the bundle or a thread; the engine verifies the bundle itself (check_evidence_file) and does not. Both read the sale as incomplete, and every step agrees",
    "python": {
-    "sale": {
-     "complete": false,
-     "findings": [
-      "opening_does_not_match_the_thread"
-     ]
-    },
     "steps": [
      {
       "outcome": "deny",
@@ -5580,7 +5574,7 @@
        }
       ],
       "capsule_id": "305a8f657b0acea5a072b1b1587d86a18510f5c4fa375d3b2e5e6647ee15b22f",
-      "sealed_capsule_id": "053bd049ecb29154be8d060867cd25300e3d16f9ef2427869061aba1caf9e335"
+      "sealed_capsule_id": "95712ca2be4348d5887bc3c90f262b08431afc9b71f4dade6238ff2319c11f75"
      },
      {
       "outcome": "deny",
@@ -5673,7 +5667,7 @@
        }
       ],
       "capsule_id": "5908babb7728def54017622e1dc883860dab085574b8faff83cffb1cd1ea7d7a",
-      "sealed_capsule_id": "788f17ca558dccdd85d0b2bf330ac505f0aef5f4e11949b7753a31bfb21f70fa"
+      "sealed_capsule_id": "dea40ba91a37f4b00f1606b9a138ddc30a799e1a94f2feb8d93b3649aaf1c6ce"
      },
      {
       "outcome": "deny",
@@ -5767,7 +5761,7 @@
        }
       ],
       "capsule_id": "8402d1f476b8251f967d74af4a9865e47462e2ee60f3438d8412b6262cb80502",
-      "sealed_capsule_id": "9bcc0dcb224a60f071b233b019cae84abea24b583f1215cd70e959636b533b70"
+      "sealed_capsule_id": "5f8a74836199c3cdb107aea753431325ee7e5d7027e3adb7eef002976b4530d4"
      },
      {
       "outcome": "deny",
@@ -5860,7 +5854,7 @@
        }
       ],
       "capsule_id": "56db7ac69e21c6fc4be4f7af4e6a22705a725324ce5cc9d7f0ba008de2ae553a",
-      "sealed_capsule_id": "125ec6823486e9e95ec13dfb1bb707c17abea0ed81388b5c72dbdc197e75826a"
+      "sealed_capsule_id": "3db314cfb400704e0cddee0547ddd7605a12070e378fb360cc4da924d22c4f3f"
      },
      {
       "outcome": "deny",
@@ -5869,7 +5863,7 @@
         "id": "dedupe",
         "result": "fail",
         "method": "exact_match_index_v0",
-        "evidence_digest": "c1347973ffd701d139d5a429965d6060e2522c12d2f26992dd504ff2dfd3d66e"
+        "evidence_digest": "12edd649a1fe4cfdc3557424665f40982b258544f3d397f98805c9438d9f6c4a"
        },
        {
         "id": "caps",
@@ -5953,9 +5947,15 @@
        }
       ],
       "capsule_id": "e7c0ad26ce151e9df13673098357ae6c941f9d22cacd3590c804b1f895e7f835",
-      "sealed_capsule_id": "559dcb5949bce6d048eda14776b766f004c8b0f763a229724003968c6b10bf2c"
+      "sealed_capsule_id": "2c66afa7ceb31031b0140394d33b62adf3f36c5d77a43ab2718c735237db07b2"
      }
-    ]
+    ],
+    "sale": {
+     "complete": false,
+     "findings": [
+      "opening_does_not_match_the_thread"
+     ]
+    }
    },
    "go": {
     "steps": [
@@ -6044,7 +6044,7 @@
        }
       ],
       "capsule_id": "305a8f657b0acea5a072b1b1587d86a18510f5c4fa375d3b2e5e6647ee15b22f",
-      "sealed_capsule_id": "053bd049ecb29154be8d060867cd25300e3d16f9ef2427869061aba1caf9e335"
+      "sealed_capsule_id": "95712ca2be4348d5887bc3c90f262b08431afc9b71f4dade6238ff2319c11f75"
      },
      {
       "outcome": "deny",
@@ -6131,7 +6131,7 @@
        }
       ],
       "capsule_id": "5908babb7728def54017622e1dc883860dab085574b8faff83cffb1cd1ea7d7a",
-      "sealed_capsule_id": "788f17ca558dccdd85d0b2bf330ac505f0aef5f4e11949b7753a31bfb21f70fa"
+      "sealed_capsule_id": "dea40ba91a37f4b00f1606b9a138ddc30a799e1a94f2feb8d93b3649aaf1c6ce"
      },
      {
       "outcome": "deny",
@@ -6218,7 +6218,7 @@
        }
       ],
       "capsule_id": "8402d1f476b8251f967d74af4a9865e47462e2ee60f3438d8412b6262cb80502",
-      "sealed_capsule_id": "9bcc0dcb224a60f071b233b019cae84abea24b583f1215cd70e959636b533b70"
+      "sealed_capsule_id": "5f8a74836199c3cdb107aea753431325ee7e5d7027e3adb7eef002976b4530d4"
      },
      {
       "outcome": "deny",
@@ -6305,7 +6305,7 @@
        }
       ],
       "capsule_id": "56db7ac69e21c6fc4be4f7af4e6a22705a725324ce5cc9d7f0ba008de2ae553a",
-      "sealed_capsule_id": "125ec6823486e9e95ec13dfb1bb707c17abea0ed81388b5c72dbdc197e75826a"
+      "sealed_capsule_id": "3db314cfb400704e0cddee0547ddd7605a12070e378fb360cc4da924d22c4f3f"
      },
      {
       "outcome": "deny",
@@ -6314,7 +6314,7 @@
         "id": "dedupe",
         "result": "fail",
         "method": "exact_match_index_v0",
-        "evidence_digest": "c1347973ffd701d139d5a429965d6060e2522c12d2f26992dd504ff2dfd3d66e"
+        "evidence_digest": "12edd649a1fe4cfdc3557424665f40982b258544f3d397f98805c9438d9f6c4a"
        },
        {
         "id": "caps",
@@ -6392,7 +6392,7 @@
        }
       ],
       "capsule_id": "e7c0ad26ce151e9df13673098357ae6c941f9d22cacd3590c804b1f895e7f835",
-      "sealed_capsule_id": "559dcb5949bce6d048eda14776b766f004c8b0f763a229724003968c6b10bf2c"
+      "sealed_capsule_id": "2c66afa7ceb31031b0140394d33b62adf3f36c5d77a43ab2718c735237db07b2"
      }
     ],
     "sale": {
@@ -6410,12 +6410,6 @@
    "issue": "https://github.com/action-state-group/capsule-engine/issues/214",
    "why": "group 6: the sale's verification. The Go guard takes it from capsulectl's verify --bundle report and adds sale_bundle_not_valid and thread_not_valid where that report fails the bundle or a thread; the engine verifies the bundle itself (check_evidence_file) and does not. Both read the sale as incomplete, and every step agrees",
    "python": {
-    "sale": {
-     "complete": false,
-     "findings": [
-      "opening_does_not_match_the_thread"
-     ]
-    },
     "steps": [
      {
       "outcome": "deny",
@@ -6509,7 +6503,7 @@
        }
       ],
       "capsule_id": "305a8f657b0acea5a072b1b1587d86a18510f5c4fa375d3b2e5e6647ee15b22f",
-      "sealed_capsule_id": "053bd049ecb29154be8d060867cd25300e3d16f9ef2427869061aba1caf9e335"
+      "sealed_capsule_id": "95712ca2be4348d5887bc3c90f262b08431afc9b71f4dade6238ff2319c11f75"
      },
      {
       "outcome": "deny",
@@ -6602,7 +6596,7 @@
        }
       ],
       "capsule_id": "5908babb7728def54017622e1dc883860dab085574b8faff83cffb1cd1ea7d7a",
-      "sealed_capsule_id": "788f17ca558dccdd85d0b2bf330ac505f0aef5f4e11949b7753a31bfb21f70fa"
+      "sealed_capsule_id": "dea40ba91a37f4b00f1606b9a138ddc30a799e1a94f2feb8d93b3649aaf1c6ce"
      },
      {
       "outcome": "deny",
@@ -6696,7 +6690,7 @@
        }
       ],
       "capsule_id": "8402d1f476b8251f967d74af4a9865e47462e2ee60f3438d8412b6262cb80502",
-      "sealed_capsule_id": "9bcc0dcb224a60f071b233b019cae84abea24b583f1215cd70e959636b533b70"
+      "sealed_capsule_id": "5f8a74836199c3cdb107aea753431325ee7e5d7027e3adb7eef002976b4530d4"
      },
      {
       "outcome": "deny",
@@ -6789,7 +6783,7 @@
        }
       ],
       "capsule_id": "56db7ac69e21c6fc4be4f7af4e6a22705a725324ce5cc9d7f0ba008de2ae553a",
-      "sealed_capsule_id": "125ec6823486e9e95ec13dfb1bb707c17abea0ed81388b5c72dbdc197e75826a"
+      "sealed_capsule_id": "3db314cfb400704e0cddee0547ddd7605a12070e378fb360cc4da924d22c4f3f"
      },
      {
       "outcome": "deny",
@@ -6798,7 +6792,7 @@
         "id": "dedupe",
         "result": "fail",
         "method": "exact_match_index_v0",
-        "evidence_digest": "c1347973ffd701d139d5a429965d6060e2522c12d2f26992dd504ff2dfd3d66e"
+        "evidence_digest": "12edd649a1fe4cfdc3557424665f40982b258544f3d397f98805c9438d9f6c4a"
        },
        {
         "id": "caps",
@@ -6882,9 +6876,15 @@
        }
       ],
       "capsule_id": "e7c0ad26ce151e9df13673098357ae6c941f9d22cacd3590c804b1f895e7f835",
-      "sealed_capsule_id": "559dcb5949bce6d048eda14776b766f004c8b0f763a229724003968c6b10bf2c"
+      "sealed_capsule_id": "2c66afa7ceb31031b0140394d33b62adf3f36c5d77a43ab2718c735237db07b2"
      }
-    ]
+    ],
+    "sale": {
+     "complete": false,
+     "findings": [
+      "opening_does_not_match_the_thread"
+     ]
+    }
    },
    "go": {
     "steps": [
@@ -6973,7 +6973,7 @@
        }
       ],
       "capsule_id": "305a8f657b0acea5a072b1b1587d86a18510f5c4fa375d3b2e5e6647ee15b22f",
-      "sealed_capsule_id": "053bd049ecb29154be8d060867cd25300e3d16f9ef2427869061aba1caf9e335"
+      "sealed_capsule_id": "95712ca2be4348d5887bc3c90f262b08431afc9b71f4dade6238ff2319c11f75"
      },
      {
       "outcome": "deny",
@@ -7060,7 +7060,7 @@
        }
       ],
       "capsule_id": "5908babb7728def54017622e1dc883860dab085574b8faff83cffb1cd1ea7d7a",
-      "sealed_capsule_id": "788f17ca558dccdd85d0b2bf330ac505f0aef5f4e11949b7753a31bfb21f70fa"
+      "sealed_capsule_id": "dea40ba91a37f4b00f1606b9a138ddc30a799e1a94f2feb8d93b3649aaf1c6ce"
      },
      {
       "outcome": "deny",
@@ -7147,7 +7147,7 @@
        }
       ],
       "capsule_id": "8402d1f476b8251f967d74af4a9865e47462e2ee60f3438d8412b6262cb80502",
-      "sealed_capsule_id": "9bcc0dcb224a60f071b233b019cae84abea24b583f1215cd70e959636b533b70"
+      "sealed_capsule_id": "5f8a74836199c3cdb107aea753431325ee7e5d7027e3adb7eef002976b4530d4"
      },
      {
       "outcome": "deny",
@@ -7234,7 +7234,7 @@
        }
       ],
       "capsule_id": "56db7ac69e21c6fc4be4f7af4e6a22705a725324ce5cc9d7f0ba008de2ae553a",
-      "sealed_capsule_id": "125ec6823486e9e95ec13dfb1bb707c17abea0ed81388b5c72dbdc197e75826a"
+      "sealed_capsule_id": "3db314cfb400704e0cddee0547ddd7605a12070e378fb360cc4da924d22c4f3f"
      },
      {
       "outcome": "deny",
@@ -7243,7 +7243,7 @@
         "id": "dedupe",
         "result": "fail",
         "method": "exact_match_index_v0",
-        "evidence_digest": "c1347973ffd701d139d5a429965d6060e2522c12d2f26992dd504ff2dfd3d66e"
+        "evidence_digest": "12edd649a1fe4cfdc3557424665f40982b258544f3d397f98805c9438d9f6c4a"
        },
        {
         "id": "caps",
@@ -7321,7 +7321,7 @@
        }
       ],
       "capsule_id": "e7c0ad26ce151e9df13673098357ae6c941f9d22cacd3590c804b1f895e7f835",
-      "sealed_capsule_id": "559dcb5949bce6d048eda14776b766f004c8b0f763a229724003968c6b10bf2c"
+      "sealed_capsule_id": "2c66afa7ceb31031b0140394d33b62adf3f36c5d77a43ab2718c735237db07b2"
      }
     ],
     "sale": {
@@ -7339,14 +7339,6 @@
    "issue": "https://github.com/action-state-group/capsule-engine/issues/214",
    "why": "group 6: the sale's verification. The Go guard takes it from capsulectl's verify --bundle report and adds sale_bundle_not_valid and thread_not_valid where that report fails the bundle or a thread; the engine verifies the bundle itself (check_evidence_file) and does not. Both read the sale as incomplete, and every step agrees",
    "python": {
-    "sale": {
-     "complete": false,
-     "findings": [
-      "sale_bundle_not_valid",
-      "sale_record_not_disclosed",
-      "opened_not_evidenced"
-     ]
-    },
     "steps": [
      {
       "outcome": "deny",
@@ -7440,7 +7432,7 @@
        }
       ],
       "capsule_id": "305a8f657b0acea5a072b1b1587d86a18510f5c4fa375d3b2e5e6647ee15b22f",
-      "sealed_capsule_id": "053bd049ecb29154be8d060867cd25300e3d16f9ef2427869061aba1caf9e335"
+      "sealed_capsule_id": "95712ca2be4348d5887bc3c90f262b08431afc9b71f4dade6238ff2319c11f75"
      },
      {
       "outcome": "deny",
@@ -7533,7 +7525,7 @@
        }
       ],
       "capsule_id": "5908babb7728def54017622e1dc883860dab085574b8faff83cffb1cd1ea7d7a",
-      "sealed_capsule_id": "788f17ca558dccdd85d0b2bf330ac505f0aef5f4e11949b7753a31bfb21f70fa"
+      "sealed_capsule_id": "dea40ba91a37f4b00f1606b9a138ddc30a799e1a94f2feb8d93b3649aaf1c6ce"
      },
      {
       "outcome": "deny",
@@ -7627,7 +7619,7 @@
        }
       ],
       "capsule_id": "8402d1f476b8251f967d74af4a9865e47462e2ee60f3438d8412b6262cb80502",
-      "sealed_capsule_id": "9bcc0dcb224a60f071b233b019cae84abea24b583f1215cd70e959636b533b70"
+      "sealed_capsule_id": "5f8a74836199c3cdb107aea753431325ee7e5d7027e3adb7eef002976b4530d4"
      },
      {
       "outcome": "deny",
@@ -7720,7 +7712,7 @@
        }
       ],
       "capsule_id": "56db7ac69e21c6fc4be4f7af4e6a22705a725324ce5cc9d7f0ba008de2ae553a",
-      "sealed_capsule_id": "125ec6823486e9e95ec13dfb1bb707c17abea0ed81388b5c72dbdc197e75826a"
+      "sealed_capsule_id": "3db314cfb400704e0cddee0547ddd7605a12070e378fb360cc4da924d22c4f3f"
      },
      {
       "outcome": "deny",
@@ -7729,7 +7721,7 @@
         "id": "dedupe",
         "result": "fail",
         "method": "exact_match_index_v0",
-        "evidence_digest": "c1347973ffd701d139d5a429965d6060e2522c12d2f26992dd504ff2dfd3d66e"
+        "evidence_digest": "12edd649a1fe4cfdc3557424665f40982b258544f3d397f98805c9438d9f6c4a"
        },
        {
         "id": "caps",
@@ -7813,9 +7805,17 @@
        }
       ],
       "capsule_id": "e7c0ad26ce151e9df13673098357ae6c941f9d22cacd3590c804b1f895e7f835",
-      "sealed_capsule_id": "559dcb5949bce6d048eda14776b766f004c8b0f763a229724003968c6b10bf2c"
+      "sealed_capsule_id": "2c66afa7ceb31031b0140394d33b62adf3f36c5d77a43ab2718c735237db07b2"
      }
-    ]
+    ],
+    "sale": {
+     "complete": false,
+     "findings": [
+      "sale_bundle_not_valid",
+      "sale_record_not_disclosed",
+      "opened_not_evidenced"
+     ]
+    }
    },
    "go": {
     "steps": [
@@ -7904,7 +7904,7 @@
        }
       ],
       "capsule_id": "305a8f657b0acea5a072b1b1587d86a18510f5c4fa375d3b2e5e6647ee15b22f",
-      "sealed_capsule_id": "053bd049ecb29154be8d060867cd25300e3d16f9ef2427869061aba1caf9e335"
+      "sealed_capsule_id": "95712ca2be4348d5887bc3c90f262b08431afc9b71f4dade6238ff2319c11f75"
      },
      {
       "outcome": "deny",
@@ -7991,7 +7991,7 @@
        }
       ],
       "capsule_id": "5908babb7728def54017622e1dc883860dab085574b8faff83cffb1cd1ea7d7a",
-      "sealed_capsule_id": "788f17ca558dccdd85d0b2bf330ac505f0aef5f4e11949b7753a31bfb21f70fa"
+      "sealed_capsule_id": "dea40ba91a37f4b00f1606b9a138ddc30a799e1a94f2feb8d93b3649aaf1c6ce"
      },
      {
       "outcome": "deny",
@@ -8078,7 +8078,7 @@
        }
       ],
       "capsule_id": "8402d1f476b8251f967d74af4a9865e47462e2ee60f3438d8412b6262cb80502",
-      "sealed_capsule_id": "9bcc0dcb224a60f071b233b019cae84abea24b583f1215cd70e959636b533b70"
+      "sealed_capsule_id": "5f8a74836199c3cdb107aea753431325ee7e5d7027e3adb7eef002976b4530d4"
      },
      {
       "outcome": "deny",
@@ -8165,7 +8165,7 @@
        }
       ],
       "capsule_id": "56db7ac69e21c6fc4be4f7af4e6a22705a725324ce5cc9d7f0ba008de2ae553a",
-      "sealed_capsule_id": "125ec6823486e9e95ec13dfb1bb707c17abea0ed81388b5c72dbdc197e75826a"
+      "sealed_capsule_id": "3db314cfb400704e0cddee0547ddd7605a12070e378fb360cc4da924d22c4f3f"
      },
      {
       "outcome": "deny",
@@ -8174,7 +8174,7 @@
         "id": "dedupe",
         "result": "fail",
         "method": "exact_match_index_v0",
-        "evidence_digest": "c1347973ffd701d139d5a429965d6060e2522c12d2f26992dd504ff2dfd3d66e"
+        "evidence_digest": "12edd649a1fe4cfdc3557424665f40982b258544f3d397f98805c9438d9f6c4a"
        },
        {
         "id": "caps",
@@ -8252,7 +8252,7 @@
        }
       ],
       "capsule_id": "e7c0ad26ce151e9df13673098357ae6c941f9d22cacd3590c804b1f895e7f835",
-      "sealed_capsule_id": "559dcb5949bce6d048eda14776b766f004c8b0f763a229724003968c6b10bf2c"
+      "sealed_capsule_id": "2c66afa7ceb31031b0140394d33b62adf3f36c5d77a43ab2718c735237db07b2"
      }
     ],
     "sale": {
@@ -8271,14 +8271,6 @@
    "issue": "https://github.com/action-state-group/capsule-engine/issues/214",
    "why": "group 6: the sale's verification. The Go guard takes it from capsulectl's verify --bundle report and adds sale_bundle_not_valid and thread_not_valid where that report fails the bundle or a thread; the engine verifies the bundle itself (check_evidence_file) and does not. Both read the sale as incomplete, and every step agrees",
    "python": {
-    "sale": {
-     "complete": false,
-     "findings": [
-      "sale_bundle_not_valid",
-      "sale_record_not_disclosed",
-      "opened_not_evidenced"
-     ]
-    },
     "steps": [
      {
       "outcome": "deny",
@@ -8372,7 +8364,7 @@
        }
       ],
       "capsule_id": "305a8f657b0acea5a072b1b1587d86a18510f5c4fa375d3b2e5e6647ee15b22f",
-      "sealed_capsule_id": "053bd049ecb29154be8d060867cd25300e3d16f9ef2427869061aba1caf9e335"
+      "sealed_capsule_id": "95712ca2be4348d5887bc3c90f262b08431afc9b71f4dade6238ff2319c11f75"
      },
      {
       "outcome": "deny",
@@ -8465,7 +8457,7 @@
        }
       ],
       "capsule_id": "5908babb7728def54017622e1dc883860dab085574b8faff83cffb1cd1ea7d7a",
-      "sealed_capsule_id": "788f17ca558dccdd85d0b2bf330ac505f0aef5f4e11949b7753a31bfb21f70fa"
+      "sealed_capsule_id": "dea40ba91a37f4b00f1606b9a138ddc30a799e1a94f2feb8d93b3649aaf1c6ce"
      },
      {
       "outcome": "deny",
@@ -8559,7 +8551,7 @@
        }
       ],
       "capsule_id": "8402d1f476b8251f967d74af4a9865e47462e2ee60f3438d8412b6262cb80502",
-      "sealed_capsule_id": "9bcc0dcb224a60f071b233b019cae84abea24b583f1215cd70e959636b533b70"
+      "sealed_capsule_id": "5f8a74836199c3cdb107aea753431325ee7e5d7027e3adb7eef002976b4530d4"
      },
      {
       "outcome": "deny",
@@ -8652,7 +8644,7 @@
        }
       ],
       "capsule_id": "56db7ac69e21c6fc4be4f7af4e6a22705a725324ce5cc9d7f0ba008de2ae553a",
-      "sealed_capsule_id": "125ec6823486e9e95ec13dfb1bb707c17abea0ed81388b5c72dbdc197e75826a"
+      "sealed_capsule_id": "3db314cfb400704e0cddee0547ddd7605a12070e378fb360cc4da924d22c4f3f"
      },
      {
       "outcome": "deny",
@@ -8661,7 +8653,7 @@
         "id": "dedupe",
         "result": "fail",
         "method": "exact_match_index_v0",
-        "evidence_digest": "c1347973ffd701d139d5a429965d6060e2522c12d2f26992dd504ff2dfd3d66e"
+        "evidence_digest": "12edd649a1fe4cfdc3557424665f40982b258544f3d397f98805c9438d9f6c4a"
        },
        {
         "id": "caps",
@@ -8745,9 +8737,17 @@
        }
       ],
       "capsule_id": "e7c0ad26ce151e9df13673098357ae6c941f9d22cacd3590c804b1f895e7f835",
-      "sealed_capsule_id": "559dcb5949bce6d048eda14776b766f004c8b0f763a229724003968c6b10bf2c"
+      "sealed_capsule_id": "2c66afa7ceb31031b0140394d33b62adf3f36c5d77a43ab2718c735237db07b2"
      }
-    ]
+    ],
+    "sale": {
+     "complete": false,
+     "findings": [
+      "sale_bundle_not_valid",
+      "sale_record_not_disclosed",
+      "opened_not_evidenced"
+     ]
+    }
    },
    "go": {
     "steps": [
@@ -8836,7 +8836,7 @@
        }
       ],
       "capsule_id": "305a8f657b0acea5a072b1b1587d86a18510f5c4fa375d3b2e5e6647ee15b22f",
-      "sealed_capsule_id": "053bd049ecb29154be8d060867cd25300e3d16f9ef2427869061aba1caf9e335"
+      "sealed_capsule_id": "95712ca2be4348d5887bc3c90f262b08431afc9b71f4dade6238ff2319c11f75"
      },
      {
       "outcome": "deny",
@@ -8923,7 +8923,7 @@
        }
       ],
       "capsule_id": "5908babb7728def54017622e1dc883860dab085574b8faff83cffb1cd1ea7d7a",
-      "sealed_capsule_id": "788f17ca558dccdd85d0b2bf330ac505f0aef5f4e11949b7753a31bfb21f70fa"
+      "sealed_capsule_id": "dea40ba91a37f4b00f1606b9a138ddc30a799e1a94f2feb8d93b3649aaf1c6ce"
      },
      {
       "outcome": "deny",
@@ -9010,7 +9010,7 @@
        }
       ],
       "capsule_id": "8402d1f476b8251f967d74af4a9865e47462e2ee60f3438d8412b6262cb80502",
-      "sealed_capsule_id": "9bcc0dcb224a60f071b233b019cae84abea24b583f1215cd70e959636b533b70"
+      "sealed_capsule_id": "5f8a74836199c3cdb107aea753431325ee7e5d7027e3adb7eef002976b4530d4"
      },
      {
       "outcome": "deny",
@@ -9097,7 +9097,7 @@
        }
       ],
       "capsule_id": "56db7ac69e21c6fc4be4f7af4e6a22705a725324ce5cc9d7f0ba008de2ae553a",
-      "sealed_capsule_id": "125ec6823486e9e95ec13dfb1bb707c17abea0ed81388b5c72dbdc197e75826a"
+      "sealed_capsule_id": "3db314cfb400704e0cddee0547ddd7605a12070e378fb360cc4da924d22c4f3f"
      },
      {
       "outcome": "deny",
@@ -9106,7 +9106,7 @@
         "id": "dedupe",
         "result": "fail",
         "method": "exact_match_index_v0",
-        "evidence_digest": "c1347973ffd701d139d5a429965d6060e2522c12d2f26992dd504ff2dfd3d66e"
+        "evidence_digest": "12edd649a1fe4cfdc3557424665f40982b258544f3d397f98805c9438d9f6c4a"
        },
        {
         "id": "caps",
@@ -9184,7 +9184,7 @@
        }
       ],
       "capsule_id": "e7c0ad26ce151e9df13673098357ae6c941f9d22cacd3590c804b1f895e7f835",
-      "sealed_capsule_id": "559dcb5949bce6d048eda14776b766f004c8b0f763a229724003968c6b10bf2c"
+      "sealed_capsule_id": "2c66afa7ceb31031b0140394d33b62adf3f36c5d77a43ab2718c735237db07b2"
      }
     ],
     "sale": {
@@ -9203,14 +9203,6 @@
    "issue": "https://github.com/action-state-group/capsule-engine/issues/214",
    "why": "group 6: the sale's verification. The Go guard takes it from capsulectl's verify --bundle report and adds sale_bundle_not_valid and thread_not_valid where that report fails the bundle or a thread; the engine verifies the bundle itself (check_evidence_file) and does not. Both read the sale as incomplete, and every step agrees",
    "python": {
-    "sale": {
-     "complete": false,
-     "findings": [
-      "sale_bundle_not_valid",
-      "sale_record_not_disclosed",
-      "no_sale_cut"
-     ]
-    },
     "steps": [
      {
       "outcome": "deny",
@@ -9304,7 +9296,7 @@
        }
       ],
       "capsule_id": "305a8f657b0acea5a072b1b1587d86a18510f5c4fa375d3b2e5e6647ee15b22f",
-      "sealed_capsule_id": "053bd049ecb29154be8d060867cd25300e3d16f9ef2427869061aba1caf9e335"
+      "sealed_capsule_id": "95712ca2be4348d5887bc3c90f262b08431afc9b71f4dade6238ff2319c11f75"
      },
      {
       "outcome": "deny",
@@ -9397,7 +9389,7 @@
        }
       ],
       "capsule_id": "5908babb7728def54017622e1dc883860dab085574b8faff83cffb1cd1ea7d7a",
-      "sealed_capsule_id": "788f17ca558dccdd85d0b2bf330ac505f0aef5f4e11949b7753a31bfb21f70fa"
+      "sealed_capsule_id": "dea40ba91a37f4b00f1606b9a138ddc30a799e1a94f2feb8d93b3649aaf1c6ce"
      },
      {
       "outcome": "deny",
@@ -9491,7 +9483,7 @@
        }
       ],
       "capsule_id": "8402d1f476b8251f967d74af4a9865e47462e2ee60f3438d8412b6262cb80502",
-      "sealed_capsule_id": "9bcc0dcb224a60f071b233b019cae84abea24b583f1215cd70e959636b533b70"
+      "sealed_capsule_id": "5f8a74836199c3cdb107aea753431325ee7e5d7027e3adb7eef002976b4530d4"
      },
      {
       "outcome": "deny",
@@ -9584,7 +9576,7 @@
        }
       ],
       "capsule_id": "56db7ac69e21c6fc4be4f7af4e6a22705a725324ce5cc9d7f0ba008de2ae553a",
-      "sealed_capsule_id": "125ec6823486e9e95ec13dfb1bb707c17abea0ed81388b5c72dbdc197e75826a"
+      "sealed_capsule_id": "3db314cfb400704e0cddee0547ddd7605a12070e378fb360cc4da924d22c4f3f"
      },
      {
       "outcome": "deny",
@@ -9593,7 +9585,7 @@
         "id": "dedupe",
         "result": "fail",
         "method": "exact_match_index_v0",
-        "evidence_digest": "c1347973ffd701d139d5a429965d6060e2522c12d2f26992dd504ff2dfd3d66e"
+        "evidence_digest": "12edd649a1fe4cfdc3557424665f40982b258544f3d397f98805c9438d9f6c4a"
        },
        {
         "id": "caps",
@@ -9677,9 +9669,17 @@
        }
       ],
       "capsule_id": "e7c0ad26ce151e9df13673098357ae6c941f9d22cacd3590c804b1f895e7f835",
-      "sealed_capsule_id": "559dcb5949bce6d048eda14776b766f004c8b0f763a229724003968c6b10bf2c"
+      "sealed_capsule_id": "2c66afa7ceb31031b0140394d33b62adf3f36c5d77a43ab2718c735237db07b2"
      }
-    ]
+    ],
+    "sale": {
+     "complete": false,
+     "findings": [
+      "sale_bundle_not_valid",
+      "sale_record_not_disclosed",
+      "no_sale_cut"
+     ]
+    }
    },
    "go": {
     "steps": [
@@ -9768,7 +9768,7 @@
        }
       ],
       "capsule_id": "305a8f657b0acea5a072b1b1587d86a18510f5c4fa375d3b2e5e6647ee15b22f",
-      "sealed_capsule_id": "053bd049ecb29154be8d060867cd25300e3d16f9ef2427869061aba1caf9e335"
+      "sealed_capsule_id": "95712ca2be4348d5887bc3c90f262b08431afc9b71f4dade6238ff2319c11f75"
      },
      {
       "outcome": "deny",
@@ -9855,7 +9855,7 @@
        }
       ],
       "capsule_id": "5908babb7728def54017622e1dc883860dab085574b8faff83cffb1cd1ea7d7a",
-      "sealed_capsule_id": "788f17ca558dccdd85d0b2bf330ac505f0aef5f4e11949b7753a31bfb21f70fa"
+      "sealed_capsule_id": "dea40ba91a37f4b00f1606b9a138ddc30a799e1a94f2feb8d93b3649aaf1c6ce"
      },
      {
       "outcome": "deny",
@@ -9942,7 +9942,7 @@
        }
       ],
       "capsule_id": "8402d1f476b8251f967d74af4a9865e47462e2ee60f3438d8412b6262cb80502",
-      "sealed_capsule_id": "9bcc0dcb224a60f071b233b019cae84abea24b583f1215cd70e959636b533b70"
+      "sealed_capsule_id": "5f8a74836199c3cdb107aea753431325ee7e5d7027e3adb7eef002976b4530d4"
      },
      {
       "outcome": "deny",
@@ -10029,7 +10029,7 @@
        }
       ],
       "capsule_id": "56db7ac69e21c6fc4be4f7af4e6a22705a725324ce5cc9d7f0ba008de2ae553a",
-      "sealed_capsule_id": "125ec6823486e9e95ec13dfb1bb707c17abea0ed81388b5c72dbdc197e75826a"
+      "sealed_capsule_id": "3db314cfb400704e0cddee0547ddd7605a12070e378fb360cc4da924d22c4f3f"
      },
      {
       "outcome": "deny",
@@ -10038,7 +10038,7 @@
         "id": "dedupe",
         "result": "fail",
         "method": "exact_match_index_v0",
-        "evidence_digest": "c1347973ffd701d139d5a429965d6060e2522c12d2f26992dd504ff2dfd3d66e"
+        "evidence_digest": "12edd649a1fe4cfdc3557424665f40982b258544f3d397f98805c9438d9f6c4a"
        },
        {
         "id": "caps",
@@ -10116,7 +10116,7 @@
        }
       ],
       "capsule_id": "e7c0ad26ce151e9df13673098357ae6c941f9d22cacd3590c804b1f895e7f835",
-      "sealed_capsule_id": "559dcb5949bce6d048eda14776b766f004c8b0f763a229724003968c6b10bf2c"
+      "sealed_capsule_id": "2c66afa7ceb31031b0140394d33b62adf3f36c5d77a43ab2718c735237db07b2"
      }
     ],
     "sale": {
@@ -10135,14 +10135,6 @@
    "issue": "https://github.com/action-state-group/capsule-engine/issues/214",
    "why": "group 6: the sale's verification. The Go guard takes it from capsulectl's verify --bundle report and adds sale_bundle_not_valid and thread_not_valid where that report fails the bundle or a thread; the engine verifies the bundle itself (check_evidence_file) and does not. Both read the sale as incomplete, and every step agrees",
    "python": {
-    "sale": {
-     "complete": false,
-     "findings": [
-      "sale_bundle_not_valid",
-      "sale_record_not_disclosed",
-      "no_sale_cut"
-     ]
-    },
     "steps": [
      {
       "outcome": "deny",
@@ -10236,7 +10228,7 @@
        }
       ],
       "capsule_id": "305a8f657b0acea5a072b1b1587d86a18510f5c4fa375d3b2e5e6647ee15b22f",
-      "sealed_capsule_id": "053bd049ecb29154be8d060867cd25300e3d16f9ef2427869061aba1caf9e335"
+      "sealed_capsule_id": "95712ca2be4348d5887bc3c90f262b08431afc9b71f4dade6238ff2319c11f75"
      },
      {
       "outcome": "deny",
@@ -10329,7 +10321,7 @@
        }
       ],
       "capsule_id": "5908babb7728def54017622e1dc883860dab085574b8faff83cffb1cd1ea7d7a",
-      "sealed_capsule_id": "788f17ca558dccdd85d0b2bf330ac505f0aef5f4e11949b7753a31bfb21f70fa"
+      "sealed_capsule_id": "dea40ba91a37f4b00f1606b9a138ddc30a799e1a94f2feb8d93b3649aaf1c6ce"
      },
      {
       "outcome": "deny",
@@ -10423,7 +10415,7 @@
        }
       ],
       "capsule_id": "8402d1f476b8251f967d74af4a9865e47462e2ee60f3438d8412b6262cb80502",
-      "sealed_capsule_id": "9bcc0dcb224a60f071b233b019cae84abea24b583f1215cd70e959636b533b70"
+      "sealed_capsule_id": "5f8a74836199c3cdb107aea753431325ee7e5d7027e3adb7eef002976b4530d4"
      },
      {
       "outcome": "deny",
@@ -10516,7 +10508,7 @@
        }
       ],
       "capsule_id": "56db7ac69e21c6fc4be4f7af4e6a22705a725324ce5cc9d7f0ba008de2ae553a",
-      "sealed_capsule_id": "125ec6823486e9e95ec13dfb1bb707c17abea0ed81388b5c72dbdc197e75826a"
+      "sealed_capsule_id": "3db314cfb400704e0cddee0547ddd7605a12070e378fb360cc4da924d22c4f3f"
      },
      {
       "outcome": "deny",
@@ -10525,7 +10517,7 @@
         "id": "dedupe",
         "result": "fail",
         "method": "exact_match_index_v0",
-        "evidence_digest": "c1347973ffd701d139d5a429965d6060e2522c12d2f26992dd504ff2dfd3d66e"
+        "evidence_digest": "12edd649a1fe4cfdc3557424665f40982b258544f3d397f98805c9438d9f6c4a"
        },
        {
         "id": "caps",
@@ -10609,9 +10601,17 @@
        }
       ],
       "capsule_id": "e7c0ad26ce151e9df13673098357ae6c941f9d22cacd3590c804b1f895e7f835",
-      "sealed_capsule_id": "559dcb5949bce6d048eda14776b766f004c8b0f763a229724003968c6b10bf2c"
+      "sealed_capsule_id": "2c66afa7ceb31031b0140394d33b62adf3f36c5d77a43ab2718c735237db07b2"
      }
-    ]
+    ],
+    "sale": {
+     "complete": false,
+     "findings": [
+      "sale_bundle_not_valid",
+      "sale_record_not_disclosed",
+      "no_sale_cut"
+     ]
+    }
    },
    "go": {
     "steps": [
@@ -10700,7 +10700,7 @@
        }
       ],
       "capsule_id": "305a8f657b0acea5a072b1b1587d86a18510f5c4fa375d3b2e5e6647ee15b22f",
-      "sealed_capsule_id": "053bd049ecb29154be8d060867cd25300e3d16f9ef2427869061aba1caf9e335"
+      "sealed_capsule_id": "95712ca2be4348d5887bc3c90f262b08431afc9b71f4dade6238ff2319c11f75"
      },
      {
       "outcome": "deny",
@@ -10787,7 +10787,7 @@
        }
       ],
       "capsule_id": "5908babb7728def54017622e1dc883860dab085574b8faff83cffb1cd1ea7d7a",
-      "sealed_capsule_id": "788f17ca558dccdd85d0b2bf330ac505f0aef5f4e11949b7753a31bfb21f70fa"
+      "sealed_capsule_id": "dea40ba91a37f4b00f1606b9a138ddc30a799e1a94f2feb8d93b3649aaf1c6ce"
      },
      {
       "outcome": "deny",
@@ -10874,7 +10874,7 @@
        }
       ],
       "capsule_id": "8402d1f476b8251f967d74af4a9865e47462e2ee60f3438d8412b6262cb80502",
-      "sealed_capsule_id": "9bcc0dcb224a60f071b233b019cae84abea24b583f1215cd70e959636b533b70"
+      "sealed_capsule_id": "5f8a74836199c3cdb107aea753431325ee7e5d7027e3adb7eef002976b4530d4"
      },
      {
       "outcome": "deny",
@@ -10961,7 +10961,7 @@
        }
       ],
       "capsule_id": "56db7ac69e21c6fc4be4f7af4e6a22705a725324ce5cc9d7f0ba008de2ae553a",
-      "sealed_capsule_id": "125ec6823486e9e95ec13dfb1bb707c17abea0ed81388b5c72dbdc197e75826a"
+      "sealed_capsule_id": "3db314cfb400704e0cddee0547ddd7605a12070e378fb360cc4da924d22c4f3f"
      },
      {
       "outcome": "deny",
@@ -10970,7 +10970,7 @@
         "id": "dedupe",
         "result": "fail",
         "method": "exact_match_index_v0",
-        "evidence_digest": "c1347973ffd701d139d5a429965d6060e2522c12d2f26992dd504ff2dfd3d66e"
+        "evidence_digest": "12edd649a1fe4cfdc3557424665f40982b258544f3d397f98805c9438d9f6c4a"
        },
        {
         "id": "caps",
@@ -11048,7 +11048,7 @@
        }
       ],
       "capsule_id": "e7c0ad26ce151e9df13673098357ae6c941f9d22cacd3590c804b1f895e7f835",
-      "sealed_capsule_id": "559dcb5949bce6d048eda14776b766f004c8b0f763a229724003968c6b10bf2c"
+      "sealed_capsule_id": "2c66afa7ceb31031b0140394d33b62adf3f36c5d77a43ab2718c735237db07b2"
      }
     ],
     "sale": {
@@ -11067,12 +11067,6 @@
    "issue": "https://github.com/action-state-group/capsule-engine/issues/214",
    "why": "group 6: the sale's verification. The Go guard takes it from capsulectl's verify --bundle report and adds sale_bundle_not_valid and thread_not_valid where that report fails the bundle or a thread; the engine verifies the bundle itself (check_evidence_file) and does not. Both read the sale as incomplete, and every step agrees",
    "python": {
-    "sale": {
-     "complete": false,
-     "findings": [
-      "never_opened_but_opened"
-     ]
-    },
     "steps": [
      {
       "outcome": "deny",
@@ -11166,7 +11160,7 @@
        }
       ],
       "capsule_id": "305a8f657b0acea5a072b1b1587d86a18510f5c4fa375d3b2e5e6647ee15b22f",
-      "sealed_capsule_id": "053bd049ecb29154be8d060867cd25300e3d16f9ef2427869061aba1caf9e335"
+      "sealed_capsule_id": "95712ca2be4348d5887bc3c90f262b08431afc9b71f4dade6238ff2319c11f75"
      },
      {
       "outcome": "deny",
@@ -11259,7 +11253,7 @@
        }
       ],
       "capsule_id": "5908babb7728def54017622e1dc883860dab085574b8faff83cffb1cd1ea7d7a",
-      "sealed_capsule_id": "788f17ca558dccdd85d0b2bf330ac505f0aef5f4e11949b7753a31bfb21f70fa"
+      "sealed_capsule_id": "dea40ba91a37f4b00f1606b9a138ddc30a799e1a94f2feb8d93b3649aaf1c6ce"
      },
      {
       "outcome": "deny",
@@ -11268,7 +11262,7 @@
         "id": "dedupe",
         "result": "fail",
         "method": "exact_match_index_v0",
-        "evidence_digest": "c1347973ffd701d139d5a429965d6060e2522c12d2f26992dd504ff2dfd3d66e"
+        "evidence_digest": "12edd649a1fe4cfdc3557424665f40982b258544f3d397f98805c9438d9f6c4a"
        },
        {
         "id": "caps",
@@ -11352,9 +11346,15 @@
        }
       ],
       "capsule_id": "e7c0ad26ce151e9df13673098357ae6c941f9d22cacd3590c804b1f895e7f835",
-      "sealed_capsule_id": "3adca47655c40eef3465eb8bb1d4dc83c48b20da99187d74b0f3de71433d6b4a"
+      "sealed_capsule_id": "40e9b70d85cb5996be0cc3342e38e351e450e919380a501124df8183c7cd1671"
      }
-    ]
+    ],
+    "sale": {
+     "complete": false,
+     "findings": [
+      "never_opened_but_opened"
+     ]
+    }
    },
    "go": {
     "steps": [
@@ -11443,7 +11443,7 @@
        }
       ],
       "capsule_id": "305a8f657b0acea5a072b1b1587d86a18510f5c4fa375d3b2e5e6647ee15b22f",
-      "sealed_capsule_id": "053bd049ecb29154be8d060867cd25300e3d16f9ef2427869061aba1caf9e335"
+      "sealed_capsule_id": "95712ca2be4348d5887bc3c90f262b08431afc9b71f4dade6238ff2319c11f75"
      },
      {
       "outcome": "deny",
@@ -11530,7 +11530,7 @@
        }
       ],
       "capsule_id": "5908babb7728def54017622e1dc883860dab085574b8faff83cffb1cd1ea7d7a",
-      "sealed_capsule_id": "788f17ca558dccdd85d0b2bf330ac505f0aef5f4e11949b7753a31bfb21f70fa"
+      "sealed_capsule_id": "dea40ba91a37f4b00f1606b9a138ddc30a799e1a94f2feb8d93b3649aaf1c6ce"
      },
      {
       "outcome": "deny",
@@ -11539,7 +11539,7 @@
         "id": "dedupe",
         "result": "fail",
         "method": "exact_match_index_v0",
-        "evidence_digest": "c1347973ffd701d139d5a429965d6060e2522c12d2f26992dd504ff2dfd3d66e"
+        "evidence_digest": "12edd649a1fe4cfdc3557424665f40982b258544f3d397f98805c9438d9f6c4a"
        },
        {
         "id": "caps",
@@ -11617,7 +11617,7 @@
        }
       ],
       "capsule_id": "e7c0ad26ce151e9df13673098357ae6c941f9d22cacd3590c804b1f895e7f835",
-      "sealed_capsule_id": "3adca47655c40eef3465eb8bb1d4dc83c48b20da99187d74b0f3de71433d6b4a"
+      "sealed_capsule_id": "40e9b70d85cb5996be0cc3342e38e351e450e919380a501124df8183c7cd1671"
      }
     ],
     "sale": {

@@ -4,7 +4,7 @@
   {
    "case": "inputs/statement-in-history/step-0.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/statement-window-vectors/inputs/statement-in-history/step-0.input.json",
    "input_sha256": "b555191961a0c720415dbf525938cee7742d3f4aa7c629d0db88ea1addb7dd41",
    "expected": {
@@ -128,7 +128,7 @@
   {
    "case": "inputs/statement-in-history/step-1.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/statement-window-vectors/inputs/statement-in-history/step-1.input.json",
    "input_sha256": "443a98669077951cbe7fded60fddca46dc8d511217ee96d778e4f7cbbfa453aa",
    "expected": {
@@ -252,7 +252,7 @@
   {
    "case": "inputs/statement-in-history/step-2.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "go/guard/testdata/statement-window-vectors/inputs/statement-in-history/step-2.input.json",
    "input_sha256": "98efd7e68e70cb566263cca011965a9ea6090a1702730b95442b47ffe72bfbed",
    "expected": {

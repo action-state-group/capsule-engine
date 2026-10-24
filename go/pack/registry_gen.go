@@ -33,6 +33,11 @@ func LoadEveryday038() (Pack, error) {
 	return LoadFrom(packs.Everyday038, packs.Everyday038Dir)
 }
 
+// LoadEveryday039 loads asg/everyday/0.3.9, at the digest its PROVENANCE.json records.
+func LoadEveryday039() (Pack, error) {
+	return LoadFrom(packs.Everyday039, packs.Everyday039Dir)
+}
+
 // LoadSeller010 loads asg/seller/0.1.0, at the digest its PROVENANCE.json records.
 func LoadSeller010() (Pack, error) {
 	return LoadFrom(packs.Seller010, packs.Seller010Dir)
@@ -63,6 +68,11 @@ func LoadSeller015() (Pack, error) {
 	return LoadFrom(packs.Seller015, packs.Seller015Dir)
 }
 
+// LoadSeller016 loads asg/seller/0.1.6, at the digest its PROVENANCE.json records.
+func LoadSeller016() (Pack, error) {
+	return LoadFrom(packs.Seller016, packs.Seller016Dir)
+}
+
 // EmbeddedPack is one embedded pack version: its directory in packs.All
 // and its loader.
 type EmbeddedPack struct {
@@ -78,12 +88,14 @@ func Embedded() []EmbeddedPack {
 		{packs.Everyday036Dir, LoadEveryday036},
 		{packs.Everyday037Dir, LoadEveryday037},
 		{packs.Everyday038Dir, LoadEveryday038},
+		{packs.Everyday039Dir, LoadEveryday039},
 		{packs.Seller010Dir, LoadSeller010},
 		{packs.Seller011Dir, LoadSeller011},
 		{packs.Seller012Dir, LoadSeller012},
 		{packs.Seller013Dir, LoadSeller013},
 		{packs.Seller014Dir, LoadSeller014},
 		{packs.Seller015Dir, LoadSeller015},
+		{packs.Seller016Dir, LoadSeller016},
 	}
 }
 
@@ -97,10 +109,12 @@ var vendored = []struct {
 	{packs.Everyday036, packs.Everyday036Dir},
 	{packs.Everyday037, packs.Everyday037Dir},
 	{packs.Everyday038, packs.Everyday038Dir},
+	{packs.Everyday039, packs.Everyday039Dir},
 	{packs.Seller010, packs.Seller010Dir},
 	{packs.Seller011, packs.Seller011Dir},
 	{packs.Seller012, packs.Seller012Dir},
 	{packs.Seller013, packs.Seller013Dir},
 	{packs.Seller014, packs.Seller014Dir},
 	{packs.Seller015, packs.Seller015Dir},
+	{packs.Seller016, packs.Seller016Dir},
 }

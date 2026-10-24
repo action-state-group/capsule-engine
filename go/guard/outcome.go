@@ -61,6 +61,10 @@ type Constraint struct {
 	// outgoing content); caps carries its limits and totals in capsFacts.
 	read *Read
 	caps *CapsFacts
+	// recorded is what recipient_role recorded in its evidence about who got
+	// which classes, when the check is configured with role_classes; the
+	// report words an r11/r12 reason from it (shareReason).
+	recorded *recordedShare
 	// scopeNote is an out-of-scope n/a's own reason, when the check gives
 	// one other than its class scope (action_class_gate/1.1.0 leaving out a
 	// recipient role, release_on_acceptance/1.1.0 a platform).

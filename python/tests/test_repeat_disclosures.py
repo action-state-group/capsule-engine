@@ -217,7 +217,7 @@ CASES = [
 
 def test_everyday_0_3_8_asks_only_for_what_is_new(tmp_path):
     pack, decisions = _decide(EVERYDAY, [action for _, action, _, _ in CASES], tmp_path)
-    assert pack.pack_id == "asg/everyday/0.3.8"
+    assert pack.pack_id == "asg/everyday/0.3.9"
     for (name, _, outcome, failed), decision in zip(CASES, decisions, strict=True):
         assert _failed(pack, decision) == failed, name
         assert decision.outcome == outcome, name

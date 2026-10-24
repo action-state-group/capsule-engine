@@ -4,7 +4,7 @@
   {
    "case": "cancel-linked-full",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "conformance-vectors/guard/v0/inputs/history-spend/cancel-linked-full.json",
    "input_sha256": "4c3a566880221ff6c45e9ac7e38ef29606f96ca2e00ea51294858d6ed1cf6d7c",
    "expected": {
@@ -131,7 +131,7 @@
   {
    "case": "cancel-linked-partial",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "conformance-vectors/guard/v0/inputs/history-spend/cancel-linked-partial.json",
    "input_sha256": "701f23952d6e2df58d993662b3706e41491826a1cc4291229b024b7527dd68db",
    "expected": {
@@ -258,7 +258,7 @@
   {
    "case": "chained-refund",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "conformance-vectors/guard/v0/inputs/history-spend/chained-refund.json",
    "input_sha256": "cf46f874e93ed10b35196e2330d907be146be20767dbc8b0cc8c1aadcc3c173e",
    "expected": {
@@ -385,7 +385,7 @@
   {
    "case": "no-spend-negative-transfer",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "conformance-vectors/guard/v0/inputs/history-spend/no-spend-negative-transfer.json",
    "input_sha256": "80cb848ed322a37871c99b9d9534d996d024db4535bd2e269fd822560bd5f0ac",
    "expected": {
@@ -512,7 +512,7 @@
   {
    "case": "no-spend",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "conformance-vectors/guard/v0/inputs/history-spend/no-spend.json",
    "input_sha256": "8df70f18f8214fbfe802bbe9e4ee098ea379894b1191b2202c8b07d4011fa9c8",
    "expected": {
@@ -639,7 +639,7 @@
   {
    "case": "partial-charge",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "conformance-vectors/guard/v0/inputs/history-spend/partial-charge.json",
    "input_sha256": "0d4cd53760ad1910f6ca61da1686990a7f0fea1ff5c2a4c327a48610b65c6bf6",
    "expected": {
@@ -766,7 +766,7 @@
   {
    "case": "refund-before-charge",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "conformance-vectors/guard/v0/inputs/history-spend/refund-before-charge.json",
    "input_sha256": "d67ddb60dd7f4e1b92bd62d34d483f0b3a3545fbcee77ffa11fa9c19725a0088",
    "expected": {
@@ -893,7 +893,7 @@
   {
    "case": "refund-linked-full",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "conformance-vectors/guard/v0/inputs/history-spend/refund-linked-full.json",
    "input_sha256": "2138a76fb4373c9231fb5223bfa76bd1487af70bd0162e05b356f89c72960080",
    "expected": {
@@ -1020,7 +1020,7 @@
   {
    "case": "refund-linked-over",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "conformance-vectors/guard/v0/inputs/history-spend/refund-linked-over.json",
    "input_sha256": "8259f9ca330c5bac2b667b6e7879d50493ba7e4b4e469df806c11b8ac748af65",
    "expected": {
@@ -1147,7 +1147,7 @@
   {
    "case": "refund-linked-partial",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "conformance-vectors/guard/v0/inputs/history-spend/refund-linked-partial.json",
    "input_sha256": "2c4678d71f3521c60af5fa8eae529028bbe7f37a870547126fc8daf2e5ffd8f1",
    "expected": {
@@ -1274,7 +1274,7 @@
   {
    "case": "refund-not-money-in",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "conformance-vectors/guard/v0/inputs/history-spend/refund-not-money-in.json",
    "input_sha256": "2e89a4c9ab791d28cd641537c55a055e7683f949a576c41162c8ea15a1d78a5e",
    "expected": {
@@ -1401,7 +1401,7 @@
   {
    "case": "refund-of-charge-outside-window",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "conformance-vectors/guard/v0/inputs/history-spend/refund-of-charge-outside-window.json",
    "input_sha256": "82bd66fa683526e1ba6808682133a87fda0c0b3d0d8a35a8075ab4a677c7eefa",
    "expected": {
@@ -1528,7 +1528,7 @@
   {
    "case": "refund-unlinked",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "conformance-vectors/guard/v0/inputs/history-spend/refund-unlinked.json",
    "input_sha256": "44231e693abf8970a9d0757dffc29fe5948020b63c45ae62a7be4acce883c846",
    "expected": {
@@ -1655,7 +1655,7 @@
   {
    "case": "refund-wrong-parent",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "conformance-vectors/guard/v0/inputs/history-spend/refund-wrong-parent.json",
    "input_sha256": "92e79aca38e4f731ff0aaadde9704a47098b5644e80ae609b7ff4b46a392b6de",
    "expected": {
@@ -1782,7 +1782,7 @@
   {
    "case": "refund-wrong-relation",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "conformance-vectors/guard/v0/inputs/history-spend/refund-wrong-relation.json",
    "input_sha256": "b45b98254c8e9692cfb0b865936b697867b9113ce6c6ee75689436327b39137e",
    "expected": {
@@ -1909,7 +1909,7 @@
   {
    "case": "spend-above-amount",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "conformance-vectors/guard/v0/inputs/history-spend/spend-above-amount.json",
    "input_sha256": "7780b88128c6c7d631bbe187c0a9cc303c0b81371590973a771373b1f6830457",
    "expected": {
@@ -2036,7 +2036,7 @@
   {
    "case": "spend-below-amount",
    "kind": "check-input",
-   "pack": "everyday-0.3.8",
+   "pack": "everyday-0.3.9",
    "input": "conformance-vectors/guard/v0/inputs/history-spend/spend-below-amount.json",
    "input_sha256": "0d4cd53760ad1910f6ca61da1686990a7f0fea1ff5c2a4c327a48610b65c6bf6",
    "expected": {
