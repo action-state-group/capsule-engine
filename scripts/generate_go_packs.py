@@ -33,6 +33,11 @@ version, which the Go guard's tests hold its ported definitions against.
 * every PROVENANCE.json's ``engine_definition_digest`` equals what this
   engine computes for that directory today, and each listed file's sha256
   holds;
+* every frozen version the Python tests keep under
+  ``python/tests/fixtures/packs/<pack>-<version>`` that ``go/packs`` also
+  holds has the ``go/packs`` pack.yaml byte for byte (``go/packs`` is the
+  record of a frozen version; the fixture adds the AI-BOOTSTRAP.md it was
+  released with, which ``go/packs`` does not vendor);
 * ``engine/action_taxonomy.json`` and its PROVENANCE.json are what this script
   writes from the engine's taxonomy;
 * the two generated Go files are what this script writes.
@@ -66,6 +71,7 @@ CATALOG = ROOT / "python" / "capsule_engine" / "packs" / "catalog"
 WICKET_DEFS = ROOT / "python" / "capsule_engine" / "guards" / "wickets" / "catalog_defs"
 FOLD_DEFS = ROOT / "python" / "capsule_engine" / "folds" / "catalog_defs"
 TAXONOMY = ROOT / "python" / "capsule_engine" / "guards" / "action_taxonomy.json"
+FIXTURE_PACKS = ROOT / "python" / "tests" / "fixtures" / "packs"
 GO = ROOT / "go"
 PACKS = GO / "packs"
 EMBED_GO = PACKS / "embed.go"
@@ -202,6 +208,9 @@ def _check_tree(problems: list[str]) -> None:
             path = directory / rel
             if not path.is_file() or _sha256(path) != entry.get("sha256"):
                 problems.append(f"{directory.name}/{rel}: sha256 is not the one PROVENANCE.json records")
+        fixture = FIXTURE_PACKS / directory.name / "pack.yaml"
+        if fixture.is_file() and fixture.read_bytes() != (directory / "pack.yaml").read_bytes():
+            problems.append(f"python/tests/fixtures/packs/{directory.name}/pack.yaml is not {directory.name}/pack.yaml")
 
 
 def render_taxonomy_provenance() -> str:

@@ -293,6 +293,8 @@ CI (§7, `packs` job) checks:
 
 - the tree, `embed.go` and the registry regenerate with no difference;
 - every wicket, fold and taxonomy file under `go/packs` is byte-identical to its source;
+- the current version's pack.yaml is the catalog's, and every frozen pack.yaml the Python tests
+  keep under `python/tests/fixtures/packs/` is the `go/packs` one, byte for byte;
 - every engine digest in a PROVENANCE.json equals what the Python engine computes for that
   directory today.
 
