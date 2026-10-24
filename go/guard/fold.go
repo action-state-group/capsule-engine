@@ -112,9 +112,10 @@ func recordValue(r Record, path string) value {
 		return nonEmpty(r.Stated.SourceKind)
 	case "chain.parent_capsule_id", "chain.relation":
 		// The engine's records of a history act (live_history.py
-		// _HistoryRecord, replay.py _ExecutedBody) carry no chain block, so a
-		// history cancel or refund cites no charge: it is unlinked and takes
-		// nothing back. Only a ledger capsule's own chain is read.
+		// _HistoryRecord, replay.py _ExecutedBody) carry no chain block, so
+		// the fold reads a history cancel or refund as citing no charge.
+		// Only a ledger capsule's own chain is read; the history's own
+		// reversals are applied to the charge they cite (historyFreed).
 		if r.live != "" {
 			return value{}
 		}
@@ -543,6 +544,7 @@ func (f fold) evaluate(records []Record, keyValue string, anchor time.Time) (int
 	var acc int64
 	var sum reversalSummary
 	charges := map[string]int64{} // capsule id -> what the charge has left
+	freed := f.historyFreed(records, anchor)
 	for _, r := range records {
 		vals, ok := f.resolve(r)
 		if !ok || !f.within(vals, anchor) || !f.passes(vals) {
@@ -555,7 +557,7 @@ func (f fold) evaluate(records []Record, keyValue string, anchor time.Time) (int
 			acc++
 			continue
 		}
-		amount := f.summed(r, vals[f.sumField].i)
+		amount := f.summed(r, vals[f.sumField].i) - freed[r.CapsuleID]
 		rv := f.reversal
 		if rv == nil {
 			acc += amount
@@ -588,4 +590,74 @@ func (f fold) evaluate(records []Record, keyValue string, anchor time.Time) (int
 		acc += counted
 	}
 	return acc, sum
+}
+
+// historyFreed is how much each accepted charge in a check input's history
+// counts less, by capsule id (report/replay.py _history_freed,
+// capsule-engine#234): ruling A on #214 hold A counts a partial charge at its
+// stated amount "until a cancel or refund is on record". A history act's
+// record carries no chain for the fold's reversal clause (recordValue), so a
+// reversal in the history is applied to the record of the charge it
+// reverses, as the engine does.
+//
+// A reversal is an act of one of the clause's classes that states the money
+// moved in (ReturnedMinor is set for such an act only) whose capsule's chain
+// cites, under the clause's relation, the capsule id of an accepted charge
+// in this history, and nothing else: never matched on amount, merchant or
+// time alone. It is sealed no earlier than its charge and no later than the
+// check (anchor), under the charge's operator and developer. It takes back
+// the amount it returns, once per capsule id or action id, and the charge
+// never counts below its sealed spend_minor; a charge that seals none, or
+// one that is not accepted, is lowered by nothing. Only the spend.weekly/3.1.0
+// family's executed-act fold does this: any other fold reads the history's
+// copy, which the frozen packs keep as they were.
+func (f fold) historyFreed(records []Record, anchor time.Time) map[string]int64 {
+	if f.reversal == nil || !f.countsExecuted() {
+		return nil
+	}
+	type charge struct {
+		counted, floor int64
+		operator, dev  string
+		at             time.Time
+	}
+	at := func(r Record) (time.Time, bool) {
+		t, err := parseInstant(r.Timestamp)
+		return t.Truncate(time.Microsecond), err == nil
+	}
+	anchor = anchor.Truncate(time.Microsecond)
+	charges := map[string]charge{}
+	freed := map[string]int64{}
+	seen := map[string]bool{}
+	for _, r := range executedOrder(records, true) {
+		t, ok := at(r)
+		if r.live == "" || r.Stated != nil || !ok || r.CapsuleID == "" {
+			continue
+		}
+		if r.ActionClass == nil || !slices.Contains(f.reversal.Classes, *r.ActionClass) {
+			if _, dup := charges[r.CapsuleID]; dup || !r.accepted() || r.Unchecked || r.AmountMinor == nil || r.SpendMinor == nil {
+				continue
+			}
+			if counted, floor := max(*r.AmountMinor, *r.SpendMinor), *r.SpendMinor; 0 <= floor && floor < counted {
+				charges[r.CapsuleID] = charge{counted, floor, r.Operator, r.Developer, t}
+			}
+			continue
+		}
+		var parent string
+		if r.ChainParent != nil {
+			parent = *r.ChainParent
+		}
+		c, linked := charges[parent]
+		if !linked || r.ChainRelation == nil || *r.ChainRelation != f.reversal.Relation ||
+			r.Direction == nil || *r.Direction != moneyIn || r.ReturnedMinor == nil || *r.ReturnedMinor <= 0 ||
+			c.operator != r.Operator || c.dev != r.Developer || t.Before(c.at) || t.After(anchor) ||
+			seen["capsule "+r.CapsuleID] || (r.ActionID != "" && seen["action "+r.ActionID]) {
+			continue
+		}
+		seen["capsule "+r.CapsuleID] = true
+		if r.ActionID != "" {
+			seen["action "+r.ActionID] = true
+		}
+		freed[parent] += min(*r.ReturnedMinor, c.counted-c.floor-freed[parent])
+	}
+	return freed
 }

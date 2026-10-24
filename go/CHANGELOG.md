@@ -5,6 +5,14 @@ and `portedDefinitions` (`guard/engine.go`).
 
 ## Unreleased
 
+- Changed (capsule-engine#234, ruling A on #214 hold A): under a fold that counts executed acts
+  (spend.weekly/3.1.0), a check input's history lets a cancel or refund free the headroom of the
+  partial charge it cites, as the Python engine does (`historyFreed`). It lowers that charge's
+  counted amount by the amount it returns, never below its `spend_minor`; it must state the money
+  moved in, cite the charge's capsule id under `supersedes`, carry its operator and developer,
+  and be sealed between the charge and the check. Any other cancel or refund frees nothing. No
+  exported API, pack or definition changes; frozen folds are unchanged.
+
 ## 0.1.3 — 2026-10-23
 
 Fixes toward the Python engine, the reference (capsule-engine#214). No exported API changes,

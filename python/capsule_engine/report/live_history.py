@@ -160,7 +160,10 @@ def history_ledger(envelope: dict, ledger: LedgerAPI, *, caps_fold: FoldDefiniti
     checked = envelope.get("record")
     checked_at = _time(checked.get("timestamp")) if isinstance(checked, dict) else None
     counts = {DISPOSITION: 0, NO_DISPOSITION: 0, UNREAD: 0, STATEMENT: 0}
-    executed = ExecutedActs([entry for _, _, entry in dated]) if counts_executed_acts(caps_fold) else None
+    executed = (
+        ExecutedActs([entry for _, _, entry in dated], reversal=caps_fold.reversal, checked_at=checked_at)
+        if counts_executed_acts(caps_fold) else None
+    )
     written: set[str] = set()
     claims: set[str] = set()
     for at, _, entry in dated:
