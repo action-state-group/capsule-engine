@@ -64,6 +64,9 @@ func TestHistoryFreed(t *testing.T) {
 			reversal("r1", n(2000), func(r *Record) { r.Stated = &Statement{} })}, 0},
 		{"only the first copy of a capsule id is the charge", []Record{charge(500, n(500), &accept), charge(9000, n(3000), &accept),
 			reversal("r1", n(2000), nil)}, 0},
+		{"refunds within a microsecond keep the order given", []Record{charge(9000, n(3000), &accept),
+			reversal("r1", n(2000), func(r *Record) { r.Timestamp = "2026-10-06T12:00:00.000000200Z" }),
+			reversal("r2", n(6000), func(r *Record) { r.Timestamp = "2026-10-06T12:00:00.000000100Z"; r.ActionID = "a/r1" })}, 2000},
 		{"no chain", []Record{charge(9000, n(3000), &accept), reversal("r1", n(2000), func(r *Record) { r.ChainParent, r.ChainRelation = nil, nil })}, 0},
 		{"money not moved in", []Record{charge(9000, n(3000), &accept), reversal("r1", n(2000), func(r *Record) { r.Direction = nil })}, 0},
 	}

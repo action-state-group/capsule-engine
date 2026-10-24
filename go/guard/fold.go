@@ -636,7 +636,8 @@ func (f fold) historyFreed(records []Record, anchor time.Time) map[int]int64 {
 		if errA != nil || errB != nil {
 			return 0
 		}
-		return ta.Compare(tb)
+		// To the microsecond, as the engine's history ledger orders them.
+		return ta.Truncate(time.Microsecond).Compare(tb.Truncate(time.Microsecond))
 	})
 	// The charges first, so a reversal sealed at the instant of its charge
 	// links whatever order the history lists them in.
