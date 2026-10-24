@@ -5,6 +5,12 @@ and `portedDefinitions` (`guard/engine.go`).
 
 ## Unreleased
 
+## 0.2.0 — 2026-10-24
+
+A new pack version (a minor on v0, RELEASING.md): everyday 0.3.9 and seller 0.1.6, and the report's
+reasons for the action_class_gate rules. The packs and definitions of 0.1.3 are unchanged beyond
+the additions below.
+
 - Changed (capsule-engine#234, ruling A on #214 hold A): under a fold that counts executed acts
   (spend.weekly/3.1.0), a check input's history lets a cancel or refund free the headroom of the
   partial charge it cites, as the Python engine does (`historyFreed`). It lowers that charge's
