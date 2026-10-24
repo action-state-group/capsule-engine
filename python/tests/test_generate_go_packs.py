@@ -74,6 +74,35 @@ def test_an_edited_definition_is_found(gen_copy):
     assert gen_copy.main(["--check"]) == 1
 
 
+@pytest.mark.parametrize("name", ["everyday", "seller"])
+@pytest.mark.parametrize("side", ["catalog", "go"])
+def test_an_edited_current_pack_is_found(gen_copy, tmp_path, monkeypatch, name, side):
+    version = gen_copy.load_pack_dir(gen_copy.CATALOG / name).pack_id.rsplit("/", 1)[1]
+    if side == "catalog":
+        shutil.copytree(gen_copy.CATALOG, tmp_path / "catalog")
+        monkeypatch.setattr(gen_copy, "CATALOG", tmp_path / "catalog")
+        assert gen_copy.main(["--check"]) == 0
+        edited = gen_copy.CATALOG / name / "pack.yaml"
+    else:
+        edited = gen_copy.PACKS / f"{name}-{version}" / "pack.yaml"
+    edited.write_bytes(edited.read_bytes() + b"\n# edited\n")
+    assert gen_copy.main(["--check"]) == 1
+
+
+def test_every_frozen_fixture_go_packs_holds_is_checked(gen_copy):
+    held = sorted(d.name for d in gen_copy._version_dirs() if (gen_copy.FIXTURE_PACKS / d.name / "pack.yaml").is_file())
+    assert held == [f"everyday-0.3.{v}" for v in range(4, 8)] + [f"seller-0.1.{v}" for v in range(5)]
+
+
+def test_an_edited_frozen_fixture_is_found(gen_copy, tmp_path, monkeypatch):
+    shutil.copytree(gen_copy.FIXTURE_PACKS, tmp_path / "fixture-packs")
+    monkeypatch.setattr(gen_copy, "FIXTURE_PACKS", tmp_path / "fixture-packs")
+    assert gen_copy.main(["--check"]) == 0
+    edited = gen_copy.FIXTURE_PACKS / "seller-0.1.4" / "pack.yaml"
+    edited.write_bytes(edited.read_bytes() + b"\n# edited\n")
+    assert gen_copy.main(["--check"]) == 1
+
+
 def test_a_hand_edited_registry_is_found(gen_copy):
     gen_copy.REGISTRY_GO.write_text(gen_copy.REGISTRY_GO.read_text() + "\n// edited\n")
     assert gen_copy.main(["--check"]) == 1
