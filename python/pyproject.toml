@@ -34,8 +34,9 @@ dependencies = [
     "jsonschema>=4.18",
     # capsule_emit.ledger_io, .period and .evidence_file: the read/verify seam,
     # --period sugar and thread-bundle check. 0.12.0 is the first release that
-    # works with agent-action-capsule 0.10 and later.
-    "capsule-emit>=0.12.0",
+    # works with agent-action-capsule 0.10 and later. Capped below 0.13, whose
+    # ledger layout refuses the flat ledger writes the engine and its tests make.
+    "capsule-emit>=0.12.0,<0.13",
     "pyyaml>=6.0",
 ]
 

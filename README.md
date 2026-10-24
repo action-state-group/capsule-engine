@@ -39,7 +39,7 @@ python3 -m venv .venv && source .venv/bin/activate
 pip install -e ./python
 ```
 
-`checkpointed-local-log` (0.6.0 or later), `capsule-emit` (0.12.0 or later)
+`checkpointed-local-log` (0.6.0 or later), `capsule-emit` (0.12.x; 0.13 is not yet supported)
 and `agent-action-capsule` (0.11.0 or later) come from PyPI. With these steps
 the test suite passes (`pip install pytest "mcp<2"`, then `python -m pytest` in `python/`).
 
