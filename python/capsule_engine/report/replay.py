@@ -93,7 +93,7 @@ from agent_action_capsule.canonical import FloatInDigestError, UnsafeIntegerErro
 from cll.ledger import LedgerStore
 from cll.ledger.api import LedgerAPI
 
-from ..folds.definition import FoldDefinition
+from ..folds.definition import FoldDefinition, Reversal
 from ..folds.duration import parse_duration_seconds
 from ..guards import ALLOW, ESCALATE, Action, GuardDecision, GuardEngine, LocalSigner
 from ..guards.action import disclosed_classes_of, handover_of, listing_classes_of, repeat_disclosures_of
@@ -1386,11 +1386,17 @@ class ExecutedActs:
     always counts. Any other act that shares a ``capsule_id`` or an
     ``action_id`` with an accepted one, or with an act already counted, is the
     same act and adds nothing. ``capsules`` are every act's capsule the
-    window may hold, so the accepted ones are known whatever their order."""
+    window may hold, so the accepted ones are known whatever their order.
+    ``reversal`` and ``checked_at``, given for a live check's history, lower
+    an accepted partial charge a cancel or refund in ``capsules`` cites
+    (``_history_freed``); without them (a replay) every act counts as it is
+    sealed."""
 
-    def __init__(self, capsules: Sequence[dict]) -> None:
+    def __init__(self, capsules: Sequence[dict], *, reversal: Reversal | None = None,
+                 checked_at: datetime | None = None) -> None:
         self._accepted = frozenset().union(*(_act_ids(c) for c in capsules if _sealed_accept(c)))
         self._counted: set[str] = set()
+        self._freed = _history_freed(capsules, reversal, checked_at) if reversal is not None else {}
 
     def record(self, capsule: dict, shown: dict | None, act_digest: str, *,
                every_record_is_an_act: bool = False) -> _ExecutedRecord | None:
@@ -1405,7 +1411,100 @@ class ExecutedActs:
             if ids & (self._accepted | self._counted):
                 return None
             self._counted |= ids
+        freed = self._freed.get(capsule.get("capsule_id"), 0) if act.spend_minor is not None else 0
+        if freed:
+            act = replace(act, spend_minor=act.spend_minor - freed)
         return _executed_record(capsule, act, act_digest)
+
+
+@dataclass(frozen=True)
+class _Charge:
+    """An accepted charge in a history whose counted amount a reversal may
+    lower: what it counts at, the least it may count at (its sealed
+    ``spend_minor``), and the key it is counted under."""
+
+    counted: int
+    floor: int
+    key: tuple[object, object]
+    at: datetime
+
+
+def _history_freed(capsules: Sequence[dict], reversal: Reversal, checked_at: datetime | None) -> dict[str, int]:
+    """How much each accepted charge in a live check's history counts less,
+    by its ``capsule_id`` (capsule-engine#234, ruling A on #214 hold A: a
+    partial charge counts at its stated amount "until a cancel or refund is
+    on record"). A history act's record carries no chain (the fold's
+    ``reversal`` clause cannot link it), so the history's reversals are
+    applied here, to the record of the charge they reverse.
+
+    A reversal is an act of a ``reversal.classes`` class stated as money in
+    (``MONEY_IN``) whose capsule's chain cites, under ``reversal.relation``,
+    the ``capsule_id`` of an accepted charge in this history, and nothing
+    else: never matched on amount, merchant or time alone. It must be sealed
+    no earlier than its charge and no later than the check (``checked_at``,
+    unread: none link), and carry the charge's operator and developer. It
+    takes back the amount it returns (``_returned_minor``), once per
+    ``capsule_id`` or ``action_id``, and the charge never counts below its
+    sealed ``spend_minor``: a charge that seals none, or whose act cannot be
+    read, is lowered by nothing, so an unlinked, malformed or unreadable
+    reversal frees nothing, as before. ``capsules`` are in the order the
+    history ledger writes them, oldest first."""
+    if checked_at is None:
+        return {}
+    charges: dict[str, _Charge] = {}
+    seen_charges: set[str] = set()
+    reversals: list[tuple[dict, dict, datetime]] = []
+    for capsule in capsules:
+        if statement_for_history_entry(capsule) is not None:
+            continue
+        shown = bound_agent_input(capsule)
+        taken = _taken(shown, every_record_is_an_act=True) if shown is not None else None
+        at = parse_aware_time(capsule.get("timestamp"))
+        capsule_id = capsule.get("capsule_id")
+        if taken is None or at is None or not isinstance(capsule_id, str) or not capsule_id:
+            continue
+        body, unchecked = taken
+        if _text(body.get("action_class")) in reversal.classes:
+            reversals.append((capsule, body, at))
+            continue
+        # Only the first copy of a capsule_id is written, so only it can be the charge.
+        if capsule_id in seen_charges:
+            continue
+        seen_charges.add(capsule_id)
+        counted = _executed_spend(body, unchecked=unchecked, accepted=True)
+        floor = _minor(body.get("spend_minor"))
+        if (_sealed_accept(capsule) and not unchecked and counted is not None and floor is not None
+                and 0 <= floor < counted):
+            charges[capsule_id] = _Charge(counted=counted, floor=floor, key=_charge_key(capsule), at=at)
+    freed: dict[str, int] = {}
+    seen: set[str] = set()
+    for capsule, body, at in reversals:
+        chain = capsule.get("chain")
+        parent = chain.get("parent_capsule_id") if isinstance(chain, dict) else None
+        returned = _returned_minor(body) if body.get("direction") == MONEY_IN else None
+        charge = charges.get(parent) if isinstance(parent, str) else None
+        ids = _act_ids(capsule)
+        if (charge is None or chain.get("relation") != reversal.relation or returned is None or returned <= 0
+                or ids & seen or charge.key != _charge_key(capsule) or not charge.at <= at <= checked_at):
+            continue
+        seen |= ids
+        freed[parent] = freed.get(parent, 0) + min(returned, charge.counted - charge.floor - freed.get(parent, 0))
+    return freed
+
+
+def _charge_key(capsule: dict) -> tuple[object, object]:
+    """The operator and developer a charge and its reversal must share."""
+    return capsule.get("operator"), capsule.get("developer")
+
+
+def parse_aware_time(value: object) -> datetime | None:
+    """``value`` as an aware time when it is an RFC 3339 string with a zone,
+    else ``None``: how a history timestamp is read."""
+    try:
+        at = datetime.fromisoformat(value) if isinstance(value, str) else None
+    except ValueError:
+        return None
+    return at if at is not None and at.tzinfo is not None else None
 
 
 class _ExecutedCitation(TypedDict):

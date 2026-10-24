@@ -3,6 +3,20 @@
 The Python package, released to PyPI as `capsule-engine` under `python/v<version>` tags. The Go
 module has its own changelog, `go/CHANGELOG.md`.
 
+## Unreleased
+
+- Changed (capsule-engine#234, ruling A on #214 hold A): under spend.weekly/3.1.0, a live check's
+  history now lets a cancel or refund free the headroom of the partial charge it cites. It lowers
+  that charge's counted amount by the amount it returns, never below the charge's sealed
+  `spend_minor`. It must state the money moved in, cite the charge's `capsule_id` under chain
+  relation `supersedes`, carry the charge's operator and developer, and be sealed between the
+  charge and the check; nothing is matched on amount, merchant or time alone. Any other
+  cancel or refund frees nothing, as before. The fold, its definition and the packs do not
+  change, and nor does any sealed record shape: the lowering is applied to the charge's executed
+  record (`report/replay.py` `_history_freed`). The caps evidence still counts such a reversal
+  as unlinked. Frozen folds (spend.weekly/3.0.0 and 1.0.0) are unchanged. Go does the same
+  (go/CHANGELOG.md); new vectors in `history-spend.json`.
+
 ## 0.2.0 — 2026-10-23
 
 - Added (capsule-engine#162, #235): `capsulectl-engine`, a capsulectl plugin (`cli-plugin/v1`).
