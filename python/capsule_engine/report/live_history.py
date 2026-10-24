@@ -93,6 +93,7 @@ from .replay import (
     bound_agent_input,
     deal_claim_statements,
     names_two_deals,
+    parse_aware_time,
     statement_for_history_entry,
 )
 
@@ -223,15 +224,9 @@ def _marked(stated: StatementRecord) -> StatementRecord:
 
 
 def _time(value: object) -> datetime | None:
-    """``value`` as an aware time, when it is an RFC 3339 string with a zone."""
-    if not isinstance(value, str):
-        return None
-    try:
-        at = datetime.fromisoformat(value)
-    except ValueError:
-        # Not a time: the caller reads the history as incomplete.
-        return None
-    return at if at.tzinfo is not None else None
+    """``value`` as an aware time, when it is an RFC 3339 string with a zone;
+    otherwise the caller reads the history as incomplete."""
+    return parse_aware_time(value)
 
 
 def _sealed_decision(entry: dict) -> str | None:

@@ -545,7 +545,7 @@ func (f fold) evaluate(records []Record, keyValue string, anchor time.Time) (int
 	var sum reversalSummary
 	charges := map[string]int64{} // capsule id -> what the charge has left
 	freed := f.historyFreed(records, anchor)
-	for _, r := range records {
+	for i, r := range records {
 		vals, ok := f.resolve(r)
 		if !ok || !f.within(vals, anchor) || !f.passes(vals) {
 			continue
@@ -557,7 +557,7 @@ func (f fold) evaluate(records []Record, keyValue string, anchor time.Time) (int
 			acc++
 			continue
 		}
-		amount := f.summed(r, vals[f.sumField].i) - freed[r.CapsuleID]
+		amount := f.summed(r, vals[f.sumField].i) - freed[i]
 		rv := f.reversal
 		if rv == nil {
 			acc += amount
@@ -611,7 +611,7 @@ func (f fold) evaluate(records []Record, keyValue string, anchor time.Time) (int
 // one that is not accepted, is lowered by nothing. Only the spend.weekly/3.1.0
 // family's executed-act fold does this: any other fold reads the history's
 // copy, which the frozen packs keep as they were.
-func (f fold) historyFreed(records []Record, anchor time.Time) map[string]int64 {
+func (f fold) historyFreed(records []Record, anchor time.Time) map[int]int64 {
 	if f.reversal == nil || !f.countsExecuted() {
 		return nil
 	}
@@ -619,29 +619,58 @@ func (f fold) historyFreed(records []Record, anchor time.Time) map[string]int64 
 		counted, floor int64
 		operator, dev  string
 		at             time.Time
+		index          int
 	}
-	at := func(r Record) (time.Time, bool) {
+	instant := func(r Record) (time.Time, bool) {
 		t, err := parseInstant(r.Timestamp)
 		return t.Truncate(time.Microsecond), err == nil
 	}
 	anchor = anchor.Truncate(time.Microsecond)
+	order := make([]int, len(records))
+	for i := range order {
+		order[i] = i
+	}
+	slices.SortStableFunc(order, func(a, b int) int {
+		ta, errA := parseInstant(records[a].Timestamp)
+		tb, errB := parseInstant(records[b].Timestamp)
+		if errA != nil || errB != nil {
+			return 0
+		}
+		return ta.Compare(tb)
+	})
+	// The charges first, so a reversal sealed at the instant of its charge
+	// links whatever order the history lists them in.
 	charges := map[string]charge{}
-	freed := map[string]int64{}
+	seenCharge := map[string]bool{}
+	var reversals []int
+	for _, i := range order {
+		r := records[i]
+		if _, ok := instant(r); r.live == "" || r.Stated != nil || !ok || r.CapsuleID == "" {
+			continue
+		}
+		if r.ActionClass != nil && slices.Contains(f.reversal.Classes, *r.ActionClass) {
+			reversals = append(reversals, i)
+			continue
+		}
+		// The engine writes only the first copy of a capsule id, so only it
+		// can be the charge.
+		if seenCharge[r.CapsuleID] {
+			continue
+		}
+		seenCharge[r.CapsuleID] = true
+		if !r.accepted() || r.Unchecked || r.AmountMinor == nil || r.SpendMinor == nil {
+			continue
+		}
+		if counted, floor := max(*r.AmountMinor, *r.SpendMinor), *r.SpendMinor; 0 <= floor && floor < counted {
+			t, _ := instant(r)
+			charges[r.CapsuleID] = charge{counted, floor, r.Operator, r.Developer, t, i}
+		}
+	}
+	freed := map[int]int64{}
 	seen := map[string]bool{}
-	for _, r := range executedOrder(records, true) {
-		t, ok := at(r)
-		if r.live == "" || r.Stated != nil || !ok || r.CapsuleID == "" {
-			continue
-		}
-		if r.ActionClass == nil || !slices.Contains(f.reversal.Classes, *r.ActionClass) {
-			if _, dup := charges[r.CapsuleID]; dup || !r.accepted() || r.Unchecked || r.AmountMinor == nil || r.SpendMinor == nil {
-				continue
-			}
-			if counted, floor := max(*r.AmountMinor, *r.SpendMinor), *r.SpendMinor; 0 <= floor && floor < counted {
-				charges[r.CapsuleID] = charge{counted, floor, r.Operator, r.Developer, t}
-			}
-			continue
-		}
+	for _, i := range reversals {
+		r := records[i]
+		t, _ := instant(r)
 		var parent string
 		if r.ChainParent != nil {
 			parent = *r.ChainParent
@@ -657,7 +686,7 @@ func (f fold) historyFreed(records []Record, anchor time.Time) map[string]int64 
 		if r.ActionID != "" {
 			seen["action "+r.ActionID] = true
 		}
-		freed[parent] += min(*r.ReturnedMinor, c.counted-c.floor-freed[parent])
+		freed[c.index] += min(*r.ReturnedMinor, c.counted-c.floor-freed[c.index])
 	}
 	return freed
 }

@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 from agent_action_capsule import json_digest
 
 from capsule_engine.folds.definition import Reversal
-from capsule_engine.report.replay import _history_freed
+from capsule_engine.report.replay import _history_freed, statement_for_history_entry
 
 REVERSAL = Reversal(
     class_field="asg_payload.action_class", classes=("booking.cancel", "money.refund"),
@@ -98,3 +98,39 @@ def test_a_refund_with_no_returned_amount_or_a_bad_chain_frees_nothing() -> None
     malformed = refund("b" * 64, 2000)
     malformed["chain"] = {"parent_capsule_id": 7, "relation": "supersedes"}
     assert freed(charge(), none, malformed) == {}
+
+
+def test_a_refund_with_the_same_action_id_counts_once() -> None:
+    second = refund("b" * 64, 2000)
+    second["action_id"] = refund("a" * 64, 2000)["action_id"]
+    assert freed(charge(), refund("a" * 64, 2000), second) == {CHARGE: 2000}
+
+
+def test_a_refund_under_another_developer_frees_nothing() -> None:
+    other = refund("a" * 64, 2000)
+    other["developer"] = "other"
+    assert freed(charge(), other) == {}
+
+
+def test_a_refund_sealed_at_the_charge_or_the_check_links() -> None:
+    assert freed(charge(), refund("a" * 64, 2000, at="2026-10-06T09:00:00Z")) == {CHARGE: 2000}
+    assert freed(charge(), refund("a" * 64, 2000, at="2026-10-07T21:40:00Z")) == {CHARGE: 2000}
+
+
+def test_a_refund_listed_before_a_charge_of_the_same_instant_links() -> None:
+    assert freed(refund("a" * 64, 2000, at="2026-10-06T09:00:00Z"), charge()) == {CHARGE: 2000}
+
+
+def test_only_the_first_copy_of_a_capsule_id_is_the_charge() -> None:
+    whole = act(CHARGE, "2026-10-05T09:00:00Z", action_class="money.purchase", amount_minor=500, spend_minor=500)
+    assert freed(whole, charge(), refund("a" * 64, 2000)) == {}
+
+
+def test_a_claim_entry_is_not_a_refund() -> None:
+    claim = refund("a" * 64, 2000)
+    shown = claim["agent_input"]
+    shown["x-deal-v0"] = {"record_type": "claim", "deal_id": "deal-1", "at": "2026-10-06T12:00:00Z"}
+    shown["body"] = {**shown["body"], "class": "x", "source_kind": "agent"}
+    claim["model_attestation"]["compute_attestation"]["agent_input_digest"] = json_digest(shown)
+    assert statement_for_history_entry(claim) is not None
+    assert freed(charge(), claim) == {}

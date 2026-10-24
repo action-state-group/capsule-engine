@@ -36,7 +36,8 @@ the 7d total is 12299 and fails. A money-in refund whose capsule chains
 ``supersedes`` to it lowers it by the amount returned, never below the 3000:
 ``refund-linked-partial`` (2000: 10299, fails), ``refund-linked-full`` (6000:
 6299, passes) and ``refund-linked-over`` (9000, floored at the spend: the same
-6299). Each of ``refund-unlinked``, ``refund-wrong-parent`` (cites no charge in
+6299); a partial cancel stating ``cancelled_amount_minor`` frees the same
+(``cancel-linked-partial``, ``cancel-linked-full``). Each of ``refund-unlinked``, ``refund-wrong-parent`` (cites no charge in
 the history), ``refund-wrong-relation``, ``refund-not-money-in`` and
 ``refund-before-charge`` frees nothing and fails as ``partial-charge`` does;
 ``refund-of-charge-outside-window`` cites a partial charge sealed before the
@@ -120,7 +121,7 @@ def partial_charge(*, charge_at: str = "2026-10-06T09:00:00Z") -> dict:
 
 
 def refund_of(out: dict, parent: str | None, returned: int, *, relation: str = "supersedes", direction: str = "in",
-              at: str = "2026-10-06T12:00:00Z", name: str = "refund") -> dict:
+              at: str = "2026-10-06T12:00:00Z", name: str = "refund", cancel: bool = False) -> dict:
     """``out`` with an accepted money.refund added to its history: it
     returns ``returned`` (the money moved ``direction``) and its capsule
     chains ``relation`` to the capsule ``parent`` (no chain when ``None``)."""
@@ -133,16 +134,21 @@ def refund_of(out: dict, parent: str | None, returned: int, *, relation: str = "
         entry["chain"] = {"parent_capsule_id": parent, "relation": relation}
     body = entry["agent_input"]["body"]
     body.update(action_class="money.refund", amount_minor=returned, spend_minor=0, direction=direction)
+    if cancel:
+        # A partial cancel states what it returns as cancelled_amount_minor, and no amount_minor.
+        body.update(action_class="booking.cancel", cancelled_amount_minor=returned)
+        del body["amount_minor"]
     entry["agent_input"]["x-deal-v0"]["at"] = at
     rebind(entry)
     out["history"].insert(0, entry)
     return out
 
 
-def linked_refund(returned: int) -> dict:
-    """The partial charge, and a refund of ``returned`` chaining to it."""
+def linked_refund(returned: int, *, cancel: bool = False) -> dict:
+    """The partial charge, and a refund (a booking.cancel with ``cancel``) of
+    ``returned`` chaining to it."""
     out = partial_charge()
-    return refund_of(out, out["history"][0]["capsule_id"], returned)
+    return refund_of(out, out["history"][0]["capsule_id"], returned, cancel=cancel)
 
 
 def refund_of_old_charge() -> dict:
@@ -167,6 +173,8 @@ CASES = {
     "refund-linked-partial": linked_refund(2000),
     "refund-linked-full": linked_refund(6000),
     "refund-linked-over": linked_refund(9000),
+    "cancel-linked-partial": linked_refund(2000, cancel=True),
+    "cancel-linked-full": linked_refund(6000, cancel=True),
     "refund-unlinked": refund_of(partial_charge(), None, 6000),
     "refund-wrong-parent": refund_of(partial_charge(), "9" * 64, 6000),
     "refund-wrong-relation": refund_of(partial_charge(), partial_charge()["history"][0]["capsule_id"], 6000,

@@ -51,17 +51,34 @@ func TestHistoryFreed(t *testing.T) {
 			reversal("r1", n(2000), func(r *Record) { r.Timestamp = "2026-10-05T00:00:00Z" })}, 0},
 		{"a cancel", []Record{charge(9000, n(3000), &accept), reversal("r1", n(1500), func(r *Record) { r.ActionClass = &cancelClass })}, 1500},
 		{"no returned amount", []Record{charge(9000, n(3000), &accept), reversal("r1", nil, nil)}, 0},
+		{"the same action id", []Record{charge(9000, n(3000), &accept), reversal("r1", n(2000), nil),
+			reversal("r2", n(2000), func(r *Record) { r.ActionID = "a/r1" })}, 2000},
+		{"another developer", []Record{charge(9000, n(3000), &accept), reversal("r1", n(2000), func(r *Record) { r.Developer = "other" })}, 0},
+		{"sealed at the charge's instant", []Record{charge(9000, n(3000), &accept),
+			reversal("r1", n(2000), func(r *Record) { r.Timestamp = "2026-10-06T09:00:00Z" })}, 2000},
+		{"sealed at the check's instant", []Record{charge(9000, n(3000), &accept),
+			reversal("r1", n(2000), func(r *Record) { r.Timestamp = "2026-10-07T21:40:00Z" })}, 2000},
+		{"listed before a charge of the same instant", []Record{
+			reversal("r1", n(2000), func(r *Record) { r.Timestamp = "2026-10-06T09:00:00Z" }), charge(9000, n(3000), &accept)}, 2000},
+		{"a claim is not a reversal", []Record{charge(9000, n(3000), &accept),
+			reversal("r1", n(2000), func(r *Record) { r.Stated = &Statement{} })}, 0},
+		{"only the first copy of a capsule id is the charge", []Record{charge(500, n(500), &accept), charge(9000, n(3000), &accept),
+			reversal("r1", n(2000), nil)}, 0},
 		{"no chain", []Record{charge(9000, n(3000), &accept), reversal("r1", n(2000), func(r *Record) { r.ChainParent, r.ChainRelation = nil, nil })}, 0},
 		{"money not moved in", []Record{charge(9000, n(3000), &accept), reversal("r1", n(2000), func(r *Record) { r.Direction = nil })}, 0},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			if got := f.historyFreed(tc.records, anchor)[charged]; got != tc.want {
+			var got int64
+			for _, v := range f.historyFreed(tc.records, anchor) {
+				got += v
+			}
+			if got != tc.want {
 				t.Errorf("freed %d, want %d", got, tc.want)
 			}
 		})
 	}
-	if got := (fold{reversal: f.reversal}).historyFreed([]Record{charge(9000, n(3000), &accept), reversal("r1", n(2000), nil)}, anchor); got != nil {
+	if got := (fold{reversal: f.reversal}).historyFreed([]Record{charge(9000, n(3000), &accept), reversal("r1", n(2000), nil)}, anchor); len(got) != 0 {
 		t.Errorf("a fold that does not count executed acts frees %v, want nothing", got)
 	}
 }

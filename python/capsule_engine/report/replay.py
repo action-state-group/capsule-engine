@@ -1386,7 +1386,11 @@ class ExecutedActs:
     always counts. Any other act that shares a ``capsule_id`` or an
     ``action_id`` with an accepted one, or with an act already counted, is the
     same act and adds nothing. ``capsules`` are every act's capsule the
-    window may hold, so the accepted ones are known whatever their order."""
+    window may hold, so the accepted ones are known whatever their order.
+    ``reversal`` and ``checked_at``, given for a live check's history, lower
+    an accepted partial charge a cancel or refund in ``capsules`` cites
+    (``_history_freed``); without them (a replay) every act counts as it is
+    sealed."""
 
     def __init__(self, capsules: Sequence[dict], *, reversal: Reversal | None = None,
                  checked_at: datetime | None = None) -> None:
@@ -1448,39 +1452,54 @@ def _history_freed(capsules: Sequence[dict], reversal: Reversal, checked_at: dat
     if checked_at is None:
         return {}
     charges: dict[str, _Charge] = {}
-    freed: dict[str, int] = {}
-    seen: set[str] = set()
+    seen_charges: set[str] = set()
+    reversals: list[tuple[dict, dict, datetime]] = []
     for capsule in capsules:
+        if statement_for_history_entry(capsule) is not None:
+            continue
         shown = bound_agent_input(capsule)
         taken = _taken(shown, every_record_is_an_act=True) if shown is not None else None
-        at = _history_time(capsule.get("timestamp"))
+        at = parse_aware_time(capsule.get("timestamp"))
         capsule_id = capsule.get("capsule_id")
         if taken is None or at is None or not isinstance(capsule_id, str) or not capsule_id:
             continue
         body, unchecked = taken
-        key = (capsule.get("operator"), capsule.get("developer"))
-        if _text(body.get("action_class")) not in reversal.classes:
-            counted = _executed_spend(body, unchecked=unchecked, accepted=True)
-            floor = _minor(body.get("spend_minor"))
-            if (_sealed_accept(capsule) and not unchecked and capsule_id not in charges
-                    and counted is not None and floor is not None and 0 <= floor < counted):
-                charges[capsule_id] = _Charge(counted=counted, floor=floor, key=key, at=at)
+        if _text(body.get("action_class")) in reversal.classes:
+            reversals.append((capsule, body, at))
             continue
+        # Only the first copy of a capsule_id is written, so only it can be the charge.
+        if capsule_id in seen_charges:
+            continue
+        seen_charges.add(capsule_id)
+        counted = _executed_spend(body, unchecked=unchecked, accepted=True)
+        floor = _minor(body.get("spend_minor"))
+        if (_sealed_accept(capsule) and not unchecked and counted is not None and floor is not None
+                and 0 <= floor < counted):
+            charges[capsule_id] = _Charge(counted=counted, floor=floor, key=_charge_key(capsule), at=at)
+    freed: dict[str, int] = {}
+    seen: set[str] = set()
+    for capsule, body, at in reversals:
         chain = capsule.get("chain")
         parent = chain.get("parent_capsule_id") if isinstance(chain, dict) else None
         returned = _returned_minor(body) if body.get("direction") == MONEY_IN else None
         charge = charges.get(parent) if isinstance(parent, str) else None
         ids = _act_ids(capsule)
         if (charge is None or chain.get("relation") != reversal.relation or returned is None or returned <= 0
-                or ids & seen or charge.key != key or not charge.at <= at <= checked_at):
+                or ids & seen or charge.key != _charge_key(capsule) or not charge.at <= at <= checked_at):
             continue
         seen |= ids
         freed[parent] = freed.get(parent, 0) + min(returned, charge.counted - charge.floor - freed.get(parent, 0))
     return freed
 
 
-def _history_time(value: object) -> datetime | None:
-    """``value`` as an aware time when it is an RFC 3339 string with a zone."""
+def _charge_key(capsule: dict) -> tuple[object, object]:
+    """The operator and developer a charge and its reversal must share."""
+    return capsule.get("operator"), capsule.get("developer")
+
+
+def parse_aware_time(value: object) -> datetime | None:
+    """``value`` as an aware time when it is an RFC 3339 string with a zone,
+    else ``None``: how a history timestamp is read."""
     try:
         at = datetime.fromisoformat(value) if isinstance(value, str) else None
     except ValueError:
