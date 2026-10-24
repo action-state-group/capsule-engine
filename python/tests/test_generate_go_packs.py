@@ -81,6 +81,7 @@ def test_an_edited_current_pack_is_found(gen_copy, tmp_path, monkeypatch, name, 
     if side == "catalog":
         shutil.copytree(gen_copy.CATALOG, tmp_path / "catalog")
         monkeypatch.setattr(gen_copy, "CATALOG", tmp_path / "catalog")
+        assert gen_copy.main(["--check"]) == 0
         edited = gen_copy.CATALOG / name / "pack.yaml"
     else:
         edited = gen_copy.PACKS / f"{name}-{version}" / "pack.yaml"
