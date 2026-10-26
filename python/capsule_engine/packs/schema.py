@@ -316,10 +316,13 @@ class JudgePin:
     ``model_id`` names the model. ``prompt_template_hash`` is the JSON-DIGEST
     (lowercase-hex SHA-256 of the RFC 8785 JCS bytes) of the judge's
     instruction template object as published, before anything is
-    interpolated into it. It equals a judgment record's
-    ``instruction_template_digest`` (Agent Action Capsule judgment extension,
-    ``x-judgment-v1``), never that record's ``prompt_digest``, which is a
-    SHA-256 of a published file's raw bytes. ``schema_hash`` is the SHA-256
+    interpolated into it. It equals ``JudgeParameters.instruction_template_digest``
+    in the Agent Action Capsule judgment extension, reached by recomputing a
+    judgment record's ``judge_parameters_digest`` from the published
+    ``JudgeParameters``. It is never compared with
+    ``JudgeParameters.prompt_file_digest``, a SHA-256 of a published prompt
+    file's raw bytes. That extension, ``x-judgment-v1``, is provisional and
+    not registered. ``schema_hash`` is the SHA-256
     hex of the answer schema the judge must return. ``input_refs`` names the
     normalized action fields the template reads. The interpolated prompt carries the action's
     content -- which can be identity or a secret -- so it never enters a
