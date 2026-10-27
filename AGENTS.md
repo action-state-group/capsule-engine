@@ -10,8 +10,8 @@ key is never sealed; an order or invoice number is guessable from its digest). T
 describe deals with other counterparties, so a decision capsule carrying any of them never enters an artifact made for
 another party. The fields cannot be stripped from a sealed capsule, because `capsule_id` covers
 them. So every export path refuses such records, naming the fields and the record count and never
-a value. Today those paths are `capsule bundle` (the bundle file, its verify link and its offline
-viewer) and `capsule guard dry-run --share`. `python/tests/test_local_only_payload_fields.py` enforces this.
+a value. Today those paths are `capsule bundle` (the bundle file and its verify link) and
+`capsule guard dry-run --share` (the report file). `python/tests/test_local_only_payload_fields.py` enforces this.
 
 One value is local-only by its prefix rather than its field: a `target` starting with
 `LOCAL_ONLY_TARGET_PREFIX` (`payee-fp:hmac-sha256-profile-key:`, beside the field list). That is a

@@ -5,6 +5,17 @@ module has its own changelog, `go/CHANGELOG.md`.
 
 ## Unreleased
 
+- Removed (capsule-engine#175): the engine's three rendering surfaces. The engine computes; pages are
+  drawn by capsule-viewer. Replacements: `capsule-engine console` and the offline `bundle_viewer` have none
+  here (use capsule-viewer's `render_report_html` / `check_and_render` over an evidence file);
+  `capsule-engine bundle` no longer takes `--with-viewer` or `--viewer-out` and still writes the bundle
+  and prints its verify link; `capsule_engine.report.render` (`render_report_html`, `encode_fragment`,
+  `decode_fragment`, `TelemetryConfig`) is gone, with its `verify.js`. `guard dry-run` now writes the
+  report as JSON (`--out`, default `dry-run-report.json`; the former `to_fragment_payload` is
+  `capsule_engine.report.to_payload`). Its rows carry capsule bodies only with `--share`, still refused
+  when one holds a local-only field; `--share` no longer prints a URL, and `--telemetry-opt-in` and
+  `--telemetry-endpoint` are removed with the HTML beacon. Drawing a withheld payload beside its digest
+  moves to action-state-group/capsule-viewer#105.
 - Changed (capsule-engine#234, ruling A on #214 hold A): under spend.weekly/3.1.0, a live check's
   history now lets a cancel or refund free the headroom of the partial charge it cites. It lowers
   that charge's counted amount by the amount it returns, never below the charge's sealed

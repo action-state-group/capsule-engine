@@ -544,7 +544,7 @@ def test_a_share_lists_the_companion_only_as_a_withheld_step():
 
 
 def test_the_engine_refuses_to_share_a_profile_keyed_decision(tmp_path, capsys):
-    out = tmp_path / "report.html"
+    out = tmp_path / "report.json"
     rc = cli_main(["guard", "dry-run", *(arg for p in OWN for arg in ("--ledger", str(p))), "--since", "all",
                    "--out", str(out), "--share", "--no-manifest"])
     printed = capsys.readouterr()

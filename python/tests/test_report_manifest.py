@@ -35,7 +35,7 @@ def test_report_manifest_digest_is_populated_when_passed_through(caps_fold, reso
 
 
 def test_cli_guard_dry_run_prints_evaluated_under_manifest(tmp_path, capsys):
-    out_path = tmp_path / "report.html"
+    out_path = tmp_path / "report.json"
     rc = main(["guard", "dry-run", "--ledger", str(NANDA), "--since", "7d", "--out", str(out_path)])
     assert rc == 0
     out = capsys.readouterr().out
@@ -43,7 +43,7 @@ def test_cli_guard_dry_run_prints_evaluated_under_manifest(tmp_path, capsys):
 
 
 def test_cli_guard_dry_run_no_manifest_flag_skips_the_line(tmp_path, capsys):
-    out_path = tmp_path / "report.html"
+    out_path = tmp_path / "report.json"
     rc = main(["guard", "dry-run", "--ledger", str(NANDA), "--since", "7d", "--out", str(out_path), "--no-manifest"])
     assert rc == 0
     out = capsys.readouterr().out

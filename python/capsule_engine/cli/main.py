@@ -4,14 +4,13 @@
 funnel report), `init` (install a starter pack), `constraints` (list the
 registered guard checks + action-class taxonomy), `tenant`
 (engine-instance-per-tenant provisioning), plus the evidence verbs `verify`
-(verify one ledger record or an offline bundle), `bundle` (produce a
-self-contained verifiable slice of the ledger), and `console` (serve the
-local console UI) -- registered only in the "full" packaging arm, same
+(verify one ledger record or an offline bundle), and `bundle` (produce a
+self-contained verifiable slice of the ledger) -- registered only in the "full" packaging arm, same
 two-arm switch (`capsule_engine.packaging`) the original monorepo used.
 
 This is a deliberately minimal dispatcher: the original monorepo's
 `cli/main.py` wired every verb across ledger, folds, guards, packs, policy,
-console, telemetry, etc. Post-split, this repo only owns the verb modules
+telemetry, etc. Post-split, this repo only owns the verb modules
 that actually live here -- the rest stayed with their owning repo.
 `cli/format.py` is not wired as a subcommand: it has no `add_parser`, it is
 shared output-formatting helpers used by the verbs above.
@@ -27,7 +26,6 @@ import sys
 from .. import packaging
 from . import (
     bundle_cmd,
-    console_cmd,
     constraints_cmd,
     guard_cmds,
     init_cmds,
@@ -53,14 +51,13 @@ def _build_parser(arm: str | None = None) -> argparse.ArgumentParser:
     telemetry_cmd.add_parser(sub)
     packs_cmds.add_parser(sub)
 
-    # The record-query/evidence verbs -- capsule verify, the shareable
-    # bundle, and the local console UI -- are the "evidence": registered
+    # The record-query/evidence verbs -- capsule verify and the shareable
+    # bundle -- are the "evidence": registered
     # only in the "full" arm. See ``packaging.py``'s module docstring for
     # why an env var, not a fork, drives this.
     if packaging.evidence_visible(arm):
         verify_cmd.add_parser(sub)
         bundle_cmd.add_parser(sub)
-        console_cmd.add_parser(sub)
 
     return parser
 

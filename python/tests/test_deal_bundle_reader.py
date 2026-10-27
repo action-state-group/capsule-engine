@@ -23,8 +23,7 @@ from agent_action_capsule import json_digest
 
 from capsule_engine.cli.main import main as cli_main
 from capsule_engine.policy import load_manifest_file, resolve_manifest
-from capsule_engine.report import build_dry_run_report
-from capsule_engine.report.render import decode_fragment, to_fragment_payload
+from capsule_engine.report import build_dry_run_report, to_payload
 from capsule_engine.report.replay import action_for_record, load_disclosed, load_records, replay
 
 PACKAGE_DIR = Path(__file__).parent.parent / "capsule_engine"
@@ -135,11 +134,10 @@ def test_a_cancel_after_an_over_cap_purchase_passes_caps(bundle, action_class):
 
 
 def _dry_run(tmp_path, capsys, bundle: Path, *extra: str) -> tuple[int, dict]:
-    out = tmp_path / "report.html"
+    out = tmp_path / "report.json"
     rc = cli_main(["guard", "dry-run", "--ledger", str(bundle), "--since", "all", "--out", str(out), "--share", *extra])
-    printed = capsys.readouterr().out
-    url = next((line.strip() for line in printed.splitlines() if line.strip().startswith("file://")), "")
-    return rc, decode_fragment(url.split("#", 1)[1]) if "#" in url else {}
+    capsys.readouterr()
+    return rc, json.loads(out.read_text()) if out.exists() else {}
 
 
 def _rows(payload: dict) -> list[dict]:
@@ -149,12 +147,12 @@ def _rows(payload: dict) -> list[dict]:
 def test_cli_caps_from_manifest_denies_the_purchase_and_passes_the_cancel(tmp_path, capsys):
     resolved = _resolved()
     for bundle in (REFUND, PARTIAL):
-        rc = cli_main(["guard", "dry-run", "--ledger", str(bundle), "--since", "all", "--out", str(tmp_path / "r.html"),
+        rc = cli_main(["guard", "dry-run", "--ledger", str(bundle), "--since", "all", "--out", str(tmp_path / "r.json"),
                        "--manifest", str(MANIFEST), "--caps-from-manifest"])
         assert rc == 0
-        # The rows come from the same report the CLI renders: its share link
-        # is refused here, since each decision seals the deal's deal_id.
-        payload = to_fragment_payload(build_dry_run_report(
+        # The rows come from the same report the CLI renders: its capsule bodies
+        # are refused here, since each decision seals the deal's deal_id.
+        payload = to_payload(build_dry_run_report(
             [str(bundle)],
             caps_fold=resolved.caps_fold(),
             since=None,
@@ -181,7 +179,7 @@ def test_cli_default_applies_no_manifest_caps(tmp_path, capsys):
 
 def test_cli_caps_from_manifest_needs_a_manifest(tmp_path, capsys):
     rc = cli_main(
-        ["guard", "dry-run", "--ledger", str(REFUND), "--no-manifest", "--caps-from-manifest", "--out", str(tmp_path / "r.html")]
+        ["guard", "dry-run", "--ledger", str(REFUND), "--no-manifest", "--caps-from-manifest", "--out", str(tmp_path / "r.json")]
     )
     assert rc == 1
     assert "needs a manifest" in capsys.readouterr().err

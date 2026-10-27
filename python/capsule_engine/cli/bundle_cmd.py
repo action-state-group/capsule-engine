@@ -63,29 +63,13 @@ def add_parser(sub: argparse._SubParsersAction) -> argparse.ArgumentParser:
         default=env_get("CAPSULE_VERIFY_BASE_URL", DEFAULT_VERIFY_BASE_URL),
         help="base URL the permalink's fragment is appended to (default: %(default)s)",
     )
-    p.add_argument(
-        "--with-viewer",
-        dest="with_viewer",
-        action="store_true",
-        help=(
-            "also write a self-contained offline HTML viewer next to --out, so the "
-            "bundle verifies on a machine with no network (default viewer path: "
-            "--out with a .html extension)"
-        ),
-    )
-    p.add_argument(
-        "--viewer-out",
-        dest="viewer_out",
-        default=None,
-        help="output path for the offline viewer HTML (implies --with-viewer; default: derived from --out)",
-    )
     p.set_defaults(func=run)
     return p
 
 
 def _echo_safe_out(out: str) -> str:
     """The ``--out`` value ``cli_echo`` renders on the public bundle
-    permalink and offline viewer -- it must show where the file went
+    permalink -- it must show where the file went
     relative to the invocation, never the operator's absolute filesystem
     layout. An absolute path outside the cwd tree (no relative route to it)
     falls back to just the filename rather than leaking the full path."""
@@ -94,17 +78,6 @@ def _echo_safe_out(out: str) -> str:
         return out
     rel = os.path.relpath(p, Path.cwd())
     return rel if not rel.startswith("..") else p.name
-
-
-def _default_viewer_out(out: str) -> str:
-    """``bundle.json`` -> ``bundle.html`` alongside it; falls back to a
-    ``-viewer.html`` suffix on the rare path where ``--out`` already ends in
-    ``.html`` (so the two outputs never collide)."""
-    p = Path(out)
-    candidate = p.with_suffix(".html")
-    if str(candidate) == out:
-        candidate = p.with_name(p.stem + "-viewer.html")
-    return str(candidate)
 
 
 def _collect_with_parents(store, matched):
@@ -254,15 +227,6 @@ def run(args: argparse.Namespace) -> int:
     print(f"wrote {args.out} ({len(records)} record(s), records {r0}–{r1}, {status})")
     print(f"checkpoint #{tree_size} · as of {format_staleness(0)}")
     print(f"verify: {permalink}")
-
-    if args.with_viewer or args.viewer_out is not None:
-        from ..bundle_viewer import render_offline_viewer_html
-
-        viewer_out = args.viewer_out or _default_viewer_out(args.out)
-        viewer_html = render_offline_viewer_html(fragment)
-        with open(viewer_out, "w", encoding="utf-8") as fh:
-            fh.write(viewer_html)
-        print(f"wrote {viewer_out} (self-contained, opens with no network)")
 
     print()
     print(echo)

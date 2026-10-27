@@ -1,20 +1,19 @@
 # SPDX-License-Identifier: Apache-2.0
-"""``capsule guard`` verbs: dry-run replay + self-contained HTML report (moved
+"""``capsule guard`` verbs: dry-run replay + JSON report (moved
 here, matching ``fold_cmds.py``'s per-verb-module convention, so ``main.py``
 stays a thin dispatcher), plus ``guard enforce`` -- a minimal, honest local
 marker command (see ``_cmd_guard_enforce``'s own docstring for exactly what
 it does and doesn't do).
 
 Every guard-dry-run invocation here checks the current packaging arm
-(``capsule_ledger.packaging``) and, in "guards-only", both suppresses the
-evidence chrome in the rendered HTML report (``render_report_html``'s own
-``arm`` param) and rewords/suppresses this command's own stdout so it never
-prints a capsule id or a share/verify link -- see this module's inline
-comments at each print site.
+(``capsule_engine.packaging``) and, in "guards-only", rewords/suppresses this
+command's own stdout so it never prints a capsule id -- see this module's
+inline comments at each print site.
 """
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 from pathlib import Path
 
@@ -101,8 +100,7 @@ def _cmd_guard_dry_run(args: argparse.Namespace) -> int:
     from ..folds.loader import load_definition_file
     from ..guards.capsule import local_only_refusal
     from ..packs import PackDefinitionError, load_proposals_file
-    from ..report import build_dry_run_report, build_dry_run_report_with_proposal, render_report_html
-    from ..report.render import TelemetryConfig, decode_fragment, to_fragment_payload
+    from ..report import build_dry_run_report, build_dry_run_report_with_proposal, to_payload
     from ..telemetry.record import record_evidence_touch, record_guard_configured, record_guard_evaluated
 
     if bool(args.model_note) != bool(args.model_id):
@@ -194,24 +192,21 @@ def _cmd_guard_dry_run(args: argparse.Namespace) -> int:
             print(f"capsule guard dry-run --share: refused: {refusal}; rerun without --share", file=sys.stderr)
             return 1
 
-    telemetry = None
-    if args.telemetry_opt_in and args.telemetry_endpoint:
-        telemetry = TelemetryConfig(opted_in=True, endpoint=args.telemetry_endpoint)
-
-    html, fragment = render_report_html(report, arm=arm, telemetry=telemetry)
+    # The sealed capsules in the file are the shareable part: written only
+    # with --share (and refused above when one is local-only), otherwise the
+    # rows carry no capsule bodies.
+    payload = to_payload(report)
+    if not (args.share and evidence_visible):
+        for section in payload["guards"]:
+            for row in section["rows"]:
+                row["capsule"] = None
+                row["cited_capsule"] = None
     out_path = Path(args.out)
-    out_path.write_text(html, encoding="utf-8")
-    url = f"file://{out_path.resolve()}#{fragment}"
+    out_path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
     print(f"wrote {out_path}")
     if report.manifest_digest is not None:
         print(f"evaluated under manifest {report.manifest_digest}")
-    # Arm A ("guards-only"): the share link is a verify-link suggestion --
-    # not printed, matching the report itself never surfacing its evidence
-    # chrome. The file above still exists and is still openable; this CLI
-    # just doesn't advertise the fragment-carried permalink.
-    if args.share and evidence_visible:
-        print(url)
 
     if caps_minor:
         record_guard_configured(arm)
@@ -221,21 +216,19 @@ def _cmd_guard_dry_run(args: argparse.Namespace) -> int:
         record_evidence_touch(arm)
 
     if args.verify:
-        written_payload = decode_fragment(fragment)
-        rebuilt_payload = to_fragment_payload(_build())
         # exclude generated_at: the one field that legitimately differs
         # between two otherwise-identical replays (it's a wall-clock
         # generation timestamp, not derived from the ledger).
-        lhs = {k: v for k, v in written_payload.items() if k != "generated_at"}
-        rhs = {k: v for k, v in rebuilt_payload.items() if k != "generated_at"}
+        lhs = {k: v for k, v in to_payload(report).items() if k != "generated_at"}
+        rhs = {k: v for k, v in to_payload(_build()).items() if k != "generated_at"}
         if lhs != rhs:
             print("FAIL: replaying the same ledger did not reproduce the same report", file=sys.stderr)
             return 1
 
         mismatches = []
-        for section in written_payload["guards"]:
-            for row in section["rows"]:
-                for capsule in (row.get("capsule"), row.get("cited_capsule")):
+        for section in report.guards:
+            for row in section.rows:
+                for capsule in (row.capsule, row.cited_capsule):
                     if not capsule:
                         continue
                     if compute_capsule_id(capsule) != capsule.get("capsule_id"):
@@ -273,12 +266,12 @@ def _cmd_guard_enforce(args: argparse.Namespace) -> int:
 
 
 def add_parser(sub: argparse._SubParsersAction) -> argparse.ArgumentParser:
-    guard = sub.add_parser("guard", help="guard API: dry-run replay + report (full CLI lands in a later task)")
+    guard = sub.add_parser("guard", help="guard API: dry-run replay + report")
     guard_sub = guard.add_subparsers(dest="guard_command")
     guard.set_defaults(guard_parser=guard)
 
     p_dry_run = guard_sub.add_parser(
-        "dry-run", help="replay a ledger through the guard checks and emit a self-contained HTML report"
+        "dry-run", help="replay a ledger through the guard checks and write a JSON report"
     )
     p_dry_run.add_argument(
         "--ledger", required=True, action="append", help="ledger JSONL file or LedgerStore directory (repeatable)"
@@ -289,12 +282,12 @@ def add_parser(sub: argparse._SubParsersAction) -> argparse.ArgumentParser:
     )
     p_dry_run.add_argument(
         "--share", action="store_true",
-        help="print the full shareable file://...#<fragment> URL (no-op in the guards-only packaging arm)",
+        help="include the sealed capsules in the report file (refused when one is local-only; no-op in the guards-only packaging arm)",
     )
     p_dry_run.add_argument(
         "--verify", action="store_true", help="re-replay and re-verify every cited capsule before exiting"
     )
-    p_dry_run.add_argument("--out", default="dry-run-report.html", help="output HTML path (default: dry-run-report.html)")
+    p_dry_run.add_argument("--out", default="dry-run-report.json", help="output JSON path (default: dry-run-report.json)")
     p_dry_run.add_argument(
         "--operator", default=None, help="override the displayed operator label (default: the ledger's own)"
     )
@@ -340,16 +333,6 @@ def add_parser(sub: argparse._SubParsersAction) -> argparse.ArgumentParser:
     p_dry_run.add_argument(
         "--no-manifest", dest="no_manifest", action="store_true",
         help="skip policy-manifest resolution entirely (report carries no manifest_digest)",
-    )
-    p_dry_run.add_argument(
-        "--telemetry-opt-in", action="store_true",
-        help="embed a disclosed, anonymous open-beacon in the report for the M6 (viral unit) metric -- "
-        "requires --telemetry-endpoint too, and is off by default; see `capsule telemetry status`",
-    )
-    p_dry_run.add_argument(
-        "--telemetry-endpoint", default=env_get("CAPSULE_LEDGER_TELEMETRY_ENDPOINT"),
-        help="where the open-beacon above (if enabled) sends its single anonymous event (default: "
-        "$CAPSULE_LEDGER_TELEMETRY_ENDPOINT, or none -- with no endpoint the beacon is never embedded)",
     )
     p_dry_run.set_defaults(func=_cmd_guard_dry_run)
 
