@@ -196,6 +196,14 @@ def test_cli_report_carries_capsule_bodies_only_with_share(tmp_path):
         assert compute_capsule_id(capsule) == capsule["capsule_id"]
 
 
+def test_cli_guards_only_arm_never_writes_capsule_bodies_even_with_share(tmp_path, monkeypatch):
+    monkeypatch.setenv("CAPSULE_LEDGER_ARM", "guards-only")
+    out = tmp_path / "r.json"
+    assert cli_main(["guard", "dry-run", "--ledger", str(NANDA), "--since", "7d", "--out", str(out), "--share"]) == 0
+    rows = [r for g in json.loads(out.read_text())["guards"] for r in g["rows"]]
+    assert rows and all(r["capsule"] is None and r["cited_capsule"] is None for r in rows)
+
+
 def test_cli_rejects_malformed_cap(tmp_path, capsys):
     out = tmp_path / "report.json"
     rc = cli_main(["guard", "dry-run", "--ledger", str(AMAURY), "--cap", "not-a-cap", "--out", str(out)])

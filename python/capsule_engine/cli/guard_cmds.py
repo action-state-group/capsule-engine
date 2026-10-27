@@ -94,13 +94,28 @@ def _parse_cap_args(items: list[str]) -> dict[str, int] | None:
     return caps_minor
 
 
+def _report_payload(report, *, with_capsules: bool) -> dict:
+    """The report as written to ``--out``. The sealed capsules in it are the
+    shareable part: kept only with ``--share`` (refused earlier when one is
+    local-only), otherwise the rows carry no capsule bodies."""
+    from ..report import to_payload
+
+    payload = to_payload(report)
+    if not with_capsules:
+        for section in payload["guards"]:
+            for row in section["rows"]:
+                row["capsule"] = None
+                row["cited_capsule"] = None
+    return payload
+
+
 def _cmd_guard_dry_run(args: argparse.Namespace) -> int:
     from agent_action_capsule import compute_capsule_id
 
     from ..folds.loader import load_definition_file
     from ..guards.capsule import local_only_refusal
     from ..packs import PackDefinitionError, load_proposals_file
-    from ..report import build_dry_run_report, build_dry_run_report_with_proposal, to_payload
+    from ..report import build_dry_run_report, build_dry_run_report_with_proposal
     from ..telemetry.record import record_evidence_touch, record_guard_configured, record_guard_evaluated
 
     if bool(args.model_note) != bool(args.model_id):
@@ -192,17 +207,9 @@ def _cmd_guard_dry_run(args: argparse.Namespace) -> int:
             print(f"capsule guard dry-run --share: refused: {refusal}; rerun without --share", file=sys.stderr)
             return 1
 
-    # The sealed capsules in the file are the shareable part: written only
-    # with --share (and refused above when one is local-only), otherwise the
-    # rows carry no capsule bodies.
-    payload = to_payload(report)
-    if not (args.share and evidence_visible):
-        for section in payload["guards"]:
-            for row in section["rows"]:
-                row["capsule"] = None
-                row["cited_capsule"] = None
+    with_capsules = bool(args.share and evidence_visible)
     out_path = Path(args.out)
-    out_path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    out_path.write_text(json.dumps(_report_payload(report, with_capsules=with_capsules), indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
     print(f"wrote {out_path}")
     if report.manifest_digest is not None:
@@ -216,19 +223,21 @@ def _cmd_guard_dry_run(args: argparse.Namespace) -> int:
         record_evidence_touch(arm)
 
     if args.verify:
-        # exclude generated_at: the one field that legitimately differs
-        # between two otherwise-identical replays (it's a wall-clock
-        # generation timestamp, not derived from the ledger).
-        lhs = {k: v for k, v in to_payload(report).items() if k != "generated_at"}
-        rhs = {k: v for k, v in to_payload(_build()).items() if k != "generated_at"}
+        # --verify attests the file itself: it is read back and compared to a
+        # rebuild. generated_at is excluded: the one field that legitimately
+        # differs between two otherwise-identical replays (a wall-clock stamp).
+        written = json.loads(out_path.read_text(encoding="utf-8"))
+        lhs = {k: v for k, v in written.items() if k != "generated_at"}
+        rebuilt = _report_payload(_build(), with_capsules=with_capsules)
+        rhs = {k: v for k, v in rebuilt.items() if k != "generated_at"}
         if lhs != rhs:
-            print("FAIL: replaying the same ledger did not reproduce the same report", file=sys.stderr)
+            print("FAIL: replaying the same ledger did not reproduce the report written", file=sys.stderr)
             return 1
 
         mismatches = []
-        for section in report.guards:
-            for row in section.rows:
-                for capsule in (row.capsule, row.cited_capsule):
+        for section in written["guards"]:
+            for row in section["rows"]:
+                for capsule in (row["capsule"], row["cited_capsule"]):
                     if not capsule:
                         continue
                     if compute_capsule_id(capsule) != capsule.get("capsule_id"):
@@ -238,7 +247,7 @@ def _cmd_guard_dry_run(args: argparse.Namespace) -> int:
             noun = "cited capsule(s)" if evidence_visible else "cited record(s)"
             print(f"FAIL: {len(mismatches)} {noun} do not re-verify", file=sys.stderr)
             return 1
-        tail = " and every cited capsule verifies" if evidence_visible else ""
+        tail = " and every cited capsule verifies" if with_capsules else ""
         print(f"OK: report is reproducible{tail}")
 
     return 0

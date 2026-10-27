@@ -1,8 +1,8 @@
 # capsule-engine
 
 The thin single-node enforcement layer for AI agent actions: the guard, append-only fold
-compute, the Terms Packs runtime, policy activation, and the local
-console/report/bundle-viewer runtime.
+compute, the Terms Packs runtime, policy activation, and the report computation
+(pages are drawn by capsule-viewer).
 
 ```
 pip install capsule-engine

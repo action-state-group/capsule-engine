@@ -23,7 +23,7 @@ class ReportRow:
     record is not a record" and ``engine.py``'s dry_run handling). ``cited_capsule``
     is the prior record this row's check matched against (e.g. the earlier
     payment a dedupe hit repeats), when the check produced one — carried in
-    full so the browser can re-verify it, not just display its id.
+    full so a viewer can re-verify it, not just display its id.
     """
 
     when: str

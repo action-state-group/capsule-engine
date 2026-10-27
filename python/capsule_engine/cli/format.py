@@ -111,8 +111,8 @@ def build_echo(verb: str, *, positional: str | None = None, flags: list[tuple[st
 
 
 def cli_echo_leaks_absolute_path(cli_echo: str) -> bool:
-    """``cli_echo`` is rendered verbatim on the bundle permalink and the
-    offline viewer -- a public page -- so it must never carry an operator's
+    """``cli_echo`` is rendered verbatim on the bundle permalink
+    -- a public URL -- so it must never carry an operator's
     absolute filesystem layout (home directory, machine username). Flags any
     token that is a POSIX absolute path (a leading ``/``, with no allowlisted
     exception defined) or a Windows drive path (``C:\\...``); callers that

@@ -197,8 +197,8 @@ def build_dry_run_report_with_proposal(
     ``caps_minor`` but would ALSO have been held under ``proposed_caps_minor``
     -- the "what would tightening to the proposed threshold catch" delta
     (starter-packs plan: "the conversion moment"). Purely additive -- the
-    base sections are untouched, ``render.py`` already loops over
-    ``report.guards`` generically, so this needed no template change.
+    base sections are untouched; ``to_payload`` already loops over
+    ``report.guards`` generically.
 
     Replays the same ledger a second time under ``proposed_caps_minor``;
     the two replays visit the same records in the same order, so decisions
