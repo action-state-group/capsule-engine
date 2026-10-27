@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 """What the caps window counts for an accepted history act whose spend and
 stated amount differ, or that seals no spend (capsule-engine#214 hold A;
-Steven's ruling A, ops 5053da83):
+Steven's ruling A):
 
 1. with no ``spend_minor``, the stated ``amount_minor``, never below 0, under
    every fold, the frozen spend.weekly/3.0.0 and 1.0.0 included;
