@@ -394,13 +394,12 @@ def _bundle_file(tmp_path: Path, with_companions: bool) -> Path:
 
 
 def test_dry_run_share_refuses_a_decision_with_a_profile_target(tmp_path, capsys):
-    out = tmp_path / "report.html"
+    out = tmp_path / "report.json"
     rc = cli_main(["guard", "dry-run", "--ledger", str(_bundle_file(tmp_path, True)), "--since", "all",
                    "--out", str(out), "--share", "--no-manifest"])
     printed = capsys.readouterr()
     assert rc == 1
     assert not out.exists()
-    assert "file://" not in printed.out
     assert "target" in printed.err
     for value in _profile_hexes():
         assert value not in printed.err + printed.out

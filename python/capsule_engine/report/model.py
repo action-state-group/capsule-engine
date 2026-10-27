@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-__all__ = ["ReportRow", "GuardSection", "ModelNote", "DryRunReport"]
+__all__ = ["ReportRow", "GuardSection", "ModelNote", "DryRunReport", "to_payload"]
 
 
 @dataclass(frozen=True)
@@ -23,7 +23,7 @@ class ReportRow:
     record is not a record" and ``engine.py``'s dry_run handling). ``cited_capsule``
     is the prior record this row's check matched against (e.g. the earlier
     payment a dedupe hit repeats), when the check produced one — carried in
-    full so the browser can re-verify it, not just display its id.
+    full so a viewer can re-verify it, not just display its id.
     """
 
     when: str
@@ -93,3 +93,59 @@ class DryRunReport:
         if not candidates:
             return self.held_rows[0] if self.held_rows else None
         return max(candidates, key=lambda gr: gr[1].amount_minor)
+
+
+def _guard_index(report: DryRunReport, guard_id: str) -> int:
+    for i, section in enumerate(report.guards):
+        if section.guard_id == guard_id:
+            return i
+    raise KeyError(guard_id)
+
+
+def _row_payload(row: ReportRow) -> dict:
+    return {
+        "when": row.when,
+        "agent": row.agent,
+        "why": row.why,
+        "amount_minor": row.amount_minor,
+        "currency": row.currency,
+        "capsule": row.capsule,
+        "cited_capsule_id": row.cited_capsule_id,
+        "cited_capsule": row.cited_capsule,
+    }
+
+
+def _section_payload(section: GuardSection) -> dict:
+    return {"id": section.guard_id, "what": section.what, "rows": [_row_payload(r) for r in section.rows]}
+
+
+def to_payload(report: DryRunReport) -> dict:
+    """The report as one JSON-able dict: what `guard dry-run` writes to its output file."""
+    picked = report.consequential()
+    consequential = None
+    if picked is not None:
+        guard_id, row = picked
+        section = report.guards[_guard_index(report, guard_id)]
+        consequential = {"guard_id": guard_id, "row_index": section.rows.index(row)}
+
+    model_note = None
+    if report.model_note is not None:
+        model_note = {
+            "quote": report.model_note.quote,
+            "model_id": report.model_note.model_id,
+            "record_count": report.model_note.record_count,
+        }
+
+    return {
+        "operator": report.operator,
+        "agents": list(report.agents),
+        "since": report.since_label,
+        "actions_replayed": report.actions_replayed,
+        "record_range": list(report.record_range),
+        "checkpoint": report.checkpoint,
+        "replay_command": report.replay_command,
+        "generated_at": report.generated_at,
+        "guards": [_section_payload(s) for s in report.guards],
+        "consequential": consequential,
+        "model_note": model_note,
+    }

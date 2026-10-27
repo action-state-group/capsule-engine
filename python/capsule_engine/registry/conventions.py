@@ -15,7 +15,7 @@ for the re-sync procedure and pinned-commit provenance. A future neutral
 not yet created as of this move) would supersede this vendor copy the same
 way; until then, this copy is never to be read as the registry-of-record
 itself. capsule-ledger's own minimal ``describe_action_class`` shim is
-archived with it; this module is the one copy the engine's CLI and console use.
+archived with it; this module is the one copy the engine's CLI uses.
 
 ``action_class`` -- not the -02 spec's own closed ``action_type`` field
 (restricted to ``fyi``/``decide``, see ``guards/action.py``) -- is the

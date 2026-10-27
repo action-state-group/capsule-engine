@@ -6,7 +6,7 @@ not-yet-existing ``capsule-registry`` "Action-type conventions" table.
 Moved here from capsule-ledger: this repo carries the full vendor copy
 (``describe_field_value``, ``conventions_digest``, the CPB provisional
 tables) and, since capsule-ledger was archived, the only
-``describe_action_class`` the CLI and console use.
+``describe_action_class`` the CLI uses.
 """
 from __future__ import annotations
 

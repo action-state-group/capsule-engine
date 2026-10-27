@@ -151,7 +151,7 @@ def test_guard_dry_run_configuring_a_cap_emits_m1_when_opted_in(opted_in, state_
 
     os.environ["CAPSULE_LEDGER_TELEMETRY_SINK_PATH"] = str(sink_path)
     try:
-        out = tmp_path / "report.html"
+        out = tmp_path / "report.json"
         rc = cli_main(
             ["guard", "dry-run", "--ledger", str(NANDA), "--since", "7d", "--out", str(out), "--cap", "money.transfer=1"]
         )
@@ -168,7 +168,7 @@ def test_guard_dry_run_configuring_a_cap_emits_m1_when_opted_in(opted_in, state_
 
 
 def test_guard_dry_run_without_opt_in_emits_nothing(opted_out, state_dir, tmp_path):
-    out = tmp_path / "report.html"
+    out = tmp_path / "report.json"
     rc = cli_main(
         ["guard", "dry-run", "--ledger", str(NANDA), "--since", "7d", "--out", str(out), "--cap", "money.transfer=1"]
     )

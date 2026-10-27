@@ -21,9 +21,9 @@ emitted once. M4 (the arm-A-vs-arm-B evidence tax) is a ratio computed
 visibility into the other arm's aggregate, so this module deliberately
 does not attempt to compute it; ``m1_activation_event`` already carries
 everything a central aggregator needs (the arm tag) to compute M4 later.
-M6 (the viral unit) is not built here at all -- see
-``report/render.py``'s ``TelemetryConfig`` for the client-side beacon that
-carries it, and this module's own docstring note below on why.
+M6 (the viral unit) is not built here at all: its client-side beacon lived in
+the report renderer, which has left this engine, and this module's own
+docstring note below says why.
 """
 from __future__ import annotations
 

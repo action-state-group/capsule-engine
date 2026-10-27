@@ -3,7 +3,7 @@
 `terms-to-report-design-2026-08-25.md`): the per-number coverage footnote a
 report attaches to every rendered fold result -- "a report cannot render a
 number without its coverage statement." Pinned literal format, same
-discipline as `format_envelope_line` (`test_console_product_laws.py`)."""
+discipline as `format_envelope_line` (the former console product-laws test)."""
 from __future__ import annotations
 
 from capsule_engine.cli.format import format_coverage_footnote

@@ -4,7 +4,8 @@ The thin single-node enforcement layer for AI agent actions: the guard that
 consumes compiled artifacts as data (never authors compile-time judgments
 itself), append-only fold compute over `capsule_emit.account`'s neutral
 semantics, the Terms Packs (packs) runtime (loader, schema, catalog packs), policy
-activation, and the local console/report/bundle-viewer runtime.
+activation, and the report computation. It draws no pages; those belong to
+[capsule-viewer](https://github.com/action-state-group/capsule-viewer).
 
 Built on top of
 [checkpointed-local-log](https://github.com/action-state-group/checkpointed-local-log)
@@ -49,16 +50,15 @@ the test suite passes (`pip install pytest "mcp<2"`, then `python -m pytest` in 
 |---|---|
 | `capsule-engine init --pack NAME` | Install a starter pack in observe mode: it records, it enforces nothing. |
 | `capsule-engine constraints list` | The registered guard checks and the action-class taxonomy. |
-| `capsule-engine guard dry-run --ledger PATH` | Replay a ledger through the guard checks and write a self-contained HTML report. |
+| `capsule-engine guard dry-run --ledger PATH` | Replay a ledger through the guard checks and write a JSON report (`--share` includes the sealed capsules). |
 | `capsule-engine guard enforce` | Record locally that this install moved from dry-run to enforce. |
 | `capsule-engine tenant init` / `upgrade` / `list` | One engine instance per tenant: its own ledger directory, policy manifest and signing key. |
 | `capsule-engine telemetry status` / `funnel` | The telemetry disclosure and opt-in state; the funnel report. |
 | `capsule-engine packs propose --pack NAME` | A read-only measurability report for any pack over a JSONL corpus. |
 | `capsule-engine verify CAPSULE_ID` | Verify one ledger record, or a whole bundle file (`--bundle`). |
 | `capsule-engine bundle` | Write a self-contained, verifiable slice of the ledger. |
-| `capsule-engine console` | Serve the local console over the real ledger. |
 
-`verify`, `bundle` and `console` are present unless `CAPSULE_LEDGER_ARM=guards-only`
+`verify` and `bundle` are present unless `CAPSULE_LEDGER_ARM=guards-only`
 (`packaging.py`), which keeps the guard checks and dry-run and hides the
 record-query verbs; the default is `full`. Run any command with `--help`.
 
@@ -72,8 +72,7 @@ record-query verbs; the default is `full`. Run any command with `--help`.
   measurability report) plus the catalog packs (`packs/catalog/`, below).
 - `policy/` — the policy manifest: a lockfile of active fold/wicket
   definitions cited by digest, never by copy.
-- `console/`, `report/`, `bundle_viewer/` — the local investigation, report,
-  and offline-verify surfaces.
+- `report/` — the dry-run report and the Evidence Result, as data (no rendering).
 - `mcp/`, `telemetry/`, `holds/` — MCP server surface, telemetry, and
   reservation-as-capsule engine-side plumbing.
 - `cli/` — the `capsule-engine` command (above).

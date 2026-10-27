@@ -6,7 +6,7 @@ The machine-readable CPB registry of record is
 ``spec/cpb-provisional-registry.md`` (the Rung-3 provisional entries). It is
 meant to be *vendored* into consuming packages as a local, no-network snapshot
 so a viewer/verifier can resolve a payload class's status offline. This mirrors
-the existing ``scripts/vendor_bundle_viewer.py`` pattern: one generated artifact
+the way other vendored snapshots work: one generated artifact
 is copied in by hand, re-run when the upstream changes, and the exact upstream
 commit is recorded for provenance.
 
