@@ -5,17 +5,21 @@ module has its own changelog, `go/CHANGELOG.md`.
 
 ## Unreleased
 
-- Removed (capsule-engine#175): the engine's three rendering surfaces. The engine computes; pages are
-  drawn by capsule-viewer. Replacements: `capsule-engine console` and the offline `bundle_viewer` have none
-  here (use capsule-viewer's `render_report_html` / `check_and_render` over an evidence file);
-  `capsule-engine bundle` no longer takes `--with-viewer` or `--viewer-out` and still writes the bundle
-  and prints its verify link; `capsule_engine.report.render` (`render_report_html`, `encode_fragment`,
-  `decode_fragment`, `TelemetryConfig`) is gone, with its `verify.js`. `guard dry-run` now writes the
-  report as JSON (`--out`, default `dry-run-report.json`; the former `to_fragment_payload` is
-  `capsule_engine.report.to_payload`). Its rows carry capsule bodies only with `--share`, still refused
-  when one holds a local-only field; `--share` no longer prints a URL, and `--telemetry-opt-in` and
-  `--telemetry-endpoint` are removed with the HTML beacon. Drawing a withheld payload beside its digest
-  moves to action-state-group/capsule-viewer#105.
+- **Breaking** (capsule-engine#175): the engine's three rendering surfaces are removed. The engine
+  computes; pages are drawn by capsule-viewer. Removed released verbs and entry points:
+  `capsule-engine console`; `capsule-engine bundle --with-viewer` and `--viewer-out` (the bundle file
+  and its verify link are unchanged); the `capsule_engine.bundle_viewer` and `capsule_engine.console`
+  packages; `capsule_engine.report.render` (`render_report_html`, `encode_fragment`, `decode_fragment`,
+  `TelemetryConfig`) with its `verify.js`. There is no like-for-like replacement here. To draw an
+  evidence file, use `capsule_viewer.evidence_report.render_report_html(bundle, check)` or
+  `check_and_render(bundle)`; these draw a bundle, not a dry-run report. `guard dry-run` now writes the
+  report as JSON (the former `to_fragment_payload` is `capsule_engine.report.to_payload`) and no page is
+  drawn for it today. An existing `--out report.html` now gets JSON inside a `.html` file; the default
+  `--out` is `dry-run-report.json`. Rows carry capsule bodies only with `--share`, still refused when one
+  holds a local-only field, and `--share` no longer prints a URL. `--telemetry-opt-in` and
+  `--telemetry-endpoint` are removed with the HTML beacon, and `CAPSULE_LEDGER_TELEMETRY_ENDPOINT` is now
+  ignored without a warning. Drawing a withheld payload beside its digest moves to
+  action-state-group/capsule-viewer#105. The next release takes a minor bump.
 - Changed (capsule-engine#234, ruling A on #214 hold A): under spend.weekly/3.1.0, a live check's
   history now lets a cancel or refund free the headroom of the partial charge it cites. It lowers
   that charge's counted amount by the amount it returns, never below the charge's sealed
