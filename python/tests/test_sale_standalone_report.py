@@ -457,7 +457,7 @@ def _replayed(sale, watch: str):
     def write(capsule_id, ledger, days=None):
         result = given(capsule_id, ledger, days)
         if capsule_id == watch:
-            seen[days] = [r.capsule["asg_payload"].get("action_class") for r in ledger.scan()]
+            seen[days] = [r.capsule["asg_payload"].get("action_class") for r in ledger.find()]
         return result
 
     records = sale.records()

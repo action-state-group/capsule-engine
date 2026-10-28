@@ -168,7 +168,7 @@ def _deal_bundle(tmp_path: Path, deal_id: str | None) -> Path:
 
 
 def _dry_run(out: Path, ledger: Path, *extra: str) -> int:
-    return cli_main(["guard", "dry-run", "--ledger", str(ledger), "--since", "all", "--out", str(out), *extra])
+    return cli_main(["guard", "dry-run", "--store", str(ledger), "--since", "all", "--out", str(out), *extra])
 
 
 def test_dry_run_share_refuses_a_decision_carrying_the_deal(tmp_path, capsys):

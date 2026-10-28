@@ -29,7 +29,7 @@ def _fresh_server(tmp_path, monkeypatch):
     reset its process-lifetime singletons -- they're module globals, cached
     across calls by design (one open `LedgerStore` per server session), so a
     test suite must reset them between tests itself."""
-    monkeypatch.setenv("CAPSULE_LEDGER", str(tmp_path))
+    monkeypatch.setenv("CAPSULE_STORE", str(tmp_path))
     monkeypatch.setenv("CAPSULE_MCP_CAPS_MINOR", json.dumps({"money.transfer": 10_000_000}))
     monkeypatch.setattr(srv, "_config", None)
     monkeypatch.setattr(srv, "_ledger", None)

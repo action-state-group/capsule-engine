@@ -9,7 +9,6 @@ from __future__ import annotations
 import hashlib
 
 import pytest
-from cll.ledger import ScanQuery
 
 from capsule_engine.conversation import (
     EVENT_CONVERSATION_TURN,
@@ -29,6 +28,7 @@ from capsule_engine.conversation import (
     turn_inclusion_proof,
     verify_turn_inclusion,
 )
+from capsule_engine.guards.history import Query, verify_record
 from capsule_engine.guards.signing import SigningKeyUnavailable
 
 OPERATOR = "acme-support"
@@ -41,7 +41,7 @@ def _digest(text: str) -> str:
 
 def _session(store, signer, session_id="sess-1"):
     return ConversationSession(
-        ledger=store,
+        history=store,
         session_id=session_id,
         operator=OPERATOR,
         developer=DEVELOPER,
@@ -59,7 +59,7 @@ def test_turns_and_close_are_real_independently_verifiable_capsules(store, signe
     close = sess.close()
 
     for record in (r0, r1, close):
-        result = store.verify(record.capsule_id)
+        result = verify_record(store, store.get(record.capsule_id))
         assert result.ok, result.findings
 
 
@@ -150,12 +150,12 @@ def test_no_unsigned_window_signing_failure_propagates_not_silently_recorded(sto
         raise SigningKeyUnavailable("key rotated out")
 
     sess = ConversationSession(
-        ledger=store, session_id="sess-1", operator=OPERATOR, developer=DEVELOPER, signer_provider=_unavailable
+        history=store, session_id="sess-1", operator=OPERATOR, developer=DEVELOPER, signer_provider=_unavailable
     )
     with pytest.raises(SigningKeyUnavailable):
         sess.record_turn(speaker_role="user", content_digest=_digest("hello"))
     assert sess.turn_count == 0
-    assert list(store.scan()) == []
+    assert list(store.find()) == []
 
 
 # -- session lifecycle --------------------------------------------------------
@@ -227,7 +227,7 @@ def test_find_session_turns_sorted_by_turn_index_even_if_appended_out_of_order(s
         operator=OPERATOR, developer=DEVELOPER, signer=signer, previous_turn_capsule_id=c1["capsule_id"],
     )
     for capsule in (c2, c0, c1):
-        store.append(capsule, consequential=False)
+        store.append(capsule)
 
     found = find_session_turns(store, "sess-1")
     assert [f.capsule["asg_payload"]["detail"]["turn_index"] for f in found] == [0, 1, 2]
@@ -353,7 +353,7 @@ def test_event_type_and_scan_filter_shape(store, signer):
     sess.record_turn(speaker_role="user", content_digest=_digest("hello"))
     sess.close()
 
-    fyi_records = list(store.scan(ScanQuery(action_type="fyi")))
+    fyi_records = store.find(Query(where={"action_type": "fyi"}))
     events = [r.capsule["asg_payload"]["event"] for r in fyi_records]
     assert events.count(EVENT_CONVERSATION_TURN) == 1
     assert events.count(EVENT_SESSION_CLOSE) == 1
@@ -377,14 +377,14 @@ def test_turn_reference_resolves_a_referenced_capsule_back_to_its_turn(store, si
         developer=DEVELOPER,
         signer=signer,
     )
-    store.append(reference, consequential=False)
+    store.append(reference)
 
     found = find_turn_reference(store, tool_capsule_id)
     assert found is not None
     assert found.capsule["asg_payload"]["event"] == EVENT_TURN_REFERENCE
     assert found.capsule["asg_payload"]["detail"]["turn_capsule_id"] == turn.capsule_id
     assert found.capsule["chain"] == {"parent_capsule_id": turn.capsule_id, "relation": "confirms"}
-    result = store.verify(found.capsule_id)
+    result = verify_record(store, store.get(found.capsule_id))
     assert result.ok, result.findings
 
 
@@ -397,7 +397,7 @@ def test_turn_reference_supports_multiple_referenced_capsules(store, signer):
     reference = build_turn_reference_capsule(
         turn_capsule_id=turn.capsule_id, referenced_capsule_ids=ids, operator=OPERATOR, developer=DEVELOPER, signer=signer,
     )
-    store.append(reference, consequential=False)
+    store.append(reference)
 
     for capsule_id in ids:
         found = find_turn_reference(store, capsule_id)

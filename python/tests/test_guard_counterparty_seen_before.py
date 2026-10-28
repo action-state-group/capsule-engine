@@ -46,7 +46,7 @@ def _action(n: int, **overrides) -> Action:
 
 def _engine(store, caps_fold, signer, *, wickets=(SEEN_BOTH,), caps_minor=None) -> GuardEngine:
     return GuardEngine(
-        ledger=store,
+        history=store,
         caps_fold=caps_fold,
         signer_provider=lambda: signer,
         caps_minor=caps_minor or {c: 10_000 for c in CLASSES},

@@ -26,10 +26,10 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import yaml
-from cll.ledger.api import LedgerAPI
 
 from ..guards.checks import RUNNABLE_CHECKS
 from ..guards.engine import ASK_RULE_EXCLUDED_CHECKS, GuardEngine
+from ..guards.history import History
 from ..guards.signing import Signer
 from ..guards.wickets.definition import WicketDefinition
 from ..policy.activation import build_manifest_activation_capsule, find_latest_activation
@@ -158,14 +158,14 @@ def install_pack(
 def build_engine(
     installed: InstalledPack,
     *,
-    ledger: LedgerAPI,
+    history: History,
     signer_provider: Callable[[], Signer | None],
     clock: Callable[[], str] | None = None,
 ) -> GuardEngine:
     """A ``GuardEngine`` wired from the installed pack's resolved manifest --
     the caps fold/limits and manifest_digest all come from what
     ``install_pack`` actually materialized and resolved, never re-declared
-    here. The caps limits are read from ``ledger``'s activation records on
+    here. The caps limits are read from ``history``'s activation records on
     every decision (``policy/limits.py``): a profile's value applies only once
     a signed activation binds it, a raise waits out the cooling-off, and each
     decision's caps evidence names the source of every limit it applied. A
@@ -182,9 +182,9 @@ def build_engine(
     wickets = installed.resolved.configured_wickets(RUNNABLE_CHECKS)
     gate_selectors, checks = engine_ask_sets(installed.pack, wickets)
     return GuardEngine(
-        ledger=ledger,
+        history=history,
         caps_fold=installed.resolved.caps_fold(),
-        caps_limits=lambda signer: read_caps_limits(installed.resolved, ledger, signer),
+        caps_limits=lambda signer: read_caps_limits(installed.resolved, history, signer),
         clock=clock,
         per_action_reads=installed.resolved.per_action_reads(),
         signer_provider=signer_provider,
@@ -202,7 +202,7 @@ def engine_ask_sets(
     ``wickets`` under ``pack`` is built with: the gate selectors and the
     configured checks among ``wickets`` whose obligations all declare ASK.
     ``build_engine`` and ``report.replay`` both build their engine from this,
-    so a replay of a pack-governed ledger decides as the live engine did."""
+    so a replay of a pack-governed history decides as the live engine did."""
     return ask_gate_selectors(pack), ask_wickets(pack) & {w.check for w in wickets}
 
 
@@ -237,7 +237,7 @@ def ask_wickets(pack: PackDefinition) -> frozenset[str]:
 def record_pack_activation(
     installed: InstalledPack,
     *,
-    ledger: LedgerAPI,
+    history: History,
     operator: str,
     developer: str,
     signer: Signer,
@@ -250,9 +250,9 @@ def record_pack_activation(
     the starter-packs plan's manifest-fragment requirement. When the install
     pins a policy profile, the record also carries that profile's digest and
     values. Chains to the
-    ledger's own previous activation, if any, so pack installs and any other
+    history's own previous activation, if any, so pack installs and any other
     manifest changes share one walkable epoch history."""
-    previous = find_latest_activation(ledger)
+    previous = find_latest_activation(history)
     capsule = build_manifest_activation_capsule(
         resolved=installed.resolved,
         operator=operator,
@@ -262,5 +262,5 @@ def record_pack_activation(
         timestamp=timestamp,
         action_id=action_id,
     )
-    ledger.append(capsule, consequential=False)
+    history.append(capsule)
     return capsule

@@ -2,7 +2,7 @@
 """Guard API: checks that gate actions and record their own outcomes.
 
 ``GuardEngine.check(action) -> allow | deny | escalate``, with every
-decision appended to the ledger as a capsule (T2's ``LedgerStore.append``).
+decision appended to the history as a capsule (``History.append``).
 See ``docs/failure-semantics.md`` for the guard's failure/degradation
 behavior.
 

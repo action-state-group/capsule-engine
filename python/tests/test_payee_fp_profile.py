@@ -248,10 +248,10 @@ def _seen_before_on_deal_2(store, signer, *, with_profile: bool):
     members = [{"counterparty_profile": _profile_block(n)} if with_profile else {} for n in (0, 1)]
     deal_1 = _at_engine_taxonomy(action_for_check_input(_entry(_deal(0)[0], 1, DAY_1, **members[0])))
     deal_2 = _at_engine_taxonomy(action_for_check_input(_entry(_deal(1)[0], 2, DAY_2, **members[1])))
-    plain = GuardEngine(ledger=store, caps_fold=fold, signer_provider=lambda: signer)
+    plain = GuardEngine(history=store, caps_fold=fold, signer_provider=lambda: signer)
     assert plain.check(deal_1).capsule["disposition"]["decision"] == "accept"
     engine = GuardEngine(
-        ledger=store, caps_fold=fold, signer_provider=lambda: signer, wickets=(load_wicket(SEEN_BEFORE_V2),)
+        history=store, caps_fold=fold, signer_provider=lambda: signer, wickets=(load_wicket(SEEN_BEFORE_V2),)
     )
     return engine.check(deal_2)
 
@@ -317,7 +317,7 @@ def test_the_seen_before_evidence_names_the_ignored_field_and_never_its_value(st
     check, _, _ = _deal(0)
     action = _at_engine_taxonomy(action_for_check_input(_entry(check, 1, DAY_1, counterparty_profile=BAD_BLOCKS["uppercase hex"])))
     engine = GuardEngine(
-        ledger=store, caps_fold=load_fold(SPEND_WEEKLY), signer_provider=lambda: signer,
+        history=store, caps_fold=load_fold(SPEND_WEEKLY), signer_provider=lambda: signer,
         wickets=(load_wicket(SEEN_BEFORE_V2),),
     )
     decision = engine.check(action, dry_run=True)
@@ -334,7 +334,7 @@ def test_a_good_value_notes_nothing(store, signer):
     action = _at_engine_taxonomy(action_for_check_input(_entry(check, 1, DAY_1, counterparty_profile=_profile_block(0))))
     assert action.ignored_inputs == ()
     engine = GuardEngine(
-        ledger=store, caps_fold=load_fold(SPEND_WEEKLY), signer_provider=lambda: signer,
+        history=store, caps_fold=load_fold(SPEND_WEEKLY), signer_provider=lambda: signer,
         wickets=(load_wicket(SEEN_BEFORE_V2),),
     )
     assert "ignored_inputs" not in _constraint(engine.check(action, dry_run=True), "counterparty_seen_before").evidence
@@ -395,7 +395,7 @@ def _bundle_file(tmp_path: Path, with_companions: bool) -> Path:
 
 def test_dry_run_share_refuses_a_decision_with_a_profile_target(tmp_path, capsys):
     out = tmp_path / "report.json"
-    rc = cli_main(["guard", "dry-run", "--ledger", str(_bundle_file(tmp_path, True)), "--since", "all",
+    rc = cli_main(["guard", "dry-run", "--store", str(_bundle_file(tmp_path, True)), "--since", "all",
                    "--out", str(out), "--share", "--no-manifest"])
     printed = capsys.readouterr()
     assert rc == 1

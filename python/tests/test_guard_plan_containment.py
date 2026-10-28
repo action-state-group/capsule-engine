@@ -20,7 +20,7 @@ PLAN = parse_plan_definition(
 
 
 def _engine(store, caps_fold, signer, **kwargs):
-    return GuardEngine(ledger=store, caps_fold=caps_fold, signer_provider=lambda: signer, plan=PLAN, **kwargs)
+    return GuardEngine(history=store, caps_fold=caps_fold, signer_provider=lambda: signer, plan=PLAN, **kwargs)
 
 
 def test_action_inside_the_plan_is_allowed_and_records_the_constraint(store, caps_fold, signer):
@@ -182,7 +182,7 @@ def test_no_plan_configured_omits_the_constraint_entirely(store, caps_fold, sign
     byte-for-byte the same engine behavior as before this check existed --
     the constraint is absent, not an ``n/a`` stub, so no existing decision
     capsule's hash shifts just because this check now exists in the code."""
-    engine = GuardEngine(ledger=store, caps_fold=caps_fold, signer_provider=lambda: signer)
+    engine = GuardEngine(history=store, caps_fold=caps_fold, signer_provider=lambda: signer)
     action = Action(verb="export_user_list", operator="acme-corp", developer="security-assistant@v1")
     decision = engine.check(action)
 

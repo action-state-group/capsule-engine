@@ -21,13 +21,13 @@ from pathlib import Path
 import pytest
 from agent_action_capsule import compute_capsule_id
 from agent_action_capsule.canonical import json_digest
-from cll.ledger import LedgerStore
 
 from capsule_engine.events import build_event_capsule
 from capsule_engine.guards import Action, GuardDecision, GuardEngine, LocalSigner
 from capsule_engine.guards.capsule import DENY, ESCALATE
 from capsule_engine.guards.checks import check_caps
 from capsule_engine.guards.checks.caps import LimitSource
+from capsule_engine.guards.history import MemoryHistory
 from capsule_engine.packs import build_engine, install_pack, load_pack_dir, record_pack_activation
 from capsule_engine.packs.contract_diff import diff_rulesets, ruleset_from_activation
 from capsule_engine.policy import PROFILE_FORMAT, PolicyProfile, parse_profile
@@ -92,7 +92,7 @@ class _Household:
     def __init__(self, tmp_path: Path) -> None:
         self.pack = load_pack_dir(EVERYDAY_DIR)
         self.project = tmp_path / "project"
-        self.ledger = LedgerStore(tmp_path / "ledger")
+        self.ledger = MemoryHistory()
         self.installed = None
 
     def install(self, profile: PolicyProfile | None, mode: str = "enforce") -> None:
@@ -101,11 +101,11 @@ class _Household:
     def activate(self, profile: PolicyProfile | None, timestamp: str) -> None:
         self.install(profile)
         record_pack_activation(
-            self.installed, ledger=self.ledger, operator=OPERATOR, developer="ops", signer=SIGNER, timestamp=timestamp
+            self.installed, history=self.ledger, operator=OPERATOR, developer="ops", signer=SIGNER, timestamp=timestamp
         )
 
     def engine(self, now: str):
-        return build_engine(self.installed, ledger=self.ledger, signer_provider=lambda: SIGNER, clock=lambda: now)
+        return build_engine(self.installed, history=self.ledger, signer_provider=lambda: SIGNER, clock=lambda: now)
 
     def check(self, name: str, amount_minor: int, timestamp: str, *, now: str | None = None):
         """``now`` is the engine's clock; by default the action is checked at
@@ -440,7 +440,7 @@ def _append_forged_activation(household, *, values: PolicyProfile, cited_digest:
         chain_parent=find_latest_activation(household.ledger).capsule_id,
         chain_relation="epoch_opens",
     )
-    household.ledger.append(capsule, consequential=False)
+    household.ledger.append(capsule)
 
 
 def test_an_activation_not_signed_with_the_nodes_key_is_refused(household):
@@ -484,7 +484,7 @@ def test_an_engine_refuses_limits_given_both_ways(household):
     resolved = household.installed.resolved
     with pytest.raises(ValueError, match="not both"):
         GuardEngine(
-            ledger=household.ledger,
+            history=household.ledger,
             caps_fold=resolved.caps_fold(),
             signer_provider=lambda: SIGNER,
             caps_minor={"money.purchase": 500},

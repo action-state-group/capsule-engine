@@ -51,10 +51,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TypedDict
 
-from cll.ledger.api import LedgerAPI, ScanQuery
-
 from ..action import Action
 from ..capsule import ConstraintOutcome, NotApplicableEvidence, not_applicable_evidence
+from ..history import History, Query
 from ..history_state import (
     DISPOSITION,
     INCOMPLETE,
@@ -123,7 +122,7 @@ def _outcome(
     )
 
 
-def sale_acceptance(operator: str, ledger: LedgerAPI, acceptance_classes: list[str], item_ref: str) -> SaleAcceptance:
+def sale_acceptance(operator: str, history: History, acceptance_classes: list[str], item_ref: str) -> SaleAcceptance:
     """The sale's acceptance: the first record in ledger order, among
     ``operator``'s, whose class is in ``acceptance_classes``, whose decision
     was accept, which was not a dry run, and which carries the same
@@ -133,8 +132,7 @@ def sale_acceptance(operator: str, ledger: LedgerAPI, acceptance_classes: list[s
     history may be missing acts (module docstring)."""
     found: SealedAcceptance | None = None
     unknown: str | None = None
-    # ``ScanQuery.counterparty`` is the ledger's filter on ``operator``.
-    for record in ledger.scan(ScanQuery(counterparty=operator)):
+    for record in history.find(Query(where={"operator": operator})):
         capsule = record.capsule
         payload = capsule.get("asg_payload") or {}
         state = history_state(capsule)
@@ -177,17 +175,17 @@ def _accepted_commitment(capsule: dict, acceptance_classes: list[str]) -> bool:
 
 
 def first_sealed_acceptance(
-    operator: str, ledger: LedgerAPI, acceptance_classes: list[str], item_ref: str
+    operator: str, history: History, acceptance_classes: list[str], item_ref: str
 ) -> SealedAcceptance | None:
     """The sale's acceptance (``sale_acceptance``), or ``None`` when the sale
     has none or it is not known. Shared with ``release_on_acceptance``, so
     both read one acceptance per sale, and an unknown one releases
     nothing."""
-    return sale_acceptance(operator, ledger, acceptance_classes, item_ref).acceptance
+    return sale_acceptance(operator, history, acceptance_classes, item_ref).acceptance
 
 
 def check_single_commitment(
-    action: Action, ledger: LedgerAPI, *, acceptance_classes: list[str], commit_classes: list[str]
+    action: Action, history: History, *, acceptance_classes: list[str], commit_classes: list[str]
 ) -> CheckOutcome:
     if action.action_class not in commit_classes:
         return _outcome("n/a", "the rule is not configured for this action class",
@@ -204,7 +202,7 @@ def check_single_commitment(
                         not_applicable_evidence(_CHECK_ID, in_scope=True, missing_field="item_ref"),
                         fails_closed=True)
 
-    sale = sale_acceptance(action.operator, ledger, acceptance_classes, action.item_ref)
+    sale = sale_acceptance(action.operator, history, acceptance_classes, action.item_ref)
     if sale.unknown is not None:
         return _outcome("n/a", _UNKNOWN_REASONS[sale.unknown],
                         not_applicable_evidence(_CHECK_ID, in_scope=True, missing_field=sale.unknown),

@@ -23,7 +23,6 @@ from pathlib import Path
 
 import pytest
 from agent_action_capsule import json_digest
-from cll.ledger import LedgerStore
 
 import capsule_engine
 from capsule_engine.folds.loader import load_definition_file as load_fold
@@ -31,6 +30,7 @@ from capsule_engine.guards import Action, GuardDecision, GuardEngine, LocalSigne
 from capsule_engine.guards.action import listing_classes_of
 from capsule_engine.guards.checks import RUNNABLE_CHECKS
 from capsule_engine.guards.checks.required_disclosure import check_required_disclosure
+from capsule_engine.guards.history import MemoryHistory
 from capsule_engine.guards.statements import make_statement_record
 from capsule_engine.guards.wickets import load_definition_file
 from capsule_engine.packs import install_pack, load_pack_dir
@@ -63,7 +63,7 @@ OPERATOR = "synthetic-seller"
 
 @pytest.fixture
 def store(tmp_path):
-    with LedgerStore(tmp_path / "ledger") as s:
+    with MemoryHistory() as s:
         yield s
 
 
@@ -167,14 +167,14 @@ def _rebound(record: dict, body_change: dict) -> dict:
 def _live(name: str, listing: list[str] | None, pack=PACK) -> GuardDecision:
     envelope = _check_input(name)
     envelope["record"] = _rebound(envelope["record"], {"listing_classes": listing})
-    with tempfile.TemporaryDirectory() as tmp, LedgerStore(Path(tmp) / "ledger") as store:
+    with tempfile.TemporaryDirectory() as tmp, MemoryHistory() as store:
         installed = install_pack(pack, project_dir=Path(tmp) / "project", mode="observe")
         resolved = installed.resolved
         wickets = resolved.configured_wickets(RUNNABLE_CHECKS)
         gates, asks = engine_ask_sets(installed.pack, wickets)
         signer = LocalSigner(key_id="listing", secret=b"listing-fixture")
         engine = GuardEngine(
-            ledger=store, caps_fold=resolved.caps_fold(), signer_provider=lambda: signer,
+            history=store, caps_fold=resolved.caps_fold(), signer_provider=lambda: signer,
             caps_minor=resolved.caps_minor() or {}, manifest_digest=resolved.manifest_digest, wickets=wickets,
             ask_gate_selectors=gates, ask_wickets=asks, evaluate_under_record_taxonomy=True,
         )

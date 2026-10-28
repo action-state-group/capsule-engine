@@ -80,14 +80,10 @@ def test_run_dataset_never_arms_witnessing(monkeypatch, tmp_path):
     """The socket-guard test above is defense in depth, but capsule-emit's
     checkpoint/witness dispatch is cadence-gated (every 100 entries or 900s
     -- see capsule_emit.witness.DEFAULT_CADENCE_ENTRIES/SECONDS) and async,
-    so a low-volume replay like this reference's would pass that test even
-    with witness=False silently dropped from the seal() call: the missing
-    kill switch just wouldn't happen to fire within one small test run.
-    This test instead asserts the kill switch itself is engaged on every
-    seal() -- spying on capsule_emit.witness.maybe_checkpoint's `enabled`
-    argument, which is exactly the value the `witness=` kwarg resolves to
-    (see witness.witness_mode/witness_enabled) -- so it fails deterministically,
-    not by chance, if witness=False is ever dropped from the call site."""
+    so a low-volume replay would pass that test even with witnessing armed.
+    The reference seals with capsule-emit's storage-free ``produce.seal``,
+    which never reaches the ledger layer's checkpoint/witness dispatch; this
+    asserts deterministically that the dispatch is never entered."""
     import capsule_emit.witness as emit_witness
 
     seen_enabled: list[object] = []
@@ -103,11 +99,7 @@ def test_run_dataset_never_arms_witnessing(monkeypatch, tmp_path):
         "pilot1-gemini-2-5-flash", ref.DATASETS["pilot1-gemini-2-5-flash"], store_dir=str(tmp_path / "store")
     )
     assert result.calls
-    assert seen_enabled, "expected at least one capsule_emit.seal() call during replay"
-    assert all(v is False for v in seen_enabled), (
-        f"witnessing was left enabled for at least one seal() call ({seen_enabled}) -- "
-        "this reference must always pass witness=False to stay offline"
-    )
+    assert seen_enabled == [], f"the ledger layer's checkpoint/witness dispatch ran ({seen_enabled})"
 
 
 # -- P6b acceptance: >=2 refusals, >=1 WITH-INSTRUMENTATION, across the reference set --
@@ -166,16 +158,16 @@ def test_capsule_verify_offline_for_a_denied_call(tmp_path):
     # Re-import the exported flat-JSONL fixture into a fresh store and verify
     # independently, matching exactly what `capsule verify --ledger <file>`
     # does for a stranger who only has the fixture, not this test's live store.
-    from cll.ledger import LedgerStore
+    from capsule_engine.guards.history import MemoryHistory, verify_record
 
-    verify_store = LedgerStore(str(tmp_path / "verify-store"))
+    verify_store = MemoryHistory()
     try:
         import json
 
         with open(fixture_path, encoding="utf-8") as fh:
             for line in fh:
-                verify_store.append(json.loads(line), consequential=False)
-        outcome = verify_store.verify(denied.capsule_id)
+                verify_store.append(json.loads(line))
+        outcome = verify_record(verify_store, verify_store.get(denied.capsule_id))
         assert outcome is not None
         assert outcome.ok, f"capsule {denied.capsule_id} failed offline verification: {outcome.findings}"
     finally:

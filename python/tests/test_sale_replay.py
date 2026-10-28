@@ -37,12 +37,12 @@ from typing import TypedDict
 
 import pytest
 from agent_action_capsule import json_digest
-from cll.ledger import LedgerStore
 
 import capsule_engine
 from capsule_engine.guards import GuardDecision, GuardEngine, LocalSigner
 from capsule_engine.guards.capsule import not_applicable_evidence
 from capsule_engine.guards.checks import RUNNABLE_CHECKS
+from capsule_engine.guards.history import MemoryHistory
 from capsule_engine.guards.history_state import INCOMPLETE, LIVE_HISTORY, STATEMENT, UNREAD
 from capsule_engine.packs import install_pack, load_pack_dir
 from capsule_engine.packs.install import engine_ask_sets
@@ -154,14 +154,14 @@ def _given_input(name: str, history: str) -> dict:
     return envelope
 
 
-def _engine(store: LedgerStore, tmp: str) -> GuardEngine:
+def _engine(store: MemoryHistory, tmp: str) -> GuardEngine:
     installed = install_pack(PACK, project_dir=Path(tmp) / "live-project", mode="observe")
     resolved = installed.resolved
     wickets = resolved.configured_wickets(RUNNABLE_CHECKS)
     gates, asks = engine_ask_sets(installed.pack, wickets)
     signer = LocalSigner(key_id="sale-replay", secret=b"sale-replay-fixture")
     return GuardEngine(
-        ledger=store, caps_fold=resolved.caps_fold(), signer_provider=lambda: signer,
+        history=store, caps_fold=resolved.caps_fold(), signer_provider=lambda: signer,
         caps_minor=resolved.caps_minor() or {}, manifest_digest=resolved.manifest_digest, wickets=wickets,
         ask_gate_selectors=gates, ask_wickets=asks, evaluate_under_record_taxonomy=True,
     )
@@ -178,10 +178,10 @@ def _live(name: str, history: str) -> Live:
     """The live decision on one check input, by a fresh engine whose ledger
     is its history (``history_ledger``), as ``test_live_history`` decides."""
     envelope = _given_input(name, history)
-    with tempfile.TemporaryDirectory() as tmp, LedgerStore(Path(tmp) / "ledger") as store:
+    with tempfile.TemporaryDirectory() as tmp, MemoryHistory() as store:
         engine = _engine(store, tmp)
         history_ledger(envelope, store)
-        ledger = [r.capsule for r in store.scan()]
+        ledger = [r.capsule for r in store.find()]
         action = action_for_check_input(envelope["record"], item_ref=envelope.get("item_ref"))
         decision = engine.check(
             action, task_authority_record=envelope.get("task_authority_record"),
@@ -217,9 +217,9 @@ def _sale_ledger(sale: SaleBundle, name: str) -> list[dict]:
     """The ledger the replay's ``single_commitment`` reads for one check:
     ``sale_history`` written by ``history_ledger``."""
     envelope = sale_history(sale, _check_input(name)["record"]["capsule_id"])
-    with tempfile.TemporaryDirectory() as tmp, LedgerStore(tmp) as store:
+    with MemoryHistory() as store:
         history_ledger(envelope, store)
-        return [r.capsule for r in store.scan()]
+        return [r.capsule for r in store.find()]
 
 
 def _s11(decision: GuardDecision):

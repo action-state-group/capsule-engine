@@ -9,7 +9,9 @@ activation, and the report computation. It draws no pages; those belong to
 
 Built on top of
 [checkpointed-local-log](https://github.com/action-state-group/checkpointed-local-log)
-(`cll.ledger`: the ledger store, chains, admission) and the public
+(`cll.log`: the entry log that orders records),
+[capsule-emit](https://github.com/action-state-group/capsule-emit)
+(`capsule_emit.artifact`: the store that holds each signed record) and the public
 [agent-action-capsule](https://github.com/action-state-group/agent-action-capsule)
 reference library for capsule parsing. No library code from either is
 vendored here; two data files are (a schema and a registry snapshot, below),
@@ -17,7 +19,7 @@ and `envcompat.py` is a small helper copied from the archived capsule-ledger.
 
 `capsule-engine` does not depend on the separate `capsule-compiler` package:
 it evaluates already-compiled artifacts (folds, packs, policy manifests)
-against the ledger. It does carry two small compiler pieces of its own:
+against the stored records. It does carry two small compiler pieces of its own:
 `compiler/` (the closed vocabulary and the advisory effect model, which
 `packs/loader.py` uses at pack-load time to validate a pack's `outcomes[]`)
 and `register/compiler.py` (the sample compiler from an obligations register
@@ -40,8 +42,8 @@ python3 -m venv .venv && source .venv/bin/activate
 pip install -e ./python
 ```
 
-`checkpointed-local-log` (0.6.0 or later), `capsule-emit` (0.12.x; 0.13 is not yet supported)
-and `agent-action-capsule` (0.11.0 or later) come from PyPI. With these steps
+`agent-action-capsule` (0.11.0 or later) comes from PyPI. `checkpointed-local-log` and `capsule-emit`
+are installed from their GitHub repositories at a pinned revision until their next releases. With these steps
 the test suite passes (`pip install pytest "mcp<2"`, then `python -m pytest` in `python/`).
 
 ## The `capsule-engine` command
@@ -50,17 +52,28 @@ the test suite passes (`pip install pytest "mcp<2"`, then `python -m pytest` in 
 |---|---|
 | `capsule-engine init --pack NAME` | Install a starter pack in observe mode: it records, it enforces nothing. |
 | `capsule-engine constraints list` | The registered guard checks and the action-class taxonomy. |
-| `capsule-engine guard dry-run --ledger PATH` | Replay a ledger through the guard checks and write a JSON report (`--share` includes the sealed capsules). |
+| `capsule-engine guard dry-run --store PATH` | Replay stored records through the guard checks and write a JSON report (`--share` includes the sealed capsules). |
 | `capsule-engine guard enforce` | Record locally that this install moved from dry-run to enforce. |
-| `capsule-engine tenant init` / `upgrade` / `list` | One engine instance per tenant: its own ledger directory, policy manifest and signing key. |
+| `capsule-engine tenant init` / `upgrade` / `list` | One engine instance per tenant: its own store directory, policy manifest and signing key. |
 | `capsule-engine telemetry status` / `funnel` | The telemetry disclosure and opt-in state; the funnel report. |
 | `capsule-engine packs propose --pack NAME` | A read-only measurability report for any pack over a JSONL corpus. |
-| `capsule-engine verify CAPSULE_ID` | Verify one ledger record, or a whole bundle file (`--bundle`). |
+| `capsule-engine verify CAPSULE_ID` | Verify one stored record (`--store`), or a whole bundle file (`--bundle`). |
 | `capsule-engine bundle` | Write a self-contained, verifiable slice of the ledger. |
 
 `verify` and `bundle` are present unless `CAPSULE_LEDGER_ARM=guards-only`
 (`packaging.py`), which keeps the guard checks and dry-run and hides the
 record-query verbs; the default is `full`. Run any command with `--help`.
+
+A store directory (`--store`, or `$CAPSULE_STORE`) holds the engine's records: a
+checkpointed-local-log entry log (`log.jsonl`) that orders them, capsule-emit's artifact store
+(`artifacts.jsonl`) that holds each signed record, and the producer public keys the store trusts
+(`trusted_keys`). Each record carries a producer envelope signed with an Ed25519 key derived from
+your own signing secret (`--key-id`/`--secret`); the secret and the derived key are never written
+to disk. Opening a store with a new secret adds its key to `trusted_keys`, and nothing removes one.
+Keep the old key after a routine rotation: the store reads a record only while its signer's key is
+listed. Delete a key only if its secret leaked, knowing that every record it signed then fails to
+read (capsule-engine#258 tracks tying key trust to the rotation timeline). `bundle` still reads a
+capsule-emit ledger (`--ledger`).
 
 ## What's here
 

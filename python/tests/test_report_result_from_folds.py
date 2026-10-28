@@ -64,7 +64,7 @@ def stub_witness(monkeypatch):
 def three_checkpoint_segment(tmp_path, stub_witness):
     """Same real-signed-chain shape as
     ``test_fold_retention_continuity.three_checkpoint_segment``."""
-    ledger_path = tmp_path / "ledger.jsonl"
+    ledger_path = tmp_path / "ledger"
     checkpoints = []
     for batch in range(3):
         for i in range(2):

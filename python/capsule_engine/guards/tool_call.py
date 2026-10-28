@@ -27,10 +27,8 @@ from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass
 
-from cll.ledger.api import LedgerAPI
-from cll.ledger.records import LedgerRecord
-
 from ..events.capsule import build_event_capsule
+from .history import History, HistoryRecord
 from .signing import Signer
 
 __all__ = ["TOOL_CALL_LANE", "ToolCallLane"]
@@ -50,7 +48,7 @@ class ToolCallLane:
     ``conversation.session.ConversationSession``'s shape: ``signer_provider``
     is called once per record, never cached."""
 
-    ledger: LedgerAPI
+    history: History
     operator: str
     developer: str
     signer_provider: Callable[[], Signer]
@@ -64,7 +62,7 @@ class ToolCallLane:
         action_id: str | None = None,
         chain_parent: str | None = None,
         chain_relation: str | None = None,
-    ) -> LedgerRecord:
+    ) -> HistoryRecord:
         """Record one tool-call READ as a passive ``fyi`` capsule, event
         ``verb`` (e.g. ``"read_user_directory"``) -- never gated, same as
         every other observation this codebase records with
@@ -80,4 +78,4 @@ class ToolCallLane:
             chain_parent=chain_parent,
             chain_relation=chain_relation,
         )
-        return self.ledger.append(capsule, consequential=False)
+        return self.history.append(capsule)

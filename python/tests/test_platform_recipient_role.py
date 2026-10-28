@@ -16,7 +16,6 @@ from pathlib import Path
 
 import pytest
 from agent_action_capsule import json_digest
-from cll.ledger import LedgerStore
 
 from capsule_engine.guards import Action, LocalSigner
 from capsule_engine.guards.action import disclosed_classes_of
@@ -26,6 +25,7 @@ from capsule_engine.guards.checks import (
     check_recipient_role,
     check_release_on_acceptance,
 )
+from capsule_engine.guards.history import MemoryHistory
 from capsule_engine.guards.wickets import load_definition_file
 from capsule_engine.packs import build_engine, install_pack, load_pack_dir
 from capsule_engine.packs.obligation_results import obligation_results
@@ -229,12 +229,12 @@ def test_an_exception_must_narrow_a_selector_with_a_list_of_roles(selector, mess
 
 @pytest.fixture
 def ledger(tmp_path):
-    store = LedgerStore(tmp_path / "ledger")
+    store = MemoryHistory()
     yield store
     store.close()
 
 
-def _release(definition, action: Action, ledger: LedgerStore):
+def _release(definition, action: Action, ledger: MemoryHistory):
     config = definition.config
     return check_release_on_acceptance(
         action, ledger, release_classes=config["release_classes"],
@@ -262,9 +262,9 @@ def _decide(pack: str, actions: list[Action], tmp_path: Path):
     installed = install_pack(load_pack_dir(ROOT / "packs" / "catalog" / pack), project_dir=tmp_path / "project",
                              mode="observe")
     signer = LocalSigner(key_id="platform-test-key", secret=b"platform-test-fixed-key")
-    store = LedgerStore(tmp_path / "ledger")
+    store = MemoryHistory()
     try:
-        engine = build_engine(installed, ledger=store, signer_provider=lambda: signer)
+        engine = build_engine(installed, history=store, signer_provider=lambda: signer)
         return installed.pack, [engine.check(a, dry_run=True) for a in actions]
     finally:
         store.close()
@@ -297,9 +297,9 @@ def test_frozen_everyday_0_3_6_still_loads_at_its_digest_and_refuses_the_email(t
         "asg/everyday/0.3.6", "8a8e0a7e1ca4319b6e45f2037f4af49e6592919f373e59874ce1ead7249b073d")
     installed = install_pack(pack, project_dir=tmp_path / "project", mode="observe")
     signer = LocalSigner(key_id="platform-test-key", secret=b"platform-test-fixed-key")
-    store = LedgerStore(tmp_path / "ledger")
+    store = MemoryHistory()
     try:
-        decision = build_engine(installed, ledger=store, signer_provider=lambda: signer).check(_share(), dry_run=True)
+        decision = build_engine(installed, history=store, signer_provider=lambda: signer).check(_share(), dry_run=True)
     finally:
         store.close()
     assert decision.outcome == DENY

@@ -18,9 +18,9 @@ import json
 from pathlib import Path
 
 import pytest
-from cll.ledger import LedgerStore
 
 from capsule_engine.guards.capsule import act_payload
+from capsule_engine.guards.history import MemoryHistory
 from capsule_engine.guards.history_state import LIVE_HISTORY, STATED_AMOUNT
 from capsule_engine.packs import load_pack_dir
 from capsule_engine.report.live_check import decide_check_input
@@ -89,10 +89,10 @@ def test_the_stated_amount_is_the_ledger_s_own_and_never_keys_dedupe(tmp_path):
     carries the stated amount beside it only for the window. No decision
     seals it."""
     envelope = _envelope("no-spend")
-    store = LedgerStore(tmp_path / "ledger")
+    store = MemoryHistory()
     try:
         history_ledger(envelope, store)
-        (copy,) = [r.capsule for r in store.scan() if r.capsule["capsule_id"] == envelope["history"][0]["capsule_id"]]
+        (copy,) = [r.capsule for r in store.find() if r.capsule["capsule_id"] == envelope["history"][0]["capsule_id"]]
     finally:
         store.close()
     payload = copy["asg_payload"]
@@ -101,10 +101,10 @@ def test_the_stated_amount_is_the_ledger_s_own_and_never_keys_dedupe(tmp_path):
     assert payload[LIVE_HISTORY] == "disposition"
     assert STATED_AMOUNT not in act_payload(action_for_history_entry(envelope["history"][0]))
     with_spend = _envelope("spend-below-amount")["history"][0]
-    store = LedgerStore(tmp_path / "ledger-2")
+    store = MemoryHistory()
     try:
         history_ledger({**envelope, "history": [with_spend]}, store)
-        (copy,) = [r.capsule for r in store.scan() if r.capsule["capsule_id"] == with_spend["capsule_id"]]
+        (copy,) = [r.capsule for r in store.find() if r.capsule["capsule_id"] == with_spend["capsule_id"]]
     finally:
         store.close()
     assert copy["asg_payload"]["amount_minor"] == 3000

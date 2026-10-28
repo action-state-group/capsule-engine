@@ -14,12 +14,12 @@ from pathlib import Path
 
 import pytest
 from agent_action_capsule import json_digest
-from cll.ledger import LedgerStore
 
 from capsule_engine.guards import Action, LocalSigner
 from capsule_engine.guards.action import repeat_disclosures_of
 from capsule_engine.guards.capsule import ALLOW, ESCALATE, act_payload
 from capsule_engine.guards.checks import check_action_class_gate
+from capsule_engine.guards.history import MemoryHistory
 from capsule_engine.guards.wickets import load_definition_file
 from capsule_engine.packs import build_engine, install_pack, load_pack_dir
 from capsule_engine.packs.obligation_results import obligation_results
@@ -185,9 +185,9 @@ def test_the_telling_inputs_are_never_sealed_on_the_decision():
 def _decide(pack_dir: Path, actions: list[Action], tmp_path: Path):
     installed = install_pack(load_pack_dir(pack_dir), project_dir=tmp_path / "project", mode="observe")
     signer = LocalSigner(key_id="repeat-test-key", secret=b"repeat-test-fixed-key")
-    store = LedgerStore(tmp_path / "ledger")
+    store = MemoryHistory()
     try:
-        engine = build_engine(installed, ledger=store, signer_provider=lambda: signer)
+        engine = build_engine(installed, history=store, signer_provider=lambda: signer)
         return installed.pack, [engine.check(a, dry_run=True) for a in actions]
     finally:
         store.close()

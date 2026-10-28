@@ -43,7 +43,7 @@ def three_checkpoint_segment(tmp_path, stub_witness):
     """Three real, signed checkpoints, two capsules apiece -- every link
     verifiable in range. Mirrors capsule-emit's own ``three_checkpoint_ledger``
     fixture."""
-    ledger_path = tmp_path / "ledger.jsonl"
+    ledger_path = tmp_path / "ledger"
     checkpoints = []
     for batch in range(3):
         for i in range(2):

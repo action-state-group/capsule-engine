@@ -2,7 +2,7 @@
 """caps check: a fold predicate over T1's fold engine.
 
 ``weekly_spend + amount <= cap``, where ``weekly_spend`` is the T1 fold's
-own evaluated result (a real replay over the ledger, never a number the
+own evaluated result (a real replay over the history, never a number the
 guard computes itself) and ``amount`` is this action's own, not-yet-
 recorded amount. Records that carry no amount (imported/foreign capsules,
 or non-money actions) are skipped by the fold engine itself (spec §3
@@ -45,7 +45,7 @@ Under a fold without one the evidence keeps the shape it had.
 
 Under a fold that also counts executed acts (``spend.weekly/3.1.0``, whose
 filter admits ``EXECUTED_DECISION``) a replay, or a live check's history
-ledger, writes a record for each executed act (``report/replay.py``,
+history, writes a record for each executed act (``report/replay.py``,
 ``ExecutedActs``). One whose spend could not be read carries
 ``asg_payload.spend_unreadable`` and no amount, so the fold skips it. With one
 in the window the total is not known: the check is ``n/a``, in scope, naming
@@ -77,13 +77,12 @@ from collections.abc import Mapping
 from dataclasses import replace
 from typing import Literal, NotRequired, TypedDict
 
-from cll.ledger.api import LedgerAPI, ScanQuery
-
 from ...folds.definition import FilterClause, FoldDefinition, ReadField, Reduce
 from ...folds.engine import EvaluationTrace, ReversalSummary, evaluate_one
 from ..action import Action
 from ..capsule import ConstraintOutcome, not_applicable_evidence
 from ..classes import resolve
+from ..history import History, Query
 from ..history_state import INCOMPLETE, STATED_AMOUNT, WINDOW_HELD, history_state
 from .base import CheckOutcome
 
@@ -231,17 +230,16 @@ def cap_for(caps_minor: Mapping[str, int], action_class: str | None) -> int | No
     return caps_minor.get(_canonical(action_class))
 
 
-def _fold_key(action: Action, key: str | None, since: str | None) -> tuple[str | None, ScanQuery]:
+def _fold_key(action: Action, key: str | None, since: str | None) -> tuple[str | None, Query]:
     """The action's value for the fold's partition key, and a scan narrowed to it.
 
-    ``ScanQuery.counterparty`` is the ledger's filter on ``operator``.
     """
     if key == "developer":
-        return action.developer, ScanQuery(agent=action.developer, since=since)
+        return action.developer, Query(where={"developer": action.developer}, since=since)
     if key == "operator":
-        return action.operator, ScanQuery(counterparty=action.operator, since=since)
+        return action.operator, Query(where={"operator": action.operator}, since=since)
     if key is None:
-        return None, ScanQuery(since=since)
+        return None, Query(since=since)
     raise ValueError(f"caps cannot partition by fold key {key!r}; it reads developer or operator")
 
 
@@ -305,11 +303,11 @@ def _count_in_window(definition: FoldDefinition, records: list[dict], key_value:
     return evaluate_one(probe, records, key_value=key_value, as_of=as_of).result or 0
 
 
-def _operator_history_incomplete(ledger: LedgerAPI, action: Action) -> bool:
+def _operator_history_incomplete(history: History, action: Action) -> bool:
     """Whether ``action``'s operator's records hold a live history's
     ``incomplete`` record, which is written under the checked record's
     operator."""
-    return any(history_state(r.capsule) == INCOMPLETE for r in ledger.scan(ScanQuery(counterparty=action.operator)))
+    return any(history_state(r.capsule) == INCOMPLETE for r in history.find(Query(where={"operator": action.operator})))
 
 
 def _window_held(records: list[dict]) -> str | None:
@@ -351,7 +349,7 @@ def _per_action_basis(action: Action, amount_minor: int) -> PerActionBasis:
 
 def check_caps(
     action: Action,
-    ledger: LedgerAPI,
+    history: History,
     *,
     definition: FoldDefinition,
     cap_minor: int,
@@ -378,15 +376,15 @@ def check_caps(
         )
 
     key_value, query = _fold_key(action, definition.key, since)
-    records = [_window_record(r.capsule) for r in ledger.scan(query)]
+    records = [_window_record(r.capsule) for r in history.find(query)]
     anchor = as_of or action.resolved_timestamp()
     trace = evaluate_one(definition, records, key_value=key_value, as_of=anchor)
     unreadable = _unreadable_in_window(definition, records, key_value, anchor) if counts_executed_acts(definition) else 0
     # Under a fold keyed by operator the records read already hold the operator's marker.
     incomplete = (any(history_state(capsule) == INCOMPLETE for capsule in records) if definition.key == "operator"
-                  else _operator_history_incomplete(ledger, action))
+                  else _operator_history_incomplete(history, action))
     held = _window_held(records if definition.key == "operator"
-                        else [r.capsule for r in ledger.scan(ScanQuery(counterparty=action.operator))])
+                        else [r.capsule for r in history.find(Query(where={"operator": action.operator}))])
     weekly_spend = trace.result or 0
     projected = weekly_spend + action.amount_minor
     envelope = trace.to_envelope()

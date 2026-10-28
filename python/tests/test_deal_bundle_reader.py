@@ -135,7 +135,7 @@ def test_a_cancel_after_an_over_cap_purchase_passes_caps(bundle, action_class):
 
 def _dry_run(tmp_path, capsys, bundle: Path, *extra: str) -> tuple[int, dict]:
     out = tmp_path / "report.json"
-    rc = cli_main(["guard", "dry-run", "--ledger", str(bundle), "--since", "all", "--out", str(out), "--share", *extra])
+    rc = cli_main(["guard", "dry-run", "--store", str(bundle), "--since", "all", "--out", str(out), "--share", *extra])
     capsys.readouterr()
     return rc, json.loads(out.read_text()) if out.exists() else {}
 
@@ -147,7 +147,7 @@ def _rows(payload: dict) -> list[dict]:
 def test_cli_caps_from_manifest_denies_the_purchase_and_passes_the_cancel(tmp_path, capsys):
     resolved = _resolved()
     for bundle in (REFUND, PARTIAL):
-        rc = cli_main(["guard", "dry-run", "--ledger", str(bundle), "--since", "all", "--out", str(tmp_path / "r.json"),
+        rc = cli_main(["guard", "dry-run", "--store", str(bundle), "--since", "all", "--out", str(tmp_path / "r.json"),
                        "--manifest", str(MANIFEST), "--caps-from-manifest"])
         assert rc == 0
         # The rows come from the same report the CLI renders: its capsule bodies
@@ -179,7 +179,7 @@ def test_cli_default_applies_no_manifest_caps(tmp_path, capsys):
 
 def test_cli_caps_from_manifest_needs_a_manifest(tmp_path, capsys):
     rc = cli_main(
-        ["guard", "dry-run", "--ledger", str(REFUND), "--no-manifest", "--caps-from-manifest", "--out", str(tmp_path / "r.json")]
+        ["guard", "dry-run", "--store", str(REFUND), "--no-manifest", "--caps-from-manifest", "--out", str(tmp_path / "r.json")]
     )
     assert rc == 1
     assert "needs a manifest" in capsys.readouterr().err

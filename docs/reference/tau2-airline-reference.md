@@ -13,7 +13,7 @@ $ python -m capsule_engine.examples.tau2_airline_reference --all --out-dir /tmp/
 dataset                        ALLOW      DENY   WITH-INSTRUMENTATION   CAPSULES   sample refusal capsule
 pilot1-gemini-2-5-flash        9 [1]     4 [1]                  0 [1]     22 [1]   f42fe531878454c8… (cancel_reservation, task "7")
   -> 22 [1] capsule(s) written to /tmp/tau2-airline/pilot1-gemini-2-5-flash.jsonl
-  -> verify one row offline:  capsule verify f42fe531878454c892488227c05de581068461ad26d1fac8fb2af7d4bd80345a --ledger /tmp/tau2-airline/pilot1-gemini-2-5-flash.jsonl
+  -> verify one row offline:  capsule verify f42fe531878454c892488227c05de581068461ad26d1fac8fb2af7d4bd80345a --store /tmp/tau2-airline/pilot1-gemini-2-5-flash.jsonl
 tau2-claude-3-7-sonnet        24 [2]    24 [2]                  0 [2]     72 [2]   5924a1a4e5c353b0… (cancel_reservation, task "1")
   -> 72 [2] capsule(s) written to /tmp/tau2-airline/tau2-claude-3-7-sonnet.jsonl
   ...
@@ -43,7 +43,7 @@ Then verify one denied row independently, with a different command than the
 one that wrote it:
 
 ```console
-$ capsule verify f42fe531878454c892488227c05de581068461ad26d1fac8fb2af7d4bd80345a --ledger /tmp/tau2-airline/pilot1-gemini-2-5-flash.jsonl
+$ capsule verify f42fe531878454c892488227c05de581068461ad26d1fac8fb2af7d4bd80345a --store /tmp/tau2-airline/pilot1-gemini-2-5-flash.jsonl
 ✓ verifies · f42fe531878454c892488227c05de581068461ad26d1fac8fb2af7d4bd80345a
 ```
 

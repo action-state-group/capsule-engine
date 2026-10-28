@@ -19,11 +19,11 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-from cll.ledger import LedgerStore
 
 from capsule_engine.guards import Action, GuardEngine, LocalSigner
 from capsule_engine.guards.capsule import ALLOW, DENY, ESCALATE
 from capsule_engine.guards.classes import TAXONOMY, TAXONOMY_VERSION
+from capsule_engine.guards.history import MemoryHistory
 from capsule_engine.packs import build_engine, install_pack, load_pack_dir
 
 PACK_DIR = Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog" / "everyday"
@@ -79,9 +79,9 @@ def _history_payment() -> Action:
 
 @pytest.fixture
 def engine(tmp_path):
-    store = LedgerStore(tmp_path / "ledger")
+    store = MemoryHistory()
     installed = install_pack(load_pack_dir(PACK_DIR), project_dir=tmp_path / "project", mode="observe")
-    yield build_engine(installed, ledger=store, signer_provider=lambda: SIGNER)
+    yield build_engine(installed, history=store, signer_provider=lambda: SIGNER)
     store.close()
 
 
@@ -145,7 +145,7 @@ def test_a_repeated_first_purchase_denies_though_first_contact_alone_would_ask(e
 
 @pytest.mark.parametrize("action_class", ACCOUNT_HOLDER_CLASSES)
 def test_an_over_limit_action_in_each_class_asks_without_the_pack(store, caps_fold, signer, action_class):
-    engine = GuardEngine(ledger=store, caps_fold=caps_fold, signer_provider=lambda: signer,
+    engine = GuardEngine(history=store, caps_fold=caps_fold, signer_provider=lambda: signer,
                          caps_minor={action_class: 1_000})
     action = Action(verb="commit", operator=OPERATOR, developer="household-assistant-ah@v1",
                     action_class=action_class, amount_minor=1_001, target="venue/first-contact")
@@ -155,7 +155,7 @@ def test_an_over_limit_action_in_each_class_asks_without_the_pack(store, caps_fo
 
 
 def test_an_over_limit_refund_still_denies_without_an_approver(store, caps_fold, signer):
-    engine = GuardEngine(ledger=store, caps_fold=caps_fold, signer_provider=lambda: signer,
+    engine = GuardEngine(history=store, caps_fold=caps_fold, signer_provider=lambda: signer,
                          caps_minor={"money.refund": 1_000})
     action = Action(verb="refund", operator=OPERATOR, developer="household-assistant-ah@v1",
                     action_class="money.refund", amount_minor=1_001, target="shop/garden-centre")

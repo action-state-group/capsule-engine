@@ -41,7 +41,6 @@ from capsule_emit.ledger_io import (
     require_ledger_path,
 )
 from capsule_emit.period import add_period_arg, apply_period
-from cll.ledger.api import ScanQuery
 
 from ..envcompat import env_get
 from ..guards.capsule import local_only_refusal
@@ -180,7 +179,7 @@ def run(args: argparse.Namespace) -> int:
             }
             all_ok = all_ok and result.ok
 
-        tree_size = sum(1 for _ in store.scan(ScanQuery()))
+        tree_size = sum(1 for _ in store.scan())
         completeness_certificate = _build_completeness_certificate(store, records, tree_size)
 
     echo = build_echo(

@@ -20,7 +20,7 @@ passes only when ALL hold:
   none;
 - that acceptance was sealed for the same recipient (its ``target`` equals
   the disclosure's);
-- the cited record re-verifies in the ledger.
+- the cited record re-verifies in the history.
 
 Anything else fails: no citation, a citation of another sale's or another
 buyer's acceptance, a record that is not a sealed acceptance, a missing
@@ -92,11 +92,10 @@ from __future__ import annotations
 
 from typing import TypedDict
 
-from cll.ledger.api import LedgerAPI
-
 from ..action import Action
 from ..capsule import ConstraintOutcome, NotApplicableEvidence, not_applicable_evidence
 from ..classes import resolve
+from ..history import History, verify_record
 from ..history_state import well_formed_counterparty
 from .base import CheckOutcome
 from .single_commitment import ThreadCounterparty, first_sealed_acceptance, sale_acceptance
@@ -185,7 +184,7 @@ def same_buyer(acceptance: ThreadCounterparty | None, fp_alg: str | None, ids: d
 
 def check_release_on_acceptance(
     action: Action,
-    ledger: LedgerAPI,
+    history: History,
     *,
     release_classes: list[str],
     acceptance_classes: list[str],
@@ -213,7 +212,7 @@ def check_release_on_acceptance(
         return _outcome("n/a", f"the recipient is a {action.recipient_role}, not a buyer; recipient_role measures it",
                         not_applicable_evidence(_CHECK_ID, in_scope=False), method)
     if binding is not None:
-        return _release_from_history(action, ledger, release_classes=release_classes,
+        return _release_from_history(action, history, release_classes=release_classes,
                                      acceptance_classes=acceptance_classes,
                                      pre_acceptance_classes=pre_acceptance_classes or [])
     cls = action.representation_class
@@ -228,14 +227,14 @@ def check_release_on_acceptance(
     if action.cited_mandate_capsule_id is None:
         return _outcome("fail", "the disclosure cites no acceptance", _evidence(cls, False))
 
-    acceptance = first_sealed_acceptance(action.operator, ledger, acceptance_classes, action.item_ref)
+    acceptance = first_sealed_acceptance(action.operator, history, acceptance_classes, action.item_ref)
     if (
         acceptance is None
         or action.cited_mandate_capsule_id != acceptance["capsule_id"]
         or action.target != acceptance["counterparty"]
     ):
         return _outcome("fail", _NOT_BOUND, _evidence(cls, False))
-    verified = ledger.verify(acceptance["capsule_id"])
+    verified = verify_record(history, history.get(acceptance["capsule_id"]))
     if verified is None or not verified.ok:
         return _outcome("fail", _NOT_BOUND, _evidence(cls, False))
     return _outcome("pass", "the disclosure cites this sale's sealed acceptance by this recipient",
@@ -244,7 +243,7 @@ def check_release_on_acceptance(
 
 def _release_from_history(
     action: Action,
-    ledger: LedgerAPI,
+    history: History,
     *,
     release_classes: list[str],
     acceptance_classes: list[str],
@@ -274,7 +273,7 @@ def _release_from_history(
         return _outcome("fail", "the counterparty input was not in its agreed shape; it cannot be bound to an "
                         "acceptance", _classes_evidence(classes, False, missing_field="counterparty"),
                         _HISTORY_METHOD)
-    sale = sale_acceptance(action.operator, ledger, acceptance_classes, action.item_ref)
+    sale = sale_acceptance(action.operator, history, acceptance_classes, action.item_ref)
     acceptance = sale.acceptance if sale.unknown is None else None
     if (
         acceptance is None

@@ -140,8 +140,8 @@ from agent_action_capsule import json_digest
 from agent_action_capsule.disclosure_envelope import verify_disclosure_envelope
 from agent_action_capsule.producer_envelope import verify_record_signature
 from capsule_emit.evidence_file import EvidenceFileCheck, check_evidence_file
-from cll.ledger.api import LedgerAPI
 
+from ..guards.history import History
 from .live_history import history_ledger
 from .replay import (
     ReplayResult,
@@ -687,7 +687,7 @@ def sale_checks(sale: SaleBundle) -> SaleHistory:
     uses, and gives the sale's key. ``days`` cuts that history to the acts
     sealed in that many days before the check (``sale_history``)."""
 
-    def write(capsule_id: str, ledger: LedgerAPI, days: int | None = None) -> SaleCheck | None:
+    def write(capsule_id: str, ledger: History, days: int | None = None) -> SaleCheck | None:
         envelope = sale_history(sale, capsule_id, days=days)
         if envelope is None:
             return None

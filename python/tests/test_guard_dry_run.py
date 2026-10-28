@@ -27,7 +27,7 @@ def _records(path: Path) -> list[dict]:
 
 def test_dry_run_never_blocks_and_nanda_dedupe_would_have_held(store, caps_fold, signer):
     records = _records(NANDA)
-    engine = GuardEngine(ledger=store, caps_fold=caps_fold, signer_provider=lambda: signer)
+    engine = GuardEngine(history=store, caps_fold=caps_fold, signer_provider=lambda: signer)
 
     outcomes = []
     for rec in records:
@@ -49,7 +49,7 @@ def test_dry_run_never_blocks_and_nanda_dedupe_would_have_held(store, caps_fold,
 def test_dry_run_amaury_caps_would_have_held(store, caps_fold, signer):
     records = _records(AMAURY)
     engine = GuardEngine(
-        ledger=store,
+        history=store,
         caps_fold=caps_fold,
         signer_provider=lambda: signer,
         caps_minor={"money.transfer": 10_000_000},

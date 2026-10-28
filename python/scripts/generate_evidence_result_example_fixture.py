@@ -58,7 +58,7 @@ def _signed_segment(ledger_path: Path) -> ChainSegment:
 
 def build_example_result():
     with tempfile.TemporaryDirectory() as tmp:
-        segment = _signed_segment(Path(tmp) / "ledger.jsonl")
+        segment = _signed_segment(Path(tmp) / "ledger")
 
     as_of = datetime.now(timezone.utc).isoformat()
 

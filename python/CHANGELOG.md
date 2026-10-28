@@ -5,6 +5,40 @@ module has its own changelog, `go/CHANGELOG.md`.
 
 ## Unreleased
 
+- **Breaking** (capsule-engine#255, ledger removal step 3): the engine reads and writes its records
+  through a `History` (`capsule_engine.guards.history`) instead of a `cll.ledger` ledger, and
+  imports nothing from `cll.ledger`. Each check asks the history for the records that can bear on
+  it, by equality on indexed fields and, for dedupe, the window's start; its rule over them is
+  unchanged, and every shared conformance vector decides as before. `StoreHistory` reads and writes a
+  store directory: a checkpointed-local-log entry log beside capsule-emit's artifact store. A record
+  is written with artifact `put`, then log `append`, and carries a producer envelope signed with
+  an Ed25519 key derived from the operator's signing secret (`producer_identity`), never written to
+  disk; the directory lists the public keys it trusts (`trusted_keys`). Opening it with a new
+  secret adds that secret's key, and nothing removes one. A routine rotation keeps the old key, since
+  the store reads a record only while its signer's key is listed; a key is deleted by hand only when
+  its secret leaked, and every record it signed then fails to read (capsule-engine#258). A store
+  whose log commits a record its artifact store does not hold is refused at open. A ledger
+  directory written by an earlier release is not converted: it is refused as "not a store
+  directory" (never opened as an empty store) and read with that release. `MemoryHistory` holds
+  records in memory and replaces the temporary ledgers a live check, a replay and a sale's check
+  used to write.
+  - `GuardEngine`, `HoldEngine`, `build_engine`, `record_pack_activation`, `ConversationSession` and
+    `ToolCallLane` take `history=` in place of `ledger=`. The checks, `history_ledger`,
+    `build_key_timeline`, `find_latest_activation`, `activation_records`, `read_caps_limits` and the
+    conversation readers take a `History`. A record is a `HistoryRecord` (`seq`, `capsule`,
+    `capsule_id`); `append` takes no `consequential=`.
+  - CLI: `guard dry-run --ledger`, `verify --ledger` and `init --ledger` are now `--store`, and
+    `$CAPSULE_LEDGER` is now `$CAPSULE_STORE`, read by `verify` and the MCP server. `guard dry-run`
+    still reads a JSONL file of capsules or a capsule bundle. A tenant's records are in
+    `<tenant>/store`, not `<tenant>/ledger`. `bundle` is unchanged: it still reads a capsule-emit
+    ledger with `--ledger`.
+  - MCP: `ledger_query` rows no longer carry `consequential`.
+  - The tau2 airline reference seals its policy checks with `capsule_emit.produce.seal`, which
+    writes nothing, and records them in its own history.
+  - `capsule-emit` and `checkpointed-local-log` are installed from GitHub at the merged revisions
+    this needs (capsule-emit#381, #382; checkpointed-local-log#98) until their next releases, so
+    this package cannot be released to PyPI before them.
+
 - **Breaking** (capsule-engine#175): the engine's three rendering surfaces are removed. The engine
   computes; pages are drawn by capsule-viewer. Removed released verbs and entry points:
   `capsule-engine console`; `capsule-engine bundle --with-viewer` and `--viewer-out` (the bundle file

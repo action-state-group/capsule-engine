@@ -25,12 +25,12 @@ import shutil
 from pathlib import Path
 
 import pytest
-from cll.ledger import LedgerStore
 
 from capsule_engine.guards import Action, GuardDecision, LocalSigner
 from capsule_engine.guards.capsule import ALLOW, ESCALATE
 from capsule_engine.guards.checks import fields_basis, task_authority_record_digest
 from capsule_engine.guards.classes import TAXONOMY_DIGEST, TAXONOMY_VERSION
+from capsule_engine.guards.history import MemoryHistory
 from capsule_engine.guards.wickets import load_definition_file
 from capsule_engine.guards.wickets.catalog import Catalog
 from capsule_engine.guards.wickets.retired import retired_entry
@@ -102,10 +102,10 @@ def decide(tmp_path):
 
     def run(pack: PackDefinition, action: Action) -> GuardDecision:
         n = len(stores)
-        store = LedgerStore(tmp_path / f"ledger-{n}")
+        store = MemoryHistory()
         stores.append(store)
         installed = install_pack(pack, project_dir=tmp_path / f"project-{n}", mode="observe")
-        engine = build_engine(installed, ledger=store, signer_provider=lambda: SIGNER)
+        engine = build_engine(installed, history=store, signer_provider=lambda: SIGNER)
         return engine.check(action, dry_run=True, task_authority_record=TASK_AUTHORITY)
 
     yield run

@@ -19,12 +19,12 @@ from typing import NotRequired, TypedDict
 
 import pytest
 from agent_action_capsule import json_digest
-from cll.ledger import LedgerStore
 
 from capsule_engine.folds.loader import load_definition_file as load_fold
 from capsule_engine.guards import Action, GuardEngine, LocalSigner
 from capsule_engine.guards.capsule import DENY
 from capsule_engine.guards.checks.dedupe import equivalence_key_for_action, equivalence_key_for_capsule
+from capsule_engine.guards.history import MemoryHistory
 from capsule_engine.report.replay import action_for_record, replay
 
 PACKAGE_DIR = Path(__file__).parent.parent / "capsule_engine"
@@ -206,8 +206,8 @@ def test_a_check_matches_the_same_act_decided_under_another_record_type(tmp_path
         target=check.target,
         taxonomy_version=check.taxonomy_version,
     )
-    with LedgerStore(tmp_path / "ledger") as store:
-        engine = GuardEngine(ledger=store, caps_fold=load_fold(SPEND_WEEKLY), signer_provider=lambda: signer)
+    with MemoryHistory() as store:
+        engine = GuardEngine(history=store, caps_fold=load_fold(SPEND_WEEKLY), signer_provider=lambda: signer)
         first = engine.check(earlier, dry_run=True)
         second = engine.check(check, dry_run=True)
     assert (second.outcome, _dedupe(second).evidence["matched_capsule_id"]) == (DENY, first.capsule["capsule_id"])
@@ -231,8 +231,8 @@ def test_a_repeated_check_is_refused_not_escalated_on_a_class_with_an_approver(t
 
     installed = install_pack(load_pack_dir(EVERYDAY_DIR), project_dir=tmp_path / "project", mode="enforce")
     signer = LocalSigner(key_id="dedupe-deal-act", secret=b"dedupe-deal-act")
-    with LedgerStore(tmp_path / "ledger") as store:
-        engine = build_engine(installed, ledger=store, signer_provider=lambda: signer)
+    with MemoryHistory() as store:
+        engine = build_engine(installed, history=store, signer_provider=lambda: signer)
         first = engine.check(action_for_record(*_check(2, amount=500)), dry_run=True)
         second = engine.check(action_for_record(*_check(7, at=AN_HOUR_LATER, amount=500)), dry_run=True)
     assert _dedupe(first).result == "pass"

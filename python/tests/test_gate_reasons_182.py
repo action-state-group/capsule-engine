@@ -9,9 +9,9 @@ import json
 from pathlib import Path
 
 import pytest
-from cll.ledger import LedgerStore
 
 from capsule_engine.guards import Action, LocalSigner
+from capsule_engine.guards.history import MemoryHistory
 from capsule_engine.packs import build_engine, install_pack, load_pack_dir, obligation_results
 from capsule_engine.packs.obligation_results import (
     GATE_FIRST_SHARE_UNKNOWN,
@@ -53,11 +53,11 @@ ACTIONS = {
 @pytest.fixture(scope="module")
 def results(tmp_path_factory):
     tmp = tmp_path_factory.mktemp("gate-reasons")
-    store = LedgerStore(tmp / "ledger")
+    store = MemoryHistory()
     try:
         installed = install_pack(PACK, project_dir=tmp / "project", mode="observe")
         signer = LocalSigner(key_id="gate-reasons-key", secret=b"gate-reasons-fixed-key")
-        engine = build_engine(installed, ledger=store, signer_provider=lambda: signer)
+        engine = build_engine(installed, history=store, signer_provider=lambda: signer)
         return {
             name: {r.obligation_id: (r.result, r.reason) for r in obligation_results(PACK, engine.check(a, dry_run=True).constraints)}
             for name, a in ACTIONS.items()
@@ -119,11 +119,11 @@ def test_the_sentences_are_the_shared_tables():
 
 
 def test_a_check_held_for_another_taxonomy_keeps_its_own_reason(tmp_path):
-    store = LedgerStore(tmp_path / "ledger")
+    store = MemoryHistory()
     try:
         installed = install_pack(PACK, project_dir=tmp_path / "project", mode="observe")
         signer = LocalSigner(key_id="gate-reasons-key", secret=b"gate-reasons-fixed-key")
-        engine = build_engine(installed, ledger=store, signer_provider=lambda: signer)
+        engine = build_engine(installed, history=store, signer_provider=lambda: signer)
         decision = engine.check(_action(9, "booking.create", taxonomy_version="1"), dry_run=True)
         by_rule = {r.obligation_id: r.reason for r in obligation_results(PACK, decision.constraints)}
     finally:

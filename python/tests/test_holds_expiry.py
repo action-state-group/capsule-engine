@@ -5,7 +5,7 @@ Acceptance criteria: hold-semantics spec §#52.
 """
 from __future__ import annotations
 
-from agent_action_capsule import Finding, VerificationResult
+from dataclasses import replace
 
 from capsule_engine.guards import Action
 from capsule_engine.holds import HoldStatus
@@ -70,7 +70,7 @@ def test_resume_after_expiry_is_a_fresh_evaluate_and_reserve_no_special_path(hol
     # to zero), not a reactivation of the old one.
     from capsule_engine.folds.engine import evaluate_one
 
-    records = [r.capsule for r in store.scan()]
+    records = [r.capsule for r in store.find()]
     trace = evaluate_one(hold_fold, records, key_value=DEVELOPER)
     assert trace.result == 1_000
 
@@ -171,37 +171,37 @@ def test_hold_status_ambiguous_when_reserve_record_missing(hold_engine):
 
 
 class _ForcedVerifyFailure:
-    """Wraps a real ledger, forcing ``verify()`` to fail for one capsule_id --
-    simulates the clock-skew/corruption ambiguity case (#52.4) through the
-    documented ``LedgerAPI`` extension point rather than on-disk tampering."""
+    """Wraps a real history, handing back one capsule_id's record altered so
+    it no longer verifies -- simulates the clock-skew/corruption ambiguity
+    case (#52.4) without tampering with what was written."""
 
     def __init__(self, inner, fail_for: str):
         self._inner = inner
         self._fail_for = fail_for
 
+    def _altered(self, record):
+        if record is None or record.capsule_id != self._fail_for:
+            return record
+        return replace(record, capsule={**record.capsule, "operator": "altered"})
+
     def append(self, *a, **k):
         return self._inner.append(*a, **k)
 
-    def scan(self, *a, **k):
-        return self._inner.scan(*a, **k)
+    def find(self, *a, **k):
+        return [self._altered(r) for r in self._inner.find(*a, **k)]
 
-    def fetch(self, *a, **k):
-        return self._inner.fetch(*a, **k)
+    def get(self, capsule_id):
+        return self._altered(self._inner.get(capsule_id))
 
-    def find_gaps(self, *a, **k):
-        return self._inner.find_gaps(*a, **k)
-
-    def verify(self, capsule_id):
-        if capsule_id == self._fail_for:
-            return VerificationResult(ok=False, findings=[Finding("simulated_ambiguity", "forced failure for test")])
-        return self._inner.verify(capsule_id)
+    def size(self):
+        return self._inner.size()
 
 
 def test_ambiguous_terminal_record_fails_closed_for_consequential_class(store, hold_fold, signer):
     from capsule_engine.holds import HoldEngine
 
     real_engine = HoldEngine(
-        ledger=store, hold_fold=hold_fold, fold_digest=hold_fold.definition_digest(),
+        history=store, hold_fold=hold_fold, fold_digest=hold_fold.definition_digest(),
         signer_provider=lambda: signer, cap_minor={"money.transfer": 1_000_000},
     )
     reserve = real_engine.evaluate_and_reserve(_action(amount_minor=1_000, target="acct-1"))
@@ -211,7 +211,7 @@ def test_ambiguous_terminal_record_fails_closed_for_consequential_class(store, h
 
     wrapped = _ForcedVerifyFailure(store, fail_for=expire_id)
     ambiguous_engine = HoldEngine(
-        ledger=wrapped, hold_fold=hold_fold, fold_digest=hold_fold.definition_digest(),
+        history=wrapped, hold_fold=hold_fold, fold_digest=hold_fold.definition_digest(),
         signer_provider=lambda: signer, cap_minor={"money.transfer": 1_000_000},
     )
 

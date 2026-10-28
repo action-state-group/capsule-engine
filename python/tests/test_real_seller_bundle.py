@@ -28,11 +28,11 @@ from typing import TypedDict
 
 import pytest
 from agent_action_capsule import json_digest
-from cll.ledger import LedgerStore
 
 import capsule_engine
 from capsule_engine.guards import ALLOW, ESCALATE, GuardDecision, GuardEngine, LocalSigner
 from capsule_engine.guards.checks import RUNNABLE_CHECKS
+from capsule_engine.guards.history import MemoryHistory
 from capsule_engine.packs import install_pack, load_pack_dir
 from capsule_engine.packs.install import engine_ask_sets
 from capsule_engine.packs.obligation_results import obligation_results
@@ -144,14 +144,14 @@ def _live(name: str) -> GuardDecision:
 
 def _live_entry(entry: dict) -> GuardDecision:
     """The decision on one check-input envelope, as ``_live`` makes it."""
-    with tempfile.TemporaryDirectory() as tmp, LedgerStore(Path(tmp) / "ledger") as store:
+    with tempfile.TemporaryDirectory() as tmp, MemoryHistory() as store:
         installed = install_pack(PACK, project_dir=Path(tmp) / "live-project", mode="observe")
         resolved = installed.resolved
         wickets = resolved.configured_wickets(RUNNABLE_CHECKS)
         gates, asks = engine_ask_sets(installed.pack, wickets)
         signer = LocalSigner(key_id="real-seller", secret=b"real-seller-fixture")
         engine = GuardEngine(
-            ledger=store, caps_fold=resolved.caps_fold(), signer_provider=lambda: signer,
+            history=store, caps_fold=resolved.caps_fold(), signer_provider=lambda: signer,
             caps_minor=resolved.caps_minor() or {}, manifest_digest=resolved.manifest_digest, wickets=wickets,
             ask_gate_selectors=gates, ask_wickets=asks, evaluate_under_record_taxonomy=True,
         )

@@ -17,7 +17,7 @@ point).
 
 **Pure function of ``(action, plan)`` -- no ledger read.** Unlike ``caps``
 (``guards/checks/caps.py``, a real fold replay over ledger history), this
-check never calls ``ledger.scan``/``ledger.fetch``. That means it has no
+check never calls ``history.find``/``history.get``. That means it has no
 read-decide-append window and is not exposed to the caps race -- see
 ``tests/test_plan_containment_check.py``'s explicit lock-independence test, which is the property under test, not a comment
 asserting it.
@@ -105,7 +105,7 @@ def check_plan_containment(action: Action, plan: PlanDefinition | None) -> Check
             # and its digest, forever, with no ledger access. Contrast
             # ``caps`` (``guards/checks/caps.py``): its evidence is a
             # function of ledger state read at decision time
-            # (``ledger.scan``), which is not itself sealed onto the
+            # (``history.find``), which is not itself sealed onto the
             # capsule, so a caps verdict is attested, not replayed --
             # see ``tests/test_plan_containment_check.py::
             # test_evidence_is_re_derivable_from_the_disclosed_record_alone``.

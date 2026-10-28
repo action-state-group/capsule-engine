@@ -27,7 +27,7 @@ Public surface:
   capsule(s) it gave rise to (e.g. a caller's own tool-call capsules),
   resolved back via ``find_turn_reference``.
 - ``find_session_turns`` / ``find_session_close`` / ``find_turn_reference``
-  -- read a session (or a cross-reference) back off any ``LedgerAPI``.
+  -- read a session (or a cross-reference) back off any ``History``.
 - ``session_root`` / ``turn_inclusion_proof`` / ``verify_turn_inclusion`` --
   the Merkle session-digest primitives (``.merkle``).
 - ``ConversationSession`` -- the stateful recorder: seals and appends each

@@ -5,7 +5,7 @@ instance per tenant" pattern for a caller embedding this package for many
 customers. See ``docs/tenant-provisioning.md`` for the layout and the
 isolation rationale.
 
-  init    -- provision a brand-new tenant: fresh ledger dir, this tenant's
+  init    -- provision a brand-new tenant: fresh store dir, this tenant's
              own pinned manifest, first activation capsule. Refuses if the
              tenant already has anything on disk.
   upgrade -- re-materialize an existing tenant's manifest (e.g. after a
@@ -83,7 +83,7 @@ def _cmd_tenant_init(args: argparse.Namespace) -> int:
         return 1
 
     print(f"provisioned tenant {args.tenant_id!r} at {result.layout.root}")
-    print(f"  ledger:          {result.layout.ledger_dir}")
+    print(f"  store:           {result.layout.store_dir}")
     print(f"  manifest:        {result.layout.manifest_path}")
     print(f"  manifest id:     {result.manifest_id}")
     print(f"  manifest digest: {result.manifest_digest}")
@@ -169,7 +169,7 @@ def add_parser(sub: argparse._SubParsersAction) -> argparse.ArgumentParser:
     tenant.set_defaults(tenant_parser=tenant)
 
     p_init = tenant_sub.add_parser(
-        "init", help="provision a brand-new tenant instance (ledger dir + manifest + first activation)"
+        "init", help="provision a brand-new tenant instance (store dir + manifest + first activation)"
     )
     p_init.add_argument("--tenants-root", required=True, help="directory holding one subdirectory per tenant")
     p_init.add_argument("--tenant-id", required=True, help="this tenant's id (becomes a directory name -- lowercase, digits, hyphens)")

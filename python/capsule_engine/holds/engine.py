@@ -19,8 +19,6 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from enum import Enum
 
-from cll.ledger.api import LedgerAPI
-
 from ..folds.definition import FoldDefinition
 from ..guards.action import Action
 from ..guards.capsule import (
@@ -41,6 +39,7 @@ from ..guards.checks import (
 )
 from ..guards.classes import classify
 from ..guards.engine import _decide
+from ..guards.history import History, Query, verify_record
 from ..guards.signing import Signer, SigningKeyUnavailable
 from .capsules import (
     SUPERSEDES,
@@ -117,7 +116,7 @@ class HoldEngine:
     def __init__(
         self,
         *,
-        ledger: LedgerAPI,
+        history: History,
         hold_fold: FoldDefinition,
         fold_digest: str,
         signer_provider: Callable[[], Signer | None],
@@ -130,7 +129,7 @@ class HoldEngine:
         manifest_digest: str | None = None,
         scope_locks: ScopeLocks | None = None,
     ) -> None:
-        self._ledger = ledger
+        self._history = history
         self._hold_fold = hold_fold
         self._fold_digest = fold_digest
         self._signer_provider = signer_provider
@@ -150,7 +149,7 @@ class HoldEngine:
             return None
 
     def _tree_size(self) -> int:
-        return sum(1 for _ in self._ledger.scan())
+        return self._history.size()
 
     def _checkpoint(self) -> dict:
         return {"tree_size": self._tree_size(), "age_ms": self._checkpoint_age_ms(), "anchor_status": "unanchored"}
@@ -210,16 +209,16 @@ class HoldEngine:
             reason={"outcome": DENY, "constraints": [{"id": "sequencer_availability", "result": "fail"}]},
             manifest_digest=self._manifest_digest,
         )
-        self._ledger.append(capsule, consequential=True)
+        self._history.append(capsule)
         return HoldDecision(outcome=DENY, capsule=capsule, reason=reason, reason_code=SEQUENCER_UNAVAILABLE)
 
     def _evaluate_and_reserve_locked(self, action: Action, *, signer: Signer, age_ms: int) -> HoldDecision:
         ac = classify(action.action_class)
-        dedupe_out = check_dedupe(action, self._ledger)
+        dedupe_out = check_dedupe(action, self._history)
         cap_minor = cap_for(self._cap_minor, action.action_class)
         if cap_minor is not None:
             caps_out = check_caps(
-                action, self._ledger, definition=self._hold_fold, cap_minor=cap_minor,
+                action, self._history, definition=self._hold_fold, cap_minor=cap_minor,
                 as_of=action.resolved_timestamp(),
             )
         else:
@@ -230,7 +229,7 @@ class HoldEngine:
                     check_type="policy", method=self._hold_fold.fold_id,
                 )
             )
-        vbd_out = check_verify_before_dispatch(action, self._ledger)
+        vbd_out = check_verify_before_dispatch(action, self._history)
 
         constraints = (dedupe_out.constraint, caps_out.constraint, vbd_out.constraint)
         outcome = _decide(constraints, ac)
@@ -244,7 +243,7 @@ class HoldEngine:
                 fold_digest=self._fold_digest, fold_envelope=envelope, checkpoint=checkpoint, signer=signer,
                 manifest_digest=self._manifest_digest,
             )
-            self._ledger.append(capsule, consequential=True)
+            self._history.append(capsule)
             return HoldDecision(
                 outcome=ALLOW, capsule=capsule, reason="reserved", hold_status=HoldStatus.ACTIVE, fold_envelope=envelope,
             )
@@ -259,7 +258,7 @@ class HoldEngine:
             reason={"outcome": outcome, "constraints": [{"id": c.id, "result": c.result} for c in constraints]},
             chain_parent=resolved_parent, chain_relation=resolved_relation, manifest_digest=self._manifest_digest,
         )
-        self._ledger.append(capsule, consequential=True)
+        self._history.append(capsule)
         return HoldDecision(outcome=outcome, capsule=capsule, reason=f"not reserved: {outcome}")
 
     # -- hold status (earliest chained terminal record wins) -------------
@@ -270,26 +269,26 @@ class HoldEngine:
         terminal record fails independent verification (clock skew,
         corruption) -- never reported as ACTIVE in that case. Mirrors
         ``agent_action_capsule.verify_store``'s own concurrent-supersedes
-        precedent: the earliest chained ``supersedes`` record in ledger
+        precedent: the earliest chained ``supersedes`` record in log
         order is authoritative."""
-        reserve_record = self._ledger.fetch(reserve_capsule_id)
+        reserve_record = self._history.get(reserve_capsule_id)
         if reserve_record is None:
             return HoldStatus.AMBIGUOUS, None
-        reserve_result = self._ledger.verify(reserve_capsule_id)
+        reserve_result = verify_record(self._history, reserve_record)
         if reserve_result is None or not reserve_result.ok:
             return HoldStatus.AMBIGUOUS, None
 
-        for record in self._ledger.scan():
+        for record in self._history.find(Query(where={"chain.parent_capsule_id": reserve_capsule_id})):
             chain = record.capsule.get("chain") or {}
             if chain.get("parent_capsule_id") != reserve_capsule_id or chain.get("relation") != SUPERSEDES:
                 continue
             verb = _verb(record.capsule)
             if verb not in _TERMINAL_VERBS:
                 continue
-            result = self._ledger.verify(record.capsule_id)
+            result = verify_record(self._history, record)
             if result is None or not result.ok:
                 return HoldStatus.AMBIGUOUS, record.capsule
-            return _STATUS_BY_VERB[verb], record.capsule  # earliest wins (scan is ledger order)
+            return _STATUS_BY_VERB[verb], record.capsule  # earliest wins (find is log order)
 
         return HoldStatus.ACTIVE, None
 
@@ -306,7 +305,7 @@ class HoldEngine:
         return self._close(reserve_capsule_id, verb="expire", reason=reason)
 
     def _close(self, reserve_capsule_id: str, *, verb: str, reason: str | None) -> HoldDecision:
-        reserve_record = self._ledger.fetch(reserve_capsule_id)
+        reserve_record = self._history.get(reserve_capsule_id)
         if reserve_record is None:
             return HoldDecision(
                 outcome=DENY, capsule=None, reason_code=HOLD_NOT_FOUND,
@@ -333,7 +332,7 @@ class HoldEngine:
                 action=attempt_action, reserve_capsule_id=reserve_capsule_id,
                 reserved_amount_minor=reserved_amount, signer=signer, reason=reason,
             )
-            self._ledger.append(capsule, consequential=True)
+            self._history.append(capsule)
             new_status = HoldStatus.RELEASED if verb == "release" else HoldStatus.EXPIRED
             return HoldDecision(outcome=ALLOW, capsule=capsule, reason=f"hold {verb}d", hold_status=new_status)
 
@@ -356,7 +355,7 @@ class HoldEngine:
         with-an-approver-role rule ``_decide`` already implements for
         ``caps``, applied here to the ``tolerance`` constraint."""
         check_integer_amount(executed_amount_minor, "executed_amount_minor")
-        reserve_record = self._ledger.fetch(reserve_capsule_id)
+        reserve_record = self._history.get(reserve_capsule_id)
         if reserve_record is None:
             return HoldDecision(
                 outcome=DENY, capsule=None, reason_code=HOLD_NOT_FOUND,
@@ -389,7 +388,7 @@ class HoldEngine:
                     executed_amount_minor=executed_amount_minor, tolerance_minor=tolerance, signer=signer,
                     manifest_digest=self._manifest_digest,
                 )
-                self._ledger.append(capsule, consequential=True)
+                self._history.append(capsule)
                 return HoldDecision(outcome=ALLOW, capsule=capsule, reason="reconciled", hold_status=HoldStatus.RECONCILED)
 
             ac = classify(action_class)
@@ -413,7 +412,7 @@ class HoldEngine:
                 reason={"outcome": outcome, "constraints": [{"id": "tolerance", "result": "fail"}], "reason_code": OVER_TOLERANCE},
                 chain_parent=reserve_capsule_id, chain_relation="confirms", manifest_digest=self._manifest_digest,
             )
-            self._ledger.append(capsule, consequential=True)
+            self._history.append(capsule)
             return HoldDecision(
                 outcome=outcome, capsule=capsule,
                 reason="over-tolerance conversion; routed as a limit event, aggregate not silently adjusted",
@@ -455,7 +454,7 @@ class HoldEngine:
             reason={"outcome": DENY, "constraints": [{"id": "hold_status", "result": "fail"}], "reason_code": reason_code},
             chain_parent=chain_parent, chain_relation="confirms", manifest_digest=self._manifest_digest,
         )
-        self._ledger.append(capsule, consequential=True)
+        self._history.append(capsule)
         return HoldDecision(outcome=DENY, capsule=capsule, reason=reason_text, reason_code=reason_code, hold_status=status)
 
 

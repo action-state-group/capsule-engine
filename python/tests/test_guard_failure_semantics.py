@@ -5,40 +5,33 @@ short version of the table each test below cites.
 """
 from dataclasses import dataclass
 
-from cll.ledger import LedgerAPI
-
 from capsule_engine.guards import Action, GuardEngine, LocalSigner, SigningKeyUnavailable
 from capsule_engine.guards.classes import classify
+from capsule_engine.guards.history import History
 
 
 @dataclass
 class FlakyLedger:
-    """Wraps a real LedgerAPI; raises on append() when armed, to simulate a
+    """Wraps a real History; raises on append() when armed, to simulate a
     disk-full/WAL-error failure. Everything else delegates straight through."""
 
-    inner: LedgerAPI
+    inner: History
     fail_next_append: bool = False
 
-    def append(self, capsule, *, consequential=True):
+    def append(self, capsule):
         if self.fail_next_append:
             self.fail_next_append = False
             raise OSError("simulated disk full")
-        return self.inner.append(capsule, consequential=consequential)
+        return self.inner.append(capsule)
 
-    def scan(self, query=None):
-        return self.inner.scan(query)
+    def find(self, query=None):
+        return self.inner.find(query)
 
-    def fetch(self, capsule_id):
-        return self.inner.fetch(capsule_id)
+    def get(self, capsule_id):
+        return self.inner.get(capsule_id)
 
-    def verify(self, capsule_id):
-        return self.inner.verify(capsule_id)
-
-    def find_gaps(self):
-        return self.inner.find_gaps()
-
-    def reindex(self):
-        return self.inner.reindex()
+    def size(self):
+        return self.inner.size()
 
 
 def _action(**overrides):
@@ -52,7 +45,7 @@ def _action(**overrides):
 
 def test_ledger_append_fails_closed_and_records_degradation_on_recovery(store, caps_fold, signer):
     flaky = FlakyLedger(inner=store)
-    engine = GuardEngine(ledger=flaky, caps_fold=caps_fold, signer_provider=lambda: signer)
+    engine = GuardEngine(history=flaky, caps_fold=caps_fold, signer_provider=lambda: signer)
 
     flaky.fail_next_append = True
     decision = engine.check(_action(action_class="money.transfer"))
@@ -70,7 +63,7 @@ def test_ledger_append_fails_closed_and_records_degradation_on_recovery(store, c
 
     recovered = [
         r
-        for r in store.scan()
+        for r in store.find()
         if (r.capsule.get("asg_payload") or {}).get("event") == "degradation_recovered"
     ]
     assert len(recovered) == 1
@@ -89,7 +82,7 @@ def test_signing_key_unavailable_fails_closed_key_id_on_recovery_and_operator_al
             raise SigningKeyUnavailable("no key material present")
         return signer
 
-    engine = GuardEngine(ledger=store, caps_fold=caps_fold, signer_provider=provider)
+    engine = GuardEngine(history=store, caps_fold=caps_fold, signer_provider=provider)
 
     decision = engine.check(_action())
     assert decision.outcome == "deny"
@@ -108,7 +101,7 @@ def test_signing_key_unavailable_fails_closed_key_id_on_recovery_and_operator_al
     # (b) the key-unavailable condition produces an operator-alert record on
     # recovery, not just a silent fail-closed.
     alerts = [
-        r for r in store.scan() if (r.capsule.get("asg_payload") or {}).get("event") == "operator_alert"
+        r for r in store.find() if (r.capsule.get("asg_payload") or {}).get("event") == "operator_alert"
     ]
     assert len(alerts) == 1
     assert alerts[0].capsule["asg_payload"]["detail"]["kind"] == "signing_key"
@@ -120,7 +113,7 @@ def test_signing_key_unavailable_fails_closed_key_id_on_recovery_and_operator_al
 def test_local_view_unhealthy_fails_closed_then_rebuilds_and_resumes(store, caps_fold, signer):
     healthy = {"value": False}
     engine = GuardEngine(
-        ledger=store, caps_fold=caps_fold, signer_provider=lambda: signer, view_healthy=lambda: healthy["value"]
+        history=store, caps_fold=caps_fold, signer_provider=lambda: signer, view_healthy=lambda: healthy["value"]
     )
 
     decision = engine.check(_action())
@@ -140,7 +133,7 @@ def test_local_view_unhealthy_fails_closed_then_rebuilds_and_resumes(store, caps
 
 def test_stale_view_fails_closed_for_consequential_class(store, caps_fold, signer):
     engine = GuardEngine(
-        ledger=store,
+        history=store,
         caps_fold=caps_fold,
         signer_provider=lambda: signer,
         freshness_bound_ms=5_000,
@@ -155,7 +148,7 @@ def test_stale_view_fails_closed_for_consequential_class(store, caps_fold, signe
 
 def test_stale_view_fails_open_only_for_explicitly_configured_low_risk_class(store, caps_fold, signer):
     engine = GuardEngine(
-        ledger=store,
+        history=store,
         caps_fold=caps_fold,
         signer_provider=lambda: signer,
         freshness_bound_ms=5_000,
@@ -172,7 +165,7 @@ def test_stale_view_fails_open_only_for_explicitly_configured_low_risk_class(sto
 
 def test_engine_unreachable_fails_closed_by_default(store, caps_fold, signer):
     engine = GuardEngine(
-        ledger=store, caps_fold=caps_fold, signer_provider=lambda: signer, engine_available=lambda: False
+        history=store, caps_fold=caps_fold, signer_provider=lambda: signer, engine_available=lambda: False
     )
     decision = engine.check(_action(action_class="money.transfer"))
     assert decision.outcome == "deny"
@@ -181,7 +174,7 @@ def test_engine_unreachable_fails_closed_by_default(store, caps_fold, signer):
 
 def test_engine_unreachable_fails_open_only_with_explicit_per_class_opt_in(store, caps_fold, signer):
     engine = GuardEngine(
-        ledger=store,
+        history=store,
         caps_fold=caps_fold,
         signer_provider=lambda: signer,
         engine_available=lambda: False,
@@ -197,7 +190,7 @@ def test_engine_unreachable_fails_open_only_with_explicit_per_class_opt_in(store
 
 def test_anchor_witness_unreachable_never_blocks(store, caps_fold, signer):
     engine = GuardEngine(
-        ledger=store, caps_fold=caps_fold, signer_provider=lambda: signer, witness_reachable=lambda: False
+        history=store, caps_fold=caps_fold, signer_provider=lambda: signer, witness_reachable=lambda: False
     )
     decision = engine.check(_action())
     assert decision.outcome == "allow"
@@ -216,7 +209,7 @@ def test_unclassified_action_defaults_to_consequential_fail_closed():
 
 def test_unclassified_action_cannot_fail_open_even_if_misconfigured(store, caps_fold, signer):
     engine = GuardEngine(
-        ledger=store,
+        history=store,
         caps_fold=caps_fold,
         signer_provider=lambda: signer,
         freshness_bound_ms=5_000,

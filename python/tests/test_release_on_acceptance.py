@@ -10,17 +10,17 @@ each test names the one condition it removes."""
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
-from cll.ledger import LedgerStore
-from cll.ledger.api import VerificationResult
 
 from capsule_engine.folds.loader import load_definition_file as load_fold
 from capsule_engine.guards import Action, GuardEngine
 from capsule_engine.guards.capsule import ALLOW, DENY
 from capsule_engine.guards.checks import CONFIGURED_CHECKS, check_release_on_acceptance
 from capsule_engine.guards.classes import resolve
+from capsule_engine.guards.history import HistoryRecord, MemoryHistory
 from capsule_engine.guards.wickets import load_definition_file
 
 ROOT = Path(__file__).parent.parent / "capsule_engine"
@@ -43,7 +43,7 @@ VALUES = (SALE, OTHER_SALE, ITEM, OTHER_ITEM, BUYER_A, BUYER_B)
 
 
 def _engine(store, signer) -> GuardEngine:
-    return GuardEngine(ledger=store, caps_fold=SPEND, signer_provider=lambda: signer, wickets=(RELEASE,))
+    return GuardEngine(history=store, caps_fold=SPEND, signer_provider=lambda: signer, wickets=(RELEASE,))
 
 
 def _accept(engine, n: int, *, target: str = BUYER_A, sale: str = SALE, item: str = ITEM,
@@ -186,23 +186,27 @@ def test_a_later_acceptance_of_the_same_sale_fails(store, signer):
     assert _check(_share(target=BUYER_B, cited_mandate_capsule_id=later), store).result == "fail"
 
 
-class _NothingVerifies(LedgerStore):
-    """A ledger that finds no record to verify (``verify`` returns None)."""
+class _NothingVerifies(MemoryHistory):
+    """A history that finds no record by id to verify (``get`` returns None)."""
 
-    def verify(self, capsule_id: str) -> VerificationResult | None:
+    def get(self, capsule_id: str) -> HistoryRecord | None:
         return None
 
 
-class _NothingReverifies(LedgerStore):
-    """A ledger whose verifier finds every record altered (``ok`` False)."""
+class _NothingReverifies(MemoryHistory):
+    """A history whose every record read back by id is altered, so it no
+    longer verifies."""
 
-    def verify(self, capsule_id: str) -> VerificationResult | None:
-        return VerificationResult(ok=False, capsule_id=capsule_id)
+    def get(self, capsule_id: str) -> HistoryRecord | None:
+        record = super().get(capsule_id)
+        if record is None:
+            return None
+        return replace(record, capsule={**record.capsule, "operator": "altered"})
 
 
 @pytest.mark.parametrize("ledger_type", [_NothingVerifies, _NothingReverifies])
 def test_an_acceptance_that_does_not_reverify_fails(tmp_path, signer, ledger_type):
-    store = ledger_type(tmp_path / "ledger")
+    store = ledger_type()
     try:
         accepted = _accept(_engine(store, signer), 1)
         assert _check(_share(cited_mandate_capsule_id=accepted), store).result == "fail"

@@ -153,7 +153,7 @@ def test_guard_dry_run_configuring_a_cap_emits_m1_when_opted_in(opted_in, state_
     try:
         out = tmp_path / "report.json"
         rc = cli_main(
-            ["guard", "dry-run", "--ledger", str(NANDA), "--since", "7d", "--out", str(out), "--cap", "money.transfer=1"]
+            ["guard", "dry-run", "--store", str(NANDA), "--since", "7d", "--out", str(out), "--cap", "money.transfer=1"]
         )
         assert rc == 0
     finally:
@@ -170,7 +170,7 @@ def test_guard_dry_run_configuring_a_cap_emits_m1_when_opted_in(opted_in, state_
 def test_guard_dry_run_without_opt_in_emits_nothing(opted_out, state_dir, tmp_path):
     out = tmp_path / "report.json"
     rc = cli_main(
-        ["guard", "dry-run", "--ledger", str(NANDA), "--since", "7d", "--out", str(out), "--cap", "money.transfer=1"]
+        ["guard", "dry-run", "--store", str(NANDA), "--since", "7d", "--out", str(out), "--cap", "money.transfer=1"]
     )
     assert rc == 0
     assert not state_dir.exists()

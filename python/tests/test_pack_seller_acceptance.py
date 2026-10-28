@@ -35,7 +35,6 @@ import tempfile
 from pathlib import Path
 
 import pytest
-from cll.ledger import LedgerStore
 
 from capsule_engine.guards import Action, GuardDecision, LocalSigner
 from capsule_engine.guards.capsule import ALLOW, DENY, ESCALATE
@@ -48,6 +47,7 @@ from capsule_engine.guards.checks import (
     task_authority_record_digest,
 )
 from capsule_engine.guards.checks.commitment import text_commitment
+from capsule_engine.guards.history import MemoryHistory, verify_record
 from capsule_engine.packs import build_engine, install_pack, load_pack_dir, record_pack_activation
 from capsule_engine.report.live_history import history_act_payload
 
@@ -535,10 +535,10 @@ def _run_scenarios(ledger, *, project_dir, decisions: dict[str, GuardDecision] |
 
     installed = install_pack(load_pack_dir(PACK_DIR), project_dir=project_dir, mode="observe")
     signer = _signer()
-    engine = build_engine(installed, ledger=ledger, signer_provider=lambda: signer)
+    engine = build_engine(installed, history=ledger, signer_provider=lambda: signer)
     activation = record_pack_activation(
         installed,
-        ledger=ledger,
+        history=ledger,
         operator=OPERATOR,
         developer="capsule-init-tool",
         signer=signer,
@@ -552,9 +552,9 @@ def _run_scenarios(ledger, *, project_dir, decisions: dict[str, GuardDecision] |
         if action.cited_mandate_capsule_id in CITED:
             cited = capsules[CITED[action.cited_mandate_capsule_id]]["capsule_id"]
             action = dataclasses.replace(action, cited_mandate_capsule_id=cited)
-        with tempfile.TemporaryDirectory() as tmp, LedgerStore(tmp) as release_history:
+        with MemoryHistory() as release_history:
             for record in history:
-                release_history.append(dict(record), consequential=False)
+                release_history.append(dict(record))
             decision = engine.check(
                 action,
                 dry_run=name not in REAL_RUN,
@@ -571,7 +571,7 @@ def _run_scenarios(ledger, *, project_dir, decisions: dict[str, GuardDecision] |
         capsules[name] = decision.capsule
         if decisions is not None:
             decisions[name] = decision
-    return installed, activation, capsules, list(ledger.scan())
+    return installed, activation, capsules, list(ledger.find())
 
 
 def _history_act(action: Action, capsule: dict) -> dict:
@@ -587,12 +587,12 @@ def _history_act(action: Action, capsule: dict) -> dict:
 @pytest.fixture(scope="module")
 def run(tmp_path_factory):
     tmp = tmp_path_factory.mktemp("seller")
-    store = LedgerStore(tmp / "ledger")
+    store = MemoryHistory()
     decisions: dict[str, GuardDecision] = {}
     try:
         installed, activation, capsules, records = _run_scenarios(store, project_dir=tmp / "project",
                                                                   decisions=decisions)
-        verified = {name: store.verify(c["capsule_id"]) for name, c in capsules.items()}
+        verified = {name: verify_record(store, store.get(c["capsule_id"])) for name, c in capsules.items()}
     finally:
         store.close()
     return installed, activation, capsules, records, verified, decisions
@@ -1016,7 +1016,7 @@ def test_fixture_is_reproducible_byte_for_byte(run):
 def _regenerate_fixture() -> None:
     with tempfile.TemporaryDirectory() as tmp:
         tmp = Path(tmp)
-        store = LedgerStore(tmp / "ledger")
+        store = MemoryHistory()
         try:
             _, _, _, records = _run_scenarios(store, project_dir=tmp / "project")
         finally:

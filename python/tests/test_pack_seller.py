@@ -43,12 +43,12 @@ from pathlib import Path
 import pytest
 import yaml
 from agent_action_capsule.canonical import json_digest
-from cll.ledger import LedgerStore
 
 from capsule_engine.guards import Action, LocalSigner
 from capsule_engine.guards.capsule import ALLOW, DENY, not_applicable_evidence
 from capsule_engine.guards.checks import AuthorizationRecord, authorization_record_digest
 from capsule_engine.guards.classes import TAXONOMY_VERSION
+from capsule_engine.guards.history import MemoryHistory
 from capsule_engine.guards.wickets import Catalog
 from capsule_engine.packs import build_engine, install_pack
 from capsule_engine.packs.errors import PackDefinitionError
@@ -292,7 +292,7 @@ def _scenario_run(pack_dir: Path, tmp_path: Path, decisions: dict | None = None)
         acceptance.EXPECTED_OVERRIDES = acceptance.BEFORE_PICKUP_AREA
     elif pack_dir != PACK_DIR:
         acceptance.EXPECTED_OVERRIDES = acceptance.BEFORE_PLATFORM
-    store = LedgerStore(tmp_path / "ledger")
+    store = MemoryHistory()
     try:
         _, _, capsules, _ = acceptance._run_scenarios(store, project_dir=tmp_path / "project", decisions=decisions)
     finally:
@@ -520,9 +520,9 @@ def _engines(tmp_path: Path):
     signer = LocalSigner(key_id="seller-strictness-key", secret=b"seller-strictness-fixed-key")
     for version, pack_dir in (("0.1.0", FROZEN_0_1_0_DIR), ("0.1.1", FROZEN_0_1_1_DIR), ("0.1.2", FROZEN_0_1_2_DIR),
                               ("0.1.3", FROZEN_0_1_3_DIR), ("0.1.4", FROZEN_0_1_4_DIR), ("0.1.5", PACK_DIR)):
-        store = LedgerStore(tmp_path / version / "ledger")
+        store = MemoryHistory()
         installed = install_pack(load_pack_dir(pack_dir), project_dir=tmp_path / version / "project", mode="observe")
-        yield version, store, build_engine(installed, ledger=store, signer_provider=lambda: signer)
+        yield version, store, build_engine(installed, history=store, signer_provider=lambda: signer)
 
 
 def test_no_personal_disclosure_0_1_0_asked_on_is_allowed_by_a_later_version_without_an_acceptance(tmp_path):

@@ -61,7 +61,7 @@ def _action(**overrides) -> Action:
 
 
 def _engine(store, signer, definition: WicketDefinition = SINGLE) -> GuardEngine:
-    return GuardEngine(ledger=store, caps_fold=SPEND, signer_provider=lambda: signer, wickets=(definition,))
+    return GuardEngine(history=store, caps_fold=SPEND, signer_provider=lambda: signer, wickets=(definition,))
 
 
 def _constraint(decision):

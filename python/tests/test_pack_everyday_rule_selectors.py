@@ -14,10 +14,10 @@ import shutil
 from pathlib import Path
 
 import pytest
-from cll.ledger import LedgerStore
 
 from capsule_engine.guards import Action, LocalSigner
 from capsule_engine.guards.capsule import ALLOW, ESCALATE
+from capsule_engine.guards.history import MemoryHistory
 from capsule_engine.packs import (
     PackDefinitionError,
     build_engine,
@@ -90,11 +90,11 @@ ACTIONS = {
 @pytest.fixture(scope="module")
 def decisions(tmp_path_factory):
     tmp = tmp_path_factory.mktemp("everyday-selectors")
-    store = LedgerStore(tmp / "ledger")
+    store = MemoryHistory()
     try:
         installed = install_pack(PACK, project_dir=tmp / "project", mode="observe")
         signer = LocalSigner(key_id="everyday-selectors-key", secret=b"everyday-selectors-fixed-key")
-        engine = build_engine(installed, ledger=store, signer_provider=lambda: signer)
+        engine = build_engine(installed, history=store, signer_provider=lambda: signer)
         return {cls: engine.check(action, dry_run=True) for cls, action in ACTIONS.items()}
     finally:
         store.close()

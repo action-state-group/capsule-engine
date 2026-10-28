@@ -1,26 +1,25 @@
 # SPDX-License-Identifier: Apache-2.0
 """verify_before_dispatch check: the cited mandate capsule must exist in the
-ledger and independently re-verify.
+history and independently re-verify.
 
 Catches the "approved, then altered" class (dev-persona doc): a Class 1
 ``verify()`` recomputes the mandate's ``capsule_id`` from its stored bytes
-(``ledger.verify``, via T2's ``LedgerStore``); if the mandate's content
+(``verify_record`` over the history); if the mandate's content
 changed after it was cited, that recomputation no longer matches the id on
 record and verification fails -- this check never recomputes or trusts a
 digest itself, it only reads the verifier's own ``ok``.
 """
 from __future__ import annotations
 
-from cll.ledger.api import LedgerAPI
-
 from ..action import Action
 from ..capsule import ConstraintOutcome, not_applicable_evidence
+from ..history import History, verify_record
 from .base import CheckOutcome
 
 __all__ = ["check_verify_before_dispatch"]
 
 
-def check_verify_before_dispatch(action: Action, ledger: LedgerAPI) -> CheckOutcome:
+def check_verify_before_dispatch(action: Action, history: History) -> CheckOutcome:
     cited = action.cited_mandate_capsule_id
     if cited is None:
         return CheckOutcome(
@@ -34,7 +33,7 @@ def check_verify_before_dispatch(action: Action, ledger: LedgerAPI) -> CheckOutc
             )
         )
 
-    record = ledger.fetch(cited)
+    record = history.get(cited)
     if record is None:
         return CheckOutcome(
             constraint=ConstraintOutcome(
@@ -47,7 +46,7 @@ def check_verify_before_dispatch(action: Action, ledger: LedgerAPI) -> CheckOutc
             )
         )
 
-    result = ledger.verify(record.capsule_id)
+    result = verify_record(history, record)
     if result is None or not result.ok:
         codes = [f.code for f in result.findings] if result is not None else []
         return CheckOutcome(

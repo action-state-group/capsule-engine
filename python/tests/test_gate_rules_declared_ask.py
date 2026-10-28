@@ -22,11 +22,11 @@ from dataclasses import replace
 from pathlib import Path
 
 import pytest
-from cll.ledger import LedgerStore
 
 from capsule_engine.guards import Action, GuardEngine, LocalSigner
 from capsule_engine.guards.capsule import DENY, ESCALATE
 from capsule_engine.guards.checks.action_class_gate import Selector
+from capsule_engine.guards.history import MemoryHistory
 from capsule_engine.guards.wickets.definition import WicketDefinition
 from capsule_engine.packs import build_engine, install_pack, load_pack_dir
 from capsule_engine.packs.obligation_results import obligation_results
@@ -69,10 +69,10 @@ def engine_for(tmp_path):
 
     def build(pack: PackDefinition) -> GuardEngine:
         n = len(stores)
-        store = LedgerStore(tmp_path / f"ledger-{n}")
+        store = MemoryHistory()
         stores.append(store)
         installed = install_pack(pack, project_dir=tmp_path / f"project-{n}", mode="observe")
-        return build_engine(installed, ledger=store, signer_provider=lambda: SIGNER)
+        return build_engine(installed, history=store, signer_provider=lambda: SIGNER)
 
     yield build
     for store in stores:
@@ -196,10 +196,10 @@ def _gate(selectors: dict[str, Selector]) -> WicketDefinition:
     return WicketDefinition(wicket_id="action_class_gate/9.0.0", check="action_class_gate", config={"selectors": selectors})
 
 
-def _direct_engine(tmp_path, selectors: dict[str, Selector], ask: frozenset[str]) -> tuple[GuardEngine, LedgerStore]:
-    store = LedgerStore(tmp_path / "direct")
+def _direct_engine(tmp_path, selectors: dict[str, Selector], ask: frozenset[str]) -> tuple[GuardEngine, MemoryHistory]:
+    store = MemoryHistory()
     engine = GuardEngine(
-        ledger=store, caps_fold=CAPS_FOLD, signer_provider=lambda: SIGNER, wickets=(_gate(selectors),),
+        history=store, caps_fold=CAPS_FOLD, signer_provider=lambda: SIGNER, wickets=(_gate(selectors),),
         ask_gate_selectors=ask,
     )
     return engine, store

@@ -292,7 +292,7 @@ def test_a_floored_sale_without_its_opening_projects_as_not_evaluable_naming_it(
 
 def _engine(store, signer, definition: WicketDefinition = FLOOR) -> GuardEngine:
     # The pack declares price_floor ASK (``packs/install.py`` ``ask_wickets``).
-    return GuardEngine(ledger=store, caps_fold=SPEND, signer_provider=lambda: signer, wickets=(definition,),
+    return GuardEngine(history=store, caps_fold=SPEND, signer_provider=lambda: signer, wickets=(definition,),
                        ask_wickets=frozenset({"price_floor"}))
 
 
@@ -337,7 +337,7 @@ def test_on_each_seller_class_a_held_offer_asks_the_account_holder(store, signer
 
 
 def _seller_engine(store, signer) -> GuardEngine:
-    return GuardEngine(ledger=store, caps_fold=SPEND, signer_provider=lambda: signer,
+    return GuardEngine(history=store, caps_fold=SPEND, signer_provider=lambda: signer,
                        wickets=(FLOOR, SINGLE_COMMITMENT, PROMISE_NEVER), ask_wickets=frozenset({"price_floor"}))
 
 
@@ -393,7 +393,7 @@ def test_nothing_the_opening_holds_enters_any_record(store, signer):
     decisions = {name: d for name, d in _decide(store, signer).items() if name != "at"}
     emitted = [json.dumps([dataclasses.asdict(c) for c in d.constraints]) for d in decisions.values()]
     emitted += [json.dumps(d.capsule) for d in decisions.values()]
-    emitted += [json.dumps(record.capsule) for record in store.scan()
+    emitted += [json.dumps(record.capsule) for record in store.find()
                 if record.capsule.get("asg_payload", {}).get("amount_minor") != FLOOR_MINOR]
     assert len(emitted) > len(decisions) * 2
     # A floor is matched as a whole number, never as digits inside a hex digest.

@@ -499,8 +499,8 @@ def _history_row(state: str, **payload) -> dict:
 
 
 def test_a_check_that_fails_closed_with_nothing_failed_is_not_evaluable(store, signer):
-    engine = GuardEngine(ledger=store, caps_fold=SPEND, signer_provider=lambda: signer, wickets=(SINGLE,))
-    store.append(_history_row(NO_DISPOSITION, target="buyer/ref-a"), consequential=False)
+    engine = GuardEngine(history=store, caps_fold=SPEND, signer_provider=lambda: signer, wickets=(SINGLE,))
+    store.append(_history_row(NO_DISPOSITION, target="buyer/ref-a"))
     decision = engine.check(_bare_action())
     assert (decision.outcome, decision.verdict) == ("deny", NOT_EVALUABLE)
     assert decision.capsule["disposition"]["decision"] == "reject"
@@ -510,12 +510,12 @@ def test_a_check_that_fails_closed_with_nothing_failed_is_not_evaluable(store, s
 def test_dedupe_matches_an_act_sealed_with_no_disposition(store):
     """Every history act was carried out, so a repeat of one is a duplicate,
     whether or not its capsule seals a disposition."""
-    store.append(_history_row(NO_DISPOSITION), consequential=False)
+    store.append(_history_row(NO_DISPOSITION))
     assert check_dedupe(_bare_action(), store).constraint.result == "fail"
 
 
 def test_dedupe_matches_an_act_whose_disposition_is_sealed(store):
-    store.append(_history_row(DISPOSITION), consequential=False)
+    store.append(_history_row(DISPOSITION))
     assert check_dedupe(_bare_action(), store).constraint.result == "fail"
 
 
@@ -523,7 +523,7 @@ def test_dedupe_matches_an_act_whose_disposition_is_sealed(store):
 def test_dedupe_never_matches_a_record_that_is_not_a_read_act(store, state):
     """An entry that could not be read, a statement and the incomplete marker
     are not acts, even with an act's fields."""
-    store.append(_history_row(state), consequential=False)
+    store.append(_history_row(state))
     assert check_dedupe(_bare_action(), store).constraint.result == "pass"
 
 

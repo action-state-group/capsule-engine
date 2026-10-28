@@ -2,7 +2,7 @@
 """counterparty_identity_change check: compare the account a counterparty is
 paid into against the value last recorded for that counterparty.
 
-The prior value is read from the ledger: the most recent accepted decision
+The prior value is read from the history: the most recent accepted decision
 whose ``asg_payload.target`` equals this action's ``target`` and which
 recorded a ``counterparty_account_ref``. A counterparty with no such record
 has nothing to compare against, so the rule does not apply to this action.
@@ -10,10 +10,9 @@ Applies only to the configured ``action_classes``.
 """
 from __future__ import annotations
 
-from cll.ledger.api import LedgerAPI, ScanQuery
-
 from ..action import Action
 from ..capsule import ConstraintOutcome, not_applicable_evidence
+from ..history import History, Query
 from .base import CheckOutcome
 
 __all__ = ["check_counterparty_identity_change"]
@@ -35,11 +34,11 @@ def _n_a(reason: str, *, in_scope: bool, missing_field: str | None = None) -> Ch
     )
 
 
-def _prior_record(action: Action, ledger: LedgerAPI) -> tuple[str, str] | None:
+def _prior_record(action: Action, history: History) -> tuple[str, str] | None:
     """(capsule_id, counterparty_account_ref) of the latest accepted decision
-    for this target that recorded one, in ledger order."""
+    for this target that recorded one, in log order."""
     prior = None
-    for record in ledger.scan(ScanQuery(action_type=action.action_type)):
+    for record in history.find(Query(where={"action_type": action.action_type, "asg_payload.target": action.target})):
         capsule = record.capsule
         payload = capsule.get("asg_payload") or {}
         if payload.get("target") != action.target:
@@ -52,7 +51,7 @@ def _prior_record(action: Action, ledger: LedgerAPI) -> tuple[str, str] | None:
     return prior
 
 
-def check_counterparty_identity_change(action: Action, ledger: LedgerAPI, *, action_classes: list[str]) -> CheckOutcome:
+def check_counterparty_identity_change(action: Action, history: History, *, action_classes: list[str]) -> CheckOutcome:
     if action.action_class not in action_classes:
         return _n_a("the rule is not configured for this action class", in_scope=False)
     if action.target is None:
@@ -61,7 +60,7 @@ def check_counterparty_identity_change(action: Action, ledger: LedgerAPI, *, act
     if action.counterparty_account_ref is None:
         return _n_a("the action carries no counterparty_account_ref; it could not be compared",
                     in_scope=True, missing_field="counterparty_account_ref")
-    prior = _prior_record(action, ledger)
+    prior = _prior_record(action, history)
     if prior is None:
         return _n_a("no prior account is recorded for this counterparty; there is nothing to compare",
                     in_scope=False)

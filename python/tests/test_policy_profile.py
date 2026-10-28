@@ -11,9 +11,9 @@ from pathlib import Path
 import pytest
 from agent_action_capsule import compute_capsule_id
 from agent_action_capsule.canonical import json_digest
-from cll.ledger import LedgerStore
 
 from capsule_engine.guards import Action, LocalSigner
+from capsule_engine.guards.history import MemoryHistory
 from capsule_engine.packs import (
     accept_thresholds,
     build_engine,
@@ -86,15 +86,15 @@ def _purchase(name: str, amount_minor: int) -> Action:
 def test_changing_a_limit_is_a_new_activation_and_no_new_catalog_artifact(tmp_path):
     pack = load_pack_dir(EVERYDAY_DIR)
     project = tmp_path / "household-a"
-    ledger = LedgerStore(tmp_path / "ledger")
+    ledger = MemoryHistory()
 
     at_25 = install_pack(pack, project_dir=project, mode="enforce", profile=_profile(2_500))
-    first = record_pack_activation(at_25, ledger=ledger, operator="household-a", developer="ops", signer=SIGNER,
+    first = record_pack_activation(at_25, history=ledger, operator="household-a", developer="ops", signer=SIGNER,
                                    timestamp="2026-10-06T09:00:00Z")
     catalog_before = _catalog_bytes(project)
 
     at_40 = install_pack(pack, project_dir=project, mode="enforce", profile=_profile(4_000))
-    second = record_pack_activation(at_40, ledger=ledger, operator="household-a", developer="ops", signer=SIGNER,
+    second = record_pack_activation(at_40, history=ledger, operator="household-a", developer="ops", signer=SIGNER,
                                     timestamp="2026-10-06T09:05:00Z")
     ledger.close()
 
@@ -125,13 +125,13 @@ def test_two_households_share_the_wicket_and_pack_and_differ_only_in_profile(tmp
     # first-purchase check fails in both.
     outcomes = {}
     for name, installed in (("a", a), ("b", b)):
-        ledger = LedgerStore(tmp_path / f"ledger-{name}")
+        ledger = MemoryHistory()
         # A profile's values apply once an activation binds them. 40.00 is a
         # raise over the pack's 25.00, so it is activated more than the 12-hour
         # cooling-off before the purchase.
-        record_pack_activation(installed, ledger=ledger, operator=f"household-{name}", developer="ops",
+        record_pack_activation(installed, history=ledger, operator=f"household-{name}", developer="ops",
                                signer=SIGNER, timestamp="2026-10-05T09:00:00Z")
-        engine = build_engine(installed, ledger=ledger, signer_provider=lambda: SIGNER,
+        engine = build_engine(installed, history=ledger, signer_provider=lambda: SIGNER,
                               clock=lambda: "2026-10-06T10:00:00Z")
         decision = engine.check(_purchase(name, 3_000), dry_run=False)
         (caps,) = [c for c in decision.constraints if c.id == "caps"]
@@ -147,8 +147,8 @@ def test_two_households_share_the_wicket_and_pack_and_differ_only_in_profile(tmp
 def test_what_was_in_force_is_recomputable_from_the_activation_alone(tmp_path):
     pack = load_pack_dir(EVERYDAY_DIR)
     installed = install_pack(pack, project_dir=tmp_path / "p", mode="enforce", profile=_profile(4_000))
-    ledger = LedgerStore(tmp_path / "ledger")
-    capsule = record_pack_activation(installed, ledger=ledger, operator="household-b", developer="ops", signer=SIGNER)
+    ledger = MemoryHistory()
+    capsule = record_pack_activation(installed, history=ledger, operator="household-b", developer="ops", signer=SIGNER)
     ledger.close()
     detail = capsule["asg_payload"]["detail"]
 
@@ -175,8 +175,8 @@ def test_without_a_profile_the_manifest_and_activation_are_unchanged(tmp_path):
     installed = install_pack(pack, project_dir=tmp_path / "p", mode="observe")
     assert "profile_digest" not in installed.manifest.canonical_dict()
     assert not (tmp_path / "p" / ".capsule" / "policy" / "profile.json").exists()
-    ledger = LedgerStore(tmp_path / "ledger")
-    capsule = record_pack_activation(installed, ledger=ledger, operator="o", developer="d", signer=SIGNER)
+    ledger = MemoryHistory()
+    capsule = record_pack_activation(installed, history=ledger, operator="o", developer="d", signer=SIGNER)
     ledger.close()
     assert set(capsule["asg_payload"]["detail"]) == {"manifest_id", "manifest_digest", "folds", "wickets", "packs"}
 

@@ -34,9 +34,9 @@ def test_activation_lands_in_the_ledger_and_cites_the_recomputed_digest(store, s
     capsule = build_manifest_activation_capsule(
         resolved=resolved, operator="acme", developer="ops", signer=signer
     )
-    store.append(capsule, consequential=False)
+    store.append(capsule)
 
-    fetched = store.fetch(capsule["capsule_id"])
+    fetched = store.get(capsule["capsule_id"])
     assert fetched is not None
 
     # Independently recompute the manifest's own digest from the checked-in
@@ -67,7 +67,7 @@ def test_first_activation_chains_to_the_genesis_sentinel(store, signer):
 def test_second_activation_chains_to_the_first(store, signer):
     resolved = _resolved()
     first = build_manifest_activation_capsule(resolved=resolved, operator="acme", developer="ops", signer=signer)
-    store.append(first, consequential=False)
+    store.append(first)
 
     previous = find_latest_activation(store)
     assert previous is not None
@@ -80,7 +80,7 @@ def test_second_activation_chains_to_the_first(store, signer):
         signer=signer,
         previous_activation_capsule_id=previous.capsule_id,
     )
-    store.append(second, consequential=False)
+    store.append(second)
 
     assert second["chain"] == {"parent_capsule_id": first["capsule_id"], "relation": "epoch_opens"}
     latest = find_latest_activation(store)

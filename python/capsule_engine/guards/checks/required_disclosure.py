@@ -48,12 +48,11 @@ from __future__ import annotations
 
 from typing import TypedDict
 
-from cll.ledger.api import LedgerAPI, ScanQuery
-
 from ...folds.definition import FoldDefinition
 from ...folds.engine import EvaluationTrace, evaluate_one
 from ..action import Action
 from ..capsule import ConstraintOutcome, NotApplicableEvidence, not_applicable_evidence
+from ..history import History, Query
 from ..statements import STATED
 from .base import CheckOutcome
 
@@ -119,7 +118,7 @@ def _outcome(
 
 def check_required_disclosure(
     action: Action,
-    ledger: LedgerAPI,
+    history: History,
     *,
     definition: FoldDefinition,
     representation_classes: list[str],
@@ -136,14 +135,14 @@ def check_required_disclosure(
         return _outcome("n/a", "the rule is not configured for this action class",
                         not_applicable_evidence(_CHECK_ID, in_scope=False), method)
     if statement_definition is not None:
-        return _check_with_statements(action, ledger, definition, statement_definition, required_classes,
+        return _check_with_statements(action, history, definition, statement_definition, required_classes,
                                       listing=count_listing_classes)
     target = action.target
     if target is None:
         return _outcome("n/a", "the action names no target; the counterparty could not be identified",
                         not_applicable_evidence(_CHECK_ID, in_scope=True, missing_field="target"), method)
 
-    traces = _counted(definition, _to_target(action, ledger, target), required_classes)
+    traces = _counted(definition, _to_target(action, history, target), required_classes)
     counts = _counts(traces, required_classes)
     missing = [cls for cls in required_classes if counts[cls] == 0]
     evidence = DisclosureEvidence(
@@ -155,20 +154,18 @@ def check_required_disclosure(
     return _decided(missing, evidence, method, traces)
 
 
-def _to_target(action: Action, ledger: LedgerAPI, target: str) -> list[dict]:
-    """This operator's records addressed to ``target``. ``ScanQuery.
-    counterparty`` is the ledger's filter on ``operator``; the ledger has no
-    filter on target, so the records are selected here."""
+def _to_target(action: Action, history: History, target: str) -> list[dict]:
+    """This operator's records addressed to ``target``."""
     return [
-        r.capsule for r in ledger.scan(ScanQuery(counterparty=action.operator))
+        r.capsule for r in history.find(Query(where={"operator": action.operator, "asg_payload.target": target}))
         if (r.capsule.get("asg_payload") or {}).get("target") == target
     ]
 
 
-def _in_deal(action: Action, ledger: LedgerAPI, deal_id: str) -> list[dict]:
+def _in_deal(action: Action, history: History, deal_id: str) -> list[dict]:
     """This operator's statement records in the deal ``deal_id``."""
     return [
-        r.capsule for r in ledger.scan(ScanQuery(counterparty=action.operator))
+        r.capsule for r in history.find(Query(where={"operator": action.operator, f"asg_payload.{STATED}.deal_id": deal_id}))
         if (((r.capsule.get("asg_payload") or {}).get(STATED)) or {}).get("deal_id") == deal_id
     ]
 
@@ -193,7 +190,7 @@ def _decided(
 
 
 def _check_with_statements(
-    action: Action, ledger: LedgerAPI, definition: FoldDefinition, statement_definition: FoldDefinition,
+    action: Action, history: History, definition: FoldDefinition, statement_definition: FoldDefinition,
     required_classes: list[str], *, listing: bool = False,
 ) -> CheckOutcome:
     """``required_disclosure/1.1.0``: a class counts as stated to the
@@ -204,8 +201,8 @@ def _check_with_statements(
     if target is None and deal_id is None:
         return _outcome("n/a", "the action names no target and no deal; the counterparty could not be identified",
                         not_applicable_evidence(_CHECK_ID, in_scope=True, missing_field="target"), method)
-    told = _counted(definition, _to_target(action, ledger, target) if target is not None else [], required_classes)
-    stated = _counted(statement_definition, _in_deal(action, ledger, deal_id) if deal_id is not None else [],
+    told = _counted(definition, _to_target(action, history, target) if target is not None else [], required_classes)
+    stated = _counted(statement_definition, _in_deal(action, history, deal_id) if deal_id is not None else [],
                       required_classes)
     prior, in_deal = _counts(told, required_classes), _counts(stated, required_classes)
     listed = action.listing_classes if listing and action.listing_classes is not None else ()

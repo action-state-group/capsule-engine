@@ -10,9 +10,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass, field
 
-from cll.ledger.api import LedgerAPI
-from cll.ledger.records import LedgerRecord
-
+from ..guards.history import History, HistoryRecord
 from ..guards.signing import Signer
 from .capsules import build_session_close_capsule, build_turn_capsule
 
@@ -34,12 +32,12 @@ class ConversationSession:
     the failure and continuing unsigned.
     """
 
-    ledger: LedgerAPI
+    history: History
     session_id: str
     operator: str
     developer: str
     signer_provider: Callable[[], Signer]
-    _turn_records: list[LedgerRecord] = field(default_factory=list, init=False)
+    _turn_records: list[HistoryRecord] = field(default_factory=list, init=False)
     _closed: bool = field(default=False, init=False)
 
     def record_turn(
@@ -49,7 +47,7 @@ class ConversationSession:
         content_digest: str,
         timestamp: str | None = None,
         action_id: str | None = None,
-    ) -> LedgerRecord:
+    ) -> HistoryRecord:
         """Seal and append the next turn. ``turn_index`` is derived from how
         many turns this session has already recorded -- callers never
         supply it directly, so it can't drift from the chain it builds."""
@@ -68,11 +66,11 @@ class ConversationSession:
             timestamp=timestamp,
             action_id=action_id,
         )
-        record = self.ledger.append(capsule, consequential=False)
+        record = self.history.append(capsule)
         self._turn_records.append(record)
         return record
 
-    def close(self, *, timestamp: str | None = None, action_id: str | None = None) -> LedgerRecord:
+    def close(self, *, timestamp: str | None = None, action_id: str | None = None) -> HistoryRecord:
         """Bind every recorded turn into one session digest and append the
         session-close capsule. Requires at least one turn."""
         if self._closed:
@@ -88,7 +86,7 @@ class ConversationSession:
             timestamp=timestamp,
             action_id=action_id,
         )
-        record = self.ledger.append(capsule, consequential=False)
+        record = self.history.append(capsule)
         self._closed = True
         return record
 

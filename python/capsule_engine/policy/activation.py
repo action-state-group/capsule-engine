@@ -17,10 +17,8 @@ parent need not resolve).
 """
 from __future__ import annotations
 
-from cll.ledger.api import LedgerAPI, ScanQuery
-from cll.ledger.records import LedgerRecord
-
 from ..events.capsule import build_event_capsule
+from ..guards.history import History, HistoryRecord, Query
 from ..guards.signing import Signer
 from .resolve import ResolvedManifest
 
@@ -76,12 +74,12 @@ def build_manifest_activation_capsule(
     )
 
 
-def find_latest_activation(ledger: LedgerAPI) -> LedgerRecord | None:
+def find_latest_activation(history: History) -> HistoryRecord | None:
     """The most recently appended manifest-activation record, or ``None`` if
-    this ledger has never had one -- used to chain a new activation to its
-    predecessor. ``scan()`` is append-ordered, so the last match wins."""
-    latest: LedgerRecord | None = None
-    for record in ledger.scan(ScanQuery(action_type="fyi")):
+    this history has never had one -- used to chain a new activation to its
+    predecessor. ``find()`` is append-ordered, so the last match wins."""
+    latest: HistoryRecord | None = None
+    for record in history.find(Query(where={"action_type": "fyi", "asg_payload.event": EVENT_MANIFEST_ACTIVATED})):
         if (record.capsule.get("asg_payload") or {}).get("event") == EVENT_MANIFEST_ACTIVATED:
             latest = record
     return latest
