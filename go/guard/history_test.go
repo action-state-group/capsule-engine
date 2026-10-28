@@ -6,6 +6,7 @@ import (
 	"crypto/ed25519"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"reflect"
 	"slices"
 	"testing"
@@ -249,4 +250,91 @@ func (p *pagedStore) Find(ctx context.Context, q artifact.Query) (artifact.Page,
 	p.calls++
 	q.Limit = p.limit
 	return p.IndexStore.Find(ctx, q)
+}
+
+// failingHistory fails every Find.
+type failingHistory struct{ MemoryHistory }
+
+var errHistoryDown = errors.New("history down")
+
+func (failingHistory) Find(Query) ([]Record, error) { return nil, errHistoryDown }
+
+// TestAHistoryReadErrorIsTheCheckError: a check whose read fails returns the
+// error, never a decision over no records.
+func TestAHistoryReadErrorIsTheCheckError(t *testing.T) {
+	for _, fx := range fixtureSets {
+		t.Run(fx.name, func(t *testing.T) {
+			e, _ := fx.engine(t)
+			py := parity(t, fx).Scenarios
+			for i, a := range scenarioActions(t, fx) {
+				if _, err := e.CheckWithTaskAuthority(a, failingHistory{}, py[i].TaskAuthorityRecord); !errors.Is(err, errHistoryDown) {
+					t.Fatalf("%s: err = %v, want the history's", a.ActionID, err)
+				}
+			}
+		})
+	}
+}
+
+func TestHistoryReaderKeepsTheFirstError(t *testing.T) {
+	r := &historyReader{h: failingHistory{}}
+	if got := r.find(Query{}); got != nil {
+		t.Fatalf("a failed read returned %v", got)
+	}
+	first := r.err
+	r.h = MemoryHistory{{CapsuleID: "a"}}
+	if got := r.find(Query{}); got != nil || r.err != first {
+		t.Fatalf("a read after a failure returned %v, err %v", got, r.err)
+	}
+}
+
+// faultyStore fails Find on its second page or Get, and faultyLog fails
+// GetEntry, each when set.
+type faultyStore struct {
+	artifact.IndexStore
+	failPage2, failGet bool
+	calls              int
+}
+
+func (s *faultyStore) Find(ctx context.Context, q artifact.Query) (artifact.Page, error) {
+	s.calls++
+	if s.failPage2 && s.calls == 2 {
+		return artifact.Page{}, errHistoryDown
+	}
+	q.Limit = 2
+	return s.IndexStore.Find(ctx, q)
+}
+
+func (s *faultyStore) Get(ctx context.Context, id string) (artifact.Record, error) {
+	if s.failGet {
+		return artifact.Record{}, errHistoryDown
+	}
+	return s.IndexStore.Get(ctx, id)
+}
+
+type faultyLog struct{ StoreLog }
+
+func (faultyLog) GetEntry(context.Context, []byte) (cll.Entry, error) {
+	return cll.Entry{}, errHistoryDown
+}
+
+// TestStoreHistoryReadErrors: a failing page, log lookup or record read
+// fails Find whole, never returning the records read before it.
+func TestStoreHistoryReadErrors(t *testing.T) {
+	capsules := capsuleLines(t, readFile(t, fixtures037.dir, "mini_ledger.jsonl"))
+	f := newStoreFixture(t, capsules)
+	for _, c := range capsules {
+		f.append(t, c)
+	}
+	for name, h := range map[string]*StoreHistory{
+		"second page": {ctx: f.ctx, artifacts: &faultyStore{IndexStore: f.artifacts, failPage2: true}, log: f.log},
+		"record":      {ctx: f.ctx, artifacts: &faultyStore{IndexStore: f.artifacts, failGet: true}, log: f.log},
+		"log entry":   {ctx: f.ctx, artifacts: f.artifacts, log: faultyLog{f.log}},
+	} {
+		t.Run(name, func(t *testing.T) {
+			recs, err := h.Find(Query{})
+			if !errors.Is(err, errHistoryDown) || recs != nil {
+				t.Fatalf("Find = %d records, %v", len(recs), err)
+			}
+		})
+	}
 }
