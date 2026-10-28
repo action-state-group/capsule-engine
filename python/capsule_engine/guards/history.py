@@ -27,7 +27,7 @@ import json
 import os
 import re
 import threading
-from collections.abc import Iterable, Mapping
+from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -49,6 +49,7 @@ __all__ = [
     "open_store",
     "producer_identity",
     "verify_record",
+    "verify_stored",
 ]
 
 #: The capsule paths a store indexes, which :attr:`Query.where` names. The
@@ -142,6 +143,22 @@ def lookup(history: History, capsule_id: str) -> HistoryRecord | None:
         return record
     matches = [r for r in history.find() if r.capsule_id.startswith(capsule_id)]
     return matches[0] if len(matches) == 1 else None
+
+
+def verify_stored(history: History, capsule_id: str) -> VerificationResult | None:
+    """:func:`verify_record` of the record ``capsule_id`` names (or is an
+    unambiguous prefix of, :func:`lookup`), or ``None`` when there is none.
+    A record the artifact store refuses to read (a capsule or producer
+    envelope that no longer verifies, an untrusted signer) is a failed
+    verification, never an error."""
+    from capsule_emit.artifact.record import ArtifactError
+
+    try:
+        record = lookup(history, capsule_id)
+    except ArtifactError as exc:
+        finding = Finding("stored_record_invalid", f"the artifact store refused the record: {exc}", severity="error")
+        return VerificationResult(ok=False, capsule_id=capsule_id, findings=[finding])
+    return verify_record(history, record)
 
 
 # -- matching (the in-memory history) ----------------------------------------
@@ -270,14 +287,39 @@ class StoreHistory:
     extension. It declares :data:`INDEX_PATHS` on the store's namespace,
     indexing the records already stored. ``identity`` (a
     ``capsule_emit.produce.SigningIdentity``) signs each written record's
-    producer envelope; without one the history only reads."""
+    producer envelope; without one the history only reads. ``sync``, when
+    given, makes a put durable; it runs before the log append, so the log
+    never commits a record the artifact store could lose."""
 
-    def __init__(self, artifacts: Any, log: Any, *, identity: Any = None) -> None:
+    def __init__(self, artifacts: Any, log: Any, *, identity: Any = None, sync: Callable[[], None] | None = None) -> None:
         artifacts.init_index(INDEX_PATHS)
         self._artifacts = artifacts
         self._log = log
         self._identity = identity
+        self._sync = sync
         self._lock = threading.Lock()
+
+    def check_committed(self) -> None:
+        """Refuse a store whose log commits a record the artifact store does
+        not hold (a lost or truncated artifact file): its queries would miss
+        that record and read the history as complete."""
+        held: set[str] = set()
+        after = None
+        while True:
+            page = self._artifacts.find(after=after, limit=_FIND_LIMIT)
+            held.update(page.ids)
+            if not page.next:
+                break
+            after = page.next
+        missing, seq = 0, 0
+        while True:
+            entries = self._log.scan_entries(seq, _FIND_LIMIT)
+            if not entries:
+                break
+            missing += sum(1 for e in entries if bytes(e.value).hex() not in held)
+            seq = entries[-1].seq
+        if missing:
+            raise RuntimeError(f"the log commits {missing} record(s) the artifact store does not hold")
 
     def find(self, query: Query | None = None) -> list[HistoryRecord]:
         """Every page of the artifact store's ``find``, less the ids the log
@@ -356,6 +398,8 @@ class StoreHistory:
             if self.get(capsule_id) is not None:
                 raise ValueError(f"{capsule_id} is already in this history")
             self._artifacts.put(Record(capsule_id=capsule_id, capsule=data, producer_envelope=envelope))
+            if self._sync is not None:
+                self._sync()
             appended = self._log.append(
                 AppendInput(value=bytes.fromhex(capsule_id), appended_at=datetime.now(timezone.utc))
             )
@@ -410,14 +454,35 @@ def open_store(
         directory.mkdir(parents=True, exist_ok=True)
     elif not log_path.is_file():
         raise FileNotFoundError(f"{directory}: not a store directory (no {LOG_FILE})")
-    keys_path = directory / TRUSTED_KEYS_FILE
-    trusted = _trusted_keys(keys_path)
-    identity = producer_identity(signer) if signer is not None else None
-    if identity is not None and identity.public_key not in trusted:
-        trusted.append(identity.public_key)
-        with keys_path.open("a", encoding="utf-8") as f:
-            f.write(identity.public_key.hex() + "\n")
+    # The log's writer lock is taken first and held while the history is
+    # open, so no other process writes between reading the artifact store
+    # and using it.
     cll_jsonl.init(log_path)
-    artifacts = JsonlArtifactStore(directory / ARTIFACTS_FILE, NAMESPACE, trusted)
-    artifacts.init()
-    return StoreHistory(artifacts, cll_jsonl.open(log_path), identity=identity)
+    log = cll_jsonl.open(log_path)
+    try:
+        keys_path = directory / TRUSTED_KEYS_FILE
+        trusted = _trusted_keys(keys_path)
+        identity = producer_identity(signer) if signer is not None else None
+        if identity is not None and identity.public_key not in trusted:
+            trusted.append(identity.public_key)
+            with keys_path.open("a", encoding="utf-8") as f:
+                f.write(identity.public_key.hex() + "\n")
+        artifacts_path = directory / ARTIFACTS_FILE
+        artifacts = JsonlArtifactStore(artifacts_path, NAMESPACE, trusted)
+        artifacts.init()
+        history = StoreHistory(artifacts, log, identity=identity, sync=lambda: _fsync(artifacts_path))
+        history.check_committed()
+    except BaseException:
+        log.close()
+        raise
+    return history
+
+
+def _fsync(path: Path) -> None:
+    """Flush ``path``'s written data to disk (the JSONL artifact store's put
+    does not)."""
+    fd = os.open(path, os.O_RDONLY)
+    try:
+        os.fsync(fd)
+    finally:
+        os.close(fd)

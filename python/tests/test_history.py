@@ -216,3 +216,58 @@ def test_the_engine_decides_alike_over_a_store_and_in_memory(steps, tmp_path):
         got = [stored.check(a).capsule for a in actions]
         assert [r.capsule for r in store.find()] == [c for c in got if c is not None]
     assert got == want
+
+
+def test_a_put_is_made_durable_before_the_log_commits(tmp_path):
+    seen = []
+    store = open_store(tmp_path / "s", signer=SIGNER, create=True)
+    try:
+        store._sync = lambda: seen.append(store.size())
+        store.append(_event(0))
+        store.append(_event(1))
+        # Each sync ran before its record's log append.
+        assert seen == [0, 1] and store.size() == 2
+    finally:
+        store.close()
+
+
+def test_a_store_whose_log_outruns_its_artifacts_is_refused(tmp_path):
+    with open_store(tmp_path / "s", signer=SIGNER, create=True) as store:
+        store.append(_event(0))
+        store.append(_event(1))
+    artifacts = tmp_path / "s" / history_mod.ARTIFACTS_FILE
+    first = artifacts.read_bytes().splitlines(keepends=True)[0]
+    artifacts.write_bytes(first)
+    with pytest.raises(RuntimeError, match="1 record"):
+        open_store(tmp_path / "s")
+    artifacts.unlink()
+    with pytest.raises(RuntimeError, match="2 record"):
+        open_store(tmp_path / "s")
+    # The refusal released the log: opening again is refused for the same
+    # reason, not for a lock still held (ContentionError).
+    with pytest.raises(RuntimeError, match="2 record"):
+        open_store(tmp_path / "s")
+
+
+def test_an_open_store_holds_the_log_until_closed(tmp_path):
+    from cll.log import ContentionError
+
+    with open_store(tmp_path / "s", signer=SIGNER, create=True):
+        with pytest.raises(ContentionError):
+            open_store(tmp_path / "s")
+    open_store(tmp_path / "s").close()
+
+
+def test_verify_reports_a_record_the_store_refuses_as_a_failure(tmp_path, capsys):
+    from capsule_engine.cli.main import main
+
+    capsule = _event(0)
+    with open_store(tmp_path / "s", signer=SIGNER, create=True) as store:
+        store.append(capsule)
+    assert main(["verify", capsule["capsule_id"], "--store", str(tmp_path / "s"), "--json"]) == 0
+    capsys.readouterr()
+    # Its producer key is no longer trusted: the store refuses the record.
+    (tmp_path / "s" / TRUSTED_KEYS_FILE).write_text(producer_identity(LocalSigner(key_id="x", secret=b"x")).public_key.hex() + "\n")
+    assert main(["verify", capsule["capsule_id"], "--store", str(tmp_path / "s"), "--json"]) == 1
+    out = json.loads(capsys.readouterr().out)
+    assert out["ok"] is False and out["findings"][0]["code"] == "stored_record_invalid"

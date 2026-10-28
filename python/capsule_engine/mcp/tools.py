@@ -30,7 +30,7 @@ from ..guards import Action, GuardEngine
 from ..guards.checks.caps import cap_for, resolve_caps_minor
 from ..guards.checks.dedupe import check_dedupe
 from ..guards.classes import TAXONOMY, UNCLASSIFIED_DEFAULT
-from ..guards.history import History, HistoryRecord, Query, lookup, parse_instant, verify_record
+from ..guards.history import History, HistoryRecord, Query, lookup, parse_instant, verify_stored
 
 __all__ = [
     "ledger_query",
@@ -372,14 +372,11 @@ def record_verify(ledger: History, *, capsule_id: str) -> dict[str, Any]:
     """Independently re-verify one capsule's digest and chain -- `capsule verify`'s
     own check, run against the live ledger. Returns `ok` plus every finding
     (never just a bare boolean) so a `False` always comes with a reason."""
-    record = lookup(ledger, capsule_id)
-    if record is None:
-        return _error("not_found", f"no such capsule {capsule_id!r}")
-    result = verify_record(ledger, record)
+    result = verify_stored(ledger, capsule_id)
     if result is None:
         return _error("not_found", f"no such capsule {capsule_id!r}")
     return {
-        "capsule_id": record.capsule_id,
+        "capsule_id": result.capsule_id or capsule_id,
         "ok": result.ok,
         "findings": [
             {"code": f.code, "detail": f.detail, "severity": f.severity} for f in result.findings

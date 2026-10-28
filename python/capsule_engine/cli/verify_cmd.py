@@ -17,7 +17,7 @@ import sys
 from agent_action_capsule import verify as verify_capsule
 
 from ..envcompat import env_get
-from ..guards.history import History, MemoryHistory, lookup, open_store, verify_record
+from ..guards.history import History, MemoryHistory, open_store, verify_stored
 from .format import build_echo
 
 __all__ = ["add_parser", "run"]
@@ -65,12 +65,11 @@ def run(args: argparse.Namespace) -> int:
 
     history = _open(store_path)
     try:
-        record = lookup(history, args.capsule_id)
-        if record is None:
+        result = verify_stored(history, args.capsule_id)
+        if result is None:
             print(f"no such capsule {args.capsule_id!r} in store {store_path}", file=sys.stderr)
             return 2
-        result = verify_record(history, record)
-        capsule_id = record.capsule_id
+        capsule_id = result.capsule_id or args.capsule_id
     finally:
         close = getattr(history, "close", None)
         if close is not None:

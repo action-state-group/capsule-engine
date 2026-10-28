@@ -69,7 +69,9 @@ checkpointed-local-log entry log (`log.jsonl`) that orders them, capsule-emit's 
 (`artifacts.jsonl`) that holds each signed record, and the producer public keys the store trusts
 (`trusted_keys`). Each record carries a producer envelope signed with an Ed25519 key derived from
 your own signing secret (`--key-id`/`--secret`); the secret and the derived key are never written
-to disk. `bundle` still reads a capsule-emit ledger (`--ledger`).
+to disk. Opening a store with a new secret adds its key to `trusted_keys`, and nothing removes one:
+after rotating or retiring a secret, delete its key's line yourself. `bundle` still reads a
+capsule-emit ledger (`--ledger`).
 
 ## What's here
 
