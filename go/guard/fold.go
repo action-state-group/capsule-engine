@@ -454,8 +454,8 @@ func (f fold) inWindowFor(r Record, keyValue string, anchor time.Time) bool {
 
 // query is what the fold asks a history for to evaluate keyValue: the
 // records carrying keyValue under its key. It sets no lower time bound,
-// because outsideTheFold counts an act once across every copy of it, an
-// accepted copy before the window included. When the fold reads its key with
+// because outsideTheFold counts an act once across every copy of it it is
+// given, an accepted copy before the window included. When the fold reads its key with
 // a default, a record missing the key is read under the default, so every
 // record is asked for.
 func (f fold) query(keyValue string) Query {

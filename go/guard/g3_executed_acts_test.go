@@ -203,17 +203,23 @@ func TestAnAcceptedActIsCountedOnce(t *testing.T) {
 	unchecked.Timestamp = "2026-10-02T10:00:00Z"
 	uncheckedTwin := unchecked
 	uncheckedTwin.ActionID = paid.ActionID
+	// The accepted copy is another operator's and developer's, outside the
+	// fold's key: the act is still counted once across the whole history,
+	// as report/replay.py ExecutedActs drops the copy before the key is read.
+	paidElsewhere := paid
+	paidElsewhere.Operator, paidElsewhere.Developer = "household-b", "e"
 	for name, tc := range map[string]struct {
 		acts   []Record
 		weekly int64
 	}{
-		"accepted + fyi, same action_id":  {[]Record{paid, sameAction}, 2000},
-		"fyi first, then accepted":        {[]Record{sameAction, paid}, 2000},
-		"accepted + fyi, same capsule":    {[]Record{paid, sameCapsule}, 2000},
-		"one executed, given twice":       {[]Record{executedAct("C", new(int64(700))), executedAct("C", new(int64(700)))}, 700},
-		"one unchecked, given twice":      {[]Record{unchecked, unchecked}, 1000},
-		"accepted + unchecked, same act":  {[]Record{paid, uncheckedTwin}, 2000},
-		"accepted + a different executed": {[]Record{paid, executedAct("D", new(int64(700)))}, 2700},
+		"accepted + fyi, same action_id":   {[]Record{paid, sameAction}, 2000},
+		"fyi first, then accepted":         {[]Record{sameAction, paid}, 2000},
+		"accepted + fyi, same capsule":     {[]Record{paid, sameCapsule}, 2000},
+		"one executed, given twice":        {[]Record{executedAct("C", new(int64(700))), executedAct("C", new(int64(700)))}, 700},
+		"one unchecked, given twice":       {[]Record{unchecked, unchecked}, 1000},
+		"accepted + unchecked, same act":   {[]Record{paid, uncheckedTwin}, 2000},
+		"accepted + a different executed":  {[]Record{paid, executedAct("D", new(int64(700)))}, 2700},
+		"accepted under another key + fyi": {[]Record{paidElsewhere, sameAction}, 0},
 	} {
 		c, f := capsWindow(t, e, tc.acts)
 		if c.Pending() != "" || f.WeeklySpendMinor != tc.weekly {

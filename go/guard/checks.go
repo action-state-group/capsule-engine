@@ -280,7 +280,16 @@ func (e *Engine) checkCaps(a Action, h *historyReader, at time.Time, in checkInp
 		keyValue = a.Operator
 	}
 	rd = append(rd, e.capsFold.key, "timestamp")
-	ledger := h.find(e.capsFold.query(keyValue))
+	// A check input's history is read whole: the engine drops a copy of an act
+	// across all of it (report/replay.py ExecutedActs) before the key is read,
+	// so an accepted copy under another key still counts the act once
+	// (outsideTheFold). A store's records are asked for by the key, as caps.py
+	// reads them.
+	q := e.capsFold.query(keyValue)
+	if in.history {
+		q = Query{}
+	}
+	ledger := h.find(q)
 	spend, reversals := e.capsFold.evaluate(ledger, keyValue, at)
 	// An unchecked act (ruling (a)) and an executed act with no
 	// recorded decision (the G3 ruling) are spend the fold never sums
