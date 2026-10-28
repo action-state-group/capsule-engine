@@ -168,7 +168,7 @@ func (r *historyReader) find(q Query) []Record {
 	}
 	recs, err := r.h.Find(q)
 	if err != nil {
-		r.err = fmt.Errorf("history: %w", err)
+		r.err = err
 		return nil
 	}
 	return recs

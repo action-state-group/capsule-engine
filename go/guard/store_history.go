@@ -113,11 +113,11 @@ func (s *StoreHistory) Size() (uint64, error) {
 }
 
 // seq is the log position of the capsule id, and false when the log does not
-// hold it.
+// hold it, as for an id that is not 32 bytes of hex.
 func (s *StoreHistory) seq(capsuleID string) (uint64, bool, error) {
 	value, err := hex.DecodeString(capsuleID)
 	if err != nil || len(value) != cll.EntryBytes {
-		return 0, false, fmt.Errorf("history: capsule id %q is not %d bytes of hex", capsuleID, cll.EntryBytes)
+		return 0, false, nil
 	}
 	e, err := s.log.GetEntry(s.ctx, value)
 	if errors.Is(err, cll.ErrNotFound) {

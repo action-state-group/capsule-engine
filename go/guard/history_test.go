@@ -211,8 +211,8 @@ func TestStoreHistoryFindAndGet(t *testing.T) {
 	if r, ok, err := f.history.Get(want[1]); err != nil || !ok || r.CapsuleID != want[1] {
 		t.Fatalf("Get = %v, %v, %v", r.CapsuleID, ok, err)
 	}
-	if _, _, err := f.history.Get("zz"); err == nil {
-		t.Fatal("a capsule id that is not hex was looked up")
+	if _, ok, err := f.history.Get("zz"); err != nil || ok {
+		t.Fatalf("an id that is not hex: %v, %v; want none", ok, err)
 	}
 }
 
