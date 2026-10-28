@@ -145,9 +145,10 @@ def lookup(history: History, capsule_id: str) -> HistoryRecord | None:
     return matches[0] if len(matches) == 1 else None
 
 
-def verify_stored(history: History, capsule_id: str) -> VerificationResult | None:
-    """:func:`verify_record` of the record ``capsule_id`` names (or is an
-    unambiguous prefix of, :func:`lookup`), or ``None`` when there is none.
+def verify_stored(history: History, capsule_id: str) -> tuple[str, VerificationResult] | None:
+    """The id of the record ``capsule_id`` names (or is an unambiguous prefix
+    of, :func:`lookup`) and its :func:`verify_record`, or ``None`` when there
+    is none.
     A record the artifact store refuses to read (a capsule or producer
     envelope that no longer verifies, an untrusted signer) is a failed
     verification, never an error."""
@@ -157,8 +158,10 @@ def verify_stored(history: History, capsule_id: str) -> VerificationResult | Non
         record = lookup(history, capsule_id)
     except ArtifactError as exc:
         finding = Finding("stored_record_invalid", f"the artifact store refused the record: {exc}", severity="error")
-        return VerificationResult(ok=False, capsule_id=capsule_id, findings=[finding])
-    return verify_record(history, record)
+        return capsule_id, VerificationResult(ok=False, capsule_id=capsule_id, findings=[finding])
+    if record is None:
+        return None
+    return record.capsule_id, verify_record(history, record)
 
 
 # -- matching (the in-memory history) ----------------------------------------

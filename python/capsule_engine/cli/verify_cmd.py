@@ -65,11 +65,11 @@ def run(args: argparse.Namespace) -> int:
 
     history = _open(store_path)
     try:
-        result = verify_stored(history, args.capsule_id)
-        if result is None:
+        verified = verify_stored(history, args.capsule_id)
+        if verified is None:
             print(f"no such capsule {args.capsule_id!r} in store {store_path}", file=sys.stderr)
             return 2
-        capsule_id = result.capsule_id or args.capsule_id
+        capsule_id, result = verified
     finally:
         close = getattr(history, "close", None)
         if close is not None:

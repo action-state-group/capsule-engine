@@ -372,11 +372,12 @@ def record_verify(ledger: History, *, capsule_id: str) -> dict[str, Any]:
     """Independently re-verify one capsule's digest and chain -- `capsule verify`'s
     own check, run against the live ledger. Returns `ok` plus every finding
     (never just a bare boolean) so a `False` always comes with a reason."""
-    result = verify_stored(ledger, capsule_id)
-    if result is None:
+    verified = verify_stored(ledger, capsule_id)
+    if verified is None:
         return _error("not_found", f"no such capsule {capsule_id!r}")
+    found_id, result = verified
     return {
-        "capsule_id": result.capsule_id or capsule_id,
+        "capsule_id": found_id,
         "ok": result.ok,
         "findings": [
             {"code": f.code, "detail": f.detail, "severity": f.severity} for f in result.findings
