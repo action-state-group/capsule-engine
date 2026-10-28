@@ -19,7 +19,6 @@ from typing import TypedDict
 
 import pytest
 from agent_action_capsule import json_digest
-from cll.ledger import LedgerStore
 
 from capsule_engine.guards import Action, LocalSigner
 from capsule_engine.guards.capsule import ALLOW, ESCALATE
@@ -31,6 +30,7 @@ from capsule_engine.guards.checks import (
     seen_before_fold,
 )
 from capsule_engine.guards.classes import TAXONOMY_VERSION
+from capsule_engine.guards.history import MemoryHistory
 from capsule_engine.guards.wickets import load_definition_file as load_wicket
 from capsule_engine.guards.wickets.retired import retired_entry
 from capsule_engine.packs import build_engine, install_pack, load_pack_dir
@@ -99,7 +99,7 @@ def _wicket_check(version: str, action: Action, ledger):
 
 @pytest.fixture
 def empty_ledger(tmp_path):
-    store = LedgerStore(tmp_path / "ledger")
+    store = MemoryHistory()
     yield store
     store.close()
 
@@ -165,10 +165,10 @@ def _rules(pack: PackDefinition, decision) -> dict[str, tuple[str, str | None]]:
 def live(tmp_path):
     """An engine on everyday 0.3.5 whose ledger holds one accepted payment
     to ``shop/known``, which makes that merchant seen."""
-    store = LedgerStore(tmp_path / "ledger")
+    store = MemoryHistory()
     signer = LocalSigner(key_id="no-payee-test-key", secret=b"no-payee-test-fixed-key")
     installed = install_pack(PACK, project_dir=tmp_path / "project", mode="observe")
-    engine = build_engine(installed, ledger=store, signer_provider=lambda: signer)
+    engine = build_engine(installed, history=store, signer_provider=lambda: signer)
     known = Action(verb="make_payment", operator=OPERATOR, developer="no-payee-test", action_class="money.transfer",
                    amount_minor=700, currency="EUR", rail="card", target="shop/known", recurrence="one_time",
                    counterparty_account_ref="acct-ref-known-1", action_id="make_payment/no-payee-known",

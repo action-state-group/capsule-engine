@@ -420,7 +420,7 @@ PURCHASE_LIMIT_MINOR = 10_000
 
 def _engine(store, signer) -> GuardEngine:
     return GuardEngine(
-        ledger=store,
+        history=store,
         caps_fold=_v3(),
         signer_provider=lambda: signer,
         caps_minor={"booking.create": BOOKING_WINDOW_MINOR, "money.purchase": BOOKING_WINDOW_MINOR},
@@ -497,7 +497,7 @@ def test_the_first_check_on_an_empty_ledger_carries_a_zero_summary(store, signer
 
 def test_a_v2_fold_keeps_the_evidence_shape_it_had(store, signer):
     engine = GuardEngine(
-        ledger=store,
+        history=store,
         caps_fold=load_definition_file(CATALOG_DIR / "spend.weekly.v2.yaml"),
         signer_provider=lambda: signer,
         caps_minor={"money.purchase": PURCHASE_LIMIT_MINOR},

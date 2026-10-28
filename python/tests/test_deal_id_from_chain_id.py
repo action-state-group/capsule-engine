@@ -26,13 +26,13 @@ from typing import TypedDict
 
 import pytest
 from agent_action_capsule import json_digest
-from cll.ledger import LedgerStore
 
 from capsule_engine.folds.loader import load_definition_file as load_fold
 from capsule_engine.guards import GuardEngine, LocalSigner
 from capsule_engine.guards.capsule import ALLOW, DENY, ESCALATE
 from capsule_engine.guards.classes import TAXONOMY_VERSION
 from capsule_engine.guards.engine import NOT_EVALUABLE
+from capsule_engine.guards.history import MemoryHistory
 from capsule_engine.report.replay import action_for_check_input, action_for_record, replay
 
 SPEND_WEEKLY = Path(__file__).parent.parent / "capsule_engine" / "folds" / "catalog_defs" / "spend.weekly.yaml"
@@ -316,8 +316,8 @@ def _live(envelope: Envelope):
 
 
 def _decided(action, ledger_dir: Path):
-    with LedgerStore(ledger_dir) as store:
-        engine = GuardEngine(ledger=store, caps_fold=load_fold(SPEND_WEEKLY), signer_provider=lambda: SIGNER)
+    with MemoryHistory() as store:
+        engine = GuardEngine(history=store, caps_fold=load_fold(SPEND_WEEKLY), signer_provider=lambda: SIGNER)
         return engine.check(action, dry_run=True)
 
 

@@ -24,7 +24,7 @@ or adding a path that exports decision capsules needs the share boundary reviewe
 path calls `local_only_refusal` and gets a test in that file.
 
 The Go guard (`go/`) holds to the same boundary. It seals no decision capsule and exports none:
-it decides, and its caller seals. `RecordFor` builds an in-memory record for the ledger the next
+it decides, and its caller seals. `RecordFor` builds an in-memory record for the history the next
 check reads. The profile-keyed payee target that `go/guard/record.go` builds is matched locally
 and never appears in a reason or a report value; `go/guard/local_only_test.go` enforces this. A
 Go path added later that writes report or bundle output for another party needs the same

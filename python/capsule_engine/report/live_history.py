@@ -65,7 +65,6 @@ from datetime import datetime
 from typing import TypedDict
 
 from agent_action_capsule import json_digest
-from cll.ledger.api import LedgerAPI
 
 from ..folds.definition import FoldDefinition
 from ..folds.duration import parse_duration_seconds
@@ -73,6 +72,7 @@ from ..guards.action import Action
 from ..guards.capsule import act_payload
 from ..guards.checks.caps import counts_executed_acts, in_window_count
 from ..guards.classes import ENGINE_TAXONOMY, same_classes
+from ..guards.history import History
 from ..guards.history_state import (
     DISPOSITION,
     INCOMPLETE,
@@ -139,7 +139,7 @@ class HistoryLedger:
     statement: int = 0
 
 
-def history_ledger(envelope: dict, ledger: LedgerAPI, *, caps_fold: FoldDefinition | None = None) -> HistoryLedger:
+def history_ledger(envelope: dict, ledger: History, *, caps_fold: FoldDefinition | None = None) -> HistoryLedger:
     """Write the acts of ``envelope``'s ``history`` into ``ledger``, oldest
     first, and an ``incomplete`` record after them when the history is not
     known to be complete (module docstring). ``caps_fold`` is the engine's;
@@ -180,13 +180,13 @@ def history_ledger(envelope: dict, ledger: LedgerAPI, *, caps_fold: FoldDefiniti
         if stated is not None:
             claims.add(claim_of(stated))
         counts[str(record["asg_payload"][LIVE_HISTORY])] += 1
-        ledger.append(dict(record), consequential=False)
+        ledger.append(dict(record))
         if executed is not None and stated is None:
             shown = bound_agent_input(entry)
             spend = executed.record(entry, shown, json_digest(shown) if shown is not None else record["capsule_id"],
                                     every_record_is_an_act=True)
             if spend is not None:
-                ledger.append(dict(spend), consequential=False)
+                ledger.append(dict(spend))
     if isinstance(checked, dict):
         for stated in deal_claim_statements(checked).statements:
             if claim_of(stated) in claims:
@@ -194,13 +194,13 @@ def history_ledger(envelope: dict, ledger: LedgerAPI, *, caps_fold: FoldDefiniti
                 continue
             claims.add(claim_of(stated))
             counts[STATEMENT] += 1
-            ledger.append(dict(_marked(stated)), consequential=False)
+            ledger.append(dict(_marked(stated)))
     if not complete:
-        ledger.append(_incomplete_record(envelope.get("record")), consequential=False)
+        ledger.append(_incomplete_record(envelope.get("record")))
     else:
         held = window_held_reason(scope, [entry for _, _, entry in dated], caps_fold, checked)
         if held is not None:
-            ledger.append(_window_held_record(envelope.get("record"), held), consequential=False)
+            ledger.append(_window_held_record(envelope.get("record"), held))
     return HistoryLedger(
         complete=complete,
         disposition=counts[DISPOSITION],

@@ -1,7 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
-"""capsule-ledger is archived (#170) and no longer a dependency: ledger
-storage comes from checkpointed-local-log's ``cll.ledger``, and nothing here
-imports ``capsule_ledger``."""
+"""capsule-ledger is archived (#170) and no longer a dependency, and the
+engine no longer uses a ledger (capsule-engine#255): records are stored in a
+checkpointed-local-log entry log beside capsule-emit's artifact store
+(``guards/history.py``). Nothing here imports ``capsule_ledger`` or
+checkpointed-local-log's ledger layer (``cll.ledger``, ``cll.log.ledger``)."""
 from __future__ import annotations
 
 import ast
@@ -9,7 +11,7 @@ import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-FORBIDDEN = "capsule_ledger"
+FORBIDDEN = ("capsule_ledger", "cll.ledger", "cll.log.ledger")
 
 
 def _imported_modules(path: Path) -> list[str]:
@@ -58,7 +60,7 @@ def _offenders() -> list[str]:
     found = []
     for directory in ("python/capsule_engine", "python/tests", "python/scripts", "scripts", "examples"):
         for path in sorted((REPO_ROOT / directory).rglob("*.py")):
-            hits = [m for m in _imported_modules(path) if m == FORBIDDEN or m.startswith(FORBIDDEN + ".")]
+            hits = [m for m in _imported_modules(path) if any(m == f or m.startswith(f + ".") for f in FORBIDDEN)]
             if hits:
                 found.append(f"{path.relative_to(REPO_ROOT)}: {hits[0]}")
     return found
@@ -85,10 +87,12 @@ def test_detector_flags_an_aliased_import(tmp_path, monkeypatch):
         "import importlib as il\nil.import_module('capsule_ledger.ledger')\n", encoding="utf-8"
     )
     (package / "g.py").write_text("from capsule_ledger.payload_store import PayloadStore\n", encoding="utf-8")
+    (package / "h.py").write_text("from cll.ledger.api import LedgerAPI\n", encoding="utf-8")
+    (package / "i.py").write_text("import importlib\nimportlib.import_module('cll.ledger')\n", encoding="utf-8")
+    (package / "j.py").write_text("from cll.log import ledger\n", encoding="utf-8")
     (package / "fine.py").write_text(
-        "from cll.ledger.api import LedgerAPI\nfrom capsule_engine import registry\n"
-        "import importlib\nimportlib.import_module('cll.ledger')\n"
-        "plugins.import_module('capsule_ledger.ledger')\nimport capsule_ledgers\n",
+        "from cll.log import jsonl\nfrom capsule_engine import registry\n"
+        "plugins.import_module('capsule_ledger.ledger')\nimport capsule_ledgers\nimport cll.ledgers\n",
         encoding="utf-8",
     )
     monkeypatch.setattr(sys.modules[__name__], "REPO_ROOT", tmp_path)
@@ -100,4 +104,7 @@ def test_detector_flags_an_aliased_import(tmp_path, monkeypatch):
         "python/capsule_engine/e.py: capsule_ledger.ledger.records",
         "python/capsule_engine/f.py: capsule_ledger.ledger",
         "python/capsule_engine/g.py: capsule_ledger.payload_store",
+        "python/capsule_engine/h.py: cll.ledger.api",
+        "python/capsule_engine/i.py: cll.ledger",
+        "python/capsule_engine/j.py: cll.log.ledger",
     ]

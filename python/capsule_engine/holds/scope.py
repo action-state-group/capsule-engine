@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: Apache-2.0
 """Per-scope single-writer locking for evaluate-and-reserve (issue #51 point 2).
 
-``LedgerStore.append`` (``ledger/store.py``) already serializes every write to
-one ledger through its own internal lock -- that guarantees physical
+``History.append`` (``guards/history.py``) already serializes every write to
+one history through its own lock -- that guarantees physical
 correctness (no torn writes, no corrupted index) but says nothing about
 *business* atomicity: two concurrent evaluate-and-reserve calls for the same
 scope can each read the fold aggregate, each see room under the cap, and each

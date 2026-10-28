@@ -150,7 +150,7 @@ def test_live_writes_the_replays_record_plus_its_marker(store):
     capsule, shown = _claim()
     entry = {**capsule, "agent_input": shown, "item_ref": "3f" * 32}
     history_ledger(_envelope(entry), store)
-    (written,) = [r.capsule for r in store.scan()]
+    (written,) = [r.capsule for r in store.find()]
     replayed = statement_record(capsule, shown)
     assert statement_for_history_entry(entry) == replayed
     assert written == {**replayed, "asg_payload": {**replayed["asg_payload"], "live_history": "statement"}}
@@ -177,7 +177,7 @@ def test_a_live_claim_never_adds_to_a_spend_window(store):
     capsule, shown = _claim()
     spend = load_fold(FOLDS / "spend.weekly.v3.1.yaml")
     history_ledger(_envelope({**capsule, "agent_input": shown}), store, caps_fold=spend)
-    assert [r.capsule["asg_payload"].get("live_history") for r in store.scan()] == ["statement"]
+    assert [r.capsule["asg_payload"].get("live_history") for r in store.find()] == ["statement"]
 
 
 def test_a_claim_given_twice_is_one_statement_live(store):
@@ -210,7 +210,7 @@ def _check(store, action: Action, *, definition=V1_1):
 
 def _state(store, **change) -> None:
     capsule, shown = _claim(**change)
-    store.append(dict(statement_record(capsule, shown)), consequential=False)
+    store.append(dict(statement_record(capsule, shown)))
 
 
 def test_a_condition_claim_in_the_deal_passes(store):
@@ -235,7 +235,7 @@ def test_a_claim_that_is_not_this_deals_condition_fails(store, change):
 def test_another_operators_claim_does_not_count(store):
     capsule, shown = _claim()
     stated = statement_record({**capsule, "operator": "someone-else"}, shown)
-    store.append(dict(stated), consequential=False)
+    store.append(dict(stated))
     assert _check(store, _action()).result == "fail"
 
 
@@ -279,7 +279,7 @@ def test_a_live_claim_with_the_sales_item_leaves_s11_and_the_history_alone(store
                 "history_scope": {"complete": True, "days": 31, "max_records": 1000}}
     written = history_ledger(envelope, store)
     assert (written.complete, written.statement, written.unread, written.disposition) == (True, 1, 0, 0)
-    (row,) = [r.capsule for r in store.scan()]
+    (row,) = [r.capsule for r in store.find()]
     assert row["asg_payload"]["live_history"] == "statement" and "item_ref" not in row["asg_payload"]
 
 

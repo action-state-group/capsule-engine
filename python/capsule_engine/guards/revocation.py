@@ -3,7 +3,7 @@
 history.
 
 Design intent (rotating a signing key is
-itself a recorded event (``events.capsule.build_event_capsule`` + ``LedgerAPI.append`` --
+itself a recorded event (``events.capsule.build_event_capsule`` + ``History.append`` --
 the same mechanism every other write path uses, see ``cli/key_cmds.py``).
 That event names the outgoing key's fingerprint, the incoming key's
 fingerprint, and the timestamp the rotation took effect. Because that event
@@ -25,7 +25,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from cll.ledger.api import LedgerAPI
+from .history import History, Query
 
 __all__ = [
     "ROTATION_EVENT",
@@ -56,15 +56,15 @@ class RevocationFinding:
     reason: str | None = None
 
 
-def build_key_timeline(ledger: LedgerAPI) -> dict[str, KeyWindow]:
-    """Scan ``ledger`` for ``key_rotation`` event capsules and rebuild the
+def build_key_timeline(history: History) -> dict[str, KeyWindow]:
+    """Find ``history``'s ``key_rotation`` event capsules and rebuild the
     key_id -> :class:`KeyWindow` map they imply. Reconstructable from the
-    ledger alone, in ledger (append) order -- the earliest rotation touching
+    history alone, in log (append) order -- the earliest rotation touching
     a given key_id sets its ``activated_at``; the earliest rotation *away*
     from it sets its ``revoked_at``.
     """
     windows: dict[str, KeyWindow] = {}
-    for record in ledger.scan():
+    for record in history.find(Query(where={"asg_payload.event": ROTATION_EVENT})):
         payload = record.capsule.get("asg_payload") or {}
         if payload.get("event") != ROTATION_EVENT:
             continue

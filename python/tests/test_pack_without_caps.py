@@ -14,11 +14,11 @@ from pathlib import Path
 
 import pytest
 from agent_action_capsule import json_digest
-from cll.ledger import LedgerStore
 
 from capsule_engine.guards import Action, GuardEngine, LocalSigner
 from capsule_engine.guards.capsule import ALLOW, DENY, not_applicable_evidence
 from capsule_engine.guards.checks import RUNNABLE_CHECKS
+from capsule_engine.guards.history import MemoryHistory
 from capsule_engine.packs import install_pack, load_pack_dir
 from capsule_engine.report.replay import replay
 
@@ -53,13 +53,13 @@ def _caps(decision) -> dict:
 
 @pytest.fixture
 def store(tmp_path):
-    s = LedgerStore(tmp_path / "ledger")
+    s = MemoryHistory()
     yield s
     s.close()
 
 
 def test_with_no_caps_definition_caps_is_out_of_scope_and_the_action_is_decided(store):
-    engine = GuardEngine(ledger=store, caps_fold=None, signer_provider=lambda: SIGNER)
+    engine = GuardEngine(history=store, caps_fold=None, signer_provider=lambda: SIGNER)
     decision = engine.check(_transfer(1))
     assert decision.outcome == ALLOW
     (caps,) = [c for c in decision.constraints if c.id == "caps"]
@@ -74,11 +74,11 @@ def test_with_no_caps_definition_caps_is_out_of_scope_and_the_action_is_decided(
                                     {"per_action_minor": {"money.transfer": 100}}])
 def test_a_limit_without_a_caps_definition_is_refused_when_the_engine_is_built(store, limits):
     with pytest.raises(ValueError, match="no caps fold definition"):
-        GuardEngine(ledger=store, caps_fold=None, signer_provider=lambda: SIGNER, **limits)
+        GuardEngine(history=store, caps_fold=None, signer_provider=lambda: SIGNER, **limits)
 
 
 def test_a_taxonomy_mismatch_leaves_an_absent_caps_out_of_scope_and_still_refuses(store):
-    engine = GuardEngine(ledger=store, caps_fold=None, signer_provider=lambda: SIGNER)
+    engine = GuardEngine(history=store, caps_fold=None, signer_provider=lambda: SIGNER)
     decision = engine.check(_transfer(2, taxonomy_version="5"))
     assert decision.taxonomy_mismatch is not None
     assert _caps(decision)["evidence_digest"] == OUT_OF_SCOPE

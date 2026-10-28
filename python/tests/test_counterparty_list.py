@@ -15,13 +15,13 @@ from typing import NotRequired, TypedDict
 
 import pytest
 from agent_action_capsule.canonical import json_digest
-from cll.ledger import LedgerStore
 
 from capsule_engine.folds.loader import load_definition_file as load_fold
 from capsule_engine.guards import Action, GuardEngine, LocalSigner
 from capsule_engine.guards.capsule import ALLOW, DENY, ESCALATE, not_applicable_evidence
 from capsule_engine.guards.checks import check_counterparty_list
 from capsule_engine.guards.checks.counterparty_list import ListEntry
+from capsule_engine.guards.history import MemoryHistory
 from capsule_engine.guards.wickets import load_definition_file
 from capsule_engine.packs import build_engine, install_pack, load_pack_dir, record_pack_activation
 from capsule_engine.policy import PROFILE_FORMAT, PolicyManifestError, parse_profile
@@ -237,7 +237,7 @@ def test_a_list_mixing_kinds_needs_every_kind_it_names():
 
 def _engine(store, caps_fold, **config) -> GuardEngine:
     return GuardEngine(
-        ledger=store,
+        history=store,
         caps_fold=caps_fold,
         signer_provider=lambda: SIGNER,
         wickets=(replace(LIST_WICKET, config={**LIST_WICKET.config, **config}),),
@@ -405,11 +405,11 @@ def _decide(tmp_path, profile, action, *, activate=True):
     once a signed activation binds it (``policy/limits.py``), so the install
     is activated an hour before the action unless ``activate`` is false."""
     installed = install_pack(_pack_with_list(), project_dir=tmp_path / "project", mode="enforce", profile=profile)
-    ledger = LedgerStore(tmp_path / "ledger")
+    ledger = MemoryHistory()
     if activate:
-        record_pack_activation(installed, ledger=ledger, operator="household-list-fixture", developer="ops",
+        record_pack_activation(installed, history=ledger, operator="household-list-fixture", developer="ops",
                                signer=SIGNER, timestamp="2026-10-08T09:00:00Z")
-    engine = build_engine(installed, ledger=ledger, signer_provider=lambda: SIGNER, clock=lambda: action.timestamp)
+    engine = build_engine(installed, history=ledger, signer_provider=lambda: SIGNER, clock=lambda: action.timestamp)
     decision = engine.check(action)
     ledger.close()
     return installed, decision

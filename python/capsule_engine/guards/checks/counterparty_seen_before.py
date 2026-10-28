@@ -24,13 +24,12 @@ from __future__ import annotations
 from functools import cache
 from pathlib import Path
 
-from cll.ledger.api import LedgerAPI, ScanQuery
-
 from ...folds.catalog import Catalog
 from ...folds.definition import FoldDefinition
 from ...folds.engine import evaluate_one
 from ..action import Action
 from ..capsule import ConstraintOutcome, not_applicable_evidence
+from ..history import History, Query
 from .base import CheckOutcome
 
 __all__ = ["check_counterparty_seen_before", "check_recipient_seen_before", "seen_before_fold"]
@@ -88,26 +87,26 @@ def _no_payee(check_id: str, noun: str, action: Action, method: str) -> CheckOut
 
 
 def check_counterparty_seen_before(
-    action: Action, ledger: LedgerAPI, *, definition: FoldDefinition, action_classes: list[str],
+    action: Action, history: History, *, definition: FoldDefinition, action_classes: list[str],
     missing_target: str = "n/a",
 ) -> CheckOutcome:
     if missing_target not in MISSING_TARGET_MODES:
         raise ValueError(f"missing_target {missing_target!r} is not one of {sorted(MISSING_TARGET_MODES)}")
-    return _seen_before(_CHECK_ID, "counterparty", action, ledger, definition=definition, action_classes=action_classes,
+    return _seen_before(_CHECK_ID, "counterparty", action, history, definition=definition, action_classes=action_classes,
                         missing_target=missing_target)
 
 
 def check_recipient_seen_before(
-    action: Action, ledger: LedgerAPI, *, definition: FoldDefinition, action_classes: list[str]
+    action: Action, history: History, *, definition: FoldDefinition, action_classes: list[str]
 ) -> CheckOutcome:
     """The same count, for a message: has this operator gone ahead with an
     action addressed to this recipient before?"""
-    return _seen_before("recipient_seen_before", "recipient", action, ledger, definition=definition,
+    return _seen_before("recipient_seen_before", "recipient", action, history, definition=definition,
                         action_classes=action_classes)
 
 
 def _seen_before(
-    check_id: str, noun: str, action: Action, ledger: LedgerAPI, *, definition: FoldDefinition,
+    check_id: str, noun: str, action: Action, history: History, *, definition: FoldDefinition,
     action_classes: list[str], missing_target: str = "n/a",
 ) -> CheckOutcome:
     method = definition.fold_id
@@ -121,8 +120,7 @@ def _seen_before(
         return _n_a(check_id, f"the action names no target; the {noun} could not be identified",
                     method, in_scope=True, missing_field="target")
 
-    # ``ScanQuery.counterparty`` is the ledger's filter on ``operator``.
-    records = [r.capsule for r in ledger.scan(ScanQuery(counterparty=action.operator))]
+    records = [r.capsule for r in history.find(Query(where={"operator": action.operator}))]
     trace = evaluate_one(definition, records, key_value=action.target)
     prior_count = trace.result or 0
     seen_before = prior_count > 0

@@ -9,7 +9,7 @@ from capsule_engine.guards import Action, GuardEngine
 
 def test_decision_capsule_carries_the_configured_manifest_digest(store, caps_fold, signer, resolved_manifest):
     engine = GuardEngine(
-        ledger=store,
+        history=store,
         caps_fold=caps_fold,
         signer_provider=lambda: signer,
         manifest_digest=resolved_manifest.manifest_digest,
@@ -22,7 +22,7 @@ def test_decision_capsule_carries_the_configured_manifest_digest(store, caps_fol
 
 
 def test_decision_capsule_omits_manifest_digest_when_none_configured(store, caps_fold, signer):
-    engine = GuardEngine(ledger=store, caps_fold=caps_fold, signer_provider=lambda: signer)
+    engine = GuardEngine(history=store, caps_fold=caps_fold, signer_provider=lambda: signer)
     action = Action(verb="info_lookup", operator="acme", developer="dev1", action_class="info.query")
     decision = engine.check(action)
 
@@ -35,7 +35,7 @@ def test_infra_deny_decision_also_carries_the_manifest_digest(store, caps_fold, 
     decision capsule (``GuardEngine._infra_deny``) -- confirm it threads the
     manifest digest too, not just the main happy-path branch."""
     engine = GuardEngine(
-        ledger=store,
+        history=store,
         caps_fold=caps_fold,
         signer_provider=lambda: signer,
         manifest_digest=resolved_manifest.manifest_digest,
@@ -54,10 +54,10 @@ def test_different_manifests_produce_different_cited_digests(store, caps_fold, s
     confirm the capsule cites the one it was actually built under, not a
     fixed/hardcoded value."""
     engine_a = GuardEngine(
-        ledger=store, caps_fold=caps_fold, signer_provider=lambda: signer, manifest_digest=resolved_manifest.manifest_digest
+        history=store, caps_fold=caps_fold, signer_provider=lambda: signer, manifest_digest=resolved_manifest.manifest_digest
     )
     engine_b = GuardEngine(
-        ledger=store, caps_fold=caps_fold, signer_provider=lambda: signer, manifest_digest="f" * 64
+        history=store, caps_fold=caps_fold, signer_provider=lambda: signer, manifest_digest="f" * 64
     )
     action = Action(verb="info_lookup", operator="acme", developer="dev1", action_class="info.query")
 

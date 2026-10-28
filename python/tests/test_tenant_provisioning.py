@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 """Engine-instance-per-tenant provisioning (``capsule_engine.tenants`` +
-``capsule tenant init/upgrade/list``): one physically-separate ledger dir +
+``capsule tenant init/upgrade/list``): one physically-separate store dir +
 pinned manifest + signing key per tenant, templated so provisioning many
 tenants is a script, not bespoke work per customer."""
 from __future__ import annotations
@@ -8,9 +8,9 @@ from __future__ import annotations
 import json
 
 import pytest
-from cll.ledger import LedgerStore
 
 from capsule_engine.cli.main import main
+from capsule_engine.guards.history import open_store
 from capsule_engine.packs import load_pack_dir
 from capsule_engine.policy import load_manifest_file
 from capsule_engine.tenants import (
@@ -43,7 +43,7 @@ def test_tenant_layout_rejects_path_traversal(tmp_path):
 def test_tenant_layout_accepts_a_normal_id(tmp_path):
     layout = tenant_layout(tmp_path, "acme-corp")
     assert layout.root == tmp_path / "acme-corp"
-    assert layout.ledger_dir == tmp_path / "acme-corp" / "ledger"
+    assert layout.store_dir == tmp_path / "acme-corp" / "store"
 
 
 # -- unit: init_tenant ---------------------------------------------------------
@@ -53,15 +53,15 @@ def test_init_tenant_default_manifest_creates_layout_and_activation(tmp_path):
     result = init_tenant(tmp_path, "acme", operator="acme-ops", developer="acme-agent")
 
     layout = result.layout
-    assert layout.ledger_dir.is_dir()
+    assert layout.store_dir.is_dir()
     assert layout.manifest_path.is_file()
     assert layout.metadata_path.is_file()
 
     manifest = load_manifest_file(layout.manifest_path)
     assert manifest.manifest_id == result.manifest_id
 
-    with LedgerStore(layout.ledger_dir) as store:
-        records = list(store.scan())
+    with open_store(layout.store_dir) as store:
+        records = list(store.find())
     assert len(records) == 1
     assert records[0].capsule_id == result.activation_capsule_id
     assert records[0].capsule["asg_payload"]["detail"]["manifest_digest"] == result.manifest_digest
@@ -120,8 +120,8 @@ def test_upgrade_tenant_is_a_noop_when_manifest_unchanged(tmp_path):
     assert upgrade_result.manifest_digest == init_result.manifest_digest
     assert upgrade_result.activation_capsule_id == init_result.activation_capsule_id
 
-    with LedgerStore(init_result.layout.ledger_dir) as store:
-        records = list(store.scan())
+    with open_store(init_result.layout.store_dir) as store:
+        records = list(store.find())
     assert len(records) == 1  # no pointless second activation
 
 
@@ -133,8 +133,8 @@ def test_upgrade_tenant_records_new_epoch_when_manifest_changes(tmp_path):
     assert upgrade_result.changed is True
     assert upgrade_result.manifest_digest != init_result.manifest_digest
 
-    with LedgerStore(init_result.layout.ledger_dir) as store:
-        records = list(store.scan())
+    with open_store(init_result.layout.store_dir) as store:
+        records = list(store.find())
     assert len(records) == 2
     assert records[0].capsule_id == init_result.activation_capsule_id
     new_activation = records[1]

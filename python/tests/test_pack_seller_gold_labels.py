@@ -17,8 +17,8 @@ import json
 from pathlib import Path
 
 import yaml
-from cll.ledger import LedgerStore
 
+from capsule_engine.guards.history import MemoryHistory
 from capsule_engine.packs.loader import load_pack_dir
 
 TESTS = Path(__file__).parent
@@ -49,7 +49,7 @@ HEADER = gold.HEADER.replace("everyday fixture corpus", "seller fixture corpus")
 
 
 def _run(tmp: Path):
-    store = LedgerStore(tmp / "ledger")
+    store = MemoryHistory()
     try:
         return acceptance._run_scenarios(store, project_dir=tmp / "project")
     finally:

@@ -1,10 +1,10 @@
 # SPDX-License-Identifier: Apache-2.0
-"""Engine-instance-per-tenant provisioning: one physically-separate ledger
+"""Engine-instance-per-tenant provisioning: one physically-separate store
 dir + policy manifest + signing-key identity per tenant, under a shared
 ``<tenants-root>/<tenant-id>/`` layout.
 
-This is deliberately NOT a multi-tenant ledger process. The OSS engine
-(``LedgerStore``/``GuardEngine``) is single-org by scope; the strongest
+This is deliberately NOT a multi-tenant store process. The OSS engine
+(``StoreHistory``/``GuardEngine``) is single-org by scope; the strongest
 isolation story for a caller embedding it for many customers is to run one
 whole engine instance per tenant -- separate files, separate keys, so a
 compromise or a bug in one tenant's instance can never cross into another's
@@ -14,7 +14,7 @@ templating that instantiation, not a new kind of engine.
 
 Layout, under ``<tenants-root>/<tenant_id>/``::
 
-    ledger/                    a LedgerStore root (segments/, index.sqlite3)
+    store/                     a store directory (``guards/history.py`` ``open_store``)
     .capsule/policy/manifest.yaml   this tenant's own pinned policy manifest
     .capsule/catalog/...        materialized fold/wicket defs, pack installs only
     tenant.json                 provisioning metadata -- never the signing secret
@@ -33,8 +33,8 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import yaml
-from cll.ledger import LedgerStore
 
+from .guards.history import open_store
 from .guards.signing import LocalSigner, key_fingerprint
 from .packs import PackDefinition, install_pack
 from .packs.install import CATALOG_DIRNAME
@@ -63,7 +63,7 @@ DEFAULT_MANIFEST_PATH = _PACKAGE_ROOT / "policy" / "catalog_defs" / "default.yam
 DEFAULT_FOLD_DIR = _PACKAGE_ROOT / "folds" / "catalog_defs"
 DEFAULT_WICKET_DIR = _PACKAGE_ROOT / "guards" / "wickets" / "catalog_defs"
 
-LEDGER_DIRNAME = "ledger"
+STORE_DIRNAME = "store"
 TENANT_METADATA_FILENAME = "tenant.json"
 
 # Deliberately conservative -- a tenant_id feeds directly into a filesystem
@@ -86,8 +86,8 @@ class TenantLayout:
     root: Path
 
     @property
-    def ledger_dir(self) -> Path:
-        return self.root / LEDGER_DIRNAME
+    def store_dir(self) -> Path:
+        return self.root / STORE_DIRNAME
 
     @property
     def catalog_root(self) -> Path:
@@ -182,10 +182,10 @@ def init_tenant(
     operator: str = "local",
     developer: str = "capsule-tenant-init",
 ) -> InitResult:
-    """Provision a brand-new tenant instance: a fresh ledger dir, this
+    """Provision a brand-new tenant instance: a fresh store dir, this
     tenant's own pinned manifest, and a first ``policy_manifest_activated``
     activation capsule opening its epoch history -- signed by a fresh (or
-    caller-supplied) key, so the tenant's ledger carries a real record of
+    caller-supplied) key, so the tenant's store carries a real record of
     what policy governed it from record one. Refuses if anything already
     exists at this tenant's path (fail closed -- use ``upgrade_tenant`` for
     an existing tenant)."""
@@ -206,7 +206,7 @@ def init_tenant(
     resolved_secret = secret if secret is not None else secrets_mod.token_hex(32).encode("utf-8")
     signer = LocalSigner(key_id=resolved_key_id, secret=resolved_secret)
 
-    with LedgerStore(layout.ledger_dir) as store:
+    with open_store(layout.store_dir, signer=signer, create=True) as store:
         capsule = build_manifest_activation_capsule(
             resolved=resolved,
             operator=operator,
@@ -214,7 +214,7 @@ def init_tenant(
             signer=signer,
             previous_activation_capsule_id=None,
         )
-        store.append(capsule, consequential=False)
+        store.append(capsule)
 
     metadata = {
         "tenant_id": tenant_id,
@@ -256,11 +256,11 @@ def upgrade_tenant(
     resulting manifest digest actually changed, record a new activation
     capsule chained to the tenant's previous one -- a new policy epoch, not
     a silent rewrite. Idempotent: running this twice with nothing changed
-    upstream is a no-op on the ledger (``changed=False``), matching
+    upstream is a no-op on the store (``changed=False``), matching
     ``install_pack``'s own idempotency guarantee for the files it writes.
     Requires the tenant's *current* live signing key -- upgrading is a
     normal write to that tenant's own epoch history, not a key rotation
-    (use ``capsule key rotate`` against this tenant's ledger for that)."""
+    (use ``capsule key rotate`` against this tenant's store for that)."""
     layout = tenant_layout(tenants_root, tenant_id)
     if not layout.metadata_path.is_file():
         raise TenantProvisionError(
@@ -283,7 +283,7 @@ def upgrade_tenant(
         )
 
     signer = LocalSigner(key_id=key_id, secret=secret)
-    with LedgerStore(layout.ledger_dir) as store:
+    with open_store(layout.store_dir, signer=signer) as store:
         previous_activation = find_latest_activation(store)
         capsule = build_manifest_activation_capsule(
             resolved=resolved,
@@ -292,7 +292,7 @@ def upgrade_tenant(
             signer=signer,
             previous_activation_capsule_id=previous_activation.capsule_id if previous_activation is not None else None,
         )
-        store.append(capsule, consequential=False)
+        store.append(capsule)
 
     metadata = {
         **previous_metadata,

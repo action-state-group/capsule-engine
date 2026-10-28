@@ -41,7 +41,7 @@ CAPPED_CLASSES = ("money.purchase", "money.refund", "external_commitment.other")
 
 def _engine(store, signer, *, window: int) -> GuardEngine:
     return GuardEngine(
-        ledger=store,
+        history=store,
         caps_fold=load_definition_file(FOLDS / "spend.weekly.v3.yaml"),
         signer_provider=lambda: signer,
         caps_minor=dict.fromkeys(CAPPED_CLASSES, window),

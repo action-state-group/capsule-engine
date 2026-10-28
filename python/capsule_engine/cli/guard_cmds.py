@@ -170,7 +170,7 @@ def _cmd_guard_dry_run(args: argparse.Namespace) -> int:
     def _build():
         if proposed_caps_minor is not None:
             return build_dry_run_report_with_proposal(
-                args.ledger,
+                args.store,
                 caps_fold=caps_fold,
                 proposed_caps_minor=proposed_caps_minor,
                 since=since,
@@ -184,7 +184,7 @@ def _cmd_guard_dry_run(args: argparse.Namespace) -> int:
                 per_action_reads=per_action_reads,
             )
         return build_dry_run_report(
-            args.ledger,
+            args.store,
             caps_fold=caps_fold,
             since=since,
             caps_minor=caps_minor,
@@ -231,7 +231,7 @@ def _cmd_guard_dry_run(args: argparse.Namespace) -> int:
         rebuilt = _report_payload(_build(), with_capsules=with_capsules)
         rhs = {k: v for k, v in rebuilt.items() if k != "generated_at"}
         if lhs != rhs:
-            print("FAIL: replaying the same ledger did not reproduce the report written", file=sys.stderr)
+            print("FAIL: replaying the same records did not reproduce the report written", file=sys.stderr)
             return 1
 
         mismatches = []
@@ -280,14 +280,15 @@ def add_parser(sub: argparse._SubParsersAction) -> argparse.ArgumentParser:
     guard.set_defaults(guard_parser=guard)
 
     p_dry_run = guard_sub.add_parser(
-        "dry-run", help="replay a ledger through the guard checks and write a JSON report"
+        "dry-run", help="replay stored records through the guard checks and write a JSON report"
     )
     p_dry_run.add_argument(
-        "--ledger", required=True, action="append", help="ledger JSONL file or LedgerStore directory (repeatable)"
+        "--store", required=True, action="append",
+        help="store directory, JSONL file of capsules or capsule bundle (repeatable)",
     )
     p_dry_run.add_argument(
         "--since", default="7d",
-        help="rolling window, e.g. '7d' (anchored to the ledger's own latest record); 'all' for no filter",
+        help="rolling window, e.g. '7d' (anchored to the records' own latest); 'all' for no filter",
     )
     p_dry_run.add_argument(
         "--share", action="store_true",
@@ -298,7 +299,7 @@ def add_parser(sub: argparse._SubParsersAction) -> argparse.ArgumentParser:
     )
     p_dry_run.add_argument("--out", default="dry-run-report.json", help="output JSON path (default: dry-run-report.json)")
     p_dry_run.add_argument(
-        "--operator", default=None, help="override the displayed operator label (default: the ledger's own)"
+        "--operator", default=None, help="override the displayed operator label (default: the records' own)"
     )
     p_dry_run.add_argument(
         "--cap", action="append", default=[], metavar="CLASS=MINOR_UNITS",

@@ -15,10 +15,10 @@ import json
 
 import pytest
 from agent_action_capsule import json_digest
-from cll.ledger import LedgerStore
 
 from capsule_engine.guards import Action, GuardEngine, LocalSigner
 from capsule_engine.guards.checks.dedupe import equivalence_key_for_action, equivalence_key_for_capsule
+from capsule_engine.guards.history import MemoryHistory
 
 SIGNER = LocalSigner(key_id="dedupe-equivalence-key", secret=b"dedupe-equivalence-key-fixed-key")
 RAW_KEY = "order-123"
@@ -41,8 +41,8 @@ def _payment(n: int, **fields) -> Action:
 
 @pytest.fixture
 def engine(tmp_path, caps_fold):
-    store = LedgerStore(tmp_path / "ledger")
-    yield GuardEngine(ledger=store, caps_fold=caps_fold, signer_provider=lambda: SIGNER)
+    store = MemoryHistory()
+    yield GuardEngine(history=store, caps_fold=caps_fold, signer_provider=lambda: SIGNER)
     store.close()
 
 

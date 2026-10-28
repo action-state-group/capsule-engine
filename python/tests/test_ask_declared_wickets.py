@@ -19,12 +19,12 @@ from dataclasses import replace
 from pathlib import Path
 
 import pytest
-from cll.ledger import LedgerStore
 
 from capsule_engine.guards import Action, GuardDecision, GuardEngine, LocalSigner
 from capsule_engine.guards.capsule import DENY, ESCALATE
 from capsule_engine.guards.checks import RUNNABLE_CHECKS, fields_basis, task_authority_record_digest
 from capsule_engine.guards.engine import ASK_RULE_EXCLUDED_CHECKS
+from capsule_engine.guards.history import MemoryHistory
 from capsule_engine.guards.wickets import load_definition_file
 from capsule_engine.packs import build_engine, install_pack, load_pack_dir
 from capsule_engine.packs.install import ask_wickets
@@ -108,10 +108,10 @@ def engine_for(tmp_path):
 
     def build(pack: PackDefinition) -> GuardEngine:
         n = len(stores)
-        store = LedgerStore(tmp_path / f"ledger-{n}")
+        store = MemoryHistory()
         stores.append(store)
         installed = install_pack(pack, project_dir=tmp_path / f"project-{n}", mode="observe")
-        return build_engine(installed, ledger=store, signer_provider=lambda: SIGNER)
+        return build_engine(installed, history=store, signer_provider=lambda: SIGNER)
 
     yield build
     for store in stores:
@@ -347,22 +347,22 @@ def test_an_integrity_or_own_rule_check_never_joins_the_ask_set_whatever_its_rul
 
 @pytest.mark.parametrize("check", EXCLUDED)
 def test_the_engine_refuses_an_integrity_or_own_rule_check_in_the_ask_set(tmp_path, check):
-    store = LedgerStore(tmp_path / "direct")
+    store = MemoryHistory()
     caps_fold = next(f for f in PACK.folds if f.fold_id.startswith("spend.weekly/"))
     try:
         with pytest.raises(ValueError, match="cannot be made to ask"):
-            GuardEngine(ledger=store, caps_fold=caps_fold, signer_provider=lambda: SIGNER,
+            GuardEngine(history=store, caps_fold=caps_fold, signer_provider=lambda: SIGNER,
                         ask_wickets=frozenset({check}))
     finally:
         store.close()
 
 
 def test_the_engine_refuses_an_ask_set_naming_a_check_no_wicket_runs(tmp_path):
-    store = LedgerStore(tmp_path / "direct")
+    store = MemoryHistory()
     caps_fold = next(f for f in PACK.folds if f.fold_id.startswith("spend.weekly/"))
     try:
         with pytest.raises(ValueError, match="no configured wicket runs"):
-            GuardEngine(ledger=store, caps_fold=caps_fold, signer_provider=lambda: SIGNER,
+            GuardEngine(history=store, caps_fold=caps_fold, signer_provider=lambda: SIGNER,
                         ask_wickets=frozenset({"refundability"}))
     finally:
         store.close()

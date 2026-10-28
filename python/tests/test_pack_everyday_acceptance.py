@@ -18,11 +18,11 @@ from typing import TypedDict
 
 import pytest
 from agent_action_capsule import json_digest
-from cll.ledger import LedgerStore
 
 from capsule_engine.guards import Action, LocalSigner
 from capsule_engine.guards.capsule import ALLOW, DENY, ESCALATE
 from capsule_engine.guards.checks import fields_basis, task_authority_record_digest
+from capsule_engine.guards.history import MemoryHistory, verify_record
 from capsule_engine.guards.wickets import load_definition_file
 from capsule_engine.packs import build_engine, install_pack, load_pack_dir, record_pack_activation
 
@@ -329,10 +329,10 @@ def _scenarios() -> list[tuple[str, Action, str]]:
 def _run_scenarios(ledger, *, project_dir):
     installed = install_pack(load_pack_dir(PACK_DIR), project_dir=project_dir, mode="observe")
     signer = _signer()
-    engine = build_engine(installed, ledger=ledger, signer_provider=lambda: signer)
+    engine = build_engine(installed, history=ledger, signer_provider=lambda: signer)
     activation = record_pack_activation(
         installed,
-        ledger=ledger,
+        history=ledger,
         operator=OPERATOR,
         developer="capsule-init-tool",
         signer=signer,
@@ -345,16 +345,16 @@ def _run_scenarios(ledger, *, project_dir):
         if decision.outcome != expected:
             raise AssertionError(f"scenario {name!r}: expected {expected!r}, got {decision.outcome!r} ({decision.reason})")
         capsules[name] = decision.capsule
-    return installed, activation, capsules, list(ledger.scan())
+    return installed, activation, capsules, list(ledger.find())
 
 
 @pytest.fixture(scope="module")
 def run(tmp_path_factory):
     tmp = tmp_path_factory.mktemp("everyday")
-    store = LedgerStore(tmp / "ledger")
+    store = MemoryHistory()
     try:
         installed, activation, capsules, records = _run_scenarios(store, project_dir=tmp / "project")
-        verified = {name: store.verify(c["capsule_id"]) for name, c in capsules.items()}
+        verified = {name: verify_record(store, store.get(c["capsule_id"])) for name, c in capsules.items()}
     finally:
         store.close()
     return installed, activation, capsules, records, verified
@@ -456,7 +456,7 @@ def _regenerate_fixture() -> None:
 
     with tempfile.TemporaryDirectory() as tmp:
         tmp = Path(tmp)
-        store = LedgerStore(tmp / "ledger")
+        store = MemoryHistory()
         try:
             _, _, _, records = _run_scenarios(store, project_dir=tmp / "project")
         finally:

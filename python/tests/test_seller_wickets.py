@@ -122,10 +122,10 @@ def _missing(constraint_id: str, field: str):
 
 
 def _engine(store, signer, *wickets: WicketDefinition) -> GuardEngine:
-    return GuardEngine(ledger=store, caps_fold=SPEND, signer_provider=lambda: signer, wickets=wickets)
+    return GuardEngine(history=store, caps_fold=SPEND, signer_provider=lambda: signer, wickets=wickets)
 
 
-def _run(definition: WicketDefinition, action: Action, *, ledger=None, record=None, approval=None, opening=None):
+def _run(definition: WicketDefinition, action: Action, *, history=None, record=None, approval=None, opening=None):
     if definition.check in COMMERCIAL_BOUNDS_CHECKS:
         return COMMERCIAL_BOUNDS_CHECKS[definition.check](action, record, opening, definition.config).constraint
     if definition.check in TASK_AUTHORITY_CHECKS:
@@ -134,7 +134,7 @@ def _run(definition: WicketDefinition, action: Action, *, ledger=None, record=No
         return AUTHORIZATION_CHECKS[definition.check](action, record, approval, definition.config).constraint
     if definition.check in STATEMENT_OPENING_CHECKS:
         return STATEMENT_OPENING_CHECKS[definition.check](action, opening, definition.config).constraint
-    return CONFIGURED_CHECKS[definition.check](action, ledger, definition.config).constraint
+    return CONFIGURED_CHECKS[definition.check](action, history, definition.config).constraint
 
 
 # -- the input shape ------------------------------------------------------------
@@ -333,7 +333,7 @@ def test_required_disclosure_is_not_waived_by_an_approval(store, signer):
 
 
 def test_required_disclosure_without_a_target_is_n_a(store, signer):
-    out = _run(DISCLOSURE, _action(target=None), ledger=store)
+    out = _run(DISCLOSURE, _action(target=None), history=store)
     assert out.evidence == _missing("required_disclosure", "target")
 
 

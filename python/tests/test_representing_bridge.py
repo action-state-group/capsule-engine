@@ -25,7 +25,6 @@ from pathlib import Path
 
 import pytest
 from agent_action_capsule import json_digest
-from cll.ledger import LedgerStore
 
 import capsule_engine
 from capsule_engine.guards import Action, GuardDecision, GuardEngine, LocalSigner
@@ -34,6 +33,7 @@ from capsule_engine.guards.checks import RUNNABLE_CHECKS
 from capsule_engine.guards.checks.commitment import text_commitment
 from capsule_engine.guards.classes import TAXONOMY_VERSION
 from capsule_engine.guards.engine import NOT_EVALUABLE
+from capsule_engine.guards.history import MemoryHistory
 from capsule_engine.guards.wickets import Catalog
 from capsule_engine.packs import install_pack, load_pack_dir
 from capsule_engine.packs.install import engine_ask_sets
@@ -109,11 +109,11 @@ def _entry(record: dict, seq: int, text: str | None = None) -> dict:
     return entry
 
 
-def _engine(store: LedgerStore, tmp: str, pack=PACK) -> GuardEngine:
+def _engine(store: MemoryHistory, tmp: str, pack=PACK) -> GuardEngine:
     resolved = install_pack(pack, project_dir=Path(tmp) / "project", mode="observe").resolved
     wickets = resolved.configured_wickets(RUNNABLE_CHECKS)
     gates, asks = engine_ask_sets(pack, wickets)
-    return GuardEngine(ledger=store, caps_fold=resolved.caps_fold(), signer_provider=lambda: SIGNER,
+    return GuardEngine(history=store, caps_fold=resolved.caps_fold(), signer_provider=lambda: SIGNER,
                        caps_minor=resolved.caps_minor() or {}, manifest_digest=resolved.manifest_digest,
                        wickets=wickets, ask_gate_selectors=gates, ask_wickets=asks,
                        evaluate_under_record_taxonomy=True)
@@ -122,7 +122,7 @@ def _engine(store: LedgerStore, tmp: str, pack=PACK) -> GuardEngine:
 def _live(entry: dict, authority: dict | None = ORDERED, pack=PACK) -> GuardDecision:
     """A live check of ``entry`` as a rules checker decides it, with the
     task-authority record capsulectl passes beside it."""
-    with tempfile.TemporaryDirectory() as tmp, LedgerStore(Path(tmp) / "ledger") as store:
+    with tempfile.TemporaryDirectory() as tmp, MemoryHistory() as store:
         return _engine(store, tmp, pack).check(
             action_for_check_input(entry), task_authority_record=authority,
             representing_opening=entry.get("representing_opening"))
@@ -294,7 +294,7 @@ def test_an_opening_that_breaks_the_template_fails_s10(text):
 ])
 def test_a_malformed_opening_fails_s10_and_never_crashes(opening):
     entry = _entry(_represent(2, "authenticity", IN_TEMPLATE, attributed_to="user"), 2)
-    with tempfile.TemporaryDirectory() as tmp, LedgerStore(Path(tmp) / "ledger") as store:
+    with tempfile.TemporaryDirectory() as tmp, MemoryHistory() as store:
         decision = _engine(store, tmp).check(action_for_check_input(entry), task_authority_record=ORDERED,
                                              representing_opening=opening)
     assert decision.outcome == DENY

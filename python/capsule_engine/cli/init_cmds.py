@@ -4,7 +4,7 @@
 Materializes the pack's constraints and folds into ``<project-dir>/.capsule/``,
 writes the policy manifest fragment that cites them plus the pack itself (by
 digest, mode ``observe``) -- so which pack version is in force is provable --
-and, when ``--ledger`` is given, records that installation as a signed
+and, when ``--store`` is given, records that installation as a signed
 ``policy_manifest_activated`` event capsule (``packs/install.py``'s
 ``record_pack_activation``).
 
@@ -32,9 +32,8 @@ import secrets
 import sys
 from pathlib import Path
 
-from cll.ledger import LedgerStore
-
 from ..envcompat import env_get
+from ..guards.history import open_store
 from ..guards.signing import LocalSigner
 from ..packs import (
     PackDefinitionError,
@@ -107,9 +106,9 @@ def _cmd_init(args: argparse.Namespace) -> int:
         f"{args.pack}` (not yet built)."
     )
 
-    if not args.ledger:
+    if not args.store:
         print()
-        print("no --ledger given: manifest written to disk only, no activation capsule recorded")
+        print("no --store given: manifest written to disk only, no activation capsule recorded")
         return 0
 
     key_id = args.key_id or env_get(_KEY_ID_ENV)
@@ -121,13 +120,10 @@ def _cmd_init(args: argparse.Namespace) -> int:
         secret_text = secrets.token_hex(32)
     signer = LocalSigner(key_id=key_id, secret=secret_text.encode("utf-8"))
 
-    ledger = LedgerStore(args.ledger)
-    try:
+    with open_store(args.store, signer=signer, create=True) as store:
         capsule = record_pack_activation(
-            installed, ledger=ledger, operator=args.operator, developer=args.developer, signer=signer
+            installed, history=store, operator=args.operator, developer=args.developer, signer=signer
         )
-    finally:
-        ledger.close()
 
     print()
     print(f"activation recorded: {capsule['capsule_id']}")
@@ -155,9 +151,9 @@ def add_parser(sub: argparse._SubParsersAction) -> argparse.ArgumentParser:
         "this command still prints each artifact's digest so you can seed one)",
     )
     p_init.add_argument(
-        "--ledger", default=None,
-        help="ledger store directory to record this install's activation capsule into (default: none, manifest "
-        "is still written to disk)",
+        "--store", default=None,
+        help="store directory to record this install's activation capsule into, created if missing (default: "
+        "none, manifest is still written to disk)",
     )
     p_init.add_argument("--operator", default="local", help="operator identity for the activation capsule (default: 'local')")
     p_init.add_argument(

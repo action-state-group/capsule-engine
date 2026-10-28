@@ -24,9 +24,11 @@ not exist in the chain.relation registry (only `confirms`, `supersedes`,
 `epoch_opens`); `supersedes` remains the token used here -- see STATUS.md's
 Needs decision (unrelated to D1/D2, not resolved by this task).
 """
+import json
 from pathlib import Path
 
 from capsule_engine.guards import Action, GuardEngine, LocalSigner
+from capsule_engine.guards.history import verify_record
 
 FIXTURES = Path(__file__).parent / "fixtures"
 AMAURY = FIXTURES / "amaury_sample_ledger.jsonl"
@@ -39,15 +41,15 @@ WEEKLY_CAP_MINOR = 10_000_000  # EUR 100,000.00
 
 
 def test_eur150k_bridge_scenario_escalates_with_fold_evidence_and_supersedes_chain(store, caps_fold):
-    n = store.import_jsonl(AMAURY)
+    n = len([store.append(json.loads(line)) for line in AMAURY.read_text(encoding="utf-8").splitlines() if line.strip()])
     assert n == 4
-    parent = store.fetch(CD0692B3)
+    parent = store.get(CD0692B3)
     assert parent is not None
     assert parent.capsule["disposition"]["verdict_class"] == "blocked"
 
     signer = LocalSigner(key_id="bridge-key-1", secret=b"bridge-secret")
     engine = GuardEngine(
-        ledger=store,
+        history=store,
         caps_fold=caps_fold,
         signer_provider=lambda: signer,
         caps_minor={"money.transfer": WEEKLY_CAP_MINOR},
@@ -91,12 +93,12 @@ def test_eur150k_bridge_scenario_escalates_with_fold_evidence_and_supersedes_cha
     # (the parent's `blocked` open state is closed/replaced; the new
     # `hitl_dispatched` capsule is itself now the open item, closed only by
     # a later, human-signed decision -- out of this test's scope)
-    result = store.verify(capsule["capsule_id"])
+    result = verify_record(store, store.get(capsule["capsule_id"]))
     assert result.ok, result.findings
 
     supersedes = [
         r
-        for r in store.scan()
+        for r in store.find()
         if (r.capsule.get("chain") or {}).get("parent_capsule_id") == CD0692B3
         and (r.capsule.get("chain") or {}).get("relation") == "supersedes"
     ]

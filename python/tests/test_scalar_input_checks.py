@@ -391,7 +391,7 @@ def test_channel_change_names_whichever_channel_is_missing():
 
 
 def _engine(store, caps_fold, signer, *wickets) -> GuardEngine:
-    return GuardEngine(ledger=store, caps_fold=caps_fold, signer_provider=lambda: signer, wickets=wickets)
+    return GuardEngine(history=store, caps_fold=caps_fold, signer_provider=lambda: signer, wickets=wickets)
 
 
 def _constraint(decision, constraint_id):

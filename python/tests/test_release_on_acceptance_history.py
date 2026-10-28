@@ -39,11 +39,11 @@ from pathlib import Path
 
 import pytest
 from agent_action_capsule import json_digest
-from cll.ledger import LedgerStore
 
 import capsule_engine
 from capsule_engine.guards import Action, GuardEngine, LocalSigner
 from capsule_engine.guards.checks import RUNNABLE_CHECKS, check_release_on_acceptance
+from capsule_engine.guards.history import MemoryHistory
 from capsule_engine.guards.history_state import INCOMPLETE, LIVE_HISTORY, RULES_HISTORY_DAYS
 from capsule_engine.guards.wickets import load_definition_file
 from capsule_engine.packs import install_pack, load_pack_dir
@@ -96,7 +96,7 @@ def _commit(*, deal: str | None = DEAL_A, ids: dict | None = None, fp_alg: str =
                   counterparty_ids=IDS_A if ids is None else ids, counterparty_fp_alg=fp_alg)
 
 
-def _history(store: LedgerStore, *acts: Action, disposition: str | None = "accept", complete: bool = True) -> None:
+def _history(store: MemoryHistory, *acts: Action, disposition: str | None = "accept", complete: bool = True) -> None:
     """Each act as ``history_ledger`` writes a history act, then the
     incomplete marker when the history is not complete."""
     for n, act in enumerate(acts):
@@ -105,10 +105,10 @@ def _history(store: LedgerStore, *acts: Action, disposition: str | None = "accep
                   "asg_payload": history_act_payload(act, sealed_disposition=disposition is not None)}
         if disposition is not None:
             record["disposition"] = {"decision": disposition}
-        store.append(record, consequential=False)
+        store.append(record)
     if not complete:
         store.append({"capsule_id": _fp("incomplete"), "operator": OPERATOR, "timestamp": "2026-10-10T02:31:00Z",
-                      "asg_payload": {LIVE_HISTORY: INCOMPLETE}}, consequential=False)
+                      "asg_payload": {LIVE_HISTORY: INCOMPLETE}})
 
 
 def _share(classes: tuple[str, ...] = ("phone",), **overrides) -> Action:
@@ -323,7 +323,7 @@ def test_the_rule_reaches_every_recipient_but_the_platform(store, cls, role):
 
 def test_a_third_party_share_is_refused_by_s13_through_the_pack(tmp_path):
     """Through the seller pack's engine: s13 runs on a third party, not n/a."""
-    with LedgerStore(tmp_path / "ledger") as store:
+    with MemoryHistory() as store:
         engine = _engine(store, str(tmp_path))
         decision = engine.check(_share(("credential",), recipient_role="third_party"), dry_run=True)
     outcome = _s13(decision)
@@ -345,7 +345,7 @@ def test_an_acceptance_with_no_thread_counterparty_binds_no_share(store, signer)
     from capsule_engine.folds.loader import load_definition_file as load_fold
 
     spend = load_fold(ROOT / "folds" / "catalog_defs" / "spend.weekly.v3.yaml")
-    engine = GuardEngine(ledger=store, caps_fold=spend, signer_provider=lambda: signer)
+    engine = GuardEngine(history=store, caps_fold=spend, signer_provider=lambda: signer)
     engine.check(_commit(), dry_run=False)
     _refused(_check(_share(), store))
 
@@ -424,13 +424,13 @@ def share_input(thread: str, classes: tuple[str, ...], *, disposition: bool = Tr
     return envelope
 
 
-def _engine(store: LedgerStore, tmp: str) -> GuardEngine:
+def _engine(store: MemoryHistory, tmp: str) -> GuardEngine:
     installed = install_pack(PACK, project_dir=Path(tmp) / "project", mode="observe")
     resolved = installed.resolved
     wickets = resolved.configured_wickets(RUNNABLE_CHECKS)
     gates, asks = engine_ask_sets(installed.pack, wickets)
     signer = LocalSigner(key_id="release-history", secret=b"release-history-fixture")
-    return GuardEngine(ledger=store, caps_fold=resolved.caps_fold(), signer_provider=lambda: signer,
+    return GuardEngine(history=store, caps_fold=resolved.caps_fold(), signer_provider=lambda: signer,
                        caps_minor=resolved.caps_minor() or {}, manifest_digest=resolved.manifest_digest,
                        wickets=wickets, ask_gate_selectors=gates, ask_wickets=asks,
                        evaluate_under_record_taxonomy=True)
@@ -443,7 +443,7 @@ def _s13(decision):
 
 def live(envelope: dict):
     """The decision a live check makes: a fresh engine on the input's history."""
-    with tempfile.TemporaryDirectory() as tmp, LedgerStore(Path(tmp) / "ledger") as store:
+    with tempfile.TemporaryDirectory() as tmp, MemoryHistory() as store:
         engine = _engine(store, tmp)
         history_ledger(envelope, store)
         action = action_for_check_input(envelope["record"], item_ref=envelope.get("item_ref"))
@@ -616,7 +616,7 @@ def _windowed(envelope: dict, *, shown_when) -> tuple:
     def write(capsule_id: str, ledger, days):
         given = envelope if shown_when(days) else without
         history_ledger({**given, "record": bare}, ledger)
-        seen[days] = [r.capsule["asg_payload"].get("action_class") for r in ledger.scan()]
+        seen[days] = [r.capsule["asg_payload"].get("action_class") for r in ledger.find()]
         return SaleCheck(item_ref=envelope["item_ref"])
 
     with tempfile.TemporaryDirectory() as tmp:

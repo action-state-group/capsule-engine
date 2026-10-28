@@ -67,7 +67,7 @@ def test_not_applicable_evidence_is_facts_only():
 
 def test_caps_out_of_scope_and_in_scope_missing_amount_seal_different_evidence_digests(store, caps_fold, signer):
     engine = GuardEngine(
-        ledger=store, caps_fold=caps_fold, signer_provider=lambda: signer, caps_minor={"money.transfer": CAP_MINOR}
+        history=store, caps_fold=caps_fold, signer_provider=lambda: signer, caps_minor={"money.transfer": CAP_MINOR}
     )
     out_of_scope = engine.check(_payment(action_class="info.query", action_id="q/1"), dry_run=True).capsule
     in_scope_missing = engine.check(_payment(action_id="p/1"), dry_run=True).capsule
@@ -89,7 +89,7 @@ def test_caps_out_of_scope_and_in_scope_missing_amount_seal_different_evidence_d
 
 def test_every_runtime_n_a_path_carries_evidence(store, caps_fold, signer, hold_engine):
     engine = GuardEngine(
-        ledger=store, caps_fold=caps_fold, signer_provider=lambda: signer, caps_minor={"money.transfer": CAP_MINOR}
+        history=store, caps_fold=caps_fold, signer_provider=lambda: signer, caps_minor={"money.transfer": CAP_MINOR}
     )
     capsules = [
         engine.check(_payment(action_class="info.query", action_id="q/2"), dry_run=True).capsule,

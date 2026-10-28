@@ -5,6 +5,7 @@ the same modules the CLI uses (`store` / `caps_fold` / `signer` fixtures come
 from `conftest.py`, shared with the guard-engine tests)."""
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import pytest
@@ -19,7 +20,7 @@ FIXTURE_LEDGER = Path(__file__).parent / "fixtures" / "sample_ledger.jsonl"
 @pytest.fixture
 def guard(store, caps_fold, signer):
     return GuardEngine(
-        ledger=store,
+        history=store,
         caps_fold=caps_fold,
         signer_provider=lambda: signer,
         caps_minor={"money.transfer": 10_000_000},
@@ -30,7 +31,7 @@ def guard(store, caps_fold, signer):
 
 
 def test_ledger_query_no_filter_reports_matched_and_total(store):
-    store.import_jsonl(FIXTURE_LEDGER)
+    [store.append(json.loads(line)) for line in FIXTURE_LEDGER.read_text(encoding="utf-8").splitlines() if line.strip()]
     result = tools.ledger_query(store)
     assert result["matched"] == 4
     assert result["total"] == 4
@@ -42,7 +43,7 @@ def test_ledger_query_no_filter_reports_matched_and_total(store):
 
 
 def test_ledger_query_filter_never_hides_the_true_total(store):
-    store.import_jsonl(FIXTURE_LEDGER)
+    [store.append(json.loads(line)) for line in FIXTURE_LEDGER.read_text(encoding="utf-8").splitlines() if line.strip()]
     result = tools.ledger_query(store, verdict="blocked")
     assert result["matched"] == 1
     assert result["total"] == 4  # the filtered view never claims to be the whole ledger
@@ -60,7 +61,7 @@ def test_fold_list_includes_built_in_catalog():
 
 
 def test_fold_get_evaluates_a_real_fold_with_envelope(store):
-    store.import_jsonl(FIXTURE_LEDGER)
+    [store.append(json.loads(line)) for line in FIXTURE_LEDGER.read_text(encoding="utf-8").splitlines() if line.strip()]
     result = tools.fold_get(store, CATALOG_DIR, fold="actions.count_by_developer/1.0.0", key="procurement-agent@v1")
     assert result["fold_id"] == "actions.count_by_developer/1.0.0"
     assert result["result"] == 4

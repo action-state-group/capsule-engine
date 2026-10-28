@@ -55,7 +55,7 @@ def _config(wicket_id: str) -> CapsConfig:
 
 def _engine(store, signer, *, per_action_reads: str | None = "spend_authorized_minor", per_action=PER_ACTION, window=WINDOW):
     return GuardEngine(
-        ledger=store,
+        history=store,
         caps_fold=load_definition_file(FOLDS / "spend.weekly.v3.yaml"),
         signer_provider=lambda: signer,
         caps_minor={"money.purchase": window},
@@ -112,7 +112,7 @@ def test_under_caps_v4_the_same_buffer_passes_and_the_evidence_keeps_its_shape(s
     under caps/4.0.0's own config."""
     v4 = _config("caps/4.0.0")
     engine = GuardEngine(
-        ledger=store,
+        history=store,
         caps_fold=load_definition_file(FOLDS / "spend.weekly.v3.yaml"),
         signer_provider=lambda: signer,
         caps_minor=v4["caps_minor"],
@@ -298,7 +298,7 @@ def _everyday_engine(store, signer, tmp_path):
 
     pack = accept_thresholds(load_pack_dir(EVERYDAY_DIR), {}, accepted_per_action={"money.purchase": PER_ACTION})
     installed = install_pack(pack, project_dir=tmp_path / "project", mode="enforce")
-    return build_engine(installed, ledger=store, signer_provider=lambda: signer)
+    return build_engine(installed, history=store, signer_provider=lambda: signer)
 
 
 def test_the_everyday_pack_cites_caps_v5_1():

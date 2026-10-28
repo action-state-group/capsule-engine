@@ -11,10 +11,10 @@ import threading
 from pathlib import Path
 
 import pytest
-from cll.ledger import LedgerStore
 
 from capsule_engine.folds.engine import evaluate_one
 from capsule_engine.guards import Action, LocalSigner
+from capsule_engine.guards.history import MemoryHistory, verify_record
 from capsule_engine.holds import HoldEngine, HoldStatus
 
 DEVELOPER = "procurement-agent@v1"
@@ -51,7 +51,7 @@ def test_reserve_cites_fold_envelope_and_reserved_amount(hold_engine, store):
     assert decision.fold_envelope == envelope
 
     # a real, independently verifiable capsule -- no special-cased path
-    result = store.verify(capsule["capsule_id"])
+    result = verify_record(store, store.get(capsule["capsule_id"]))
     assert result.ok, result.findings
 
 
@@ -63,7 +63,7 @@ def _run_concurrency_round(n: int, k: int, unit: int) -> tuple[int, int]:
     a cap sized to admit exactly ``k`` of them. Returns (allowed, denied)."""
     tmp = Path(tempfile.mkdtemp())
     try:
-        store = LedgerStore(tmp)
+        store = MemoryHistory()
         signer = LocalSigner(key_id="k1", secret=b"s1")
         from capsule_engine.folds.loader import load_definition_file
 
@@ -71,7 +71,7 @@ def _run_concurrency_round(n: int, k: int, unit: int) -> tuple[int, int]:
             Path(__file__).parent.parent / "capsule_engine" / "folds" / "catalog_defs" / "hold.active_exposure.yaml"
         )
         engine = HoldEngine(
-            ledger=store,
+            history=store,
             hold_fold=fold,
             fold_digest=fold.definition_digest(),
             signer_provider=lambda: signer,
@@ -99,7 +99,7 @@ def _run_concurrency_round(n: int, k: int, unit: int) -> tuple[int, int]:
 
         # zero interleavings over-reserve: independently recompute the fold
         # over the resulting ledger and confirm it never exceeds the cap.
-        records = [r.capsule for r in store.scan()]
+        records = [r.capsule for r in store.find()]
         trace = evaluate_one(fold, records, key_value=DEVELOPER)
         assert trace.result is not None and trace.result <= unit * k
         reserve_count = sum(
@@ -153,7 +153,7 @@ def test_pending_hold_blocks_action_that_would_exceed_cap(hold_engine):
 
 def test_engine_unavailable_fails_closed_no_reserve(store, hold_fold, signer):
     engine = HoldEngine(
-        ledger=store,
+        history=store,
         hold_fold=hold_fold,
         fold_digest=hold_fold.definition_digest(),
         signer_provider=lambda: signer,
@@ -162,7 +162,7 @@ def test_engine_unavailable_fails_closed_no_reserve(store, hold_fold, signer):
     )
     decision = engine.evaluate_and_reserve(_action(amount_minor=100))
     assert decision.outcome == "deny"
-    assert not any((r.capsule.get("action_id") or "").startswith("hold.reserve/") for r in store.scan())
+    assert not any((r.capsule.get("action_id") or "").startswith("hold.reserve/") for r in store.find())
 
 
 def test_engine_unavailable_mutant_disabling_the_check_flips_to_allow(hold_fold, signer):
@@ -174,9 +174,9 @@ def test_engine_unavailable_mutant_disabling_the_check_flips_to_allow(hold_fold,
     an incidental dedupe collision between the two calls."""
     tmp_real, tmp_mutant = Path(tempfile.mkdtemp()), Path(tempfile.mkdtemp())
     try:
-        real_store = LedgerStore(tmp_real)
+        real_store = MemoryHistory()
         real_engine = HoldEngine(
-            ledger=real_store,
+            history=real_store,
             hold_fold=hold_fold,
             fold_digest=hold_fold.definition_digest(),
             signer_provider=lambda: signer,
@@ -189,9 +189,9 @@ def test_engine_unavailable_mutant_disabling_the_check_flips_to_allow(hold_fold,
 
         # the mutant: the engine reports available even though it is not --
         # i.e. the fail-closed condition never fires.
-        mutant_store = LedgerStore(tmp_mutant)
+        mutant_store = MemoryHistory()
         mutant_engine = HoldEngine(
-            ledger=mutant_store,
+            history=mutant_store,
             hold_fold=hold_fold,
             fold_digest=hold_fold.definition_digest(),
             signer_provider=lambda: signer,
@@ -208,7 +208,7 @@ def test_engine_unavailable_mutant_disabling_the_check_flips_to_allow(hold_fold,
 
 def test_stale_view_fails_closed_no_reserve(store, hold_fold, signer):
     engine = HoldEngine(
-        ledger=store,
+        history=store,
         hold_fold=hold_fold,
         fold_digest=hold_fold.definition_digest(),
         signer_provider=lambda: signer,
@@ -218,7 +218,7 @@ def test_stale_view_fails_closed_no_reserve(store, hold_fold, signer):
     )
     decision = engine.evaluate_and_reserve(_action(amount_minor=100))
     assert decision.outcome == "deny"
-    assert not any((r.capsule.get("action_id") or "").startswith("hold.reserve/") for r in store.scan())
+    assert not any((r.capsule.get("action_id") or "").startswith("hold.reserve/") for r in store.find())
 
 
 # -- #51.5: replay reproduces the cited aggregate byte-exactly -------------
@@ -234,7 +234,7 @@ def test_replay_reproduces_cited_aggregate_byte_exactly(hold_engine, store, hold
 
     # independent verifier: fresh evaluation over the ledger, including the
     # hold capsules, must reproduce the same aggregate byte-exactly.
-    records = [r.capsule for r in store.scan()]
+    records = [r.capsule for r in store.find()]
     full_trace = evaluate_one(hold_fold, records, key_value=DEVELOPER, as_of=records[-1]["timestamp"])
     assert full_trace.result == cited_aggregate + 200_000  # includes d3's own reservation
 

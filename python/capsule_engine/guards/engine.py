@@ -46,8 +46,6 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from typing import TYPE_CHECKING, TypedDict
 
-from cll.ledger.api import LedgerAPI
-
 from ..events.capsule import build_event_capsule
 from ..folds.definition import FoldDefinition
 from ..policy.errors import PolicyManifestError
@@ -82,8 +80,8 @@ from .classes import (
     ActionClass,
     TaxonomyTable,
     carried_taxonomy,
-    classify,
 )
+from .history import History
 from .plan import PlanDefinition
 from .signing import Signer, SigningKeyUnavailable
 from .wickets.definition import WicketDefinition
@@ -199,7 +197,7 @@ class GuardEngine:
     def __init__(
         self,
         *,
-        ledger: LedgerAPI,
+        history: History,
         caps_fold: FoldDefinition | None,
         signer_provider: Callable[[], Signer | None],
         caps_minor: dict[str, int] | None = None,
@@ -224,7 +222,7 @@ class GuardEngine:
             raise ValueError("give caps limits as caps_limits or as caps_minor/per_action_minor, not both")
         if caps_fold is None and (caps_minor or per_action_minor):
             raise ValueError("caps limits were given but no caps fold definition to read spend with")
-        self._ledger = ledger
+        self._history = history
         # ``None`` when the pack cites no ``caps`` definition: a pack may omit
         # it. ``caps`` is then recorded ``n/a``, out of scope, on every
         # decision, and no limit is read for it.
@@ -325,7 +323,7 @@ class GuardEngine:
             return None
 
     def _tree_size(self) -> int:
-        return sum(1 for _ in self._ledger.scan())
+        return self._history.size()
 
     # -- the public API -------------------------------------------------
 
@@ -347,8 +345,8 @@ class GuardEngine:
         authorization_record: AuthorizationRecord | None = None,
         commercial_bounds_opening: CommercialBoundsOpening | None = None,
         representing_opening: RepresentingOpening | None = None,
-        sale_history: LedgerAPI | None = None,
-        release_history: LedgerAPI | None = None,
+        sale_history: History | None = None,
+        release_history: History | None = None,
     ) -> GuardDecision:
         """``task_authority_record`` is the whole sealed task-authority record
         ``action.task_authority_ref`` names, read only by a
@@ -387,7 +385,7 @@ class GuardEngine:
         # ledger through this same view.
         if not self._view_healthy():
             before = self._tree_size()
-            reindex = getattr(self._ledger, "reindex", None)
+            reindex = getattr(self._history, "reindex", None)
             if reindex is not None:
                 reindex()
             after = self._tree_size()
@@ -477,7 +475,7 @@ class GuardEngine:
 
         # -- the three reference checks --------------------------------
         since_dedupe = _shift(action.resolved_timestamp(), days=_DEDUPE_WINDOW_DAYS)
-        dedupe_out = check_dedupe(action, self._ledger, since=since_dedupe)
+        dedupe_out = check_dedupe(action, self._history, since=since_dedupe)
 
         def held(constraint: ConstraintOutcome) -> ConstraintOutcome:
             if mismatch is None or constraint.id in _NEVER_HELD_CHECKS:
@@ -486,7 +484,7 @@ class GuardEngine:
 
         caps_out = self._check_caps(action, caps_limits)
 
-        vbd_out = check_verify_before_dispatch(action, self._ledger)
+        vbd_out = check_verify_before_dispatch(action, self._history)
 
         # With no caps definition, caps reads nothing keyed on the class, so a
         # taxonomy mismatch does not hold it: it stays out of scope.
@@ -527,7 +525,7 @@ class GuardEngine:
                 elif release_history is not None and reads_release_history(wicket):
                     reads = release_history
                 else:
-                    reads = self._ledger
+                    reads = self._history
                 out = CONFIGURED_CHECKS[wicket.check](action, reads, wicket.config)
             constraint = held(out.constraint)
             constraints = (*constraints, constraint)
@@ -604,7 +602,7 @@ class GuardEngine:
         # Row: "Ledger append fails (disk full, WAL error)" -- fail closed
         # for consequential classes; the action does not dispatch.
         try:
-            self._ledger.append(capsule, consequential=consequential and not dry_run)
+            self._history.append(capsule)
         except OSError as exc:
             self._open["ledger_append"] = _OpenDegradation(
                 kind="ledger_append", started_at=_utc_now(), cause=str(exc)
@@ -691,7 +689,7 @@ class GuardEngine:
             return _caps_out_of_scope("no cap configured for this action class", method=self._caps_fold.fold_id)
         return check_caps(
             action,
-            self._ledger,
+            self._history,
             definition=self._caps_fold,
             cap_minor=cap_minor,
             per_action_cap_minor=per_action_cap_minor,
@@ -741,7 +739,7 @@ class GuardEngine:
                 record = build_event_capsule(
                     operator=action.operator, developer=action.developer, signer=signer, event=event, detail=detail
                 )
-                self._ledger.append(record, consequential=False)
+                self._history.append(record)
             except OSError:
                 continue
             del self._open[kind]
@@ -772,7 +770,7 @@ class GuardEngine:
             manifest_digest=self._manifest_digest,
         )
         try:
-            self._ledger.append(capsule, consequential=classify(action.action_class).consequential and not dry_run)
+            self._history.append(capsule)
         except OSError as exc:
             self._open["ledger_append"] = _OpenDegradation(kind="ledger_append", started_at=_utc_now(), cause=str(exc))
             capsule = None

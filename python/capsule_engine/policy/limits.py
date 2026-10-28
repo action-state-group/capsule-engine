@@ -54,8 +54,6 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from itertools import pairwise
 
-from cll.ledger.api import LedgerAPI, ScanQuery
-
 from ..events.capsule import event_signature_valid
 from ..guards.checks.caps import (
     LIMIT_SOURCE_DEFAULT,
@@ -65,6 +63,7 @@ from ..guards.checks.caps import (
     cap_for,
 )
 from ..guards.classes import resolve
+from ..guards.history import History, Query
 from ..guards.signing import Signer
 from .activation import EVENT_MANIFEST_ACTIVATED
 from .errors import (
@@ -191,11 +190,11 @@ class CapsLimits:
         return at_clock if at_clock.value_minor < at_action.value_minor else at_action
 
 
-def activation_records(ledger: LedgerAPI) -> list[ActivationRecord]:
-    """Every ``policy_manifest_activated`` record in ``ledger``, in append order."""
+def activation_records(history: History) -> list[ActivationRecord]:
+    """Every ``policy_manifest_activated`` record in ``history``, in append order."""
     return [
         ActivationRecord(capsule=record.capsule)
-        for record in ledger.scan(ScanQuery(action_type="fyi"))
+        for record in history.find(Query(where={"action_type": "fyi", "asg_payload.event": EVENT_MANIFEST_ACTIVATED}))
         if (record.capsule.get("asg_payload") or {}).get("event") == EVENT_MANIFEST_ACTIVATED
     ]
 
@@ -282,6 +281,6 @@ def caps_limits(resolved: ResolvedManifest, activations: Sequence[ActivationReco
     return CapsLimits(steps=steps)
 
 
-def read_caps_limits(resolved: ResolvedManifest, ledger: LedgerAPI, signer: Signer) -> CapsLimits:
-    """``caps_limits`` over ``ledger``'s activation records as they stand now."""
-    return caps_limits(resolved, activation_records(ledger), signer)
+def read_caps_limits(resolved: ResolvedManifest, history: History, signer: Signer) -> CapsLimits:
+    """``caps_limits`` over ``history``'s activation records as they stand now."""
+    return caps_limits(resolved, activation_records(history), signer)

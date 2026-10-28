@@ -20,9 +20,9 @@ import threading
 from pathlib import Path
 
 import pytest
-from cll.ledger import LedgerStore
 
 from capsule_engine.guards import Action, LocalSigner
+from capsule_engine.guards.history import open_store
 from capsule_engine.packs import build_engine, install_pack, load_pack_dir
 
 PACK_DIR = Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog" / "payments-safety"
@@ -33,17 +33,19 @@ CAP_MINOR = 1_000_000
 N_ROUNDS = 20
 
 
+SIGNER = LocalSigner(key_id="concurrency-probe-key", secret=b"concurrency-probe-fixed-key")
+
+
 def _make_engine(ledger, project_dir):
     pack = load_pack_dir(PACK_DIR)
     installed = install_pack(pack, project_dir=project_dir, mode="observe")
-    signer = LocalSigner(key_id="concurrency-probe-key", secret=b"concurrency-probe-fixed-key")
-    return build_engine(installed, ledger=ledger, signer_provider=lambda: signer)
+    return build_engine(installed, history=ledger, signer_provider=lambda: SIGNER)
 
 
 @pytest.mark.xfail(
     reason=(
         "CONFIRMED FINDING (2026-08-11): GuardEngine.check() (capsule_ledger/guards/engine.py) holds no "
-        "lock across its own read (check_caps' ledger.scan()) -> decide -> append span. Two concurrent "
+        "lock across its own read (check_caps' ledger.find()) -> decide -> append span. Two concurrent "
         "check() calls for the same developer/action_class both read the pre-write ledger state, both "
         "compute 'under cap', and both append -- the cap is not enforced under concurrency at all (this "
         "test measured 40/40 admitted concurrently vs. 20/40 sequentially, for traffic designed so "
@@ -64,8 +66,8 @@ def test_sequential_and_concurrent_admission_agree_on_total_admitted():
     sequential_admits = 0
     concurrent_admits = 0
 
-    with tempfile.TemporaryDirectory() as ld_seq, tempfile.TemporaryDirectory() as pd_seq:
-        ledger_seq = LedgerStore(ld_seq)
+    with tempfile.TemporaryDirectory() as pd_seq:
+        ledger_seq = open_store(Path(pd_seq) / "store", signer=SIGNER, create=True)
         engine_seq = _make_engine(ledger_seq, pd_seq)
         try:
             for i in range(N_ROUNDS):
@@ -90,8 +92,8 @@ def test_sequential_and_concurrent_admission_agree_on_total_admitted():
         finally:
             ledger_seq.close()
 
-    with tempfile.TemporaryDirectory() as ld_conc, tempfile.TemporaryDirectory() as pd_conc:
-        ledger_conc = LedgerStore(ld_conc)
+    with tempfile.TemporaryDirectory() as pd_conc:
+        ledger_conc = open_store(Path(pd_conc) / "store", signer=SIGNER, create=True)
         engine_conc = _make_engine(ledger_conc, pd_conc)
         try:
             for i in range(N_ROUNDS):

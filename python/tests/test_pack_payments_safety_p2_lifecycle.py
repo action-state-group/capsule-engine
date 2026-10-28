@@ -19,11 +19,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from cll.ledger import LedgerStore
-
 from capsule_engine.folds.loader import load_definition_file
 from capsule_engine.guards import Action, LocalSigner
 from capsule_engine.guards.capsule import ALLOW, ESCALATE
+from capsule_engine.guards.history import MemoryHistory, open_store
 from capsule_engine.packs import (
     build_engine,
     enforce_pack,
@@ -54,14 +53,14 @@ def test_full_p2_lifecycle(tmp_path):
 
     # -- 1. capsule init --pack payments-safety (observe) --
     signer = _signer()
-    ledger = LedgerStore(observe_ledger_dir)
+    ledger = open_store(observe_ledger_dir, signer=signer, create=True)
     installed_observe = install_pack(pack, project_dir=observe_project, mode="observe")
     assert installed_observe.manifest.packs[0].mode == "observe"
-    engine = build_engine(installed_observe, ledger=ledger, signer_provider=lambda: signer)
+    engine = build_engine(installed_observe, history=ledger, signer_provider=lambda: signer)
 
     init_activation = record_pack_activation(
         installed_observe,
-        ledger=ledger,
+        history=ledger,
         operator=OPERATOR,
         developer="capsule-init-tool",
         signer=signer,
@@ -127,11 +126,10 @@ def test_full_p2_lifecycle(tmp_path):
     # the observe-mode one ("provable what was in force" through a change).
     assert installed_enforce.resolved.manifest_digest != installed_observe.resolved.manifest_digest
 
-    enforce_ledger_dir = tmp_path / "enforce-ledger"
-    enforce_ledger = LedgerStore(enforce_ledger_dir)
+    enforce_ledger = MemoryHistory()
     enforce_activation = record_pack_activation(
         installed_enforce,
-        ledger=enforce_ledger,
+        history=enforce_ledger,
         operator=OPERATOR,
         developer="capsule-enforce-tool",
         signer=signer,
@@ -143,7 +141,7 @@ def test_full_p2_lifecycle(tmp_path):
     # under the newly-accepted, tighter cap -- a fresh ledger, so this
     # single payment alone (600k) must exceed the accepted cap (500k) on
     # its own for the assertion to mean anything. --
-    enforced_engine = build_engine(installed_enforce, ledger=enforce_ledger, signer_provider=lambda: signer)
+    enforced_engine = build_engine(installed_enforce, history=enforce_ledger, signer_provider=lambda: signer)
     a3 = Action(
         verb="dispatch_payout", operator=OPERATOR, developer=TREASURY_DEVELOPER,
         action_class="money.transfer",

@@ -147,7 +147,7 @@ def test_a_fail_selector_outranks_a_pass_selector():
 
 def test_engine_runs_the_gate_as_a_configured_check(store, caps_fold, signer):
     assert "action_class_gate" in CONFIGURED_CHECKS
-    engine = GuardEngine(ledger=store, caps_fold=caps_fold, signer_provider=lambda: signer, wickets=(GATE,))
+    engine = GuardEngine(history=store, caps_fold=caps_fold, signer_provider=lambda: signer, wickets=(GATE,))
     decision = engine.check(
         Action(verb="post", operator="household", developer="assistant@v1", action_class="communication.publish"),
         dry_run=True,

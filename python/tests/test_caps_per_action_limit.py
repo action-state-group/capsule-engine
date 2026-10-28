@@ -48,7 +48,7 @@ def _caps_v3_config() -> CapsConfig:
 
 def _engine(store, signer, action_class: str) -> GuardEngine:
     return GuardEngine(
-        ledger=store,
+        history=store,
         caps_fold=load_definition_file(CATALOG_DIR / "spend.weekly.v2.yaml"),
         signer_provider=lambda: signer,
         caps_minor={action_class: WINDOW_MINOR},
@@ -137,7 +137,7 @@ def test_a_purchase_under_both_limits_passes_with_nothing_tripped(store, signer)
 
 def test_without_a_per_action_limit_the_evidence_keeps_its_single_limit_shape(store, signer):
     engine = GuardEngine(
-        ledger=store,
+        history=store,
         caps_fold=load_definition_file(CATALOG_DIR / "spend.weekly.v2.yaml"),
         signer_provider=lambda: signer,
         caps_minor={"money.purchase": WINDOW_MINOR},
@@ -151,7 +151,7 @@ def test_without_a_per_action_limit_the_evidence_keeps_its_single_limit_shape(st
 
 def test_a_legacy_keyed_per_action_limit_applies_to_the_canonical_class(store, signer):
     engine = GuardEngine(
-        ledger=store,
+        history=store,
         caps_fold=load_definition_file(CATALOG_DIR / "spend.weekly.v2.yaml"),
         signer_provider=lambda: signer,
         caps_minor={"communication.send": WINDOW_MINOR},
@@ -172,7 +172,7 @@ def test_the_installed_everyday_pack_wires_the_per_action_limit(store, signer, t
 
     installed = install_pack(load_pack_dir(EVERYDAY_DIR), project_dir=tmp_path / "project", mode="enforce")
     assert installed.resolved.per_action_minor() == _everyday_caps_config()["per_action_minor"]
-    engine = build_engine(installed, ledger=store, signer_provider=lambda: signer)
+    engine = build_engine(installed, history=store, signer_provider=lambda: signer)
     caps = _caps(engine.check(_action(1, "money.purchase", 6_000)))
     assert caps.evidence["tripped"][0]["limit"] == "per_action"
 

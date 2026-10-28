@@ -4,7 +4,7 @@
 Every decision here comes from actually running ``GuardEngine.check(...,
 dry_run=True)`` over the real fixture/ledger records -- this module never
 fabricates an outcome. The guard's own replay-local view (an ephemeral
-``LedgerStore``) accumulates the decision capsules this replay itself
+``MemoryHistory``) accumulates the decision capsules this replay itself
 produces, so a dedupe hit fires the same way it would in ``test_guard_dry_run.py``:
 against a *prior decision in this same replay*, not against the source
 ledger's original capsules (which the guard never produced and has no
@@ -81,7 +81,6 @@ from __future__ import annotations
 
 import json
 import re
-import tempfile
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, replace
 from datetime import datetime, timedelta
@@ -90,8 +89,6 @@ from typing import TypedDict
 
 from agent_action_capsule import json_digest
 from agent_action_capsule.canonical import FloatInDigestError, UnsafeIntegerError
-from cll.ledger import LedgerStore
-from cll.ledger.api import LedgerAPI
 
 from ..folds.definition import FoldDefinition, Reversal
 from ..folds.duration import parse_duration_seconds
@@ -100,6 +97,7 @@ from ..guards.action import disclosed_classes_of, handover_of, listing_classes_o
 from ..guards.checks.caps import EXECUTED_DECISION, SPEND_UNREADABLE, counts_executed_acts
 from ..guards.checks.commitment import text_commitment
 from ..guards.checks.promise_never import ATTRIBUTED_TO_USER, WORDS_NOT_IN_BUNDLE
+from ..guards.history import History, MemoryHistory, open_store
 from ..guards.history_state import CHECK_FP_ALGS, RULES_HISTORY_DAYS, well_formed_counterparty
 from ..guards.statements import StatementRecord, claim_of, make_statement_record
 from ..guards.wickets.definition import WicketDefinition
@@ -136,10 +134,10 @@ _TRANSFER_NOTE_RE = re.compile(r"amount_eur:\s*(\d+).*?target_iban:\s*([A-Z0-9]+
 def load_records(paths: Sequence[str | Path]) -> list[dict]:
     """Load every record from one or more sources, in the given order.
 
-    Each source is either a plain JSONL ledger file (read in file-internal
-    line order), a ``LedgerStore`` directory (read via ``scan()``, its own
-    append order) -- the CLI's real-deployment path, since an operator's
-    actual local ledger is a store directory, not a loose JSONL file -- or a
+    Each source is either a plain JSONL file of capsules (read in file-internal
+    line order), a store directory (``guards/history.py`` ``open_store``,
+    read in its log order) -- the CLI's real-deployment path, since an
+    operator's records are in a store directory, not a loose JSONL file -- or a
     capsule bundle (one JSON object with ``records`` and ``disclosures``, as
     ``capsulectl bundle --deal`` writes), read in its record order.
     """
@@ -150,12 +148,8 @@ def load_records(paths: Sequence[str | Path]) -> list[dict]:
         if bundle is not None:
             records.extend(bundle["records"])
         elif p.is_dir():
-            store = LedgerStore(p)
-            try:
-                for rec in store.scan():
-                    records.append(rec.capsule)
-            finally:
-                store.close()
+            with open_store(p) as store:
+                records.extend(r.capsule for r in store.find())
         else:
             with p.open(encoding="utf-8") as fh:
                 for line in fh:
@@ -1579,7 +1573,7 @@ class SaleCheck:
 # ledger it is given, and says so; ``None`` for a record of no such sale. The
 # third argument, when not ``None``, cuts the history to the acts sealed in
 # that many days before the check, as a live check's history is cut.
-SaleHistory = Callable[[str, LedgerAPI, "int | None"], "SaleCheck | None"]
+SaleHistory = Callable[[str, History, "int | None"], "SaleCheck | None"]
 
 
 @dataclass(frozen=True)
@@ -1674,67 +1668,67 @@ def replay(
     gate_selectors, ask_checks = engine_ask_sets(pack, wickets) if pack is not None else (frozenset(), frozenset())
     sourced: list[SourcedDecision] = []
     undecided: list[dict] = []
-    with tempfile.TemporaryDirectory() as tmp, LedgerStore(tmp) as store:
-        engine = GuardEngine(
-            ledger=store,
-            caps_fold=caps_fold,
-            signer_provider=lambda: signer,
-            caps_minor=caps_minor or {},
-            per_action_minor=per_action_minor,
-            per_action_reads=per_action_reads,
-            manifest_digest=manifest_digest,
-            wickets=wickets,
-            ask_gate_selectors=gate_selectors,
-            ask_wickets=ask_checks,
-            evaluate_under_record_taxonomy=True,
-        )
-        profiles = _companion_profiles(records, disclosed or {})
-        deal = _deal_records(records, disclosed or {})
-        offered_at = _accepted_offer_at(records, disclosed or {})
-        authorities = _task_authorities(disclosed or {})
-        decided_checks: dict[str, SourcedDecision] = {}
-        counts_spend = counts_executed_acts(caps_fold)
-        executed_acts = ExecutedActs(records)
-        written_statements: set[str] = set()
-        for record in records:
-            shown = (disclosed or {}).get(record.get("capsule_id", ""))
-            digest = json_digest(shown) if shown is not None else None
-            if _gets_no_decision(record, shown, withheld):
-                undecided.append(record)
-                stated = statement_record(record, shown)
-                if stated is not None and claim_of(stated) not in written_statements:
-                    # A claim given twice (overlapping sources) is one statement.
-                    written_statements.add(claim_of(stated))
-                    store.append(dict(stated), consequential=False)
-                chain = _carried_out(digest, deal) if digest is not None else None
-                checked = decided_checks.pop(chain.check, None) if chain is not None else None
-                if chain is not None and checked is not None and checked.decision.outcome in (ALLOW, ESCALATE):
-                    store.append(dict(_carried_out_record(checked, chain, _text(record.get("timestamp")))), consequential=False)
-                if counts_spend and digest is not None and _bound(record, shown):
-                    executed = executed_acts.record(record, shown, digest)
-                    if executed is not None:
-                        store.append(dict(executed), consequential=False)
-                continue
-            profile = profiles.get(digest) if profiles and digest is not None else None
-            action = action_for_record(record, shown, counterparty_profile=profile)
-            if digest in offered_at:
-                action = replace(action, proposal_at=offered_at[digest])
-            authority = authorities.get(action.task_authority_ref) if action.task_authority_ref else None
-            opening = (representing_openings or {}).get(action.representation_text_commitment or "")
-            action, decision = _decide(engine, action, record, sale_history, authority, opening)
-            cited_capsule = None
-            for constraint in decision.constraints:
-                cited_id = (constraint.evidence or {}).get("matched_capsule_id") or (
-                    constraint.evidence or {}
-                ).get("cited_capsule_id")
-                if cited_id:
-                    found = store.fetch(cited_id)
-                    if found is not None:
-                        cited_capsule = found.capsule
-                        break
-            sourced.append(SourcedDecision(record=record, action=action, decision=decision, cited_capsule=cited_capsule))
-            if digest in deal and decision.capsule is not None:
-                decided_checks[digest] = sourced[-1]
+    store = MemoryHistory()
+    engine = GuardEngine(
+        history=store,
+        caps_fold=caps_fold,
+        signer_provider=lambda: signer,
+        caps_minor=caps_minor or {},
+        per_action_minor=per_action_minor,
+        per_action_reads=per_action_reads,
+        manifest_digest=manifest_digest,
+        wickets=wickets,
+        ask_gate_selectors=gate_selectors,
+        ask_wickets=ask_checks,
+        evaluate_under_record_taxonomy=True,
+    )
+    profiles = _companion_profiles(records, disclosed or {})
+    deal = _deal_records(records, disclosed or {})
+    offered_at = _accepted_offer_at(records, disclosed or {})
+    authorities = _task_authorities(disclosed or {})
+    decided_checks: dict[str, SourcedDecision] = {}
+    counts_spend = counts_executed_acts(caps_fold)
+    executed_acts = ExecutedActs(records)
+    written_statements: set[str] = set()
+    for record in records:
+        shown = (disclosed or {}).get(record.get("capsule_id", ""))
+        digest = json_digest(shown) if shown is not None else None
+        if _gets_no_decision(record, shown, withheld):
+            undecided.append(record)
+            stated = statement_record(record, shown)
+            if stated is not None and claim_of(stated) not in written_statements:
+                # A claim given twice (overlapping sources) is one statement.
+                written_statements.add(claim_of(stated))
+                store.append(dict(stated))
+            chain = _carried_out(digest, deal) if digest is not None else None
+            checked = decided_checks.pop(chain.check, None) if chain is not None else None
+            if chain is not None and checked is not None and checked.decision.outcome in (ALLOW, ESCALATE):
+                store.append(dict(_carried_out_record(checked, chain, _text(record.get("timestamp")))))
+            if counts_spend and digest is not None and _bound(record, shown):
+                executed = executed_acts.record(record, shown, digest)
+                if executed is not None:
+                    store.append(dict(executed))
+            continue
+        profile = profiles.get(digest) if profiles and digest is not None else None
+        action = action_for_record(record, shown, counterparty_profile=profile)
+        if digest in offered_at:
+            action = replace(action, proposal_at=offered_at[digest])
+        authority = authorities.get(action.task_authority_ref) if action.task_authority_ref else None
+        opening = (representing_openings or {}).get(action.representation_text_commitment or "")
+        action, decision = _decide(engine, action, record, sale_history, authority, opening)
+        cited_capsule = None
+        for constraint in decision.constraints:
+            cited_id = (constraint.evidence or {}).get("matched_capsule_id") or (
+                constraint.evidence or {}
+            ).get("cited_capsule_id")
+            if cited_id:
+                found = store.get(cited_id)
+                if found is not None:
+                    cited_capsule = found.capsule
+                    break
+        sourced.append(SourcedDecision(record=record, action=action, decision=decision, cited_capsule=cited_capsule))
+        if digest in deal and decision.capsule is not None:
+            decided_checks[digest] = sourced[-1]
 
     return ReplayResult(decisions=tuple(sourced), record_range=(1, len(records)), undecided=tuple(undecided))
 
@@ -1771,20 +1765,20 @@ def _decide(engine: GuardEngine, action: Action, record: dict, sale_history: Sal
     never a failure (``guards/checks/promise_never.py``)."""
     capsule_id = _text(record.get("capsule_id"))
 
-    def check(decided: Action, **ledgers: LedgerAPI) -> GuardDecision:
+    def check(decided: Action, **ledgers: History) -> GuardDecision:
         return engine.check(decided, dry_run=True, task_authority_record=task_authority,
                             representing_opening=opening if opening is not None else WORDS_NOT_IN_BUNDLE,
                             **ledgers)
 
     if sale_history is None or capsule_id is None:
         return action, check(action)
-    with tempfile.TemporaryDirectory() as tmp, LedgerStore(tmp) as sale_ledger:
-        sale = sale_history(capsule_id, sale_ledger, None)
-        if sale is None:
-            return action, check(action)
-        action = replace(action, item_ref=sale.item_ref)
-        if not engine.uses_release_history:
-            return action, check(action, sale_history=sale_ledger)
-        with tempfile.TemporaryDirectory() as window_tmp, LedgerStore(window_tmp) as window_ledger:
-            sale_history(capsule_id, window_ledger, RULES_HISTORY_DAYS)
-            return action, check(action, sale_history=sale_ledger, release_history=window_ledger)
+    sale_ledger = MemoryHistory()
+    sale = sale_history(capsule_id, sale_ledger, None)
+    if sale is None:
+        return action, check(action)
+    action = replace(action, item_ref=sale.item_ref)
+    if not engine.uses_release_history:
+        return action, check(action, sale_history=sale_ledger)
+    window_ledger = MemoryHistory()
+    sale_history(capsule_id, window_ledger, RULES_HISTORY_DAYS)
+    return action, check(action, sale_history=sale_ledger, release_history=window_ledger)

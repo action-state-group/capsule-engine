@@ -54,7 +54,7 @@ def _fold_v2():
 
 def _engine(store, signer, caps_minor: dict[str, int], fold=None) -> GuardEngine:
     return GuardEngine(
-        ledger=store, caps_fold=fold or _fold_v2(), signer_provider=lambda: signer, caps_minor=caps_minor
+        history=store, caps_fold=fold or _fold_v2(), signer_provider=lambda: signer, caps_minor=caps_minor
     )
 
 

@@ -50,8 +50,8 @@ from pathlib import Path
 
 import pytest
 import yaml
-from cll.ledger import LedgerStore
 
+from capsule_engine.guards.history import MemoryHistory
 from capsule_engine.packs.loader import load_pack_dir
 from capsule_engine.packs.schema import NORMALIZED_ACTION_FIELDS
 from capsule_engine.report.result_from_folds import project_guard_constraint
@@ -215,7 +215,7 @@ def _regenerate() -> None:
     code_value = source_tree_sha256()  # captured at check time, before the run
     with tempfile.TemporaryDirectory() as tmp:
         tmp = Path(tmp)
-        store = LedgerStore(tmp / "ledger")
+        store = MemoryHistory()
         try:
             installed, _, _, records = _run_scenarios(store, project_dir=tmp / "project")
         finally:
@@ -298,7 +298,7 @@ def test_rerunning_each_row_from_its_recorded_pins_reproduces_its_record():
     import tempfile
 
     with tempfile.TemporaryDirectory() as tmp:
-        store = LedgerStore(Path(tmp) / "ledger")
+        store = MemoryHistory()
         try:
             installed, _, capsules, _ = _run_scenarios(store, project_dir=Path(tmp) / "project")
         finally:

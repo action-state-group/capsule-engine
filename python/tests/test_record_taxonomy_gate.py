@@ -26,7 +26,6 @@ from typing import TypedDict
 
 import pytest
 from agent_action_capsule import json_digest
-from cll.ledger import LedgerStore
 
 from capsule_engine.folds.loader import load_definition_file as load_fold
 from capsule_engine.guards import Action, GuardEngine, LocalSigner
@@ -39,6 +38,7 @@ from capsule_engine.guards.classes import (
     carried_taxonomy,
 )
 from capsule_engine.guards.engine import NOT_EVALUABLE
+from capsule_engine.guards.history import MemoryHistory
 from capsule_engine.guards.wickets import load_definition_file as load_wicket
 from capsule_engine.packs import build_engine, install_pack, load_pack_dir
 from capsule_engine.report.replay import replay
@@ -126,9 +126,9 @@ def _action(action_class: str, n: int, amount_minor: int, **fields) -> Action:
 
 @pytest.fixture
 def engine(tmp_path):
-    store = LedgerStore(tmp_path / "ledger")
+    store = MemoryHistory()
     installed = install_pack(load_pack_dir(PACK_DIR), project_dir=tmp_path / "project", mode="observe")
-    yield build_engine(installed, ledger=store, signer_provider=lambda: SIGNER)
+    yield build_engine(installed, history=store, signer_provider=lambda: SIGNER)
     store.close()
 
 
@@ -215,9 +215,9 @@ def test_a_live_mismatch_still_refuses_a_repeat_on_dedupe(engine):
 def test_a_live_mismatch_never_holds_an_integrity_check(tmp_path):
     """promise_never refuses whatever the taxonomy says, so a mismatch leaves
     its refusal standing."""
-    with LedgerStore(tmp_path / "ledger") as store:
+    with MemoryHistory() as store:
         engine = GuardEngine(
-            ledger=store, caps_fold=load_fold(SPEND_WEEKLY), signer_provider=lambda: SIGNER, wickets=(PROMISE_NEVER,)
+            history=store, caps_fold=load_fold(SPEND_WEEKLY), signer_provider=lambda: SIGNER, wickets=(PROMISE_NEVER,)
         )
         decision = engine.check(_action("agreement.accept", 4, 100, taxonomy_version="5", representation_class="authenticity"))
     assert decision.taxonomy_mismatch is not None

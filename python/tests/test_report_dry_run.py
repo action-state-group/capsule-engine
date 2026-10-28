@@ -165,7 +165,7 @@ def test_cli_dry_run_writes_report_and_verifies(tmp_path):
         [
             "guard",
             "dry-run",
-            "--ledger",
+            "--store",
             str(AMAURY),
             "--since",
             "7d",
@@ -183,7 +183,7 @@ def test_cli_dry_run_writes_report_and_verifies(tmp_path):
 def test_cli_report_carries_capsule_bodies_only_with_share(tmp_path):
     bare, shared = tmp_path / "bare.json", tmp_path / "shared.json"
     for out, extra in ((bare, []), (shared, ["--share"])):
-        assert cli_main(["guard", "dry-run", "--ledger", str(NANDA), "--since", "7d", "--out", str(out), *extra]) == 0
+        assert cli_main(["guard", "dry-run", "--store", str(NANDA), "--since", "7d", "--out", str(out), *extra]) == 0
 
     def capsules(path):
         rows = [r for g in json.loads(path.read_text())["guards"] for r in g["rows"]]
@@ -199,14 +199,14 @@ def test_cli_report_carries_capsule_bodies_only_with_share(tmp_path):
 def test_cli_guards_only_arm_never_writes_capsule_bodies_even_with_share(tmp_path, monkeypatch):
     monkeypatch.setenv("CAPSULE_LEDGER_ARM", "guards-only")
     out = tmp_path / "r.json"
-    assert cli_main(["guard", "dry-run", "--ledger", str(NANDA), "--since", "7d", "--out", str(out), "--share"]) == 0
+    assert cli_main(["guard", "dry-run", "--store", str(NANDA), "--since", "7d", "--out", str(out), "--share"]) == 0
     rows = [r for g in json.loads(out.read_text())["guards"] for r in g["rows"]]
     assert rows and all(r["capsule"] is None and r["cited_capsule"] is None for r in rows)
 
 
 def test_cli_rejects_malformed_cap(tmp_path, capsys):
     out = tmp_path / "report.json"
-    rc = cli_main(["guard", "dry-run", "--ledger", str(AMAURY), "--cap", "not-a-cap", "--out", str(out)])
+    rc = cli_main(["guard", "dry-run", "--store", str(AMAURY), "--cap", "not-a-cap", "--out", str(out)])
     assert rc == 1
     assert not out.exists()
 
@@ -214,7 +214,7 @@ def test_cli_rejects_malformed_cap(tmp_path, capsys):
 def test_cli_requires_model_id_alongside_model_note(tmp_path):
     out = tmp_path / "report.json"
     rc = cli_main(
-        ["guard", "dry-run", "--ledger", str(AMAURY), "--model-note", "a quote", "--out", str(out)]
+        ["guard", "dry-run", "--store", str(AMAURY), "--model-note", "a quote", "--out", str(out)]
     )
     assert rc == 1
     assert not out.exists()
@@ -223,12 +223,12 @@ def test_cli_requires_model_id_alongside_model_note(tmp_path):
 def test_cli_ledger_directory_binding_reads_a_real_store(tmp_path):
     """The real-deployment path: --ledger pointed at a LedgerStore directory,
     not a loose JSONL file."""
-    from cll.ledger import LedgerStore
+    from capsule_engine.guards.history import open_store
+    from capsule_engine.guards.signing import LocalSigner
 
     store_dir = tmp_path / "store"
-    store = LedgerStore(store_dir)
-    n = store.import_jsonl(AMAURY)
-    store.close()
+    with open_store(store_dir, signer=LocalSigner(key_id="k", secret=b"s"), create=True) as store:
+        n = len([store.append(json.loads(line)) for line in AMAURY.read_text(encoding="utf-8").splitlines() if line.strip()])
     assert n == 4
 
     out = tmp_path / "report.json"
@@ -236,7 +236,7 @@ def test_cli_ledger_directory_binding_reads_a_real_store(tmp_path):
         [
             "guard",
             "dry-run",
-            "--ledger",
+            "--store",
             str(store_dir),
             "--since",
             "7d",

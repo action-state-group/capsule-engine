@@ -14,7 +14,6 @@ from pathlib import Path
 
 import pytest
 from agent_action_capsule import json_digest
-from cll.ledger import LedgerStore
 
 from capsule_engine.folds.loader import load_definition_file as load_fold
 from capsule_engine.guards import Action, GuardEngine, LocalSigner
@@ -22,6 +21,7 @@ from capsule_engine.guards.action import HANDOVERS
 from capsule_engine.guards.capsule import act_payload, not_applicable_evidence
 from capsule_engine.guards.checks import CONFIGURED_CHECKS
 from capsule_engine.guards.checks.destination_rail import MISSING_RAIL_REASON
+from capsule_engine.guards.history import MemoryHistory
 from capsule_engine.guards.wickets import WicketDefinition, load_definition_file
 from capsule_engine.report.replay import action_for_record
 
@@ -175,10 +175,10 @@ def test_the_handover_set_is_closed():
 
 
 def test_the_handover_is_sealed_only_when_set_and_read_back(tmp_path):
-    store = LedgerStore(tmp_path / "ledger")
+    store = MemoryHistory()
     try:
         signer = LocalSigner(key_id="rail-key", secret=b"rail-test-key")
-        engine = GuardEngine(ledger=store, caps_fold=SPEND, signer_provider=lambda: signer, wickets=(RAIL_1_1,))
+        engine = GuardEngine(history=store, caps_fold=SPEND, signer_provider=lambda: signer, wickets=(RAIL_1_1,))
         bare = engine.check(_action(COMMIT, rail="card", action_id="commit/bare")).capsule
         assert "handover" not in bare["asg_payload"]
         sealed = engine.check(_action(COMMIT, rail="cash", handover="in_person", action_id="commit/cash")).capsule

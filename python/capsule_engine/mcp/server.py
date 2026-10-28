@@ -7,12 +7,12 @@ custom client), stdio transport.
                                             # MCP host that spawns a subprocess
 
 Every tool here is a thin wrapper over the same modules the `capsule` CLI uses
-(`ledger.api.LedgerAPI`, the fold engine, `guards.GuardEngine`) -- see
+(`guards.history.History`, the fold engine, `guards.GuardEngine`) -- see
 `tools.py`, which contains 100% of the actual logic and has no dependency on
 this module or on the `mcp` package at all. This module's only job is
 registering those functions as FastMCP tools with Tier-1 descriptions and
 wiring up the one piece of process-lifetime state every tool needs: a single
-open `LedgerAPI` binding (see `config.py` for the backend seam).
+open `History` (see `config.py` for the backend seam).
 
 Nine tools are read-only; `intent_declare` is the only tool that writes.
 
@@ -20,7 +20,7 @@ Configuration is entirely environment-driven (`config.load_config()`) so a
 harness's own MCP config format (Claude Code hook, Goose extension entry) can
 point this at a real deployment with no code change:
 
-    CAPSULE_LEDGER              ledger directory or JSONL fixture (required)
+    CAPSULE_STORE               store directory or JSONL fixture (required)
     CAPSULE_FOLD_DIR            fold catalog directory (default: built-in catalog)
     CAPSULE_MCP_BACKEND         "local" (default; anything else -- not yet built)
     CAPSULE_MCP_CAPS_MINOR      JSON object, e.g. {"money.transfer": 10000000}
@@ -92,7 +92,7 @@ def _get_guard() -> GuardEngine:
                 "always evaluates for the caps check)."
             )
         _guard = GuardEngine(
-            ledger=_get_ledger(),
+            history=_get_ledger(),
             caps_fold=entry.definition,
             signer_provider=lambda: signer,
             caps_minor=config.caps_minor,

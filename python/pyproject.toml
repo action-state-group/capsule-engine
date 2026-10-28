@@ -25,18 +25,19 @@ classifiers = [
 # vendor-of-record copy of the action-class and field conventions.
 dependencies = [
     "agent-action-capsule>=0.11.0",
-    # cll.ledger: LedgerStore, LedgerAPI, ScanQuery, LedgerRecord and
-    # VerificationResult. They replaced the archived capsule-ledger (#170),
-    # whose ledger modules were aliases for these.
-    "checkpointed-local-log>=0.6.0",
+    # cll.log: the CLL entry log a store directory keeps (guards/history.py),
+    # with its entry count. Pinned to the merged revision that adds the count
+    # (checkpointed-local-log#98) until its next release.
+    "checkpointed-local-log @ git+https://github.com/action-state-group/checkpointed-local-log@fe4281c10be3#subdirectory=python",
     # capsule_engine/schemas/evidence-contract-v0.json's validator entry point
     # (packs/contract_validate.py).
     "jsonschema>=4.18",
-    # capsule_emit.ledger_io, .period and .evidence_file: the read/verify seam,
-    # --period sugar and thread-bundle check. 0.12.0 is the first release that
-    # works with agent-action-capsule 0.10 and later. Capped below 0.13, whose
-    # ledger layout refuses the flat ledger writes the engine and its tests make.
-    "capsule-emit>=0.12.0,<0.13",
+    # capsule_emit.artifact (the artifact store and its index, guards/history.py),
+    # capsule_emit.produce (the producer envelope a stored record carries),
+    # .period and .evidence_file (--period sugar and the thread-bundle check).
+    # Pinned to the merged revision with the index and produce
+    # (capsule-emit#381, #382) until its next release.
+    "capsule-emit @ git+https://github.com/action-state-group/capsule-emit@9defe98af14b#subdirectory=python",
     "pyyaml>=6.0",
 ]
 

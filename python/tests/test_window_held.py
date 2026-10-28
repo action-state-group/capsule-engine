@@ -16,10 +16,10 @@ from pathlib import Path
 
 import pytest
 from agent_action_capsule import json_digest
-from cll.ledger import LedgerStore
 
 from capsule_engine.guards.checks.caps import WINDOW_UNREADABLE_REASON
 from capsule_engine.guards.classes import ENGINE_TAXONOMY, same_classes
+from capsule_engine.guards.history import MemoryHistory
 from capsule_engine.guards.history_state import WINDOW_HELD, history_state
 from capsule_engine.packs import install_pack, load_pack_dir
 from capsule_engine.report.live_check import decide_check_input
@@ -115,9 +115,9 @@ def test_a_failing_per_purchase_limit_still_stands_under_a_held_window():
 
 
 def test_with_no_caps_fold_nothing_is_held(tmp_path):
-    with LedgerStore(tmp_path / "ledger") as store:
+    with MemoryHistory() as store:
         history_ledger(_envelope("pay-history-5-days"), store, caps_fold=None)
-        assert not [r for r in store.scan() if history_state(r.capsule) == WINDOW_HELD]
+        assert not [r for r in store.find() if history_state(r.capsule) == WINDOW_HELD]
 
 
 def test_the_marker_changes_no_check_but_caps():

@@ -1,10 +1,10 @@
 # SPDX-License-Identifier: Apache-2.0
 """The MCP tool implementations: plain functions returning plain, JSON-serializable
-dicts, each one a thin wrapper over an existing module -- ``LedgerAPI``, the fold
+dicts, each one a thin wrapper over an existing module -- ``History``, the fold
 engine, or the guard engine/checks. No business logic is reimplemented here.
 
 Kept independent of ``mcp.server.fastmcp`` (no import of it anywhere in this
-module) so every tool is directly unit-testable with a plain ``LedgerStore`` and
+module) so every tool is directly unit-testable with a plain ``MemoryHistory`` and
 no MCP session/transport in the loop -- ``server.py`` is the only module that
 knows FastMCP exists.
 
@@ -15,11 +15,10 @@ must never need to fall back to raw ledger rows to check a tool's own claim.
 """
 from __future__ import annotations
 
+import re
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
-
-from cll.ledger.api import LedgerAPI, ScanQuery
 
 from ..cli.constraints_cmd import CHECKS, DEFAULT_CAPS_FOLD_ID
 from ..cli.format import summarize_action
@@ -31,6 +30,7 @@ from ..guards import Action, GuardEngine
 from ..guards.checks.caps import cap_for, resolve_caps_minor
 from ..guards.checks.dedupe import check_dedupe
 from ..guards.classes import TAXONOMY, UNCLASSIFIED_DEFAULT
+from ..guards.history import History, HistoryRecord, Query, lookup, parse_instant, verify_record
 
 __all__ = [
     "ledger_query",
@@ -52,13 +52,34 @@ def _error(reason: str, message: str) -> dict[str, Any]:
     return {"error": {"reason": reason, "message": message}}
 
 
-def _record_dict(record) -> dict[str, Any]:
+def _record_dict(record: HistoryRecord) -> dict[str, Any]:
     return {
         "seq": record.seq,
         "capsule_id": record.capsule_id,
         "capsule": record.capsule,
-        "consequential": record.consequential,
     }
+
+
+def _until(value: str) -> datetime:
+    """``ledger_query``'s ``until`` as an instant: a date alone is midnight
+    UTC and a time with no offset is UTC, as the ledger's scan read it."""
+    if re.fullmatch(r"\d{4}-\d\d-\d\d", value.strip()):
+        return datetime.fromisoformat(value.strip()).replace(tzinfo=timezone.utc)
+    parsed = parse_instant(value)
+    if parsed is None:
+        raise ValueError(f"until is not an RFC 3339 time or date: {value!r}")
+    return parsed
+
+
+def _chain_gaps(history: History) -> list[str]:
+    """The id of each record whose chain parent the history does not hold,
+    as the ledger's ``find_gaps`` counted them."""
+    out = []
+    for record in history.find():
+        parent = (record.capsule.get("chain") or {}).get("parent_capsule_id")
+        if parent is not None and history.get(parent) is None:
+            out.append(record.capsule_id)
+    return out
 
 
 def _shift(ts: str, *, days: int) -> str:
@@ -73,7 +94,7 @@ def _shift(ts: str, *, days: int) -> str:
 
 
 def ledger_query(
-    ledger: LedgerAPI,
+    ledger: History,
     *,
     agent: str | None = None,
     since: str | None = None,
@@ -86,18 +107,17 @@ def ledger_query(
     """The same filtered scan `capsule log` runs: every matching record, plus the
     honest total (a filtered view is never mistaken for the whole ledger) and
     the chain-gap count `capsule log`'s own footer reports."""
-    total = sum(1 for _ in ledger.scan(ScanQuery()))
-    query = ScanQuery(
-        agent=agent,
-        since=since,
-        until=until,
-        counterparty=counterparty,
-        verdict=verdict,
-        action_type=action_type,
-        limit=limit,
-    )
-    records = list(ledger.scan(query))
-    gaps = ledger.find_gaps()
+    total = ledger.size()
+    records = ledger.find(Query(where={"developer": agent, "operator": counterparty, "action_type": action_type},
+                                since=since))
+    if until is not None:
+        bound = _until(until)
+        records = [r for r in records if (at := parse_instant(r.capsule.get("timestamp"))) is not None and at <= bound]
+    if verdict is not None:
+        records = [r for r in records if (r.capsule.get("disposition") or {}).get("verdict_class") == verdict]
+    if limit is not None:
+        records = records[:limit]
+    gaps = _chain_gaps(ledger)
     return {
         "records": [_record_dict(r) for r in records],
         "matched": len(records),
@@ -132,7 +152,7 @@ def fold_list(catalog_dir: str | Path) -> dict[str, Any]:
 
 
 def fold_get(
-    ledger: LedgerAPI,
+    ledger: History,
     catalog_dir: str | Path,
     *,
     fold: str,
@@ -161,7 +181,7 @@ def fold_get(
     except FoldDefinitionError as exc:
         return _error(exc.reason, str(exc))
 
-    records = [r.capsule for r in ledger.scan(ScanQuery())]
+    records = [r.capsule for r in ledger.find()]
     try:
         trace = evaluate_one(definition, records, key_value=key, as_of=as_of)
     except FoldDeterminismError as exc:
@@ -176,7 +196,7 @@ def fold_get(
 
 
 def budget_remaining(
-    ledger: LedgerAPI,
+    ledger: History,
     catalog_dir: str | Path,
     caps_minor: dict[str, int],
     *,
@@ -207,7 +227,7 @@ def budget_remaining(
     if entry is None:
         return _error("not_found", f"caps fold {DEFAULT_CAPS_FOLD_ID!r} not found in catalog {catalog_dir}")
 
-    records = [r.capsule for r in ledger.scan(ScanQuery(agent=agent))]
+    records = [r.capsule for r in ledger.find(Query(where={"developer": agent}))]
     resolved_as_of = as_of or datetime.now(timezone.utc).isoformat()
     trace = evaluate_one(entry.definition, records, key_value=agent, as_of=resolved_as_of)
     spent_minor = trace.result or 0
@@ -231,7 +251,7 @@ def budget_remaining(
 
 
 def action_been_done(
-    ledger: LedgerAPI,
+    ledger: History,
     *,
     verb: str,
     operator: str,
@@ -305,13 +325,13 @@ def constraints_list(catalog_dir: str | Path) -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 
 
-def decision_explain(ledger: LedgerAPI, *, capsule_id: str) -> dict[str, Any]:
+def decision_explain(ledger: History, *, capsule_id: str) -> dict[str, Any]:
     """Why a decision came out the way it did: the capsule's own constraints
     breakdown (`id`/`result`/`method` per check that ran) plus its verdict --
     the same information `capsule show` prints, never a separately-generated
     explanation. A capsule's constraints ARE the explanation; there is no
     other reasoning to fetch."""
-    record = ledger.fetch(capsule_id)
+    record = lookup(ledger, capsule_id)
     if record is None:
         return _error("not_found", f"no such capsule {capsule_id!r}")
 
@@ -339,23 +359,23 @@ def decision_explain(ledger: LedgerAPI, *, capsule_id: str) -> dict[str, Any]:
     }
 
 
-def record_get(ledger: LedgerAPI, *, capsule_id: str) -> dict[str, Any]:
+def record_get(ledger: History, *, capsule_id: str) -> dict[str, Any]:
     """The full raw capsule by id or unambiguous prefix -- `capsule show --json`'s
     own output, unchanged."""
-    record = ledger.fetch(capsule_id)
+    record = lookup(ledger, capsule_id)
     if record is None:
         return _error("not_found", f"no such capsule {capsule_id!r}")
     return _record_dict(record)
 
 
-def record_verify(ledger: LedgerAPI, *, capsule_id: str) -> dict[str, Any]:
+def record_verify(ledger: History, *, capsule_id: str) -> dict[str, Any]:
     """Independently re-verify one capsule's digest and chain -- `capsule verify`'s
     own check, run against the live ledger. Returns `ok` plus every finding
     (never just a bare boolean) so a `False` always comes with a reason."""
-    record = ledger.fetch(capsule_id)
+    record = lookup(ledger, capsule_id)
     if record is None:
         return _error("not_found", f"no such capsule {capsule_id!r}")
-    result = ledger.verify(capsule_id)
+    result = verify_record(ledger, record)
     if result is None:
         return _error("not_found", f"no such capsule {capsule_id!r}")
     return {
@@ -373,7 +393,7 @@ def record_verify(ledger: LedgerAPI, *, capsule_id: str) -> dict[str, Any]:
 
 
 def intent_declare(
-    ledger: LedgerAPI,
+    ledger: History,
     guard: GuardEngine,
     *,
     verb: str,

@@ -30,11 +30,11 @@ from typing import TypedDict
 
 import pytest
 from agent_action_capsule import json_digest
-from cll.ledger import LedgerStore
 
 import capsule_engine
 from capsule_engine.guards import GuardDecision, GuardEngine, LocalSigner
 from capsule_engine.guards.checks import RUNNABLE_CHECKS
+from capsule_engine.guards.history import MemoryHistory
 from capsule_engine.packs import install_pack, load_pack_dir
 from capsule_engine.packs.install import engine_ask_sets
 from capsule_engine.packs.obligation_results import obligation_results
@@ -165,7 +165,7 @@ def _given(envelope: dict, variant: str, bad: str = "uppercase hex") -> dict:
     return envelope
 
 
-def _engine(store: LedgerStore, tmp: str, envelope: dict) -> GuardEngine:
+def _engine(store: MemoryHistory, tmp: str, envelope: dict) -> GuardEngine:
     """A fresh engine under everyday, its ledger ``store`` with ``envelope``'s
     history written into it (``history_ledger``)."""
     installed = install_pack(PACK, project_dir=Path(tmp) / "live-project", mode="observe")
@@ -175,7 +175,7 @@ def _engine(store: LedgerStore, tmp: str, envelope: dict) -> GuardEngine:
     gates, asks = engine_ask_sets(installed.pack, wickets)
     signer = LocalSigner(key_id="history-act-counterparty", secret=b"history-act-counterparty-fixture")
     return GuardEngine(
-        ledger=store, caps_fold=resolved.caps_fold(), signer_provider=lambda: signer,
+        history=store, caps_fold=resolved.caps_fold(), signer_provider=lambda: signer,
         caps_minor=resolved.caps_minor() or {}, per_action_minor=resolved.per_action_minor(),
         per_action_reads=resolved.per_action_reads(), manifest_digest=resolved.manifest_digest,
         wickets=wickets, ask_gate_selectors=gates, ask_wickets=asks, evaluate_under_record_taxonomy=True,
@@ -185,7 +185,7 @@ def _engine(store: LedgerStore, tmp: str, envelope: dict) -> GuardEngine:
 def _decide(envelope: dict) -> GuardDecision:
     """The decision on one check input under everyday, by a fresh engine
     whose ledger is the input's history (``history_ledger``)."""
-    with tempfile.TemporaryDirectory() as tmp, LedgerStore(Path(tmp) / "ledger") as store:
+    with tempfile.TemporaryDirectory() as tmp, MemoryHistory() as store:
         return _engine(store, tmp, envelope).check(
             action_for_check_input(envelope["record"], item_ref=envelope.get("item_ref")),
             task_authority_record=envelope.get("task_authority_record"),

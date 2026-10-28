@@ -23,10 +23,9 @@ from __future__ import annotations
 from collections.abc import Sequence
 
 from agent_action_capsule.contracts import is_hex64
-from cll.ledger.api import LedgerAPI, ScanQuery
-from cll.ledger.records import LedgerRecord
 
 from ..events.capsule import build_event_capsule
+from ..guards.history import History, HistoryRecord, Query
 from ..guards.signing import Signer
 from .merkle import session_root
 
@@ -221,44 +220,50 @@ def build_turn_reference_capsule(
     )
 
 
-def _matches(record: LedgerRecord, event: str, session_id: str) -> bool:
+def _matches(record: HistoryRecord, event: str, session_id: str) -> bool:
     payload = record.capsule.get("asg_payload") or {}
     if payload.get("event") != event:
         return False
     return (payload.get("detail") or {}).get("session_id") == session_id
 
 
-def find_session_turns(ledger: LedgerAPI, session_id: str) -> list[LedgerRecord]:
+def find_session_turns(history: History, session_id: str) -> list[HistoryRecord]:
     """Every turn capsule recorded for ``session_id``, sorted by
     ``turn_index`` (not append order -- defensive against an out-of-order
     replay/import; a live ``ConversationSession`` always appends in order).
     """
-    matches = [r for r in ledger.scan(ScanQuery(action_type="fyi")) if _matches(r, EVENT_CONVERSATION_TURN, session_id)]
+    query = Query(where={"action_type": "fyi", "asg_payload.event": EVENT_CONVERSATION_TURN,
+                         "asg_payload.detail.session_id": session_id})
+    matches = [r for r in history.find(query) if _matches(r, EVENT_CONVERSATION_TURN, session_id)]
     matches.sort(key=lambda r: (r.capsule.get("asg_payload") or {}).get("detail", {}).get("turn_index", 0))
     return matches
 
 
-def find_session_close(ledger: LedgerAPI, session_id: str) -> LedgerRecord | None:
+def find_session_close(history: History, session_id: str) -> HistoryRecord | None:
     """The session-close capsule for ``session_id``, or ``None`` if the
-    session is still open (or never existed). ``scan()`` is append-ordered
+    session is still open (or never existed). ``find()`` is append-ordered
     and a session closes at most once, so the last match wins if more than
     one is ever found (defensive; not an expected shape).
     """
-    latest: LedgerRecord | None = None
-    for record in ledger.scan(ScanQuery(action_type="fyi")):
+    latest: HistoryRecord | None = None
+    query = Query(where={"action_type": "fyi", "asg_payload.event": EVENT_SESSION_CLOSE,
+                         "asg_payload.detail.session_id": session_id})
+    for record in history.find(query):
         if _matches(record, EVENT_SESSION_CLOSE, session_id):
             latest = record
     return latest
 
 
-def find_turn_reference(ledger: LedgerAPI, capsule_id: str) -> LedgerRecord | None:
+def find_turn_reference(history: History, capsule_id: str) -> HistoryRecord | None:
     """The turn-reference capsule (if any) that names ``capsule_id`` among
     its ``referenced_capsule_ids`` -- lets a caller resolve any capsule
     (e.g. a tool-call capsule from an unrelated pipeline) back to the
     conversation turn that gave rise to it. ``None`` if no such reference
     was ever recorded.
     """
-    for record in ledger.scan(ScanQuery(action_type="fyi")):
+    query = Query(where={"action_type": "fyi", "asg_payload.event": EVENT_TURN_REFERENCE,
+                         "asg_payload.detail.referenced_capsule_ids": capsule_id})
+    for record in history.find(query):
         payload = record.capsule.get("asg_payload") or {}
         if payload.get("event") != EVENT_TURN_REFERENCE:
             continue

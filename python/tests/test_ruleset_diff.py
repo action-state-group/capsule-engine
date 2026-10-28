@@ -8,9 +8,9 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-from cll.ledger import LedgerStore
 
 from capsule_engine.guards import LocalSigner
+from capsule_engine.guards.history import MemoryHistory
 from capsule_engine.packs import install_pack, load_pack_dir, record_pack_activation
 from capsule_engine.packs.contract_diff import (
     BREAKING,
@@ -148,13 +148,13 @@ def test_anything_without_a_rule_is_changed_and_breaking(a, b, path):
 def test_the_diff_reads_two_real_activations(tmp_path):
     pack = load_pack_dir(EVERYDAY_DIR)
     signer = LocalSigner(key_id="ruleset-diff-key", secret=b"ruleset-diff-fixed-key")
-    ledger = LedgerStore(tmp_path / "ledger")
+    ledger = MemoryHistory()
     details = []
     for n, limit in enumerate((2_500, 1_500)):
         profile = parse_profile({"format": PROFILE_FORMAT, "packs": [
             {"pack": "asg/everyday", "parameters": {"caps": {"per_action_minor": {"money.purchase": limit}}}}]})
         installed = install_pack(pack, project_dir=tmp_path / "p", mode="enforce", profile=profile)
-        capsule = record_pack_activation(installed, ledger=ledger, operator="household-a", developer="ops",
+        capsule = record_pack_activation(installed, history=ledger, operator="household-a", developer="ops",
                                          signer=signer, timestamp=f"2026-10-06T09:0{n}:00Z")
         details.append(capsule["asg_payload"]["detail"])
     ledger.close()

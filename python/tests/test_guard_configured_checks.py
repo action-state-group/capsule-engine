@@ -97,7 +97,7 @@ def test_credential_pattern_passes_on_ordinary_content():
 
 def test_credential_pattern_never_puts_the_content_on_the_capsule(store, caps_fold, signer):
     secret = "Your verification code is 482913"
-    engine = GuardEngine(ledger=store, caps_fold=caps_fold, signer_provider=lambda: signer, wickets=(CREDENTIAL,))
+    engine = GuardEngine(history=store, caps_fold=caps_fold, signer_provider=lambda: signer, wickets=(CREDENTIAL,))
     capsule = engine.check(_action(outgoing_content=secret, action_id="pay/c1"), dry_run=True).capsule
     assert secret not in repr(capsule)
     assert "outgoing_content" not in capsule["asg_payload"]
@@ -107,7 +107,7 @@ def test_credential_evidence_digest_does_not_depend_on_the_content(store, caps_f
     """Two different one-time codes that match the same pattern must seal the
     same evidence_digest; otherwise the sealed digest is a guessable hash of
     the content."""
-    engine = GuardEngine(ledger=store, caps_fold=caps_fold, signer_provider=lambda: signer, wickets=(CREDENTIAL,))
+    engine = GuardEngine(history=store, caps_fold=caps_fold, signer_provider=lambda: signer, wickets=(CREDENTIAL,))
     first = engine.check(_action(outgoing_content="Your verification code is 482913", action_id="pay/d1",
                                  equivalence_key="d1"), dry_run=True).capsule
     second = engine.check(_action(outgoing_content="Your verification code is 105377", action_id="pay/d2",
@@ -159,7 +159,7 @@ def test_credential_pattern_without_content_is_out_of_scope():
 
 
 def _engine(store, caps_fold, signer, *wickets):
-    return GuardEngine(ledger=store, caps_fold=caps_fold, signer_provider=lambda: signer, wickets=wickets)
+    return GuardEngine(history=store, caps_fold=caps_fold, signer_provider=lambda: signer, wickets=wickets)
 
 
 # Reads raw capsule or fixture JSON/YAML: the test's decoding boundary.
@@ -273,12 +273,12 @@ def test_recurrence_is_recorded_on_the_capsule(store, caps_fold, signer):
 
 
 def test_engine_with_no_configured_wickets_seals_the_same_capsule_as_before(tmp_path, caps_fold, signer):
-    from cll.ledger import LedgerStore
+    from capsule_engine.guards.history import MemoryHistory
 
-    a, b = LedgerStore(tmp_path / "a"), LedgerStore(tmp_path / "b")
+    a, b = MemoryHistory(), MemoryHistory()
     try:
-        plain = GuardEngine(ledger=a, caps_fold=caps_fold, signer_provider=lambda: signer)
-        explicit = GuardEngine(ledger=b, caps_fold=caps_fold, signer_provider=lambda: signer, wickets=())
+        plain = GuardEngine(history=a, caps_fold=caps_fold, signer_provider=lambda: signer)
+        explicit = GuardEngine(history=b, caps_fold=caps_fold, signer_provider=lambda: signer, wickets=())
         assert plain.check(_action(action_id="pay/w1")).capsule == explicit.check(_action(action_id="pay/w1")).capsule
         capsule = plain.check(_action(action_id="pay/w2", amount_minor=5)).capsule
         assert [c["id"] for c in capsule["constraints"]] == ["dedupe", "caps", "verify_before_dispatch"]

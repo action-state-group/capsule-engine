@@ -20,11 +20,11 @@ from pathlib import Path
 
 import pytest
 from agent_action_capsule import json_digest
-from cll.ledger import LedgerStore
 
 from capsule_engine.folds.loader import load_definition_file as load_fold
 from capsule_engine.guards.capsule import DENY, not_applicable_evidence
 from capsule_engine.guards.checks.dedupe import check_dedupe
+from capsule_engine.guards.history import MemoryHistory
 from capsule_engine.report.replay import action_for_record, load_disclosed, load_records, replay
 
 PACKAGE_DIR = Path(__file__).parent.parent / "capsule_engine"
@@ -73,7 +73,7 @@ def test_a_record_that_states_no_act_would_read_dedupe_not_applicable(name, tmp_
             continue
         action = action_for_record(record, disclosed[record["capsule_id"]])
         assert action.states_act is False
-        with LedgerStore(tmp_path / record["capsule_id"]) as ledger:
+        with MemoryHistory() as ledger:
             outcome = check_dedupe(action, ledger)
         assert (outcome.constraint.result, outcome.constraint.evidence) == (
             "n/a", not_applicable_evidence("dedupe", in_scope=False))

@@ -41,12 +41,12 @@ def _seen_after_a_dry_run(store, signer, wicket_file: str):
     counterparty fails the rule, so a dry run under it is not accepted),
     then the first real action once it is."""
     fold = load_fold(FOLDS / "spend.weekly.v3.yaml")
-    observing = GuardEngine(ledger=store, caps_fold=fold, signer_provider=lambda: signer)
+    observing = GuardEngine(history=store, caps_fold=fold, signer_provider=lambda: signer)
     dry = observing.check(_action(1), dry_run=True)
     assert dry.capsule["disposition"]["decision"] == "accept"
     assert dry.capsule["asg_payload"]["checkpoint"]["dry_run"] is True
     engine = GuardEngine(
-        ledger=store,
+        history=store,
         caps_fold=fold,
         signer_provider=lambda: signer,
         wickets=(load_wicket(WICKETS / wicket_file),),
@@ -83,13 +83,13 @@ def test_v2_does_not_count_a_dry_run(store, signer):
 
 def test_v2_still_counts_a_real_prior_action(store, signer):
     fold = load_fold(FOLDS / "spend.weekly.v3.yaml")
-    plain = GuardEngine(ledger=store, caps_fold=fold, signer_provider=lambda: signer)
+    plain = GuardEngine(history=store, caps_fold=fold, signer_provider=lambda: signer)
     prior = plain.check(_action(1))
     assert prior.capsule["disposition"]["decision"] == "accept"
     assert "dry_run" not in prior.capsule["asg_payload"]["checkpoint"]
 
     engine = GuardEngine(
-        ledger=store,
+        history=store,
         caps_fold=fold,
         signer_provider=lambda: signer,
         wickets=(load_wicket(WICKETS / "counterparty_seen_before.v2.yaml"),),

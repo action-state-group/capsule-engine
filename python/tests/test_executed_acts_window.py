@@ -23,7 +23,6 @@ from typing import TypedDict
 
 import pytest
 from agent_action_capsule import json_digest
-from cll.ledger import LedgerStore
 
 import capsule_engine
 from capsule_engine.folds.catalog import Catalog as FoldCatalog
@@ -32,6 +31,7 @@ from capsule_engine.guards.capsule import ESCALATE
 from capsule_engine.guards.checks import RUNNABLE_CHECKS
 from capsule_engine.guards.checks.caps import WINDOW_UNREADABLE_REASON, check_caps
 from capsule_engine.guards.engine import NOT_EVALUABLE, GuardDecision
+from capsule_engine.guards.history import MemoryHistory
 from capsule_engine.packs import install_pack, load_pack_dir
 from capsule_engine.packs.install import engine_ask_sets
 from capsule_engine.packs.loader import CORE_FOLD_CATALOG_DIR
@@ -75,14 +75,14 @@ def _decide(name: str, step: int) -> GuardDecision:
 
 
 def _decide_envelope(envelope: dict) -> GuardDecision:
-    with tempfile.TemporaryDirectory() as tmp, LedgerStore(Path(tmp) / "ledger") as store:
+    with tempfile.TemporaryDirectory() as tmp, MemoryHistory() as store:
         installed = install_pack(PACK, project_dir=Path(tmp) / "live-project", mode="observe")
         resolved = installed.resolved
         wickets = resolved.configured_wickets(RUNNABLE_CHECKS)
         gates, asks = engine_ask_sets(installed.pack, wickets)
         signer = LocalSigner(key_id="executed-acts-window", secret=b"executed-acts-window-fixture")
         engine = GuardEngine(
-            ledger=store, caps_fold=resolved.caps_fold(), signer_provider=lambda: signer,
+            history=store, caps_fold=resolved.caps_fold(), signer_provider=lambda: signer,
             caps_minor=resolved.caps_minor() or {}, per_action_minor=resolved.per_action_minor(),
             per_action_reads=resolved.per_action_reads(), manifest_digest=resolved.manifest_digest,
             wickets=wickets, ask_gate_selectors=gates, ask_wickets=asks, evaluate_under_record_taxonomy=True,
@@ -222,7 +222,7 @@ def test_a_fold_keyed_by_developer_still_reads_the_marker():
     envelope = _incomplete("decided-pay", 0)
     spend_v1 = FoldCatalog(CORE_FOLD_CATALOG_DIR).get("spend.weekly/1.0.0").definition
     assert spend_v1.key == "developer"
-    with tempfile.TemporaryDirectory() as tmp, LedgerStore(Path(tmp) / "ledger") as store:
+    with MemoryHistory() as store:
         history_ledger(envelope, store)
         action = action_for_check_input(envelope["record"])
         outcome = check_caps(action, store, definition=spend_v1, cap_minor=10_000)

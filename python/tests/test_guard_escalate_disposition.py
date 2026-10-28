@@ -43,7 +43,7 @@ def test_vendored_files_are_the_bytes_they_claim_to_be():
 # Reads raw capsule or fixture JSON/YAML: the test's decoding boundary.
 def _escalated(store, caps_fold, signer) -> dict:
     engine = GuardEngine(
-        ledger=store, caps_fold=caps_fold, signer_provider=lambda: signer, caps_minor={"money.transfer": 100}
+        history=store, caps_fold=caps_fold, signer_provider=lambda: signer, caps_minor={"money.transfer": 100}
     )
     action = Action(
         verb="pay", operator="acme", developer="agent@v1", action_class="money.transfer", amount_minor=500,

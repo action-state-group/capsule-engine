@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: Apache-2.0
 """capsule-engine: the thin single-node engine -- guard, append-only fold
 compute, packs, policy activation, and the report
-surfaces for AI agent actions. Ledger storage comes from
-checkpointed-local-log (``cll.ledger``); the action-class registry is this
+surfaces for AI agent actions. Records are stored in a checkpointed-local-log
+entry log beside capsule-emit's artifact store (``guards/history.py``); the action-class registry is this
 package's own ``registry``.
 """
 

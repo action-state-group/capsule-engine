@@ -50,11 +50,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from agent_action_capsule import json_digest
-from cll.ledger import LedgerRecord
-from cll.ledger.api import LedgerAPI, ScanQuery
 
 from ..action import Action
 from ..capsule import ConstraintOutcome, not_applicable_evidence
+from ..history import History, HistoryRecord, Query
 from ..history_state import counts_as_act
 from .base import CheckOutcome
 
@@ -156,7 +155,7 @@ class _EarlierAct:
     at: str | None
 
     @classmethod
-    def of(cls, record: LedgerRecord) -> _EarlierAct:
+    def of(cls, record: HistoryRecord) -> _EarlierAct:
         payload = record.capsule.get("asg_payload") or {}
         return cls(
             capsule_id=record.capsule_id,
@@ -222,7 +221,7 @@ def _repeat_in_another_deal(key: str, earlier: _EarlierAct) -> CheckOutcome:
     )
 
 
-def check_dedupe(action: Action, ledger: LedgerAPI, *, since: str | None = None) -> CheckOutcome:
+def check_dedupe(action: Action, history: History, *, since: str | None = None) -> CheckOutcome:
     if not action.states_act:
         return CheckOutcome(
             constraint=ConstraintOutcome(
@@ -236,9 +235,9 @@ def check_dedupe(action: Action, ledger: LedgerAPI, *, since: str | None = None)
         )
     key = equivalence_key_for_action(action)
     scanned_type = None if action.taxonomy_version is not None else action.action_type
-    query = ScanQuery(action_type=scanned_type, since=since)
+    query = Query(where={"action_type": scanned_type}, since=since)
     other_deal = None
-    for record in ledger.scan(query):
+    for record in history.find(query):
         if not counts_as_act(record.capsule) or equivalence_key_for_capsule(record.capsule) != key:
             continue
         earlier = _EarlierAct.of(record)

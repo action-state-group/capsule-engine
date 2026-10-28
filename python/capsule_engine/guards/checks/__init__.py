@@ -7,15 +7,14 @@ containment, a pure function of ``(action, plan)`` with no ledger read.
 configuring them is in force (``GuardEngine(wickets=...)``); each takes the
 action, the ledger and that wicket's ``config``. ``TASK_AUTHORITY_CHECKS`` run the
 same way but take the task-authority body supplied with the decision in place
-of the ledger, ``AUTHORIZATION_CHECKS`` both the task-authority record and
+of the history, ``AUTHORIZATION_CHECKS`` both the task-authority record and
 the approval record supplied with it, and ``COMMERCIAL_BOUNDS_CHECKS`` the
 task-authority record and the commercial-bounds opening supplied with it.
 ``RUNNABLE_CHECKS`` names all four."""
 from collections.abc import Callable
 
-from cll.ledger.api import LedgerAPI
-
 from ..action import Action
+from ..history import History
 from .action_class_gate import check_action_class_gate
 from .base import CheckOutcome
 from .caps import LimitSources, cap_for, check_caps, require_per_action_reads, resolve_caps_minor
@@ -61,8 +60,8 @@ from .task_authority import (
 from .upfront_amount import check_upfront_amount
 from .verify_before_dispatch import check_verify_before_dispatch
 
-CONFIGURED_CHECKS: dict[str, Callable[[Action, LedgerAPI, dict], CheckOutcome]] = {
-    "destination_rail": lambda action, ledger, config: check_destination_rail(
+CONFIGURED_CHECKS: dict[str, Callable[[Action, History, dict], CheckOutcome]] = {
+    "destination_rail": lambda action, history, config: check_destination_rail(
         action,
         watched_rails=config.get("watched_rails", []),
         allowed_rails=config.get("allowed_rails"),
@@ -71,63 +70,63 @@ CONFIGURED_CHECKS: dict[str, Callable[[Action, LedgerAPI, dict], CheckOutcome]] 
         rail_aliases=config.get("rail_aliases"),
         missing_rail=config.get("missing_rail"),
     ),
-    "counterparty_identity_change": lambda action, ledger, config: check_counterparty_identity_change(
-        action, ledger, action_classes=config["action_classes"]
+    "counterparty_identity_change": lambda action, history, config: check_counterparty_identity_change(
+        action, history, action_classes=config["action_classes"]
     ),
-    "counterparty_seen_before": lambda action, ledger, config: check_counterparty_seen_before(
+    "counterparty_seen_before": lambda action, history, config: check_counterparty_seen_before(
         action,
-        ledger,
+        history,
         definition=seen_before_fold(config["fold_id"], config["fold_digest"]),
         action_classes=config["action_classes"],
         missing_target=config.get("missing_target", "n/a"),
     ),
-    "credential_pattern": lambda action, ledger, config: check_credential_pattern(
+    "credential_pattern": lambda action, history, config: check_credential_pattern(
         action, patterns=config["patterns"]
     ),
-    "recurring_charge": lambda action, ledger, config: check_recurring_charge(
+    "recurring_charge": lambda action, history, config: check_recurring_charge(
         action, one_time_values=config["one_time_values"], action_classes=config["action_classes"]
     ),
-    "action_class_gate": lambda action, ledger, config: check_action_class_gate(action, selectors=config["selectors"]),
-    "counterparty_list": lambda action, ledger, config: check_counterparty_list(
+    "action_class_gate": lambda action, history, config: check_action_class_gate(action, selectors=config["selectors"]),
+    "counterparty_list": lambda action, history, config: check_counterparty_list(
         action, mode=config["mode"], entries=config["entries"], action_classes=config["action_classes"]
     ),
-    "recipient_role": lambda action, ledger, config: check_recipient_role(
+    "recipient_role": lambda action, history, config: check_recipient_role(
         action, roles=config["roles"], allowed_roles=config["allowed_roles"], action_classes=config["action_classes"],
         role_classes=config.get("role_classes"),
     ),
-    "refundability": lambda action, ledger, config: check_refundability(
+    "refundability": lambda action, history, config: check_refundability(
         action, action_classes=config["action_classes"]
     ),
-    "material_fields_changed": lambda action, ledger, config: check_material_fields_changed(
+    "material_fields_changed": lambda action, history, config: check_material_fields_changed(
         action,
         counted_fields=config["counted_fields"],
         max_changed=config["max_changed"],
         action_classes=config["action_classes"],
     ),
-    "offer_fields_changed": lambda action, ledger, config: check_offer_fields_changed(
+    "offer_fields_changed": lambda action, history, config: check_offer_fields_changed(
         action,
         counted_fields=config["counted_fields"],
         max_changed=config["max_changed"],
         action_classes=config["action_classes"],
     ),
-    "recipient_seen_before": lambda action, ledger, config: check_recipient_seen_before(
+    "recipient_seen_before": lambda action, history, config: check_recipient_seen_before(
         action,
-        ledger,
+        history,
         definition=seen_before_fold(config["fold_id"], config["fold_digest"]),
         action_classes=config["action_classes"],
     ),
-    "channel_change": lambda action, ledger, config: check_channel_change(
+    "channel_change": lambda action, history, config: check_channel_change(
         action, seeded_channels=config["seeded_channels"], action_classes=config["action_classes"]
     ),
-    "upfront_amount": lambda action, ledger, config: check_upfront_amount(
+    "upfront_amount": lambda action, history, config: check_upfront_amount(
         action,
         upfront_max_minor=config["upfront_max_minor"],
         upfront_max_bps=config["upfront_max_bps"],
         action_classes=config["action_classes"],
     ),
-    "required_disclosure": lambda action, ledger, config: check_required_disclosure(
+    "required_disclosure": lambda action, history, config: check_required_disclosure(
         action,
-        ledger,
+        history,
         definition=seen_before_fold(config["fold_id"], config["fold_digest"]),
         representation_classes=config["representation_classes"],
         required_classes=config["required_classes"],
@@ -138,18 +137,18 @@ CONFIGURED_CHECKS: dict[str, Callable[[Action, LedgerAPI, dict], CheckOutcome]] 
         ),
         count_listing_classes=config.get("count_listing_classes", False),
     ),
-    "offer_expiry": lambda action, ledger, config: check_offer_expiry(
+    "offer_expiry": lambda action, history, config: check_offer_expiry(
         action,
         max_age_seconds=config["max_age_seconds"],
         action_classes=config["action_classes"],
         no_proposal_classes=config.get("no_proposal_classes"),
     ),
-    "single_commitment": lambda action, ledger, config: check_single_commitment(
-        action, ledger, acceptance_classes=config["acceptance_classes"], commit_classes=config["commit_classes"]
+    "single_commitment": lambda action, history, config: check_single_commitment(
+        action, history, acceptance_classes=config["acceptance_classes"], commit_classes=config["commit_classes"]
     ),
-    "release_on_acceptance": lambda action, ledger, config: check_release_on_acceptance(
+    "release_on_acceptance": lambda action, history, config: check_release_on_acceptance(
         action,
-        ledger,
+        history,
         release_classes=config["release_classes"],
         acceptance_classes=config["acceptance_classes"],
         action_classes=config["action_classes"],

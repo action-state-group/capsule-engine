@@ -15,7 +15,7 @@ APPROVE_ID = "76f263fef08da2470b4c3dbf0b4c6e52b818cdd20c3c08936d1c79dc6bf07c0a"
 
 
 def test_verify_ok_exits_zero(capsys):
-    rc = main(["verify", APPROVE_ID, "--ledger", str(FIXTURE_LEDGER)])
+    rc = main(["verify", APPROVE_ID, "--store", str(FIXTURE_LEDGER)])
     assert rc == 0
     out = capsys.readouterr().out
     assert f"✓ verifies · {APPROVE_ID}" in out
@@ -23,7 +23,7 @@ def test_verify_ok_exits_zero(capsys):
 
 
 def test_verify_json_flag(capsys):
-    rc = main(["verify", APPROVE_ID, "--ledger", str(FIXTURE_LEDGER), "--json"])
+    rc = main(["verify", APPROVE_ID, "--store", str(FIXTURE_LEDGER), "--json"])
     assert rc == 0
     result = json.loads(capsys.readouterr().out)
     assert result["ok"] is True
@@ -31,7 +31,7 @@ def test_verify_json_flag(capsys):
 
 
 def test_verify_not_found_is_exit_code_2(capsys):
-    rc = main(["verify", "deadbeef", "--ledger", str(FIXTURE_LEDGER)])
+    rc = main(["verify", "deadbeef", "--store", str(FIXTURE_LEDGER)])
     assert rc == 2
     err = capsys.readouterr().err
     assert "no such capsule" in err
@@ -56,7 +56,7 @@ def test_verify_catches_a_tampered_record_exit_code_1(tmp_path, capsys):
         for c in capsules:
             fh.write(json.dumps(c) + "\n")
 
-    rc = main(["verify", APPROVE_ID, "--ledger", str(tampered_ledger)])
+    rc = main(["verify", APPROVE_ID, "--store", str(tampered_ledger)])
     assert rc == 1
     out = capsys.readouterr().out
     assert f"✗ verification failed · {APPROVE_ID}" in out

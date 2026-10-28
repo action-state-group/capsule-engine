@@ -31,7 +31,7 @@ DB access) could do -- and evaluates two of tau2-bench airline's real
 Every replayed action goes through a real ``GuardEngine.check()`` and
 produces a real, chained, signed capsule -- the same mandate-citation
 mechanism record-grounding-bench's own ``ManifestClassifier`` uses (cite a
-real ledger capsule on a pass, a dangling id on a fail, so
+real stored capsule on a pass, a dangling id on a fail, so
 ``verify_before_dispatch`` is what actually denies it, not this module
 deciding unilaterally). This module has no dependency on
 record-grounding-bench -- it re-derives the same two predicates directly
@@ -76,19 +76,17 @@ import argparse
 import hashlib
 import json
 import os
-import shutil
 import sys
-import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
-import capsule_emit
-from cll.ledger import LedgerAPI, LedgerRecord, LedgerStore
+from capsule_emit import produce
 
 from capsule_engine.cli.format import format_coverage_footnote
 from capsule_engine.folds.engine import EvaluationTrace, evaluate_one
 from capsule_engine.folds.loader import load_definition_file
 from capsule_engine.guards import Action, GuardEngine, LocalSigner
+from capsule_engine.guards.history import History, HistoryRecord, MemoryHistory, open_store, producer_identity
 
 __all__ = ["DATASETS", "DatasetResult", "coverage_trace", "run_dataset", "main"]
 
@@ -201,7 +199,7 @@ class ReplayedCall:
 @dataclass(frozen=True)
 class DatasetResult:
     dataset: str
-    records: tuple[LedgerRecord, ...]
+    records: tuple[HistoryRecord, ...]
     calls: tuple[ReplayedCall, ...]
 
     def counts(self) -> dict[str, int]:
@@ -243,53 +241,43 @@ def _iter_task_events(path: Path):
 
 
 def _mandate_capsule_id(
-    ledger: LedgerAPI, *, operator: str, developer: str, tool_name: str, action_class: str,
-    task_id: str, call_seq: int, verdict: PredicateVerdict, emit_ledger_path: Path,
+    history: History, *, operator: str, developer: str, tool_name: str, action_class: str,
+    task_id: str, call_seq: int, verdict: PredicateVerdict, timestamp: str, identity: produce.SigningIdentity,
 ) -> str | None:
     if not verdict.passed:
-        # Deliberately dangling: verify_before_dispatch's ledger.fetch()
+        # Deliberately dangling: verify_before_dispatch's history.get()
         # returns None for this id, which is what actually denies the
         # action -- this module never denies unilaterally.
         return f"policy-check-failed/{action_class}/{task_id}/{call_seq}"
-    result = capsule_emit.seal(
-        {"tool_name": tool_name, "tau2_task_id": task_id, "tau2_call_seq": call_seq},
-        action=f"policy_check.{action_class}",
-        operator=operator,
-        developer=developer,
+    # capsule-emit's storage-free producing call: it builds and signs the
+    # policy-check capsule and writes nothing; this module records it.
+    result = produce.seal(produce.SealInput(
+        capsule=produce.Input(
+            action_id=f"policy_check.{action_class}/{task_id}/{call_seq}",
+            action_type="fyi",
+            operator=operator,
+            developer=developer,
+            timestamp=timestamp,
+            disposition=produce.Disposition(decision="accept", approver="policy", verdict_class="executed"),
+        ),
+        identity=identity,
+        payload={"tool_name": tool_name, "tau2_task_id": task_id, "tau2_call_seq": call_seq},
         agent_output={"policy_check_passed": True, "reason": verdict.reason},
-        verdict="confirmed",
-        effect={"type": f"policy_check.{action_class}", "status": "confirmed"},
-        decision="accept",
-        action_type="fyi",
-        anchor=False,
-        # witness=False: this reference is offline, no network -- without it,
-        # capsule-emit's default checkpoint/witness stream POSTs to the live
-        # witness endpoint (anchor=False alone does not disable witnessing).
-        witness=False,
-        # A real, writable, dataset-scoped path -- not os.devnull. capsule-emit
-        # persists a lock file and a signing keypair beside whatever `ledger`
-        # path it's given, and /dev (os.devnull's directory) isn't writable.
-        # This module keeps its own record via LedgerStore below regardless.
-        ledger=emit_ledger_path,
-    ).capsule
-    ledger.append(result, consequential=False)
-    return result["capsule_id"]
+    ))
+    return history.append(json.loads(result.payload)).capsule_id
 
 
 def run_dataset(dataset: str, path: Path, *, store_dir: str | os.PathLike | None = None) -> DatasetResult:
-    """Replay one vendored dataset end to end against a fresh, ephemeral,
-    local ``LedgerStore``. Fully offline: no network, no API key."""
-    cleanup_dir: Path | None = None
-    if store_dir is None:
-        store_dir = tempfile.mkdtemp(prefix=f"capsule-ledger-tau2-airline-{dataset}-")
-        cleanup_dir = Path(store_dir)
-    ledger = LedgerStore(store_dir)
+    """Replay one vendored dataset end to end against a fresh in-memory
+    history, or the store directory ``store_dir``. Fully offline: no network,
+    no API key."""
+    signer = LocalSigner(key_id=f"tau2-airline-reference-{dataset}", secret=_seeded_secret(dataset))
+    ledger = MemoryHistory() if store_dir is None else open_store(store_dir, signer=signer, create=True)
     try:
         caps_fold = load_definition_file(CATALOG_DIR / "spend.weekly.yaml")
-        signer = LocalSigner(key_id=f"tau2-airline-reference-{dataset}", secret=_seeded_secret(dataset))
-        engine = GuardEngine(ledger=ledger, caps_fold=caps_fold, signer_provider=lambda: signer)
+        engine = GuardEngine(history=ledger, caps_fold=caps_fold, signer_provider=lambda: signer)
         developer = _developer(dataset)
-        policy_check_ledger_path = Path(store_dir) / f"{dataset}.policy-check.ledger.jsonl"
+        identity = producer_identity(signer)
 
         calls: list[ReplayedCall] = []
         last_capsule_id: str | None = None
@@ -317,7 +305,7 @@ def run_dataset(dataset: str, path: Path, *, store_dir: str | os.PathLike | None
                     cited = _mandate_capsule_id(
                         ledger, operator=OPERATOR, developer=developer, tool_name=tool_name,
                         action_class=action_class, task_id=task_id, call_seq=call_seq, verdict=verdict,
-                        emit_ledger_path=policy_check_ledger_path,
+                        timestamp=event.get("timestamp"), identity=identity,
                     )
 
                 action = Action(
@@ -357,12 +345,12 @@ def run_dataset(dataset: str, path: Path, *, store_dir: str | os.PathLike | None
                     )
                 )
 
-        records = tuple(ledger.scan())
+        records = tuple(ledger.find())
         return DatasetResult(dataset=dataset, records=records, calls=tuple(calls))
     finally:
-        ledger.close()
-        if cleanup_dir is not None:
-            shutil.rmtree(cleanup_dir, ignore_errors=True)
+        close = getattr(ledger, "close", None)
+        if close is not None:
+            close()
 
 
 def coverage_trace(result: DatasetResult) -> EvaluationTrace:
@@ -377,7 +365,7 @@ def coverage_trace(result: DatasetResult) -> EvaluationTrace:
     return evaluate_one(definition, records, key_value=_developer(result.dataset))
 
 
-def _export_fixture(records: tuple[LedgerRecord, ...], path: Path) -> None:
+def _export_fixture(records: tuple[HistoryRecord, ...], path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", encoding="utf-8") as fh:
         for record in records:
@@ -395,7 +383,7 @@ def _parse_args(argv: list[str] | None) -> argparse.Namespace:
     parser.add_argument(
         "--out-dir",
         default=None,
-        help="directory to write one <dataset>.jsonl ledger fixture per replayed dataset "
+        help="directory to write one <dataset>.jsonl capsule fixture per replayed dataset "
         "(default: print a summary only, write nothing)",
     )
     return parser.parse_args(argv)
@@ -444,7 +432,7 @@ def main(argv: list[str] | None = None) -> int:
                 )
             if sample:
                 print(
-                    f"  -> verify one row offline:  capsule verify {sample.capsule_id} --ledger {out_path}"
+                    f"  -> verify one row offline:  capsule verify {sample.capsule_id} --store {out_path}"
                 )
     print()
     for line in footnotes:

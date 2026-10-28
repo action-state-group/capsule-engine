@@ -25,10 +25,10 @@ import json
 from pathlib import Path
 
 import pytest
-from cll.ledger import LedgerStore
 
 from capsule_engine.guards import Action, LocalSigner
 from capsule_engine.guards.capsule import ALLOW, DENY, ESCALATE
+from capsule_engine.guards.history import MemoryHistory, verify_record
 from capsule_engine.packs import build_engine, install_pack, load_pack_dir, record_pack_activation
 
 PACK_DIR = Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog" / "payments-safety"
@@ -55,11 +55,11 @@ def _run_scenarios(ledger, *, project_dir):
     pack = load_pack_dir(PACK_DIR)
     installed = install_pack(pack, project_dir=project_dir, mode="observe")
     signer = _signer()
-    engine = build_engine(installed, ledger=ledger, signer_provider=lambda: signer)
+    engine = build_engine(installed, history=ledger, signer_provider=lambda: signer)
 
     activation = record_pack_activation(
         installed,
-        ledger=ledger,
+        history=ledger,
         operator=OPERATOR,
         developer=INSTALL_TOOL_DEVELOPER,
         signer=signer,
@@ -212,14 +212,13 @@ def _run_scenarios(ledger, *, project_dir):
         ALLOW,
     )
 
-    records = list(ledger.scan())
+    records = list(ledger.find())
     return installed, activation, outcomes, capsules, records
 
 
 def test_payments_safety_pack_observe_mode_acceptance(tmp_path):
-    ledger_dir = tmp_path / "ledger"
     project_dir = tmp_path / "project"
-    store = LedgerStore(ledger_dir)
+    store = MemoryHistory()
     try:
         installed, activation, outcomes, capsules, records = _run_scenarios(store, project_dir=project_dir)
         # Every capsule this pack produced must independently, structurally
@@ -227,7 +226,7 @@ def test_payments_safety_pack_observe_mode_acceptance(tmp_path):
         # This is what caught, and now locks in, a real bug: action_type is
         # a base-spec field with a closed {fyi, decide} vocabulary (§5.1),
         # and this pack briefly wrote its own action-type name into it.
-        verify_results = {name: store.verify(c["capsule_id"]) for name, c in capsules.items()}
+        verify_results = {name: verify_record(store, store.get(c["capsule_id"])) for name, c in capsules.items()}
     finally:
         store.close()
     for name, result in verify_results.items():
@@ -275,15 +274,15 @@ def test_pack_gives_identical_verdicts_regardless_of_action_origin(tmp_path):
     where an ``Action`` came from)."""
     from capsule_engine.guards.action import Action as ActionCls
 
-    ledger_direct = LedgerStore(tmp_path / "ledger-direct")
-    ledger_replayed = LedgerStore(tmp_path / "ledger-replayed")
+    ledger_direct = MemoryHistory()
+    ledger_replayed = MemoryHistory()
     try:
         pack = load_pack_dir(PACK_DIR)
         installed_direct = install_pack(pack, project_dir=tmp_path / "project-direct", mode="observe")
         installed_replayed = install_pack(pack, project_dir=tmp_path / "project-replayed", mode="observe")
         signer = _signer()
-        engine_direct = build_engine(installed_direct, ledger=ledger_direct, signer_provider=lambda: signer)
-        engine_replayed = build_engine(installed_replayed, ledger=ledger_replayed, signer_provider=lambda: signer)
+        engine_direct = build_engine(installed_direct, history=ledger_direct, signer_provider=lambda: signer)
+        engine_replayed = build_engine(installed_replayed, history=ledger_replayed, signer_provider=lambda: signer)
 
         # (a) raw, hand-built Action -- what a direct emit()-style integration does.
         direct_action = Action(
@@ -333,9 +332,8 @@ def test_fixture_is_reproducible_byte_for_byte(tmp_path):
     if not FIXTURE_PATH.is_file():
         pytest.skip("fixture not yet generated -- run `python -m tests.test_pack_payments_safety_acceptance`")
 
-    ledger_dir = tmp_path / "ledger"
     project_dir = tmp_path / "project"
-    store = LedgerStore(ledger_dir)
+    store = MemoryHistory()
     try:
         _, _, _, _, records = _run_scenarios(store, project_dir=project_dir)
     finally:
@@ -354,7 +352,7 @@ def _regenerate_fixture() -> None:
 
     with tempfile.TemporaryDirectory() as tmp:
         tmp = Path(tmp)
-        store = LedgerStore(tmp / "ledger")
+        store = MemoryHistory()
         try:
             _, _, _, _, records = _run_scenarios(store, project_dir=tmp / "project")
         finally:

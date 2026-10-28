@@ -1,16 +1,15 @@
 # SPDX-License-Identifier: Apache-2.0
 """Server configuration and the backend seam.
 
-``backend`` selects how the server obtains its :class:`~cll.ledger.api.LedgerAPI`
-binding. ``"local"`` -- the only value implemented in v0 -- opens a
-:class:`~cll.ledger.store.LedgerStore` rooted at ``ledger_path`` (or imports a
-JSONL fixture into one, reusing the CLI's own ``open_ledger`` convenience so a
-fixture under ``tests/fixtures/`` works here exactly as it does for `capsule log`) and
-keeps it open for the life of the process.
+``backend`` selects how the server obtains its
+:class:`~capsule_engine.guards.history.History`. ``"local"`` -- the only value
+implemented in v0 -- opens the store directory at ``store_path``
+(``guards/history.py`` ``open_store``), or reads a JSONL fixture of capsules
+into memory so a fixture under ``tests/fixtures/`` works here as it does for
+``capsule verify``, and keeps it open for the life of the process.
 
 Any other value is the seam for a future remote/paid backend: same tools, same
-``LedgerAPI`` Protocol (see ``ledger/api.py``'s own docstring for why every method
-on it is already wire-shaped), a different binding putting requests over a
+``History`` Protocol, a different binding putting requests over a
 network hop instead of touching a local directory -- no server-shape change, no
 tool-schema change. Nothing is built for that yet, deliberately: this module
 only keeps v0 from being painted into a local-only corner. ``open_backend``
@@ -24,10 +23,9 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from capsule_emit.ledger_io import open_ledger
-from cll.ledger.api import LedgerAPI
-
 from ..envcompat import env_get
+from ..guards.history import History, MemoryHistory, open_store
+from ..guards.signing import LocalSigner
 
 __all__ = ["ServerConfig", "load_config", "open_backend", "DEFAULT_CATALOG_DIR"]
 
@@ -44,7 +42,7 @@ class ServerConfig:
     extension entry) can point this at a real deployment with no code change."""
 
     backend: str = "local"
-    ledger_path: str | None = None
+    store_path: str | None = None
     fold_catalog_dir: Path = field(default_factory=lambda: DEFAULT_CATALOG_DIR)
     caps_minor: dict[str, int] = field(default_factory=dict)
     signing_key_id: str = _DEFAULT_SIGNING_KEY_ID
@@ -55,7 +53,7 @@ def load_config() -> ServerConfig:
     """Read config from the environment (the same variables the CLI honors,
     plus MCP-only ones for the guard signer and per-class caps).
 
-    ``$CAPSULE_LEDGER`` / ``$CAPSULE_FOLD_DIR`` -- shared with the CLI, see AGENTS.md.
+    ``$CAPSULE_STORE`` / ``$CAPSULE_FOLD_DIR`` -- shared with the CLI, see AGENTS.md.
     ``$CAPSULE_MCP_BACKEND`` -- backend selector (default ``"local"``).
     ``$CAPSULE_MCP_CAPS_MINOR`` -- JSON object, ``{"money.transfer": 10000000}``;
         an action class absent here has no cap configured, matching the CLI's
@@ -80,7 +78,7 @@ def load_config() -> ServerConfig:
 
     return ServerConfig(
         backend=env_get("CAPSULE_MCP_BACKEND", "local"),
-        ledger_path=env_get("CAPSULE_LEDGER"),
+        store_path=env_get("CAPSULE_STORE"),
         fold_catalog_dir=fold_catalog_dir,
         caps_minor=caps_minor,
         signing_key_id=env_get("CAPSULE_MCP_SIGNING_KEY_ID", _DEFAULT_SIGNING_KEY_ID),
@@ -89,29 +87,30 @@ def load_config() -> ServerConfig:
     )
 
 
-def open_backend(config: ServerConfig) -> tuple[LedgerAPI, Callable[[], None]]:
-    """Resolve ``config.backend`` into a live ``LedgerAPI`` binding.
+def open_backend(config: ServerConfig) -> tuple[History, Callable[[], None]]:
+    """Resolve ``config.backend`` into a live ``History``, which writes with
+    the config's signer.
 
-    Returns ``(ledger, close)`` -- the caller owns the lifetime and must call
+    Returns ``(history, close)`` -- the caller owns the lifetime and must call
     ``close()`` on server shutdown (there is no ``atexit`` registration here;
     that's a server-process concern, not a config concern).
     """
     if config.backend != "local":
         raise NotImplementedError(
             f"backend={config.backend!r} is not implemented -- only 'local' is wired up in v0. "
-            "This is the seam for a future remote/paid backend (same tools, same LedgerAPI "
+            "This is the seam for a future remote/paid backend (same tools, same History "
             "Protocol, a different wire binding); no transport or auth exists yet."
         )
-    if not config.ledger_path:
+    if not config.store_path:
         raise RuntimeError(
-            "CAPSULE_LEDGER is required for backend='local' -- point it at a LedgerStore "
-            "directory or a JSONL fixture file, same as the CLI's --ledger."
+            "CAPSULE_STORE is required for backend='local' -- point it at a store "
+            "directory or a JSONL fixture file, same as the CLI's --store."
         )
 
-    cm = open_ledger(config.ledger_path)
-    ledger = cm.__enter__()
-
-    def _close() -> None:
-        cm.__exit__(None, None, None)
-
-    return ledger, _close
+    path = Path(config.store_path)
+    if path.is_file():
+        with path.open(encoding="utf-8") as fh:
+            return MemoryHistory(json.loads(line) for line in fh if line.strip()), lambda: None
+    store = open_store(path, signer=LocalSigner(key_id=config.signing_key_id, secret=config.signing_secret),
+                       create=True)
+    return store, store.close

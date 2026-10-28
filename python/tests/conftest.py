@@ -2,10 +2,10 @@
 from pathlib import Path
 
 import pytest
-from cll.ledger import LedgerStore
 
 from capsule_engine.folds.loader import load_definition_file
 from capsule_engine.guards import LocalSigner
+from capsule_engine.guards.history import MemoryHistory
 
 CATALOG_DIR = Path(__file__).parent.parent / "capsule_engine" / "folds" / "catalog_defs"
 WICKET_CATALOG_DIR = Path(__file__).parent.parent / "capsule_engine" / "guards" / "wickets" / "catalog_defs"
@@ -15,7 +15,7 @@ HOLDS_MANIFEST_PATH = Path(__file__).parent.parent / "capsule_engine" / "policy"
 
 @pytest.fixture
 def store(tmp_path):
-    s = LedgerStore(tmp_path)
+    s = MemoryHistory()
     yield s
     s.close()
 
@@ -57,7 +57,7 @@ def hold_engine(store, hold_fold, signer, resolved_holds_manifest):
 
     policy = resolve_hold_policy(resolved_holds_manifest)
     return HoldEngine(
-        ledger=store,
+        history=store,
         hold_fold=hold_fold,
         fold_digest=policy.fold_digest,
         signer_provider=lambda: signer,

@@ -10,6 +10,7 @@ import pytest
 
 from capsule_engine.folds.engine import evaluate_one
 from capsule_engine.guards import Action
+from capsule_engine.guards.history import verify_record
 from capsule_engine.holds import HoldStatus
 from capsule_engine.holds.errors import OVER_TOLERANCE
 
@@ -52,7 +53,7 @@ def test_reconcile_carries_planned_executed_delta_and_chains_to_both(hold_engine
     # and to the execution capsule via the payload citation
     assert decision.capsule["asg_payload"]["execution_capsule_id"] == execution_capsule_id
 
-    result = store.verify(decision.capsule["capsule_id"])
+    result = verify_record(store, store.get(decision.capsule["capsule_id"]))
     assert result.ok, result.findings
 
 
@@ -98,7 +99,7 @@ def test_over_tolerance_escalates_when_approver_role_configured_never_adjusts_ag
     # the hold is still just the original reservation, pending resolution.
     status, _ = hold_engine.hold_status(reserve_id)
     assert status == HoldStatus.ACTIVE
-    records = [r.capsule for r in store.scan()]
+    records = [r.capsule for r in store.find()]
     trace = evaluate_one(hold_fold, records, key_value=DEVELOPER)
     assert trace.result == 1_000_000
 
@@ -110,7 +111,7 @@ def test_over_tolerance_denies_when_no_approver_role_configured(store, hold_fold
     from capsule_engine.holds import HoldEngine
 
     engine = HoldEngine(
-        ledger=store, hold_fold=hold_fold, fold_digest=hold_fold.definition_digest(),
+        history=store, hold_fold=hold_fold, fold_digest=hold_fold.definition_digest(),
         signer_provider=lambda: signer, cap_minor={"external_commitment.other": 1_000_000},
         tolerance_minor={"external_commitment.other": 1_000},
     )
@@ -152,13 +153,13 @@ def test_fold_semantics_across_partial_over_within_and_over_beyond_tolerance(sto
     from capsule_engine.holds import HoldEngine
 
     engine = HoldEngine(
-        ledger=store, hold_fold=hold_fold, fold_digest=hold_fold.definition_digest(),
+        history=store, hold_fold=hold_fold, fold_digest=hold_fold.definition_digest(),
         signer_provider=lambda: signer, cap_minor={"money.transfer": 100_000_000},
         tolerance_minor={"money.transfer": TOLERANCE},
     )
 
     def aggregate() -> int:
-        records = [r.capsule for r in store.scan()]
+        records = [r.capsule for r in store.find()]
         trace = evaluate_one(hold_fold, records, key_value=DEVELOPER)
         return trace.result or 0
 
@@ -194,7 +195,7 @@ def test_fold_semantics_across_partial_over_within_and_over_beyond_tolerance(sto
     # brand new independent evaluation still reproduces the final value
     # byte-exactly, over the complete record set including every hold
     # capsule from every stage.
-    records = [r.capsule for r in store.scan()]
+    records = [r.capsule for r in store.find()]
     final_trace = evaluate_one(hold_fold, records, key_value=DEVELOPER)
     assert final_trace.result == before == aggregate()
 
@@ -207,7 +208,7 @@ def test_over_tolerance_escalates_for_the_account_holder_classes(store, hold_fol
     from capsule_engine.holds import HoldEngine
 
     engine = HoldEngine(
-        ledger=store, hold_fold=hold_fold, fold_digest=hold_fold.definition_digest(),
+        history=store, hold_fold=hold_fold, fold_digest=hold_fold.definition_digest(),
         signer_provider=lambda: signer, cap_minor={action_class: 1_000_000}, tolerance_minor={action_class: 1_000},
     )
     action = Action(verb="act", operator=OPERATOR, developer=DEVELOPER, action_class=action_class, amount_minor=10_000)
