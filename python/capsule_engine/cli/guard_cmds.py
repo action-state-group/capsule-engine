@@ -19,6 +19,7 @@ from pathlib import Path
 
 from .. import packaging
 from ..envcompat import env_get
+from ..guards.history import NotAStoreError
 
 __all__ = ["add_parser"]
 
@@ -196,7 +197,11 @@ def _cmd_guard_dry_run(args: argparse.Namespace) -> int:
             per_action_reads=per_action_reads,
         )
 
-    report = _build()
+    try:
+        report = _build()
+    except NotAStoreError as exc:
+        print(f"capsule guard dry-run: {exc}", file=sys.stderr)
+        return 2
 
     # The printed link carries every row's decision capsule and the capsule
     # it cites; one holding a local-only field must not leave this machine.

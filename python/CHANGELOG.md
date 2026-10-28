@@ -16,7 +16,9 @@ module has its own changelog, `go/CHANGELOG.md`.
   disk; the directory lists the public keys it trusts (`trusted_keys`). Opening it with a new
   secret adds that secret's key, and nothing removes one, so a rotated or retired secret's key is
   deleted from the file by hand. A store whose log commits a record its artifact store does not
-  hold is refused at open. `MemoryHistory` holds records in memory and
+  hold is refused at open. A ledger directory written by an earlier release is not converted: it
+  is refused as "not a store directory" (never opened as an empty store) and read with that
+  release. `MemoryHistory` holds records in memory and
   replaces the temporary ledgers a live check, a replay and a sale's check used to write.
   - `GuardEngine`, `HoldEngine`, `build_engine`, `record_pack_activation`, `ConversationSession` and
     `ToolCallLane` take `history=` in place of `ledger=`. The checks, `history_ledger`,

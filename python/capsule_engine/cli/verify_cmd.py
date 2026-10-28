@@ -17,7 +17,7 @@ import sys
 from agent_action_capsule import verify as verify_capsule
 
 from ..envcompat import env_get
-from ..guards.history import History, MemoryHistory, open_store, verify_stored
+from ..guards.history import History, MemoryHistory, NotAStoreError, open_store, verify_stored
 from .format import build_echo
 
 __all__ = ["add_parser", "run"]
@@ -63,7 +63,11 @@ def run(args: argparse.Namespace) -> int:
         print("capsule verify: --store is required (or set $CAPSULE_STORE)", file=sys.stderr)
         return 2
 
-    history = _open(store_path)
+    try:
+        history = _open(store_path)
+    except NotAStoreError as exc:
+        print(f"capsule verify: {exc}", file=sys.stderr)
+        return 2
     try:
         verified = verify_stored(history, args.capsule_id)
         if verified is None:

@@ -33,7 +33,7 @@ import sys
 from pathlib import Path
 
 from ..envcompat import env_get
-from ..guards.history import open_store
+from ..guards.history import NotAStoreError, open_store
 from ..guards.signing import LocalSigner
 from ..packs import (
     PackDefinitionError,
@@ -120,7 +120,12 @@ def _cmd_init(args: argparse.Namespace) -> int:
         secret_text = secrets.token_hex(32)
     signer = LocalSigner(key_id=key_id, secret=secret_text.encode("utf-8"))
 
-    with open_store(args.store, signer=signer, create=True) as store:
+    try:
+        store = open_store(args.store, signer=signer, create=True)
+    except NotAStoreError as exc:
+        print(f"capsule init: {exc}", file=sys.stderr)
+        return 2
+    with store:
         capsule = record_pack_activation(
             installed, history=store, operator=args.operator, developer=args.developer, signer=signer
         )

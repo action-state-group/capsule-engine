@@ -291,3 +291,54 @@ def test_every_other_signature_is_over_a_pre_signature_digest():
                 if arg not in allowed:
                     found.append(f"{path.relative_to(REPO)}: sign({arg})")
     assert found == []
+
+
+def test_a_directory_with_files_but_no_log_is_never_made_a_store(tmp_path):
+    legacy = tmp_path / "ledger"
+    (legacy / "segments").mkdir(parents=True)
+    (legacy / "index.sqlite3").write_bytes(b"")
+    for create in (False, True):
+        with pytest.raises(history_mod.NotAStoreError, match="earlier capsule-engine release"):
+            open_store(legacy, signer=SIGNER, create=create)
+    assert sorted(p.name for p in legacy.iterdir()) == ["index.sqlite3", "segments"]
+    # An empty directory may be made one.
+    (tmp_path / "empty").mkdir()
+    open_store(tmp_path / "empty", signer=SIGNER, create=True).close()
+
+
+def test_the_mcp_server_and_init_refuse_a_ledger_directory(tmp_path, monkeypatch, capsys):
+    from capsule_engine.cli.main import main
+    from capsule_engine.mcp.config import load_config, open_backend
+
+    legacy = tmp_path / "ledger"
+    (legacy / "segments").mkdir(parents=True)
+    monkeypatch.setenv("CAPSULE_STORE", str(legacy))
+    with pytest.raises(history_mod.NotAStoreError):
+        open_backend(load_config())
+    rc = main(["init", "--pack", "everyday", "--project-dir", str(tmp_path / "p"), "--store", str(legacy),
+               "--secret", "s"])
+    assert rc == 2 and "not a store directory" in capsys.readouterr().err
+
+
+def test_a_tenant_upgrade_over_a_ledger_directory_is_a_provision_error(tmp_path):
+    from capsule_engine.tenants import TenantProvisionError, tenant_layout, upgrade_tenant
+
+    layout = tenant_layout(tmp_path, "acme")
+    (layout.root / "ledger" / "segments").mkdir(parents=True)
+    layout.metadata_path.write_text(json.dumps({"tenant_id": "acme", "manifest_digest": "old"}))
+    with pytest.raises(TenantProvisionError) as raised:
+        upgrade_tenant(tmp_path, "acme", key_id="k", secret=b"s")
+    assert raised.value.reason == "not_a_store"
+
+
+def test_a_store_refuses_a_capsule_without_a_well_formed_id(tmp_path):
+    with open_store(tmp_path / "s", signer=SIGNER, create=True) as store:
+        for capsule_id in (None, "ABC", "0" * 63):
+            capsule = _event(0)
+            if capsule_id is None:
+                del capsule["capsule_id"]
+            else:
+                capsule["capsule_id"] = capsule_id
+            with pytest.raises(ValueError, match="64 lowercase hex"):
+                store.append(capsule)
+        assert store.size() == 0

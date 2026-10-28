@@ -34,7 +34,7 @@ from pathlib import Path
 
 import yaml
 
-from .guards.history import open_store
+from .guards.history import NotAStoreError, open_store
 from .guards.signing import LocalSigner, key_fingerprint
 from .packs import PackDefinition, install_pack
 from .packs.install import CATALOG_DIRNAME
@@ -283,7 +283,11 @@ def upgrade_tenant(
         )
 
     signer = LocalSigner(key_id=key_id, secret=secret)
-    with open_store(layout.store_dir, signer=signer) as store:
+    try:
+        store = open_store(layout.store_dir, signer=signer)
+    except NotAStoreError as exc:
+        raise TenantProvisionError("not_a_store", str(exc)) from exc
+    with store:
         previous_activation = find_latest_activation(store)
         capsule = build_manifest_activation_capsule(
             resolved=resolved,

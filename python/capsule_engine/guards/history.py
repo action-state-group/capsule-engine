@@ -44,6 +44,7 @@ __all__ = [
     "History",
     "HistoryRecord",
     "MemoryHistory",
+    "NotAStoreError",
     "Query",
     "StoreHistory",
     "open_store",
@@ -284,6 +285,10 @@ class MemoryHistory:
 _FIND_LIMIT = 1000
 
 
+class NotAStoreError(FileNotFoundError):
+    """A path :func:`open_store` cannot open as a store directory."""
+
+
 class StoreHistory:
     """A :class:`History` over a CLL entry log (``cll.log``) and capsule-emit's
     artifact store (``capsule_emit.artifact``), which must implement the index
@@ -394,7 +399,9 @@ class StoreHistory:
 
         if self._identity is None:
             raise RuntimeError("this history has no signing identity, so it cannot write")
-        capsule_id = capsule["capsule_id"]
+        capsule_id = capsule.get("capsule_id")
+        if not isinstance(capsule_id, str) or not re.fullmatch(r"[0-9a-f]{64}", capsule_id):
+            raise ValueError(f"capsule_id {capsule_id!r} is not 64 lowercase hex")
         data = json.dumps(capsule, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
         envelope = sign(BuiltPayload(capsule_id=capsule_id, value=capsule, json=data), self._identity)
         with self._lock:
@@ -460,10 +467,17 @@ def open_store(
 
     directory = Path(directory)
     log_path = directory / LOG_FILE
-    if create:
+    if not log_path.is_file():
+        if not create or (directory.is_dir() and any(directory.iterdir())):
+            # A directory that holds files but no log is not a store: a
+            # ledger directory from an earlier release (segments/,
+            # index.sqlite3) is read with that release. Never start an empty
+            # history inside it.
+            raise NotAStoreError(
+                f"{directory}: not a store directory (no {LOG_FILE}); a ledger directory written by an "
+                "earlier capsule-engine release is read with that release"
+            )
         directory.mkdir(parents=True, exist_ok=True)
-    elif not log_path.is_file():
-        raise FileNotFoundError(f"{directory}: not a store directory (no {LOG_FILE})")
     # The log's writer lock is taken first and held while the history is
     # open, so no other process writes between reading the artifact store
     # and using it.
