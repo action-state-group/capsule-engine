@@ -142,8 +142,12 @@ def lookup(history: History, capsule_id: str) -> HistoryRecord | None:
     record = history.get(capsule_id)
     if record is not None or len(capsule_id) >= 64:
         return record
-    matches = [r for r in history.find() if r.capsule_id.startswith(capsule_id)]
-    return matches[0] if len(matches) == 1 else None
+    ids = getattr(history, "capsule_ids", None)
+    # The prefix is resolved from the ids alone, so a record that cannot be
+    # read never decides which one is meant.
+    candidates = ids() if ids is not None else [r.capsule_id for r in history.find()]
+    matches = [i for i in candidates if i.startswith(capsule_id)]
+    return history.get(matches[0]) if len(matches) == 1 else None
 
 
 def verify_stored(history: History, capsule_id: str) -> tuple[str, VerificationResult] | None:
@@ -155,14 +159,22 @@ def verify_stored(history: History, capsule_id: str) -> tuple[str, VerificationR
     verification, never an error."""
     from capsule_emit.artifact.record import ArtifactError
 
+    ids = getattr(history, "capsule_ids", None)
+    if ids is not None and len(capsule_id) < 64:
+        matches = [i for i in ids() if i.startswith(capsule_id)]
+        if len(matches) != 1:
+            return None
+        capsule_id = matches[0]
     try:
         record = lookup(history, capsule_id)
+        if record is None:
+            return None
+        return record.capsule_id, verify_record(history, record)
     except ArtifactError as exc:
-        finding = Finding("stored_record_invalid", f"the artifact store refused the record: {exc}", severity="error")
+        # The record itself, or one its verification reads (its chain
+        # parent, a key rotation), is refused.
+        finding = Finding("stored_record_invalid", f"the artifact store refused a record: {exc}", severity="error")
         return capsule_id, VerificationResult(ok=False, capsule_id=capsule_id, findings=[finding])
-    if record is None:
-        return None
-    return record.capsule_id, verify_record(history, record)
 
 
 # -- matching (the in-memory history) ----------------------------------------
@@ -253,6 +265,10 @@ class MemoryHistory:
 
     def get(self, capsule_id: str) -> HistoryRecord | None:
         return next((r for r in self._records if r.capsule_id == capsule_id), None)
+
+    def capsule_ids(self) -> list[str]:
+        """Every record's id, in log order."""
+        return [r.capsule_id for r in self._records]
 
     def size(self) -> int:
         return len(self._records)
@@ -371,6 +387,17 @@ class StoreHistory:
 
     def size(self) -> int:
         return self._log.entry_count()
+
+    def capsule_ids(self) -> list[str]:
+        """Every committed record's id, in log order, read from the log
+        alone (no record is read or verified)."""
+        out, seq = [], 0
+        while True:
+            entries = self._log.scan_entries(seq, _FIND_LIMIT)
+            if not entries:
+                return out
+            out.extend(bytes(e.value).hex() for e in entries)
+            seq = entries[-1].seq
 
     def close(self) -> None:
         """Release the log (a JSONL log holds a writer lock while open)."""

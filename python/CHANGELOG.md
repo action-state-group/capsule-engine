@@ -14,8 +14,9 @@ module has its own changelog, `go/CHANGELOG.md`.
   is written with artifact `put`, then log `append`, and carries a producer envelope signed with
   an Ed25519 key derived from the operator's signing secret (`producer_identity`), never written to
   disk; the directory lists the public keys it trusts (`trusted_keys`). Opening it with a new
-  secret adds that secret's key, and nothing removes one, so a rotated or retired secret's key is
-  deleted from the file by hand. A store whose log commits a record its artifact store does not
+  secret adds that secret's key, and nothing removes one. A routine rotation keeps the old key, since
+  the store reads a record only while its signer's key is listed; a key is deleted by hand only when
+  its secret leaked, and every record it signed then fails to read (capsule-engine#258). A store whose log commits a record its artifact store does not
   hold is refused at open. A ledger directory written by an earlier release is not converted: it
   is refused as "not a store directory" (never opened as an empty store) and read with that
   release. `MemoryHistory` holds records in memory and

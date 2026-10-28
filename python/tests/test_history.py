@@ -342,3 +342,35 @@ def test_a_store_refuses_a_capsule_without_a_well_formed_id(tmp_path):
             with pytest.raises(ValueError, match="64 lowercase hex"):
                 store.append(capsule)
         assert store.size() == 0
+
+
+def test_verify_resolves_a_prefix_from_ids_and_reports_a_refused_dependency(tmp_path):
+    other, third = LocalSigner(key_id="other", secret=b"other"), LocalSigner(key_id="third", secret=b"third")
+    parent = _event(0)
+    child = build_event_capsule(
+        operator="op-0", developer="dev", signer=other, event="probe", detail={"n": 9},
+        timestamp="2026-10-09T00:00:00Z", action_id="probe/9", chain_parent=parent["capsule_id"],
+        chain_relation="confirms",
+    )
+    for signer, capsule in ((SIGNER, parent), (other, child), (third, _event(1))):
+        with open_store(tmp_path / "s", signer=signer, create=True) as store:
+            store.append(capsule)
+    keys = tmp_path / "s" / TRUSTED_KEYS_FILE
+
+    def trust(*signers):
+        keys.write_text("".join(producer_identity(s).public_key.hex() + "\n" for s in signers))
+
+    # The third record's key is no longer trusted: a prefix of the parent
+    # still finds and verifies the parent, never blamed for that record.
+    trust(SIGNER, other)
+    with open_store(tmp_path / "s") as store:
+        found_id, result = history_mod.verify_stored(store, parent["capsule_id"][:10])
+        assert found_id == parent["capsule_id"] and result.ok
+    # Only the parent's key is no longer trusted: the child reads, but
+    # verifying it reads the parent, which is reported as a failure.
+    trust(other)
+    with open_store(tmp_path / "s") as store:
+        assert store.get(child["capsule_id"]) is not None
+        found_id, result = history_mod.verify_stored(store, child["capsule_id"])
+        assert found_id == child["capsule_id"]
+        assert not result.ok and result.findings[0].code == "stored_record_invalid"

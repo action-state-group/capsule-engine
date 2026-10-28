@@ -69,8 +69,10 @@ checkpointed-local-log entry log (`log.jsonl`) that orders them, capsule-emit's 
 (`artifacts.jsonl`) that holds each signed record, and the producer public keys the store trusts
 (`trusted_keys`). Each record carries a producer envelope signed with an Ed25519 key derived from
 your own signing secret (`--key-id`/`--secret`); the secret and the derived key are never written
-to disk. Opening a store with a new secret adds its key to `trusted_keys`, and nothing removes one:
-after rotating or retiring a secret, delete its key's line yourself. `bundle` still reads a
+to disk. Opening a store with a new secret adds its key to `trusted_keys`, and nothing removes one.
+Keep the old key after a routine rotation: the store reads a record only while its signer's key is
+listed. Delete a key only if its secret leaked, knowing that every record it signed then fails to
+read (capsule-engine#258 tracks tying key trust to the rotation timeline). `bundle` still reads a
 capsule-emit ledger (`--ledger`).
 
 ## What's here
