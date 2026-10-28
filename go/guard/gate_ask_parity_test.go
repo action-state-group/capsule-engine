@@ -311,7 +311,7 @@ func checkGateCorpus(t *testing.T, name string, named map[string]string) {
 			if a, err = DecodeAction(bytes.NewReader(step.Action)); err != nil {
 				t.Fatalf("%s: %v", c.Name, err)
 			}
-			if d, err = e.Check(a, ledger); err != nil {
+			if d, err = e.Check(a, MemoryHistory(ledger)); err != nil {
 				// Only an action citing a mandate is refused, and only where
 				// the engine denies it.
 				if a.CitedMandateCapsuleID == nil || want.Outcome != Deny || !slices.Contains(want.FailingConstraints, "verify_before_dispatch") {

@@ -82,7 +82,7 @@ func TestEquivalenceKeySealedAsDigestMatchesTheEngine(t *testing.T) {
 			if err := json.Compact(&line, step.Capsule); err != nil {
 				t.Fatal(err)
 			}
-			recs, err := ReadLedger(&line)
+			recs, err := readCapsules(&line)
 			if err != nil || len(recs) != 1 {
 				t.Fatalf("%s step %d: %d records, %v", name, i, len(recs), err)
 			}
@@ -97,7 +97,7 @@ func TestEquivalenceKeySealedAsDigestMatchesTheEngine(t *testing.T) {
 				if own {
 					ledger = ownLedger
 				}
-				d, err := e.Check(a, ledger)
+				d, err := e.Check(a, MemoryHistory(ledger))
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -181,7 +181,7 @@ func TestEquivalenceKeyEqualToAFormulaNeverMatchesAnUnkeyedRecord(t *testing.T) 
 		t.Fatalf("an unkeyed decision records a key digest %s", *r.EquivalenceKeyDigest)
 	}
 	retry := keyedPay(t, 2, &formula)
-	d, err = e.Check(retry, []Record{r})
+	d, err = e.Check(retry, MemoryHistory([]Record{r}))
 	if err != nil {
 		t.Fatal(err)
 	}

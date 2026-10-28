@@ -109,7 +109,7 @@ func runReleaseVectors(t *testing.T, e *Engine, p pack.Pack, decisionsFile, comm
 			t.Fatalf("%s: %v", step.Name, err)
 		}
 		in := checkInputs{taskAuthority: corpus.TaskAuthorityRecord, opening: corpus.CommercialBoundsOpening, authorization: step.AuthorizationRecord}
-		c, err := e.constraintFor("release_on_acceptance", a, ledger, in)
+		c, err := e.constraintFor("release_on_acceptance", a, MemoryHistory(ledger), in)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -156,7 +156,7 @@ func runReleaseVectors(t *testing.T, e *Engine, p pack.Pack, decisionsFile, comm
 			if check == "release_on_acceptance" || (check == "verify_before_dispatch" && a.CitedMandateCapsuleID != nil) {
 				continue
 			}
-			oc, err := e.constraintFor(check, a, ledger, in)
+			oc, err := e.constraintFor(check, a, MemoryHistory(ledger), in)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -165,7 +165,7 @@ func runReleaseVectors(t *testing.T, e *Engine, p pack.Pack, decisionsFile, comm
 			}
 		}
 		if a.CitedMandateCapsuleID == nil {
-			d, err := e.checkWith(a, ledger, in)
+			d, err := e.checkWith(a, MemoryHistory(ledger), in)
 			if err != nil {
 				t.Fatal(err)
 			}

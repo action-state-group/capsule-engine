@@ -1,10 +1,13 @@
 package guard
 
 import (
+	"bufio"
 	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"slices"
@@ -176,7 +179,7 @@ func goldLabels(t *testing.T, fx fixtureSet) []goldRow {
 
 func miniLedger(t *testing.T, fx fixtureSet) []Record {
 	t.Helper()
-	recs, err := ReadLedger(bytes.NewReader(readFile(t, fx.dir, "mini_ledger.jsonl")))
+	recs, err := readCapsules(bytes.NewReader(readFile(t, fx.dir, "mini_ledger.jsonl")))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -259,7 +262,7 @@ func goReplay(t *testing.T, e *Engine, fx fixtureSet) map[string]Decision {
 	out := map[string]Decision{}
 	py := parity(t, fx).Scenarios
 	for i, a := range scenarioActions(t, fx) {
-		d, err := e.CheckWithTaskAuthority(a, ledger, py[i].TaskAuthorityRecord)
+		d, err := e.CheckWithTaskAuthority(a, MemoryHistory(ledger), py[i].TaskAuthorityRecord)
 		if err != nil {
 			t.Fatalf("%s: %v", a.ActionID, err)
 		}
@@ -335,3 +338,23 @@ func unportedFailed(e *Engine, results map[string]string) bool {
 // later seen-before check finds. Every other scenario is a dry run, which
 // the seen-before and spend folds leave out.
 var realRun = map[string]bool{"merchant-history-real-payment": true, "recipient-history-real-payment": true}
+
+// readCapsules reads a JSONL fixture, one Agent Action Capsule per line, in
+// file order: the records a MemoryHistory holds for a test.
+func readCapsules(r io.Reader) ([]Record, error) {
+	var out []Record
+	sc := bufio.NewScanner(r)
+	sc.Buffer(make([]byte, 0, 1<<16), 1<<24)
+	for n := 1; sc.Scan(); n++ {
+		line := bytes.TrimSpace(sc.Bytes())
+		if len(line) == 0 {
+			continue
+		}
+		rec, err := DecodeCapsule(line)
+		if err != nil {
+			return nil, fmt.Errorf("line %d: %w", n, err)
+		}
+		out = append(out, rec)
+	}
+	return out, sc.Err()
+}

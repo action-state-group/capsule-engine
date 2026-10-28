@@ -117,7 +117,7 @@ func testDealIDA4EngineVectors(t *testing.T, file string, load func() (pack.Pack
 			if len(a.Unevaluable()) > 0 {
 				rep = e.ReportUnevaluable(a)
 			} else {
-				if d, err = e.Check(a, ledger); err != nil {
+				if d, err = e.Check(a, MemoryHistory(ledger)); err != nil {
 					t.Fatal(err)
 				}
 				rep = e.Report(a, d)

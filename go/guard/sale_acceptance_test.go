@@ -57,7 +57,7 @@ func TestTheSalesAcceptanceIsReadAsTheHistoryLedgerWritesIt(t *testing.T) {
 		{"the sealed accept counts, whatever is read for spend", []Record{conflicted}, "deal-z", Fail, ""},
 		{"an unread act of the sale", []Record{unchecked, older}, "deal-a", NotApplicable, "history"},
 	} {
-		got, err := e.constraintFor("single_commitment", saleCommit(c.deal), c.ledger, live)
+		got, err := e.constraintFor("single_commitment", saleCommit(c.deal), MemoryHistory(c.ledger), live)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -148,7 +148,7 @@ func TestAnUnknownAcceptanceReleasesNothing(t *testing.T) {
 		in   checkInputs
 		want Result
 	}{{checkInputs{history: true}, NotApplicable}, {checkInputs{history: true, historyIncomplete: true}, Fail}} {
-		got, err := e.constraintFor("release_on_acceptance", share, []Record{acceptance}, c.in)
+		got, err := e.constraintFor("release_on_acceptance", share, MemoryHistory([]Record{acceptance}), c.in)
 		if err != nil {
 			t.Fatal(err)
 		}

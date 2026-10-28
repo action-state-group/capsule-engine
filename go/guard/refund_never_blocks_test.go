@@ -149,14 +149,14 @@ func TestAMoneyInActNeverBlocksTheWindowAsTheEngineDecides(t *testing.T) {
 			var d Decision
 			var err error
 			if i < 2 {
-				d, err = e.Check(acts[i], decided[:i])
+				d, err = e.Check(acts[i], MemoryHistory(decided[:i]))
 			} else {
 				in := "in"
 				history := append(decided[:1:1], Record{CapsuleID: "2", Operator: "household-a", Developer: "capsulectl-deal",
 					Timestamp: "2026-10-02T10:00:00Z", AmountMinor: new(v.RefundStatedSpendMinor), SpendMinor: new(v.RefundStatedSpendMinor),
 					ActionClass:     new(map[string]string{"refund": "money.refund", "partial_cancel": "external_commitment.other"}[kind]),
 					TaxonomyVersion: new("6"), Direction: &in})
-				d, err = e.CheckWithHistory(acts[i], History{Days: 31, Complete: true, Acts: history})
+				d, err = e.CheckWithHistory(acts[i], InputHistory{Days: 31, Complete: true, Acts: history})
 			}
 			if err != nil {
 				t.Fatalf("%s #%d: %v", name, i+1, err)
@@ -226,7 +226,7 @@ func TestAnUndecidedActWithNoSpendThatIsNotMoneyInStillBlocksTheWindow(t *testin
 		if name == "in, and another, out" {
 			acts = append(acts, undecided(&in, new(int64(0))))
 		}
-		d, err := e.CheckWithHistory(purchaseAction(t, 3, 200), History{Days: 31, Complete: true, Acts: acts})
+		d, err := e.CheckWithHistory(purchaseAction(t, 3, 200), InputHistory{Days: 31, Complete: true, Acts: acts})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -265,7 +265,7 @@ func TestTheExcludedMoneyInActStaysInternal(t *testing.T) {
 		"two refunds":     {[]Record{purchase, refund, refund}, &ExcludedFromWindow{Direction: "in", Count: 2}},
 	} {
 		a := purchaseAction(t, 3, 200)
-		d, err := e.CheckWithHistory(a, History{Days: 31, Complete: true, Acts: c.acts})
+		d, err := e.CheckWithHistory(a, InputHistory{Days: 31, Complete: true, Acts: c.acts})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -299,16 +299,16 @@ func TestARealRefundActIsReadAsMoneyIn(t *testing.T) {
 	}
 	for name, weekly := range map[string]int64{"acc-probe-purchase-after-a-refund": 7000, "acc-refund-repeat-same-reversed-act": 5000} {
 		env := decodeJSON[struct {
-			Record  json.RawMessage   `json:"record"`
-			History []json.RawMessage `json:"history"`
+			Record       json.RawMessage   `json:"record"`
+			InputHistory []json.RawMessage `json:"history"`
 		}](t, readFile(t, "testdata", "refund-never-blocks-vectors", "real", name+".json"))
 		a, err := DecodeCheckInputRecord(env.Record)
 		if err != nil {
 			t.Fatal(err)
 		}
-		h := History{Days: 31, Complete: true}
+		h := InputHistory{Days: 31, Complete: true}
 		moneyIn := 0
-		for _, raw := range env.History {
+		for _, raw := range env.InputHistory {
 			r, err := DecodeHistoryAct(raw)
 			if err != nil {
 				t.Fatalf("%s: %v", name, err)
@@ -395,7 +395,7 @@ func TestAMoneyInHistoryActIsBridgedAsTheEngineBridgesIt(t *testing.T) {
 			accept := "accept"
 			purchase := Record{CapsuleID: "1", Operator: "household-a", Developer: "shopping-assistant@v1", Timestamp: "2026-10-01T10:00:00Z",
 				Decision: &accept, AmountMinor: new(int64(300)), ActionClass: new("money.purchase")}
-			d, err := e.CheckWithHistory(purchaseAction(t, 3, 200), History{Days: 31, Complete: true, Acts: []Record{purchase, r}})
+			d, err := e.CheckWithHistory(purchaseAction(t, 3, 200), InputHistory{Days: 31, Complete: true, Acts: []Record{purchase, r}})
 			if err != nil {
 				t.Fatal(err)
 			}

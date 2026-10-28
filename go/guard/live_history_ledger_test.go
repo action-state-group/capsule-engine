@@ -68,7 +68,7 @@ type liveLedgerRow struct {
 
 type liveVector struct {
 	Input            string            `json:"input"`
-	History          string            `json:"history"`
+	InputHistory     string            `json:"history"`
 	Ledger           []liveLedgerRow   `json:"ledger"`
 	Complete         bool              `json:"complete"`
 	Outcome          string            `json:"outcome"`
@@ -155,7 +155,7 @@ func givenEnvelope(t *testing.T, name, history string) []byte {
 // vectors list them: h's records oldest first, the statements of the claims
 // beside the checked record after them, then the incomplete record
 // under a's operator at its time when h may be missing acts.
-func liveRows(t *testing.T, a Action, h History) []liveLedgerRow {
+func liveRows(t *testing.T, a Action, h InputHistory) []liveLedgerRow {
 	t.Helper()
 	rows := []liveLedgerRow{}
 	for _, r := range append(liveOrder(h.Acts), h.claimed...) {
@@ -206,8 +206,8 @@ func liveVectorFileDifferences(t *testing.T, file string, load func() (pack.Pack
 	var diffs []string
 	for _, want := range v.Decisions {
 		name := strings.TrimSuffix(strings.TrimPrefix(want.Input, "check-inputs/"), ".json")
-		at := name + " " + want.History
-		a, h, err := DecodeCheckInput(envelope(name, want.History))
+		at := name + " " + want.InputHistory
+		a, h, err := DecodeCheckInput(envelope(name, want.InputHistory))
 		if err != nil {
 			t.Fatalf("%s: %v", at, err)
 		}

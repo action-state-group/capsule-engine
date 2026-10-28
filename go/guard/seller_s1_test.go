@@ -130,7 +130,7 @@ func runS1Vectors(t *testing.T, e *Engine, p pack.Pack, dir, commit string, cove
 		}
 		in := s1Inputs(t, corpus.Tasks[step.Task], corpus.Openings[step.Opening])
 		for _, check := range slices.Concat(s1Checks, also) {
-			c, err := e.constraintFor(check, a, ledger, in)
+			c, err := e.constraintFor(check, a, MemoryHistory(ledger), in)
 			if err != nil {
 				t.Fatalf("%s %s: %v", step.Name, check, err)
 			}
@@ -171,7 +171,7 @@ func runS1Vectors(t *testing.T, e *Engine, p pack.Pack, dir, commit string, cove
 		// The whole step, where it cites no mandate: every constraint's
 		// result and the outcome are the engine's.
 		if a.CitedMandateCapsuleID == nil {
-			d, err := e.checkWith(a, ledger, in)
+			d, err := e.checkWith(a, MemoryHistory(ledger), in)
 			if err != nil {
 				t.Fatalf("%s: %v", step.Name, err)
 			}

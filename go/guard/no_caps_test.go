@@ -106,8 +106,8 @@ func TestNoCapsDefinitionIgnoresHistoryCoverage(t *testing.T) {
 	e, _ := seller012Engine(t)
 	a := noCapsTransfer(t, 2, "")
 	earlier := []Record{RecordFor(noCapsTransfer(t, 1, ""), Decision{Outcome: Allow})}
-	for _, h := range []History{{Days: 0, Complete: false}, {Days: 1, Complete: true}, {Days: 30, Complete: false, Acts: earlier}, {Days: 30, Complete: true, Acts: earlier}} {
-		want, err := e.Check(a, h.Acts)
+	for _, h := range []InputHistory{{Days: 0, Complete: false}, {Days: 1, Complete: true}, {Days: 30, Complete: false, Acts: earlier}, {Days: 30, Complete: true, Acts: earlier}} {
+		want, err := e.Check(a, MemoryHistory(h.Acts))
 		if err != nil {
 			t.Fatal(err)
 		}

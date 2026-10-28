@@ -157,7 +157,7 @@ func HistoryStatement(entry json.RawMessage) (Record, bool) {
 // cannot be read also leaves the history incomplete, as the engine reads
 // it); a claim given twice is written once. Any other entry is an act
 // (DecodeHistoryAct), refused when it cannot be read.
-func (h *History) AddEntry(entry json.RawMessage, a Action) error {
+func (h *InputHistory) AddEntry(entry json.RawMessage, a Action) error {
 	// live_history.py: an entry passing an item_ref not in its agreed shape
 	// (a null included) leaves which sale its act is in unknown, so the
 	// history may be missing an act of a sale (saleUnknown).
@@ -200,7 +200,7 @@ func (h *History) AddEntry(entry json.RawMessage, a Action) error {
 // addStatement marks stated's claim as written, so the same claim given
 // again, in the history or in deal_claims, is written once (live_history.py
 // claim_of, capsule-engine #142).
-func (h *History) addStatement(stated Record) {
+func (h *InputHistory) addStatement(stated Record) {
 	if h.statements == nil {
 		h.statements = map[string]bool{}
 	}
@@ -249,7 +249,7 @@ func isHex64(raw json.RawMessage) bool {
 // beside the sealed record like counterparty_profile: record_digest is
 // checked for shape only, since a live check has no claim record to
 // recompute it from (AMENDMENT 9 note 1).
-func (h *History) AddDealClaims(record json.RawMessage, a Action) Action {
+func (h *InputHistory) AddDealClaims(record json.RawMessage, a Action) Action {
 	var entry struct {
 		DealClaims json.RawMessage `json:"deal_claims"`
 		AgentInput json.RawMessage `json:"agent_input"`
@@ -303,9 +303,9 @@ func (h *History) AddDealClaims(record json.RawMessage, a Action) Action {
 
 // statementsIn is the operator's statement records in deal
 // (required_disclosure.py _in_deal).
-func statementsIn(ledger []Record, operator, deal string) []Record {
+func statementsIn(h *historyReader, operator, deal string) []Record {
 	var out []Record
-	for _, r := range ledger {
+	for _, r := range h.find(Query{Where: map[string]string{FieldOperator: operator, FieldStatedDealID: deal}}) {
 		if r.Operator == operator && r.Stated != nil && r.Stated.DealID == deal {
 			out = append(out, r)
 		}

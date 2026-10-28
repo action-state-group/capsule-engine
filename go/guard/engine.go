@@ -842,35 +842,36 @@ func (d Decision) Constraint(id string) (Constraint, bool) {
 	return Constraint{}, false
 }
 
-// Check evaluates one action against the prior ledger records.
-func (e *Engine) Check(a Action, ledger []Record) (Decision, error) {
-	return e.check(a, ledger, "", nil)
+// Check evaluates one action against the history of earlier records; a nil
+// history holds none.
+func (e *Engine) Check(a Action, h History) (Decision, error) {
+	return e.check(a, h, "", nil)
 }
 
 // CheckWithTaskAuthority is Check with the sealed task-authority record the
 // action's task_authority_ref names supplied beside it (GuardEngine.check
 // task_authority_record): the whole record as JSON, read by task_authority
 // only when its digest equals the reference.
-func (e *Engine) CheckWithTaskAuthority(a Action, ledger []Record, record json.RawMessage) (Decision, error) {
-	return e.check(a, ledger, "", record)
+func (e *Engine) CheckWithTaskAuthority(a Action, h History, record json.RawMessage) (Decision, error) {
+	return e.check(a, h, "", record)
 }
 
 // CheckReplay is Check for a record read from a capsule bundle or a single
 // capsule (check --record), decided as the engine's replay decides it: with
 // what the bundle gives it beside the record (BundleReplay).
-func (e *Engine) CheckReplay(a Action, ledger []Record, r Replay) (Decision, error) {
-	return e.checkWith(a, ledger, checkInputs{taskAuthority: r.taskAuthority, words: r.words})
+func (e *Engine) CheckReplay(a Action, h History, r Replay) (Decision, error) {
+	return e.checkWith(a, h, checkInputs{taskAuthority: r.taskAuthority, words: r.words})
 }
 
 // CheckWithRecords is CheckWithTaskAuthority with the sealed approval record
 // the action's authorized_by names supplied too (GuardEngine.check
 // authorization_record): the whole record as JSON, read by
 // promise_requires_approval only when its digest equals the reference.
-func (e *Engine) CheckWithRecords(a Action, ledger []Record, taskAuthority, authorization json.RawMessage) (Decision, error) {
-	return e.checkWith(a, ledger, checkInputs{taskAuthority: taskAuthority, authorization: authorization})
+func (e *Engine) CheckWithRecords(a Action, h History, taskAuthority, authorization json.RawMessage) (Decision, error) {
+	return e.checkWith(a, h, checkInputs{taskAuthority: taskAuthority, authorization: authorization})
 }
 
-// History says what a history of earlier acts covers (external-check-input/v0
+// InputHistory says what a history of earlier acts covers (external-check-input/v0
 // history_scope): how many days back it reaches, whether it holds every act
 // sealed in them, and the acts themselves. TaskAuthorityRecord is the
 // envelope's task_authority_record, supplied beside them (see
@@ -878,7 +879,7 @@ func (e *Engine) CheckWithRecords(a Action, ledger []Record, taskAuthority, auth
 // task-authority/v0 record the sale discloses under the digest the check
 // cites (SaleBundle.Check), or nil; CommercialBoundsOpening is its
 // commercial_bounds_opening, read only by price_floor, or nil.
-type History struct {
+type InputHistory struct {
 	Days                    int
 	Complete                bool
 	Acts                    []Record
@@ -904,7 +905,7 @@ type History struct {
 	// releaseWindow is, for a sale bundle's check (SaleBundle.Check), the
 	// same history cut to the acts sealed in the last rulesHistoryDays days
 	// before the check, which release_on_acceptance 1.2.0 reads (CheckSale).
-	releaseWindow *History
+	releaseWindow *InputHistory
 }
 
 // saleUnknown is whether h may be missing an act of a sale, as
@@ -913,20 +914,20 @@ type History struct {
 // item_ref cannot be read. Only single_commitment and release_on_acceptance
 // read it; the caps window reads Complete alone, as before (the engine's
 // caps never reads the incomplete record).
-func (h History) saleUnknown() bool { return !h.Complete || h.itemRefUnread }
+func (h InputHistory) saleUnknown() bool { return !h.Complete || h.itemRefUnread }
 
 // words are the words beside the check: on a replay, none is
 // notInBundle (promise_never.py WORDS_NOT_IN_BUNDLE); live, none was given.
-func (h History) words() statementWords {
+func (h InputHistory) words() statementWords {
 	if isJSONNull(h.RepresentingOpening) {
 		return statementWords{notInBundle: h.replayed}
 	}
 	return statementWords{opening: h.RepresentingOpening}
 }
 
-// ledger is what the checks read of h: its acts and history statements, then
+// records is what the checks read of h: its acts and history statements, then
 // the statements the claims beside the checked record make.
-func (h History) ledger() []Record {
+func (h InputHistory) records() []Record {
 	return append(slices.Clone(h.Acts), h.claimed...)
 }
 
@@ -943,27 +944,27 @@ func (h History) ledger() []Record {
 // record states the money moved in is never spend, so it does not leave the
 // window unevaluated; the caps facts name how many were left out
 // (ExcludedFromWindow). The per-purchase limit is evaluated either way.
-func (e *Engine) CheckWithHistory(a Action, h History) (Decision, error) {
+func (e *Engine) CheckWithHistory(a Action, h InputHistory) (Decision, error) {
 	coverage, moneyIn := e.windowCoverage(a, h)
-	return e.checkWith(a, h.ledger(), checkInputs{coverage: coverage, moneyInExcluded: moneyIn, history: true,
+	return e.checkWith(a, MemoryHistory(h.records()), checkInputs{coverage: coverage, moneyInExcluded: moneyIn, history: true,
 		historyIncomplete: h.saleUnknown(), taskAuthority: h.TaskAuthorityRecord, opening: h.CommercialBoundsOpening, words: h.words()})
 }
 
 // CheckSale is Check for a check of a sale bundle's thread (SaleBundle.Check;
 // capsule-engine #146, GuardEngine.check sale_history): single_commitment
 // reads the sale's acceptance from sale, the sale's history read as a live
-// check's history is read, never from ledger; every other check reads
-// ledger, as Check does. A release_on_acceptance that binds the acceptance
+// check's history is read, never from h; every other check reads h, as
+// Check does. A release_on_acceptance that binds the acceptance
 // from the history (1.2.0) reads sale's history cut to the live window
-// (History.releaseWindow, which SaleBundle.Check gives); the cited 1.0.0
-// and 1.1.0 read ledger, as the engine's replay does, where no acceptance
+// (InputHistory.releaseWindow, which SaleBundle.Check gives); the cited 1.0.0
+// and 1.1.0 read h, as the engine's replay does, where no acceptance
 // is sealed, so they release nothing. A check citing a task authority is
 // decided with the record the sale discloses under that digest
 // (sale.TaskAuthorityRecord, which SaleBundle.Check gives), and a represent
 // check with the opening of its words the sale's deal reports carry, or
-// none (History.words).
-func (e *Engine) CheckSale(a Action, ledger []Record, sale History) (Decision, error) {
-	return e.checkWith(a, ledger, checkInputs{sale: &sale, taskAuthority: sale.TaskAuthorityRecord, words: sale.words()})
+// none (InputHistory.words).
+func (e *Engine) CheckSale(a Action, h History, sale InputHistory) (Decision, error) {
+	return e.checkWith(a, h, checkInputs{sale: &sale, taskAuthority: sale.TaskAuthorityRecord, words: sale.words()})
 }
 
 // moneyIn is the direction a deal body states when the money moved in (a
@@ -984,7 +985,7 @@ const moneyIn = "in"
 // shape) leaves the window unevaluated, and only when it is in the window
 // for a's fold key: one outside cannot change the total (rule 5,
 // window-only).
-func (e *Engine) windowCoverage(a Action, h History) (string, int) {
+func (e *Engine) windowCoverage(a Action, h InputHistory) (string, int) {
 	if e.capsFold == nil {
 		// No caps definition: there is no window to cover.
 		return "", 0
@@ -1043,15 +1044,15 @@ func (e *Engine) windowCoverage(a Action, h History) (string, int) {
 }
 
 // check is Check; coverage, when set, is why the caps window cannot be
-// evaluated over the ledger; taskAuthority is the supplied task-authority
+// evaluated over the history; taskAuthority is the supplied task-authority
 // record, or nil.
-func (e *Engine) check(a Action, ledger []Record, coverage string, taskAuthority json.RawMessage) (Decision, error) {
-	return e.checkWith(a, ledger, checkInputs{coverage: coverage, taskAuthority: taskAuthority})
+func (e *Engine) check(a Action, h History, coverage string, taskAuthority json.RawMessage) (Decision, error) {
+	return e.checkWith(a, h, checkInputs{coverage: coverage, taskAuthority: taskAuthority})
 }
 
-// checkInputs is what a check reads beside the action and the ledger:
+// checkInputs is what a check reads beside the action and the history:
 // coverage, when set, is why the caps window cannot be evaluated over the
-// ledger; moneyInExcluded is how many money-in acts with no recorded
+// history; moneyInExcluded is how many money-in acts with no recorded
 // decision the window did not count (windowCoverage); taskAuthority is the supplied task-authority record, or nil;
 // opening is the checker input's commercial_bounds_opening, or nil;
 // authorization is the supplied approval record (GuardEngine.check
@@ -1059,10 +1060,10 @@ func (e *Engine) check(a Action, ledger []Record, coverage string, taskAuthority
 type checkInputs struct {
 	coverage        string
 	moneyInExcluded int
-	// history is whether the ledger is a check input's history, every entry
-	// an executed act (CheckWithHistory), not a ledger of decisions;
+	// history is whether the history is a check input's, every entry an
+	// executed act (CheckWithHistory), not a log of decisions;
 	// historyIncomplete, whether that history may be missing acts
-	// (History.saleUnknown), which single_commitment and release_on_acceptance
+	// (InputHistory.saleUnknown), which single_commitment and release_on_acceptance
 	// 1.2.0 read.
 	history           bool
 	historyIncomplete bool
@@ -1074,19 +1075,19 @@ type checkInputs struct {
 	words statementWords
 	// sale is the history of a sale bundle's check (CheckSale), which
 	// single_commitment reads whole and release_on_acceptance 1.2.0 cut to
-	// the live window (History.releaseWindow), or nil.
-	sale *History
+	// the live window (InputHistory.releaseWindow), or nil.
+	sale *InputHistory
 }
 
 // checkWith is check with its inputs: dedupe, caps and verify_before_dispatch
 // in the engine's order, then the configured checks in pack order.
-func (e *Engine) checkWith(a Action, ledger []Record, in checkInputs) (Decision, error) {
+func (e *Engine) checkWith(a Action, h History, in checkInputs) (Decision, error) {
 	if a.CitedMandateCapsuleID != nil {
 		return Decision{}, ErrCitedMandate
 	}
 	var cs []Constraint
 	for _, check := range append([]string{"dedupe", "caps", "verify_before_dispatch"}, e.order...) {
-		c, err := e.constraintFor(check, a, ledger, in)
+		c, err := e.constraintFor(check, a, h, in)
 		if err != nil {
 			return Decision{}, err
 		}
@@ -1146,7 +1147,17 @@ func capsHeld(cs []Constraint) bool {
 // (compareTaxonomy) and the decision. A check cited at a definition pinned as
 // unported is not yet run, even when the check is implemented at another
 // definition.
-func (e *Engine) constraintFor(check string, a Action, ledger []Record, in checkInputs) (Constraint, error) {
+func (e *Engine) constraintFor(check string, a Action, h History, in checkInputs) (Constraint, error) {
+	r := &historyReader{h: orEmpty(h)}
+	c, err := e.runCheck(check, a, r, in)
+	if err == nil {
+		err = r.err
+	}
+	return c, err
+}
+
+// runCheck is constraintFor's check, reading the history through r.
+func (e *Engine) runCheck(check string, a Action, r *historyReader, in checkInputs) (Constraint, error) {
 	if u, ok := e.unported[check]; ok {
 		return checkUnported(a, check, u), nil
 	}
@@ -1157,15 +1168,15 @@ func (e *Engine) constraintFor(check string, a Action, ledger []Record, in check
 			return Constraint{}, fmt.Errorf("timestamp: %w", err)
 		}
 		if check == "dedupe" {
-			return e.checkDedupe(a, ledger, at)
+			return e.checkDedupe(a, r, at)
 		}
-		return e.checkCaps(a, ledger, at, in), nil
+		return e.checkCaps(a, r, at, in), nil
 	case "verify_before_dispatch":
 		return checkVerifyBeforeDispatch(), nil
 	case "destination_rail":
 		return checkDestinationRail(a, e.rail), nil
 	case "counterparty_identity_change":
-		return checkCounterpartyIdentityChange(a, ledger, e.counterparty), nil
+		return checkCounterpartyIdentityChange(a, r, e.counterparty), nil
 	case "credential_pattern":
 		return checkCredentialPattern(a, e.patterns), nil
 	case "recurring_charge":
@@ -1179,7 +1190,7 @@ func (e *Engine) constraintFor(check string, a Action, ledger []Record, in check
 	case "task_authority":
 		return checkTaskAuthority(a, in.taskAuthority, e.authority), nil
 	case "counterparty_seen_before":
-		return checkSeenBefore(a, ledger, e.seenBefore), nil
+		return checkSeenBefore(a, r, e.seenBefore), nil
 	case "channel_change":
 		return checkChannelChange(a, e.channel), nil
 	case "material_fields_changed":
@@ -1187,7 +1198,7 @@ func (e *Engine) constraintFor(check string, a Action, ledger []Record, in check
 	case "offer_fields_changed":
 		return checkFieldCount(check, "offer_fields_changed", "offer_fields_basis", a.OfferFieldsChanged, a.OfferFieldsBasis, e.offer, a), nil
 	case "recipient_seen_before":
-		return checkSeenBefore(a, ledger, e.recipientSeenBefore), nil
+		return checkSeenBefore(a, r, e.recipientSeenBefore), nil
 	case "action_class_gate":
 		return checkActionClassGate(a, e.gate, e.tax)
 	case "offer_expiry":
@@ -1196,24 +1207,26 @@ func (e *Engine) constraintFor(check string, a Action, ledger []Record, in check
 		return checkPriceFloor(a, in.taskAuthority, in.opening, e.priceFloor), nil
 	case "single_commitment":
 		if in.sale != nil {
-			return checkSingleCommitment(a, in.sale.ledger(), checkInputs{history: true, historyIncomplete: in.sale.saleUnknown()},
+			r.h = MemoryHistory(in.sale.records())
+			return checkSingleCommitment(a, r, checkInputs{history: true, historyIncomplete: in.sale.saleUnknown()},
 				e.singleCommitment), nil
 		}
-		return checkSingleCommitment(a, ledger, in, e.singleCommitment), nil
+		return checkSingleCommitment(a, r, in, e.singleCommitment), nil
 	case "release_on_acceptance":
 		if e.release.Binding != "" && in.sale != nil && in.sale.releaseWindow != nil {
 			// A replayed sale's 1.2.0 reads the sale's history cut to the
 			// live window (GuardEngine.check release_history).
 			w := in.sale.releaseWindow
-			return checkReleaseOnAcceptance(a, w.ledger(), checkInputs{history: true, historyIncomplete: w.saleUnknown()}, e.release, e.tax), nil
+			r.h = MemoryHistory(w.records())
+			return checkReleaseOnAcceptance(a, r, checkInputs{history: true, historyIncomplete: w.saleUnknown()}, e.release, e.tax), nil
 		}
-		return checkReleaseOnAcceptance(a, ledger, in, e.release, e.tax), nil
+		return checkReleaseOnAcceptance(a, r, in, e.release, e.tax), nil
 	case "promise_never":
 		return checkPromiseNever(a, in.words, e.never), nil
 	case "promise_requires_approval":
 		return checkPromiseRequiresApproval(a, in.taskAuthority, in.authorization, e.approval, e.noApprovalRecords), nil
 	case "required_disclosure":
-		return checkRequiredDisclosure(a, ledger, e.disclosure), nil
+		return checkRequiredDisclosure(a, r, e.disclosure), nil
 	}
 	return Constraint{}, fmt.Errorf("check %q is configured and neither run nor pinned as unported", check)
 }

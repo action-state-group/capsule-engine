@@ -161,7 +161,7 @@ func testLeg1PopulationBIsUnproducible(t *testing.T, fx fixtureSet) {
 			if mask&32 != 0 {
 				a.Recurrence = ptr("monthly")
 			}
-			d, err := e.Check(a, ledger)
+			d, err := e.Check(a, MemoryHistory(ledger))
 			if err != nil {
 				t.Fatal(err)
 			}

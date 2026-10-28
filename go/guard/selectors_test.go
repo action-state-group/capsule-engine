@@ -22,7 +22,7 @@ var gateRules = map[string]string{
 
 func reportOf(t *testing.T, e *Engine, a Action, ledger []Record) (Decision, map[string]RuleResult) {
 	t.Helper()
-	d, err := e.Check(a, ledger)
+	d, err := e.Check(a, MemoryHistory(ledger))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -84,7 +84,7 @@ func TestPurchasesAskUnderTaxonomy3(t *testing.T) {
 	repeat := purchase("shop/known")
 	accepted := RecordFor(repeat, Decision{Outcome: Allow})
 	accepted.CapsuleID = "c-accepted"
-	d, err := e.Check(repeat, []Record{accepted})
+	d, err := e.Check(repeat, MemoryHistory([]Record{accepted}))
 	if err != nil {
 		t.Fatal(err)
 	}

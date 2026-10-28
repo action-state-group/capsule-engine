@@ -433,7 +433,7 @@ func newRequiredDisclosure(w pack.Wicket, p pack.Pack) (requiredDisclosure, erro
 // to the action's target (accepted, not dry runs); a zero fails, and the
 // evidence lists every count and the classes still missing. It never reads
 // an approval: one does not waive a statement the user required.
-func checkRequiredDisclosure(a Action, ledger []Record, c requiredDisclosure) (out Constraint) {
+func checkRequiredDisclosure(a Action, h *historyReader, c requiredDisclosure) (out Constraint) {
 	const id = "required_disclosure"
 	method := c.fold.id
 	rd := []string{"action_class"}
@@ -446,13 +446,13 @@ func checkRequiredDisclosure(a Action, ledger []Record, c requiredDisclosure) (o
 		if c.countListing {
 			rd = append(rd, "listing_classes")
 		}
-		return checkRequiredStatements(a, ledger, c)
+		return checkRequiredStatements(a, h, c)
 	}
 	rd = append(rd, "target", "operator")
 	if a.Target == nil {
 		return missingField(id, method, "target")
 	}
-	counts, told := classCounts(c.fold, toTarget(ledger, a), c.requiredClasses)
+	counts, told := classCounts(c.fold, toTarget(h, a), c.requiredClasses)
 	missing := []string{}
 	for _, cls := range c.requiredClasses {
 		if told[cls] == 0 {
@@ -468,12 +468,12 @@ func checkRequiredDisclosure(a Action, ledger []Record, c requiredDisclosure) (o
 // toTarget is required_disclosure.py _to_target: a's operator's records
 // addressed to its target (ScanQuery(counterparty=action.operator), then the
 // target), or none when a names no target.
-func toTarget(ledger []Record, a Action) []Record {
+func toTarget(h *historyReader, a Action) []Record {
 	if a.Target == nil {
 		return nil
 	}
 	var mine []Record
-	for _, r := range ledger {
+	for _, r := range h.find(Query{Where: map[string]string{FieldOperator: a.Operator, FieldTarget: *a.Target}}) {
 		if r.Operator == a.Operator && r.Target != nil && *r.Target == *a.Target {
 			mine = append(mine, r)
 		}
@@ -512,7 +512,7 @@ func classCounts(f fold, records []Record, classes []string) (canon.Value, map[s
 // the classes every live listing of the sale stated as its check sealed
 // them; with none, or an empty list, a listing counts for nothing. The
 // evidence then also lists that value (null with none).
-func checkRequiredStatements(a Action, ledger []Record, c requiredDisclosure) Constraint {
+func checkRequiredStatements(a Action, h *historyReader, c requiredDisclosure) Constraint {
 	const id = "required_disclosure"
 	method := c.fold.id
 	if a.Target == nil && a.DealID == nil {
@@ -520,9 +520,9 @@ func checkRequiredStatements(a Action, ledger []Record, c requiredDisclosure) Co
 	}
 	var inDeal []Record
 	if a.DealID != nil {
-		inDeal = statementsIn(ledger, a.Operator, *a.DealID)
+		inDeal = statementsIn(h, a.Operator, *a.DealID)
 	}
-	prior, told := classCounts(c.fold, toTarget(ledger, a), c.requiredClasses)
+	prior, told := classCounts(c.fold, toTarget(h, a), c.requiredClasses)
 	stated, said := classCounts(*c.statements, inDeal, c.requiredClasses)
 	missing := []string{}
 	for _, cls := range c.requiredClasses {

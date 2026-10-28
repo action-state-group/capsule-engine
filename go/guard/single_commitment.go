@@ -36,7 +36,7 @@ const itemRefInput = "item_ref"
 // Nothing it records names a reference: the evidence says only whether the
 // sale has an acceptance, and the reasons name no value, so no finding can
 // link one buyer's thread to another's.
-func checkSingleCommitment(a Action, ledger []Record, in checkInputs, c singleCommitmentConfig) (out Constraint) {
+func checkSingleCommitment(a Action, h *historyReader, in checkInputs, c singleCommitmentConfig) (out Constraint) {
 	const id, method = "single_commitment", "first_sealed_acceptance_v1"
 	rd := []string{"action_class"}
 	defer func() { out.reads = rd }()
@@ -59,7 +59,7 @@ func checkSingleCommitment(a Action, ledger []Record, in checkInputs, c singleCo
 		out.failsClosed = true
 		return out
 	}
-	acceptance, unknown := saleAcceptance(a, ledger, in, c.AcceptanceClasses)
+	acceptance, unknown := saleAcceptance(a, h, in, c.AcceptanceClasses)
 	if unknown != "" {
 		out = missingField(id, method, unknown)
 		out.pending = saleUnknownReasons[unknown]
@@ -105,10 +105,11 @@ var saleUnknownReasons = map[string]string{
 // engine's history ledger writes it (liveOrder). Shared with
 // release_on_acceptance, so both read one acceptance per sale, and an
 // unknown one releases nothing.
-func saleAcceptance(a Action, ledger []Record, in checkInputs, classes []string) (*Record, string) {
+func saleAcceptance(a Action, h *historyReader, in checkInputs, classes []string) (*Record, string) {
 	if in.history && in.historyIncomplete {
 		return nil, "history"
 	}
+	ledger := h.find(Query{Where: map[string]string{FieldOperator: a.Operator}})
 	if in.history {
 		ledger = liveOrder(ledger)
 	}

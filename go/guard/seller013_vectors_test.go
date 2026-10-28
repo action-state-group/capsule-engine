@@ -129,11 +129,11 @@ type statementVectors struct {
 		Statement  json.RawMessage `json:"statement"`
 	} `json:"reader"`
 	Live []struct {
-		Input   string            `json:"input"`
-		History string            `json:"history"`
-		Outcome string            `json:"outcome"`
-		Rules   map[string]string `json:"rules"`
-		S05     s05Vector         `json:"s05"`
+		Input        string            `json:"input"`
+		InputHistory string            `json:"history"`
+		Outcome      string            `json:"outcome"`
+		Rules        map[string]string `json:"rules"`
+		S05          s05Vector         `json:"s05"`
 	} `json:"live"`
 	Replay []struct {
 		ActionID string    `json:"action_id"`
@@ -257,7 +257,7 @@ const (
 // decides it (DecodeCheckInput, then CheckWithHistory): the claims-in-history
 // file as vendored, or, for historyAccepted, the same input with its claims
 // taken out of the history.
-func liveCheck(t *testing.T, e *Engine, name, history string) (Decision, History) {
+func liveCheck(t *testing.T, e *Engine, name, history string) (Decision, InputHistory) {
 	t.Helper()
 	raw := readFile(t, seller013Vectors, "go-vectors", "check-inputs", name+".claims-in-history.json")
 	if history == historyAccepted {
@@ -377,8 +377,8 @@ func liveDifferences(t *testing.T, v statementVectors) []string {
 	var diffs []string
 	passes := 0
 	for _, want := range v.Live {
-		d, _ := liveCheck(t, e, want.Input, want.History)
-		at := want.Input + " " + want.History
+		d, _ := liveCheck(t, e, want.Input, want.InputHistory)
+		at := want.Input + " " + want.InputHistory
 		if why := s05Agrees(t, d, want.S05); why != "" {
 			t.Errorf("%s: s05 %s", at, why)
 		}
@@ -452,16 +452,16 @@ func TestSeller013ChangesOnlyS05(t *testing.T) {
 	e12, _ := seller012Engine(t)
 	moved := 0
 	for _, want := range v.Live {
-		at := want.Input + " " + want.History
-		d13, _ := liveCheck(t, e13, want.Input, want.History)
-		d12, _ := liveCheck(t, e12, want.Input, want.History)
+		at := want.Input + " " + want.InputHistory
+		d13, _ := liveCheck(t, e13, want.Input, want.InputHistory)
+		d12, _ := liveCheck(t, e12, want.Input, want.InputHistory)
 		r13, r12 := rulesOf(d13, p), rulesOf(d12, p)
 		if r12[requiredStatementRule] != string(Fail) {
 			t.Errorf("%s: s05 under 0.1.2 is %s", at, r12[requiredStatementRule])
 		}
 		if r13[requiredStatementRule] != r12[requiredStatementRule] {
 			moved++
-			if want.History != historyWithClaims {
+			if want.InputHistory != historyWithClaims {
 				t.Errorf("%s: s05 moved with no claim in the history", at)
 			}
 		} else if d13.Outcome != d12.Outcome {
@@ -534,7 +534,7 @@ func replayStatements(t *testing.T, e *Engine, outcomes map[string]string) map[s
 			if a.statesNoAct {
 				continue
 			}
-			d, err := e.Check(a, ledger)
+			d, err := e.Check(a, MemoryHistory(ledger))
 			if err != nil {
 				t.Fatalf("%s %s: %v", name, a.ActionID, err)
 			}

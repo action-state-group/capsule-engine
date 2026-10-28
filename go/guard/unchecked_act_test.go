@@ -26,8 +26,8 @@ const uncheckedDir = "real-unchecked-act"
 func uncheckedHistory(t *testing.T, name string) []json.RawMessage {
 	t.Helper()
 	return decodeJSON[struct {
-		History []json.RawMessage `json:"history"`
-	}](t, readFile(t, "testdata", uncheckedDir, name+".input.json")).History
+		InputHistory []json.RawMessage `json:"history"`
+	}](t, readFile(t, "testdata", uncheckedDir, name+".input.json")).InputHistory
 }
 
 func TestARealUncheckedActIsReadAsUncheckedSpend(t *testing.T) {
@@ -113,7 +113,7 @@ func TestAnUncheckedActIsSpendNeverSeenNeverDeduped(t *testing.T) {
 		earlier int64
 		result  Result
 	}{{"under", 2000, Pass}, {"over", cap - 1999, Fail}} {
-		h := History{Days: 31, Complete: true, Acts: []Record{uncheckedAct(tc.earlier, "payee/one")}}
+		h := InputHistory{Days: 31, Complete: true, Acts: []Record{uncheckedAct(tc.earlier, "payee/one")}}
 		d, err := e.CheckWithHistory(a, h)
 		if err != nil {
 			t.Fatal(err)
@@ -143,7 +143,7 @@ func TestAnUncheckedActIsSpendNeverSeenNeverDeduped(t *testing.T) {
 	// The control: the same act accepted is a dedupe match and seen.
 	accepted := uncheckedAct(2000, "payee/one")
 	accepted.Unchecked, accepted.Decision = false, strp("accept")
-	d, err := e.CheckWithHistory(a, History{Days: 31, Complete: true, Acts: []Record{accepted}})
+	d, err := e.CheckWithHistory(a, InputHistory{Days: 31, Complete: true, Acts: []Record{accepted}})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -153,7 +153,7 @@ func TestAnUncheckedActIsSpendNeverSeenNeverDeduped(t *testing.T) {
 	// Money in stays 0 and leaves the window evaluated (#130).
 	in := uncheckedAct(0, "payee/one")
 	in.Direction = strp(moneyIn)
-	d, err = e.CheckWithHistory(a, History{Days: 31, Complete: true, Acts: []Record{in}})
+	d, err = e.CheckWithHistory(a, InputHistory{Days: 31, Complete: true, Acts: []Record{in}})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -214,7 +214,7 @@ func TestTheEngineReplayCountsTheUncheckedSpendAsThisPortDoes(t *testing.T) {
 	if id.CapsuleID != v.Bundles["x-deal-v0.bundle.json"].Decisions[1].CapsuleID {
 		t.Fatalf("the envelope's record %s is not the engine's second check", id.CapsuleID)
 	}
-	h := History{Days: in.HistoryScope.Days, Complete: in.HistoryScope.Complete}
+	h := InputHistory{Days: in.HistoryScope.Days, Complete: in.HistoryScope.Complete}
 	for _, raw := range uncheckedHistory(t, "x-deal-v0-check-2") {
 		r, err := DecodeHistoryAct(raw)
 		if err != nil {
@@ -294,7 +294,7 @@ func TestAnUncheckedActIsCountedUnderTheFoldsKeyAndWindow(t *testing.T) {
 		act    Record
 		weekly int64
 	}{{"outside the window", old, 0}, {"another operator", other, 0}, {"spend_minor sealed", sealedSpend, 500}} {
-		d, err := e.CheckWithHistory(a, History{Days: 31, Complete: true, Acts: []Record{tc.act}})
+		d, err := e.CheckWithHistory(a, InputHistory{Days: 31, Complete: true, Acts: []Record{tc.act}})
 		if err != nil {
 			t.Fatal(err)
 		}

@@ -14,8 +14,8 @@ import (
 func claimEntryAt(t *testing.T, at string) (json.RawMessage, Action) {
 	t.Helper()
 	var in struct {
-		Record  json.RawMessage   `json:"record"`
-		History []json.RawMessage `json:"history"`
+		Record       json.RawMessage   `json:"record"`
+		InputHistory []json.RawMessage `json:"history"`
 	}
 	if err := json.Unmarshal(readFile(t, seller013Vectors, "go-vectors", "check-inputs", "a-offer-1900.claims-in-history.json"), &in); err != nil {
 		t.Fatal(err)
@@ -25,7 +25,7 @@ func claimEntryAt(t *testing.T, at string) (json.RawMessage, Action) {
 		t.Fatal(err)
 	}
 	var entry map[string]json.RawMessage
-	if err := json.Unmarshal(in.History[0], &entry); err != nil {
+	if err := json.Unmarshal(in.InputHistory[0], &entry); err != nil {
 		t.Fatal(err)
 	}
 	if at == "" {
@@ -62,7 +62,7 @@ func TestALiveClaimCountsOnlyWhenSealedByTheCheck(t *testing.T) {
 		if c.checkAt != "" {
 			a.Timestamp = c.checkAt
 		}
-		h := History{Complete: true}
+		h := InputHistory{Complete: true}
 		for range 2 {
 			if err := h.AddEntry(entry, a); err != nil {
 				t.Fatalf("%q: %v", c.at, err)
@@ -92,7 +92,7 @@ func TestALiveClaimIsNeverAnAct(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	h := History{Days: 31, Complete: true}
+	h := InputHistory{Days: 31, Complete: true}
 	if err := h.AddEntry(entry, a); err != nil {
 		t.Fatal(err)
 	}
@@ -102,7 +102,7 @@ func TestALiveClaimIsNeverAnAct(t *testing.T) {
 	if why, _ := e.windowCoverage(a, h); why != "" {
 		t.Errorf("a statement holds the window: %s", why)
 	}
-	c, err := e.constraintFor("dedupe", a, h.Acts, checkInputs{})
+	c, err := e.constraintFor("dedupe", a, MemoryHistory(h.Acts), checkInputs{})
 	if err != nil || c.Result != Pass {
 		t.Errorf("dedupe over a statement: %s %v", c.Result, err)
 	}
@@ -141,7 +141,7 @@ func TestRequiredStatementsByDealAndTarget(t *testing.T) {
 		{"another operator", e13, otherOperator, Fail},
 		{"1.0.0", e12, a, Fail},
 	} {
-		got, err := c.e.constraintFor("required_disclosure", c.a, ledger, checkInputs{})
+		got, err := c.e.constraintFor("required_disclosure", c.a, MemoryHistory(ledger), checkInputs{})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -175,7 +175,7 @@ func TestAnUnboundClaimIsNoStatement(t *testing.T) {
 func TestALedgerStatementIsRead(t *testing.T) {
 	v := loadStatementVectors(t)
 	line := v.Reader[0].Statement
-	ledger, err := ReadLedger(bytes.NewReader(line))
+	ledger, err := readCapsules(bytes.NewReader(line))
 	if err != nil || len(ledger) != 1 || ledger[0].Stated == nil {
 		t.Fatalf("read %+v %v", ledger, err)
 	}
@@ -184,7 +184,7 @@ func TestALedgerStatementIsRead(t *testing.T) {
 	}
 	e, _ := seller013Engine(t)
 	a := Action{Operator: "synthetic-seller", ActionClass: new("marketplace.offer"), DealID: new("deal-a")}
-	c, err := e.constraintFor("required_disclosure", a, ledger, checkInputs{})
+	c, err := e.constraintFor("required_disclosure", a, MemoryHistory(ledger), checkInputs{})
 	if err != nil || c.Result != Pass {
 		t.Errorf("required_disclosure %s %v", c.Result, err)
 	}

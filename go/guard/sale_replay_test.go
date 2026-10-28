@@ -73,7 +73,7 @@ type saleLedgerRow struct {
 type saleReplayVector struct {
 	Sale             string            `json:"sale"`
 	Input            string            `json:"input"`
-	History          string            `json:"history"`
+	InputHistory     string            `json:"history"`
 	Ledger           []saleLedgerRow   `json:"ledger"`
 	Outcome          string            `json:"outcome"`
 	Verdict          string            `json:"verdict"`
@@ -204,7 +204,7 @@ func checkedCapsule(t *testing.T, input string) string {
 // writes it: each act's state, sealed decision, class, deal, item_ref and
 // target, oldest first, then the incomplete record when the sale's
 // acceptance is unknown.
-func saleRows(t *testing.T, a Action, h History) []saleLedgerRow {
+func saleRows(t *testing.T, a Action, h InputHistory) []saleLedgerRow {
 	t.Helper()
 	rows := []saleLedgerRow{}
 	for _, r := range liveOrder(h.Acts) {
@@ -309,7 +309,7 @@ func replayLedgerSealed(t *testing.T, e *Engine, s SaleBundle, capsuleID string,
 		if err != nil || a.statesNoAct || len(a.Unevaluable()) > 0 {
 			continue
 		}
-		d, err := e.CheckSale(a, ledger, h)
+		d, err := e.CheckSale(a, MemoryHistory(ledger), h)
 		if err != nil {
 			t.Fatalf("%s: %v", id, err)
 		}
@@ -342,13 +342,13 @@ func saleReplayDifferences(t *testing.T) []string {
 		differ(&diffs, name, "findings", fmt.Sprint(s.Findings), fmt.Sprint(want.Findings))
 	}
 	for _, want := range v.Decisions {
-		at := strings.Join([]string{want.Sale, want.Input, want.History}, " ")
-		sale := givenSale(t, want.Sale, want.History)
+		at := strings.Join([]string{want.Sale, want.Input, want.InputHistory}, " ")
+		sale := givenSale(t, want.Sale, want.InputHistory)
 		a, h, err := sale.Check(checkedCapsule(t, want.Input))
 		if err != nil {
 			t.Fatalf("%s: %v", at, err)
 		}
-		d, err := e.CheckSale(a, replayLedger(t, e, sale, checkedCapsule(t, want.Input)), h)
+		d, err := e.CheckSale(a, MemoryHistory(replayLedger(t, e, sale, checkedCapsule(t, want.Input))), h)
 		if err != nil {
 			t.Fatalf("%s: %v", at, err)
 		}
@@ -400,7 +400,7 @@ func TestSaleReplayVectorsAgreeWithTheEngine(t *testing.T) {
 // saleLiveVector is one expected_live.json decision of #147's fixture.
 type saleLiveVector struct {
 	Input            string            `json:"input"`
-	History          string            `json:"history"`
+	InputHistory     string            `json:"history"`
 	Ledger           []saleLedgerRow   `json:"ledger"`
 	Outcome          string            `json:"outcome"`
 	Verdict          string            `json:"verdict"`
@@ -461,8 +461,8 @@ func TestSaleLiveVectorsAgreeWithTheEngine(t *testing.T) {
 	e, p := seller014Engine(t)
 	var diffs []string
 	for _, want := range v.Decisions {
-		at := want.Input + " " + want.History
-		a, h, err := DecodeCheckInput(saleLiveInput(t, want.Input, want.History))
+		at := want.Input + " " + want.InputHistory
+		a, h, err := DecodeCheckInput(saleLiveInput(t, want.Input, want.InputHistory))
 		if err != nil {
 			t.Fatalf("%s: %v", at, err)
 		}
@@ -491,7 +491,7 @@ func TestSaleLiveVectorsAgreeWithTheEngine(t *testing.T) {
 			}
 			rows = append(rows, row)
 		}
-		rows = append(rows, saleRows(t, a, History{Complete: !h.saleUnknown()})...)
+		rows = append(rows, saleRows(t, a, InputHistory{Complete: !h.saleUnknown()})...)
 		gotRows, _ := json.Marshal(rows)
 		wantRows, _ := json.Marshal(want.Ledger)
 		differ(&diffs, at, "ledger", string(gotRows), string(wantRows))
@@ -534,7 +534,7 @@ func TestSaleReplayDecidesS11AsLive(t *testing.T) {
 					}
 					t.Fatal(err)
 				}
-				replayed, err := e.CheckSale(ra, replayLedger(t, e, sale, checkedCapsule(t, input)), rh)
+				replayed, err := e.CheckSale(ra, MemoryHistory(replayLedger(t, e, sale, checkedCapsule(t, input))), rh)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -888,7 +888,7 @@ func rebind(t *testing.T, th *SaleThread, i int, agentInput json.RawMessage) {
 func TestTheSaleHistoryKeepsSalesOrderAndBindings(t *testing.T) {
 	sale := readSale(t, saleAsWritten)
 	check := checkedCapsule(t, "check-inputs/a-commit-again-1900.json")
-	historyOf := func(s SaleBundle) History {
+	historyOf := func(s SaleBundle) InputHistory {
 		t.Helper()
 		_, h, err := s.Check(check)
 		if err != nil {

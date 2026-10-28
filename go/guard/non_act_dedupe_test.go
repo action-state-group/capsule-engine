@@ -54,7 +54,7 @@ func TestANonActDealRecordIsNotDeduped(t *testing.T) {
 			if !isAct {
 				against = nil
 			}
-			d, err := e.Check(a, against)
+			d, err := e.Check(a, MemoryHistory(against))
 			if err != nil {
 				t.Fatalf("%s row %d: %v", name, i, err)
 			}

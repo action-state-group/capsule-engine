@@ -92,7 +92,7 @@ func newSeenBefore(w pack.Wicket, p pack.Pack) (seenBefore, error) {
 // otherwise a missing target is a population-a n/a; otherwise the fold's count of the
 // operator's accepted prior actions addressed to this target, failing at
 // zero (a first-time counterparty or recipient) and passing at one or more.
-func checkSeenBefore(a Action, ledger []Record, sb seenBefore) (c Constraint) {
+func checkSeenBefore(a Action, h *historyReader, sb seenBefore) (c Constraint) {
 	id := sb.id
 	rd := []string{"action_class"}
 	defer func() { c.reads = rd }()
@@ -109,9 +109,15 @@ func checkSeenBefore(a Action, ledger []Record, sb seenBefore) (c Constraint) {
 	if a.Target == nil {
 		return missingField(id, method, "target")
 	}
-	// ScanQuery(counterparty=action.operator): this operator's records only.
+	// ScanQuery(counterparty=action.operator): this operator's records only,
+	// those carrying the target under the fold's key.
+	q := sb.fold.query(*a.Target)
+	if q.Where == nil {
+		q.Where = map[string]string{}
+	}
+	q.Where[FieldOperator] = a.Operator
 	var mine []Record
-	for _, r := range ledger {
+	for _, r := range h.find(q) {
 		if r.Operator == a.Operator {
 			mine = append(mine, r)
 		}

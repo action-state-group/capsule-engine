@@ -307,7 +307,8 @@ the pack is in the next Go tag. Choosing which version a product serves stays wi
 The move keeps Muse's exported API (`NewEngine`, the `Check*` methods, `DecodeAction`,
 `DecodeCheckInput`, `ReadLedger`, `RecordFor`, `Report`, `ReadSaleBundle`, `pack.*`, `canon.*`,
 and so on). Only the import path changes, plus the three caller-side parameters in §1. There is
-no rename and no new abstraction. The module stays on v0. A cleanup of the surface, such as
+no rename and no new abstraction. The module stays on v0. (Later, capsule-engine#255 replaced
+`ReadLedger` and the `[]Record` ledger with `History`.) A cleanup of the surface, such as
 unexporting what no caller uses, is a separate PR made after Muse has switched, when the full
 caller list is known.
 

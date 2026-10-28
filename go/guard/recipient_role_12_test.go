@@ -62,7 +62,7 @@ func TestRecipientRole12AgreesWithTheEngine(t *testing.T) {
 		if err != nil {
 			t.Fatalf("%s: %v", want.Input, err)
 		}
-		c, err := e.constraintFor("recipient_role", a, h.ledger(), checkInputs{history: true, historyIncomplete: h.saleUnknown()})
+		c, err := e.constraintFor("recipient_role", a, MemoryHistory(h.records()), checkInputs{history: true, historyIncomplete: h.saleUnknown()})
 		if err != nil {
 			t.Fatal(err)
 		}

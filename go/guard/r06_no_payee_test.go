@@ -225,7 +225,7 @@ func testNoPayeeAsksOnR06(t *testing.T, v r06NoPayeeVectors) {
 			var ledger []Record
 			setupOutcomes := []string{}
 			for _, a := range setup {
-				d, err := e.Check(a, ledger)
+				d, err := e.Check(a, MemoryHistory(ledger))
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -235,7 +235,7 @@ func testNoPayeeAsksOnR06(t *testing.T, v r06NoPayeeVectors) {
 			if !slices.Equal(setupOutcomes, want.SetupOutcomes) {
 				t.Errorf("%s %s: setup %v, engine %v", version, name, setupOutcomes, want.SetupOutcomes)
 			}
-			d, err := e.Check(probe, ledger)
+			d, err := e.Check(probe, MemoryHistory(ledger))
 			if err != nil {
 				t.Fatal(err)
 			}

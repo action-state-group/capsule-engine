@@ -103,7 +103,7 @@ func TestReleaseOnAcceptance12AgreesWithTheEngineLive(t *testing.T) {
 		if err != nil {
 			t.Fatalf("%s: %v", want.Input, err)
 		}
-		c, err := e.constraintFor("release_on_acceptance", a, h.ledger(), checkInputs{history: true, historyIncomplete: h.saleUnknown()})
+		c, err := e.constraintFor("release_on_acceptance", a, MemoryHistory(h.records()), checkInputs{history: true, historyIncomplete: h.saleUnknown()})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -215,7 +215,7 @@ func TestTheReplayGivesTheShareTheLiveWindow(t *testing.T) {
 func commitAct(t *testing.T) string {
 	t.Helper()
 	in := decodeJSON[struct {
-		History []struct {
+		InputHistory []struct {
 			CapsuleID  string `json:"capsule_id"`
 			AgentInput struct {
 				Body struct {
@@ -224,7 +224,7 @@ func commitAct(t *testing.T) string {
 			} `json:"agent_input"`
 		} `json:"history"`
 	}](t, readFile(t, standaloneVectors, "check-inputs", "a-share-phone.json"))
-	for _, e := range in.History {
+	for _, e := range in.InputHistory {
 		if e.AgentInput.Body.Action == "commit" {
 			return e.CapsuleID
 		}
@@ -250,7 +250,7 @@ func recordTime(t *testing.T, sale SaleBundle, capsuleID string) time.Time {
 	return time.Time{}
 }
 
-// A replay with no window given (a History built without SaleBundle.Check)
+// A replay with no window given (an InputHistory built without SaleBundle.Check)
 // reads the replay's own ledger, as the engine's replay outside a sale
 // does: a decision record carries no thread counterparty, so a share that
 // needs the acceptance refuses even with the sale's accepted commit on that
@@ -272,10 +272,10 @@ func TestWithNoWindowTheShareReadsTheReplayLedger(t *testing.T) {
 	if decision.ActionClass == nil || *decision.ActionClass != "agreement.accept" || decision.ItemRef == nil || *decision.ItemRef != *a.ItemRef {
 		t.Fatalf("the commit is not this sale's acceptance: %+v", decision)
 	}
-	if acceptance, unknown := saleAcceptance(a, []Record{decision}, checkInputs{}, e.release.AcceptanceClasses); acceptance == nil || unknown != "" {
+	if acceptance, unknown := saleAcceptance(a, &historyReader{h: MemoryHistory([]Record{decision})}, checkInputs{}, e.release.AcceptanceClasses); acceptance == nil || unknown != "" {
 		t.Fatalf("the ledger's commit is not read as the acceptance (%q)", unknown)
 	}
-	c, err := e.constraintFor("release_on_acceptance", a, []Record{decision}, checkInputs{sale: &h})
+	c, err := e.constraintFor("release_on_acceptance", a, MemoryHistory([]Record{decision}), checkInputs{sale: &h})
 	if err != nil {
 		t.Fatal(err)
 	}

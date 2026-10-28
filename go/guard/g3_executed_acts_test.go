@@ -26,7 +26,7 @@ func executedAct(id string, spend *int64) Record {
 
 func capsWindow(t *testing.T, e *Engine, acts []Record) (Constraint, CapsFacts) {
 	t.Helper()
-	d, err := e.CheckWithHistory(purchaseAction(t, 3, 200), History{Days: 31, Complete: true, Acts: acts})
+	d, err := e.CheckWithHistory(purchaseAction(t, 3, 200), InputHistory{Days: 31, Complete: true, Acts: acts})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -261,9 +261,9 @@ func TestAnExecutedActsSpendIsReadOrMarkedUnreadable(t *testing.T) {
 func realFyiAct(t *testing.T) json.RawMessage {
 	t.Helper()
 	in := decodeJSON[struct {
-		History []json.RawMessage `json:"history"`
+		InputHistory []json.RawMessage `json:"history"`
 	}](t, readFile(t, "testdata", "real-fyi-act", "purchase-commit-repeat.input.json"))
-	for _, raw := range in.History {
+	for _, raw := range in.InputHistory {
 		var h struct {
 			ActionType string `json:"action_type"`
 		}
