@@ -237,7 +237,7 @@ func ledgerSteps(t *testing.T, e *Engine, c conformanceCase, raw []byte) (steps 
 		if err != nil {
 			return nil, "decode: " + err.Error()
 		}
-		d, err := e.Check(a, ledger)
+		d, err := e.Check(a, MemoryHistory(ledger))
 		if err != nil {
 			return nil, "check: " + err.Error()
 		}
@@ -337,7 +337,7 @@ func replaySteps(t *testing.T, e *Engine, s SaleBundle, sealed map[string]string
 		if err != nil || a.statesNoAct || len(a.Unevaluable()) > 0 {
 			continue
 		}
-		d, err := e.CheckSale(a, ledger, h)
+		d, err := e.CheckSale(a, MemoryHistory(ledger), h)
 		if err != nil {
 			steps = append(steps, replayStep{id: id, decision: conformanceDecision{Error: "check: " + err.Error()}})
 			continue

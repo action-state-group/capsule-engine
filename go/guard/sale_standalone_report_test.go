@@ -173,7 +173,7 @@ func standaloneReplayAgrees(t *testing.T, dir string, decisions, wantAccepted in
 		if err != nil {
 			t.Fatalf("%s: %v", at, err)
 		}
-		d, err := e.CheckSale(a, replayLedger(t, e, sale, id), h)
+		d, err := e.CheckSale(a, MemoryHistory(replayLedger(t, e, sale, id)), h)
 		if err != nil {
 			t.Fatalf("%s: %v", at, err)
 		}
@@ -511,7 +511,7 @@ func TestAnRC20PickupAreaShareKeepsItsClasses(t *testing.T) {
 		if !slices.Equal(a.DisclosedClasses, c.classes) {
 			t.Errorf("%s: classes %v, want %v", c.input, a.DisclosedClasses, c.classes)
 		}
-		got, err := e.constraintFor("recipient_role", a, h.ledger(), checkInputs{history: true, historyIncomplete: h.saleUnknown()})
+		got, err := e.constraintFor("recipient_role", a, MemoryHistory(h.records()), checkInputs{history: true, historyIncomplete: h.saleUnknown()})
 		if err != nil {
 			t.Fatal(err)
 		}

@@ -69,7 +69,7 @@ func TestDedupeKeysOnTheCheckedActMatchTheEngine(t *testing.T) {
 			if err != nil {
 				t.Fatalf("%s step %d: %v", name, i, err)
 			}
-			if d, err = e.Check(a, ledger); err != nil {
+			if d, err = e.Check(a, MemoryHistory(ledger)); err != nil {
 				t.Fatalf("%s step %d: %v", name, i, err)
 			}
 			key, err := equivalenceKeyForAction(a)

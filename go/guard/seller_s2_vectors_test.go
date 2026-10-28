@@ -72,7 +72,7 @@ func runS2VectorsOn(t *testing.T, e *Engine, p pack.Pack, decisionsDir, commit, 
 		if err != nil {
 			t.Fatalf("%s: %v", step.Name, err)
 		}
-		d, err := e.CheckWithRecords(a, ledger, corpus.Records[step.TaskAuthorityRecord], corpus.Records[step.AuthorizationRecord])
+		d, err := e.CheckWithRecords(a, MemoryHistory(ledger), corpus.Records[step.TaskAuthorityRecord], corpus.Records[step.AuthorizationRecord])
 		if err != nil {
 			t.Fatalf("%s: %v", step.Name, err)
 		}
@@ -271,10 +271,10 @@ func TestRequiredDisclosureAgreesWithTheEngine(t *testing.T) {
 }
 
 // A ledger capsule's asg_payload.representation_class is what the fold
-// counts: ReadLedger reads it, and the record a decision leaves carries the
+// counts: DecodeCapsule reads it, and the record a decision leaves carries the
 // action's.
 func TestLedgerCarriesTheStatementClass(t *testing.T) {
-	recs, err := ReadLedger(strings.NewReader(`{"capsule_id":"c1","operator":"op","asg_payload":{"target":"cp/a","representation_class":"condition"}}` + "\n"))
+	recs, err := readCapsules(strings.NewReader(`{"capsule_id":"c1","operator":"op","asg_payload":{"target":"cp/a","representation_class":"condition"}}` + "\n"))
 	if err != nil {
 		t.Fatal(err)
 	}

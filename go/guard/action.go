@@ -28,7 +28,6 @@
 package guard
 
 import (
-	"bufio"
 	"bytes"
 	"encoding/json"
 	"errors"
@@ -558,49 +557,6 @@ type capsuleJSON struct {
 		ParentCapsuleID *string `json:"parent_capsule_id"`
 		Relation        *string `json:"relation"`
 	} `json:"chain"`
-}
-
-// ReadLedger reads Agent Action Capsules, one JSON object per line, in ledger
-// order.
-func ReadLedger(r io.Reader) ([]Record, error) {
-	var out []Record
-	sc := bufio.NewScanner(r)
-	sc.Buffer(make([]byte, 0, 1<<16), 1<<24)
-	for n := 1; sc.Scan(); n++ {
-		line := bytes.TrimSpace(sc.Bytes())
-		if len(line) == 0 {
-			continue
-		}
-		var c capsuleJSON
-		if err := json.Unmarshal(line, &c); err != nil {
-			return nil, fmt.Errorf("ledger line %d: %w", n, err)
-		}
-		rec := Record{CapsuleID: c.CapsuleID, ActionID: c.ActionID, ActionType: c.ActionType,
-			Operator: c.Operator, Developer: c.Developer, Timestamp: c.Timestamp}
-		if c.Disposition != nil {
-			rec.Decision = c.Disposition.Decision
-		}
-		if c.Payload != nil {
-			rec.Target, rec.AmountMinor, rec.CounterpartyAccountRef = c.Payload.Target, c.Payload.AmountMinor, c.Payload.CounterpartyAccountRef
-			rec.ActionClass, rec.SpendMinor, rec.TaxonomyVersion = c.Payload.ActionClass, c.Payload.SpendMinor, c.Payload.TaxonomyVersion
-			rec.ReturnedMinor, rec.ReversesRef, rec.DealID, rec.Currency = c.Payload.ReturnedMinor, c.Payload.ReversesRef, c.Payload.DealID, c.Payload.Currency
-			rec.TaskAuthorityRef, rec.ItemRef = c.Payload.TaskAuthorityRef, c.Payload.ItemRef
-			rec.RepresentationClass, rec.EquivalenceKeyDigest = c.Payload.RepresentationClass, c.Payload.EquivalenceKeyDigest
-			if s := c.Payload.Stated; s != nil {
-				rec.Stated = &Statement{Class: s.Class, SourceKind: s.SourceKind, DealID: s.DealID, Claim: s.Claim}
-			}
-			rec.LiveHistory = c.Payload.LiveHistory
-			rec.SpendUnreadable = c.Payload.SpendUnreadable != nil && *c.Payload.SpendUnreadable
-			if c.Payload.Checkpoint != nil {
-				rec.DryRun = c.Payload.Checkpoint.DryRun
-			}
-		}
-		if c.Chain != nil {
-			rec.ChainParent, rec.ChainRelation = c.Chain.ParentCapsuleID, c.Chain.Relation
-		}
-		out = append(out, rec)
-	}
-	return out, sc.Err()
 }
 
 func (r Record) accepted() bool { return r.Decision != nil && *r.Decision == "accept" }

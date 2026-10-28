@@ -246,7 +246,7 @@ func TestSellerVectorsPortedChecksAgree(t *testing.T) {
 		if step.DryRun {
 			rec.DryRun = ptr(true)
 		}
-		d, err := e.checkWith(a, ledger, checkInputs{taskAuthority: corpus.TaskAuthorityRecord, opening: corpus.CommercialBoundsOpening, authorization: step.AuthorizationRecord})
+		d, err := e.checkWith(a, MemoryHistory(ledger), checkInputs{taskAuthority: corpus.TaskAuthorityRecord, opening: corpus.CommercialBoundsOpening, authorization: step.AuthorizationRecord})
 		ledger = append(ledger, rec)
 		if a.CitedMandateCapsuleID != nil {
 			if !errors.Is(err, ErrCitedMandate) {

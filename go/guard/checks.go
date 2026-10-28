@@ -142,9 +142,11 @@ func inAnotherDeal(a Action, r Record) bool {
 
 // checkDedupe: exact-match equivalence over records of the same action_type
 // whose timestamp is at or after (timestamp - window_days); the first match
-// in ledger order fails (dedupe.py:58-83, engine.py window, cll ScanQuery:
-// since is an inclusive instant and an unparseable timestamp is left out).
-func (e *Engine) checkDedupe(a Action, ledger []Record, at time.Time) (c Constraint, err error) {
+// in log order fails (dedupe.py:58-83, engine.py window: since is an
+// inclusive instant and an unparseable timestamp is left out). It asks the
+// history for the records of a's action_type (of every action_type when a's
+// taxonomy is pinned) since the window's start.
+func (e *Engine) checkDedupe(a Action, h *historyReader, at time.Time) (c Constraint, err error) {
 	const id, method = "dedupe", "exact_match_index_v0"
 	// The key's fields (or the caller's override alone), and the timestamp
 	// the window is anchored on.
@@ -167,6 +169,11 @@ func (e *Engine) checkDedupe(a Action, ledger []Record, at time.Time) (c Constra
 		rd = append(rd, "returned_minor", "reverses_ref")
 	}
 	since := at.AddDate(0, 0, -e.dedupeWindowDays)
+	q := Query{Since: since}
+	if a.TaxonomyVersion == nil {
+		q.Where = map[string]string{FieldActionType: a.ActionType}
+	}
+	ledger := h.find(q)
 	var other *Record
 	// dedupe.py check_dedupe (f334dd5): an act stated against a pinned
 	// taxonomy is matched across every action_type (a deal check is fyi, the
@@ -243,7 +250,7 @@ func (e *Engine) checkDedupe(a Action, ledger []Record, at time.Time) (c Constra
 // to pass). A class with a window limit and no per-action limit is judged
 // on the window alone, as caps.py does. Limits are looked up by canonical
 // class (caps.py cap_for).
-func (e *Engine) checkCaps(a Action, ledger []Record, at time.Time, in checkInputs) (c Constraint) {
+func (e *Engine) checkCaps(a Action, h *historyReader, at time.Time, in checkInputs) (c Constraint) {
 	const id = "caps"
 	if e.capsFold == nil {
 		// engine.py _check_caps (e0e664d): no caps definition is configured,
@@ -273,6 +280,16 @@ func (e *Engine) checkCaps(a Action, ledger []Record, at time.Time, in checkInpu
 		keyValue = a.Operator
 	}
 	rd = append(rd, e.capsFold.key, "timestamp")
+	// A check input's history is read whole: the engine drops a copy of an act
+	// across all of it (report/replay.py ExecutedActs) before the key is read,
+	// so an accepted copy under another key still counts the act once
+	// (outsideTheFold). A store's records are asked for by the key, as caps.py
+	// reads them.
+	q := e.capsFold.query(keyValue)
+	if in.history {
+		q = Query{}
+	}
+	ledger := h.find(q)
 	spend, reversals := e.capsFold.evaluate(ledger, keyValue, at)
 	// An unchecked act (ruling (a)) and an executed act with no
 	// recorded decision (the G3 ruling) are spend the fold never sums
@@ -527,8 +544,9 @@ const inPersonHandover = "in_person"
 
 // checkCounterpartyIdentityChange compares the account against the latest
 // accepted record for the same target and action_type that recorded one
-// (counterparty_identity_change.py:41-95). No such record: out of scope.
-func checkCounterpartyIdentityChange(a Action, ledger []Record, c counterpartyConfig) (out Constraint) {
+// (counterparty_identity_change.py:41-95), asking the history for the
+// records of a's action_type and target. No such record: out of scope.
+func checkCounterpartyIdentityChange(a Action, h *historyReader, c counterpartyConfig) (out Constraint) {
 	const id, method = "counterparty_identity_change", "prior_recorded_value_v0"
 	rd := []string{"action_class"}
 	defer func() { out.reads = rd }()
@@ -542,6 +560,7 @@ func checkCounterpartyIdentityChange(a Action, ledger []Record, c counterpartyCo
 	if a.CounterpartyAccountRef == nil {
 		return missingField(id, method, "counterparty_account_ref")
 	}
+	ledger := h.find(Query{Where: map[string]string{FieldActionType: a.ActionType, FieldTarget: *a.Target}})
 	var prior *Record
 	for i, r := range ledger {
 		if r.ActionType != a.ActionType || r.Target == nil || *r.Target != *a.Target || !r.accepted() || r.CounterpartyAccountRef == nil {

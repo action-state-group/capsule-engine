@@ -204,7 +204,7 @@ func TestTypedCheckIsKeyedOnTheSealedPayee(t *testing.T) {
 					// The companion: the replay gives it no decision.
 					continue
 				}
-				d, err := e.Check(a, ledger)
+				d, err := e.Check(a, MemoryHistory(ledger))
 				if err != nil {
 					t.Fatal(err)
 				}

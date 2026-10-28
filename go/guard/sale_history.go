@@ -17,7 +17,7 @@ import (
 // thread sealed before the check, oldest first, with the sale's key beside
 // it as item_ref and, from the check the act rests on, the counterparty
 // that check sealed and its counterparty_profile companion. Each entry is
-// read by the reader a live check's history is read by (History.AddEntry).
+// read by the reader a live check's history is read by (InputHistory.AddEntry).
 // The history is complete only when the sale is complete and the check's
 // whole second falls before CertifiedUntil. Records are ordered by the
 // whole second they name, and two threads are two logs, so records of two
@@ -34,10 +34,10 @@ import (
 // (replay.py _companion_profiles) and the sale's key as item_ref; and the
 // sale's history for it, which single_commitment reads whole and
 // release_on_acceptance 1.2.0 reads cut to the live window
-// (History.releaseWindow; CheckSale), with the task-authority record the
+// (InputHistory.releaseWindow; CheckSale), with the task-authority record the
 // sale discloses under the digest the check cites (TaskAuthorityRecord).
 // It is an error when no carried thread holds the record.
-func (s SaleBundle) Check(capsuleID string) (Action, History, error) {
+func (s SaleBundle) Check(capsuleID string) (Action, InputHistory, error) {
 	for t, thread := range s.Threads {
 		for i, r := range thread.records {
 			if id, _ := textOf(r["capsule_id"]); id != capsuleID {
@@ -52,7 +52,7 @@ func (s SaleBundle) Check(capsuleID string) (Action, History, error) {
 			}
 			a, err := decodeRecord(thread.bundle, capsuleID, profile)
 			if err != nil {
-				return Action{}, History{}, err
+				return Action{}, InputHistory{}, err
 			}
 			a.ItemRef = nil
 			if s.Key != nil {
@@ -61,11 +61,11 @@ func (s SaleBundle) Check(capsuleID string) (Action, History, error) {
 			}
 			h, err := s.history(t, i, a, 0)
 			if err != nil {
-				return Action{}, History{}, err
+				return Action{}, InputHistory{}, err
 			}
 			w, err := s.history(t, i, a, rulesHistoryDays)
 			if err != nil {
-				return Action{}, History{}, err
+				return Action{}, InputHistory{}, err
 			}
 			h.releaseWindow = &w
 			h.TaskAuthorityRecord = disclosedTaskAuthority(s.disclosed(), a.TaskAuthorityRef)
@@ -73,7 +73,7 @@ func (s SaleBundle) Check(capsuleID string) (Action, History, error) {
 			return a, h, nil
 		}
 	}
-	return Action{}, History{}, fmt.Errorf("record: no thread the sale bundle carries holds %s", capsuleID)
+	return Action{}, InputHistory{}, fmt.Errorf("record: no thread the sale bundle carries holds %s", capsuleID)
 }
 
 // disclosed is every carried thread's disclosed agent_input, by capsule id
@@ -110,7 +110,7 @@ const rulesHistoryDays = 31
 // days above 0, an act sealed more than that many days before the check is
 // left out, as capsulectl leaves it out of a live check's history; it is
 // still complete when nothing in that window is missing.
-func (s SaleBundle) history(own, index int, a Action, days int) (History, error) {
+func (s SaleBundle) history(own, index int, a Action, days int) (InputHistory, error) {
 	at := secondOf(s.Threads[own].records[index]["timestamp"])
 	complete := s.Complete() && at != nil && s.CertifiedUntil != nil && !at.Add(time.Second).After(*s.CertifiedUntil)
 	type dated struct {
@@ -154,10 +154,10 @@ func (s SaleBundle) history(own, index int, a Action, days int) (History, error)
 	slices.SortStableFunc(before, func(x, y dated) int {
 		return cmp.Or(x.at.Compare(y.at), cmp.Compare(x.thread, y.thread), cmp.Compare(x.index, y.index))
 	})
-	h := History{Complete: complete}
+	h := InputHistory{Complete: complete}
 	for _, b := range before {
 		if err := h.addSaleEntry(b.entry, a); err != nil {
-			return History{}, err
+			return InputHistory{}, err
 		}
 	}
 	return h, nil
@@ -174,7 +174,7 @@ type saleEntry struct {
 // (AddEntry). An entry with no bound agent_input, or one whose act cannot
 // be read, is written unread with its item_ref, as the engine's history
 // ledger writes an entry action_for_history_entry cannot read.
-func (h *History) addSaleEntry(e saleEntry, a Action) error {
+func (h *InputHistory) addSaleEntry(e saleEntry, a Action) error {
 	if e.shown {
 		if _, err := DecodeHistoryAct(e.raw); err == nil {
 			return h.AddEntry(e.raw, a)

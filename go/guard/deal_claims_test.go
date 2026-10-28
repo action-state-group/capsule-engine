@@ -164,7 +164,7 @@ func TestADealClaimTheHistoryGaveIsOneStatement(t *testing.T) {
 			t.Fatal(err)
 		}
 		var written []string
-		for _, r := range h.ledger() {
+		for _, r := range h.records() {
 			if r.Stated != nil && r.Stated.DealID == *a.DealID {
 				written = append(written, r.Stated.Claim)
 			}
@@ -193,7 +193,7 @@ func TestDealClaimsAreReadAfterTheHistory(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	ledger := h.ledger()
+	ledger := h.records()
 	if len(h.Acts) == 0 || len(h.claimed) != 1 || len(ledger) != len(h.Acts)+1 {
 		t.Fatalf("%d acts, %d claimed, ledger %d", len(h.Acts), len(h.claimed), len(ledger))
 	}

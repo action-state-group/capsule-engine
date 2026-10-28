@@ -71,7 +71,8 @@ type pythonTotals struct {
 // weekly_spend_minor and the same reversal summary, case by case: a linked
 // cancel takes its charge back out, an unlinked one does nothing, a dry run
 // is left out, refunds stop at what their charge has left. The records go
-// through ReadLedger, so the Go side reads them as it reads a real ledger.
+// through DecodeCapsule, so the Go side reads them as it reads a stored
+// capsule.
 func TestSpendWeeklyV3MatchesPythonOnOneCorpus(t *testing.T) {
 	testFoldMatchesPython(t, capsV5Engine(t), "corpus.json", "python-totals.json")
 }
@@ -82,7 +83,7 @@ func TestSpendWeeklyV3MatchesPythonOnOneCorpus(t *testing.T) {
 // copy of a history act (live_history disposition) is left out, an
 // executed record with no amount or a dry run is not counted, and an
 // executed cancel is an unlinked reversal. The records go through
-// ReadLedger, so asg_payload.live_history is read as sealed.
+// DecodeCapsule, so asg_payload.live_history is read as sealed.
 func TestSpendWeeklyV31MatchesPythonOnOneCorpus(t *testing.T) {
 	testFoldMatchesPython(t, shippedCapsEngine(t), "corpus-3.1.0.json", "python-totals-3.1.0.json")
 }
@@ -114,7 +115,7 @@ func testFoldMatchesPython(t *testing.T, e *Engine, corpusFile, totalsFile strin
 			}
 			lines.WriteByte('\n')
 		}
-		records, err := ReadLedger(&lines)
+		records, err := readCapsules(&lines)
 		if err != nil {
 			t.Fatalf("%s: %v", c.Name, err)
 		}
@@ -194,7 +195,7 @@ func TestCapsV5MatchesPythonDecisions(t *testing.T) {
 		if err != nil {
 			t.Fatalf("%s: %v", s.Scenario, err)
 		}
-		d, err := e.Check(a, ledgers[s.Config])
+		d, err := e.Check(a, MemoryHistory(ledgers[s.Config]))
 		if err != nil {
 			t.Fatalf("%s: %v", s.Scenario, err)
 		}

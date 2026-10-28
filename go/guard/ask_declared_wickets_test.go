@@ -124,7 +124,7 @@ func TestASKDeclaredChecksMatchTheEngine(t *testing.T) {
 			if a, err = DecodeAction(bytes.NewReader(step.Action)); err != nil {
 				t.Fatalf("%s: %v", c.Name, err)
 			}
-			if d, err = e.CheckWithTaskAuthority(a, ledger, step.TaskAuthorityRecord); err != nil {
+			if d, err = e.CheckWithTaskAuthority(a, MemoryHistory(ledger), step.TaskAuthorityRecord); err != nil {
 				if a.CitedMandateCapsuleID == nil || want.Outcome != Deny || !slices.Contains(want.FailingConstraints, "verify_before_dispatch") {
 					t.Fatalf("%s: %v", c.Name, err)
 				}

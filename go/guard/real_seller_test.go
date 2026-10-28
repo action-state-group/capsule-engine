@@ -171,7 +171,7 @@ func realSellerRun(t *testing.T, e *Engine, p pack.Pack, want realSellerExpected
 			if a.statesNoAct {
 				continue
 			}
-			d, err := e.Check(a, ledger)
+			d, err := e.Check(a, MemoryHistory(ledger))
 			if err != nil {
 				t.Fatalf("%s %s: %v", name, r.CapsuleID, err)
 			}

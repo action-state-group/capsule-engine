@@ -53,7 +53,7 @@ func TestRollupVerdictIsTheEngineDecision(t *testing.T) {
 		if err != nil {
 			t.Fatalf("%s: %v", s.Scenario, err)
 		}
-		d, err := e.CheckWithTaskAuthority(a, ledger, s.TaskAuthorityRecord)
+		d, err := e.CheckWithTaskAuthority(a, MemoryHistory(ledger), s.TaskAuthorityRecord)
 		if err != nil {
 			t.Fatalf("%s: %v", s.Scenario, err)
 		}

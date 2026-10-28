@@ -452,6 +452,24 @@ func (f fold) inWindowFor(r Record, keyValue string, anchor time.Time) bool {
 	return k.kind == str && k.s == keyValue && f.within(vals, anchor)
 }
 
+// query is what the fold asks a history for to evaluate keyValue: the
+// records carrying keyValue under its key. It sets no lower time bound,
+// because outsideTheFold counts an act once across all the copies it is
+// given, an accepted copy before the window included. When the fold reads its key with
+// a default, a record missing the key is read under the default, so every
+// record is asked for.
+func (f fold) query(keyValue string) Query {
+	if f.key != FieldOperator && f.key != FieldDeveloper && f.key != FieldTarget {
+		return Query{}
+	}
+	for _, rd := range f.reads {
+		if rd.path == f.key && rd.hasDefault {
+			return Query{}
+		}
+	}
+	return Query{Where: map[string]string{f.key: keyValue}}
+}
+
 // passes is engine.py _passes_filter for eq, ne and in.
 func (f fold) passes(vals map[string]value) bool {
 	for _, c := range f.filters {

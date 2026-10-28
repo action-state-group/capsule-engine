@@ -19,13 +19,13 @@ import (
 //   - the history: its scope, the task-authority record and floor opening
 //     beside the check, the opening of a represent check's words in the
 //     record entry (representing_opening, capsule-cli rules_checker.go;
-//     capsule-engine #205), and each entry (History.AddEntry); then the deal's
+//     capsule-engine #205), and each entry (InputHistory.AddEntry); then the deal's
 //     earlier agent claims beside the record entry (record.deal_claims,
-//     AMENDMENT 9; History.AddDealClaims).
-func DecodeCheckInput(raw []byte) (Action, History, error) {
+//     AMENDMENT 9; InputHistory.AddDealClaims).
+func DecodeCheckInput(raw []byte) (Action, InputHistory, error) {
 	var in struct {
 		Record       json.RawMessage   `json:"record"`
-		History      []json.RawMessage `json:"history"`
+		InputHistory []json.RawMessage `json:"history"`
 		HistoryScope struct {
 			Days     int  `json:"days"`
 			Complete bool `json:"complete"`
@@ -46,18 +46,18 @@ func DecodeCheckInput(raw []byte) (Action, History, error) {
 		PartyRole json.RawMessage `json:"party_role"`
 	}
 	if err := json.Unmarshal(raw, &in); err != nil {
-		return Action{}, History{}, fmt.Errorf("input: %w", err)
+		return Action{}, InputHistory{}, fmt.Errorf("input: %w", err)
 	}
 	a, err := DecodeCheckInputRecord(in.Record)
 	if err != nil {
-		return Action{}, History{}, err
+		return Action{}, InputHistory{}, err
 	}
 	var entry struct {
 		ItemRef    json.RawMessage `json:"item_ref"`
 		ProposalAt json.RawMessage `json:"proposal_at"`
 	}
 	if err := json.Unmarshal(in.Record, &entry); err != nil {
-		return Action{}, History{}, fmt.Errorf("record: %w", err)
+		return Action{}, InputHistory{}, fmt.Errorf("record: %w", err)
 	}
 	itemRef := in.ItemRef
 	if isJSONNull(itemRef) {
@@ -65,11 +65,11 @@ func DecodeCheckInput(raw []byte) (Action, History, error) {
 	}
 	a = withProposalAt(WithItemRef(a, itemRef), entry.ProposalAt)
 	a = WithPartyRole(a, in.PartyRole)
-	h := History{Days: in.HistoryScope.Days, Complete: in.HistoryScope.Complete, TaskAuthorityRecord: in.TaskAuthorityRecord,
+	h := InputHistory{Days: in.HistoryScope.Days, Complete: in.HistoryScope.Complete, TaskAuthorityRecord: in.TaskAuthorityRecord,
 		CommercialBoundsOpening: in.CommercialBoundsOpening, RepresentingOpening: objectOf(in.Record)[representingOpeningInput]}
-	for _, e := range in.History {
+	for _, e := range in.InputHistory {
 		if err := h.AddEntry(e, a); err != nil {
-			return Action{}, History{}, err
+			return Action{}, InputHistory{}, err
 		}
 	}
 	a = h.AddDealClaims(in.Record, a)

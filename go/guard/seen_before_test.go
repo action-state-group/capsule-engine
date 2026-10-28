@@ -37,7 +37,7 @@ func prior(op, target, decision string, dryRun *bool) Record {
 
 func seenResult(t *testing.T, e *Engine, a Action, ledger []Record) Constraint {
 	t.Helper()
-	d, err := e.Check(a, ledger)
+	d, err := e.Check(a, MemoryHistory(ledger))
 	if err != nil {
 		t.Fatal(err)
 	}

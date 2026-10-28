@@ -77,7 +77,7 @@ func TestAProfilePayeeNeverReachesAReasonOrTheReport(t *testing.T) {
 
 func assertNoProfilePayee(t *testing.T, e *Engine, name string, a Action, ledger []Record) {
 	t.Helper()
-	d, err := e.Check(a, ledger)
+	d, err := e.Check(a, MemoryHistory(ledger))
 	if err != nil {
 		t.Fatal(err)
 	}

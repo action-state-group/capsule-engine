@@ -109,7 +109,7 @@ func testLeg3ParityPerRecord(t *testing.T, fx fixtureSet) {
 		if s.CapsuleID != ledger[i+1].CapsuleID || ledger[i+1].ActionID != a.ActionID {
 			t.Fatalf("%s: live Python run and vendored ledger disagree on record %d", s.Scenario, i+1)
 		}
-		d, err := e.CheckWithTaskAuthority(a, ledger[:i+1], s.TaskAuthorityRecord)
+		d, err := e.CheckWithTaskAuthority(a, MemoryHistory(ledger[:i+1]), s.TaskAuthorityRecord)
 		if err != nil {
 			t.Fatalf("%s: %v", s.Scenario, err)
 		}

@@ -84,7 +84,7 @@ func TestRepresentCheckPromiseAgreesWithTheEngine(t *testing.T) {
 		if h.TaskAuthorityRecord == nil {
 			t.Errorf("replay %s: the sale's task authority is not bound", name)
 		}
-		d, err := e.CheckSale(a, replayLedger(t, e, sale, id), h)
+		d, err := e.CheckSale(a, MemoryHistory(replayLedger(t, e, sale, id)), h)
 		if err != nil {
 			t.Fatal(err)
 		}

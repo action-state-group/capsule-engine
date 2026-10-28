@@ -131,11 +131,11 @@ func testExecutedActsMatchTheEngine(t *testing.T, set string, sequences, wantSte
 
 // g3Envelope decodes an external-check-input/v0 envelope as the plugin's
 // check --emit does: the record, and the history acts with their scope.
-func g3Envelope(t *testing.T, raw []byte) (Action, History) {
+func g3Envelope(t *testing.T, raw []byte) (Action, InputHistory) {
 	t.Helper()
 	var in struct {
 		Record       json.RawMessage   `json:"record"`
-		History      []json.RawMessage `json:"history"`
+		InputHistory []json.RawMessage `json:"history"`
 		HistoryScope struct {
 			Days     int  `json:"days"`
 			Complete bool `json:"complete"`
@@ -150,8 +150,8 @@ func g3Envelope(t *testing.T, raw []byte) (Action, History) {
 		t.Fatal(err)
 	}
 	a = WithItemRef(a, in.ItemRef)
-	h := History{Days: in.HistoryScope.Days, Complete: in.HistoryScope.Complete}
-	for _, act := range in.History {
+	h := InputHistory{Days: in.HistoryScope.Days, Complete: in.HistoryScope.Complete}
+	for _, act := range in.InputHistory {
 		r, err := DecodeHistoryAct(act)
 		if err != nil {
 			t.Fatal(err)
@@ -169,7 +169,7 @@ func g3Envelope(t *testing.T, raw []byte) (Action, History) {
 // record counts its amount; the engine's copy of a history act
 // (live_history disposition) is left out beside its executed record; and a
 // per-action failure stands beside an unreadable record. The records go
-// through ReadLedger and Check, as a --ledger check reads them; caps'
+// through DecodeCapsule and Check, as a store-backed check reads them; caps'
 // result, reason and sealed evidence digest must be the engine's.
 func TestExecutedRecordsOnALedgerMatchTheEngine(t *testing.T) {
 	var py struct {
@@ -202,7 +202,7 @@ func TestExecutedRecordsOnALedgerMatchTheEngine(t *testing.T) {
 			}
 			lines.WriteByte('\n')
 		}
-		ledger, err := ReadLedger(&lines)
+		ledger, err := readCapsules(&lines)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -210,7 +210,7 @@ func TestExecutedRecordsOnALedgerMatchTheEngine(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		d, err := e.Check(a, ledger)
+		d, err := e.Check(a, MemoryHistory(ledger))
 		if err != nil {
 			t.Fatal(err)
 		}

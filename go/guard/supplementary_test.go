@@ -38,7 +38,7 @@ func TestLeg3SupplementaryParity(t *testing.T) {
 		if err != nil {
 			t.Fatalf("%s: %v", s.Scenario, err)
 		}
-		d, err := e.Check(a, ledger)
+		d, err := e.Check(a, MemoryHistory(ledger))
 		if err != nil {
 			t.Fatalf("%s: %v", s.Scenario, err)
 		}

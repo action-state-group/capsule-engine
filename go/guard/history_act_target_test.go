@@ -17,12 +17,12 @@ type historyEntry map[string]json.RawMessage
 func givenHistoryEntry(t *testing.T, way string) historyEntry {
 	t.Helper()
 	env := decodeJSON[struct {
-		History []historyEntry `json:"history"`
+		InputHistory []historyEntry `json:"history"`
 	}](t, readFile(t, atB455063a, "history-act-counterparty", "given", "typed", "repeat-in-one-deal."+way+".json"))
-	if len(env.History) != 1 {
-		t.Fatalf("%s: %d history entries", way, len(env.History))
+	if len(env.InputHistory) != 1 {
+		t.Fatalf("%s: %d history entries", way, len(env.InputHistory))
 	}
-	return env.History[0]
+	return env.InputHistory[0]
 }
 
 // typedRepeatEntry is the typed repeat's one history act as the engine gives
@@ -234,9 +234,9 @@ func TestDedupeKeysAHistoryActOnItsSpend(t *testing.T) {
 // first), never in its body.
 func TestAnActionStepIsReadFromItsBlockWhateverItsType(t *testing.T) {
 	env := decodeJSON[struct {
-		History []historyEntry `json:"history"`
+		InputHistory []historyEntry `json:"history"`
 	}](t, readFile(t, atB455063a, "history-act-counterparty", "given", "x-deal-v0", "repeat-in-one-deal.as-sealed.json"))
-	entry := env.History[0]
+	entry := env.InputHistory[0]
 	delete(entry, "counterparty_profile")
 	delete(entry, "counterparty")
 	block, body := strings.Repeat("ab", 32), strings.Repeat("cd", 32)

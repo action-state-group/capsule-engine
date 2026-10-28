@@ -243,7 +243,7 @@ func TestPayeeProfileReplayMatchesTheEngine(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			dd, err := e.checkDedupe(a, ledger, at)
+			dd, err := e.checkDedupe(a, &historyReader{h: MemoryHistory(ledger)}, at)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -378,7 +378,7 @@ func TestPayeeProfileSeenBeforeMatchesTheEngine(t *testing.T) {
 		if e.seenBefore.fold.digest != "73dbf8cd8a36fadca0ac823d2b17592fdc457c24081bc44667f032601e914033" {
 			t.Fatalf("r06 reads fold %s", e.seenBefore.fold.digest)
 		}
-		sb := checkSeenBefore(a, []Record{r}, e.seenBefore)
+		sb := checkSeenBefore(a, &historyReader{h: MemoryHistory([]Record{r})}, e.seenBefore)
 		sbDigest, _, err := sb.EvidenceDigest()
 		if err != nil {
 			t.Fatal(err)
@@ -387,7 +387,7 @@ func TestPayeeProfileSeenBeforeMatchesTheEngine(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		dd, err := e.checkDedupe(a, []Record{r}, at)
+		dd, err := e.checkDedupe(a, &historyReader{h: MemoryHistory([]Record{r})}, at)
 		if err != nil {
 			t.Fatal(err)
 		}

@@ -32,14 +32,14 @@ type historyActRow struct {
 }
 
 type buyerLiveVector struct {
-	Set     string            `json:"set"`
-	Input   string            `json:"input"`
-	Variant string            `json:"variant"`
-	History []historyActRow   `json:"history"`
-	Outcome string            `json:"outcome"`
-	Verdict string            `json:"verdict"`
-	Rules   map[string]string `json:"rules"`
-	Dedupe  struct {
+	Set          string            `json:"set"`
+	Input        string            `json:"input"`
+	Variant      string            `json:"variant"`
+	InputHistory []historyActRow   `json:"history"`
+	Outcome      string            `json:"outcome"`
+	Verdict      string            `json:"verdict"`
+	Rules        map[string]string `json:"rules"`
+	Dedupe       struct {
 		Result string `json:"result"`
 		Reason string `json:"reason"`
 	} `json:"dedupe"`
@@ -102,10 +102,10 @@ func buyerVectorDifferences(t *testing.T, set string, envelope func(buyerLiveVec
 		if m := dedupeMatched.FindStringSubmatch(want.Dedupe.Reason); m != nil {
 			differ(&diffs, at, "dedupe matched", matched[:min(16, len(matched))], m[1])
 		}
-		if len(h.Acts) != len(want.History) {
-			t.Fatalf("%s: %d history acts, the vector states %d", at, len(h.Acts), len(want.History))
+		if len(h.Acts) != len(want.InputHistory) {
+			t.Fatalf("%s: %d history acts, the vector states %d", at, len(h.Acts), len(want.InputHistory))
 		}
-		for i, row := range want.History {
+		for i, row := range want.InputHistory {
 			r := h.Acts[i]
 			differ(&diffs, at, "history "+row.CapsuleID+" capsule", r.CapsuleID, row.CapsuleID)
 			target := r.Target

@@ -58,7 +58,7 @@ func TestPayeeProfileLiveChecksAtEngineMain(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		d2, err := e.Check(a, []Record{r})
+		d2, err := e.Check(a, MemoryHistory([]Record{r}))
 		if err != nil {
 			t.Fatal(err)
 		}

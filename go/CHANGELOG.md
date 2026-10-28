@@ -5,6 +5,28 @@ and `portedDefinitions` (`guard/engine.go`).
 
 ## Unreleased
 
+- Changed, breaking (capsule-engine#255, ledger removal step 3): the checks read earlier records
+  through a `History` (`Find`, `Get`, `Size`) instead of a `[]Record` ledger. `Engine.Check`,
+  `CheckWithTaskAuthority`, `CheckReplay`, `CheckWithRecords` and `CheckSale` take a `History`; a
+  nil one holds no records. Each check asks for the records that can bear on it by equality on
+  indexed fields (`IndexPaths`), and dedupe also by its window's start; its rule over them is
+  unchanged. `MemoryHistory` holds records in memory. `NewStoreHistory` reads a CLL entry log beside
+  capsule-emit's artifact store: it declares `IndexPaths` on the store's namespace and returns the
+  records the log holds, in log order. A `History` read error is returned by the check, never a
+  decision.
+- Changed: decisions do not change, with two exceptions. Over `NewStoreHistory`, dedupe does not find a
+  record whose timestamp the store cannot read as a time (more than nine fraction digits, or a comma
+  before them). Over any history but a check input's (`CheckWithHistory`, which caps still reads
+  whole), caps reads only the records under its fold key, as the Python engine does, so an accepted
+  copy of an act under another operator or developer no longer keeps that act from counting.
+- Changed, breaking: the check-input history struct `History` is renamed `InputHistory`.
+- Added: `History`, `Query`, `IndexPaths` and the `Field*` constants, `MemoryHistory`,
+  `NewStoreHistory` with `StoreHistory` and `StoreLog`, and `DecodeCapsule`, which reads one stored
+  capsule as the checks read it.
+- Removed, breaking: `ReadLedger`.
+- Added: dependencies on capsule-emit's Go module and checkpointed-local-log's Go module, pinned
+  to unreleased revisions until their next releases.
+
 ## 0.2.0 — 2026-10-24
 
 A new pack version (a minor on v0, RELEASING.md): everyday 0.3.9 and seller 0.1.6, and the report's

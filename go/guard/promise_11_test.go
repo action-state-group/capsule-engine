@@ -125,7 +125,7 @@ func TestPromise11AgreesWithTheEngine(t *testing.T) {
 		if err != nil {
 			t.Fatalf("%s: %v", want.Input, err)
 		}
-		d, err := e.CheckSale(a, replayLedger(t, e, sale, id), h)
+		d, err := e.CheckSale(a, MemoryHistory(replayLedger(t, e, sale, id)), h)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -370,7 +370,7 @@ func TestSeller015DecidesRepresentChecksAsTheEngine(t *testing.T) {
 		if err != nil {
 			t.Fatalf("%s: %v", want.Input, err)
 		}
-		d, err := e.CheckSale(a, replayLedger(t, e, sale, id), h)
+		d, err := e.CheckSale(a, MemoryHistory(replayLedger(t, e, sale, id)), h)
 		if err != nil {
 			t.Fatal(err)
 		}

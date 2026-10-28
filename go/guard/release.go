@@ -80,7 +80,7 @@ const NoCapsuleVerifier = "the cited acceptance could not be re-verified: this p
 // The evidence names only the declared class, whether the release was
 // bound, and a missing field's name: never the disclosed data, a reference,
 // a counterparty or a capsule id.
-func checkReleaseOnAcceptance(a Action, ledger []Record, in checkInputs, c releaseConfig, tax taxonomy) (out Constraint) {
+func checkReleaseOnAcceptance(a Action, h *historyReader, in checkInputs, c releaseConfig, tax taxonomy) (out Constraint) {
 	const id = "release_on_acceptance"
 	method := "cited_sealed_acceptance_v1"
 	if c.Binding != "" {
@@ -127,7 +127,7 @@ func checkReleaseOnAcceptance(a Action, ledger []Record, in checkInputs, c relea
 		}
 	}
 	if c.Binding != "" {
-		return releaseFromHistory(a, ledger, in, c, &rd)
+		return releaseFromHistory(a, h, in, c, &rd)
 	}
 	rd = append(rd, "representation_class")
 	cls := a.RepresentationClass
@@ -154,7 +154,7 @@ func checkReleaseOnAcceptance(a Action, ledger []Record, in checkInputs, c relea
 	if a.CitedMandateCapsuleID == nil {
 		return fail(cls, "", "the disclosure cites no acceptance")
 	}
-	acceptance, _ := saleAcceptance(a, ledger, in, c.AcceptanceClasses)
+	acceptance, _ := saleAcceptance(a, h, in, c.AcceptanceClasses)
 	if acceptance == nil || *a.CitedMandateCapsuleID != acceptance.CapsuleID || acceptance.Target == nil || *a.Target != *acceptance.Target {
 		return fail(cls, "", releaseNotBound)
 	}
@@ -214,7 +214,7 @@ func releaseFail(classes []string, missing, note string) Constraint {
 // counterparty its check sealed, which the history carries beside the act).
 // The acceptance is not cited and not re-verified: the history is the
 // producer's own sealed records, the trust single_commitment places in them.
-func releaseFromHistory(a Action, ledger []Record, in checkInputs, c releaseConfig, rd *[]string) Constraint {
+func releaseFromHistory(a Action, h *historyReader, in checkInputs, c releaseConfig, rd *[]string) Constraint {
 	const id = "release_on_acceptance"
 	*rd = append(*rd, "disclosed_classes")
 	classes := a.DisclosedClasses
@@ -246,7 +246,7 @@ func releaseFromHistory(a Action, ledger []Record, in checkInputs, c releaseConf
 	if a.counterpartyMalformed {
 		return releaseFail(classes, "counterparty", "the counterparty input was not in its agreed shape; it cannot be bound to an acceptance")
 	}
-	acceptance, unknown := saleAcceptance(a, ledger, in, c.AcceptanceClasses)
+	acceptance, unknown := saleAcceptance(a, h, in, c.AcceptanceClasses)
 	if unknown != "" || acceptance == nil || acceptance.DealID == nil || *acceptance.DealID != *a.DealID ||
 		!sameBuyer(acceptance.threadCounterparty, a.counterpartyFPAlg, a.counterpartyIDs) {
 		return releaseFail(classes, "", releaseNotAccepted)

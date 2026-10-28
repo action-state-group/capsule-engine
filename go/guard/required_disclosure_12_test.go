@@ -74,7 +74,7 @@ func TestRequiredDisclosure12AgreesWithTheEngine(t *testing.T) {
 		if (a.ListingClasses == nil) != (want.ListingClasses == nil) || !slices.Equal(a.ListingClasses, want.ListingClasses) {
 			t.Errorf("%s: listing_classes %v, engine %v", want.Input, a.ListingClasses, want.ListingClasses)
 		}
-		got := checkRequiredDisclosure(a, h.ledger(), rd)
+		got := checkRequiredDisclosure(a, &historyReader{h: MemoryHistory(h.records())}, rd)
 		engine := releaseOutcomeOf(t, want.Result, museListWording(want.Reason), want.Evidence)
 		if want.Result != "fail" {
 			engine.Reason = ""
