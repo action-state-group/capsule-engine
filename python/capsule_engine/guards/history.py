@@ -421,7 +421,14 @@ def producer_identity(signer: Signer) -> Any:
     records: a seed derived from ``signer``'s signature over a fixed label,
     so it is the operator's own key, never written anywhere, and the same
     each time the same signing secret is given. ``signer`` must sign
-    deterministically, as ``LocalSigner`` does."""
+    deterministically, as ``LocalSigner`` does.
+
+    The derivation holds only while nothing else has ``signer`` sign the
+    label's digest: every other ``sign`` call in this package signs a
+    capsule's pre-signature digest, the JCS digest of a JSON object, which
+    the digest of this plain label never is.
+    ``tests/test_history.py`` pins that; a KDF over the secret itself would
+    not need it."""
     from capsule_emit.produce import new_ed25519_signing_identity
 
     label = hashlib.sha256(PRODUCER_KEY_LABEL.encode("ascii")).hexdigest()

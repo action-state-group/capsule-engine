@@ -271,3 +271,23 @@ def test_verify_reports_a_record_the_store_refuses_as_a_failure(tmp_path, capsys
     assert main(["verify", capsule["capsule_id"], "--store", str(tmp_path / "s"), "--json"]) == 1
     out = json.loads(capsys.readouterr().out)
     assert out["ok"] is False and out["findings"][0]["code"] == "stored_record_invalid"
+
+
+def test_every_other_signature_is_over_a_pre_signature_digest():
+    """``producer_identity`` derives its seed from the signer's signature of
+    a fixed label. That is sound only while no other call has the signer sign
+    a caller-chosen string, so every other ``.sign(`` in the package must sign
+    a capsule's pre-signature digest."""
+    import ast
+
+    allowed = {"presig_digest", "json_digest(presig)"}
+    found = []
+    for path in sorted((REPO / "python" / "capsule_engine").rglob("*.py")):
+        for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+            if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute) and node.func.attr == "sign":
+                arg = ast.unparse(node.args[0]) if node.args else ""
+                if path.name == "history.py" and arg == "label":
+                    continue
+                if arg not in allowed:
+                    found.append(f"{path.relative_to(REPO)}: sign({arg})")
+    assert found == []
