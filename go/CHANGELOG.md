@@ -14,7 +14,7 @@ and `portedDefinitions` (`guard/engine.go`).
   capsule-emit's artifact store: it declares `IndexPaths` on the store's namespace and returns the
   records the log holds, in log order. A `History` read error is returned by the check, never a
   decision.
-- Decisions do not change, with two exceptions. Over `NewStoreHistory`, dedupe does not find a
+- Changed: decisions do not change, with two exceptions. Over `NewStoreHistory`, dedupe does not find a
   record whose timestamp the store cannot read as a time (more than nine fraction digits, or a comma
   before them). Over any history but a check input's (`CheckWithHistory`, which caps still reads
   whole), caps reads only the records under its fold key, as the Python engine does, so an accepted
