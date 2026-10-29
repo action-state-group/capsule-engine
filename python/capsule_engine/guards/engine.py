@@ -74,6 +74,7 @@ from .checks import (
     resolve_caps_minor,
 )
 from .checks.action_class_gate import Selector, check_action_class_gate
+from .checks.required_fields import check_required_fields
 from .classes import (
     CARRIED_TAXONOMY_VERSIONS,
     ENGINE_TAXONOMY,
@@ -217,6 +218,7 @@ class GuardEngine:
         ask_gate_selectors: frozenset[str] = frozenset(),
         ask_wickets: frozenset[str] = frozenset(),
         evaluate_under_record_taxonomy: bool = False,
+        required_fields: Mapping[str, tuple[str, ...]] | None = None,
     ) -> None:
         if caps_limits is not None and (caps_minor or per_action_minor):
             raise ValueError("give caps limits as caps_limits or as caps_minor/per_action_minor, not both")
@@ -303,6 +305,11 @@ class GuardEngine:
         # taxonomy it names, where the engine carries it; live, an action
         # naming another taxonomy than the engine's is not evaluated.
         self._evaluate_under_record_taxonomy = evaluate_under_record_taxonomy
+        # The pack's action types and the fields each requires
+        # (``packs/install.py`` ``required_fields``): an action whose verb
+        # names one is refused when it lacks one (``checks/required_fields.py``).
+        # Empty by default, so an engine without a pack decides as it did.
+        self._required_fields = dict(required_fields or {})
         self._open: dict[str, _OpenDegradation] = {}
 
     # -- introspection (tests / recovery bookkeeping) -----------------------
@@ -533,6 +540,12 @@ class GuardEngine:
                 not_evaluated.append(constraint.id)
             if wicket.check == _GATE:
                 gate_runs.append((wicket, constraint))
+        # Not keyed on the class, so never held by a taxonomy mismatch.
+        required_out = check_required_fields(action, self._required_fields)
+        if required_out is not None:
+            constraints = (*constraints, required_out.constraint)
+            if required_out.fails_closed:
+                not_evaluated.append(required_out.constraint.id)
         # A held caps result is not reported, so neither is the fold it read.
         fold_envelopes = tuple(caps_out.fold_envelopes) if mismatch is None else ()
         escalatable = self._escalatable

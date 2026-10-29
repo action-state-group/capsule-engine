@@ -21,6 +21,11 @@ module has its own changelog, `go/CHANGELOG.md`.
   `rate_cap.max_output_msat_per_million` (`policy.profile.RATE_CAP_KEYS`), refused unless the
   installed `rate_cap` wicket declares them. They lay over the wicket's config at install, as
   `counterparty_list`'s values do.
+- Added: the `required_fields` check (`guards/checks/required_fields.py`). An action whose `verb`
+  names one of its pack's action types (`action_semantics`) is refused when it lacks a field that
+  type requires: `n/a` in scope naming the field, fails closed. A capsule's own `action_type` stays
+  `fyi` or `decide`. An action whose verb names no pack type gets no constraint, so every existing
+  decision keeps its bytes. `GuardEngine(required_fields=)`, `packs.install.required_fields`.
 - Added: an `action-ledger` conformance input may name its served pack and carry a canonical
   profile, installed and activated before its steps (`decide_steps(profile=)`). A coverage
   exemption may name the one pack it applies to. New set `conformance-vectors/guard/v0/inference.json`.

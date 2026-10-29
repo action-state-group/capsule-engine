@@ -15,6 +15,7 @@ import pytest
 
 from capsule_engine.guards import Action
 from capsule_engine.guards.checks import check_rate_cap
+from capsule_engine.guards.checks.required_fields import check_required_fields
 from capsule_engine.packs import install_pack, load_pack_dir
 from capsule_engine.policy import PROFILE_FORMAT, PolicyManifestError, parse_profile
 from capsule_engine.policy.errors import MALFORMED_PROFILE, PROFILE_UNKNOWN_PARAMETER
@@ -29,7 +30,7 @@ CAPS = {"max_input_msat_per_million": 2_000_000, "max_output_msat_per_million": 
 def _step(**kw) -> dict:
     step = {
         "operator": "node-a", "developer": "mesh-node@v1", "action_type": "decide", "taxonomy_version": "6",
-        "verb": "buy", "action_class": "money.purchase", "action_id": "inference/t1",
+        "verb": "inference.purchase", "action_class": "money.purchase", "action_id": "inference/t1",
         "timestamp": "2026-10-29T12:00:00Z", "target": "node-b",
         "input_msat_per_million": 1_000_000, "output_msat_per_million": 4_000_000, "equivalence_key": "exchange-1",
     }
@@ -133,3 +134,30 @@ def test_the_pack_requires_the_exchange_id():
 
 def test_a_profile_with_no_steps_decides_nothing():
     assert decide_steps(INFERENCE, [], profile=_profile(rate_cap=CAPS)) == []
+
+
+@pytest.mark.parametrize("missing", ["equivalence_key", "target"])
+def test_a_purchase_missing_a_required_field_is_refused_naming_it(missing):
+    (decision,) = decide_steps(INFERENCE, [_step(**{missing: None})])
+    assert decision.outcome == "deny"
+    assert decision.verdict == "not_evaluable"
+    assert decision.not_evaluated_checks == ("required_fields",)
+    required = next(c for c in decision.constraints if c.id == "required_fields")
+    assert required.evidence["missing_field"] == missing
+
+
+def test_required_fields_checks_only_an_action_whose_verb_names_a_pack_type():
+    required = {"inference.purchase": ("target", "equivalence_key")}
+    assert check_required_fields(Action(**{**_step(), "verb": "buy"}), required) is None
+    out = check_required_fields(Action(**_step(equivalence_key="")), required)
+    assert out.fails_closed and out.constraint.evidence["missing_field"] == "equivalence_key"
+    passed = check_required_fields(Action(**_step()), required)
+    assert passed.constraint.result == "pass"
+    assert passed.constraint.evidence == {"action_type": "inference.purchase", "required_fields": ["target", "equivalence_key"]}
+
+
+def test_everyday_decides_as_before_because_no_input_names_its_types_in_verb():
+    """everyday's own fixture caps-in-scope-amount-missing still allows: its
+    action types (purchase.make, ...) are not verbs any caller sends today."""
+    (decision,) = decide_steps(EVERYDAY, [_step(verb="buy", target="merchant-a", refundable=True, equivalence_key=None)])
+    assert all(c.id != "required_fields" for c in decision.constraints)

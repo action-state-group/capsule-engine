@@ -25,7 +25,7 @@
    "developer": "mesh-node@v1",
    "action_type": "decide",
    "taxonomy_version": "6",
-   "verb": "buy",
+   "verb": "inference.purchase",
    "action_class": "money.purchase",
    "action_id": "inference/conformance-i12",
    "timestamp": "2026-10-29T12:12:00Z",

@@ -7,12 +7,12 @@
 # as input_msat_per_million and output_msat_per_million: millisatoshis per
 # million input and output tokens, mesh-llm's Pricing units. Both are
 # optional fields, so a peer whose price cannot be read reaches rate_cap and
-# is refused there rather than read as malformed. equivalence_key is required:
-# the exchange's own id, which the caller must supply on every purchase. The
-# engine does not enforce a pack's required_fields; dedupe runs on every
-# decision, and without a key it keys an act on its target and amount, so a
-# second inference from the same peer (no amount) is refused as a repeat
-# (vector no-exchange-id-twice pins that).
+# is refused there rather than read as malformed. An action names this type
+# in its verb (inference.purchase), and the engine refuses one that lacks a
+# required field (guards/checks/required_fields.py). equivalence_key is
+# required: the exchange's own id. dedupe runs on every decision, and without
+# a key it keys an act on its target and amount, so a second inference from
+# the same peer (no amount) would be refused as a repeat.
 #
 # The pack ships no price bound: both rate caps default to the largest
 # integer every JSON reader holds exactly. The operator's policy profile

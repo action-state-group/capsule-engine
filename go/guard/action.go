@@ -62,7 +62,12 @@ type Action struct {
 	Target                *string `json:"target,omitempty"`
 	CitedMandateCapsuleID *string `json:"cited_mandate_capsule_id,omitempty"`
 	EquivalenceKey        *string `json:"equivalence_key,omitempty"`
-	Rail                  *string `json:"rail,omitempty"`
+	// ModelID and Provider are action.py's model_id and provider: normalized
+	// fields a pack may require (required_fields), read by no other check and
+	// never sealed.
+	ModelID  *string `json:"model_id,omitempty"`
+	Provider *string `json:"provider,omitempty"`
+	Rail     *string `json:"rail,omitempty"`
 	// Handover is how the item reaches the buyer, a closed token
 	// (Handovers: in_person or shipped; action.py handover_of): anything
 	// else is no handover. Read by seller.destination_rail/1.1.0.

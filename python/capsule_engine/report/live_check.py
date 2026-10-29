@@ -28,7 +28,7 @@ from ..guards import Action, GuardDecision, GuardEngine, LocalSigner
 from ..guards.checks import RUNNABLE_CHECKS
 from ..guards.history import History, MemoryHistory
 from ..packs import install_pack, record_pack_activation
-from ..packs.install import engine_ask_sets
+from ..packs.install import engine_ask_sets, required_fields
 from ..packs.schema import PackDefinition
 from ..policy.limits import read_caps_limits
 from ..policy.profile import PolicyProfile
@@ -70,7 +70,7 @@ def _wired(installed, store: History, signer) -> GuardEngine:
         caps_limits=lambda s: read_caps_limits(resolved, store, s),
         per_action_reads=resolved.per_action_reads(), signer_provider=lambda: signer,
         manifest_digest=resolved.manifest_digest, wickets=wickets,
-        ask_gate_selectors=gates, ask_wickets=asks,
+        ask_gate_selectors=gates, ask_wickets=asks, required_fields=required_fields(installed.pack),
     )
 
 

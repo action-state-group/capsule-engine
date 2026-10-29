@@ -481,6 +481,10 @@ type Engine struct {
 	// perActionReads is the caps wicket's per_action_reads ("" reads the
 	// capture).
 	perActionReads string
+	// requiredFields are the pack's action types and the fields each
+	// requires (requiredFieldsOf): an action whose verb names one is refused
+	// when it lacks one (checkRequiredFields).
+	requiredFields map[string][]string
 	// limitSources: caps evidence names where each limit came from
 	// (limit_sources). An engine built from an installed pack reads its
 	// limits from policy (capsule-engine 365eb92 engine.py _limits_for):
@@ -633,6 +637,9 @@ func NewEngine(p pack.Pack) (*Engine, error) {
 		return nil, err
 	}
 	e := &Engine{pack: p, tax: tax, limitSources: true, askGate: askGateSelectors(p)}
+	if e.requiredFields, err = requiredFieldsOf(p); err != nil {
+		return nil, err
+	}
 	// A pack may cite no caps definition (capsule-engine e0e664d,
 	// GuardEngine caps_fold=None); this port reads no limit from anywhere
 	// else, so there is no limit to refuse without one.
@@ -1108,6 +1115,9 @@ func (e *Engine) checkWith(a Action, h History, in checkInputs) (Decision, error
 		}
 		cs = append(cs, c)
 	}
+	if c, ok := checkRequiredFields(a, e.requiredFields); ok {
+		cs = append(cs, c)
+	}
 	cs = e.compareTaxonomy(a, cs)
 	_, approver := e.tax.approver(a.class())
 	asks := e.askChecks
@@ -1276,7 +1286,7 @@ func requirePerActionReads(s string) error {
 // sealed). Every other check is keyed on the class, so a mismatch leaves it
 // unevaluated (compareTaxonomy), including any check added later.
 var neverHeld = []string{"dedupe", "verify_before_dispatch", "single_commitment", "promise_never", "release_on_acceptance",
-	"credential_pattern", "plan_containment"}
+	"credential_pattern", "plan_containment", "required_fields"}
 
 // compareTaxonomy holds the action's taxonomy_version against the vendored
 // action taxonomy's. A different version leaves every check that reads

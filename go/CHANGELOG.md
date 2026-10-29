@@ -5,6 +5,12 @@ and `portedDefinitions` (`guard/engine.go`).
 
 ## Unreleased
 
+- Added (capsule-engine#263): the `required_fields` check (`action_semantics_v0`). An action whose
+  verb names one of the pack's action types (`pack.Pack.ActionSemantics`, new) is refused, n/a and
+  fails closed, when it lacks a field that type requires. An action whose verb names none gets no
+  constraint, so existing decisions keep their bytes. `Action` gains `ModelID` and `Provider`, the
+  last normalized fields it did not carry; `NewEngine` refuses a pack requiring a field `Action`
+  does not carry.
 - Added (capsule-engine#263): the embedded pack `asg/inference/0.1.0` (`packs.Inference010`,
   `pack.LoadInference010`). It cites `rate_cap/1.0.0`, `counterparty_list/1.0.0` and
   `dedupe/1.0.0`, which are now ported. `rate_cap` compares a peer's advertised input and output

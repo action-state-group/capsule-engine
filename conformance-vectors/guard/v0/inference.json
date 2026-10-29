@@ -6,7 +6,7 @@
    "kind": "action-ledger",
    "pack": "inference-0.1.0",
    "input": "conformance-vectors/guard/v0/inputs/inference/allow-list-listed.json",
-   "input_sha256": "be8244157415367d736293884288480e956a34413f8a38c99a436c0aefd16690",
+   "input_sha256": "bf9a74931a1f15a6585afee71b1075d231c31f6731138c26abce33a778a35546",
    "expected": {
     "steps": [
      {
@@ -43,9 +43,15 @@
         "result": "pass",
         "method": "exact_reference_match_v0",
         "evidence_digest": "9249f0e33e267604bd367e0e35be40feaefb019faa27bba5d847594ed7c02c30"
+       },
+       {
+        "id": "required_fields",
+        "result": "pass",
+        "method": "action_semantics_v0",
+        "evidence_digest": "f48d4b5d6e66b7567b908dacd896317e3e6b4de382807d4dcf5d68e32cbe2bba"
        }
       ],
-      "capsule_id": "c916554a07dcc019b3c3f2fc10a7ea3757bff5270c71508081fdd9b6060fd633"
+      "capsule_id": "f1252945ce478d3d2d0ebab1b2cd78479b4f396895902b6affa051d24433ecd6"
      }
     ]
    }
@@ -55,7 +61,7 @@
    "kind": "action-ledger",
    "pack": "inference-0.1.0",
    "input": "conformance-vectors/guard/v0/inputs/inference/allow-list-unlisted-asks.json",
-   "input_sha256": "06237564e3336a34129af61f22e6e1f96517ab541f370b955edcbdcd86b19df0",
+   "input_sha256": "facf5ed5357cbc4788237de6e4e50bcf178589c5243ddc39c1c01d83ec58e791",
    "expected": {
     "steps": [
      {
@@ -92,9 +98,15 @@
         "result": "fail",
         "method": "exact_reference_match_v0",
         "evidence_digest": "585ccbc599bd55b26d26642876a19d4d3890397cb4b6173d9e5564c851afa195"
+       },
+       {
+        "id": "required_fields",
+        "result": "pass",
+        "method": "action_semantics_v0",
+        "evidence_digest": "f48d4b5d6e66b7567b908dacd896317e3e6b4de382807d4dcf5d68e32cbe2bba"
        }
       ],
-      "capsule_id": "4762f3c7641c98eb42fe548f54e45a85d1b466e0af6e817d8a4d403c69a989df"
+      "capsule_id": "512b6970f5d00859212611bb5fdd3e56be0e633dca61d060deb61c8366a78c2e"
      }
     ]
    }
@@ -104,7 +116,7 @@
    "kind": "action-ledger",
    "pack": "inference-0.1.0",
    "input": "conformance-vectors/guard/v0/inputs/inference/allow-list-unlisted.json",
-   "input_sha256": "f5b844b4bf5b49d7fd935ad2b81ffdef8876bc79b8aa014e9b7edd50fd260206",
+   "input_sha256": "0a819553aae3c2ad4c99db80dc32fb1aed88636c7094030f2eabe148484c1d06",
    "expected": {
     "steps": [
      {
@@ -141,9 +153,15 @@
         "result": "fail",
         "method": "exact_reference_match_v0",
         "evidence_digest": "585ccbc599bd55b26d26642876a19d4d3890397cb4b6173d9e5564c851afa195"
+       },
+       {
+        "id": "required_fields",
+        "result": "pass",
+        "method": "action_semantics_v0",
+        "evidence_digest": "f48d4b5d6e66b7567b908dacd896317e3e6b4de382807d4dcf5d68e32cbe2bba"
        }
       ],
-      "capsule_id": "d699a895f1b7af62d39fa1d85c2bb0f665162613d701794d3cb015dca3d49987"
+      "capsule_id": "ae8ddfe3ecac97609e5195eb1344044e8dabec4b9c549d9be1a51e9df3a0db10"
      }
     ]
    }
@@ -153,7 +171,7 @@
    "kind": "action-ledger",
    "pack": "inference-0.1.0",
    "input": "conformance-vectors/guard/v0/inputs/inference/at-both-caps.json",
-   "input_sha256": "1d037b85f3a9d37627b049c8538b52a76e1c11a7e3e9a7fc921b4a12feca3801",
+   "input_sha256": "ea61e2cd8989ede828c21cb404669e8c0f59f480157387301604bc997e55cf34",
    "expected": {
     "steps": [
      {
@@ -190,9 +208,15 @@
         "result": "pass",
         "method": "exact_reference_match_v0",
         "evidence_digest": "cacca023bca54cb4d3e10cb3cd8f38dcc37001ce5ba09b9cfd6ac4c8a1040246"
+       },
+       {
+        "id": "required_fields",
+        "result": "pass",
+        "method": "action_semantics_v0",
+        "evidence_digest": "f48d4b5d6e66b7567b908dacd896317e3e6b4de382807d4dcf5d68e32cbe2bba"
        }
       ],
-      "capsule_id": "2f5f0489e7337978fd6196df954a8e5d3979c0f615df20186a3d842d25a42ea0"
+      "capsule_id": "e80d494ae84afb21158a180028d3d370aa43b30ba5e31491ae8a6e2bb0a80f7d"
      }
     ]
    }
@@ -202,7 +226,7 @@
    "kind": "action-ledger",
    "pack": "inference-0.1.0",
    "input": "conformance-vectors/guard/v0/inputs/inference/deny-list-listed.json",
-   "input_sha256": "4c47e46376c74f654d2d756ed46bf8ac1f0985b2d0934a9a4888fb4923b727a2",
+   "input_sha256": "85a7aa752716a25c1526ea791091044b70a292c4222753a35b0bd44262aa40a5",
    "expected": {
     "steps": [
      {
@@ -239,9 +263,15 @@
         "result": "fail",
         "method": "exact_reference_match_v0",
         "evidence_digest": "28c1f408568b4afd415f8a3b05af7510448ab18a5ee7a171a236595081bd6088"
+       },
+       {
+        "id": "required_fields",
+        "result": "pass",
+        "method": "action_semantics_v0",
+        "evidence_digest": "f48d4b5d6e66b7567b908dacd896317e3e6b4de382807d4dcf5d68e32cbe2bba"
        }
       ],
-      "capsule_id": "6f0e8dfdf9891501400d28bf05e8ac88ee01002bad5f997f0b9846c783eb9232"
+      "capsule_id": "1fda5002f37e26bf0f6cfae888bd6d7902d5d462181cbcb01940e4e63e7c914b"
      }
     ]
    }
@@ -251,7 +281,7 @@
    "kind": "action-ledger",
    "pack": "inference-0.1.0",
    "input": "conformance-vectors/guard/v0/inputs/inference/deny-list-payee-fingerprint-kind-missing.json",
-   "input_sha256": "21f7474374b0277c9cb1b43c5870e5f4ae02c90824369dfd6c1f23038bb7a601",
+   "input_sha256": "b1554a9201907b4b25073b2ba9c89da056bc8dcb309dd522b8c3b92529ccaee4",
    "expected": {
     "steps": [
      {
@@ -289,9 +319,15 @@
         "method": "exact_reference_match_v0",
         "evidence_digest": "819480ea071dd87d22224c12f88687747f0ebb1eec3e950869f5a3caac47f86d",
         "reason": "the action carries no usable counterparty.ids.payee; the counterparty list could not be checked"
+       },
+       {
+        "id": "required_fields",
+        "result": "pass",
+        "method": "action_semantics_v0",
+        "evidence_digest": "f48d4b5d6e66b7567b908dacd896317e3e6b4de382807d4dcf5d68e32cbe2bba"
        }
       ],
-      "capsule_id": "61bc57e37843177c2ece31de985e58a3348d93a383997bd862372cdebe0cae9d"
+      "capsule_id": "5c6510872c84b8aa329ae7e90060906f73996bb16a4467e42fb5bf8614c8cdeb"
      }
     ]
    }
@@ -301,7 +337,7 @@
    "kind": "action-ledger",
    "pack": "inference-0.1.0",
    "input": "conformance-vectors/guard/v0/inputs/inference/deny-list-payee-fingerprint-listed.json",
-   "input_sha256": "16591dfc0ce9076758dae4bc882f3136629b21bba2ab30ce8b6e25f1abe38976",
+   "input_sha256": "a0a6efabf42c673633c2f83bce685db4f010465a23b76a9f7d6c5d7ad45f020d",
    "expected": {
     "steps": [
      {
@@ -338,9 +374,15 @@
         "result": "fail",
         "method": "exact_reference_match_v0",
         "evidence_digest": "1c2b528b0a31c34b5acba5e17ae446e95bdefd330da5249ec13eaf9e04a6acc6"
+       },
+       {
+        "id": "required_fields",
+        "result": "pass",
+        "method": "action_semantics_v0",
+        "evidence_digest": "f48d4b5d6e66b7567b908dacd896317e3e6b4de382807d4dcf5d68e32cbe2bba"
        }
       ],
-      "capsule_id": "e3aa9f646c13c528989967220055869342f17c514e3a632e855c7d467cac6f07"
+      "capsule_id": "e940dabdea64a298ab2c23a228434679173ef5a37016345e9298c73d027e82a3"
      }
     ]
    }
@@ -350,7 +392,7 @@
    "kind": "action-ledger",
    "pack": "inference-0.1.0",
    "input": "conformance-vectors/guard/v0/inputs/inference/deny-list-payee-fingerprint-none-sealed.json",
-   "input_sha256": "6c4ecfb7b81e2d9f5b1495046294776a79e814f14c18d8bae50ddb0ffce376a7",
+   "input_sha256": "2f12d6b5e9f1cde4dcdfa895d696e896e8b8ffa3650d5e9109a548cafb083363",
    "expected": {
     "steps": [
      {
@@ -388,9 +430,15 @@
         "method": "exact_reference_match_v0",
         "evidence_digest": "2229cad5c5ccb9819f0fe07cb32c80705f7fdd38e1e5b0838db4312bd92a8952",
         "reason": "the action carries no usable counterparty; the counterparty list could not be checked"
+       },
+       {
+        "id": "required_fields",
+        "result": "pass",
+        "method": "action_semantics_v0",
+        "evidence_digest": "f48d4b5d6e66b7567b908dacd896317e3e6b4de382807d4dcf5d68e32cbe2bba"
        }
       ],
-      "capsule_id": "8a972f0278cf5a07ab0981a2636b66c721bfe46367b80b06497d1f0655f811e3"
+      "capsule_id": "d5bf81f34ac1deb5199f1cab58d45cde3ceb2921291e800222c8363febee282e"
      }
     ]
    }
@@ -400,7 +448,7 @@
    "kind": "action-ledger",
    "pack": "inference-0.1.0",
    "input": "conformance-vectors/guard/v0/inputs/inference/deny-list-payee-fingerprint-other-alg.json",
-   "input_sha256": "17c854305538b595a1463a32add30cc4bb49530703bead06597f8d7312c3f8f0",
+   "input_sha256": "ef4bf2a77d1a3cffc5faa27636cca7e3c91ba677ac18c356f44cedd8a10e9535",
    "expected": {
     "steps": [
      {
@@ -438,9 +486,15 @@
         "method": "exact_reference_match_v0",
         "evidence_digest": "16f8e6bfc1914fd029d93c1863fa5682f8a66a012bf3062cc8325c27b35bf0be",
         "reason": "the action carries no usable counterparty.fp_alg; the counterparty list could not be checked"
+       },
+       {
+        "id": "required_fields",
+        "result": "pass",
+        "method": "action_semantics_v0",
+        "evidence_digest": "f48d4b5d6e66b7567b908dacd896317e3e6b4de382807d4dcf5d68e32cbe2bba"
        }
       ],
-      "capsule_id": "489a1f6976a5d63c0b0fe0ebdb16702bc0a83e9bb9ba69a54e52e4928df95d2c"
+      "capsule_id": "cedd7c94a8856beea9fc1c2ac72c47845c03e1f86487f84988be4aa19864febe"
      }
     ]
    }
@@ -450,7 +504,7 @@
    "kind": "action-ledger",
    "pack": "inference-0.1.0",
    "input": "conformance-vectors/guard/v0/inputs/inference/deny-list-payee-fingerprint-unlisted.json",
-   "input_sha256": "d39cd5e02f3341a5da4a870fe6d4eebb34614e2343c0163dda126ba2bf0b83c9",
+   "input_sha256": "e35112b9c1dc5389b965f32b530ffce0a0abb14719ca52e56fe80ca5d7adaf53",
    "expected": {
     "steps": [
      {
@@ -487,9 +541,15 @@
         "result": "pass",
         "method": "exact_reference_match_v0",
         "evidence_digest": "fba49b352ca77a7fc52a1a25b1c8c6b37895d05d750dbe8abe34eb47fa26d9fa"
+       },
+       {
+        "id": "required_fields",
+        "result": "pass",
+        "method": "action_semantics_v0",
+        "evidence_digest": "f48d4b5d6e66b7567b908dacd896317e3e6b4de382807d4dcf5d68e32cbe2bba"
        }
       ],
-      "capsule_id": "c05e0f4789ed4962536f9a276916bce11211c5ba33e86d76013d6c1f2b1e65b3"
+      "capsule_id": "a9c3f2e84b635b3e973f00be3e26b8c588196ccf646d22ebc07099ed06785c9e"
      }
     ]
    }
@@ -499,7 +559,7 @@
    "kind": "action-ledger",
    "pack": "inference-0.1.0",
    "input": "conformance-vectors/guard/v0/inputs/inference/deny-list-unlisted.json",
-   "input_sha256": "e154a54478d0a4eef77b9a0d2bbaa4c5acee1159ac78a614efe128ec4a206447",
+   "input_sha256": "7abf812d63d215cfcd1fa00b8c324b68065dee63894d9e57edb3b318fc8c55e1",
    "expected": {
     "steps": [
      {
@@ -536,9 +596,15 @@
         "result": "pass",
         "method": "exact_reference_match_v0",
         "evidence_digest": "220cee216d9acf7445ccbc05a29ccb8867d61c7c64887cd0d1bc6dc1b1171b60"
+       },
+       {
+        "id": "required_fields",
+        "result": "pass",
+        "method": "action_semantics_v0",
+        "evidence_digest": "f48d4b5d6e66b7567b908dacd896317e3e6b4de382807d4dcf5d68e32cbe2bba"
        }
       ],
-      "capsule_id": "588d1e546b37dc319b23d93fa5201de139c38991dcb5cb749f4b8e2beccd5f59"
+      "capsule_id": "31f71eb7ce197499b29e8f553f0a33ae42b68ca3fefa133f68f670f66a7749f1"
      }
     ]
    }
@@ -548,7 +614,7 @@
    "kind": "action-ledger",
    "pack": "inference-0.1.0",
    "input": "conformance-vectors/guard/v0/inputs/inference/free-peer.json",
-   "input_sha256": "39b4da52357c34c84bc813031bce8caa1d9a133b60a06f650bab9012c678ecb8",
+   "input_sha256": "62e713dfbc6aebda6057156a0514170fe3a9b510ded82bed9a332f5c065b0182",
    "expected": {
     "steps": [
      {
@@ -585,9 +651,71 @@
         "result": "pass",
         "method": "exact_reference_match_v0",
         "evidence_digest": "cacca023bca54cb4d3e10cb3cd8f38dcc37001ce5ba09b9cfd6ac4c8a1040246"
+       },
+       {
+        "id": "required_fields",
+        "result": "pass",
+        "method": "action_semantics_v0",
+        "evidence_digest": "f48d4b5d6e66b7567b908dacd896317e3e6b4de382807d4dcf5d68e32cbe2bba"
        }
       ],
-      "capsule_id": "ea8847512334b8d45b15fc39a11503331bf60504a207f4f02b2c47c2845cf45e"
+      "capsule_id": "177fe20b0d54f6b12a6369268be456743b59319d50589f15023c481f2851f66d"
+     }
+    ]
+   }
+  },
+  {
+   "case": "missing-exchange-id",
+   "kind": "action-ledger",
+   "pack": "inference-0.1.0",
+   "input": "conformance-vectors/guard/v0/inputs/inference/missing-exchange-id.json",
+   "input_sha256": "e824498c2b03527a0e389c7ee63bcf34f373b1972263274091148d927eb1d9a3",
+   "expected": {
+    "steps": [
+     {
+      "outcome": "deny",
+      "constraints": [
+       {
+        "id": "dedupe",
+        "result": "pass",
+        "method": "exact_match_index_v0",
+        "evidence_digest": "2dcbf602ef37ab9bcfb007b599c12fa3454169957fee6ead3692b9b65bede0cd"
+       },
+       {
+        "id": "caps",
+        "result": "n/a",
+        "method": "",
+        "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+        "reason": "no caps definition is configured"
+       },
+       {
+        "id": "verify_before_dispatch",
+        "result": "n/a",
+        "method": "agent_action_capsule.verify",
+        "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+        "reason": "action cites no mandate capsule"
+       },
+       {
+        "id": "rate_cap",
+        "result": "pass",
+        "method": "rate_threshold_v0",
+        "evidence_digest": "b4e57e1e638f10536136f36d3ad34ea631d2d30fbca145698c62d52abdafad34"
+       },
+       {
+        "id": "counterparty_list",
+        "result": "pass",
+        "method": "exact_reference_match_v0",
+        "evidence_digest": "cacca023bca54cb4d3e10cb3cd8f38dcc37001ce5ba09b9cfd6ac4c8a1040246"
+       },
+       {
+        "id": "required_fields",
+        "result": "n/a",
+        "method": "action_semantics_v0",
+        "evidence_digest": "7aa3a5f09a21daaab29b78132bc3cf011093d1c0bc8171083b2a48c1a3f3c40e",
+        "reason": "the action carries no equivalence_key, which action type inference.purchase requires; it is refused"
+       }
+      ],
+      "capsule_id": "1196c4f8acaf5dbd870f82de722273c1abc92fa11982e7823fefbc7835a3f3a4"
      }
     ]
    }
@@ -597,7 +725,7 @@
    "kind": "action-ledger",
    "pack": "inference-0.1.0",
    "input": "conformance-vectors/guard/v0/inputs/inference/missing-output-rate.json",
-   "input_sha256": "a689892907b23fecd8cb628b5b6a7d0d4732488657766fbbfcce1e55991ff26b",
+   "input_sha256": "386fa65d4f911eaf3c126f61f173bb7fe092d93603048d6f2073f483b091d6ab",
    "expected": {
     "steps": [
      {
@@ -635,9 +763,15 @@
         "result": "pass",
         "method": "exact_reference_match_v0",
         "evidence_digest": "cacca023bca54cb4d3e10cb3cd8f38dcc37001ce5ba09b9cfd6ac4c8a1040246"
+       },
+       {
+        "id": "required_fields",
+        "result": "pass",
+        "method": "action_semantics_v0",
+        "evidence_digest": "f48d4b5d6e66b7567b908dacd896317e3e6b4de382807d4dcf5d68e32cbe2bba"
        }
       ],
-      "capsule_id": "4418423c7b18f232f4e026a645b0cb28f29f02071fb182dc1688f0556007fad7"
+      "capsule_id": "abb8161b9efa2a42262b36e327a1bb703eec0402ac6a7d277e3e0ac3ecf7dcbd"
      }
     ]
    }
@@ -647,7 +781,7 @@
    "kind": "action-ledger",
    "pack": "inference-0.1.0",
    "input": "conformance-vectors/guard/v0/inputs/inference/missing-price-no-profile.json",
-   "input_sha256": "19d31aa10697b721e3fd75cf84c15b2095aa8d2ae4a5bc45f2d1db9e25521b20",
+   "input_sha256": "c053abc843660ec3f669809e47b1fbb181572b72555f3e73ef9638e2d67e2ced",
    "expected": {
     "steps": [
      {
@@ -685,9 +819,15 @@
         "result": "pass",
         "method": "exact_reference_match_v0",
         "evidence_digest": "cacca023bca54cb4d3e10cb3cd8f38dcc37001ce5ba09b9cfd6ac4c8a1040246"
+       },
+       {
+        "id": "required_fields",
+        "result": "pass",
+        "method": "action_semantics_v0",
+        "evidence_digest": "f48d4b5d6e66b7567b908dacd896317e3e6b4de382807d4dcf5d68e32cbe2bba"
        }
       ],
-      "capsule_id": "be67e9b9310a2f047004999d56cc420cecd8f57b4920344ff8ec8dbd74ce7464"
+      "capsule_id": "4be7fe2ac8bb1f7c3bd4e9586b1d1f566d92fe8ed897d886c499e92723adfd3a"
      }
     ]
    }
@@ -697,7 +837,7 @@
    "kind": "action-ledger",
    "pack": "inference-0.1.0",
    "input": "conformance-vectors/guard/v0/inputs/inference/missing-price.json",
-   "input_sha256": "f2f81348c653f3adca1b15981324c42d6d3d042fcc7b98746fec8c8aea49a196",
+   "input_sha256": "e55bd16ee6c4d6298c397883dc554c6d2279e7df6ad97ba33c79d2b81391852b",
    "expected": {
     "steps": [
      {
@@ -735,96 +875,15 @@
         "result": "pass",
         "method": "exact_reference_match_v0",
         "evidence_digest": "cacca023bca54cb4d3e10cb3cd8f38dcc37001ce5ba09b9cfd6ac4c8a1040246"
+       },
+       {
+        "id": "required_fields",
+        "result": "pass",
+        "method": "action_semantics_v0",
+        "evidence_digest": "f48d4b5d6e66b7567b908dacd896317e3e6b4de382807d4dcf5d68e32cbe2bba"
        }
       ],
-      "capsule_id": "c94aeebbae6f444bbf48fe718fd8e42934a3c315a80258c26ca3896654ae47f2"
-     }
-    ]
-   }
-  },
-  {
-   "case": "no-exchange-id-twice",
-   "kind": "action-ledger",
-   "pack": "inference-0.1.0",
-   "input": "conformance-vectors/guard/v0/inputs/inference/no-exchange-id-twice.json",
-   "input_sha256": "e8b6aab219f7ac3cad3f82eb3a0489e099c8dab52015e6f67e5e80539d365610",
-   "expected": {
-    "steps": [
-     {
-      "outcome": "allow",
-      "constraints": [
-       {
-        "id": "dedupe",
-        "result": "pass",
-        "method": "exact_match_index_v0",
-        "evidence_digest": "2dcbf602ef37ab9bcfb007b599c12fa3454169957fee6ead3692b9b65bede0cd"
-       },
-       {
-        "id": "caps",
-        "result": "n/a",
-        "method": "",
-        "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
-        "reason": "no caps definition is configured"
-       },
-       {
-        "id": "verify_before_dispatch",
-        "result": "n/a",
-        "method": "agent_action_capsule.verify",
-        "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
-        "reason": "action cites no mandate capsule"
-       },
-       {
-        "id": "rate_cap",
-        "result": "pass",
-        "method": "rate_threshold_v0",
-        "evidence_digest": "b4e57e1e638f10536136f36d3ad34ea631d2d30fbca145698c62d52abdafad34"
-       },
-       {
-        "id": "counterparty_list",
-        "result": "pass",
-        "method": "exact_reference_match_v0",
-        "evidence_digest": "cacca023bca54cb4d3e10cb3cd8f38dcc37001ce5ba09b9cfd6ac4c8a1040246"
-       }
-      ],
-      "capsule_id": "a0df1a2acf292d25c1eeccc3ea414f4990de3fe935d382d7edd1e86b747e640a"
-     },
-     {
-      "outcome": "deny",
-      "constraints": [
-       {
-        "id": "dedupe",
-        "result": "fail",
-        "method": "exact_match_index_v0",
-        "evidence_digest": "14b21abf4e507a4ddd761bd320bde63889bca8c558c5d31e617880b91ff21ff2"
-       },
-       {
-        "id": "caps",
-        "result": "n/a",
-        "method": "",
-        "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
-        "reason": "no caps definition is configured"
-       },
-       {
-        "id": "verify_before_dispatch",
-        "result": "n/a",
-        "method": "agent_action_capsule.verify",
-        "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
-        "reason": "action cites no mandate capsule"
-       },
-       {
-        "id": "rate_cap",
-        "result": "pass",
-        "method": "rate_threshold_v0",
-        "evidence_digest": "b4e57e1e638f10536136f36d3ad34ea631d2d30fbca145698c62d52abdafad34"
-       },
-       {
-        "id": "counterparty_list",
-        "result": "pass",
-        "method": "exact_reference_match_v0",
-        "evidence_digest": "cacca023bca54cb4d3e10cb3cd8f38dcc37001ce5ba09b9cfd6ac4c8a1040246"
-       }
-      ],
-      "capsule_id": "fd17e229e2c2a75cbb67737bcda58f69933a9336c8d633065440c0c700b01d47"
+      "capsule_id": "173a1f8b18595351778544eb0cb802fc0e5cb02cb43417286192c59ff315d680"
      }
     ]
    }
@@ -834,7 +893,7 @@
    "kind": "action-ledger",
    "pack": "inference-0.1.0",
    "input": "conformance-vectors/guard/v0/inputs/inference/over-both-caps.json",
-   "input_sha256": "2c0bd6b36a44d188fc27ce0b99bddeff81d139c598e2af72825ab39793fe9151",
+   "input_sha256": "7ed79bd1cdccf89be877f4cfbd226cea04f0f1718a4474213d74c53b1d83aea7",
    "expected": {
     "steps": [
      {
@@ -871,9 +930,15 @@
         "result": "pass",
         "method": "exact_reference_match_v0",
         "evidence_digest": "cacca023bca54cb4d3e10cb3cd8f38dcc37001ce5ba09b9cfd6ac4c8a1040246"
+       },
+       {
+        "id": "required_fields",
+        "result": "pass",
+        "method": "action_semantics_v0",
+        "evidence_digest": "f48d4b5d6e66b7567b908dacd896317e3e6b4de382807d4dcf5d68e32cbe2bba"
        }
       ],
-      "capsule_id": "3436fd24c6f2d7955fe1a4994e6015571ddee66fd5b6331d953b853af05f616a"
+      "capsule_id": "56265c648e82b2a71d8b98f6a94223c3436ffdc9928e35a271c61e68549a67c2"
      }
     ]
    }
@@ -883,7 +948,7 @@
    "kind": "action-ledger",
    "pack": "inference-0.1.0",
    "input": "conformance-vectors/guard/v0/inputs/inference/over-the-input-cap.json",
-   "input_sha256": "2b6a513d6717ea6cbfe4897ad6c9312447674927abb1d9b11bf2360f56a469ca",
+   "input_sha256": "a0470933627874ce99f436032da6b3ba42b773641c7c0ce2839fb9428839ce23",
    "expected": {
     "steps": [
      {
@@ -920,9 +985,15 @@
         "result": "pass",
         "method": "exact_reference_match_v0",
         "evidence_digest": "cacca023bca54cb4d3e10cb3cd8f38dcc37001ce5ba09b9cfd6ac4c8a1040246"
+       },
+       {
+        "id": "required_fields",
+        "result": "pass",
+        "method": "action_semantics_v0",
+        "evidence_digest": "f48d4b5d6e66b7567b908dacd896317e3e6b4de382807d4dcf5d68e32cbe2bba"
        }
       ],
-      "capsule_id": "ad2ad3a6c7dac886966be3c5ee10fcb4f646167730b262adde4cccf6dc3925a0"
+      "capsule_id": "cccee0062bbec331a8b903a292c06caaaa53063fc9c6a6c01be960b51cc83b03"
      }
     ]
    }
@@ -932,7 +1003,7 @@
    "kind": "action-ledger",
    "pack": "inference-0.1.0",
    "input": "conformance-vectors/guard/v0/inputs/inference/over-the-output-cap.json",
-   "input_sha256": "1e3e21384e5e0e7e6330ec6ad032c2d2b968fdceab8278d5c0e9eadbba29a8b0",
+   "input_sha256": "efac1d27f5703e9353501975966c2986799990e2eca66bea55d93c929d9c5a7d",
    "expected": {
     "steps": [
      {
@@ -969,9 +1040,15 @@
         "result": "pass",
         "method": "exact_reference_match_v0",
         "evidence_digest": "cacca023bca54cb4d3e10cb3cd8f38dcc37001ce5ba09b9cfd6ac4c8a1040246"
+       },
+       {
+        "id": "required_fields",
+        "result": "pass",
+        "method": "action_semantics_v0",
+        "evidence_digest": "f48d4b5d6e66b7567b908dacd896317e3e6b4de382807d4dcf5d68e32cbe2bba"
        }
       ],
-      "capsule_id": "dac3d6ea35ecaf0ac0b6668f9c13eeab95de198353eb6bfaf5382418c4b6321c"
+      "capsule_id": "5ea7d0905a072660ef8e6f228297ecdd226e4e238ed8a9d628d97a62b54e3ce9"
      }
     ]
    }
@@ -981,7 +1058,7 @@
    "kind": "action-ledger",
    "pack": "inference-0.1.0",
    "input": "conformance-vectors/guard/v0/inputs/inference/priced-no-profile.json",
-   "input_sha256": "7dc5b0d8f4119a961cebd2581ba4120c713f4c933406ac44443239dd2151caef",
+   "input_sha256": "7d3e8a651d7ae96ea7bcf079f58e58c2816e1b2b31e714babdd2cba4e121c31e",
    "expected": {
     "steps": [
      {
@@ -1018,9 +1095,15 @@
         "result": "pass",
         "method": "exact_reference_match_v0",
         "evidence_digest": "cacca023bca54cb4d3e10cb3cd8f38dcc37001ce5ba09b9cfd6ac4c8a1040246"
+       },
+       {
+        "id": "required_fields",
+        "result": "pass",
+        "method": "action_semantics_v0",
+        "evidence_digest": "f48d4b5d6e66b7567b908dacd896317e3e6b4de382807d4dcf5d68e32cbe2bba"
        }
       ],
-      "capsule_id": "1cf4abfb8a7198542bb6cbceb7a54a85d8eeec7f38bc06453c3d6a01df3e026e"
+      "capsule_id": "8ba83f78d2ce6bb5aa4928b149c1c51259eac2bd279e75d2fb01997ee9fcfc69"
      }
     ]
    }
@@ -1030,7 +1113,7 @@
    "kind": "action-ledger",
    "pack": "inference-0.1.0",
    "input": "conformance-vectors/guard/v0/inputs/inference/same-exchange-twice.json",
-   "input_sha256": "0c434c4ed1f9b351edcba6ff76c2df4718b442982ea0ed83c4682b5a28ad01b2",
+   "input_sha256": "6b3d753f4cc1d523353ecdb077700f7c43fea7f0b95e32c31a79e520b9d51dde",
    "expected": {
     "steps": [
      {
@@ -1067,9 +1150,15 @@
         "result": "pass",
         "method": "exact_reference_match_v0",
         "evidence_digest": "cacca023bca54cb4d3e10cb3cd8f38dcc37001ce5ba09b9cfd6ac4c8a1040246"
+       },
+       {
+        "id": "required_fields",
+        "result": "pass",
+        "method": "action_semantics_v0",
+        "evidence_digest": "f48d4b5d6e66b7567b908dacd896317e3e6b4de382807d4dcf5d68e32cbe2bba"
        }
       ],
-      "capsule_id": "708b5b9706f8d9cfd7579122ad69ee206a11e20d6702bd68a856dbd2dc1c67d9"
+      "capsule_id": "4a72383e6c5e46b11c5c8106b3369551e27578634ce8919d732392a6c156e478"
      },
      {
       "outcome": "deny",
@@ -1078,7 +1167,7 @@
         "id": "dedupe",
         "result": "fail",
         "method": "exact_match_index_v0",
-        "evidence_digest": "55f2f21aabe7042649433261132633a20865589302098e79f60a0e48a21b0e87"
+        "evidence_digest": "d0f40df3029bf8b8c5b2eb475bbe5a59f6b01508ca24ee7f70281b1a2dac9b40"
        },
        {
         "id": "caps",
@@ -1105,9 +1194,15 @@
         "result": "pass",
         "method": "exact_reference_match_v0",
         "evidence_digest": "cacca023bca54cb4d3e10cb3cd8f38dcc37001ce5ba09b9cfd6ac4c8a1040246"
+       },
+       {
+        "id": "required_fields",
+        "result": "pass",
+        "method": "action_semantics_v0",
+        "evidence_digest": "f48d4b5d6e66b7567b908dacd896317e3e6b4de382807d4dcf5d68e32cbe2bba"
        }
       ],
-      "capsule_id": "df70c0acb47649d1940a441b93dd7a78a893355bb8617c9919ea46081a43bc66"
+      "capsule_id": "b52cebb9b9d9f4f4236b76cb869539a028c18e490b25dd31933b1ba064902f6c"
      }
     ]
    }
@@ -1117,7 +1212,7 @@
    "kind": "action-ledger",
    "pack": "inference-0.1.0",
    "input": "conformance-vectors/guard/v0/inputs/inference/two-exchanges-same-peer.json",
-   "input_sha256": "acd09a820b297e9a2c97aea0e40d0d1f13fd7218209de125209bfd0da4e1d31d",
+   "input_sha256": "2aaadae78c79506b07d42d550a7ec9671f1295d8fc89aa66aaf4d39879b9aca6",
    "expected": {
     "steps": [
      {
@@ -1154,9 +1249,15 @@
         "result": "pass",
         "method": "exact_reference_match_v0",
         "evidence_digest": "cacca023bca54cb4d3e10cb3cd8f38dcc37001ce5ba09b9cfd6ac4c8a1040246"
+       },
+       {
+        "id": "required_fields",
+        "result": "pass",
+        "method": "action_semantics_v0",
+        "evidence_digest": "f48d4b5d6e66b7567b908dacd896317e3e6b4de382807d4dcf5d68e32cbe2bba"
        }
       ],
-      "capsule_id": "0f77ce99fbdd031135854a621a0f72e7f11f7477ad18ae30ab5d82550f2848ff"
+      "capsule_id": "e229a29d53a0b41c2aa22f0f05002af34dba7f3a5d242da14d0ac9942c436c49"
      },
      {
       "outcome": "allow",
@@ -1192,9 +1293,15 @@
         "result": "pass",
         "method": "exact_reference_match_v0",
         "evidence_digest": "cacca023bca54cb4d3e10cb3cd8f38dcc37001ce5ba09b9cfd6ac4c8a1040246"
+       },
+       {
+        "id": "required_fields",
+        "result": "pass",
+        "method": "action_semantics_v0",
+        "evidence_digest": "f48d4b5d6e66b7567b908dacd896317e3e6b4de382807d4dcf5d68e32cbe2bba"
        }
       ],
-      "capsule_id": "d7d3362a645a9f63bafa10439f022efc88437da827f0b002643381beffd3a66e"
+      "capsule_id": "080704d3307932e2f8dbab6656054489344b9c40a74802f3181879fae70f4e79"
      }
     ]
    }
@@ -1204,7 +1311,7 @@
    "kind": "action-ledger",
    "pack": "inference-0.1.0",
    "input": "conformance-vectors/guard/v0/inputs/inference/under-both-caps.json",
-   "input_sha256": "c900aa0be2248b8aea7eb668812fef3f32f7b2a9d9dc8a2d1dc3c9ac729fa4cc",
+   "input_sha256": "1c4b5c3853b93bdf065ca395840abb207db248c4e5ba7fff8e37a1bf3c1885d7",
    "expected": {
     "steps": [
      {
@@ -1241,9 +1348,15 @@
         "result": "pass",
         "method": "exact_reference_match_v0",
         "evidence_digest": "cacca023bca54cb4d3e10cb3cd8f38dcc37001ce5ba09b9cfd6ac4c8a1040246"
+       },
+       {
+        "id": "required_fields",
+        "result": "pass",
+        "method": "action_semantics_v0",
+        "evidence_digest": "f48d4b5d6e66b7567b908dacd896317e3e6b4de382807d4dcf5d68e32cbe2bba"
        }
       ],
-      "capsule_id": "484df45c8654fb5a3549f3cd0cba1f9ee97a1988ed9b95b82f85e60289a65619"
+      "capsule_id": "e4dced331605504d4bc07e7c389f8aeeb0defd627e83b560d7a73ac0026317c4"
      }
     ]
    }
