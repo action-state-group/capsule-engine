@@ -73,7 +73,7 @@ func checkRateCap(a Action, cfg rateCapConfig) (out Constraint) {
 		if observed > limit {
 			over = append(over, canon.Obj(canon.M("cap", canon.Str(k.cap)),
 				canon.M("cap_msat_per_million", canon.Int(limit)), canon.M("observed_msat_per_million", canon.Int(observed))))
-			notes = append(notes, fmt.Sprintf("%s %d exceeded by %d", k.cap, limit, observed))
+			notes = append(notes, fmt.Sprintf("%s %d, observed %d", k.cap, limit, observed))
 		}
 	}
 	if over == nil {

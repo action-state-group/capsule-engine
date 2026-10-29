@@ -12,6 +12,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/action-state-group/capsule-engine/go/canon"
 	"github.com/action-state-group/capsule-engine/go/pack"
 )
 
@@ -244,6 +245,16 @@ func ledgerSteps(t *testing.T, e *Engine, c conformanceCase, raw []byte) (steps 
 		profile, err := DecodeProfile(in.Profile)
 		if err != nil {
 			return nil, "decode: " + err.Error()
+		}
+		// The vectors' profiles are canonical, so the digest DecodeProfile
+		// computes is the JCS SHA-256 of the bytes as given: the profile
+		// digest a manifest pins is compared across languages here.
+		given, err := canon.FromJSON(in.Profile)
+		if err != nil {
+			t.Fatalf("%s: profile: %v", c.Case, err)
+		}
+		if want, err := canon.Digest(given); err != nil || profile.Digest != want {
+			t.Fatalf("%s: profile digest %s, want %s (%v)", c.Case, profile.Digest, want, err)
 		}
 		fresh, err := NewEngine(e.pack)
 		if err != nil {

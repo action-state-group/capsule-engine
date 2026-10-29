@@ -111,7 +111,7 @@ def decide_steps(
         installed = install_pack(pack, project_dir=Path(tmp) / "live-project", mode="observe", profile=profile)
         store = MemoryHistory()
         signer = signer or _default_signer()
-        if profile is not None:
+        if profile is not None and steps:
             first = steps[0]
             record_pack_activation(installed, history=store, operator=first["operator"],
                                    developer=first["developer"], signer=signer, timestamp=first["timestamp"])

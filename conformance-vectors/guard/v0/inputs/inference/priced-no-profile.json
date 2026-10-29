@@ -12,7 +12,8 @@
    "timestamp": "2026-10-29T12:01:00Z",
    "target": "node-b",
    "input_msat_per_million": 900000000,
-   "output_msat_per_million": 900000000
+   "output_msat_per_million": 900000000,
+   "equivalence_key": "exchange-i1"
   }
  ]
 }

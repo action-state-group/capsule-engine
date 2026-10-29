@@ -7,7 +7,10 @@
 # as input_msat_per_million and output_msat_per_million: millisatoshis per
 # million input and output tokens, mesh-llm's Pricing units. Both are
 # optional fields, so a peer whose price cannot be read reaches rate_cap and
-# is refused there rather than read as malformed.
+# is refused there rather than read as malformed. equivalence_key is required:
+# the exchange's own id. dedupe runs on every decision, and without a key it
+# keys an act on its target and amount, so a second inference from the same
+# peer (no amount) would be refused as a repeat.
 #
 # The pack ships no price bound: both rate caps default to the largest
 # integer every JSON reader holds exactly. The operator's policy profile
@@ -45,15 +48,16 @@ obligations:
   - id: r03-same-purchase-twice
     statement: >-
       Checks whether an inference purchase repeats one already accepted under
-      the same equivalence key, and refuses the repeat.
+      the same equivalence key, the exchange's id, and refuses the repeat.
+      Two exchanges with the same peer are two purchases.
     check: dedupe
     default_disposition: NEVER
 
 action_semantics:
   - action_type: inference.purchase
     action_class: money.purchase
-    required_fields: [target]
-    optional_fields: [input_msat_per_million, output_msat_per_million, equivalence_key]
+    required_fields: [target, equivalence_key]
+    optional_fields: [input_msat_per_million, output_msat_per_million]
 
 constraints:
   - wicket_ref: rate_cap/1.0.0

@@ -24,7 +24,8 @@
    "action_class": "money.purchase",
    "action_id": "inference/conformance-i8",
    "timestamp": "2026-10-29T12:08:00Z",
-   "target": "node-b"
+   "target": "node-b",
+   "equivalence_key": "exchange-i8"
   }
  ]
 }

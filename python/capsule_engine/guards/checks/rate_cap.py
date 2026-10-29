@@ -86,7 +86,7 @@ def check_rate_cap(
     ]
     evidence = RateCapEvidence(**rates, **caps, over=over)
     if over:
-        which = "; ".join(f"{o['cap']} {o['cap_msat_per_million']} exceeded by {o['observed_msat_per_million']}"
+        which = "; ".join(f"{o['cap']} {o['cap_msat_per_million']}, observed {o['observed_msat_per_million']}"
                           for o in over)
         return _outcome("fail", which, evidence)
     return _outcome("pass", "both rates are at or under their caps", evidence)

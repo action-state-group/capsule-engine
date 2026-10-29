@@ -111,6 +111,8 @@ func TestWithProfileRefusesWhatResolveRefuses(t *testing.T) {
 
 func TestDecodeProfileRefusesAMalformedRateCap(t *testing.T) {
 	for _, params := range []string{
+		`{"rate_cap":{"max_input_msat_per_million":"2000000"}}`,
+		`{"rate_cap":{"max_input_msat_per_million":true}}`,
 		`{"rate_cap":{}}`,
 		`{"rate_cap":{"max_input_msat_per_million":-1}}`,
 		`{"rate_cap":{"max_input_msat_per_million":1.5}}`,
@@ -140,5 +142,68 @@ func TestTheProfileDigestIgnoresEntryOrder(t *testing.T) {
 	}
 	if p1.Digest != p2.Digest {
 		t.Errorf("digests differ: %s, %s", p1.Digest, p2.Digest)
+	}
+}
+
+// DecodeProfile refuses what profile.py parse_profile refuses beyond a value's
+// range: a pack entry with no parameters mapping, an entry key its kind does
+// not have (an "fp_alg": null on a target entry is one), and data after the
+// document.
+func TestDecodeProfileRefusesWhatParseProfileRefuses(t *testing.T) {
+	list := func(entry string) string {
+		return `{"format":"policy-profile/v0","packs":[{"pack":"asg/inference","parameters":{"counterparty_list":
+			{"mode":"deny","entries":[` + entry + `]}}}]}`
+	}
+	for name, raw := range map[string]string{
+		"no parameters":        `{"format":"policy-profile/v0","packs":[{"pack":"asg/inference"}]}`,
+		"null parameters":      `{"format":"policy-profile/v0","packs":[{"pack":"asg/inference","parameters":null}]}`,
+		"target with fp_alg":   list(`{"kind":"target","value":"node-b","fp_alg":null}`),
+		"target extra key":     list(`{"kind":"target","value":"node-b","note":"x"}`),
+		"payee without fp_alg": list(`{"kind":"payee","value":"` + strings.Repeat("b", 64) + `"}`),
+		"value not a string":   list(`{"kind":"target","value":1}`),
+		"trailing data":        capsProfile + ` {}`,
+	} {
+		if _, err := DecodeProfile([]byte(raw)); err == nil {
+			t.Errorf("%s: accepted", name)
+		}
+	}
+	if _, err := DecodeProfile([]byte(list(`{"kind":"payee","fp_alg":"hmac-sha256-deal-key","value":"` + strings.Repeat("b", 64) + `"}`))); err != nil {
+		t.Errorf("a payee entry with its fp_alg: %v", err)
+	}
+}
+
+// A second WithProfile replaces the first whole: what it omits is the
+// wicket's default again (resolve.py lays a profile over the wicket's own
+// config), and a refused profile leaves the engine as it was.
+func TestWithProfileReplacesAnEarlierProfileWhole(t *testing.T) {
+	first := `{"format":"policy-profile/v0","packs":[{"pack":"asg/inference","parameters":{
+		"rate_cap":{"max_input_msat_per_million":1},
+		"counterparty_list":{"mode":"allow","entries":[{"kind":"target","value":"node-x"}],"disposition":"ask"}}}]}`
+	second := `{"format":"policy-profile/v0","packs":[{"pack":"asg/inference","parameters":{
+		"counterparty_list":{"mode":"deny","entries":[{"kind":"target","value":"node-x"}]}}}]}`
+	e := inferenceEngine(t, first)
+	p, err := DecodeProfile([]byte(second))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if e, err = e.WithProfile(p); err != nil {
+		t.Fatal(err)
+	}
+	if e.rateCap.MaxInputMsatPerMillion != maxSafeInt || e.list.Disposition != "deny" || e.list.Mode != "deny" {
+		t.Errorf("after the second profile: rate_cap %+v, list %+v; want the wicket's cap and disposition", e.rateCap, e.list)
+	}
+
+	before := inferenceEngine(t, first)
+	rateCap, list := before.rateCap, before.list
+	bad, err := DecodeProfile([]byte(`{"format":"policy-profile/v0","packs":[{"pack":"asg/inference","parameters":{
+		"rate_cap":{"max_input_msat_per_million":5},"caps":{"per_action_minor":{"money.purchase":1}}}}]}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := before.WithProfile(bad); err == nil {
+		t.Fatal("a profile setting caps limits was accepted")
+	}
+	if before.rateCap.MaxInputMsatPerMillion != rateCap.MaxInputMsatPerMillion || before.list.Disposition != list.Disposition {
+		t.Errorf("a refused profile changed the engine: rate_cap %+v, list %+v", before.rateCap, before.list)
 	}
 }

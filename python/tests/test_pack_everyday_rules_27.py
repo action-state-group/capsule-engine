@@ -77,7 +77,7 @@ OTHER_PACK_DIGESTS = {
     "airline-engagement": "ea74a099524b5f7a82047cc883e211a25ef230a29c34438e68bfac22c9169277",
     "eu-ai-act": "9d3197935b6b002ccd4682c7cfa2bacf01d9dbc2b3b04811e94dd50e6a2b9cfa",
     "eu-ai-act-deterministic": "b6f6b62454380c6ab4fc1c11fd4418045cc310b95f6a7cbbf2ea23bf54ca5609",
-    "inference": "c9f4cab0cf78d55e28d5d011eb74eba12e8b10e38dddb5170f408fd5483d5e93",
+    "inference": "b8410fcf29faa0c027012a76bd275d397e210b788a6aa64098e96c4cd09098ed",
     "payments-safety": "81278051db5ca3755956b7adeaea727d333d12a0c14c51c7e030f15ea8b9666f",
     "seller": "5e112a7f5136e2193adb177605dfad10b7b0753a2de93ed72e446695b7acc56a",
     "standard-vendor": "9ae420d59ebfb1f87ecd740c948be4d0df16cefac97d8640da24934302359ae2",

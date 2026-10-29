@@ -285,11 +285,54 @@ func dropForeignAttribution(body []byte) ([]byte, error) {
 	return json.Marshal(fields)
 }
 
+// takeCounterpartyFingerprints is body without counterparty_ids and
+// counterparty_fp_alg, and their values: action.py Action's keyed
+// fingerprints by kind and their algorithm, read by counterparty_list and
+// never sealed, so they are not exported fields of Action. ids is a mapping of
+// kind to fingerprint and fp_alg a string; null is absent.
+func takeCounterpartyFingerprints(body []byte) ([]byte, map[string]string, string, error) {
+	var fields map[string]json.RawMessage
+	if err := json.Unmarshal(body, &fields); err != nil {
+		return nil, nil, "", err
+	}
+	rawIDs, hasIDs := fields["counterparty_ids"]
+	rawAlg, hasAlg := fields["counterparty_fp_alg"]
+	if !hasIDs && !hasAlg {
+		return body, nil, "", nil
+	}
+	var ids map[string]string
+	if hasIDs {
+		if err := json.Unmarshal(rawIDs, &ids); err != nil {
+			return nil, nil, "", fmt.Errorf("counterparty_ids must map a kind to a fingerprint: %w", err)
+		}
+	}
+	var fpAlg *string
+	if hasAlg {
+		if err := json.Unmarshal(rawAlg, &fpAlg); err != nil {
+			return nil, nil, "", fmt.Errorf("counterparty_fp_alg must be a string: %w", err)
+		}
+	}
+	delete(fields, "counterparty_ids")
+	delete(fields, "counterparty_fp_alg")
+	rest, err := json.Marshal(fields)
+	if err != nil {
+		return nil, nil, "", err
+	}
+	if fpAlg == nil {
+		return rest, ids, "", nil
+	}
+	return rest, ids, *fpAlg, nil
+}
+
 // decodeAction decodes a normalized action. With checkTimestamp false the
 // timestamp is not parsed (DecodeRecord's placeholder for a record that
 // will not be evaluated).
 func decodeAction(given []byte, checkTimestamp bool) (Action, error) {
 	body, err := dropForeignAttribution(given)
+	if err != nil {
+		return Action{}, fmt.Errorf("action: %w", err)
+	}
+	body, ids, fpAlg, err := takeCounterpartyFingerprints(body)
 	if err != nil {
 		return Action{}, fmt.Errorf("action: %w", err)
 	}
@@ -299,6 +342,7 @@ func decodeAction(given []byte, checkTimestamp bool) (Action, error) {
 	if err := dec.Decode(&a); err != nil {
 		return Action{}, fmt.Errorf("action: %w", err)
 	}
+	a.counterpartyIDs, a.counterpartyFPAlg = ids, fpAlg
 	// What the action carried, as given: an attribution it drops is still
 	// listed, as a value out of its closed set is (handover).
 	var fields map[string]json.RawMessage

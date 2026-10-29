@@ -20,8 +20,9 @@ Kinds:
   name the served pack it is decided under (``"pack": "inference"``;
   everyday when it names none), and may carry a ``"profile"``, a
   policy-profile/v0 in its canonical form, installed and activated with the
-  pack (``decide_steps``'s ``profile``; Go: ``ProfileParameters`` and
-  ``ProfileLimits``). Its expected
+  pack (``decide_steps``'s ``profile``; Go: ``DecodeProfile`` and
+  ``WithProfile``, whose profile digest the Go runner compares with the
+  JCS SHA-256 of the profile as given). Its expected
   decision is ``{"steps": [<decision>, ...]}``, each step with the
   ``capsule_id`` the engine sealed for it: the caller seals in Go, so the Go
   runner gives the record it appends that id, and a later step's evidence
@@ -185,8 +186,9 @@ def decide(case: dict) -> tuple[dict, set[str]]:
 
 
 def _profile(data: dict):
-    """The input's profile, which must be in its canonical form: the Go
-    runner digests the bytes as given."""
+    """The input's profile, which must be in its canonical form, so its JCS
+    digest as given is the digest Python pins, and the Go runner compares
+    its own ``DecodeProfile`` digest with it."""
     if "profile" not in data:
         return None
     profile = parse_profile(data["profile"])

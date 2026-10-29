@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"maps"
 	"regexp"
 	"slices"
@@ -78,6 +79,9 @@ func DecodeProfile(raw []byte) (Profile, error) {
 		if err := strictJSON(rawPack, &entry); err != nil {
 			return Profile{}, fmt.Errorf("profile: packs entry: %w", err)
 		}
+		if entry.Parameters == nil {
+			return Profile{}, fmt.Errorf("profile: packs[%q].parameters must be a mapping", entry.Pack)
+		}
 		if !profilePackName.MatchString(entry.Pack) {
 			return Profile{}, fmt.Errorf("profile: packs[].pack must be '<publisher>/<name>' with no version, got %q", entry.Pack)
 		}
@@ -145,12 +149,18 @@ func decodeProfilePack(name string, raw map[string]map[string]json.RawMessage) (
 	return out, canon.Obj(checks...), nil
 }
 
-// safeInt reads raw as an integer from 0 to 2^53-1, as profile.py does.
+// safeInt reads raw as an integer from 0 to 2^53-1, as profile.py does. A
+// quoted number is a string, which profile.py refuses, so it is refused here
+// too (json.Number alone would accept "2000000").
 func safeInt(raw json.RawMessage) (int64, bool) {
 	dec := json.NewDecoder(bytes.NewReader(raw))
 	dec.UseNumber()
-	var n json.Number
-	if dec.Decode(&n) != nil {
+	var any_ any
+	if dec.Decode(&any_) != nil {
+		return 0, false
+	}
+	n, ok := any_.(json.Number)
+	if !ok {
 		return 0, false
 	}
 	v, err := n.Int64()
@@ -217,20 +227,9 @@ func decodeProfileList(keys map[string]json.RawMessage, ctx string) (listConfig,
 		return out, canon.Value{}, fmt.Errorf("%s['entries'] must be a list", ctx)
 	}
 	for _, re := range rawEntries {
-		var e struct {
-			Kind  string  `json:"kind"`
-			Value string  `json:"value"`
-			FPAlg *string `json:"fp_alg"`
-		}
-		if err := strictJSON(re, &e); err != nil {
+		entry, err := decodeListEntry(re)
+		if err != nil {
 			return out, canon.Value{}, fmt.Errorf("%s['entries']: %w", ctx, err)
-		}
-		entry := ListEntry{Kind: e.Kind, Value: e.Value}
-		if e.FPAlg != nil {
-			if *e.FPAlg == "" {
-				return out, canon.Value{}, fmt.Errorf("%s['entries'] entry has an empty fp_alg", ctx)
-			}
-			entry.FPAlg = *e.FPAlg
 		}
 		if err := entry.check(); err != nil {
 			return out, canon.Value{}, fmt.Errorf("%s['entries']: %w", ctx, err)
@@ -255,11 +254,56 @@ func decodeProfileList(keys map[string]json.RawMessage, ctx string) (listConfig,
 	return out, canon.Obj(members...), nil
 }
 
-// strictJSON decodes raw into v, refusing an unknown key.
+// decodeListEntry is profile.py _parse_list_entry: {kind: target, value} or
+// {kind: <fingerprint kind>, fp_alg, value}, with exactly those keys and
+// string values (an "fp_alg": null on a target entry is a key too much).
+func decodeListEntry(raw json.RawMessage) (ListEntry, error) {
+	var fields map[string]json.RawMessage
+	if err := strictJSON(raw, &fields); err != nil || fields == nil {
+		return ListEntry{}, errors.New("an entry must be a mapping")
+	}
+	str := func(key string) (string, error) {
+		var s *string
+		if err := json.Unmarshal(fields[key], &s); err != nil || s == nil || *s == "" {
+			return "", fmt.Errorf("entry %s must be a non-empty string, got %s", key, fields[key])
+		}
+		return *s, nil
+	}
+	kind, err := str("kind")
+	if err != nil {
+		return ListEntry{}, err
+	}
+	want := []string{"kind", "value"}
+	if slices.Contains(fingerprintKinds, kind) {
+		want = []string{"fp_alg", "kind", "value"}
+	}
+	if got := slices.Sorted(maps.Keys(fields)); !slices.Equal(got, want) {
+		return ListEntry{}, fmt.Errorf("entry of kind %q must have exactly the keys %v, got %v", kind, want, got)
+	}
+	entry := ListEntry{Kind: kind}
+	if entry.Value, err = str("value"); err != nil {
+		return ListEntry{}, err
+	}
+	if len(want) == 3 {
+		if entry.FPAlg, err = str("fp_alg"); err != nil {
+			return ListEntry{}, err
+		}
+	}
+	return entry, nil
+}
+
+// strictJSON decodes raw into v, refusing an unknown key and anything after
+// the one document.
 func strictJSON(raw []byte, v any) error {
 	dec := json.NewDecoder(bytes.NewReader(raw))
 	dec.DisallowUnknownFields()
-	return dec.Decode(v)
+	if err := dec.Decode(v); err != nil {
+		return err
+	}
+	if dec.Decode(&struct{}{}) != io.EOF {
+		return errors.New("data after the document")
+	}
+	return nil
 }
 
 // packName is profile.py pack_name: asg/everyday/0.1.0 -> asg/everyday.
@@ -273,10 +317,13 @@ func packName(packID string) string {
 // WithProfile makes e decide with p's values laid over its pack's wickets,
 // as an engine built from a pack installed with p does
 // (policy/resolve.py configured_wickets): p's rate_cap caps and counterparty
-// list replace the wicket's. It refuses, as resolve.py _check_profile does,
-// values for a pack other than e's and for a check e's pack does not cite. It
-// also refuses caps limits: this port reads them only through OperatorLimits
-// (WithOperatorLimits), whose caller applies an activation's cooling-off.
+// list replace the wicket's. Each starts from the wicket's own config, so a
+// later profile replaces an earlier one whole: what it omits is the wicket's
+// default again. It refuses, as resolve.py _check_profile does, values for a
+// pack other than e's and for a check e's pack does not cite, and on any
+// refusal e is left as it was. It also refuses caps limits: this port reads
+// them only through OperatorLimits (WithOperatorLimits), whose caller
+// applies an activation's cooling-off.
 func (e *Engine) WithProfile(p Profile) (*Engine, error) {
 	name := packName(e.pack.ID)
 	for n := range p.Packs {
@@ -289,6 +336,19 @@ func (e *Engine) WithProfile(p Profile) (*Engine, error) {
 		return nil, errors.New("profile sets caps limits, which this port does not apply from a profile: " +
 			"give them through WithOperatorLimits")
 	}
+	rateCap, list := e.rateCap, e.list
+	if w, ok := e.pack.Wicket("rate_cap"); ok {
+		var err error
+		if rateCap, err = decodeConfig[rateCapConfig](w); err != nil {
+			return nil, err
+		}
+	}
+	if w, ok := e.pack.Wicket("counterparty_list"); ok {
+		var err error
+		if list, err = decodeConfig[listConfig](w); err != nil {
+			return nil, err
+		}
+	}
 	if values.RateCap != nil {
 		w, ok := e.pack.Wicket("rate_cap")
 		if !ok {
@@ -298,24 +358,21 @@ func (e *Engine) WithProfile(p Profile) (*Engine, error) {
 		if err := w.Config.Decode(&declared); err != nil {
 			return nil, fmt.Errorf("%s config: %w", w.ID, err)
 		}
-		cfg := e.rateCap
 		for key, v := range values.RateCap {
 			if _, ok := declared[key]; !ok {
 				return nil, fmt.Errorf("profile sets rate_cap.%s, which wicket %s declares no default for", key, w.ID)
 			}
 			if key == "max_input_msat_per_million" {
-				cfg.MaxInputMsatPerMillion = v
+				rateCap.MaxInputMsatPerMillion = v
 			} else {
-				cfg.MaxOutputMsatPerMillion = v
+				rateCap.MaxOutputMsatPerMillion = v
 			}
 		}
-		e.rateCap = cfg
 	}
 	if values.List != nil {
 		if _, ok := e.pack.Wicket("counterparty_list"); !ok {
 			return nil, errors.New("profile sets counterparty_list, which no wicket of this pack runs")
 		}
-		list := e.list
 		list.Mode, list.Entries = values.List.Mode, values.List.Entries
 		if values.List.Disposition != "" {
 			list.Disposition = values.List.Disposition
@@ -323,7 +380,7 @@ func (e *Engine) WithProfile(p Profile) (*Engine, error) {
 		if err := list.check(); err != nil {
 			return nil, err
 		}
-		e.list = list
 	}
+	e.rateCap, e.list = rateCap, list
 	return e, nil
 }

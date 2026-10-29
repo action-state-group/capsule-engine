@@ -25,7 +25,8 @@
    "action_id": "inference/conformance-i9",
    "timestamp": "2026-10-29T12:09:00Z",
    "target": "node-b",
-   "input_msat_per_million": 1000000
+   "input_msat_per_million": 1000000,
+   "equivalence_key": "exchange-i9"
   }
  ]
 }

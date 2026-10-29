@@ -31,7 +31,7 @@ def _step(**kw) -> dict:
         "operator": "node-a", "developer": "mesh-node@v1", "action_type": "decide", "taxonomy_version": "6",
         "verb": "buy", "action_class": "money.purchase", "action_id": "inference/t1",
         "timestamp": "2026-10-29T12:00:00Z", "target": "node-b",
-        "input_msat_per_million": 1_000_000, "output_msat_per_million": 4_000_000,
+        "input_msat_per_million": 1_000_000, "output_msat_per_million": 4_000_000, "equivalence_key": "exchange-1",
     }
     return {k: v for k, v in {**step, **kw}.items() if v is not None}
 
@@ -117,3 +117,19 @@ def test_a_profile_cannot_set_rate_caps_for_a_pack_that_cites_no_rate_cap(tmp_pa
     with pytest.raises(PolicyManifestError) as err:
         install_pack(EVERYDAY, project_dir=tmp_path, profile=_profile("asg/everyday", rate_cap=CAPS))
     assert err.value.reason == PROFILE_UNKNOWN_PARAMETER
+
+
+def test_two_exchanges_with_one_peer_are_two_purchases_and_a_retry_is_refused():
+    first = _step()
+    second = _step(action_id="inference/t2", timestamp="2026-10-29T12:26:00Z", equivalence_key="exchange-2")
+    retry = _step(action_id="inference/t3", timestamp="2026-10-29T12:27:00Z")
+    assert [d.outcome for d in decide_steps(INFERENCE, [first, second, retry])] == ["allow", "allow", "deny"]
+
+
+def test_the_pack_requires_the_exchange_id():
+    (semantics,) = INFERENCE.action_semantics
+    assert "equivalence_key" in semantics.required_fields
+
+
+def test_a_profile_with_no_steps_decides_nothing():
+    assert decide_steps(INFERENCE, [], profile=_profile(rate_cap=CAPS)) == []
