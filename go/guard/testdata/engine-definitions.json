@@ -1,6 +1,7 @@
 {
   "current": {
     "everyday": "everyday-0.3.9",
+    "inference": "inference-0.1.0",
     "seller": "seller-0.1.6"
   },
   "folds": {
@@ -58,6 +59,7 @@
     "promise_never/1.1.0": "ed9e02ed17cbd08a0f846023e7091e7636d504ba1f18c6b9173e0a2443d92b8b",
     "promise_requires_approval/1.0.0": "b29e29e0a31ef764b282fa5754992b49b5ffc4f3fc261fb821987ae6c2e1c9b2",
     "promise_requires_approval/1.1.0": "52514fb625b208f2f04d900d115468b526c01ec34c5630fe3ae68ed86eefe386",
+    "rate_cap/1.0.0": "a2628f677ddbeb6cdd6a62ac44403b51ac03f878b40e1c8d1627c95039c13d93",
     "recipient_role/1.0.0": "917ab5edea21867f318b8dfd54a6d7b458cbabcc5cebfac6ff0c4861e918d43b",
     "recipient_role/1.1.0": "57cb99bde24b5ae41ae214f4d2db0e8f20cbdf7ba31170b65da0561afdc499e1",
     "recipient_seen_before/1.0.0": "df8803e9c4bdab9deff48e772fcd21ff813d00157068dd250a8a5c6b45cd6c44",

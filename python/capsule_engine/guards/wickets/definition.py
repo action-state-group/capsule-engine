@@ -61,7 +61,7 @@ WICKET_ID_RE = re.compile(r"^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)*/\d+\.\d+\.\d+$"
 # ``counterparty_list``, ``recipient_role``, ``refundability``,
 # ``material_fields_changed``, ``offer_fields_changed``,
 # ``recipient_seen_before``, ``channel_change``, ``upfront_amount``,
-# ``task_authority``, and the seller-side ``price_floor``,
+# ``task_authority``, ``rate_cap``, and the seller-side ``price_floor``,
 # ``required_disclosure``, ``promise_requires_approval``, ``promise_never``,
 # ``offer_expiry``, ``single_commitment``, ``release_on_acceptance`` --
 # ``guards/checks/__init__.py``'s ``RUNNABLE_CHECKS``). Closed for
@@ -82,6 +82,7 @@ KNOWN_CHECKS = frozenset(
         "recurring_charge",
         "action_class_gate",
         "counterparty_list",
+        "rate_cap",
         "recipient_role",
         "refundability",
         "material_fields_changed",

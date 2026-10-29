@@ -1,10 +1,16 @@
 {
- "note": "Definitions a current pack cites that no conformance case can run, each with why. The coverage gate (scripts/conformance_vectors.py --check) skips only these.",
+ "note": "Definitions a current pack cites that no conformance case can run, each with why. The coverage gate (scripts/conformance_vectors.py --check) skips only these; an entry naming a pack skips the definition in that pack alone.",
  "exempt": [
   {
    "definition": "verify_before_dispatch/1.0.0",
    "why": "the Go guard has no capsule verifier: checkVerifyBeforeDispatch is always n/a, and an action that cites a mandate is refused with ErrCitedMandate before any check runs",
    "issue": "https://github.com/action-state-group/capsule-engine/issues/210"
+  },
+  {
+   "definition": "spend.weekly/3.1.0",
+   "pack": "inference",
+   "why": "the pack loader requires a fold, and no check of the inference pack reads one (rate_cap reads the action alone)",
+   "issue": "https://github.com/action-state-group/capsule-engine/issues/263"
   }
  ]
 }

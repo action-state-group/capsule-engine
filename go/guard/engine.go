@@ -162,6 +162,13 @@ var portedDefinitions = map[string]string{
 	// (decideAttributed). promise_11_test.go holds them to the engine.
 	"promise_requires_approval/1.1.0": "52514fb625b208f2f04d900d115468b526c01ec34c5630fe3ae68ed86eefe386",
 	"promise_never/1.1.0":             "ed9e02ed17cbd08a0f846023e7091e7636d504ba1f18c6b9173e0a2443d92b8b",
+	// asg/inference/0.1.0 (capsule-engine#263): rate_cap/1.0.0 compares a
+	// peer's advertised rates with two caps (checkRateCap), and
+	// counterparty_list/1.0.0 is the user's list (checkCounterpartyList),
+	// their values set by a profile (WithProfile). The inference conformance
+	// vectors hold both to the engine.
+	"rate_cap/1.0.0":          "a2628f677ddbeb6cdd6a62ac44403b51ac03f878b40e1c8d1627c95039c13d93",
+	"counterparty_list/1.0.0": "d95162931a6c1f88c763f2fd221d63b238888c1bdd7c6d594123ee5671e18f65",
 }
 
 // unportedDefinitions are the definitions a vendored pack cites that this
@@ -261,7 +268,7 @@ var implementedChecks = []string{"caps", "dedupe", "destination_rail", "counterp
 	"recurring_charge", "refundability", "upfront_amount", "recipient_role", "task_authority", "counterparty_seen_before",
 	"channel_change", "material_fields_changed", "offer_fields_changed", "recipient_seen_before", "action_class_gate",
 	"verify_before_dispatch", "offer_expiry", "price_floor", "single_commitment", "promise_never", "promise_requires_approval",
-	"required_disclosure", "release_on_acceptance"}
+	"required_disclosure", "release_on_acceptance", "counterparty_list", "rate_cap"}
 
 // NotYetRunRules are the rules of p whose check this port does not run, by
 // rule id: their result is not_evaluable, NotYetRun, and a listing must say
@@ -474,6 +481,10 @@ type Engine struct {
 	// perActionReads is the caps wicket's per_action_reads ("" reads the
 	// capture).
 	perActionReads string
+	// requiredFields are the pack's action types and the fields each
+	// requires (requiredFieldsOf): an action whose verb names one is refused
+	// when it lacks one (checkRequiredFields).
+	requiredFields map[string][]string
 	// limitSources: caps evidence names where each limit came from
 	// (limit_sources). An engine built from an installed pack reads its
 	// limits from policy (capsule-engine 365eb92 engine.py _limits_for):
@@ -499,6 +510,8 @@ type Engine struct {
 	upfront      upfrontConfig
 	role         roleConfig
 	authority    classConfig
+	list         listConfig
+	rateCap      rateCapConfig
 	gate         yaml.Node
 	// askGate are the action_class_gate selectors whose obligations all
 	// declare ASK (askGateSelectors): a gate failure on these alone asks.
@@ -624,6 +637,9 @@ func NewEngine(p pack.Pack) (*Engine, error) {
 		return nil, err
 	}
 	e := &Engine{pack: p, tax: tax, limitSources: true, askGate: askGateSelectors(p)}
+	if e.requiredFields, err = requiredFieldsOf(p); err != nil {
+		return nil, err
+	}
 	// A pack may cite no caps definition (capsule-engine e0e664d,
 	// GuardEngine caps_fold=None); this port reads no limit from anywhere
 	// else, so there is no limit to refuse without one.
@@ -698,6 +714,12 @@ func NewEngine(p pack.Pack) (*Engine, error) {
 			}
 		case "task_authority":
 			e.authority, err = decodeConfig[classConfig](w)
+		case "counterparty_list":
+			if e.list, err = decodeConfig[listConfig](w); err == nil {
+				err = e.list.check()
+			}
+		case "rate_cap":
+			e.rateCap, err = decodeConfig[rateCapConfig](w)
 		case "counterparty_seen_before":
 			e.seenBefore, err = newSeenBefore(w, p)
 		case "channel_change":
@@ -1085,6 +1107,10 @@ func (e *Engine) checkWith(a Action, h History, in checkInputs) (Decision, error
 	if a.CitedMandateCapsuleID != nil {
 		return Decision{}, ErrCitedMandate
 	}
+	// An Action built directly, not by DecodeAction, is held to the same rule.
+	if err := a.checkEquivalenceKey(); err != nil {
+		return Decision{}, err
+	}
 	var cs []Constraint
 	for _, check := range append([]string{"dedupe", "caps", "verify_before_dispatch"}, e.order...) {
 		c, err := e.constraintFor(check, a, h, in)
@@ -1093,9 +1119,22 @@ func (e *Engine) checkWith(a Action, h History, in checkInputs) (Decision, error
 		}
 		cs = append(cs, c)
 	}
+	if c, ok := checkRequiredFields(a, e.requiredFields); ok {
+		cs = append(cs, c)
+	}
 	cs = e.compareTaxonomy(a, cs)
 	_, approver := e.tax.approver(a.class())
-	outcome := decide(cs, approver, e.gateFailuresAsk(cs), e.askChecks)
+	asks := e.askChecks
+	if e.list.Disposition == "ask" {
+		// engine.py: a counterparty_list configured disposition ask joins the
+		// failures that ask an approver.
+		asks = maps.Clone(asks)
+		if asks == nil {
+			asks = map[string]bool{}
+		}
+		asks["counterparty_list"] = true
+	}
+	outcome := decide(cs, approver, e.gateFailuresAsk(cs), asks)
 	// A would-allow held only by its record's taxonomy is refused, as the
 	// engine seals it (a reject;
 	// capsule-engine 9ac3722): the class-keyed checks were never run, so
@@ -1227,6 +1266,10 @@ func (e *Engine) runCheck(check string, a Action, r *historyReader, in checkInpu
 		return checkPromiseRequiresApproval(a, in.taskAuthority, in.authorization, e.approval, e.noApprovalRecords), nil
 	case "required_disclosure":
 		return checkRequiredDisclosure(a, r, e.disclosure), nil
+	case "counterparty_list":
+		return checkCounterpartyList(a, e.list), nil
+	case "rate_cap":
+		return checkRateCap(a, e.rateCap), nil
 	}
 	return Constraint{}, fmt.Errorf("check %q is configured and neither run nor pinned as unported", check)
 }
@@ -1247,7 +1290,7 @@ func requirePerActionReads(s string) error {
 // sealed). Every other check is keyed on the class, so a mismatch leaves it
 // unevaluated (compareTaxonomy), including any check added later.
 var neverHeld = []string{"dedupe", "verify_before_dispatch", "single_commitment", "promise_never", "release_on_acceptance",
-	"credential_pattern", "plan_containment"}
+	"credential_pattern", "plan_containment", "required_fields"}
 
 // compareTaxonomy holds the action's taxonomy_version against the vendored
 // action taxonomy's. A different version leaves every check that reads
@@ -1375,7 +1418,7 @@ func RecordFor(a Action, d Decision) Record {
 // (capsule.py _payload_extension, #134), or nil when a carries no key.
 func sealedKeyOf(a Action) *string {
 	if a.EquivalenceKey == nil {
-		return nil
+		return a.EquivalenceKeyDigest
 	}
 	// A JSON string always digests: canon refuses only non-finite numbers.
 	d, _ := sealedEquivalenceKey(*a.EquivalenceKey)

@@ -16,7 +16,13 @@ Kinds:
   ``DecodeCheckInput`` then ``CheckWithHistory``);
 * ``action-ledger``: ``{"steps": [<Action fields>, ...]}``, decided in order
   by ``decide_steps``, each decision in the ledger before the next step (Go:
-  ``DecodeAction`` then ``Check``, appending ``RecordFor``). Its expected
+  ``DecodeAction`` then ``Check``, appending ``RecordFor``). The input may
+  name the served pack it is decided under (``"pack": "inference"``;
+  everyday when it names none), and may carry a ``"profile"``, a
+  policy-profile/v0 in its canonical form, installed and activated with the
+  pack (``decide_steps``'s ``profile``; Go: ``DecodeProfile`` and
+  ``WithProfile``, whose profile digest the Go runner compares with the
+  JCS SHA-256 of the profile as given). Its expected
   decision is ``{"steps": [<decision>, ...]}``, each step with the
   ``capsule_id`` the engine sealed for it: the caller seals in Go, so the Go
   runner gives the record it appends that id, and a later step's evidence
@@ -83,6 +89,7 @@ from agent_action_capsule import json_digest
 
 from capsule_engine.guards.wickets.loader import load_definition_file as load_wicket_file
 from capsule_engine.packs import load_pack_dir
+from capsule_engine.policy.profile import parse_profile
 from capsule_engine.report.live_check import decide_check_input, decide_sale_bundle, decide_steps
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -152,6 +159,8 @@ def decide(case: dict) -> tuple[dict, set[str]]:
     if case["kind"] not in ("check-input", "action-ledger", "sale-bundle"):
         raise ValueError(f"{case['case']}: unknown kind {case['kind']!r}")
     data = json.loads((ROOT / case["input"]).read_text())
+    # A profile not in canonical form is a broken vector, not an engine refusal.
+    profile = _profile(data) if case["kind"] == "action-ledger" else None
     try:
         if case["kind"] == "check-input":
             decisions = [decide_check_input(_pack(case["pack"]), data).decision]
@@ -160,7 +169,7 @@ def decide(case: dict) -> tuple[dict, set[str]]:
             decisions = [s.decision for s in result.decisions]
             records = [s.record for s in result.decisions]
         else:
-            decisions = decide_steps(_pack(case["pack"]), data["steps"])
+            decisions = decide_steps(_pack(case["pack"]), data["steps"], profile=profile)
     except Exception as exc:  # the engine refuses the input
         return {"error": type(exc).__name__}, set()
     seen = set().union(set(), *(_strings(c.evidence) for d in decisions for c in d.constraints))
@@ -174,6 +183,18 @@ def decide(case: dict) -> tuple[dict, set[str]]:
         return {"sale": {"complete": sale.complete, "findings": list(sale.findings)}, "steps": steps}, seen
     steps = [{**_decision(d), "capsule_id": (d.capsule or {}).get("capsule_id", "")} for d in decisions]
     return {"steps": steps}, seen
+
+
+def _profile(data: dict):
+    """The input's profile, which must be in its canonical form, so its JCS
+    digest as given is the digest Python pins, and the Go runner compares
+    its own ``DecodeProfile`` digest with it."""
+    if "profile" not in data:
+        return None
+    profile = parse_profile(data["profile"])
+    if profile.canonical_dict() != data["profile"]:
+        raise ValueError("an action-ledger input's profile must be in its canonical form")
+    return profile
 
 
 def decision_of(case: dict) -> dict:
@@ -190,9 +211,11 @@ def coverage(sets: list[dict], evidence_strings: set[str]) -> list[str]:
     wicket is covered by a case where its check is not n/a; a fold, by a case
     whose evidence names the fold's digest, which a check writes only when
     it ran the fold."""
-    exempt = {e["definition"] for e in json.loads((VECTORS / "COVERAGE-EXEMPT.json").read_text())["exempt"]}
+    entries = json.loads((VECTORS / "COVERAGE-EXEMPT.json").read_text())["exempt"]
     problems = []
-    for directory in _current().values():
+    for name, directory in _current().items():
+        # An entry naming a pack exempts the definition in that pack alone.
+        exempt = {e["definition"] for e in entries if e.get("pack", name) == name}
         provenance = json.loads((PACKS / directory / "PROVENANCE.json").read_text())
         ran = set()
         for data in sets:
@@ -221,13 +244,14 @@ def _current() -> dict[str, str]:
 def _kind_and_pack(data) -> tuple[str, str] | None:
     """An input's kind and the current pack it is decided under, or None when
     it is no input: an envelope under the served pack its ``party_role``
-    names (seller, else everyday), and a steps file under everyday."""
+    names (seller, else everyday), and a steps file under the served pack it
+    names, else everyday."""
     current = _current()
     if isinstance(data, dict) and data.get("schema") == ENVELOPE_SCHEMA:
         party = data.get("party_role") or (data.get("record") or {}).get("party_role")
         return "check-input", current["seller"] if party == "seller" else current["everyday"]
     if isinstance(data, dict) and isinstance(data.get("steps"), list):
-        return "action-ledger", current["everyday"]
+        return "action-ledger", current[data.get("pack", "everyday")]
     if isinstance(data, dict) and isinstance(data.get("sale_bundle"), str):
         return "sale-bundle", current["seller"]
     return None

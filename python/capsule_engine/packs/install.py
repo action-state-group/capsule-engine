@@ -48,6 +48,7 @@ __all__ = [
     "manifest_id_for_pack",
     "build_engine",
     "record_pack_activation",
+    "required_fields",
 ]
 
 PACK_ENGINE = "pack/1"
@@ -192,6 +193,7 @@ def build_engine(
         wickets=wickets,
         ask_gate_selectors=gate_selectors,
         ask_wickets=checks,
+        required_fields=required_fields(installed.pack),
     )
 
 
@@ -232,6 +234,13 @@ def ask_wickets(pack: PackDefinition) -> frozenset[str]:
         if o.check in RUNNABLE_CHECKS and o.check not in ASK_RULE_EXCLUDED_CHECKS:
             declared.setdefault(o.check, set()).add(o.default_disposition)
     return frozenset(check for check, dispositions in declared.items() if dispositions == {"ASK"})
+
+
+def required_fields(pack: PackDefinition) -> dict[str, tuple[str, ...]]:
+    """The pack's action types and the normalized fields each requires
+    (``action_semantics``): what ``GuardEngine`` refuses an action whose verb
+    names one of them for lacking."""
+    return {s.action_type: tuple(s.required_fields) for s in pack.action_semantics}
 
 
 def record_pack_activation(

@@ -5,6 +5,31 @@ module has its own changelog, `go/CHANGELOG.md`.
 
 ## Unreleased
 
+- Added (capsule-engine#263): the `rate_cap` check and its wicket `rate_cap/1.0.0`. It compares the
+  advertised input and output rates of the peer an inference is bought from, in millisatoshis per
+  million tokens (mesh-llm's `Pricing` units), with `max_input_msat_per_million` and
+  `max_output_msat_per_million`. A rate over its cap fails, naming the cap; an action missing a rate
+  is `n/a` in scope and refused (fails closed, verdict `not_evaluable`). Both caps default to
+  2^53-1, so the wicket bounds nothing until a profile sets them.
+- Added: two normalized action fields, `input_msat_per_million` and `output_msat_per_million`
+  (`Action`, sealed on the decision, and in the field basis a pack may bind to). Additive: a record
+  without them keeps its bytes.
+- Added: the `asg/inference/0.1.0` pack, a node's basic policy before it buys one inference: action
+  type `inference.purchase` in the existing class `money.purchase`, citing `rate_cap/1.0.0`,
+  `counterparty_list/1.0.0` and `dedupe/1.0.0`. Every rule declares NEVER. It ships no price bound.
+- Added: `policy-profile/v0` may set `rate_cap.max_input_msat_per_million` and
+  `rate_cap.max_output_msat_per_million` (`policy.profile.RATE_CAP_KEYS`), refused unless the
+  installed `rate_cap` wicket declares them. They lay over the wicket's config at install, as
+  `counterparty_list`'s values do.
+- Added: the `required_fields` check (`guards/checks/required_fields.py`). An action whose `verb`
+  names one of its pack's action types (`action_semantics`) is refused when it lacks a field that
+  type requires: `n/a` in scope naming the field, fails closed. A capsule's own `action_type` stays
+  `fyi` or `decide`. An action whose verb names no pack type gets no constraint, so every existing
+  decision keeps its bytes. `GuardEngine(required_fields=)`, `packs.install.required_fields`.
+- Added: an `action-ledger` conformance input may name its served pack and carry a canonical
+  profile, installed and activated before its steps (`decide_steps(profile=)`). A coverage
+  exemption may name the one pack it applies to. New set `conformance-vectors/guard/v0/inference.json`.
+
 - **Breaking** (capsule-engine#255, ledger removal step 3): the engine reads and writes its records
   through a `History` (`capsule_engine.guards.history`) instead of a `cll.ledger` ledger, and
   imports nothing from `cll.ledger`. Each check asks the history for the records that can bear on

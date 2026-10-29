@@ -5,6 +5,25 @@ and `portedDefinitions` (`guard/engine.go`).
 
 ## Unreleased
 
+- Added (capsule-engine#263): the `required_fields` check (`action_semantics_v0`). An action whose
+  verb names one of the pack's action types (`pack.Pack.ActionSemantics`, new) is refused, n/a and
+  fails closed, when it lacks a field that type requires. An action whose verb names none gets no
+  constraint, so existing decisions keep their bytes. `Action` gains `ModelID` and `Provider`, the
+  last normalized fields it did not carry; `NewEngine` refuses a pack requiring a field `Action`
+  does not carry.
+- Added (capsule-engine#263): the embedded pack `asg/inference/0.1.0` (`packs.Inference010`,
+  `pack.LoadInference010`). It cites `rate_cap/1.0.0`, `counterparty_list/1.0.0` and
+  `dedupe/1.0.0`, which are now ported. `rate_cap` compares a peer's advertised input and output
+  rates (the new `Action` fields `InputMsatPerMillion` and `OutputMsatPerMillion`, in msat per
+  million tokens) with two caps. A rate over its cap fails. A missing rate is n/a and fails
+  closed, so the action is refused. `counterparty_list` is a deny or allow list. Its
+  `disposition: ask` joins the failures that ask an approver.
+- Added: `DecodeProfile`, `Profile` and `ProfilePack` read a policy-profile/v0.
+  `(*Engine).WithProfile` lays the profile's `rate_cap` caps and counterparty list over the
+  pack's wickets. It refuses another pack's values, a check the pack doesn't cite, a rate cap the
+  wicket doesn't declare, and caps limits: callers give those through `WithOperatorLimits`.
+  `ListEntry` and `ProfileFormat` are exported.
+
 - Changed, breaking (capsule-engine#255, ledger removal step 3): the checks read earlier records
   through a `History` (`Find`, `Get`, `Size`) instead of a `[]Record` ledger. `Engine.Check`,
   `CheckWithTaskAuthority`, `CheckReplay`, `CheckWithRecords` and `CheckSale` take a `History`; a

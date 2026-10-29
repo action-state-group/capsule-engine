@@ -1,0 +1,21 @@
+# rate_cap wicket: the advertised input and output rates of the peer an
+# inference is bought from, in millisatoshis per million tokens (mesh-llm's
+# Pricing units), against two caps (guards/checks/rate_cap.py). A rate over
+# either cap fails, naming it; an action with a rate missing is not
+# applicable, in scope, and refused.
+#
+# Both caps ship at the largest integer every JSON reader holds exactly, so
+# citing this wicket bounds nothing until the operator's policy profile sets
+# them (policy/profile.py): the digest below is the same for every operator.
+wicket_id: rate_cap/1.0.0
+check: rate_cap
+semantics: >-
+  For an action in action_classes, compares the selected peer's advertised
+  input rate with max_input_msat_per_million and its output rate with
+  max_output_msat_per_million, in millisatoshis per million tokens. A rate
+  over its cap fails. An action missing either rate is not applicable, in
+  scope, and is refused.
+config:
+  action_classes: [money.purchase]
+  max_input_msat_per_million: 9007199254740991
+  max_output_msat_per_million: 9007199254740991

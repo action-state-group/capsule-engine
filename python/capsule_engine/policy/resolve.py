@@ -34,7 +34,15 @@ from .errors import (
     PolicyManifestError,
 )
 from .manifest import Manifest
-from .profile import CONFIGURABLE, LIST_CHECK, LIST_KEYS, PolicyProfile, pack_name
+from .profile import (
+    CONFIGURABLE,
+    LIST_CHECK,
+    LIST_KEYS,
+    RATE_CAP_CHECK,
+    RATE_CAP_KEYS,
+    PolicyProfile,
+    pack_name,
+)
 
 __all__ = ["SUPPORTED_FOLD_ENGINES", "SUPPORTED_WICKET_ENGINES", "ResolvedManifest", "resolve_manifest"]
 
@@ -94,17 +102,17 @@ class ResolvedManifest:
 
     def configured_wickets(self, checks: frozenset[str]) -> tuple[WicketDefinition, ...]:
         """Every resolved wicket configuring one of ``checks``, in manifest
-        order. A ``counterparty_list`` wicket comes back with the profile's
-        list values laid over its config: that is what the check runs with,
-        while the manifest still pins the wicket's own digest."""
-        return tuple(self._with_profile_list(w) for w in self.wickets.values() if w.check in checks)
+        order. A ``counterparty_list`` or ``rate_cap`` wicket comes back with
+        the profile's values laid over its config: that is what the check runs
+        with, while the manifest still pins the wicket's own digest."""
+        return tuple(self._with_profile_values(w) for w in self.wickets.values() if w.check in checks)
 
-    def _with_profile_list(self, wicket: WicketDefinition) -> WicketDefinition:
-        if wicket.check != LIST_CHECK or self.profile is None:
+    def _with_profile_values(self, wicket: WicketDefinition) -> WicketDefinition:
+        if wicket.check not in (LIST_CHECK, RATE_CAP_CHECK) or self.profile is None:
             return wicket
         config = dict(wicket.config)
         for entry in self.profile.packs:
-            config.update(entry.parameters.get(LIST_CHECK, {}))
+            config.update(entry.parameters.get(wicket.check, {}))
         return replace(wicket, config=config)
 
     def plan(self) -> PlanDefinition | None:
@@ -144,13 +152,22 @@ def _check_profile(manifest: Manifest, profile: PolicyProfile | None, wickets: d
             )
         for check, keys in entry.parameters.items():
             wicket = next((w for w in wickets.values() if w.check == check), None)
-            settable = LIST_KEYS if check == LIST_CHECK else CONFIGURABLE.get(check, frozenset())
+            settable = {LIST_CHECK: LIST_KEYS, RATE_CAP_CHECK: RATE_CAP_KEYS}.get(
+                check, CONFIGURABLE.get(check, frozenset())
+            )
             for key, values in keys.items():
                 if wicket is None or key not in settable:
                     raise PolicyManifestError(
                         PROFILE_UNKNOWN_PARAMETER, f"profile sets {check}.{key}, which no installed wicket lets a user set"
                     )
                 if check == LIST_CHECK:
+                    continue
+                if check == RATE_CAP_CHECK:
+                    if key not in wicket.config:
+                        raise PolicyManifestError(
+                            PROFILE_UNKNOWN_PARAMETER,
+                            f"profile sets {check}.{key}, which wicket {wicket.wicket_id!r} declares no default for",
+                        )
                     continue
                 defaults = wicket.config.get(key) or {}
                 undeclared = sorted(set(values) - set(defaults))

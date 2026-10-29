@@ -103,6 +103,16 @@ type Pack struct {
 	// Taxonomy is the action taxonomy the pack pins, nil when it pins none.
 	// A pinned pack loads only when the pin names the vendored taxonomy.
 	Taxonomy *TaxonomyPin
+	// ActionSemantics are the pack's action types, in pack order
+	// (packs/schema.py ActionSemantic).
+	ActionSemantics []ActionSemantic
+}
+
+// ActionSemantic is one action type a pack governs, its class and the
+// normalized fields it requires (packs/schema.py ActionSemantic).
+type ActionSemantic struct {
+	ActionType, ActionClass string
+	RequiredFields          []string
 }
 
 // TaxonomyPin is a pack's taxonomy pin (capsule-engine packs/schema.py
@@ -487,7 +497,10 @@ func Load(packYAML []byte, catalogFS fs.FS, catalogDir string) (Pack, error) {
 	}
 
 	semantics := make([]canon.Value, 0, len(raw.ActionSemantics))
+	actionSemantics := make([]ActionSemantic, 0, len(raw.ActionSemantics))
 	for _, a := range raw.ActionSemantics {
+		actionSemantics = append(actionSemantics, ActionSemantic{ActionType: a.ActionType, ActionClass: a.ActionClass,
+			RequiredFields: a.RequiredFields})
 		members := []canon.Member{
 			canon.M("action_type", canon.Str(a.ActionType)),
 			canon.M("action_class", canon.Str(a.ActionClass)),
@@ -567,7 +580,8 @@ func Load(packYAML []byte, catalogFS fs.FS, catalogDir string) (Pack, error) {
 	if len(rules) == 0 {
 		return Pack{}, errors.New("pack declares no rules")
 	}
-	return Pack{ID: raw.PackID, DefinitionDigest: digest, Rules: rules, Wickets: cited, Folds: citedFolds, catalog: foldDefs, Taxonomy: pin}, nil
+	return Pack{ID: raw.PackID, DefinitionDigest: digest, Rules: rules, Wickets: cited, Folds: citedFolds, catalog: foldDefs, Taxonomy: pin,
+		ActionSemantics: actionSemantics}, nil
 }
 
 // checkTaxonomyPin is capsule-engine packs/loader.py _parse_taxonomy_pin

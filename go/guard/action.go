@@ -62,7 +62,18 @@ type Action struct {
 	Target                *string `json:"target,omitempty"`
 	CitedMandateCapsuleID *string `json:"cited_mandate_capsule_id,omitempty"`
 	EquivalenceKey        *string `json:"equivalence_key,omitempty"`
-	Rail                  *string `json:"rail,omitempty"`
+	// EquivalenceKeyDigest is action.py's equivalence_key_digest: the digest
+	// of a caller's key, as a decision seals it, for an action read back
+	// from one. Without EquivalenceKey it is the key dedupe compares
+	// (action.py sealed_equivalence_key), and it satisfies a required
+	// equivalence_key (required_fields.py _SEALED_AS).
+	EquivalenceKeyDigest *string `json:"equivalence_key_digest,omitempty"`
+	// ModelID and Provider are action.py's model_id and provider: normalized
+	// fields a pack may require (required_fields), read by no other check and
+	// never sealed.
+	ModelID  *string `json:"model_id,omitempty"`
+	Provider *string `json:"provider,omitempty"`
+	Rail     *string `json:"rail,omitempty"`
 	// Handover is how the item reaches the buyer, a closed token
 	// (Handovers: in_person or shipped; action.py handover_of): anything
 	// else is no handover. Read by seller.destination_rail/1.1.0.
@@ -77,6 +88,12 @@ type Action struct {
 	// UpfrontAmountMinor is the stated deposit, in the same minor units as
 	// amount_minor, read by upfront_amount (action.py upfront_amount_minor).
 	UpfrontAmountMinor *int64 `json:"upfront_amount_minor,omitempty"`
+	// InputMsatPerMillion and OutputMsatPerMillion are the advertised rates
+	// of the peer an inference is bought from, in millisatoshis per million
+	// input and output tokens (mesh-llm Pricing), read by rate_cap (action.py
+	// input_msat_per_million, output_msat_per_million; capsule-engine#263).
+	InputMsatPerMillion  *int64 `json:"input_msat_per_million,omitempty"`
+	OutputMsatPerMillion *int64 `json:"output_msat_per_million,omitempty"`
 	// RecipientRole is the role of whoever receives a disclosure, one of a
 	// closed set, never who they are; read by recipient_role (action.py
 	// recipient_role).
@@ -279,6 +296,45 @@ func dropForeignAttribution(body []byte) ([]byte, error) {
 	return json.Marshal(fields)
 }
 
+// takeCounterpartyFingerprints is body without counterparty_ids and
+// counterparty_fp_alg, and their values: action.py Action's keyed
+// fingerprints by kind and their algorithm, read by counterparty_list and
+// never sealed, so they are not exported fields of Action. ids is a mapping of
+// kind to fingerprint and fp_alg a string; null is absent.
+func takeCounterpartyFingerprints(body []byte) ([]byte, map[string]string, string, error) {
+	var fields map[string]json.RawMessage
+	if err := json.Unmarshal(body, &fields); err != nil {
+		return nil, nil, "", err
+	}
+	rawIDs, hasIDs := fields["counterparty_ids"]
+	rawAlg, hasAlg := fields["counterparty_fp_alg"]
+	if !hasIDs && !hasAlg {
+		return body, nil, "", nil
+	}
+	var ids map[string]string
+	if hasIDs {
+		if err := json.Unmarshal(rawIDs, &ids); err != nil {
+			return nil, nil, "", fmt.Errorf("counterparty_ids must map a kind to a fingerprint: %w", err)
+		}
+	}
+	var fpAlg *string
+	if hasAlg {
+		if err := json.Unmarshal(rawAlg, &fpAlg); err != nil {
+			return nil, nil, "", fmt.Errorf("counterparty_fp_alg must be a string: %w", err)
+		}
+	}
+	delete(fields, "counterparty_ids")
+	delete(fields, "counterparty_fp_alg")
+	rest, err := json.Marshal(fields)
+	if err != nil {
+		return nil, nil, "", err
+	}
+	if fpAlg == nil {
+		return rest, ids, "", nil
+	}
+	return rest, ids, *fpAlg, nil
+}
+
 // decodeAction decodes a normalized action. With checkTimestamp false the
 // timestamp is not parsed (DecodeRecord's placeholder for a record that
 // will not be evaluated).
@@ -287,10 +343,18 @@ func decodeAction(given []byte, checkTimestamp bool) (Action, error) {
 	if err != nil {
 		return Action{}, fmt.Errorf("action: %w", err)
 	}
+	body, ids, fpAlg, err := takeCounterpartyFingerprints(body)
+	if err != nil {
+		return Action{}, fmt.Errorf("action: %w", err)
+	}
 	dec := json.NewDecoder(bytes.NewReader(body))
 	dec.DisallowUnknownFields()
 	var a Action
 	if err := dec.Decode(&a); err != nil {
+		return Action{}, fmt.Errorf("action: %w", err)
+	}
+	a.counterpartyIDs, a.counterpartyFPAlg = ids, fpAlg
+	if err := a.checkEquivalenceKey(); err != nil {
 		return Action{}, fmt.Errorf("action: %w", err)
 	}
 	// What the action carried, as given: an attribution it drops is still
@@ -673,4 +737,18 @@ func repeatDisclosuresOf(raw json.RawMessage) []string {
 	}
 	slices.Sort(out)
 	return out
+}
+
+// errKeyAndDigest is action.py's refusal of an action that carries both an
+// equivalence_key and an equivalence_key_digest: a caller sets the key, and
+// only an action read back from a decision carries the digest.
+var errKeyAndDigest = errors.New("equivalence_key and equivalence_key_digest are both set; " +
+	"a caller sets the key, and only a replayed capsule carries the digest")
+
+// checkEquivalenceKey refuses an action carrying both (errKeyAndDigest).
+func (a Action) checkEquivalenceKey() error {
+	if a.EquivalenceKey != nil && a.EquivalenceKeyDigest != nil {
+		return errKeyAndDigest
+	}
+	return nil
 }

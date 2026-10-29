@@ -27,10 +27,11 @@ from pathlib import Path
 from ..guards import Action, GuardDecision, GuardEngine, LocalSigner
 from ..guards.checks import RUNNABLE_CHECKS
 from ..guards.history import History, MemoryHistory
-from ..packs import install_pack
-from ..packs.install import engine_ask_sets
+from ..packs import install_pack, record_pack_activation
+from ..packs.install import engine_ask_sets, required_fields
 from ..packs.schema import PackDefinition
 from ..policy.limits import read_caps_limits
+from ..policy.profile import PolicyProfile
 from .live_history import HistoryLedger, history_ledger
 from .replay import action_for_check_input
 
@@ -69,7 +70,7 @@ def _wired(installed, store: History, signer) -> GuardEngine:
         caps_limits=lambda s: read_caps_limits(resolved, store, s),
         per_action_reads=resolved.per_action_reads(), signer_provider=lambda: signer,
         manifest_digest=resolved.manifest_digest, wickets=wickets,
-        ask_gate_selectors=gates, ask_wickets=asks,
+        ask_gate_selectors=gates, ask_wickets=asks, required_fields=required_fields(installed.pack),
     )
 
 
@@ -97,14 +98,24 @@ def decide_check_input(
         return LiveCheck(decision=decision, ledger=ledger, written=written)
 
 
-def decide_steps(pack: PackDefinition, steps: list[dict], *, signer=None) -> list[GuardDecision]:
+def decide_steps(
+    pack: PackDefinition, steps: list[dict], *, signer=None, profile: PolicyProfile | None = None
+) -> list[GuardDecision]:
     """The decisions on a run of actions under ``pack``, each one an
     ``Action``'s fields as JSON (an array is a tuple), decided in order by one
     engine whose ledger starts empty and holds each decision before the next
-    step is checked."""
+    step is checked. With ``profile``, the pack is installed with it, and the
+    ledger starts with its activation, signed by the engine's key under the
+    first step's operator and developer at the first step's timestamp."""
     with tempfile.TemporaryDirectory() as tmp:
-        engine = _wired(install_pack(pack, project_dir=Path(tmp) / "live-project", mode="observe"), MemoryHistory(),
-                        signer)
+        installed = install_pack(pack, project_dir=Path(tmp) / "live-project", mode="observe", profile=profile)
+        store = MemoryHistory()
+        signer = signer or _default_signer()
+        if profile is not None and steps:
+            first = steps[0]
+            record_pack_activation(installed, history=store, operator=first["operator"],
+                                   developer=first["developer"], signer=signer, timestamp=first["timestamp"])
+        engine = _wired(installed, store, signer)
         return [engine.check(Action(**{k: tuple(v) if isinstance(v, list) else v for k, v in step.items()})) for step in steps]
 
 

@@ -158,6 +158,10 @@ type RuleWindow struct {
 // whose row it then is.
 const referenceRule = "(engine reference check)"
 
+// semanticsRule names the required_fields check, which no pack rule cites:
+// the action type the action's verb names lacks a field it requires.
+const semanticsRule = "(pack action semantics)"
+
 // citesReference is whether a rule of the engine's pack is measured by the
 // engine's reference check, verify_before_dispatch: its result is then that
 // rule's, and there is no separate reference row.
@@ -207,6 +211,11 @@ func (e *Engine) Report(a Action, d Decision) CheckReport {
 	}
 	if c, ok := d.Constraint("verify_before_dispatch"); ok && !e.citesReference() {
 		res, blocks := e.ruleResult(referenceRule, a, c)
+		blocked = blocked || blocks
+		r.Rules = append(r.Rules, res)
+	}
+	if c, ok := d.Constraint("required_fields"); ok {
+		res, blocks := e.ruleResult(semanticsRule, a, c)
 		blocked = blocked || blocks
 		r.Rules = append(r.Rules, res)
 	}

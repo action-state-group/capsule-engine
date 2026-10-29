@@ -59,6 +59,7 @@ EXPECTED_DIGESTS = {
     "action_class_gate/1.2.0": "39a7c5b94173a4c8496b338028b8680ba20ac65543802c67e419577acce097bf",
     # An empty deny list; the user's list rides in a policy profile. No pack cites it yet.
     "counterparty_list/1.0.0": "d95162931a6c1f88c763f2fd221d63b238888c1bdd7c6d594123ee5671e18f65",
+    "rate_cap/1.0.0": "a2628f677ddbeb6cdd6a62ac44403b51ac03f878b40e1c8d1627c95039c13d93",
     # The everyday pack 0.3.1 checks that each read one number, one member of
     # a closed set, or one opaque reference.
     "recipient_role/1.0.0": "917ab5edea21867f318b8dfd54a6d7b458cbabcc5cebfac6ff0c4861e918d43b",
@@ -134,7 +135,7 @@ WITHOUT_SEMANTICS = frozenset(EXPECTED_DIGESTS) - {
     "offer_expiry/1.0.1", "price_floor/2.0.1", "channel_change/1.1.0", "material_fields_changed/1.1.0",
     "offer_fields_changed/1.1.0", "refundability/1.1.0", "task_authority/1.1.0", "upfront_amount/1.1.0",
     "counterparty_seen_before/3.0.0", "counterparty_seen_before/4.0.0", "seller.release_on_acceptance/1.0.0",
-    "caps/5.1.0",
+    "caps/5.1.0", "rate_cap/1.0.0",
     "required_disclosure/1.1.0", "required_disclosure/1.2.0",
     "action_class_gate/1.1.0", "recipient_role/1.1.0", "seller.recipient_role/1.1.0",
     "seller.release_on_acceptance/1.1.0",

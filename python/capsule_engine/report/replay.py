@@ -101,7 +101,7 @@ from ..guards.history import History, MemoryHistory, open_store
 from ..guards.history_state import CHECK_FP_ALGS, RULES_HISTORY_DAYS, well_formed_counterparty
 from ..guards.statements import StatementRecord, claim_of, make_statement_record
 from ..guards.wickets.definition import WicketDefinition
-from ..packs.install import engine_ask_sets
+from ..packs.install import engine_ask_sets, required_fields
 from ..packs.schema import PackDefinition
 
 __all__ = [
@@ -1681,6 +1681,7 @@ def replay(
         ask_gate_selectors=gate_selectors,
         ask_wickets=ask_checks,
         evaluate_under_record_taxonomy=True,
+        required_fields=required_fields(pack) if pack is not None else None,
     )
     profiles = _companion_profiles(records, disclosed or {})
     deal = _deal_records(records, disclosed or {})

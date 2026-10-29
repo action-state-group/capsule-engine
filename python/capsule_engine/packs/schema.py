@@ -136,6 +136,8 @@ NORMALIZED_ACTION_FIELDS = frozenset(
         "channel",
         "first_contact_channel",
         "upfront_amount_minor",
+        "input_msat_per_million",
+        "output_msat_per_million",
         "task_authority_ref",
         "representation_class",
         "statement_attributed_to",

@@ -27,6 +27,9 @@ func equivalenceKeyForAction(a Action) (string, error) {
 	if a.EquivalenceKey != nil {
 		return sealedEquivalenceKey(*a.EquivalenceKey)
 	}
+	if a.EquivalenceKeyDigest != nil {
+		return *a.EquivalenceKeyDigest, nil
+	}
 	if a.TaxonomyVersion != nil && (a.ReturnedMinor != nil || a.ReversesRef != nil) {
 		return refundKey(a.Operator, a.Developer, a.ActionClass, a.Target, a.ReturnedMinor, a.ReversesRef)
 	}

@@ -178,7 +178,11 @@ class Action:
     ``first_contact_channel`` the one the relationship started on (``email``,
     ``sms``, ...), never an address, read by ``channel_change``.
     ``upfront_amount_minor`` is the stated deposit, in the same minor units
-    as ``amount_minor``, read by ``upfront_amount``. ``task_authority_ref`` is
+    as ``amount_minor``, read by ``upfront_amount``.
+    ``input_msat_per_million``/``output_msat_per_million`` are the advertised
+    rates of the peer an inference is bought from, in millisatoshis per
+    million input and output tokens (mesh-llm's ``Pricing``), read by
+    ``rate_cap``. ``task_authority_ref`` is
     the SHA-256 digest of the sealed task-authority record the action cites,
     read by ``task_authority``.
     ``representation_class`` is the one class of statement the action makes
@@ -294,6 +298,8 @@ class Action:
     channel: str | None = None
     first_contact_channel: str | None = None
     upfront_amount_minor: int | None = None
+    input_msat_per_million: int | None = None
+    output_msat_per_million: int | None = None
     task_authority_ref: str | None = None
     representation_class: str | None = None
     statement_attributed_to: str | None = None
@@ -431,6 +437,8 @@ class Action:
             channel=payload.get("channel"),
             first_contact_channel=payload.get("first_contact_channel"),
             upfront_amount_minor=payload.get("upfront_amount_minor"),
+            input_msat_per_million=payload.get("input_msat_per_million"),
+            output_msat_per_million=payload.get("output_msat_per_million"),
             task_authority_ref=payload.get("task_authority_ref"),
             representation_class=payload.get("representation_class"),
             statement_attributed_to=payload.get("statement_attributed_to"),

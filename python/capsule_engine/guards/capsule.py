@@ -273,6 +273,8 @@ def _payload_extension(action: Action, checkpoint: dict, manifest_digest: str | 
         ("channel", action.channel),
         ("first_contact_channel", action.first_contact_channel),
         ("upfront_amount_minor", action.upfront_amount_minor),
+        ("input_msat_per_million", action.input_msat_per_million),
+        ("output_msat_per_million", action.output_msat_per_million),
         ("task_authority_ref", action.task_authority_ref),
         ("representation_class", action.representation_class),
         ("statement_attributed_to", action.statement_attributed_to),

@@ -12,6 +12,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/action-state-group/capsule-engine/go/canon"
 	"github.com/action-state-group/capsule-engine/go/pack"
 )
 
@@ -222,14 +223,46 @@ func caseInput(t *testing.T, engines map[string]*Engine, c conformanceCase) (*En
 // which the record appended takes, so a later step's evidence naming an
 // earlier decision names the same capsule.
 // A step this port refuses ends the case: refused is the refusal, and no
-// step is returned.
+// step is returned. An input carrying a profile is decided by a fresh engine
+// over the case's pack with that profile (WithProfile), as the engine's
+// decide_steps installs it; the activation record decide_steps seals first is
+// read by no check of the inference pack. The input's "pack" names the
+// served pack, which the case's pack directory already is.
 func ledgerSteps(t *testing.T, e *Engine, c conformanceCase, raw []byte) (steps []replayStep, refused string) {
 	t.Helper()
 	var in struct {
-		Steps []json.RawMessage `json:"steps"`
+		Pack    string            `json:"pack"`
+		Profile json.RawMessage   `json:"profile"`
+		Steps   []json.RawMessage `json:"steps"`
 	}
 	if err := json.Unmarshal(raw, &in); err != nil {
 		t.Fatalf("%s: %v", c.Case, err)
+	}
+	if in.Pack != "" && !strings.HasPrefix(c.Pack, in.Pack+"-") {
+		t.Fatalf("%s: the input names pack %s, the case %s", c.Case, in.Pack, c.Pack)
+	}
+	if in.Profile != nil {
+		profile, err := DecodeProfile(in.Profile)
+		if err != nil {
+			return nil, "decode: " + err.Error()
+		}
+		// The vectors' profiles are canonical, so the digest DecodeProfile
+		// computes is the JCS SHA-256 of the bytes as given: the profile
+		// digest a manifest pins is compared across languages here.
+		given, err := canon.FromJSON(in.Profile)
+		if err != nil {
+			t.Fatalf("%s: profile: %v", c.Case, err)
+		}
+		if want, err := canon.Digest(given); err != nil || profile.Digest != want {
+			t.Fatalf("%s: profile digest %s, want %s (%v)", c.Case, profile.Digest, want, err)
+		}
+		fresh, err := NewEngine(e.pack)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if e, err = fresh.WithProfile(profile); err != nil {
+			return nil, "check: " + err.Error()
+		}
 	}
 	var ledger []Record
 	for i, step := range in.Steps {
