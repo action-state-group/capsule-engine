@@ -610,6 +610,16 @@
    }
   },
   {
+   "case": "exchange-id-and-digest-both",
+   "kind": "action-ledger",
+   "pack": "inference-0.1.0",
+   "input": "conformance-vectors/guard/v0/inputs/inference/exchange-id-and-digest-both.json",
+   "input_sha256": "cd5a2f0ad22bac59f15cb9492e98ad5c0e7bf0e56784772b254627374ab46dfb",
+   "expected": {
+    "error": "ValueError"
+   }
+  },
+  {
    "case": "free-peer",
    "kind": "action-ledger",
    "pack": "inference-0.1.0",

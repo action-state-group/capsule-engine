@@ -52,3 +52,22 @@ func TestRequiredFieldsTreatsEmptyAsMissing(t *testing.T) {
 		t.Error("a verb naming no action type got a constraint")
 	}
 }
+
+// An Action built directly, not decoded, that carries both the key and its
+// digest is refused by the engine as DecodeAction refuses it (action.py).
+func TestAnActionCarryingKeyAndDigestIsRefused(t *testing.T) {
+	p, err := pack.LoadInference010()
+	if err != nil {
+		t.Fatal(err)
+	}
+	e, err := NewEngine(p)
+	if err != nil {
+		t.Fatal(err)
+	}
+	key, digest := "", "dd"
+	a := Action{Verb: "inference.purchase", Operator: "node-a", Developer: "mesh-node@v1",
+		EquivalenceKey: &key, EquivalenceKeyDigest: &digest}
+	if _, err := e.Check(a, nil); err == nil {
+		t.Fatal("an action with both the key and its digest was decided")
+	}
+}

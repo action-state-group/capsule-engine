@@ -1107,6 +1107,10 @@ func (e *Engine) checkWith(a Action, h History, in checkInputs) (Decision, error
 	if a.CitedMandateCapsuleID != nil {
 		return Decision{}, ErrCitedMandate
 	}
+	// An Action built directly, not by DecodeAction, is held to the same rule.
+	if err := a.checkEquivalenceKey(); err != nil {
+		return Decision{}, err
+	}
 	var cs []Constraint
 	for _, check := range append([]string{"dedupe", "caps", "verify_before_dispatch"}, e.order...) {
 		c, err := e.constraintFor(check, a, h, in)

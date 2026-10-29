@@ -354,6 +354,9 @@ func decodeAction(given []byte, checkTimestamp bool) (Action, error) {
 		return Action{}, fmt.Errorf("action: %w", err)
 	}
 	a.counterpartyIDs, a.counterpartyFPAlg = ids, fpAlg
+	if err := a.checkEquivalenceKey(); err != nil {
+		return Action{}, fmt.Errorf("action: %w", err)
+	}
 	// What the action carried, as given: an attribution it drops is still
 	// listed, as a value out of its closed set is (handover).
 	var fields map[string]json.RawMessage
@@ -734,4 +737,18 @@ func repeatDisclosuresOf(raw json.RawMessage) []string {
 	}
 	slices.Sort(out)
 	return out
+}
+
+// errKeyAndDigest is action.py's refusal of an action that carries both an
+// equivalence_key and an equivalence_key_digest: a caller sets the key, and
+// only an action read back from a decision carries the digest.
+var errKeyAndDigest = errors.New("equivalence_key and equivalence_key_digest are both set; " +
+	"a caller sets the key, and only a replayed capsule carries the digest")
+
+// checkEquivalenceKey refuses an action carrying both (errKeyAndDigest).
+func (a Action) checkEquivalenceKey() error {
+	if a.EquivalenceKey != nil && a.EquivalenceKeyDigest != nil {
+		return errKeyAndDigest
+	}
+	return nil
 }
