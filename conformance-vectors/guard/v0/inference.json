@@ -247,6 +247,56 @@
    }
   },
   {
+   "case": "deny-list-payee-fingerprint-kind-missing",
+   "kind": "action-ledger",
+   "pack": "inference-0.1.0",
+   "input": "conformance-vectors/guard/v0/inputs/inference/deny-list-payee-fingerprint-kind-missing.json",
+   "input_sha256": "21f7474374b0277c9cb1b43c5870e5f4ae02c90824369dfd6c1f23038bb7a601",
+   "expected": {
+    "steps": [
+     {
+      "outcome": "allow",
+      "constraints": [
+       {
+        "id": "dedupe",
+        "result": "pass",
+        "method": "exact_match_index_v0",
+        "evidence_digest": "67b5031f096e8cb224a5b7d0d5c1c6222a2603a2769cc1adbbf4271719cb0d6c"
+       },
+       {
+        "id": "caps",
+        "result": "n/a",
+        "method": "",
+        "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+        "reason": "no caps definition is configured"
+       },
+       {
+        "id": "verify_before_dispatch",
+        "result": "n/a",
+        "method": "agent_action_capsule.verify",
+        "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+        "reason": "action cites no mandate capsule"
+       },
+       {
+        "id": "rate_cap",
+        "result": "pass",
+        "method": "rate_threshold_v0",
+        "evidence_digest": "b4e57e1e638f10536136f36d3ad34ea631d2d30fbca145698c62d52abdafad34"
+       },
+       {
+        "id": "counterparty_list",
+        "result": "n/a",
+        "method": "exact_reference_match_v0",
+        "evidence_digest": "819480ea071dd87d22224c12f88687747f0ebb1eec3e950869f5a3caac47f86d",
+        "reason": "the action carries no usable counterparty.ids.payee; the counterparty list could not be checked"
+       }
+      ],
+      "capsule_id": "61bc57e37843177c2ece31de985e58a3348d93a383997bd862372cdebe0cae9d"
+     }
+    ]
+   }
+  },
+  {
    "case": "deny-list-payee-fingerprint-listed",
    "kind": "action-ledger",
    "pack": "inference-0.1.0",
@@ -291,6 +341,56 @@
        }
       ],
       "capsule_id": "e3aa9f646c13c528989967220055869342f17c514e3a632e855c7d467cac6f07"
+     }
+    ]
+   }
+  },
+  {
+   "case": "deny-list-payee-fingerprint-none-sealed",
+   "kind": "action-ledger",
+   "pack": "inference-0.1.0",
+   "input": "conformance-vectors/guard/v0/inputs/inference/deny-list-payee-fingerprint-none-sealed.json",
+   "input_sha256": "6c4ecfb7b81e2d9f5b1495046294776a79e814f14c18d8bae50ddb0ffce376a7",
+   "expected": {
+    "steps": [
+     {
+      "outcome": "allow",
+      "constraints": [
+       {
+        "id": "dedupe",
+        "result": "pass",
+        "method": "exact_match_index_v0",
+        "evidence_digest": "237d7d03c923b7e704261e4844861c54cf9b8ea1858a717447b551f34a00a955"
+       },
+       {
+        "id": "caps",
+        "result": "n/a",
+        "method": "",
+        "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+        "reason": "no caps definition is configured"
+       },
+       {
+        "id": "verify_before_dispatch",
+        "result": "n/a",
+        "method": "agent_action_capsule.verify",
+        "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+        "reason": "action cites no mandate capsule"
+       },
+       {
+        "id": "rate_cap",
+        "result": "pass",
+        "method": "rate_threshold_v0",
+        "evidence_digest": "b4e57e1e638f10536136f36d3ad34ea631d2d30fbca145698c62d52abdafad34"
+       },
+       {
+        "id": "counterparty_list",
+        "result": "n/a",
+        "method": "exact_reference_match_v0",
+        "evidence_digest": "2229cad5c5ccb9819f0fe07cb32c80705f7fdd38e1e5b0838db4312bd92a8952",
+        "reason": "the action carries no usable counterparty; the counterparty list could not be checked"
+       }
+      ],
+      "capsule_id": "8a972f0278cf5a07ab0981a2636b66c721bfe46367b80b06497d1f0655f811e3"
      }
     ]
    }
@@ -638,6 +738,93 @@
        }
       ],
       "capsule_id": "c94aeebbae6f444bbf48fe718fd8e42934a3c315a80258c26ca3896654ae47f2"
+     }
+    ]
+   }
+  },
+  {
+   "case": "no-exchange-id-twice",
+   "kind": "action-ledger",
+   "pack": "inference-0.1.0",
+   "input": "conformance-vectors/guard/v0/inputs/inference/no-exchange-id-twice.json",
+   "input_sha256": "e8b6aab219f7ac3cad3f82eb3a0489e099c8dab52015e6f67e5e80539d365610",
+   "expected": {
+    "steps": [
+     {
+      "outcome": "allow",
+      "constraints": [
+       {
+        "id": "dedupe",
+        "result": "pass",
+        "method": "exact_match_index_v0",
+        "evidence_digest": "2dcbf602ef37ab9bcfb007b599c12fa3454169957fee6ead3692b9b65bede0cd"
+       },
+       {
+        "id": "caps",
+        "result": "n/a",
+        "method": "",
+        "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+        "reason": "no caps definition is configured"
+       },
+       {
+        "id": "verify_before_dispatch",
+        "result": "n/a",
+        "method": "agent_action_capsule.verify",
+        "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+        "reason": "action cites no mandate capsule"
+       },
+       {
+        "id": "rate_cap",
+        "result": "pass",
+        "method": "rate_threshold_v0",
+        "evidence_digest": "b4e57e1e638f10536136f36d3ad34ea631d2d30fbca145698c62d52abdafad34"
+       },
+       {
+        "id": "counterparty_list",
+        "result": "pass",
+        "method": "exact_reference_match_v0",
+        "evidence_digest": "cacca023bca54cb4d3e10cb3cd8f38dcc37001ce5ba09b9cfd6ac4c8a1040246"
+       }
+      ],
+      "capsule_id": "a0df1a2acf292d25c1eeccc3ea414f4990de3fe935d382d7edd1e86b747e640a"
+     },
+     {
+      "outcome": "deny",
+      "constraints": [
+       {
+        "id": "dedupe",
+        "result": "fail",
+        "method": "exact_match_index_v0",
+        "evidence_digest": "14b21abf4e507a4ddd761bd320bde63889bca8c558c5d31e617880b91ff21ff2"
+       },
+       {
+        "id": "caps",
+        "result": "n/a",
+        "method": "",
+        "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+        "reason": "no caps definition is configured"
+       },
+       {
+        "id": "verify_before_dispatch",
+        "result": "n/a",
+        "method": "agent_action_capsule.verify",
+        "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+        "reason": "action cites no mandate capsule"
+       },
+       {
+        "id": "rate_cap",
+        "result": "pass",
+        "method": "rate_threshold_v0",
+        "evidence_digest": "b4e57e1e638f10536136f36d3ad34ea631d2d30fbca145698c62d52abdafad34"
+       },
+       {
+        "id": "counterparty_list",
+        "result": "pass",
+        "method": "exact_reference_match_v0",
+        "evidence_digest": "cacca023bca54cb4d3e10cb3cd8f38dcc37001ce5ba09b9cfd6ac4c8a1040246"
+       }
+      ],
+      "capsule_id": "fd17e229e2c2a75cbb67737bcda58f69933a9336c8d633065440c0c700b01d47"
      }
     ]
    }
