@@ -9,7 +9,7 @@ capsulectl plugins compile them in.
 |---|---|
 | `canon` | JCS canonical JSON values, used by every digest |
 | `pack` | the pack runtime: loading a pack, its wicket and fold definitions and their digests, pinned at the digests the engine computed |
-| `packs` | the embedded pack versions the Go guard serves (everyday, seller), generated from `../python/capsule_engine/packs/catalog` |
+| `packs` | the embedded pack versions the Go guard serves (everyday, seller, inference), generated from `../python/capsule_engine/packs/catalog` |
 | `guard` | the engine: every ported wicket check, the action-class gate, folds, deal records and history, external-check-input/v0 envelopes, sale bundles, and the per-rule report |
 
 `portedDefinitions` (`guard/engine.go`) is the exact list of wicket and fold

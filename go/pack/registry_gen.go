@@ -38,6 +38,11 @@ func LoadEveryday039() (Pack, error) {
 	return LoadFrom(packs.Everyday039, packs.Everyday039Dir)
 }
 
+// LoadInference010 loads asg/inference/0.1.0, at the digest its PROVENANCE.json records.
+func LoadInference010() (Pack, error) {
+	return LoadFrom(packs.Inference010, packs.Inference010Dir)
+}
+
 // LoadSeller010 loads asg/seller/0.1.0, at the digest its PROVENANCE.json records.
 func LoadSeller010() (Pack, error) {
 	return LoadFrom(packs.Seller010, packs.Seller010Dir)
@@ -89,6 +94,7 @@ func Embedded() []EmbeddedPack {
 		{packs.Everyday037Dir, LoadEveryday037},
 		{packs.Everyday038Dir, LoadEveryday038},
 		{packs.Everyday039Dir, LoadEveryday039},
+		{packs.Inference010Dir, LoadInference010},
 		{packs.Seller010Dir, LoadSeller010},
 		{packs.Seller011Dir, LoadSeller011},
 		{packs.Seller012Dir, LoadSeller012},
@@ -110,6 +116,7 @@ var vendored = []struct {
 	{packs.Everyday037, packs.Everyday037Dir},
 	{packs.Everyday038, packs.Everyday038Dir},
 	{packs.Everyday039, packs.Everyday039Dir},
+	{packs.Inference010, packs.Inference010Dir},
 	{packs.Seller010, packs.Seller010Dir},
 	{packs.Seller011, packs.Seller011Dir},
 	{packs.Seller012, packs.Seller012Dir},

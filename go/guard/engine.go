@@ -162,6 +162,13 @@ var portedDefinitions = map[string]string{
 	// (decideAttributed). promise_11_test.go holds them to the engine.
 	"promise_requires_approval/1.1.0": "52514fb625b208f2f04d900d115468b526c01ec34c5630fe3ae68ed86eefe386",
 	"promise_never/1.1.0":             "ed9e02ed17cbd08a0f846023e7091e7636d504ba1f18c6b9173e0a2443d92b8b",
+	// asg/inference/0.1.0 (capsule-engine#263): rate_cap/1.0.0 compares a
+	// peer's advertised rates with two caps (checkRateCap), and
+	// counterparty_list/1.0.0 is the user's list (checkCounterpartyList),
+	// their values set by a profile (WithProfile). The inference conformance
+	// vectors hold both to the engine.
+	"rate_cap/1.0.0":          "a2628f677ddbeb6cdd6a62ac44403b51ac03f878b40e1c8d1627c95039c13d93",
+	"counterparty_list/1.0.0": "d95162931a6c1f88c763f2fd221d63b238888c1bdd7c6d594123ee5671e18f65",
 }
 
 // unportedDefinitions are the definitions a vendored pack cites that this
@@ -261,7 +268,7 @@ var implementedChecks = []string{"caps", "dedupe", "destination_rail", "counterp
 	"recurring_charge", "refundability", "upfront_amount", "recipient_role", "task_authority", "counterparty_seen_before",
 	"channel_change", "material_fields_changed", "offer_fields_changed", "recipient_seen_before", "action_class_gate",
 	"verify_before_dispatch", "offer_expiry", "price_floor", "single_commitment", "promise_never", "promise_requires_approval",
-	"required_disclosure", "release_on_acceptance"}
+	"required_disclosure", "release_on_acceptance", "counterparty_list", "rate_cap"}
 
 // NotYetRunRules are the rules of p whose check this port does not run, by
 // rule id: their result is not_evaluable, NotYetRun, and a listing must say
@@ -499,6 +506,8 @@ type Engine struct {
 	upfront      upfrontConfig
 	role         roleConfig
 	authority    classConfig
+	list         listConfig
+	rateCap      rateCapConfig
 	gate         yaml.Node
 	// askGate are the action_class_gate selectors whose obligations all
 	// declare ASK (askGateSelectors): a gate failure on these alone asks.
@@ -698,6 +707,12 @@ func NewEngine(p pack.Pack) (*Engine, error) {
 			}
 		case "task_authority":
 			e.authority, err = decodeConfig[classConfig](w)
+		case "counterparty_list":
+			if e.list, err = decodeConfig[listConfig](w); err == nil {
+				err = e.list.check()
+			}
+		case "rate_cap":
+			e.rateCap, err = decodeConfig[rateCapConfig](w)
 		case "counterparty_seen_before":
 			e.seenBefore, err = newSeenBefore(w, p)
 		case "channel_change":
@@ -1095,7 +1110,17 @@ func (e *Engine) checkWith(a Action, h History, in checkInputs) (Decision, error
 	}
 	cs = e.compareTaxonomy(a, cs)
 	_, approver := e.tax.approver(a.class())
-	outcome := decide(cs, approver, e.gateFailuresAsk(cs), e.askChecks)
+	asks := e.askChecks
+	if e.list.Disposition == "ask" {
+		// engine.py: a counterparty_list configured disposition ask joins the
+		// failures that ask an approver.
+		asks = maps.Clone(asks)
+		if asks == nil {
+			asks = map[string]bool{}
+		}
+		asks["counterparty_list"] = true
+	}
+	outcome := decide(cs, approver, e.gateFailuresAsk(cs), asks)
 	// A would-allow held only by its record's taxonomy is refused, as the
 	// engine seals it (a reject;
 	// capsule-engine 9ac3722): the class-keyed checks were never run, so
@@ -1227,6 +1252,10 @@ func (e *Engine) runCheck(check string, a Action, r *historyReader, in checkInpu
 		return checkPromiseRequiresApproval(a, in.taskAuthority, in.authorization, e.approval, e.noApprovalRecords), nil
 	case "required_disclosure":
 		return checkRequiredDisclosure(a, r, e.disclosure), nil
+	case "counterparty_list":
+		return checkCounterpartyList(a, e.list), nil
+	case "rate_cap":
+		return checkRateCap(a, e.rateCap), nil
 	}
 	return Constraint{}, fmt.Errorf("check %q is configured and neither run nor pinned as unported", check)
 }

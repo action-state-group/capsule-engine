@@ -77,6 +77,12 @@ type Action struct {
 	// UpfrontAmountMinor is the stated deposit, in the same minor units as
 	// amount_minor, read by upfront_amount (action.py upfront_amount_minor).
 	UpfrontAmountMinor *int64 `json:"upfront_amount_minor,omitempty"`
+	// InputMsatPerMillion and OutputMsatPerMillion are the advertised rates
+	// of the peer an inference is bought from, in millisatoshis per million
+	// input and output tokens (mesh-llm Pricing), read by rate_cap (action.py
+	// input_msat_per_million, output_msat_per_million; capsule-engine#263).
+	InputMsatPerMillion  *int64 `json:"input_msat_per_million,omitempty"`
+	OutputMsatPerMillion *int64 `json:"output_msat_per_million,omitempty"`
 	// RecipientRole is the role of whoever receives a disclosure, one of a
 	// closed set, never who they are; read by recipient_role (action.py
 	// recipient_role).

@@ -25,6 +25,9 @@ Shape (``policy-profile/v0``)::
           caps:                          # the check the values configure
             per_action_minor: {money.purchase: 4000}
             caps_minor: {money.purchase: 20000}
+          rate_cap:                      # two caps, not class values
+            max_input_msat_per_million: 2000000
+            max_output_msat_per_million: 8000000
           counterparty_list:             # a list, not class values
             mode: deny                   # required: deny | allow
             entries:                     # each names its kind and form
@@ -42,6 +45,11 @@ Which parameters a profile may set is a closed table (``CONFIGURABLE``), and
 a value may only replace a default the pack's wicket already declares: a
 profile never adds a class the pack does not limit. Anything else is refused
 (``resolve.py``), never ignored.
+
+``rate_cap`` takes two integers, its caps on a peer's advertised input and
+output rates (``RATE_CAP_KEYS``). Like a limit, each only replaces a default
+the installed wicket declares, and lays over it as soon as the profile is
+installed, as the list does.
 
 ``counterparty_list`` is the one check whose values are not per-class
 amounts: its ``entries`` replace the wicket's (empty) list whole. A profile
@@ -78,6 +86,8 @@ __all__ = [
     "LIST_KEYS",
     "PROFILE_FORMAT",
     "PackParameters",
+    "RATE_CAP_CHECK",
+    "RATE_CAP_KEYS",
     "PolicyProfile",
     "load_profile_file",
     "pack_name",
@@ -92,6 +102,12 @@ CONFIGURABLE: dict[str, frozenset[str]] = {
     "caps": frozenset({"caps_minor", "per_action_minor"}),
 }
 
+# The check whose profile values are two scalar caps, and the keys a profile
+# may set on it. Each is a non-negative integer, millisatoshis per million
+# tokens (``guards/checks/rate_cap.py``).
+RATE_CAP_CHECK = "rate_cap"
+RATE_CAP_KEYS = frozenset({"max_input_msat_per_million", "max_output_msat_per_million"})
+
 # The one check whose profile values are not per-class amounts, and the keys
 # a profile may set on it. Kept out of ``CONFIGURABLE``, whose every key is a
 # per-class limit to its readers.
@@ -105,9 +121,10 @@ PACK_NAME_RE = re.compile(r"^[a-z0-9][a-z0-9_.-]*/[a-z0-9][a-z0-9-]*$")
 _MAX_SAFE_INT = 2**53 - 1
 
 ClassValues = dict[str, int]
-# A ``caps`` key carries ClassValues; a ``counterparty_list`` key carries its
-# mode or disposition (str) or its entries (list[ListEntry]).
-ParameterValue = ClassValues | str | list[ListEntry]
+# A ``caps`` key carries ClassValues; a ``rate_cap`` key an int; a
+# ``counterparty_list`` key carries its mode or disposition (str) or its
+# entries (list[ListEntry]).
+ParameterValue = ClassValues | int | str | list[ListEntry]
 
 
 class PackParametersDict(TypedDict):
@@ -184,6 +201,17 @@ def _nonempty_str(value: object) -> bool:
     return isinstance(value, str) and bool(value)
 
 
+def _parse_rate_caps(raw: dict, context: str) -> dict[str, ParameterValue]:
+    unknown = sorted(set(raw) - RATE_CAP_KEYS, key=str)
+    if unknown or not raw:
+        raise _refuse(f"{context} may set only {sorted(RATE_CAP_KEYS)}, and at least one, got {sorted(raw, key=str)}")
+    for key, value in raw.items():
+        # bool is an int subclass; True is not a cap.
+        if type(value) is not int or not 0 <= value <= _MAX_SAFE_INT:
+            raise _refuse(f"{context}[{key!r}] must be an integer from 0 to {_MAX_SAFE_INT}, got {value!r}")
+    return dict(raw)
+
+
 def _parse_list_entry(raw: Any, context: str) -> ListEntry:
     """``{kind: target, value}`` or ``{kind: <fingerprint kind>, fp_alg,
     value}``. A bare string names no kind, and a name is never a kind."""
@@ -244,6 +272,9 @@ def _parse_pack_entry(raw: Any) -> PackParameters:
             raise _refuse(f"packs[{name!r}].parameters[{check!r}] must be a mapping of config key to values")
         if check == LIST_CHECK:
             parameters[check] = _parse_list_parameters(keys, f"packs[{name!r}].parameters[{check!r}]")
+            continue
+        if check == RATE_CAP_CHECK:
+            parameters[check] = _parse_rate_caps(keys, f"packs[{name!r}].parameters[{check!r}]")
             continue
         parameters[check] = {
             key: _parse_class_values(values, f"packs[{name!r}].parameters[{check!r}][{key!r}]")

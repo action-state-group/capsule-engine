@@ -75,7 +75,17 @@ def test_a_fold_counts_only_when_a_case_ran_it():
     tool = _tool()
     sets = [json.loads(p.read_text()) for p in sorted(tool.VECTORS.glob("*.json")) if not p.name[0].isupper()]
     missing = tool.coverage(sets, set())
-    assert sum("no case runs the fold" in m for m in missing) == len(_fold_digests(tool)), missing
+    # One finding per current pack and fold it cites that no entry exempts:
+    # two packs citing one fold are two findings, and inference's fold is
+    # exempt for that pack alone (COVERAGE-EXEMPT.json).
+    exempt = json.loads((tool.VECTORS / "COVERAGE-EXEMPT.json").read_text())["exempt"]
+    cited = sum(
+        1
+        for name, d in tool._current().items()
+        for fid in json.loads((tool.PACKS / d / "PROVENANCE.json").read_text())["fold_digests"]
+        if not any(e["definition"] == fid and e.get("pack", name) == name for e in exempt)
+    )
+    assert sum("no case runs the fold" in m for m in missing) == cited, missing
 
 
 def _one_case(tool, set_name: str, case_name: str) -> Path:

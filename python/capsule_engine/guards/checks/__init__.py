@@ -42,6 +42,7 @@ from .promise_requires_approval import (
     authorization_record_digest,
     check_promise_requires_approval,
 )
+from .rate_cap import check_rate_cap
 from .recipient_role import check_recipient_role
 from .recurring_charge import check_recurring_charge
 from .refundability import check_refundability
@@ -117,6 +118,12 @@ CONFIGURED_CHECKS: dict[str, Callable[[Action, History, dict], CheckOutcome]] = 
     ),
     "channel_change": lambda action, history, config: check_channel_change(
         action, seeded_channels=config["seeded_channels"], action_classes=config["action_classes"]
+    ),
+    "rate_cap": lambda action, history, config: check_rate_cap(
+        action,
+        max_input_msat_per_million=config["max_input_msat_per_million"],
+        max_output_msat_per_million=config["max_output_msat_per_million"],
+        action_classes=config["action_classes"],
     ),
     "upfront_amount": lambda action, history, config: check_upfront_amount(
         action,
@@ -257,6 +264,7 @@ __all__ = [
     "check_single_commitment",
     "check_task_authority",
     "task_authority_record_digest",
+    "check_rate_cap",
     "check_upfront_amount",
     "check_verify_before_dispatch",
     "fields_basis",

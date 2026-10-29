@@ -117,13 +117,14 @@ capsule-emit ledger (`--ledger`).
 | `airline-engagement/` | `asg/airline-engagement/1.0.1` | An airline-engagement starter pack, used at judge and report time (its `outcomes[]`). |
 | `eu-ai-act/` | `asg/eu-ai-act-obligations/0.1.1` | EU AI Act obligations, backward-only: its outcomes are the sample compiler's output from `register.yaml`. |
 | `eu-ai-act-deterministic/` | `asg/eu-ai-act-deterministic/0.1.0` | EU AI Act obligations, backward-only, produced from `../eu-ai-act/obligations-register.yaml` (26 contracts). |
+| `inference/` | `asg/inference/0.1.0` | A node's basic policy before it buys an inference: the selected peer's advertised input and output rates (msat per million tokens) against two caps the operator's profile sets, a price that cannot be read refused, a counterparty list, and dedupe. |
 | `payments-safety/` | `asg/payments-safety/1.0.0` | Caps per scope and window, dedupe, and verify-before-dispatch on money movement, plus the spend fold. |
 | `standard-vendor/` | `asg/standard-vendor/1.0.1` | The standard outcome catalog over the general capsule vocabulary: one pack that grades any vendor's ledger. |
 
 ### The Go guard (`go/`)
 
 `go/` is the Go module `github.com/action-state-group/capsule-engine/go`, the
-Go implementation of the guard for the everyday and seller packs. The Python
+Go implementation of the guard for the everyday, seller and inference packs. The Python
 guard above is the reference, and CI decides the shared vectors in
 `conformance-vectors/guard/v0` with both on every pull request. See
 [go/README.md](go/README.md).
