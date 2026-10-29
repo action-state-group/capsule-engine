@@ -1208,6 +1208,61 @@
    }
   },
   {
+   "case": "sealed-exchange-id-digest",
+   "kind": "action-ledger",
+   "pack": "inference-0.1.0",
+   "input": "conformance-vectors/guard/v0/inputs/inference/sealed-exchange-id-digest.json",
+   "input_sha256": "e97dd6d77e70b6a1a2a471aa9b577217dceaad9b8f79a8ab7d232af08be5c7f7",
+   "expected": {
+    "steps": [
+     {
+      "outcome": "allow",
+      "constraints": [
+       {
+        "id": "dedupe",
+        "result": "pass",
+        "method": "exact_match_index_v0",
+        "evidence_digest": "a34616368dbe04838c97e7a77253f4c0d7ae39897beb2901c19c9bf6e066e375"
+       },
+       {
+        "id": "caps",
+        "result": "n/a",
+        "method": "",
+        "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+        "reason": "no caps definition is configured"
+       },
+       {
+        "id": "verify_before_dispatch",
+        "result": "n/a",
+        "method": "agent_action_capsule.verify",
+        "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+        "reason": "action cites no mandate capsule"
+       },
+       {
+        "id": "rate_cap",
+        "result": "pass",
+        "method": "rate_threshold_v0",
+        "evidence_digest": "b4e57e1e638f10536136f36d3ad34ea631d2d30fbca145698c62d52abdafad34"
+       },
+       {
+        "id": "counterparty_list",
+        "result": "pass",
+        "method": "exact_reference_match_v0",
+        "evidence_digest": "cacca023bca54cb4d3e10cb3cd8f38dcc37001ce5ba09b9cfd6ac4c8a1040246"
+       },
+       {
+        "id": "required_fields",
+        "result": "pass",
+        "method": "action_semantics_v0",
+        "evidence_digest": "f48d4b5d6e66b7567b908dacd896317e3e6b4de382807d4dcf5d68e32cbe2bba"
+       }
+      ],
+      "capsule_id": "a51554ce5b9c5c3f50821e22626974634437321d616073f975840ee5b93f7f0a"
+     }
+    ]
+   }
+  },
+  {
    "case": "two-exchanges-same-peer",
    "kind": "action-ledger",
    "pack": "inference-0.1.0",

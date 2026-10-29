@@ -1414,7 +1414,7 @@ func RecordFor(a Action, d Decision) Record {
 // (capsule.py _payload_extension, #134), or nil when a carries no key.
 func sealedKeyOf(a Action) *string {
 	if a.EquivalenceKey == nil {
-		return nil
+		return a.EquivalenceKeyDigest
 	}
 	// A JSON string always digests: canon refuses only non-finite numbers.
 	d, _ := sealedEquivalenceKey(*a.EquivalenceKey)

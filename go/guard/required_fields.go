@@ -50,8 +50,13 @@ func requiredFieldsOf(p pack.Pack) (map[string][]string, error) {
 	return out, nil
 }
 
-// fieldSet is required_fields.py _missing, negated.
+// fieldSet is required_fields.py _unset, negated: equivalence_key also
+// counts as set when only its sealed digest is (_SEALED_AS), as on an action
+// read back from a decision.
 func fieldSet(a Action, name string) bool {
+	if name == "equivalence_key" && a.EquivalenceKeyDigest != nil && *a.EquivalenceKeyDigest != "" {
+		return true
+	}
 	v := reflect.ValueOf(a).Field(actionFieldIndex[name])
 	switch v.Kind() {
 	case reflect.Pointer:

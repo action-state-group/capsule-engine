@@ -161,3 +161,23 @@ def test_everyday_decides_as_before_because_no_input_names_its_types_in_verb():
     action types (purchase.make, ...) are not verbs any caller sends today."""
     (decision,) = decide_steps(EVERYDAY, [_step(verb="buy", target="merchant-a", refundable=True, equivalence_key=None)])
     assert all(c.id != "required_fields" for c in decision.constraints)
+
+
+def test_a_purchase_allowed_live_is_allowed_on_replay():
+    """A decision seals only the exchange id's digest; replaying its capsule
+    must not read the id as missing."""
+    import tempfile
+
+    from capsule_engine.guards.checks import RUNNABLE_CHECKS
+    from capsule_engine.report.replay import replay
+
+    (live,) = decide_steps(INFERENCE, [_step(action_id="inference.purchase/x1")])
+    assert live.outcome == "allow"
+    assert "equivalence_key" not in live.capsule["asg_payload"]
+    with tempfile.TemporaryDirectory() as tmp:
+        resolved = install_pack(INFERENCE, project_dir=tmp).resolved
+        result = replay([live.capsule], caps_fold=resolved.caps_fold(),
+                        wickets=resolved.configured_wickets(RUNNABLE_CHECKS), pack=INFERENCE)
+    (replayed,) = result.decisions
+    assert replayed.decision.outcome == "allow"
+    assert next(c for c in replayed.decision.constraints if c.id == "required_fields").result == "pass"

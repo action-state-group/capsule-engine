@@ -12,6 +12,11 @@ it is ``n/a`` in scope naming the first missing field, in the order the pack
 lists them, and fails closed (``CheckOutcome.fails_closed``): the engine
 refuses it. An action whose verb names no type of the pack is not checked
 and gets no constraint, so a decision on one keeps the bytes it had.
+
+A decision seals only the digest of an ``equivalence_key``, never the key
+(``guards/capsule.py``), and an action read back from it carries only
+``equivalence_key_digest``. So ``equivalence_key`` counts as set when either
+is: a purchase allowed live is not refused on replay.
 """
 from __future__ import annotations
 
@@ -33,8 +38,17 @@ class RequiredFieldsEvidence(TypedDict):
     required_fields: list[str]
 
 
+# A required field and the field a decision seals in its place.
+_SEALED_AS = {"equivalence_key": "equivalence_key_digest"}
+
+
 def _missing(value: object) -> bool:
     return value is None or value == "" or value == ()
+
+
+def _unset(action: Action, name: str) -> bool:
+    sealed = _SEALED_AS.get(name)
+    return _missing(getattr(action, name)) and (sealed is None or _missing(getattr(action, sealed)))
 
 
 def check_required_fields(action: Action, required: Mapping[str, tuple[str, ...]]) -> CheckOutcome | None:
@@ -44,7 +58,7 @@ def check_required_fields(action: Action, required: Mapping[str, tuple[str, ...]
     if fields is None:
         return None
     for name in fields:
-        if _missing(getattr(action, name)):
+        if _unset(action, name):
             return CheckOutcome(
                 constraint=ConstraintOutcome(
                     id=_CHECK_ID, result="n/a",

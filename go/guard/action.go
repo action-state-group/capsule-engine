@@ -62,6 +62,12 @@ type Action struct {
 	Target                *string `json:"target,omitempty"`
 	CitedMandateCapsuleID *string `json:"cited_mandate_capsule_id,omitempty"`
 	EquivalenceKey        *string `json:"equivalence_key,omitempty"`
+	// EquivalenceKeyDigest is action.py's equivalence_key_digest: the digest
+	// of a caller's key, as a decision seals it, for an action read back
+	// from one. Without EquivalenceKey it is the key dedupe compares
+	// (action.py sealed_equivalence_key), and it satisfies a required
+	// equivalence_key (required_fields.py _SEALED_AS).
+	EquivalenceKeyDigest *string `json:"equivalence_key_digest,omitempty"`
 	// ModelID and Provider are action.py's model_id and provider: normalized
 	// fields a pack may require (required_fields), read by no other check and
 	// never sealed.
