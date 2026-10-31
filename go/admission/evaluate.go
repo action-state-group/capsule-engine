@@ -71,10 +71,21 @@ type Card struct {
 	// Claims are the claims the card holds, with their denominator; nil when
 	// the card carries no counts (history_card/1 carries none today).
 	Claims *Claims
-	// Bands are the card's per-band counts; nil when the card carries none
-	// (no card served today does), and empty when it carries them and every
-	// band is empty.
+	// Bands are the card's per-band counts; nil when the card carries none,
+	// and empty when it carries them and every band is empty. A
+	// standard_history/1 card carries them (StandardHistoryCounts).
 	Bands []BandCount
+	// Disputes are the card's received disputes, open out of all; nil when
+	// the card carries no dispute tally. StandardHistoryCounts fills Bands
+	// and Disputes from a standard_history/1 card.
+	Disputes *Disputes
+}
+
+// Disputes are the disputes others raised about the counterparty that its
+// card shows: those still open, out of all of them.
+type Disputes struct {
+	Open int64 `json:"open"`
+	Of   int64 `json:"of"`
 }
 
 // BandCount is a card's count in one value band (Reference v3 §3A.14): the
@@ -82,10 +93,10 @@ type Card struct {
 // Currency, each subject banded once after netting, and how many of them
 // were resolved against the counterparty.
 type BandCount struct {
-	Currency string
-	Decade   int
-	Subjects int64
-	Adverse  int64
+	Currency string `json:"currency"`
+	Decade   int    `json:"decade"`
+	Subjects int64  `json:"subjects"`
+	Adverse  int64  `json:"adverse"`
 }
 
 // Claims are a card's claims held out of claims made, in its window.
@@ -441,6 +452,7 @@ var predicates = map[string]predicate{
 	"vouch.distinct_controllers":       {SourceVouch, []string{"min"}},
 	"stake.covers_deal":                {SourceStake, nil},
 	"card.band_history_or_stake":       {SourceCard, []string{"k", "step_decades", "max_adverse_permille"}},
+	"card.open_disputes":               {SourceCard, []string{"max"}},
 	"judged":                           {SourceJudged, nil},
 }
 
@@ -672,6 +684,14 @@ func readRow(r Row, in Inputs, accept map[string]Unit, roots TrustRoots) RowResu
 			return RowResult{Result: of(covers)}
 		case "card.band_history_or_stake":
 			return ladder(r, in, accept, roots)
+		case "card.open_disputes":
+			// Open disputes stand beside the ladder, never inside its
+			// adverse share (evidencebook-skills#87).
+			if in.Card.State != CardVerified || in.Card.Disputes == nil {
+				return RowResult{Result: NotRead}
+			}
+			c := in.Card.Disputes
+			return counted(of(c.Open <= r.Params["max"]), c.Open, c.Of)
 		case "judged":
 			// A judge outside the trust roots is reported, not counted
 			// (SDK-SURFACE evaluate, NOT_CHECKED).

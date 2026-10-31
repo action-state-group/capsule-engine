@@ -4196,6 +4196,146 @@
     "tier": "T1",
     "block_sha256": "8556113aa86b6e539869cd5b15f0b6c2b4ffc4086be9770895a4d77aaf1fcef1"
    }
+  },
+  {
+   "case": "od-none-open-goes",
+   "pack": "packs/open-disputes.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "disputes": {
+      "open": 0,
+      "of": 3
+     }
+    }
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T1",
+    "block_sha256": "1edc3b0224e6d9ac17338722e03a80941a22ea5f8c0dc3dc9dc0de0cb8c0509a"
+   }
+  },
+  {
+   "case": "od-one-open-is-recorded-and-goes",
+   "pack": "packs/open-disputes.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "disputes": {
+      "open": 1,
+      "of": 3
+     }
+    }
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T1",
+    "block_sha256": "6d6356a05b8f601e53e538fe17bc76326770193bd8bb9184c4bd4e889d9e56fc"
+   }
+  },
+  {
+   "case": "od-two-open-limits",
+   "pack": "packs/open-disputes.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "disputes": {
+      "open": 2,
+      "of": 3
+     }
+    }
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "b91b41155089621c373928043a66953325969de901d3fa87ca0f464a1d89ec40"
+   }
+  },
+  {
+   "case": "od-no-dispute-tally-is-not-read",
+   "pack": "packs/open-disputes.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z"
+    }
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "6aa52c16428a144973ced48cdfc60981bbd25c9992a1f087e65f33e48ec7c401"
+   }
+  },
+  {
+   "case": "od-an-unverified-card-is-not-read",
+   "pack": "packs/open-disputes.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "unverifiable",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "disputes": {
+      "open": 0,
+      "of": 0
+     }
+    }
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "6aa52c16428a144973ced48cdfc60981bbd25c9992a1f087e65f33e48ec7c401"
+   }
+  },
+  {
+   "case": "od-a-micro-deal-only-records-it",
+   "pack": "packs/open-disputes.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "5",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "disputes": {
+      "open": 2,
+      "of": 2
+     }
+    }
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "b7229bdc0bb0d77bf2c11a4159ca5f82d37a5f0f48d92607a5e7be8daa304cb1"
+   }
   }
  ]
 }

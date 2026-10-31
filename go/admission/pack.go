@@ -479,6 +479,7 @@ var paramMax = map[string]int64{
 	"window_days": 100 * 365,
 	"min":         1<<53 - 1,
 	"k":           1<<53 - 1,
+	"max":         1<<53 - 1,
 	// step_decades keeps an earned limit (a card band's decade, bounded by
 	// bandDecadeMax, plus the step) far inside an int.
 	"step_decades":         decadeMax,

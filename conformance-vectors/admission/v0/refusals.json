@@ -724,6 +724,36 @@
     }
    ],
    "want": "unknown field \"weight\""
+  },
+  {
+   "case": "open disputes without max",
+   "base": "packs/open-disputes.json",
+   "ops": [
+    {
+     "delete": [
+      "rows",
+      2,
+      "params",
+      "max"
+     ]
+    }
+   ],
+   "want": "needs params.max"
+  },
+  {
+   "case": "open disputes decide NO",
+   "base": "packs/open-disputes.json",
+   "ops": [
+    {
+     "set": [
+      "rows",
+      2,
+      "on_fail"
+     ],
+     "value": "NO"
+    }
+   ],
+   "want": "a card row may not decide NO"
   }
  ],
  "raw": [

@@ -403,6 +403,12 @@ fn read_row(r: &Row, input: &Inputs, p: &Pack) -> RowResult {
         }
         "stake.covers_deal" => stake_covers(input, p).map_or_else(not_read, |c| result(of(c))),
         "card.band_history_or_stake" => ladder(r, input, p),
+        // Open disputes stand beside the ladder, never inside its adverse
+        // share (evidencebook-skills#87).
+        "card.open_disputes" => match (&input.card.disputes, verified) {
+            (Some(c), true) => counted(of(c.open <= param(r, "max")), c.open, c.of),
+            _ => not_read(),
+        },
         // A judge outside the trust roots is reported, not counted
         // (SDK-SURFACE evaluate, NOT_CHECKED).
         "judged" => match input.judged.get(&r.id) {

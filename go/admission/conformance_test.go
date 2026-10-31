@@ -61,6 +61,10 @@ type vectorInput struct {
 			Held  int64 `json:"held"`
 			Total int64 `json:"total"`
 		} `json:"claims"`
+		Disputes *struct {
+			Open int64 `json:"open"`
+			Of   int64 `json:"of"`
+		} `json:"disputes"`
 		Bands *[]struct {
 			Currency string `json:"currency"`
 			Decade   int    `json:"decade"`
@@ -137,6 +141,9 @@ func decodeInput(t *testing.T, raw json.RawMessage) Inputs {
 	}
 	if v.Card.Claims != nil {
 		in.Card.Claims = &Claims{Held: v.Card.Claims.Held, Total: v.Card.Claims.Total}
+	}
+	if v.Card.Disputes != nil {
+		in.Card.Disputes = &Disputes{Open: v.Card.Disputes.Open, Of: v.Card.Disputes.Of}
 	}
 	if v.Card.Bands != nil {
 		in.Card.Bands = []BandCount{}
