@@ -1682,14 +1682,185 @@
     "asks_made": 0,
     "stake": {
      "amount": "5000",
-     "currency": "cents"
+     "currency": "cents",
+     "rail": {
+      "id": "rail-a",
+      "digest": "5555555555555555555555555555555555555555555555555555555555555555"
+     }
     }
    },
    "expected": {
     "verdict": "GO",
     "source": "rows",
     "tier": "T1",
-    "block_sha256": "c7681f095e3b87bedb9ac54c0f78109146305cdc3d425eec8750b6416e937a25"
+    "block_sha256": "53be537e5c2687794701f7331a4496a7b265cea431f03740b4c15e4f3cea7353"
+   }
+  },
+  {
+   "case": "cov-stake-on-an-unpinned-rail-limits",
+   "pack": "packs/coverage.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "platform": {
+     "release_attestation": "valid",
+     "owner_signed": true
+    },
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-06-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "witness": "witness-a",
+     "controller": "ctl-trusted",
+     "claims": {
+      "held": 7,
+      "total": 9
+     }
+    },
+    "selection": {
+     "state": "verified",
+     "unanswered_disputes": []
+    },
+    "own": {
+     "exchanges": 0,
+     "settled": 0,
+     "held_halves": 0,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {},
+    "asks": {},
+    "asks_made": 0,
+    "stake": {
+     "amount": "5000",
+     "currency": "cents",
+     "rail": {
+      "id": "rail-b",
+      "digest": "5555555555555555555555555555555555555555555555555555555555555555"
+     }
+    }
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "b6475e0f9278d4130b2556b1906af99134129d11efc684f28be237c241b3f1c0"
+   }
+  },
+  {
+   "case": "cov-stake-on-a-rail-pinned-by-another-digest-limits",
+   "pack": "packs/coverage.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "platform": {
+     "release_attestation": "valid",
+     "owner_signed": true
+    },
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-06-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "witness": "witness-a",
+     "controller": "ctl-trusted",
+     "claims": {
+      "held": 7,
+      "total": 9
+     }
+    },
+    "selection": {
+     "state": "verified",
+     "unanswered_disputes": []
+    },
+    "own": {
+     "exchanges": 0,
+     "settled": 0,
+     "held_halves": 0,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {},
+    "asks": {},
+    "asks_made": 0,
+    "stake": {
+     "amount": "5000",
+     "currency": "cents",
+     "rail": {
+      "id": "rail-a",
+      "digest": "6666666666666666666666666666666666666666666666666666666666666666"
+     }
+    }
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "b6475e0f9278d4130b2556b1906af99134129d11efc684f28be237c241b3f1c0"
+   }
+  },
+  {
+   "case": "cov-stake-without-a-rail-limits",
+   "pack": "packs/coverage.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "platform": {
+     "release_attestation": "valid",
+     "owner_signed": true
+    },
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-06-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "witness": "witness-a",
+     "controller": "ctl-trusted",
+     "claims": {
+      "held": 7,
+      "total": 9
+     }
+    },
+    "selection": {
+     "state": "verified",
+     "unanswered_disputes": []
+    },
+    "own": {
+     "exchanges": 0,
+     "settled": 0,
+     "held_halves": 0,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {},
+    "asks": {},
+    "asks_made": 0,
+    "stake": {
+     "amount": "5000",
+     "currency": "cents"
+    }
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "b6475e0f9278d4130b2556b1906af99134129d11efc684f28be237c241b3f1c0"
    }
   },
   {
@@ -1735,14 +1906,18 @@
     "asks_made": 0,
     "stake": {
      "amount": "4999",
-     "currency": "cents"
+     "currency": "cents",
+     "rail": {
+      "id": "rail-a",
+      "digest": "5555555555555555555555555555555555555555555555555555555555555555"
+     }
     }
    },
    "expected": {
     "verdict": "LIMIT",
     "source": "rows",
     "tier": "T0",
-    "block_sha256": "b8ad8be845abfe47c84b53776845cad42bdc324272737759cb96e74ee5efad6c"
+    "block_sha256": "76bb7c51b402136a6186d3a893e675c7b0a04da079f2992c40283534565efa4d"
    }
   },
   {
@@ -1788,14 +1963,18 @@
     "asks_made": 0,
     "stake": {
      "amount": "50.00",
-     "currency": "USDC"
+     "currency": "USDC",
+     "rail": {
+      "id": "rail-a",
+      "digest": "5555555555555555555555555555555555555555555555555555555555555555"
+     }
     }
    },
    "expected": {
     "verdict": "GO",
     "source": "rows",
     "tier": "T1",
-    "block_sha256": "c7681f095e3b87bedb9ac54c0f78109146305cdc3d425eec8750b6416e937a25"
+    "block_sha256": "53be537e5c2687794701f7331a4496a7b265cea431f03740b4c15e4f3cea7353"
    }
   },
   {
@@ -1841,14 +2020,18 @@
     "asks_made": 0,
     "stake": {
      "amount": "50.01",
-     "currency": "USD"
+     "currency": "USD",
+     "rail": {
+      "id": "rail-a",
+      "digest": "5555555555555555555555555555555555555555555555555555555555555555"
+     }
     }
    },
    "expected": {
     "verdict": "GO",
     "source": "rows",
     "tier": "T1",
-    "block_sha256": "c7681f095e3b87bedb9ac54c0f78109146305cdc3d425eec8750b6416e937a25"
+    "block_sha256": "53be537e5c2687794701f7331a4496a7b265cea431f03740b4c15e4f3cea7353"
    }
   },
   {
@@ -1897,7 +2080,7 @@
     "verdict": "LIMIT",
     "source": "rows",
     "tier": "T0",
-    "block_sha256": "ae3c67615ea80ab2e888792ba928e9751dda3fa94e5515371e74a16f12f9be35"
+    "block_sha256": "b6475e0f9278d4130b2556b1906af99134129d11efc684f28be237c241b3f1c0"
    }
   },
   {
@@ -1943,14 +2126,18 @@
     "asks_made": 0,
     "stake": {
      "amount": "50",
-     "currency": "EUR"
+     "currency": "EUR",
+     "rail": {
+      "id": "rail-a",
+      "digest": "5555555555555555555555555555555555555555555555555555555555555555"
+     }
     }
    },
    "expected": {
     "verdict": "LIMIT",
     "source": "rows",
     "tier": "T0",
-    "block_sha256": "ae3c67615ea80ab2e888792ba928e9751dda3fa94e5515371e74a16f12f9be35"
+    "block_sha256": "b6475e0f9278d4130b2556b1906af99134129d11efc684f28be237c241b3f1c0"
    }
   },
   {
@@ -1996,14 +2183,18 @@
     "asks_made": 0,
     "stake": {
      "amount": "5000",
-     "currency": "cents"
+     "currency": "cents",
+     "rail": {
+      "id": "rail-a",
+      "digest": "5555555555555555555555555555555555555555555555555555555555555555"
+     }
     }
    },
    "expected": {
     "verdict": "LIMIT",
     "source": "rows",
     "tier": "T0",
-    "block_sha256": "04909b76f53e7d74e6d390a9cc27c5aedef01977e72ad5e4b1dfbce97cb7b23d"
+    "block_sha256": "7cf45d8d921d38798748db403197f8c97de73029335a5313bd56ce68eb069a7d"
    }
   },
   {
@@ -2049,14 +2240,18 @@
     "asks_made": 0,
     "stake": {
      "amount": "5000",
-     "currency": "cents"
+     "currency": "cents",
+     "rail": {
+      "id": "rail-a",
+      "digest": "5555555555555555555555555555555555555555555555555555555555555555"
+     }
     }
    },
    "expected": {
     "verdict": "ASK",
     "source": "rows",
     "tier": "T0",
-    "block_sha256": "5377b0baf5a117ad7dddda232245c7e9bbaf1acece38c247ced20eab06b02684"
+    "block_sha256": "e8a5197ff878c5ac6793926db33540d679b4ad572d356cdf507e78626bffa244"
    }
   },
   {
@@ -2099,14 +2294,18 @@
     "asks_made": 0,
     "stake": {
      "amount": "5000",
-     "currency": "cents"
+     "currency": "cents",
+     "rail": {
+      "id": "rail-a",
+      "digest": "5555555555555555555555555555555555555555555555555555555555555555"
+     }
     }
    },
    "expected": {
     "verdict": "ASK",
     "source": "rows",
     "tier": "T0",
-    "block_sha256": "eae2f367bf7089958af66cb56930dbbdf9c9620a3ac6fbe3547c2af4888ecf70"
+    "block_sha256": "68168f7f85e8a377d9e37f7e934c3c4485319991352e1bbe31754d8b2af05adb"
    }
   },
   {
@@ -2154,14 +2353,18 @@
     "asks_made": 0,
     "stake": {
      "amount": "5000",
-     "currency": "cents"
+     "currency": "cents",
+     "rail": {
+      "id": "rail-a",
+      "digest": "5555555555555555555555555555555555555555555555555555555555555555"
+     }
     }
    },
    "expected": {
     "verdict": "LIMIT",
     "source": "rows",
     "tier": "T0",
-    "block_sha256": "7eba9c742de86f2d32689b494a45308f8481ed1600d1afb66f13c74a7fad297f"
+    "block_sha256": "c9df4efe6298fda4fca1f2e2b4a0433f719c2458fd431198f9d64f6e5be591e2"
    }
   },
   {
@@ -2207,14 +2410,18 @@
     "asks_made": 0,
     "stake": {
      "amount": "5000",
-     "currency": "cents"
+     "currency": "cents",
+     "rail": {
+      "id": "rail-a",
+      "digest": "5555555555555555555555555555555555555555555555555555555555555555"
+     }
     }
    },
    "expected": {
     "verdict": "LIMIT",
     "source": "rows",
     "tier": "T0",
-    "block_sha256": "e58d8b31cf0eb4ffee8f0d05cdb7a331222c1cdf0175a0fab6434c86963015d9"
+    "block_sha256": "885bf88d9ee8ac102521207e29bc8a7a6574ff9bb87d7a97aeb9e76284bd0678"
    }
   },
   {
@@ -2260,14 +2467,18 @@
     "asks_made": 0,
     "stake": {
      "amount": "5000",
-     "currency": "cents"
+     "currency": "cents",
+     "rail": {
+      "id": "rail-a",
+      "digest": "5555555555555555555555555555555555555555555555555555555555555555"
+     }
     }
    },
    "expected": {
     "verdict": "LIMIT",
     "source": "rows",
     "tier": "T0",
-    "block_sha256": "063d52eb19ecc6cfebaa91dfc4d4cf28e06f8041288535a8b3a2812342b4006f"
+    "block_sha256": "fac73524dbcfaabf5717c973151042e676b7549428f73aac83e845f9fbbcd5fe"
    }
   },
   {
@@ -2310,14 +2521,18 @@
     "asks_made": 0,
     "stake": {
      "amount": "5000",
-     "currency": "cents"
+     "currency": "cents",
+     "rail": {
+      "id": "rail-a",
+      "digest": "5555555555555555555555555555555555555555555555555555555555555555"
+     }
     }
    },
    "expected": {
     "verdict": "ASK",
     "source": "rows",
     "tier": "T0",
-    "block_sha256": "c198b3e8bbd2ee9c36d7c134e809cc42cc7f59f25a6adc0610f13149f0b49050"
+    "block_sha256": "b7e2e137daa03a7a9467dd132c65bbb7798eab03e150db905bf07c4838874e33"
    }
   },
   {
@@ -2364,14 +2579,18 @@
     "asks_made": 0,
     "stake": {
      "amount": "5000",
-     "currency": "cents"
+     "currency": "cents",
+     "rail": {
+      "id": "rail-a",
+      "digest": "5555555555555555555555555555555555555555555555555555555555555555"
+     }
     }
    },
    "expected": {
     "verdict": "LIMIT",
     "source": "rows",
     "tier": "T0",
-    "block_sha256": "1384276daaa98e6d74597d9fa3eff7abdfbac03bb2aeb6811b9ac83655cc5ca7"
+    "block_sha256": "34d7edbcece9a7301119d3567ddf2e2b07167bd487848e2dc73b3c72a007478c"
    }
   },
   {
@@ -2420,14 +2639,18 @@
     "asks_made": 0,
     "stake": {
      "amount": "5000",
-     "currency": "cents"
+     "currency": "cents",
+     "rail": {
+      "id": "rail-a",
+      "digest": "5555555555555555555555555555555555555555555555555555555555555555"
+     }
     }
    },
    "expected": {
     "verdict": "LIMIT",
     "source": "rows",
     "tier": "T0",
-    "block_sha256": "36a73c635daf8cfdff55a1d3c4c7c9656d83451e1a45baf36fdcea21bb63961d"
+    "block_sha256": "67fd562b40125b17f0033a355952b434efafa9afd1e18d955760298735878b39"
    }
   },
   {
@@ -2475,14 +2698,18 @@
     "asks_made": 0,
     "stake": {
      "amount": "5000",
-     "currency": "cents"
+     "currency": "cents",
+     "rail": {
+      "id": "rail-a",
+      "digest": "5555555555555555555555555555555555555555555555555555555555555555"
+     }
     }
    },
    "expected": {
     "verdict": "GO",
     "source": "rows",
     "tier": "T1",
-    "block_sha256": "c7681f095e3b87bedb9ac54c0f78109146305cdc3d425eec8750b6416e937a25"
+    "block_sha256": "53be537e5c2687794701f7331a4496a7b265cea431f03740b4c15e4f3cea7353"
    }
   },
   {
@@ -2528,14 +2755,18 @@
     "asks_made": 0,
     "stake": {
      "amount": "5000",
-     "currency": "cents"
+     "currency": "cents",
+     "rail": {
+      "id": "rail-a",
+      "digest": "5555555555555555555555555555555555555555555555555555555555555555"
+     }
     }
    },
    "expected": {
     "verdict": "GO",
     "source": "rows",
     "tier": "T1",
-    "block_sha256": "c569772101e6e71612555d93196262aa2e3ba97e3de5afb9e0c05ffa32004c43"
+    "block_sha256": "28b4c6266fb5acd74b76e5a35464855b3bda8d9db0885438d8e8b548e5dd299c"
    }
   },
   {
@@ -2582,14 +2813,18 @@
     "asks_made": 0,
     "stake": {
      "amount": "5000",
-     "currency": "cents"
+     "currency": "cents",
+     "rail": {
+      "id": "rail-a",
+      "digest": "5555555555555555555555555555555555555555555555555555555555555555"
+     }
     }
    },
    "expected": {
     "verdict": "NO",
     "source": "allow-list",
     "tier": null,
-    "block_sha256": "5752c55db55112d9cb55d798daa75d1142c4c70dc5bc5b0d8bea3f6319348a7a"
+    "block_sha256": "a0be6548dffa1cfb32e7bd0abdfb87ce02527f47d3bd8e98e8b4b25fca57504b"
    }
   },
   {
@@ -2636,14 +2871,870 @@
     "asks_made": 0,
     "stake": {
      "amount": "5000",
-     "currency": "cents"
+     "currency": "cents",
+     "rail": {
+      "id": "rail-a",
+      "digest": "5555555555555555555555555555555555555555555555555555555555555555"
+     }
     }
    },
    "expected": {
     "verdict": "GO",
     "source": "rows",
     "tier": "T1",
-    "block_sha256": "c7681f095e3b87bedb9ac54c0f78109146305cdc3d425eec8750b6416e937a25"
+    "block_sha256": "53be537e5c2687794701f7331a4496a7b265cea431f03740b4c15e4f3cea7353"
+   }
+  },
+  {
+   "case": "hos-micro-needs-no-card",
+   "pack": "packs/history-or-stake.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "5",
+    "currency": "USD"
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "d6f3e2b4f40d05d6ff1662c8afa410feaaa359bf86c1d71e31ac90d2f460c715"
+   }
+  },
+  {
+   "case": "hos-earned-band-times-step-covers",
+   "pack": "packs/history-or-stake.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "500",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "bands": [
+      {
+       "currency": "USD",
+       "decade": 1,
+       "subjects": 3,
+       "adverse": 0
+      }
+     ]
+    }
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T2",
+    "block_sha256": "aaa0d9a61a2806c0789543a6c0df8f825f32ce5b433faaffa6aeb0782d360454"
+   }
+  },
+  {
+   "case": "hos-above-the-step-asks",
+   "pack": "packs/history-or-stake.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "5000",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "bands": [
+      {
+       "currency": "USD",
+       "decade": 1,
+       "subjects": 3,
+       "adverse": 0
+      }
+     ]
+    }
+   },
+   "expected": {
+    "verdict": "ASK",
+    "source": "rows",
+    "tier": "T2",
+    "block_sha256": "34a00ac2f4f1391002ffffb1ec667c8b38c56d97212d58ba8237e9fea97924e4"
+   }
+  },
+  {
+   "case": "hos-above-the-step-asked-limits-to-the-earned-tier",
+   "pack": "packs/history-or-stake.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "5000",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "bands": [
+      {
+       "currency": "USD",
+       "decade": 1,
+       "subjects": 3,
+       "adverse": 0
+      }
+     ]
+    },
+    "asks": {
+     "served_summary/1": "answered"
+    },
+    "asks_made": 1
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T2",
+    "block_sha256": "ce9f217e76151ae660270cf1288213d74e2d1d270fbba2040d68ea32f5dbe81e"
+   }
+  },
+  {
+   "case": "hos-a-hundred-micro-subjects-earn-the-micro-band",
+   "pack": "packs/history-or-stake.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "500",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "bands": [
+      {
+       "currency": "USD",
+       "decade": 0,
+       "subjects": 100,
+       "adverse": 0
+      }
+     ]
+    },
+    "asks": {
+     "served_summary/1": "answered"
+    },
+    "asks_made": 1
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T1",
+    "block_sha256": "8459dbb3d5e4f78b8a5f1e4eb6eb11b75d493861b991200e276e808ee54e744a"
+   }
+  },
+  {
+   "case": "hos-the-highest-qualifying-band-earns",
+   "pack": "packs/history-or-stake.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "5000",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "bands": [
+      {
+       "currency": "USD",
+       "decade": 0,
+       "subjects": 100,
+       "adverse": 0
+      },
+      {
+       "currency": "USD",
+       "decade": 2,
+       "subjects": 3,
+       "adverse": 0
+      }
+     ]
+    }
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T3",
+    "block_sha256": "8a1596a056d210d65d53e7108f14bcb3e27f640964bb1f0b8ac6e5432c1f1cb7"
+   }
+  },
+  {
+   "case": "hos-fewer-than-k-earns-nothing",
+   "pack": "packs/history-or-stake.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "bands": [
+      {
+       "currency": "USD",
+       "decade": 2,
+       "subjects": 2,
+       "adverse": 0
+      }
+     ]
+    },
+    "asks": {
+     "served_summary/1": "answered"
+    },
+    "asks_made": 1
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "7476d4feea8b69368914be3a3c3138c0b73a576f6cb99cc44529bc571b3ec9be"
+   }
+  },
+  {
+   "case": "hos-too-many-adverse-skips-the-band",
+   "pack": "packs/history-or-stake.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "500",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "bands": [
+      {
+       "currency": "USD",
+       "decade": 1,
+       "subjects": 10,
+       "adverse": 2
+      },
+      {
+       "currency": "USD",
+       "decade": 0,
+       "subjects": 3,
+       "adverse": 0
+      }
+     ]
+    },
+    "asks": {
+     "served_summary/1": "answered"
+    },
+    "asks_made": 1
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T1",
+    "block_sha256": "8459dbb3d5e4f78b8a5f1e4eb6eb11b75d493861b991200e276e808ee54e744a"
+   }
+  },
+  {
+   "case": "hos-adverse-at-the-limit-counts",
+   "pack": "packs/history-or-stake.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "500",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "bands": [
+      {
+       "currency": "USD",
+       "decade": 1,
+       "subjects": 10,
+       "adverse": 1
+      }
+     ]
+    }
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T2",
+    "block_sha256": "aaa0d9a61a2806c0789543a6c0df8f825f32ce5b433faaffa6aeb0782d360454"
+   }
+  },
+  {
+   "case": "hos-a-band-in-cents-maps-to-usd",
+   "pack": "packs/history-or-stake.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "500",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "bands": [
+      {
+       "currency": "cents",
+       "decade": 3,
+       "subjects": 3,
+       "adverse": 0
+      }
+     ]
+    }
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T2",
+    "block_sha256": "aaa0d9a61a2806c0789543a6c0df8f825f32ce5b433faaffa6aeb0782d360454"
+   }
+  },
+  {
+   "case": "hos-bands-of-one-unit-are-added",
+   "pack": "packs/history-or-stake.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "500",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "bands": [
+      {
+       "currency": "USD",
+       "decade": 1,
+       "subjects": 2,
+       "adverse": 0
+      },
+      {
+       "currency": "cents",
+       "decade": 3,
+       "subjects": 1,
+       "adverse": 0
+      }
+     ]
+    }
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T2",
+    "block_sha256": "aaa0d9a61a2806c0789543a6c0df8f825f32ce5b433faaffa6aeb0782d360454"
+   }
+  },
+  {
+   "case": "hos-a-currency-outside-accept-is-not-counted",
+   "pack": "packs/history-or-stake.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "bands": [
+      {
+       "currency": "EUR",
+       "decade": 2,
+       "subjects": 10,
+       "adverse": 0
+      }
+     ]
+    },
+    "asks": {
+     "served_summary/1": "answered"
+    },
+    "asks_made": 1
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "7476d4feea8b69368914be3a3c3138c0b73a576f6cb99cc44529bc571b3ec9be"
+   }
+  },
+  {
+   "case": "hos-another-unit-is-not-counted",
+   "pack": "packs/history-or-stake.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "bands": [
+      {
+       "currency": "sat",
+       "decade": 6,
+       "subjects": 10,
+       "adverse": 0
+      }
+     ]
+    },
+    "asks": {
+     "served_summary/1": "answered"
+    },
+    "asks_made": 1
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "7476d4feea8b69368914be3a3c3138c0b73a576f6cb99cc44529bc571b3ec9be"
+   }
+  },
+  {
+   "case": "hos-counts-that-do-not-read-are-not-counted",
+   "pack": "packs/history-or-stake.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "bands": [
+      {
+       "currency": "USD",
+       "decade": 2,
+       "subjects": 3,
+       "adverse": 4
+      }
+     ]
+    },
+    "asks": {
+     "served_summary/1": "answered"
+    },
+    "asks_made": 1
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "7476d4feea8b69368914be3a3c3138c0b73a576f6cb99cc44529bc571b3ec9be"
+   }
+  },
+  {
+   "case": "hos-a-card-with-no-bands-asks",
+   "pack": "packs/history-or-stake.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z"
+    }
+   },
+   "expected": {
+    "verdict": "ASK",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "6f4b8fd8076d7bc169d64565c4450375379e27a28eb2fc38ad510e35495c4f19"
+   }
+  },
+  {
+   "case": "hos-a-card-with-empty-bands-asks",
+   "pack": "packs/history-or-stake.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "bands": []
+    }
+   },
+   "expected": {
+    "verdict": "ASK",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "37f5cbbb35599ad2b0bfc99030e80ca975d5773c9ce9b8144a21bdaff9aee423"
+   }
+  },
+  {
+   "case": "hos-an-unverified-card-is-not-read",
+   "pack": "packs/history-or-stake.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "unverifiable",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "bands": [
+      {
+       "currency": "USD",
+       "decade": 1,
+       "subjects": 3,
+       "adverse": 0
+      }
+     ]
+    },
+    "asks": {
+     "served_summary/1": "answered"
+    },
+    "asks_made": 1
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "431280c43ffb2261bbe78a97fb623af4009480db67e3616f1517eb4edc7bc292"
+   }
+  },
+  {
+   "case": "hos-no-card-asks",
+   "pack": "packs/history-or-stake.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD"
+   },
+   "expected": {
+    "verdict": "ASK",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "6f4b8fd8076d7bc169d64565c4450375379e27a28eb2fc38ad510e35495c4f19"
+   }
+  },
+  {
+   "case": "hos-stake-on-a-pinned-rail-covers",
+   "pack": "packs/history-or-stake.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "5000",
+    "currency": "USD",
+    "stake": {
+     "amount": "5000",
+     "currency": "USD",
+     "rail": {
+      "id": "rail-a",
+      "digest": "5555555555555555555555555555555555555555555555555555555555555555"
+     }
+    }
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T3",
+    "block_sha256": "8a1596a056d210d65d53e7108f14bcb3e27f640964bb1f0b8ac6e5432c1f1cb7"
+   }
+  },
+  {
+   "case": "hos-stake-in-cents-covers",
+   "pack": "packs/history-or-stake.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "5000",
+    "currency": "USD",
+    "stake": {
+     "amount": "500000",
+     "currency": "cents",
+     "rail": {
+      "id": "rail-a",
+      "digest": "5555555555555555555555555555555555555555555555555555555555555555"
+     }
+    }
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T3",
+    "block_sha256": "8a1596a056d210d65d53e7108f14bcb3e27f640964bb1f0b8ac6e5432c1f1cb7"
+   }
+  },
+  {
+   "case": "hos-stake-short-and-no-history-asks",
+   "pack": "packs/history-or-stake.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "5000",
+    "currency": "USD",
+    "stake": {
+     "amount": "4999.99",
+     "currency": "USD",
+     "rail": {
+      "id": "rail-a",
+      "digest": "5555555555555555555555555555555555555555555555555555555555555555"
+     }
+    }
+   },
+   "expected": {
+    "verdict": "ASK",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "18de2ee7d840d9ac7e378671b276646d595929d04782ff7ee2fefd49e3501d95"
+   }
+  },
+  {
+   "case": "hos-stake-short-history-covers",
+   "pack": "packs/history-or-stake.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "500",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "bands": [
+      {
+       "currency": "USD",
+       "decade": 1,
+       "subjects": 3,
+       "adverse": 0
+      }
+     ]
+    },
+    "stake": {
+     "amount": "1",
+     "currency": "USD",
+     "rail": {
+      "id": "rail-a",
+      "digest": "5555555555555555555555555555555555555555555555555555555555555555"
+     }
+    }
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T2",
+    "block_sha256": "aaa0d9a61a2806c0789543a6c0df8f825f32ce5b433faaffa6aeb0782d360454"
+   }
+  },
+  {
+   "case": "hos-stake-short-history-earns-a-tier",
+   "pack": "packs/history-or-stake.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "5000",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "bands": [
+      {
+       "currency": "USD",
+       "decade": 1,
+       "subjects": 3,
+       "adverse": 0
+      }
+     ]
+    },
+    "stake": {
+     "amount": "1",
+     "currency": "USD",
+     "rail": {
+      "id": "rail-a",
+      "digest": "5555555555555555555555555555555555555555555555555555555555555555"
+     }
+    },
+    "asks": {
+     "served_summary/1": "answered"
+    },
+    "asks_made": 1
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T2",
+    "block_sha256": "ce9f217e76151ae660270cf1288213d74e2d1d270fbba2040d68ea32f5dbe81e"
+   }
+  },
+  {
+   "case": "hos-stake-on-an-unpinned-rail-is-not-counted",
+   "pack": "packs/history-or-stake.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "5000",
+    "currency": "USD",
+    "stake": {
+     "amount": "5000",
+     "currency": "USD",
+     "rail": {
+      "id": "rail-b",
+      "digest": "5555555555555555555555555555555555555555555555555555555555555555"
+     }
+    },
+    "asks": {
+     "served_summary/1": "answered"
+    },
+    "asks_made": 1
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "23d7a6066b4a6b2af986bfe53f727fca8e9d6e8497de3e1a741428222d16f723"
+   }
+  },
+  {
+   "case": "hos-stake-on-a-rail-with-another-digest-is-not-counted",
+   "pack": "packs/history-or-stake.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "5000",
+    "currency": "USD",
+    "stake": {
+     "amount": "5000",
+     "currency": "USD",
+     "rail": {
+      "id": "rail-a",
+      "digest": "6666666666666666666666666666666666666666666666666666666666666666"
+     }
+    },
+    "asks": {
+     "served_summary/1": "answered"
+    },
+    "asks_made": 1
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "23d7a6066b4a6b2af986bfe53f727fca8e9d6e8497de3e1a741428222d16f723"
+   }
+  },
+  {
+   "case": "hos-stake-in-another-unit-is-not-counted",
+   "pack": "packs/history-or-stake.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "5000",
+    "currency": "USD",
+    "stake": {
+     "amount": "100000000",
+     "currency": "sat",
+     "rail": {
+      "id": "rail-a",
+      "digest": "5555555555555555555555555555555555555555555555555555555555555555"
+     }
+    },
+    "asks": {
+     "served_summary/1": "answered"
+    },
+    "asks_made": 1
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "23d7a6066b4a6b2af986bfe53f727fca8e9d6e8497de3e1a741428222d16f723"
+   }
+  },
+  {
+   "case": "hos-above-the-top-tier-history-covers",
+   "pack": "packs/history-or-stake.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50000",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "bands": [
+      {
+       "currency": "USD",
+       "decade": 3,
+       "subjects": 3,
+       "adverse": 0
+      }
+     ]
+    }
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "above_tier",
+    "tier": "T3",
+    "block_sha256": "0ecb9cd7ac45cabb964ad3eaf4a9ef07e369804e97d805066dacef61fe8f94b4"
+   }
+  },
+  {
+   "case": "hos-above-the-top-tier-history-holds-the-top",
+   "pack": "packs/history-or-stake.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50000",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "bands": [
+      {
+       "currency": "USD",
+       "decade": 2,
+       "subjects": 3,
+       "adverse": 0
+      }
+     ]
+    },
+    "asks": {
+     "served_summary/1": "answered"
+    },
+    "asks_made": 1
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "above_tier",
+    "tier": "T3",
+    "block_sha256": "7f5d16ea5c163c98ff0cd279b931d1d2d54571f0d0c9aeb7cebd11544d8cfaf7"
+   }
+  },
+  {
+   "case": "hos-above-the-top-tier-history-short",
+   "pack": "packs/history-or-stake.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50000",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "bands": [
+      {
+       "currency": "USD",
+       "decade": 1,
+       "subjects": 3,
+       "adverse": 0
+      }
+     ]
+    },
+    "asks": {
+     "served_summary/1": "answered"
+    },
+    "asks_made": 1
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T2",
+    "block_sha256": "9ebb4220382bcc203d2c6b3d954030dc7c7239f7bae2e1d3e7a15844c517fd69"
+   }
+  },
+  {
+   "case": "hos-a-sat-deal-in-the-floor",
+   "pack": "packs/history-or-stake.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "500",
+    "currency": "sat",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "bands": []
+    }
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "18ee9b329f583e5f4b7aec98450dd834f8b5f778e8a6f59b8bb11ca77e2e5c78"
    }
   }
  ]

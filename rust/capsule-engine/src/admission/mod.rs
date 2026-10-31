@@ -48,7 +48,7 @@ use std::collections::BTreeMap;
 pub use band::{Band, Unit};
 pub use decision::{AskOut, Decision, Effect, PackRef, RowResult, RowStatus};
 pub use evaluate::evaluate;
-pub use pack::{Pack, COMPILED_FORMAT};
+pub use pack::{Pack, RailPin, COMPILED_FORMAT};
 
 use crate::instant::Instant;
 
@@ -216,6 +216,22 @@ pub struct Card {
     /// The claims the card holds, with their denominator; None when the card
     /// carries no counts (history_card/1 carries none today).
     pub claims: Option<Claims>,
+    /// The card's per-band counts; None when the card carries none (no card
+    /// served today does), and empty when it carries them and every band is
+    /// empty.
+    pub bands: Option<Vec<BandCount>>,
+}
+
+/// A card's count in one value band (evaluate.go BandCount; Reference v3
+/// §3A.14): the corroborated, net-settled subjects whose net amount falls in
+/// `decade` of `currency`, each subject banded once after netting, and how
+/// many of them were resolved against the counterparty.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct BandCount {
+    pub currency: String,
+    pub decade: i64,
+    pub subjects: i64,
+    pub adverse: i64,
 }
 
 /// A card's claims held out of claims made, in its window (evaluate.go
@@ -278,6 +294,9 @@ pub struct Operator {
 pub struct Stake {
     pub amount: String,
     pub currency: String,
+    /// The adapter declaration of the rail the stake is posted on; a stake
+    /// counts only on a rail the pack's trust roots pin.
+    pub rail: RailPin,
 }
 
 /// One verified vouch: the controller its signer is bound to (evaluate.go

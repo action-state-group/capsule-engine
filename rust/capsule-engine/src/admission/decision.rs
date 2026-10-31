@@ -62,6 +62,10 @@ pub struct RowResult {
     /// A not_read row whose input was there but held nothing to read (no
     /// verdict yet about the counterparty): not a missing input.
     pub(crate) held: bool,
+    /// On a ladder row that read the card's bands and found one earned: the
+    /// highest decade, in the deal's band unit, the earned history covers
+    /// (the earned band plus the step).
+    pub(crate) earned: Option<i64>,
 }
 
 /// One Evidence Request a decision derives from a row that did not pass
