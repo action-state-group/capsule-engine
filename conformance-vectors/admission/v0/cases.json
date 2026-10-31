@@ -3736,6 +3736,358 @@
     "tier": "T0",
     "block_sha256": "18ee9b329f583e5f4b7aec98450dd834f8b5f778e8a6f59b8bb11ca77e2e5c78"
    }
+  },
+  {
+   "case": "hos-subjects-above-2^53-1-are-not-counted",
+   "pack": "packs/history-or-stake.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "bands": [
+      {
+       "currency": "USD",
+       "decade": 2,
+       "subjects": 9007199254740992,
+       "adverse": 0
+      }
+     ]
+    },
+    "asks": {
+     "served_summary/1": "answered"
+    },
+    "asks_made": 1
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "7476d4feea8b69368914be3a3c3138c0b73a576f6cb99cc44529bc571b3ec9be"
+   }
+  },
+  {
+   "case": "hos-negative-subjects-are-not-counted",
+   "pack": "packs/history-or-stake.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "bands": [
+      {
+       "currency": "USD",
+       "decade": 2,
+       "subjects": -3,
+       "adverse": 0
+      }
+     ]
+    },
+    "asks": {
+     "served_summary/1": "answered"
+    },
+    "asks_made": 1
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "7476d4feea8b69368914be3a3c3138c0b73a576f6cb99cc44529bc571b3ec9be"
+   }
+  },
+  {
+   "case": "hos-negative-adverse-is-not-counted",
+   "pack": "packs/history-or-stake.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "bands": [
+      {
+       "currency": "USD",
+       "decade": 2,
+       "subjects": 3,
+       "adverse": -1
+      }
+     ]
+    },
+    "asks": {
+     "served_summary/1": "answered"
+    },
+    "asks_made": 1
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "7476d4feea8b69368914be3a3c3138c0b73a576f6cb99cc44529bc571b3ec9be"
+   }
+  },
+  {
+   "case": "hos-a-decade-beyond-1000-is-not-counted",
+   "pack": "packs/history-or-stake.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "bands": [
+      {
+       "currency": "USD",
+       "decade": 1001,
+       "subjects": 3,
+       "adverse": 0
+      }
+     ]
+    },
+    "asks": {
+     "served_summary/1": "answered"
+    },
+    "asks_made": 1
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "7476d4feea8b69368914be3a3c3138c0b73a576f6cb99cc44529bc571b3ec9be"
+   }
+  },
+  {
+   "case": "hos-a-decade-of-1000-is-counted",
+   "pack": "packs/history-or-stake.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "bands": [
+      {
+       "currency": "USD",
+       "decade": 1000,
+       "subjects": 3,
+       "adverse": 0
+      }
+     ]
+    }
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T1",
+    "block_sha256": "704302aaf55e9eab028f1179847511c1371cdb811b30de60ae86a3a1b87e71fc"
+   }
+  },
+  {
+   "case": "hos-a-decade-below-minus-1000-is-not-counted",
+   "pack": "packs/history-or-stake.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "bands": [
+      {
+       "currency": "USD",
+       "decade": -1001,
+       "subjects": 3,
+       "adverse": 0
+      }
+     ]
+    },
+    "asks": {
+     "served_summary/1": "answered"
+    },
+    "asks_made": 1
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "7476d4feea8b69368914be3a3c3138c0b73a576f6cb99cc44529bc571b3ec9be"
+   }
+  },
+  {
+   "case": "hos-subjects-added-saturate-at-2^53-1",
+   "pack": "packs/history-or-stake.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "500",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "bands": [
+      {
+       "currency": "USD",
+       "decade": 2,
+       "subjects": 9007199254740991,
+       "adverse": 0
+      },
+      {
+       "currency": "USD",
+       "decade": 2,
+       "subjects": 5,
+       "adverse": 5
+      }
+     ]
+    }
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T2",
+    "block_sha256": "aaa0d9a61a2806c0789543a6c0df8f825f32ce5b433faaffa6aeb0782d360454"
+   }
+  },
+  {
+   "case": "hos-adverse-added-is-clamped-to-subjects",
+   "pack": "packs/history-or-stake.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "500",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "bands": [
+      {
+       "currency": "USD",
+       "decade": 2,
+       "subjects": 9007199254740991,
+       "adverse": 9007199254740991
+      },
+      {
+       "currency": "USD",
+       "decade": 2,
+       "subjects": 5,
+       "adverse": 5
+      }
+     ]
+    },
+    "asks": {
+     "served_summary/1": "answered"
+    },
+    "asks_made": 1
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "f3d37017a9db3830e4d3257c6d7ee2c63607b9699693cd9e8bad039361d73914"
+   }
+  },
+  {
+   "case": "hos-adverse-share-at-the-bound-at-scale",
+   "pack": "packs/history-or-stake.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "500",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "bands": [
+      {
+       "currency": "USD",
+       "decade": 1,
+       "subjects": 9007199254740990,
+       "adverse": 900719925474099
+      }
+     ]
+    }
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T2",
+    "block_sha256": "aaa0d9a61a2806c0789543a6c0df8f825f32ce5b433faaffa6aeb0782d360454"
+   }
+  },
+  {
+   "case": "hos-adverse-share-one-over-the-bound-at-scale",
+   "pack": "packs/history-or-stake.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "500",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "bands": [
+      {
+       "currency": "USD",
+       "decade": 1,
+       "subjects": 9007199254740990,
+       "adverse": 900719925474100
+      }
+     ]
+    },
+    "asks": {
+     "served_summary/1": "answered"
+    },
+    "asks_made": 1
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "f3d37017a9db3830e4d3257c6d7ee2c63607b9699693cd9e8bad039361d73914"
+   }
+  },
+  {
+   "case": "hos-an-earned-limit-below-every-tier-holds-at-the-tier-below-from",
+   "pack": "packs/history-or-stake.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "bands": [
+      {
+       "currency": "USD",
+       "decade": -3,
+       "subjects": 3,
+       "adverse": 0
+      }
+     ]
+    },
+    "asks": {
+     "served_summary/1": "answered"
+    },
+    "asks_made": 1
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "7476d4feea8b69368914be3a3c3138c0b73a576f6cb99cc44529bc571b3ec9be"
+   }
   }
  ]
 }
