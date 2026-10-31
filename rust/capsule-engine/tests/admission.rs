@@ -10,8 +10,8 @@ use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 
 use capsule_engine::admission::{
-    evaluate, AdjudicationVerdict, BandCount, Card, Claims, Inputs, Judgement, Operator, OwnHistory, Pack, Platform,
-    RailPin, Selection, Stake, Timestamp, Vouch,
+    evaluate, standard_history_counts, AdjudicationVerdict, BandCount, Card, Claims, Disputes, Inputs, Judgement,
+    Operator, OwnHistory, Pack, Platform, RailPin, Selection, Stake, Timestamp, Vouch,
 };
 use capsule_engine::canon;
 use serde_json::{Map, Value};
@@ -84,7 +84,16 @@ fn decode_input(raw: &Value) -> Inputs {
     let platform = object(v.get("platform").unwrap_or(&empty), &["release_attestation", "owner_signed"], "platform");
     let card = object(
         v.get("card").unwrap_or(&empty),
-        &["state", "first_checkpoint_at", "latest_checkpoint_at", "witness", "controller", "claims", "bands"],
+        &[
+            "state",
+            "first_checkpoint_at",
+            "latest_checkpoint_at",
+            "witness",
+            "controller",
+            "claims",
+            "bands",
+            "disputes",
+        ],
         "card",
     );
     let selection = object(v.get("selection").unwrap_or(&empty), &["state", "unanswered_disputes"], "selection");
@@ -120,6 +129,10 @@ fn decode_input(raw: &Value) -> Inputs {
                     }
                 })
                 .collect()
+        }),
+        disputes: null_or(card, "disputes").map(|d| {
+            let d = object(d, &["open", "of"], "card.disputes");
+            Disputes { open: int(d, "open"), of: int(d, "of") }
         }),
     };
     input.selection = Selection {
@@ -378,5 +391,49 @@ fn key_age_fails_without_a_first_checkpoint() {
         let d = evaluate(&p, &input);
         let row = d.rows.iter().find(|r| r.row == "key-age").unwrap();
         assert_eq!(row.result.as_str(), "fail", "{first:?}");
+    }
+}
+
+/// standard_history_test.go TestStandardHistoryVectors: the shared
+/// standard_history/1 mapping vectors.
+#[test]
+fn standard_history_vectors() {
+    let raw = std::fs::read(vector_dir().join("standard-history.json")).unwrap();
+    let set: Value = serde_json::from_slice(&raw).unwrap();
+    let cases = set["cases"].as_array().unwrap();
+    assert!(!cases.is_empty(), "no standard_history/1 vectors");
+    for c in cases {
+        let name = c["case"].as_str().unwrap();
+        let got = standard_history_counts(c["artifact"].as_str().unwrap().as_bytes());
+        match c.get("expected") {
+            None => {
+                let want = c["want"].as_str().unwrap();
+                match got {
+                    Err(e) => assert!(e.0.contains(want), "{name}: error {e}, want one containing {want:?}"),
+                    Ok(_) => panic!("{name}: read, want an error containing {want:?}"),
+                }
+            }
+            Some(e) => {
+                let (bands, disputes) = got.unwrap_or_else(|err| panic!("{name}: {err}"));
+                let want: Vec<BandCount> = e["bands"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .map(|b| BandCount {
+                        currency: b["currency"].as_str().unwrap().into(),
+                        decade: b["decade"].as_i64().unwrap(),
+                        subjects: b["subjects"].as_i64().unwrap(),
+                        adverse: b["adverse"].as_i64().unwrap(),
+                    })
+                    .collect();
+                assert_eq!(bands, want, "{name}: bands");
+                let d = &e["disputes"];
+                assert_eq!(
+                    disputes,
+                    Disputes { open: d["open"].as_i64().unwrap(), of: d["of"].as_i64().unwrap() },
+                    "{name}: disputes"
+                );
+            }
+        }
     }
 }

@@ -36,7 +36,7 @@ const MAY_DECIDE_NO: [&str; 3] = [SOURCE_PLATFORM, SOURCE_OWN_HISTORY, SOURCE_OP
 
 /// evaluate.go predicates: each admission check, the source it reads and
 /// the params it takes. The list is closed and versioned with the evaluator.
-pub(crate) const PREDICATES: [(&str, &str, &[&str]); 21] = [
+pub(crate) const PREDICATES: [(&str, &str, &[&str]); 22] = [
     ("platform.attestation_not_invalid", SOURCE_PLATFORM, &[]),
     ("platform.owner_signed", SOURCE_PLATFORM, &[]),
     ("card.verified", SOURCE_CARD, &[]),
@@ -57,6 +57,7 @@ pub(crate) const PREDICATES: [(&str, &str, &[&str]); 21] = [
     ("vouch.distinct_controllers", SOURCE_VOUCH, &["min"]),
     ("stake.covers_deal", SOURCE_STAKE, &[]),
     ("card.band_history_or_stake", SOURCE_CARD, &["k", "step_decades", "max_adverse_permille"]),
+    ("card.open_disputes", SOURCE_CARD, &["max"]),
     ("judged", SOURCE_JUDGED, &[]),
 ];
 
@@ -67,7 +68,7 @@ pub(crate) fn param_max(name: &str) -> Option<i64> {
     match name {
         "max_age_s" => Some(100 * 365 * 24 * 3600),
         "min_days" | "window_days" => Some(100 * 365),
-        "min" | "k" => Some(canon::MAX_SAFE_INTEGER),
+        "min" | "k" | "max" => Some(canon::MAX_SAFE_INTEGER),
         // step_decades keeps an earned limit (a card band's decade, bounded
         // by BAND_DECADE_MAX, plus the step) far inside an i64.
         "step_decades" => Some(DECADE_MAX),

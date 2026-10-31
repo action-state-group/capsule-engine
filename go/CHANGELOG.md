@@ -5,6 +5,12 @@ and `portedDefinitions` (`guard/engine.go`).
 
 ## Unreleased
 
+- Added (evidencebook-skills#87): `StandardHistoryCounts` reads a verified `standard_history/1`
+  card's bands and received disputes as `Card.Bands` and `Card.Disputes`. A band's subjects are its
+  decided deals (`held` plus `did_not_hold`), and its adverse count is `did_not_hold`; a null-decade
+  band is skipped. The card's received disputes are read as `Disputes.Open` out of `Disputes.Of`.
+  Also added: the predicate `card.open_disputes` (param `max`), which shows the open-dispute count
+  beside the ladder and never decides NO.
 - Added (capsule-engine#267, evidencebook-skills#79): the admission predicate
   `card.band_history_or_stake`, the per-band ladder. A deal passes when it is within the earned band
   plus `step_decades`, or when a stake on a pinned rail covers it. The earned band is the highest

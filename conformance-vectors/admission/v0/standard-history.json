@@ -1,0 +1,340 @@
+{
+ "source": "capsule-engine admission: StandardHistoryCounts over standard_history/1 cards (evidencebook-skills#87). Each case gives a card's artifact bytes; expected is the bands and disputes it reads, or want is a substring of the refusal. The aac- cases are the passing cards of agent-action-capsule vectors/standard-history-v0/vectors.json at 306918030318cf1b09197f95dc5cecd188e81bb6. Go (go/admission) and Rust (rust/capsule-engine admission) decide every case.",
+ "cases": [
+  {
+   "case": "aac-person-3-months",
+   "artifact": "{\"anchor\":\"0a3a88faf7a2294fa5590ee30ffeaf35182fd22e945cdc2431170de610cb2212\",\"bands\":[{\"currency\":\"BTC\",\"decade\":-7,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"EUR\",\"decade\":0,\"did_not_hold\":1,\"held\":0,\"of\":1,\"undecided\":0},{\"currency\":\"USD\",\"decade\":1,\"did_not_hold\":0,\"held\":1,\"of\":2,\"undecided\":1},{\"currency\":\"USD\",\"decade\":2,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0}],\"class_missing\":{\"count\":1,\"of\":5},\"controller_class\":\"person_declared\",\"derivation\":\"standard_history/1\",\"disputes\":{\"raised\":{\"by_forum\":{\"auto\":1,\"external\":0,\"network\":0,\"of\":2,\"rail\":1},\"by_outcome\":{\"against\":0,\"for\":1,\"no_finding\":0,\"of\":2,\"open\":0,\"split\":1,\"withdrawn\":0},\"of\":2},\"received\":{\"by_forum\":{\"auto\":0,\"external\":0,\"network\":1,\"of\":1,\"rail\":0},\"by_outcome\":{\"against\":0,\"for\":0,\"no_finding\":0,\"of\":1,\"open\":1,\"split\":0,\"withdrawn\":0},\"of\":1}},\"happened\":{\"no_record\":1,\"of\":5,\"receipt_only\":2,\"stamped_by_both\":2},\"holder_kind\":\"person\",\"in_window\":{\"counted\":5,\"not_counted\":2,\"of\":7},\"outcomes\":{\"did_not_hold\":1,\"held\":3,\"of\":5,\"undecided\":1},\"policy\":\"2cc796d2069a0ced9a272cb5b15a05d6bef97a4f7599aad5124b1ae88ba770ec\",\"roles\":{\"bought\":2,\"of\":5,\"provided\":3},\"since\":\"2026-03\",\"window\":{\"months\":3}}",
+   "expected": {
+    "bands": [
+     {
+      "currency": "BTC",
+      "decade": -7,
+      "subjects": 1,
+      "adverse": 0
+     },
+     {
+      "currency": "EUR",
+      "decade": 0,
+      "subjects": 1,
+      "adverse": 1
+     },
+     {
+      "currency": "USD",
+      "decade": 1,
+      "subjects": 1,
+      "adverse": 0
+     },
+     {
+      "currency": "USD",
+      "decade": 2,
+      "subjects": 1,
+      "adverse": 0
+     }
+    ],
+    "disputes": {
+     "open": 1,
+     "of": 1
+    }
+   }
+  },
+  {
+   "case": "aac-person-3-months-without-deals",
+   "artifact": "{\"anchor\":\"0a3a88faf7a2294fa5590ee30ffeaf35182fd22e945cdc2431170de610cb2212\",\"bands\":[{\"currency\":\"BTC\",\"decade\":-7,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"EUR\",\"decade\":0,\"did_not_hold\":1,\"held\":0,\"of\":1,\"undecided\":0},{\"currency\":\"USD\",\"decade\":1,\"did_not_hold\":0,\"held\":1,\"of\":2,\"undecided\":1},{\"currency\":\"USD\",\"decade\":2,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0}],\"class_missing\":{\"count\":1,\"of\":5},\"controller_class\":\"person_declared\",\"derivation\":\"standard_history/1\",\"disputes\":{\"raised\":{\"by_forum\":{\"auto\":1,\"external\":0,\"network\":0,\"of\":2,\"rail\":1},\"by_outcome\":{\"against\":0,\"for\":1,\"no_finding\":0,\"of\":2,\"open\":0,\"split\":1,\"withdrawn\":0},\"of\":2},\"received\":{\"by_forum\":{\"auto\":0,\"external\":0,\"network\":1,\"of\":1,\"rail\":0},\"by_outcome\":{\"against\":0,\"for\":0,\"no_finding\":0,\"of\":1,\"open\":1,\"split\":0,\"withdrawn\":0},\"of\":1}},\"happened\":{\"no_record\":1,\"of\":5,\"receipt_only\":2,\"stamped_by_both\":2},\"holder_kind\":\"person\",\"in_window\":{\"counted\":5,\"not_counted\":2,\"of\":7},\"outcomes\":{\"did_not_hold\":1,\"held\":3,\"of\":5,\"undecided\":1},\"policy\":\"2cc796d2069a0ced9a272cb5b15a05d6bef97a4f7599aad5124b1ae88ba770ec\",\"roles\":{\"bought\":2,\"of\":5,\"provided\":3},\"since\":\"2026-03\",\"window\":{\"months\":3}}",
+   "expected": {
+    "bands": [
+     {
+      "currency": "BTC",
+      "decade": -7,
+      "subjects": 1,
+      "adverse": 0
+     },
+     {
+      "currency": "EUR",
+      "decade": 0,
+      "subjects": 1,
+      "adverse": 1
+     },
+     {
+      "currency": "USD",
+      "decade": 1,
+      "subjects": 1,
+      "adverse": 0
+     },
+     {
+      "currency": "USD",
+      "decade": 2,
+      "subjects": 1,
+      "adverse": 0
+     }
+    ],
+    "disputes": {
+     "open": 1,
+     "of": 1
+    }
+   }
+  },
+  {
+   "case": "aac-person-3-months-card-only",
+   "artifact": "{\"anchor\":\"0a3a88faf7a2294fa5590ee30ffeaf35182fd22e945cdc2431170de610cb2212\",\"bands\":[{\"currency\":\"BTC\",\"decade\":-7,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"EUR\",\"decade\":0,\"did_not_hold\":1,\"held\":0,\"of\":1,\"undecided\":0},{\"currency\":\"USD\",\"decade\":1,\"did_not_hold\":0,\"held\":1,\"of\":2,\"undecided\":1},{\"currency\":\"USD\",\"decade\":2,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0}],\"class_missing\":{\"count\":1,\"of\":5},\"controller_class\":\"person_declared\",\"derivation\":\"standard_history/1\",\"disputes\":{\"raised\":{\"by_forum\":{\"auto\":1,\"external\":0,\"network\":0,\"of\":2,\"rail\":1},\"by_outcome\":{\"against\":0,\"for\":1,\"no_finding\":0,\"of\":2,\"open\":0,\"split\":1,\"withdrawn\":0},\"of\":2},\"received\":{\"by_forum\":{\"auto\":0,\"external\":0,\"network\":1,\"of\":1,\"rail\":0},\"by_outcome\":{\"against\":0,\"for\":0,\"no_finding\":0,\"of\":1,\"open\":1,\"split\":0,\"withdrawn\":0},\"of\":1}},\"happened\":{\"no_record\":1,\"of\":5,\"receipt_only\":2,\"stamped_by_both\":2},\"holder_kind\":\"person\",\"in_window\":{\"counted\":5,\"not_counted\":2,\"of\":7},\"outcomes\":{\"did_not_hold\":1,\"held\":3,\"of\":5,\"undecided\":1},\"policy\":\"2cc796d2069a0ced9a272cb5b15a05d6bef97a4f7599aad5124b1ae88ba770ec\",\"roles\":{\"bought\":2,\"of\":5,\"provided\":3},\"since\":\"2026-03\",\"window\":{\"months\":3}}",
+   "expected": {
+    "bands": [
+     {
+      "currency": "BTC",
+      "decade": -7,
+      "subjects": 1,
+      "adverse": 0
+     },
+     {
+      "currency": "EUR",
+      "decade": 0,
+      "subjects": 1,
+      "adverse": 1
+     },
+     {
+      "currency": "USD",
+      "decade": 1,
+      "subjects": 1,
+      "adverse": 0
+     },
+     {
+      "currency": "USD",
+      "decade": 2,
+      "subjects": 1,
+      "adverse": 0
+     }
+    ],
+    "disputes": {
+     "open": 1,
+     "of": 1
+    }
+   }
+  },
+  {
+   "case": "aac-node-all",
+   "artifact": "{\"anchor\":\"0a3a88faf7a2294fa5590ee30ffeaf35182fd22e945cdc2431170de610cb2212\",\"bands\":[{\"currency\":\"BTC\",\"decade\":-7,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"EUR\",\"decade\":0,\"did_not_hold\":1,\"held\":0,\"of\":1,\"undecided\":0},{\"currency\":\"USD\",\"decade\":1,\"did_not_hold\":0,\"held\":1,\"of\":2,\"undecided\":1},{\"currency\":\"USD\",\"decade\":2,\"did_not_hold\":0,\"held\":2,\"of\":2,\"undecided\":0}],\"class_missing\":{\"count\":1,\"of\":6},\"controller_class\":\"node_declared\",\"derivation\":\"standard_history/1\",\"disputes\":{\"raised\":{\"by_forum\":{\"auto\":1,\"external\":0,\"network\":0,\"of\":2,\"rail\":1},\"by_outcome\":{\"against\":0,\"for\":1,\"no_finding\":0,\"of\":2,\"open\":0,\"split\":1,\"withdrawn\":0},\"of\":2},\"received\":{\"by_forum\":{\"auto\":0,\"external\":0,\"network\":1,\"of\":1,\"rail\":0},\"by_outcome\":{\"against\":0,\"for\":0,\"no_finding\":0,\"of\":1,\"open\":1,\"split\":0,\"withdrawn\":0},\"of\":1}},\"happened\":{\"no_record\":1,\"of\":6,\"receipt_only\":2,\"stamped_by_both\":3},\"holder_kind\":\"node\",\"in_window\":{\"counted\":6,\"not_counted\":2,\"of\":8},\"outcomes\":{\"did_not_hold\":1,\"held\":4,\"of\":6,\"undecided\":1},\"policy\":\"23af49cf396d86427e65a0a32e82c27c46ac42d42ae2d54f80986258f7afd542\",\"roles\":{\"bought\":2,\"of\":6,\"provided\":4},\"since\":\"2026-03\",\"window\":{\"all\":true}}",
+   "expected": {
+    "bands": [
+     {
+      "currency": "BTC",
+      "decade": -7,
+      "subjects": 1,
+      "adverse": 0
+     },
+     {
+      "currency": "EUR",
+      "decade": 0,
+      "subjects": 1,
+      "adverse": 1
+     },
+     {
+      "currency": "USD",
+      "decade": 1,
+      "subjects": 1,
+      "adverse": 0
+     },
+     {
+      "currency": "USD",
+      "decade": 2,
+      "subjects": 2,
+      "adverse": 0
+     }
+    ],
+    "disputes": {
+     "open": 1,
+     "of": 1
+    }
+   }
+  },
+  {
+   "case": "aac-window-month-end",
+   "artifact": "{\"anchor\":\"0a3a88faf7a2294fa5590ee30ffeaf35182fd22e945cdc2431170de610cb2212\",\"bands\":[{\"currency\":\"GBP\",\"decade\":1,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0}],\"class_missing\":{\"count\":0,\"of\":1},\"controller_class\":\"person_declared\",\"derivation\":\"standard_history/1\",\"disputes\":{\"raised\":{\"by_forum\":{\"auto\":0,\"external\":0,\"network\":0,\"of\":0,\"rail\":0},\"by_outcome\":{\"against\":0,\"for\":0,\"no_finding\":0,\"of\":0,\"open\":0,\"split\":0,\"withdrawn\":0},\"of\":0},\"received\":{\"by_forum\":{\"auto\":0,\"external\":0,\"network\":0,\"of\":0,\"rail\":0},\"by_outcome\":{\"against\":0,\"for\":0,\"no_finding\":0,\"of\":0,\"open\":0,\"split\":0,\"withdrawn\":0},\"of\":0}},\"happened\":{\"no_record\":0,\"of\":1,\"receipt_only\":0,\"stamped_by_both\":1},\"holder_kind\":\"person\",\"in_window\":{\"counted\":1,\"not_counted\":0,\"of\":1},\"outcomes\":{\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},\"policy\":\"2cc796d2069a0ced9a272cb5b15a05d6bef97a4f7599aad5124b1ae88ba770ec\",\"roles\":{\"bought\":0,\"of\":1,\"provided\":1},\"since\":\"2026-03\",\"window\":{\"months\":3}}",
+   "expected": {
+    "bands": [
+     {
+      "currency": "GBP",
+      "decade": 1,
+      "subjects": 1,
+      "adverse": 0
+     }
+    ],
+    "disputes": {
+     "open": 0,
+     "of": 0
+    }
+   }
+  },
+  {
+   "case": "aac-empty-window",
+   "artifact": "{\"anchor\":\"0a3a88faf7a2294fa5590ee30ffeaf35182fd22e945cdc2431170de610cb2212\",\"bands\":[],\"class_missing\":{\"count\":0,\"of\":0},\"controller_class\":\"person_declared\",\"derivation\":\"standard_history/1\",\"disputes\":{\"raised\":{\"by_forum\":{\"auto\":0,\"external\":0,\"network\":0,\"of\":0,\"rail\":0},\"by_outcome\":{\"against\":0,\"for\":0,\"no_finding\":0,\"of\":0,\"open\":0,\"split\":0,\"withdrawn\":0},\"of\":0},\"received\":{\"by_forum\":{\"auto\":0,\"external\":0,\"network\":0,\"of\":0,\"rail\":0},\"by_outcome\":{\"against\":0,\"for\":0,\"no_finding\":0,\"of\":0,\"open\":0,\"split\":0,\"withdrawn\":0},\"of\":0}},\"happened\":{\"no_record\":0,\"of\":0,\"receipt_only\":0,\"stamped_by_both\":0},\"holder_kind\":\"person\",\"in_window\":{\"counted\":0,\"not_counted\":0,\"of\":0},\"outcomes\":{\"did_not_hold\":0,\"held\":0,\"of\":0,\"undecided\":0},\"policy\":\"2cc796d2069a0ced9a272cb5b15a05d6bef97a4f7599aad5124b1ae88ba770ec\",\"roles\":{\"bought\":0,\"of\":0,\"provided\":0},\"since\":\"2026-03\",\"window\":{\"months\":3}}",
+   "expected": {
+    "bands": [],
+    "disputes": {
+     "open": 0,
+     "of": 0
+    }
+   }
+  },
+  {
+   "case": "aac-year-end-small-and-zero",
+   "artifact": "{\"anchor\":\"0a3a88faf7a2294fa5590ee30ffeaf35182fd22e945cdc2431170de610cb2212\",\"bands\":[{\"currency\":\"BTC\",\"decade\":-6,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"USD\",\"decade\":null,\"did_not_hold\":0,\"held\":0,\"of\":1,\"undecided\":1},{\"currency\":\"USD\",\"decade\":1,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0}],\"class_missing\":{\"count\":1,\"of\":3},\"controller_class\":\"person_declared\",\"derivation\":\"standard_history/1\",\"disputes\":{\"raised\":{\"by_forum\":{\"auto\":0,\"external\":0,\"network\":0,\"of\":0,\"rail\":0},\"by_outcome\":{\"against\":0,\"for\":0,\"no_finding\":0,\"of\":0,\"open\":0,\"split\":0,\"withdrawn\":0},\"of\":0},\"received\":{\"by_forum\":{\"auto\":0,\"external\":0,\"network\":0,\"of\":0,\"rail\":0},\"by_outcome\":{\"against\":0,\"for\":0,\"no_finding\":0,\"of\":0,\"open\":0,\"split\":0,\"withdrawn\":0},\"of\":0}},\"happened\":{\"no_record\":1,\"of\":3,\"receipt_only\":1,\"stamped_by_both\":1},\"holder_kind\":\"person\",\"in_window\":{\"counted\":3,\"not_counted\":0,\"of\":3},\"outcomes\":{\"did_not_hold\":0,\"held\":2,\"of\":3,\"undecided\":1},\"policy\":\"2cc796d2069a0ced9a272cb5b15a05d6bef97a4f7599aad5124b1ae88ba770ec\",\"roles\":{\"bought\":2,\"of\":3,\"provided\":1},\"since\":\"2026-03\",\"window\":{\"months\":3}}",
+   "expected": {
+    "bands": [
+     {
+      "currency": "BTC",
+      "decade": -6,
+      "subjects": 1,
+      "adverse": 0
+     },
+     {
+      "currency": "USD",
+      "decade": 1,
+      "subjects": 1,
+      "adverse": 0
+     }
+    ],
+    "disputes": {
+     "open": 0,
+     "of": 0
+    }
+   }
+  },
+  {
+   "case": "aac-window-before-year-one",
+   "artifact": "{\"anchor\":\"0a3a88faf7a2294fa5590ee30ffeaf35182fd22e945cdc2431170de610cb2212\",\"bands\":[{\"currency\":\"BTC\",\"decade\":-7,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"EUR\",\"decade\":0,\"did_not_hold\":1,\"held\":0,\"of\":1,\"undecided\":0},{\"currency\":\"USD\",\"decade\":1,\"did_not_hold\":0,\"held\":1,\"of\":2,\"undecided\":1},{\"currency\":\"USD\",\"decade\":2,\"did_not_hold\":0,\"held\":2,\"of\":2,\"undecided\":0}],\"class_missing\":{\"count\":1,\"of\":6},\"controller_class\":\"person_declared\",\"derivation\":\"standard_history/1\",\"disputes\":{\"raised\":{\"by_forum\":{\"auto\":1,\"external\":0,\"network\":0,\"of\":2,\"rail\":1},\"by_outcome\":{\"against\":0,\"for\":1,\"no_finding\":0,\"of\":2,\"open\":0,\"split\":1,\"withdrawn\":0},\"of\":2},\"received\":{\"by_forum\":{\"auto\":0,\"external\":0,\"network\":1,\"of\":1,\"rail\":0},\"by_outcome\":{\"against\":0,\"for\":0,\"no_finding\":0,\"of\":1,\"open\":1,\"split\":0,\"withdrawn\":0},\"of\":1}},\"happened\":{\"no_record\":1,\"of\":6,\"receipt_only\":2,\"stamped_by_both\":3},\"holder_kind\":\"person\",\"in_window\":{\"counted\":6,\"not_counted\":2,\"of\":8},\"outcomes\":{\"did_not_hold\":1,\"held\":4,\"of\":6,\"undecided\":1},\"policy\":\"a8a2338af7cebb6cb1b9fa8b061fa88b8687ab74155fb6470f6f15b63e496a9a\",\"roles\":{\"bought\":2,\"of\":6,\"provided\":4},\"since\":\"2026-03\",\"window\":{\"months\":30000}}",
+   "expected": {
+    "bands": [
+     {
+      "currency": "BTC",
+      "decade": -7,
+      "subjects": 1,
+      "adverse": 0
+     },
+     {
+      "currency": "EUR",
+      "decade": 0,
+      "subjects": 1,
+      "adverse": 1
+     },
+     {
+      "currency": "USD",
+      "decade": 1,
+      "subjects": 1,
+      "adverse": 0
+     },
+     {
+      "currency": "USD",
+      "decade": 2,
+      "subjects": 2,
+      "adverse": 0
+     }
+    ],
+    "disputes": {
+     "open": 1,
+     "of": 1
+    }
+   }
+  },
+  {
+   "case": "aac-decade-examples",
+   "artifact": "{\"anchor\":\"0a3a88faf7a2294fa5590ee30ffeaf35182fd22e945cdc2431170de610cb2212\",\"bands\":[{\"currency\":\"BTC\",\"decade\":-11,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"BTC\",\"decade\":-8,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"BTC\",\"decade\":-6,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"BTC\",\"decade\":0,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"eip155:8453/erc20:0x833589fcd6edb6e08f4c7c32d4f71b54bda02913\",\"decade\":-2,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0}],\"class_missing\":{\"count\":0,\"of\":5},\"controller_class\":\"person_declared\",\"derivation\":\"standard_history/1\",\"disputes\":{\"raised\":{\"by_forum\":{\"auto\":0,\"external\":0,\"network\":0,\"of\":0,\"rail\":0},\"by_outcome\":{\"against\":0,\"for\":0,\"no_finding\":0,\"of\":0,\"open\":0,\"split\":0,\"withdrawn\":0},\"of\":0},\"received\":{\"by_forum\":{\"auto\":0,\"external\":0,\"network\":0,\"of\":0,\"rail\":0},\"by_outcome\":{\"against\":0,\"for\":0,\"no_finding\":0,\"of\":0,\"open\":0,\"split\":0,\"withdrawn\":0},\"of\":0}},\"happened\":{\"no_record\":0,\"of\":5,\"receipt_only\":0,\"stamped_by_both\":5},\"holder_kind\":\"person\",\"in_window\":{\"counted\":5,\"not_counted\":0,\"of\":5},\"outcomes\":{\"did_not_hold\":0,\"held\":5,\"of\":5,\"undecided\":0},\"policy\":\"2cc796d2069a0ced9a272cb5b15a05d6bef97a4f7599aad5124b1ae88ba770ec\",\"roles\":{\"bought\":0,\"of\":5,\"provided\":5},\"since\":\"2026-03\",\"window\":{\"months\":3}}",
+   "expected": {
+    "bands": [
+     {
+      "currency": "BTC",
+      "decade": -11,
+      "subjects": 1,
+      "adverse": 0
+     },
+     {
+      "currency": "BTC",
+      "decade": -8,
+      "subjects": 1,
+      "adverse": 0
+     },
+     {
+      "currency": "BTC",
+      "decade": -6,
+      "subjects": 1,
+      "adverse": 0
+     },
+     {
+      "currency": "BTC",
+      "decade": 0,
+      "subjects": 1,
+      "adverse": 0
+     },
+     {
+      "currency": "eip155:8453/erc20:0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+      "decade": -2,
+      "subjects": 1,
+      "adverse": 0
+     }
+    ],
+    "disputes": {
+     "open": 0,
+     "of": 0
+    }
+   }
+  },
+  {
+   "case": "held-negative",
+   "artifact": "{\"anchor\":\"0a3a88faf7a2294fa5590ee30ffeaf35182fd22e945cdc2431170de610cb2212\",\"bands\":[{\"currency\":\"BTC\",\"decade\":-11,\"did_not_hold\":0,\"held\":-1,\"of\":1,\"undecided\":0},{\"currency\":\"BTC\",\"decade\":-8,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"BTC\",\"decade\":-6,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"BTC\",\"decade\":0,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"eip155:8453/erc20:0x833589fcd6edb6e08f4c7c32d4f71b54bda02913\",\"decade\":-2,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0}],\"class_missing\":{\"count\":0,\"of\":5},\"controller_class\":\"person_declared\",\"derivation\":\"standard_history/1\",\"disputes\":{\"raised\":{\"by_forum\":{\"auto\":0,\"external\":0,\"network\":0,\"of\":0,\"rail\":0},\"by_outcome\":{\"against\":0,\"for\":0,\"no_finding\":0,\"of\":0,\"open\":0,\"split\":0,\"withdrawn\":0},\"of\":0},\"received\":{\"by_forum\":{\"auto\":0,\"external\":0,\"network\":0,\"of\":0,\"rail\":0},\"by_outcome\":{\"against\":0,\"for\":0,\"no_finding\":0,\"of\":0,\"open\":0,\"split\":0,\"withdrawn\":0},\"of\":0}},\"happened\":{\"no_record\":0,\"of\":5,\"receipt_only\":0,\"stamped_by_both\":5},\"holder_kind\":\"person\",\"in_window\":{\"counted\":5,\"not_counted\":0,\"of\":5},\"outcomes\":{\"did_not_hold\":0,\"held\":5,\"of\":5,\"undecided\":0},\"policy\":\"2cc796d2069a0ced9a272cb5b15a05d6bef97a4f7599aad5124b1ae88ba770ec\",\"roles\":{\"bought\":0,\"of\":5,\"provided\":5},\"since\":\"2026-03\",\"window\":{\"months\":3}}",
+   "want": "bands[0].held"
+  },
+  {
+   "case": "held-a-float-form",
+   "artifact": "{\"anchor\":\"0a3a88faf7a2294fa5590ee30ffeaf35182fd22e945cdc2431170de610cb2212\",\"bands\":[{\"currency\":\"BTC\",\"decade\":-11,\"did_not_hold\":0,\"held\":1.0,\"of\":1,\"undecided\":0},{\"currency\":\"BTC\",\"decade\":-8,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"BTC\",\"decade\":-6,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"BTC\",\"decade\":0,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"eip155:8453/erc20:0x833589fcd6edb6e08f4c7c32d4f71b54bda02913\",\"decade\":-2,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0}],\"class_missing\":{\"count\":0,\"of\":5},\"controller_class\":\"person_declared\",\"derivation\":\"standard_history/1\",\"disputes\":{\"raised\":{\"by_forum\":{\"auto\":0,\"external\":0,\"network\":0,\"of\":0,\"rail\":0},\"by_outcome\":{\"against\":0,\"for\":0,\"no_finding\":0,\"of\":0,\"open\":0,\"split\":0,\"withdrawn\":0},\"of\":0},\"received\":{\"by_forum\":{\"auto\":0,\"external\":0,\"network\":0,\"of\":0,\"rail\":0},\"by_outcome\":{\"against\":0,\"for\":0,\"no_finding\":0,\"of\":0,\"open\":0,\"split\":0,\"withdrawn\":0},\"of\":0}},\"happened\":{\"no_record\":0,\"of\":5,\"receipt_only\":0,\"stamped_by_both\":5},\"holder_kind\":\"person\",\"in_window\":{\"counted\":5,\"not_counted\":0,\"of\":5},\"outcomes\":{\"did_not_hold\":0,\"held\":5,\"of\":5,\"undecided\":0},\"policy\":\"2cc796d2069a0ced9a272cb5b15a05d6bef97a4f7599aad5124b1ae88ba770ec\",\"roles\":{\"bought\":0,\"of\":5,\"provided\":5},\"since\":\"2026-03\",\"window\":{\"months\":3}}",
+   "want": "bands[0].held"
+  },
+  {
+   "case": "held-quoted",
+   "artifact": "{\"anchor\":\"0a3a88faf7a2294fa5590ee30ffeaf35182fd22e945cdc2431170de610cb2212\",\"bands\":[{\"currency\":\"BTC\",\"decade\":-11,\"did_not_hold\":0,\"held\":\"1\",\"of\":1,\"undecided\":0},{\"currency\":\"BTC\",\"decade\":-8,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"BTC\",\"decade\":-6,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"BTC\",\"decade\":0,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"eip155:8453/erc20:0x833589fcd6edb6e08f4c7c32d4f71b54bda02913\",\"decade\":-2,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0}],\"class_missing\":{\"count\":0,\"of\":5},\"controller_class\":\"person_declared\",\"derivation\":\"standard_history/1\",\"disputes\":{\"raised\":{\"by_forum\":{\"auto\":0,\"external\":0,\"network\":0,\"of\":0,\"rail\":0},\"by_outcome\":{\"against\":0,\"for\":0,\"no_finding\":0,\"of\":0,\"open\":0,\"split\":0,\"withdrawn\":0},\"of\":0},\"received\":{\"by_forum\":{\"auto\":0,\"external\":0,\"network\":0,\"of\":0,\"rail\":0},\"by_outcome\":{\"against\":0,\"for\":0,\"no_finding\":0,\"of\":0,\"open\":0,\"split\":0,\"withdrawn\":0},\"of\":0}},\"happened\":{\"no_record\":0,\"of\":5,\"receipt_only\":0,\"stamped_by_both\":5},\"holder_kind\":\"person\",\"in_window\":{\"counted\":5,\"not_counted\":0,\"of\":5},\"outcomes\":{\"did_not_hold\":0,\"held\":5,\"of\":5,\"undecided\":0},\"policy\":\"2cc796d2069a0ced9a272cb5b15a05d6bef97a4f7599aad5124b1ae88ba770ec\",\"roles\":{\"bought\":0,\"of\":5,\"provided\":5},\"since\":\"2026-03\",\"window\":{\"months\":3}}",
+   "want": "bands[0].held"
+  },
+  {
+   "case": "held-above-2^53-1",
+   "artifact": "{\"anchor\":\"0a3a88faf7a2294fa5590ee30ffeaf35182fd22e945cdc2431170de610cb2212\",\"bands\":[{\"currency\":\"BTC\",\"decade\":-11,\"did_not_hold\":0,\"held\":9007199254740992,\"of\":1,\"undecided\":0},{\"currency\":\"BTC\",\"decade\":-8,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"BTC\",\"decade\":-6,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"BTC\",\"decade\":0,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"eip155:8453/erc20:0x833589fcd6edb6e08f4c7c32d4f71b54bda02913\",\"decade\":-2,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0}],\"class_missing\":{\"count\":0,\"of\":5},\"controller_class\":\"person_declared\",\"derivation\":\"standard_history/1\",\"disputes\":{\"raised\":{\"by_forum\":{\"auto\":0,\"external\":0,\"network\":0,\"of\":0,\"rail\":0},\"by_outcome\":{\"against\":0,\"for\":0,\"no_finding\":0,\"of\":0,\"open\":0,\"split\":0,\"withdrawn\":0},\"of\":0},\"received\":{\"by_forum\":{\"auto\":0,\"external\":0,\"network\":0,\"of\":0,\"rail\":0},\"by_outcome\":{\"against\":0,\"for\":0,\"no_finding\":0,\"of\":0,\"open\":0,\"split\":0,\"withdrawn\":0},\"of\":0}},\"happened\":{\"no_record\":0,\"of\":5,\"receipt_only\":0,\"stamped_by_both\":5},\"holder_kind\":\"person\",\"in_window\":{\"counted\":5,\"not_counted\":0,\"of\":5},\"outcomes\":{\"did_not_hold\":0,\"held\":5,\"of\":5,\"undecided\":0},\"policy\":\"2cc796d2069a0ced9a272cb5b15a05d6bef97a4f7599aad5124b1ae88ba770ec\",\"roles\":{\"bought\":0,\"of\":5,\"provided\":5},\"since\":\"2026-03\",\"window\":{\"months\":3}}",
+   "want": "bands[0].held"
+  },
+  {
+   "case": "undecided-missing",
+   "artifact": "{\"anchor\":\"0a3a88faf7a2294fa5590ee30ffeaf35182fd22e945cdc2431170de610cb2212\",\"bands\":[{\"currency\":\"BTC\",\"decade\":-11,\"did_not_hold\":0,\"held\":1,\"of\":1},{\"currency\":\"BTC\",\"decade\":-8,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"BTC\",\"decade\":-6,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"BTC\",\"decade\":0,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"eip155:8453/erc20:0x833589fcd6edb6e08f4c7c32d4f71b54bda02913\",\"decade\":-2,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0}],\"class_missing\":{\"count\":0,\"of\":5},\"controller_class\":\"person_declared\",\"derivation\":\"standard_history/1\",\"disputes\":{\"raised\":{\"by_forum\":{\"auto\":0,\"external\":0,\"network\":0,\"of\":0,\"rail\":0},\"by_outcome\":{\"against\":0,\"for\":0,\"no_finding\":0,\"of\":0,\"open\":0,\"split\":0,\"withdrawn\":0},\"of\":0},\"received\":{\"by_forum\":{\"auto\":0,\"external\":0,\"network\":0,\"of\":0,\"rail\":0},\"by_outcome\":{\"against\":0,\"for\":0,\"no_finding\":0,\"of\":0,\"open\":0,\"split\":0,\"withdrawn\":0},\"of\":0}},\"happened\":{\"no_record\":0,\"of\":5,\"receipt_only\":0,\"stamped_by_both\":5},\"holder_kind\":\"person\",\"in_window\":{\"counted\":5,\"not_counted\":0,\"of\":5},\"outcomes\":{\"did_not_hold\":0,\"held\":5,\"of\":5,\"undecided\":0},\"policy\":\"2cc796d2069a0ced9a272cb5b15a05d6bef97a4f7599aad5124b1ae88ba770ec\",\"roles\":{\"bought\":0,\"of\":5,\"provided\":5},\"since\":\"2026-03\",\"window\":{\"months\":3}}",
+   "want": "bands[0].undecided"
+  },
+  {
+   "case": "decade-a-float",
+   "artifact": "{\"anchor\":\"0a3a88faf7a2294fa5590ee30ffeaf35182fd22e945cdc2431170de610cb2212\",\"bands\":[{\"currency\":\"BTC\",\"decade\":1.5,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"BTC\",\"decade\":-8,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"BTC\",\"decade\":-6,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"BTC\",\"decade\":0,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"eip155:8453/erc20:0x833589fcd6edb6e08f4c7c32d4f71b54bda02913\",\"decade\":-2,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0}],\"class_missing\":{\"count\":0,\"of\":5},\"controller_class\":\"person_declared\",\"derivation\":\"standard_history/1\",\"disputes\":{\"raised\":{\"by_forum\":{\"auto\":0,\"external\":0,\"network\":0,\"of\":0,\"rail\":0},\"by_outcome\":{\"against\":0,\"for\":0,\"no_finding\":0,\"of\":0,\"open\":0,\"split\":0,\"withdrawn\":0},\"of\":0},\"received\":{\"by_forum\":{\"auto\":0,\"external\":0,\"network\":0,\"of\":0,\"rail\":0},\"by_outcome\":{\"against\":0,\"for\":0,\"no_finding\":0,\"of\":0,\"open\":0,\"split\":0,\"withdrawn\":0},\"of\":0}},\"happened\":{\"no_record\":0,\"of\":5,\"receipt_only\":0,\"stamped_by_both\":5},\"holder_kind\":\"person\",\"in_window\":{\"counted\":5,\"not_counted\":0,\"of\":5},\"outcomes\":{\"did_not_hold\":0,\"held\":5,\"of\":5,\"undecided\":0},\"policy\":\"2cc796d2069a0ced9a272cb5b15a05d6bef97a4f7599aad5124b1ae88ba770ec\",\"roles\":{\"bought\":0,\"of\":5,\"provided\":5},\"since\":\"2026-03\",\"window\":{\"months\":3}}",
+   "want": "bands[0].decade"
+  },
+  {
+   "case": "currency-empty",
+   "artifact": "{\"anchor\":\"0a3a88faf7a2294fa5590ee30ffeaf35182fd22e945cdc2431170de610cb2212\",\"bands\":[{\"currency\":\"\",\"decade\":-11,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"BTC\",\"decade\":-8,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"BTC\",\"decade\":-6,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"BTC\",\"decade\":0,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"eip155:8453/erc20:0x833589fcd6edb6e08f4c7c32d4f71b54bda02913\",\"decade\":-2,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0}],\"class_missing\":{\"count\":0,\"of\":5},\"controller_class\":\"person_declared\",\"derivation\":\"standard_history/1\",\"disputes\":{\"raised\":{\"by_forum\":{\"auto\":0,\"external\":0,\"network\":0,\"of\":0,\"rail\":0},\"by_outcome\":{\"against\":0,\"for\":0,\"no_finding\":0,\"of\":0,\"open\":0,\"split\":0,\"withdrawn\":0},\"of\":0},\"received\":{\"by_forum\":{\"auto\":0,\"external\":0,\"network\":0,\"of\":0,\"rail\":0},\"by_outcome\":{\"against\":0,\"for\":0,\"no_finding\":0,\"of\":0,\"open\":0,\"split\":0,\"withdrawn\":0},\"of\":0}},\"happened\":{\"no_record\":0,\"of\":5,\"receipt_only\":0,\"stamped_by_both\":5},\"holder_kind\":\"person\",\"in_window\":{\"counted\":5,\"not_counted\":0,\"of\":5},\"outcomes\":{\"did_not_hold\":0,\"held\":5,\"of\":5,\"undecided\":0},\"policy\":\"2cc796d2069a0ced9a272cb5b15a05d6bef97a4f7599aad5124b1ae88ba770ec\",\"roles\":{\"bought\":0,\"of\":5,\"provided\":5},\"since\":\"2026-03\",\"window\":{\"months\":3}}",
+   "want": "bands[0]: currency"
+  },
+  {
+   "case": "bands-missing",
+   "artifact": "{\"anchor\":\"0a3a88faf7a2294fa5590ee30ffeaf35182fd22e945cdc2431170de610cb2212\",\"class_missing\":{\"count\":0,\"of\":5},\"controller_class\":\"person_declared\",\"derivation\":\"standard_history/1\",\"disputes\":{\"raised\":{\"by_forum\":{\"auto\":0,\"external\":0,\"network\":0,\"of\":0,\"rail\":0},\"by_outcome\":{\"against\":0,\"for\":0,\"no_finding\":0,\"of\":0,\"open\":0,\"split\":0,\"withdrawn\":0},\"of\":0},\"received\":{\"by_forum\":{\"auto\":0,\"external\":0,\"network\":0,\"of\":0,\"rail\":0},\"by_outcome\":{\"against\":0,\"for\":0,\"no_finding\":0,\"of\":0,\"open\":0,\"split\":0,\"withdrawn\":0},\"of\":0}},\"happened\":{\"no_record\":0,\"of\":5,\"receipt_only\":0,\"stamped_by_both\":5},\"holder_kind\":\"person\",\"in_window\":{\"counted\":5,\"not_counted\":0,\"of\":5},\"outcomes\":{\"did_not_hold\":0,\"held\":5,\"of\":5,\"undecided\":0},\"policy\":\"2cc796d2069a0ced9a272cb5b15a05d6bef97a4f7599aad5124b1ae88ba770ec\",\"roles\":{\"bought\":0,\"of\":5,\"provided\":5},\"since\":\"2026-03\",\"window\":{\"months\":3}}",
+   "want": "bands is missing"
+  },
+  {
+   "case": "received-missing",
+   "artifact": "{\"anchor\":\"0a3a88faf7a2294fa5590ee30ffeaf35182fd22e945cdc2431170de610cb2212\",\"bands\":[{\"currency\":\"BTC\",\"decade\":-11,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"BTC\",\"decade\":-8,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"BTC\",\"decade\":-6,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"BTC\",\"decade\":0,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"eip155:8453/erc20:0x833589fcd6edb6e08f4c7c32d4f71b54bda02913\",\"decade\":-2,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0}],\"class_missing\":{\"count\":0,\"of\":5},\"controller_class\":\"person_declared\",\"derivation\":\"standard_history/1\",\"disputes\":{\"raised\":{\"by_forum\":{\"auto\":0,\"external\":0,\"network\":0,\"of\":0,\"rail\":0},\"by_outcome\":{\"against\":0,\"for\":0,\"no_finding\":0,\"of\":0,\"open\":0,\"split\":0,\"withdrawn\":0},\"of\":0}},\"happened\":{\"no_record\":0,\"of\":5,\"receipt_only\":0,\"stamped_by_both\":5},\"holder_kind\":\"person\",\"in_window\":{\"counted\":5,\"not_counted\":0,\"of\":5},\"outcomes\":{\"did_not_hold\":0,\"held\":5,\"of\":5,\"undecided\":0},\"policy\":\"2cc796d2069a0ced9a272cb5b15a05d6bef97a4f7599aad5124b1ae88ba770ec\",\"roles\":{\"bought\":0,\"of\":5,\"provided\":5},\"since\":\"2026-03\",\"window\":{\"months\":3}}",
+   "want": "disputes.received is missing"
+  },
+  {
+   "case": "open-missing",
+   "artifact": "{\"anchor\":\"0a3a88faf7a2294fa5590ee30ffeaf35182fd22e945cdc2431170de610cb2212\",\"bands\":[{\"currency\":\"BTC\",\"decade\":-11,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"BTC\",\"decade\":-8,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"BTC\",\"decade\":-6,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"BTC\",\"decade\":0,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"eip155:8453/erc20:0x833589fcd6edb6e08f4c7c32d4f71b54bda02913\",\"decade\":-2,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0}],\"class_missing\":{\"count\":0,\"of\":5},\"controller_class\":\"person_declared\",\"derivation\":\"standard_history/1\",\"disputes\":{\"raised\":{\"by_forum\":{\"auto\":0,\"external\":0,\"network\":0,\"of\":0,\"rail\":0},\"by_outcome\":{\"against\":0,\"for\":0,\"no_finding\":0,\"of\":0,\"open\":0,\"split\":0,\"withdrawn\":0},\"of\":0},\"received\":{\"by_forum\":{\"auto\":0,\"external\":0,\"network\":0,\"of\":0,\"rail\":0},\"by_outcome\":{\"against\":0,\"for\":0,\"no_finding\":0,\"of\":0,\"split\":0,\"withdrawn\":0},\"of\":0}},\"happened\":{\"no_record\":0,\"of\":5,\"receipt_only\":0,\"stamped_by_both\":5},\"holder_kind\":\"person\",\"in_window\":{\"counted\":5,\"not_counted\":0,\"of\":5},\"outcomes\":{\"did_not_hold\":0,\"held\":5,\"of\":5,\"undecided\":0},\"policy\":\"2cc796d2069a0ced9a272cb5b15a05d6bef97a4f7599aad5124b1ae88ba770ec\",\"roles\":{\"bought\":0,\"of\":5,\"provided\":5},\"since\":\"2026-03\",\"window\":{\"months\":3}}",
+   "want": "disputes.received.by_outcome.open"
+  },
+  {
+   "case": "received-of-negative",
+   "artifact": "{\"anchor\":\"0a3a88faf7a2294fa5590ee30ffeaf35182fd22e945cdc2431170de610cb2212\",\"bands\":[{\"currency\":\"BTC\",\"decade\":-11,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"BTC\",\"decade\":-8,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"BTC\",\"decade\":-6,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"BTC\",\"decade\":0,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"eip155:8453/erc20:0x833589fcd6edb6e08f4c7c32d4f71b54bda02913\",\"decade\":-2,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0}],\"class_missing\":{\"count\":0,\"of\":5},\"controller_class\":\"person_declared\",\"derivation\":\"standard_history/1\",\"disputes\":{\"raised\":{\"by_forum\":{\"auto\":0,\"external\":0,\"network\":0,\"of\":0,\"rail\":0},\"by_outcome\":{\"against\":0,\"for\":0,\"no_finding\":0,\"of\":0,\"open\":0,\"split\":0,\"withdrawn\":0},\"of\":0},\"received\":{\"by_forum\":{\"auto\":0,\"external\":0,\"network\":0,\"of\":0,\"rail\":0},\"by_outcome\":{\"against\":0,\"for\":0,\"no_finding\":0,\"of\":0,\"open\":0,\"split\":0,\"withdrawn\":0},\"of\":-2}},\"happened\":{\"no_record\":0,\"of\":5,\"receipt_only\":0,\"stamped_by_both\":5},\"holder_kind\":\"person\",\"in_window\":{\"counted\":5,\"not_counted\":0,\"of\":5},\"outcomes\":{\"did_not_hold\":0,\"held\":5,\"of\":5,\"undecided\":0},\"policy\":\"2cc796d2069a0ced9a272cb5b15a05d6bef97a4f7599aad5124b1ae88ba770ec\",\"roles\":{\"bought\":0,\"of\":5,\"provided\":5},\"since\":\"2026-03\",\"window\":{\"months\":3}}",
+   "want": "disputes.received.of"
+  },
+  {
+   "case": "another-derivation",
+   "artifact": "{\"anchor\":\"0a3a88faf7a2294fa5590ee30ffeaf35182fd22e945cdc2431170de610cb2212\",\"bands\":[{\"currency\":\"BTC\",\"decade\":-11,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"BTC\",\"decade\":-8,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"BTC\",\"decade\":-6,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"BTC\",\"decade\":0,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0},{\"currency\":\"eip155:8453/erc20:0x833589fcd6edb6e08f4c7c32d4f71b54bda02913\",\"decade\":-2,\"did_not_hold\":0,\"held\":1,\"of\":1,\"undecided\":0}],\"class_missing\":{\"count\":0,\"of\":5},\"controller_class\":\"person_declared\",\"derivation\":\"history_card/1\",\"disputes\":{\"raised\":{\"by_forum\":{\"auto\":0,\"external\":0,\"network\":0,\"of\":0,\"rail\":0},\"by_outcome\":{\"against\":0,\"for\":0,\"no_finding\":0,\"of\":0,\"open\":0,\"split\":0,\"withdrawn\":0},\"of\":0},\"received\":{\"by_forum\":{\"auto\":0,\"external\":0,\"network\":0,\"of\":0,\"rail\":0},\"by_outcome\":{\"against\":0,\"for\":0,\"no_finding\":0,\"of\":0,\"open\":0,\"split\":0,\"withdrawn\":0},\"of\":0}},\"happened\":{\"no_record\":0,\"of\":5,\"receipt_only\":0,\"stamped_by_both\":5},\"holder_kind\":\"person\",\"in_window\":{\"counted\":5,\"not_counted\":0,\"of\":5},\"outcomes\":{\"did_not_hold\":0,\"held\":5,\"of\":5,\"undecided\":0},\"policy\":\"2cc796d2069a0ced9a272cb5b15a05d6bef97a4f7599aad5124b1ae88ba770ec\",\"roles\":{\"bought\":0,\"of\":5,\"provided\":5},\"since\":\"2026-03\",\"window\":{\"months\":3}}",
+   "want": "derivation is"
+  }
+ ]
+}

@@ -42,6 +42,7 @@ mod band;
 mod decision;
 mod evaluate;
 mod pack;
+mod standard_history;
 
 use std::collections::BTreeMap;
 
@@ -49,6 +50,7 @@ pub use band::{Band, Unit};
 pub use decision::{AskOut, Decision, Effect, PackRef, RowResult, RowStatus};
 pub use evaluate::evaluate;
 pub use pack::{Pack, RailPin, COMPILED_FORMAT};
+pub use standard_history::standard_history_counts;
 
 use crate::instant::Instant;
 
@@ -220,6 +222,18 @@ pub struct Card {
     /// served today does), and empty when it carries them and every band is
     /// empty.
     pub bands: Option<Vec<BandCount>>,
+    /// The card's received disputes, open out of all; None when the card
+    /// carries no dispute tally. `standard_history_counts` fills `bands` and
+    /// `disputes` from a standard_history/1 card.
+    pub disputes: Option<Disputes>,
+}
+
+/// The disputes others raised about the counterparty that its card shows:
+/// those still open, out of all of them (evaluate.go Disputes).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct Disputes {
+    pub open: i64,
+    pub of: i64,
 }
 
 /// A card's count in one value band (evaluate.go BandCount; Reference v3

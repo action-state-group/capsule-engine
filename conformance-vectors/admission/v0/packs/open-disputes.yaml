@@ -1,0 +1,46 @@
+# A test admission pack (capsule-engine#265 conformance vectors) for
+# card.open_disputes, the open-dispute count a pack shows beside the ladder
+# (evidencebook-skills#87): one recorded row and one limiting row. Every
+# number is a placeholder.
+pack_id: asg/admission_open_disputes_test/0.1.0
+pack_version: 0.1.0
+scope:
+  kind: admission
+source: capsule-engine#265 conformance vectors; evidencebook-skills#87
+outcomes: ["GO", "LIMIT", "NO"]
+missing: "LIMIT"
+accept:
+  USD: {band: USD, scale: 0}
+tiers:
+  - id: T0
+    max_decade: {USD: 0}
+  - id: T1
+    max_decade: {USD: 2}
+budget:
+  max_asks: 0
+  deadline_s: 3600
+trust_roots:
+  controllers: []
+  witnesses: []
+  judges: []
+rows:
+  - id: deny-list
+    statement: The counterparty is not on the operator's deny list.
+    source: operator
+    check: operator.not_deny_listed
+    from: T0
+    on_fail: "NO"
+  - id: open-disputes-seen
+    statement: The card shows no dispute raised about the counterparty that is still open.
+    source: card
+    check: card.open_disputes
+    params: {max: 0}
+    from: T0
+    on_fail: "record"
+  - id: open-disputes
+    statement: The card shows at most one dispute raised about the counterparty that is still open.
+    source: card
+    check: card.open_disputes
+    params: {max: 1}
+    from: T1
+    on_fail: "LIMIT"
