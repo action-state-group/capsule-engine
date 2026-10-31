@@ -165,9 +165,19 @@ impl Pack {
 
 type Decoded<T> = Result<T, String>;
 
-/// A struct's fields (encoding/json decoding an object into a struct with
-/// DisallowUnknownFields): null is the zero struct; a key not taken is
-/// refused.
+/// pack.go noNulls: whether a null appears anywhere in `v`.
+fn has_null(v: &Value) -> bool {
+    match v {
+        Value::Null => true,
+        Value::Arr(items) => items.iter().any(has_null),
+        Value::Obj(members) => members.iter().any(|(_, m)| has_null(m)),
+        _ => false,
+    }
+}
+
+/// A struct's fields (encoding/json decoding an object into a struct, with
+/// pack.go exactKeys refusing a name not exactly one the format names). No
+/// value is null here: the loader refused every null first.
 struct Struct<'a> {
     what: String,
     members: &'a [(String, Value)],
@@ -179,7 +189,6 @@ impl<'a> Struct<'a> {
         let what = what.into();
         match v {
             Value::Obj(members) => Ok(Struct { what, members, taken: Vec::new() }),
-            Value::Null => Ok(Struct { what, members: &[], taken: Vec::new() }),
             _ => Err(format!("cannot unmarshal into {what}, an object")),
         }
     }
@@ -194,9 +203,10 @@ impl<'a> Struct<'a> {
         self.get(key).map_or(Ok(String::new()), |v| string(v, &what))
     }
 
+    /// An integer member, None when absent.
     fn int(&mut self, key: &'static str) -> Decoded<Option<i64>> {
         let what = format!("{}.{key}", self.what);
-        self.get(key).map_or(Ok(None), |v| int(v, &what))
+        self.get(key).map(|v| int(v, &what)).transpose()
     }
 
     /// encoding/json DisallowUnknownFields: `unknown field "x"`.
@@ -208,27 +218,25 @@ impl<'a> Struct<'a> {
     }
 }
 
-/// encoding/json decoding into a string: a string; null leaves it "".
+/// encoding/json decoding into a string.
 fn string(v: &Value, what: &str) -> Decoded<String> {
     match v {
         Value::Str(s) => Ok(s.clone()),
-        Value::Null => Ok(String::new()),
         _ => Err(format!("cannot unmarshal into {what}, a string")),
     }
 }
 
-/// encoding/json decoding into a *int: an integer, or None for null.
-fn int(v: &Value, what: &str) -> Decoded<Option<i64>> {
+/// encoding/json decoding into an int.
+fn int(v: &Value, what: &str) -> Decoded<i64> {
     match v {
-        Value::Int(i) => Ok(Some(*i)),
-        Value::Null => Ok(None),
+        Value::Int(i) => Ok(*i),
         _ => Err(format!("cannot unmarshal into {what}, an integer")),
     }
 }
 
 fn array<'a>(v: Option<&'a Value>, what: &str) -> Decoded<&'a [Value]> {
     match v {
-        None | Some(Value::Null) => Ok(&[]),
+        None => Ok(&[]),
         Some(Value::Arr(items)) => Ok(items),
         Some(_) => Err(format!("cannot unmarshal into {what}, an array")),
     }
@@ -236,7 +244,7 @@ fn array<'a>(v: Option<&'a Value>, what: &str) -> Decoded<&'a [Value]> {
 
 fn object<'a>(v: Option<&'a Value>, what: &str) -> Decoded<&'a [(String, Value)]> {
     match v {
-        None | Some(Value::Null) => Ok(&[]),
+        None => Ok(&[]),
         Some(Value::Obj(m)) => Ok(m),
         Some(_) => Err(format!("cannot unmarshal into {what}, an object")),
     }
@@ -246,8 +254,8 @@ fn strings(v: Option<&Value>, what: &str) -> Decoded<Vec<String>> {
     array(v, what)?.iter().map(|i| string(i, &format!("{what}[]"))).collect()
 }
 
-/// A map of name to *int (max_decade, params): None where the value is null.
-fn int_map(v: Option<&Value>, what: &str) -> Decoded<BTreeMap<String, Option<i64>>> {
+/// A map of name to integer (max_decade, params).
+fn int_map(v: Option<&Value>, what: &str) -> Decoded<BTreeMap<String, i64>> {
     object(v, what)?.iter().map(|(k, n)| Ok((k.clone(), int(n, &format!("{what}.{k}"))?))).collect()
 }
 
@@ -257,7 +265,7 @@ struct RawRow<'a> {
     statement: String,
     source: String,
     check: String,
-    params: BTreeMap<String, Option<i64>>,
+    params: BTreeMap<String, i64>,
     from: String,
     /// The on_fail value as given (json.RawMessage), None when absent.
     on_fail: Option<&'a Value>,
@@ -316,6 +324,12 @@ impl Pack {
         if canon::jcs(&v).ok().as_deref().map(str::as_bytes) != Some(src) {
             return Err(fail("the bytes are not the JCS encoding of their own parse".into()));
         }
+        if has_null(&v) {
+            // pack.go noNulls: no member of the format is nullable, and a
+            // null would otherwise decode to a zero value (an empty
+            // trust-root name, a threshold of 0).
+            return Err(fail("null is not a pack value".into()));
+        }
         let (f, rows) = decode(&v).map_err(fail)?;
         validate(src, f, rows)
     }
@@ -335,7 +349,8 @@ impl Pack {
 }
 
 /// pack.go sourceFile: pack-definition.json, every optional field written
-/// out. An Option marks a number that may be 0 but not absent or null.
+/// out. An Option marks a number that may be 0 but not absent (the loader
+/// has refused every null).
 struct SourceFile {
     format: String,
     pack_id: String,
@@ -344,11 +359,14 @@ struct SourceFile {
     missing: String,
     /// Each currency's band and scale.
     accept: Vec<(String, String, Option<i64>)>,
-    tiers: Vec<(String, BTreeMap<String, Option<i64>>)>,
+    tiers: Vec<(String, BTreeMap<String, i64>)>,
     max_asks: Option<i64>,
     deadline_s: Option<i64>,
     trust_roots: TrustRoots,
 }
+
+/// An absent struct member: the zero struct.
+static EMPTY: Value = Value::Obj(Vec::new());
 
 fn decode(v: &Value) -> Decoded<(SourceFile, Vec<RawRow<'_>>)> {
     let mut top = Struct::of(v, "the pack")?;
@@ -376,13 +394,13 @@ fn decode(v: &Value) -> Decoded<(SourceFile, Vec<RawRow<'_>>)> {
         tiers.push((id, max_decade));
     }
     let (max_asks, deadline_s) = {
-        let mut s = Struct::of(top.get("budget").unwrap_or(&Value::Null), "budget")?;
+        let mut s = Struct::of(top.get("budget").unwrap_or(&EMPTY), "budget")?;
         let v = (s.int("max_asks")?, s.int("deadline_s")?);
         s.done()?;
         v
     };
     let trust_roots = {
-        let mut s = Struct::of(top.get("trust_roots").unwrap_or(&Value::Null), "trust_roots")?;
+        let mut s = Struct::of(top.get("trust_roots").unwrap_or(&EMPTY), "trust_roots")?;
         let t = TrustRoots {
             controllers: strings(s.get("controllers"), "trust_roots.controllers")?,
             witnesses: strings(s.get("witnesses"), "trust_roots.witnesses")?,
@@ -403,7 +421,7 @@ fn decode(v: &Value) -> Decoded<(SourceFile, Vec<RawRow<'_>>)> {
             from: s.string("from")?,
             on_fail: s.get("on_fail"),
             ask: match s.get("ask") {
-                None | Some(Value::Null) => None,
+                None => None,
                 Some(a) => {
                     let mut af = Struct::of(a, format!("rows[{i}].ask"))?;
                     let d = af.string("derivation")?;
@@ -510,10 +528,6 @@ fn validate(src: &[u8], f: SourceFile, raw_rows: Vec<RawRow<'_>>) -> Result<Pack
         // The keys in sorted order (pack.go sortedKeys): a BTreeMap's.
         let mut decades = BTreeMap::new();
         for (band, d) in max_decade {
-            let Some(d) = d else {
-                bad(format!("tier {id}: max_decade.{band} must be an integer"));
-                continue;
-            };
             decades.insert(band.clone(), *d);
             if !(-DECADE_MAX..=DECADE_MAX).contains(d) {
                 bad(format!("tier {id}: max_decade.{band} {d} must be from {} to {DECADE_MAX}", -DECADE_MAX));
@@ -555,6 +569,20 @@ fn validate(src: &[u8], f: SourceFile, raw_rows: Vec<RawRow<'_>>) -> Result<Pack
         }
     };
 
+    // No empty or whitespace-only name: it would name no controller,
+    // witness or judge.
+    for (kind, names) in [
+        ("controllers", &f.trust_roots.controllers),
+        ("witnesses", &f.trust_roots.witnesses),
+        ("judges", &f.trust_roots.judges),
+    ] {
+        for n in names {
+            if n.trim().is_empty() {
+                bad(format!("trust_roots.{kind}: a name must not be empty"));
+            }
+        }
+    }
+
     let mut seen: Vec<&str> = Vec::new();
     let mut rows = Vec::new();
     if raw_rows.is_empty() {
@@ -580,20 +608,16 @@ fn validate(src: &[u8], f: SourceFile, raw_rows: Vec<RawRow<'_>>) -> Result<Pack
             }
             Some((_, _, wants)) => {
                 for k in *wants {
-                    // A key given as null is there, and refused below.
                     if !r.params.contains_key(*k) {
                         bad(format!("{at}: check {} needs params.{k}", r.check));
                     }
                 }
                 // In sorted order (pack.go sortedKeys): a BTreeMap's.
                 for (k, v) in &r.params {
-                    match (param_max(k).filter(|_| wants.contains(&k.as_str())), v) {
-                        (None, _) => bad(format!("{at}: check {} takes no params.{k}", r.check)),
-                        (Some(_), None) => bad(format!("{at}: params.{k} must be an integer")),
-                        (Some(max), Some(v)) if *v < 0 || *v > max => {
-                            bad(format!("{at}: params.{k} {v} must be from 0 to {max}"))
-                        }
-                        (Some(_), Some(v)) => {
+                    match param_max(k).filter(|_| wants.contains(&k.as_str())) {
+                        None => bad(format!("{at}: check {} takes no params.{k}", r.check)),
+                        Some(max) if *v < 0 || *v > max => bad(format!("{at}: params.{k} {v} must be from 0 to {max}")),
+                        Some(_) => {
                             params.insert(k.clone(), *v);
                         }
                     }
@@ -644,10 +668,10 @@ fn validate(src: &[u8], f: SourceFile, raw_rows: Vec<RawRow<'_>>) -> Result<Pack
             // and Cap stay zero); the pack is refused.
             on_fail.unwrap_or(OnFail::Record)
         } else {
-            // pack.go: on_fail decoded as a string; null leaves it "", and
-            // an absent one does not decode.
+            // pack.go: on_fail decoded as a string; an absent one does not
+            // decode.
             let o = match r.on_fail {
-                Some(n @ (Value::Str(_) | Value::Null)) => string(n, "on_fail").unwrap_or_default(),
+                Some(Value::Str(o)) => o.clone(),
                 _ => {
                     bad(format!("{at}: on_fail must be NO, LIMIT or record"));
                     String::new()

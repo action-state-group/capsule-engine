@@ -233,7 +233,7 @@
      }
     }
    ],
-   "want": "params.min must be an integer"
+   "want": "null is not a pack value"
   },
   {
    "case": "a negative threshold",
@@ -329,7 +329,7 @@
      "value": null
     }
    ],
-   "want": "max_decade.USD must be an integer"
+   "want": "null is not a pack value"
   },
   {
    "case": "a ceiling out of range",
@@ -469,7 +469,7 @@
      "value": null
     }
    ],
-   "want": "rows must not be empty"
+   "want": "null is not a pack value"
   },
   {
    "case": "a budget out of range",
@@ -498,6 +498,51 @@
     }
    ],
    "want": "budget.deadline_s must be from 1 to 3153600000"
+  },
+  {
+   "case": "a null trust root",
+   "base": "packs/ladder.json",
+   "ops": [
+    {
+     "set": [
+      "trust_roots",
+      "judges"
+     ],
+     "value": [
+      null
+     ]
+    }
+   ],
+   "want": "null is not a pack value"
+  },
+  {
+   "case": "a null optional member",
+   "base": "packs/ladder.json",
+   "ops": [
+    {
+     "set": [
+      "source"
+     ],
+     "value": null
+    }
+   ],
+   "want": "null is not a pack value"
+  },
+  {
+   "case": "an empty trust root name",
+   "base": "packs/ladder.json",
+   "ops": [
+    {
+     "set": [
+      "trust_roots",
+      "judges"
+     ],
+     "value": [
+      ""
+     ]
+    }
+   ],
+   "want": "trust_roots.judges: a name must not be empty"
   }
  ],
  "raw": [

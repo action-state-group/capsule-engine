@@ -7,8 +7,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"regexp"
 	"slices"
+	"strings"
 
 	"github.com/action-state-group/capsule-engine/go/canon"
 )
@@ -108,7 +110,8 @@ type Row struct {
 
 // sourceFile is pack-definition.json: the pack source as evidencebook-skills'
 // pack_compile.py compiles it, every optional field written out. A pointer
-// marks a number that may be 0 but not absent or null.
+// marks a number that may be 0 but not absent (noNulls has refused every
+// null).
 type sourceFile struct {
 	Format      string   `json:"format"`
 	PackID      string   `json:"pack_id"`
@@ -121,8 +124,8 @@ type sourceFile struct {
 		Scale *int   `json:"scale"`
 	} `json:"accept"`
 	Tiers []struct {
-		ID        string          `json:"id"`
-		MaxDecade map[string]*int `json:"max_decade"`
+		ID        string         `json:"id"`
+		MaxDecade map[string]int `json:"max_decade"`
 	} `json:"tiers"`
 	Budget struct {
 		MaxAsks   *int   `json:"max_asks"`
@@ -134,13 +137,13 @@ type sourceFile struct {
 		Judges      []string `json:"judges"`
 	} `json:"trust_roots"`
 	Rows []struct {
-		ID        string            `json:"id"`
-		Statement string            `json:"statement"`
-		Source    string            `json:"source"`
-		Check     string            `json:"check"`
-		Params    map[string]*int64 `json:"params"`
-		From      string            `json:"from"`
-		OnFail    json.RawMessage   `json:"on_fail"`
+		ID        string           `json:"id"`
+		Statement string           `json:"statement"`
+		Source    string           `json:"source"`
+		Check     string           `json:"check"`
+		Params    map[string]int64 `json:"params"`
+		From      string           `json:"from"`
+		OnFail    json.RawMessage  `json:"on_fail"`
 		Ask       *struct {
 			Derivation string `json:"derivation"`
 		} `json:"ask"`
@@ -170,6 +173,9 @@ func Load(src []byte) (*Pack, error) {
 	}
 	if jcs, err := canon.JCS(v); err != nil || jcs != string(src) {
 		return nil, errors.New("admission pack: the bytes are not the JCS encoding of their own parse")
+	}
+	if err := noNulls(src); err != nil {
+		return nil, fmt.Errorf("admission pack: %w", err)
 	}
 	if err := exactKeys(src); err != nil {
 		return nil, fmt.Errorf("admission pack: %w", err)
@@ -255,11 +261,7 @@ func Load(src []byte) (*Pack, error) {
 		tierIndex[t.ID] = i
 		decades := map[string]int{}
 		for _, band := range sortedKeys(t.MaxDecade) {
-			if t.MaxDecade[band] == nil {
-				bad("tier %s: max_decade.%s must be an integer", t.ID, band)
-				continue
-			}
-			d := *t.MaxDecade[band]
+			d := t.MaxDecade[band]
 			decades[band] = d
 			if d < -decadeMax || d > decadeMax {
 				bad("tier %s: max_decade.%s %d must be from %d to %d", t.ID, band, d, -decadeMax, decadeMax)
@@ -290,6 +292,16 @@ func Load(src []byte) (*Pack, error) {
 		bad("budget.deadline_s must be from 1 to %d", deadlineSMax)
 	} else {
 		p.DeadlineS = *f.Budget.DeadlineS
+	}
+	for _, k := range []struct {
+		kind  string
+		names []string
+	}{{"controllers", f.TrustRoots.Controllers}, {"witnesses", f.TrustRoots.Witnesses}, {"judges", f.TrustRoots.Judges}} {
+		for _, n := range k.names {
+			if strings.TrimSpace(n) == "" {
+				bad("trust_roots.%s: a name must not be empty", k.kind)
+			}
+		}
 	}
 	p.TrustRoots = TrustRoots{Controllers: f.TrustRoots.Controllers, Witnesses: f.TrustRoots.Witnesses, Judges: f.TrustRoots.Judges}
 
@@ -325,9 +337,7 @@ func Load(src []byte) (*Pack, error) {
 			for _, k := range sortedKeys(r.Params) {
 				if !slices.Contains(pred.params, k) {
 					bad("%s: check %s takes no params.%s", where, r.Check, k)
-				} else if r.Params[k] == nil {
-					bad("%s: params.%s must be an integer", where, k)
-				} else if v := *r.Params[k]; v < 0 || v > paramMax[k] {
+				} else if v := r.Params[k]; v < 0 || v > paramMax[k] {
 					bad("%s: params.%s %d must be from 0 to %d", where, k, v, paramMax[k])
 				} else {
 					row.Params[k] = v
@@ -512,4 +522,23 @@ func exactKeys(src []byte) error {
 		}
 	}
 	return nil
+}
+
+// noNulls refuses a null anywhere: no member of the format is nullable, and
+// a null would otherwise decode to a zero value (an empty trust-root name, a
+// threshold of 0).
+func noNulls(src []byte) error {
+	dec := json.NewDecoder(bytes.NewReader(src))
+	for {
+		tok, err := dec.Token()
+		if err == io.EOF {
+			return nil
+		}
+		if err != nil {
+			return err
+		}
+		if tok == nil {
+			return errors.New("null is not a pack value")
+		}
+	}
 }
