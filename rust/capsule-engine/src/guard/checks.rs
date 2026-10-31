@@ -271,8 +271,12 @@ pub(crate) fn check_dedupe(a: &Action, h: &History, at: Instant, window_days: i6
     let mut other: Option<&super::action::Record> = None;
     for r in h.records() {
         // history.go Query: the action_type where the taxonomy is not pinned,
-        // and a time at or after since, both read to the microsecond; a
-        // record whose time cannot be read does not match.
+        // and a time at or after since, both read to the microsecond. A
+        // record's time is read as Go's parseInstant reads it (instant::parse
+        // accepts exactly what time.Parse(RFC3339Nano) does, a comma fraction
+        // included), and one Go cannot read does not match there either
+        // (history.go matches, checks.go checkDedupe), so it is passed over
+        // here as Go passes it over.
         if a.taxonomy_version.is_none() && r.action_type != a.action_type {
             continue;
         }

@@ -4,17 +4,18 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"regexp"
 	"slices"
-	"strings"
 
-	"gopkg.in/yaml.v3"
+	"github.com/action-state-group/capsule-engine/go/canon"
 )
 
 // The admission pack profile v0 (evidencebook-skills#51): a pack-source.yaml
-// with scope.kind admission. The pack states thresholds; what they mean is
+// with scope.kind admission, compiled to pack-definition.json, which is what
+// this package reads. The pack states thresholds; what they mean is
 // the evaluator's (Evaluate). The loader refuses a pack that breaks the
 // admission design rules (capsule-engine#265), so a pack cannot opt out of
 // them: only platform, own_history and operator rows decide NO, a judged row
@@ -55,8 +56,9 @@ var mayDecideNO = []string{SourcePlatform, SourceOwnHistory, SourceOperator}
 type Pack struct {
 	ID      string
 	Version string
-	// Digest is the SHA-256 of the pack-source.yaml bytes as loaded: the
-	// bytes the decision cites (pack_id@version plus this digest).
+	// Digest is the definition_digest: the SHA-256 of the
+	// pack-definition.json bytes as loaded, which the decision cites beside
+	// pack_id.
 	Digest   string
 	Outcomes []string
 	Missing  string
@@ -104,72 +106,79 @@ type Row struct {
 	Ask string
 }
 
+// sourceFile is pack-definition.json: the pack source as evidencebook-skills'
+// pack_compile.py compiles it, every optional field written out. A pointer
+// marks a number that may be 0 but not absent or null.
 type sourceFile struct {
-	PackID      string `yaml:"pack_id"`
-	PackVersion string `yaml:"pack_version"`
-	Scope       struct {
-		Kind string `yaml:"kind"`
-	} `yaml:"scope"`
-	Source   string   `yaml:"source"`
-	Outcomes []string `yaml:"outcomes"`
-	Missing  string   `yaml:"missing"`
-	Accept   map[string]struct {
-		Band  string `yaml:"band"`
-		Scale *int   `yaml:"scale"`
-	} `yaml:"accept"`
+	Format      string   `json:"format"`
+	PackID      string   `json:"pack_id"`
+	PackVersion string   `json:"pack_version"`
+	Source      string   `json:"source"`
+	Outcomes    []string `json:"outcomes"`
+	Missing     string   `json:"missing"`
+	Accept      map[string]struct {
+		Band  string `json:"band"`
+		Scale *int   `json:"scale"`
+	} `json:"accept"`
 	Tiers []struct {
-		ID        string         `yaml:"id"`
-		MaxDecade map[string]int `yaml:"max_decade"`
-	} `yaml:"tiers"`
+		ID        string          `json:"id"`
+		MaxDecade map[string]*int `json:"max_decade"`
+	} `json:"tiers"`
 	Budget struct {
-		MaxAsks   *int   `yaml:"max_asks"`
-		DeadlineS *int64 `yaml:"deadline_s"`
-	} `yaml:"budget"`
+		MaxAsks   *int   `json:"max_asks"`
+		DeadlineS *int64 `json:"deadline_s"`
+	} `json:"budget"`
 	TrustRoots struct {
-		Controllers []string `yaml:"controllers"`
-		Witnesses   []string `yaml:"witnesses"`
-		Judges      []string `yaml:"judges"`
-	} `yaml:"trust_roots"`
+		Controllers []string `json:"controllers"`
+		Witnesses   []string `json:"witnesses"`
+		Judges      []string `json:"judges"`
+	} `json:"trust_roots"`
 	Rows []struct {
-		ID        string           `yaml:"id"`
-		Statement string           `yaml:"statement"`
-		Source    string           `yaml:"source"`
-		Check     string           `yaml:"check"`
-		Params    map[string]int64 `yaml:"params"`
-		From      string           `yaml:"from"`
-		OnFail    yaml.Node        `yaml:"on_fail"`
+		ID        string            `json:"id"`
+		Statement string            `json:"statement"`
+		Source    string            `json:"source"`
+		Check     string            `json:"check"`
+		Params    map[string]*int64 `json:"params"`
+		From      string            `json:"from"`
+		OnFail    json.RawMessage   `json:"on_fail"`
 		Ask       *struct {
-			Derivation string `yaml:"derivation"`
-		} `yaml:"ask"`
-	} `yaml:"rows"`
+			Derivation string `json:"derivation"`
+		} `json:"ask"`
+	} `json:"rows"`
 }
+
+// CompiledFormat is the format a pack-definition.json names.
+const CompiledFormat = "admission-pack/v0"
 
 var (
 	rowIDPattern  = regexp.MustCompile(`^[a-z][a-z0-9_-]*$`)
 	packIDPattern = regexp.MustCompile(`^[a-z][a-z0-9_]*/[a-z][a-z0-9_-]*/\d+\.\d+\.\d+$`)
 )
 
-// Load reads an admission pack from its pack-source.yaml bytes. A pinned
-// pack is loaded with LoadPinned, which also checks the digest.
+// Load reads an admission pack from its pack-definition.json bytes, the
+// pinned artifact pack_compile.py writes from a pack-source.yaml. The
+// evaluator reads no YAML: two YAML readers read one source two ways, so the
+// compiler's is the only one. The bytes must be exactly the JCS (RFC 8785)
+// encoding of their own parse, which refuses duplicate keys, other
+// whitespace or key order and non-integer numbers; they are then decoded
+// strictly. A pinned pack is loaded with LoadPinned, which also checks the
+// digest.
 func Load(src []byte) (*Pack, error) {
-	var doc yaml.Node
-	if err := yaml.Unmarshal(src, &doc); err != nil {
+	v, err := canon.FromJSON(src)
+	if err != nil {
 		return nil, fmt.Errorf("admission pack: %w", err)
 	}
-	if v := yaml11Boolean(&doc); v != "" {
-		// YAML 1.1 readers (PyYAML, so the pack's own lint) read a plain NO as
-		// false; this reader (YAML 1.2) reads it as "NO". A pack reads the
-		// same in both or not at all.
-		return nil, fmt.Errorf("admission pack: the plain scalar %q is a boolean in YAML 1.1; quote it", v)
+	if jcs, err := canon.JCS(v); err != nil || jcs != string(src) {
+		return nil, errors.New("admission pack: the bytes are not the JCS encoding of their own parse")
 	}
-	if err := plainScalars(&doc); err != nil {
+	if err := exactKeys(src); err != nil {
 		return nil, fmt.Errorf("admission pack: %w", err)
 	}
 	var f sourceFile
-	dec := yaml.NewDecoder(bytes.NewReader(src))
+	dec := json.NewDecoder(bytes.NewReader(src))
 	// An unknown key is refused, so no weight, score or other field the
 	// evaluator does not read can ride in a pack.
-	dec.KnownFields(true)
+	dec.DisallowUnknownFields()
 	if err := dec.Decode(&f); err != nil {
 		return nil, fmt.Errorf("admission pack: %w", err)
 	}
@@ -178,8 +187,8 @@ func Load(src []byte) (*Pack, error) {
 	var errs []error
 	bad := func(format string, args ...any) { errs = append(errs, fmt.Errorf(format, args...)) }
 
-	if f.Scope.Kind != "admission" {
-		bad("scope.kind must be admission, got %q", f.Scope.Kind)
+	if f.Format != CompiledFormat {
+		bad("format must be %s, got %q", CompiledFormat, f.Format)
 	}
 	if !packIDPattern.MatchString(f.PackID) {
 		bad("pack_id %q is not owner/name/version", f.PackID)
@@ -219,6 +228,9 @@ func Load(src []byte) (*Pack, error) {
 			bad("accept.%s needs band and scale", cur)
 			continue
 		}
+		if *u.Scale < -scaleMax || *u.Scale > scaleMax {
+			bad("accept.%s: scale %d must be from %d to %d", cur, *u.Scale, -scaleMax, scaleMax)
+		}
 		p.Accept[cur] = Unit{Band: u.Band, Scale: *u.Scale}
 	}
 
@@ -241,8 +253,17 @@ func Load(src []byte) (*Pack, error) {
 			bad("tier %q is listed twice", t.ID)
 		}
 		tierIndex[t.ID] = i
+		decades := map[string]int{}
 		for _, band := range sortedKeys(t.MaxDecade) {
-			d := t.MaxDecade[band]
+			if t.MaxDecade[band] == nil {
+				bad("tier %s: max_decade.%s must be an integer", t.ID, band)
+				continue
+			}
+			d := *t.MaxDecade[band]
+			decades[band] = d
+			if d < -decadeMax || d > decadeMax {
+				bad("tier %s: max_decade.%s %d must be from %d to %d", t.ID, band, d, -decadeMax, decadeMax)
+			}
 			if !bands[band] {
 				bad("tier %s: max_decade.%s is not a band unit in accept", t.ID, band)
 			}
@@ -251,7 +272,7 @@ func Load(src []byte) (*Pack, error) {
 			}
 			below[band] = d
 		}
-		p.Tiers = append(p.Tiers, Tier{ID: t.ID, MaxDecade: t.MaxDecade})
+		p.Tiers = append(p.Tiers, Tier{ID: t.ID, MaxDecade: decades})
 	}
 	// A unit no tier names would leave a deal in it with no tier at all.
 	for _, band := range sortedKeys(bands) {
@@ -260,19 +281,22 @@ func Load(src []byte) (*Pack, error) {
 		}
 	}
 
-	if f.Budget.MaxAsks == nil || *f.Budget.MaxAsks < 0 {
-		bad("budget.max_asks must be a non-negative integer")
+	if f.Budget.MaxAsks == nil || *f.Budget.MaxAsks < 0 || *f.Budget.MaxAsks > maxAsksMax {
+		bad("budget.max_asks must be from 0 to %d", maxAsksMax)
 	} else {
 		p.MaxAsks = *f.Budget.MaxAsks
 	}
-	if f.Budget.DeadlineS == nil || *f.Budget.DeadlineS <= 0 {
-		bad("budget.deadline_s must be a positive integer")
+	if f.Budget.DeadlineS == nil || *f.Budget.DeadlineS <= 0 || *f.Budget.DeadlineS > deadlineSMax {
+		bad("budget.deadline_s must be from 1 to %d", deadlineSMax)
 	} else {
 		p.DeadlineS = *f.Budget.DeadlineS
 	}
 	p.TrustRoots = TrustRoots{Controllers: f.TrustRoots.Controllers, Witnesses: f.TrustRoots.Witnesses, Judges: f.TrustRoots.Judges}
 
 	seen := map[string]bool{}
+	if len(f.Rows) == 0 {
+		bad("rows must not be empty")
+	}
 	for i, r := range f.Rows {
 		where := fmt.Sprintf("rows[%d] (%s)", i, r.ID)
 		if !rowIDPattern.MatchString(r.ID) {
@@ -282,7 +306,7 @@ func Load(src []byte) (*Pack, error) {
 			bad("%s: id is listed twice", where)
 		}
 		seen[r.ID] = true
-		row := Row{ID: r.ID, Statement: r.Statement, Source: r.Source, Check: r.Check, Params: r.Params}
+		row := Row{ID: r.ID, Statement: r.Statement, Source: r.Source, Check: r.Check, Params: map[string]int64{}}
 		if r.Statement == "" {
 			bad("%s: statement is required", where)
 		}
@@ -301,8 +325,12 @@ func Load(src []byte) (*Pack, error) {
 			for _, k := range sortedKeys(r.Params) {
 				if !slices.Contains(pred.params, k) {
 					bad("%s: check %s takes no params.%s", where, r.Check, k)
-				} else if v := r.Params[k]; v < 0 || v > paramMax[k] {
+				} else if r.Params[k] == nil {
+					bad("%s: params.%s must be an integer", where, k)
+				} else if v := *r.Params[k]; v < 0 || v > paramMax[k] {
 					bad("%s: params.%s %d must be from 0 to %d", where, k, v, paramMax[k])
+				} else {
+					row.Params[k] = v
 				}
 			}
 		}
@@ -315,7 +343,7 @@ func Load(src []byte) (*Pack, error) {
 		if r.Source == SourceJudged {
 			// A judged row caps a tier and never decides NO (D-23).
 			var c map[string]string
-			if r.OnFail.Kind != yaml.MappingNode || r.OnFail.Decode(&c) != nil || len(c) != 1 || c["cap"] == "" {
+			if json.Unmarshal(r.OnFail, &c) != nil || len(c) != 1 || c["cap"] == "" {
 				bad("%s: a judged row's on_fail must be {cap: <tier>}", where)
 			} else if idx, ok := tierIndex[c["cap"]]; !ok {
 				bad("%s: cap %q is not a tier", where, c["cap"])
@@ -332,7 +360,7 @@ func Load(src []byte) (*Pack, error) {
 			}
 		} else {
 			var o string
-			if r.OnFail.Kind != yaml.ScalarNode || r.OnFail.Decode(&o) != nil {
+			if json.Unmarshal(r.OnFail, &o) != nil {
 				bad("%s: on_fail must be NO, LIMIT or record", where)
 			}
 			switch o {
@@ -393,74 +421,15 @@ func LoadPinned(src []byte, packID, digest string) (*Pack, error) {
 	return p, nil
 }
 
-// The plain scalar rule. YAML readers disagree on which plain scalars are
-// strings: yaml.v3 (YAML 1.2) reads 1e3 and 0o10 as numbers, PyYAML (YAML
-// 1.1, the pack's lint) reads them as strings, and reads NO, 1:30 and 010 as
-// a boolean and integers. So a pack may write a plain (unquoted) scalar only
-// in a form every reader reads alike: a plain decimal integer, a dotted
-// version (1.0.0), or text that starts with none of the characters numbers,
-// timestamps, nulls and merges start with and is not a boolean or null word.
-// Anything else is quoted. The lint and the Rust reader hold the same rule.
-var (
-	decimalInt     = regexp.MustCompile(`^(0|-?[1-9][0-9]*)$`)
-	dottedVersion  = regexp.MustCompile(`^[0-9]+\.[0-9]+\.[0-9]+$`)
-	specialLeaders = "0123456789+-.~<"
+// scaleMax and decadeMax bound an accept scale and a tier ceiling, so a
+// band's decade (digits + scale) stays far inside an int.
+const (
+	scaleMax  = 30
+	decadeMax = 60
+	// maxAsksMax and deadlineSMax bound the budget, as the lint does.
+	maxAsksMax   = 1000
+	deadlineSMax = 100 * 365 * 24 * 3600
 )
-
-// plainScalars refuses a plain scalar outside the plain scalar rule, and
-// anchors, aliases and explicit tags, so a pack reads one way in every
-// reader (the lint, this one and the Rust one) or not at all.
-func plainScalars(n *yaml.Node) error {
-	if n.Anchor != "" || n.Kind == yaml.AliasNode {
-		return fmt.Errorf("line %d: anchors and aliases are not read", n.Line)
-	}
-	if n.Style&yaml.TaggedStyle != 0 {
-		return fmt.Errorf("line %d: tags are not read", n.Line)
-	}
-	if n.Kind == yaml.ScalarNode && n.Style == 0 {
-		v := n.Value
-		switch {
-		case v == "", decimalInt.MatchString(v), dottedVersion.MatchString(v):
-		case strings.ContainsRune(specialLeaders, rune(v[0])) || yaml11Booleans[v] || plainWords[v]:
-			return fmt.Errorf("line %d: quote %q: YAML readers do not all read it as the same string", n.Line, v)
-		}
-	}
-	for _, c := range n.Content {
-		if err := plainScalars(c); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-// plainWords are the boolean and null words YAML 1.2 reads as non-strings,
-// beside yaml11Booleans.
-var plainWords = map[string]bool{
-	"true": true, "True": true, "TRUE": true, "false": true, "False": true, "FALSE": true,
-	"null": true, "Null": true, "NULL": true,
-}
-
-// yaml11Booleans are the plain scalars YAML 1.1 reads as booleans and YAML
-// 1.2 reads as strings (true and false are booleans in both).
-var yaml11Booleans = map[string]bool{
-	"y": true, "Y": true, "yes": true, "Yes": true, "YES": true, "n": true, "N": true,
-	"no": true, "No": true, "NO": true, "on": true, "On": true, "ON": true,
-	"off": true, "Off": true, "OFF": true,
-}
-
-// yaml11Boolean is the first plain scalar under n that YAML 1.1 and 1.2 read
-// differently, or "".
-func yaml11Boolean(n *yaml.Node) string {
-	if n.Kind == yaml.ScalarNode && n.Style == 0 && yaml11Booleans[n.Value] {
-		return n.Value
-	}
-	for _, c := range n.Content {
-		if v := yaml11Boolean(c); v != "" {
-			return v
-		}
-	}
-	return ""
-}
 
 // paramMax bounds each threshold, so its duration in nanoseconds never wraps:
 // a century of seconds or days, and a count no JSON reader loses.
@@ -478,4 +447,69 @@ func sortedKeys[V any](m map[string]V) []string {
 	}
 	slices.Sort(keys)
 	return keys
+}
+
+// The member names each object of a pack-definition.json may have.
+// encoding/json matches a field name case-insensitively ("Statement" would
+// fill statement), which the Rust loader does not, so every name is checked
+// exactly first.
+var (
+	topKeys    = []string{"format", "pack_id", "pack_version", "source", "outcomes", "missing", "accept", "tiers", "budget", "trust_roots", "rows"}
+	unitKeys   = []string{"band", "scale"}
+	tierKeys   = []string{"id", "max_decade"}
+	budgetKeys = []string{"max_asks", "deadline_s"}
+	rootKeys   = []string{"controllers", "witnesses", "judges"}
+	rowKeys    = []string{"id", "statement", "source", "check", "params", "from", "on_fail", "ask"}
+	askKeys    = []string{"derivation"}
+)
+
+// exactKeys refuses a member name that is not exactly one the format names.
+func exactKeys(src []byte) error {
+	check := func(where string, raw json.RawMessage, allowed []string) (map[string]json.RawMessage, error) {
+		var m map[string]json.RawMessage
+		if len(raw) == 0 || string(raw) == "null" || json.Unmarshal(raw, &m) != nil {
+			return nil, nil // not an object: the strict decode reports it
+		}
+		for k := range m {
+			if !slices.Contains(allowed, k) {
+				return nil, fmt.Errorf("%s: unknown field %q", where, k)
+			}
+		}
+		return m, nil
+	}
+	top, err := check("pack", src, topKeys)
+	if err != nil {
+		return err
+	}
+	var accept map[string]json.RawMessage
+	_ = json.Unmarshal(top["accept"], &accept)
+	for cur, u := range accept {
+		if _, err := check("accept."+cur, u, unitKeys); err != nil {
+			return err
+		}
+	}
+	if _, err := check("budget", top["budget"], budgetKeys); err != nil {
+		return err
+	}
+	if _, err := check("trust_roots", top["trust_roots"], rootKeys); err != nil {
+		return err
+	}
+	var tiers, rows []json.RawMessage
+	_ = json.Unmarshal(top["tiers"], &tiers)
+	for i, t := range tiers {
+		if _, err := check(fmt.Sprintf("tiers[%d]", i), t, tierKeys); err != nil {
+			return err
+		}
+	}
+	_ = json.Unmarshal(top["rows"], &rows)
+	for i, r := range rows {
+		m, err := check(fmt.Sprintf("rows[%d]", i), r, rowKeys)
+		if err != nil {
+			return err
+		}
+		if _, err := check(fmt.Sprintf("rows[%d].ask", i), m["ask"], askKeys); err != nil {
+			return err
+		}
+	}
+	return nil
 }

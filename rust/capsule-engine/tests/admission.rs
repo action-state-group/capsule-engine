@@ -2,8 +2,9 @@
 
 //! The shared admission vectors (conformance-vectors/admission/v0), decided
 //! as go/admission/conformance_test.go decides them: each case's verdict,
-//! source and tier, and the SHA-256 of its decision block's JCS bytes; and
-//! the loader's refusals (pack_test.go TestLoadRefuses, TestLoadPinned).
+//! source and tier, and the SHA-256 of its decision block's JCS bytes; the
+//! loader's shared refusals (pack_test.go TestRefusalVectors, TestLoadPinned);
+//! and the admission-baseline@1 fixtures (baseline_test.go).
 
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
@@ -213,169 +214,84 @@ fn admission_conformance_vectors() {
     assert!(failures.is_empty(), "{} of {} cases differ:\n{}", failures.len(), cases.len(), failures.join("\n"));
 }
 
-fn ladder_source() -> String {
-    std::fs::read_to_string(vector_dir().join("packs/ladder.yaml")).unwrap()
+fn ladder_source() -> Vec<u8> {
+    std::fs::read(vector_dir().join("packs/ladder.json")).unwrap()
 }
 
 // pack_test.go TestLoadPinned.
 #[test]
 fn load_pinned() {
     let src = ladder_source();
-    let p = Pack::load(src.as_bytes()).unwrap();
-    assert!(Pack::load_pinned(src.as_bytes(), p.id(), p.digest()).is_ok(), "the pinned bytes");
-    assert!(
-        Pack::load_pinned(format!("{src}\n").as_bytes(), p.id(), p.digest()).is_err(),
-        "changed bytes under the same pin load"
-    );
-    assert!(
-        Pack::load_pinned(src.as_bytes(), "asg/other/0.1.0", p.digest()).is_err(),
-        "another pack id loads under this pin"
-    );
-    assert_eq!(p.digest(), canon::sha256_hex(src.as_bytes()));
+    let p = Pack::load(&src).unwrap();
+    assert!(Pack::load_pinned(&src, p.id(), p.digest()).is_ok(), "the pinned bytes");
+    let other = String::from_utf8(src.clone()).unwrap().replacen(r#""deadline_s":86400"#, r#""deadline_s":86401"#, 1);
+    assert_ne!(other.as_bytes(), &src[..]);
+    assert!(Pack::load_pinned(other.as_bytes(), p.id(), p.digest()).is_err(), "changed bytes under the same pin load");
+    assert!(Pack::load_pinned(&src, "asg/other/0.1.0", p.digest()).is_err(), "another pack id loads under this pin");
+    assert_eq!(p.digest(), canon::sha256_hex(&src));
 }
 
-// pack_test.go TestLoadRefuses: the admission design rules
-// (capsule-engine#265) as the loader holds them. Each edit of the ladder
-// pack must be refused, naming what broke the rule.
-#[test]
-fn load_refuses() {
-    let cases: &[(&str, &str, &str, &str)] = &[
-        (
-            "a card row decides NO",
-            "    check: card.verified\n    from: T1\n    on_fail: LIMIT",
-            "    check: card.verified\n    from: T1\n    on_fail: \"NO\"",
-            "a card row may not decide NO",
-        ),
-        ("a vouch row decides NO", "    from: T2\n    on_fail: LIMIT", "    from: T2\n    on_fail: \"NO\"", "a vouch row may not decide NO"),
-        ("a judged row decides NO", "    on_fail: {cap: T1}", "    on_fail: \"NO\"", "a judged row's on_fail must be {cap: <tier>}"),
-        ("a missing input defaults to GO", "missing: LIMIT", "missing: GO", "missing must not be GO"),
-        ("a score field", "budget:\n", "score_weights: {settled: 3}\nbudget:\n", "score_weights"),
-        (
-            "a judged row in a pack without LIMIT",
-            r#"outcomes: ["GO", "ASK", "LIMIT", "NO"]"#,
-            r#"outcomes: ["GO", "ASK", "NO"]"#,
-            "a judged row caps a tier, so LIMIT must be in outcomes",
-        ),
-        ("a cap that lowers nothing", "    on_fail: {cap: T1}", "    on_fail: {cap: T2}", "cap T2 must be a tier below from T2"),
-        (
-            "an ask on a NO row",
-            "    check: platform.attestation_not_invalid\n    from: T0\n    on_fail: \"NO\"",
-            "    check: platform.attestation_not_invalid\n    from: T0\n    on_fail: \"NO\"\n    ask: {derivation: history_card/1}",
-            "only a LIMIT row may carry an ask",
-        ),
-        (
-            "a ceiling in a unit accept does not name",
-            "max_decade: {USD: 2}",
-            "max_decade: {USD: 2, Sat: 9}",
-            "max_decade.Sat is not a band unit in accept",
-        ),
-        (
-            "a ceiling that falls across a skipped tier",
-            "max_decade: {USD: 2}",
-            "max_decade: {USD: 2, sat: 3}",
-            "max_decade.sat 3 does not rise above the tier below (4)",
-        ),
-        (
-            "a cap with another key",
-            "    on_fail: {cap: T1}",
-            "    on_fail: {cap: T1, weight: 2}",
-            "a judged row's on_fail must be {cap: <tier>}",
-        ),
-        (
-            "a unit no tier names",
-            "  USD: {band: USD, scale: 0}\n",
-            "  USD: {band: USD, scale: 0}\n  EUR: {band: EUR, scale: 0}\n",
-            "band unit EUR is named by no tier",
-        ),
-        ("a negative threshold", "params: {min: 1}\n    from: T1", "params: {min: -1}\n    from: T1", "params.min -1 must be from 0"),
-        (
-            "a threshold whose duration wraps",
-            "params: {max_age_s: 604800}",
-            "params: {max_age_s: 99999999999}",
-            "params.max_age_s 99999999999 must be from 0",
-        ),
-        ("a float", "scale: -3}", "scale: -3.5}", "quote \"-3.5\""),
-        ("a hex integer", "max_asks: 2", "max_asks: 0x2", "quote \"0x2\""),
-        ("a boolean id", "  - id: attestation\n", "  - id: True\n", "quote \"True\""),
-        ("an exponent with no dot", "  - id: attestation\n", "  - id: 1e3\n", "quote \"1e3\""),
-        ("an octal 0o", "  - id: attestation\n", "  - id: 0o10\n", "quote \"0o10\""),
-        ("a one-digit date", "  - id: attestation\n", "  - id: 2026-1-2\n", "quote \"2026-1-2\""),
-        ("a base-60 number", "  - id: attestation\n", "  - id: 1:30\n", "quote \"1:30\""),
-        ("a tag on a quoted scalar", "max_asks: 2", "max_asks: !!int \"2\"", "tags are not read"),
-        ("a merge key", "  - id: T0\n", "  - <<: {x: 1}\n    id: T0\n", "quote \"<<\""),
-        ("an anchor", "  - id: T0\n", "  - &t0 id: T0\n", "anchors and aliases"),
-        ("no ask deadline", "  deadline_s: 86400\n", "", "budget.deadline_s must be a positive integer"),
-        ("a row weight", "    check: own.settled\n", "    check: own.settled\n    weight: 2\n", "weight"),
-        (
-            "LIMIT from the lowest tier",
-            "    params: {min: 1}\n    from: T0\n    on_fail: record",
-            "    params: {min: 1}\n    from: T0\n    on_fail: LIMIT",
-            "cannot LIMIT",
-        ),
-        ("an unknown predicate", "check: own.settled", "check: own.reputation", "not an admission predicate"),
-        (
-            "a predicate under the wrong source",
-            "    source: own_history\n    check: own.settled",
-            "    source: card\n    check: own.settled",
-            "reads own_history",
-        ),
-        ("a missing threshold", "    params: {min: 1}\n    from: T1", "    from: T1", "needs params.min"),
-        ("decades that do not rise", "max_decade: {sat: 4, USD: 0}", "max_decade: {sat: 3, USD: 0}", "does not rise"),
-        (
-            "an outcome the pack does not yield",
-            r#"outcomes: ["GO", "ASK", "LIMIT", "NO"]"#,
-            r#"outcomes: ["GO", "LIMIT", "NO"]"#,
-            "ASK is not in outcomes",
-        ),
-        ("an unquoted NO", "    from: T0\n    on_fail: \"NO\"", "    from: T0\n    on_fail: NO", "is a boolean in YAML 1.1"),
-        ("another scope kind", "kind: admission", "kind: live", "scope.kind must be admission"),
-        ("a version that is not the id's", "pack_version: 0.1.0", "pack_version: 0.2.0", "does not end in pack_version"),
-    ];
-    let src = ladder_source();
-    let mut failures = Vec::new();
-    for (name, old, new, want) in cases {
-        assert!(src.contains(old), "{name}: the ladder pack has no {old:?}");
-        match Pack::load(src.replacen(old, new, 1).as_bytes()) {
-            Err(e) if e.to_string().contains(want) => {}
-            got => failures.push(format!("{name}: got {got:?}; want an error naming {want:?}")),
+/// pack_test.go applyOp: sets or deletes the member at `path` (object keys
+/// and array indexes) in `doc`.
+fn apply_op(doc: &mut Value, path: &[Value], value: Option<&Value>) {
+    let (last, parents) = path.split_last().expect("refusals.json: an empty path");
+    let mut node = doc;
+    for step in parents {
+        node = match step {
+            Value::String(k) => node.get_mut(k.as_str()).expect("refusals.json: a path through a missing key"),
+            Value::Number(n) => node
+                .get_mut(n.as_u64().expect("an array index") as usize)
+                .expect("refusals.json: an index out of range"),
+            _ => panic!("refusals.json: a path step that is neither a key nor an index"),
+        };
+    }
+    match (last, value) {
+        (Value::String(k), None) => {
+            node.as_object_mut().expect("refusals.json: a delete through a scalar").remove(k);
         }
+        (Value::String(k), Some(v)) => {
+            node.as_object_mut().expect("refusals.json: a set through a scalar").insert(k.clone(), v.clone());
+        }
+        (Value::Number(n), Some(v)) => node[n.as_u64().expect("an array index") as usize] = v.clone(),
+        _ => panic!("refusals.json: an op this test does not apply"),
+    }
+}
+
+// pack_test.go TestRefusalVectors: conformance-vectors/admission/v0/
+// refusals.json, the admission design rules (capsule-engine#265) as the
+// loader holds them, and the exact-JCS rule. Each case applies its ops to
+// the parsed base pack and re-encodes it as JCS, or gives its bytes outright;
+// load must refuse it with an error containing want.
+#[test]
+fn refusal_vectors() {
+    let raw = std::fs::read(vector_dir().join("refusals.json")).unwrap();
+    let v: Value = serde_json::from_slice(&raw).unwrap();
+    let (cases, raws) = (v["cases"].as_array().unwrap(), v["raw"].as_array().unwrap());
+    assert!(!cases.is_empty() && !raws.is_empty(), "no refusal vectors");
+    let mut failures = Vec::new();
+    let mut refused = |name: &str, src: &[u8], want: &str| match Pack::load(src) {
+        Err(e) if e.to_string().contains(want) => {}
+        got => failures
+            .push(format!("{name}: got {:?}; want an error containing {want:?}", got.map(|p| p.id().to_string()))),
+    };
+    for c in cases {
+        let name = c["case"].as_str().unwrap();
+        let base = std::fs::read(vector_dir().join(c["base"].as_str().unwrap())).unwrap();
+        let mut doc: Value = serde_json::from_slice(&base).unwrap();
+        for op in c["ops"].as_array().unwrap() {
+            match (op.get("delete"), op.get("set")) {
+                (Some(Value::Array(path)), _) => apply_op(&mut doc, path, None),
+                (_, Some(Value::Array(path))) => apply_op(&mut doc, path, Some(&op["value"])),
+                _ => panic!("{name}: an op that neither sets nor deletes"),
+            }
+        }
+        let jcs = canon::jcs(&canon::from_json(&doc).unwrap()).unwrap();
+        refused(name, jcs.as_bytes(), c["want"].as_str().unwrap());
+    }
+    for c in raws {
+        refused(c["case"].as_str().unwrap(), c["bytes"].as_str().unwrap().as_bytes(), c["want"].as_str().unwrap());
     }
     assert!(failures.is_empty(), "{}", failures.join("\n"));
-}
-
-/// The reader is the trust boundary for an authored pack: what it cannot
-/// read exactly is refused, never guessed at.
-#[test]
-fn load_refuses_what_the_reader_does_not_read() {
-    let src = ladder_source();
-    for (old, new) in [
-        ("    params: {min: 1}\n    from: T1", "    params: {min: 1.5}\n    from: T1"),
-        ("    params: {min: 1}\n    from: T1", "    params: {min: \"1\"}\n    from: T1"),
-        ("    params: {min: 1}\n    from: T1", "    params: {min: 0x1}\n    from: T1"),
-        ("  msat: {band: sat, scale: -3}", "  msat: {band: sat, scale: -3, scale: -3}"),
-        ("  msat: {band: sat, scale: -3}", "  msat: {band: {unit: sat}, scale: -3}"),
-        ("  msat: {band: sat, scale: -3}", "  msat: &m {band: sat, scale: -3}"),
-        ("    on_fail: {cap: T1}", "    on_fail: {cap: T1, weight: 2}"),
-        ("kind: admission", "kind: yes"),
-        ("kind: admission", "Off: admission"),
-        ("statement: The counterparty is not", "statement: note: The counterparty is not"),
-    ] {
-        assert!(src.contains(old), "the ladder pack has no {old:?}");
-        let edited = src.replacen(old, new, 1);
-        assert!(Pack::load(edited.as_bytes()).is_err(), "loaded {new:?}");
-    }
-    // The error is Go's: the rule and the value, the line it is on.
-    let err = Pack::load(
-        src.replacen("    params: {min: 1}\n    from: T1", "    params: {min: 9007199254740992}\n    from: T1", 1)
-            .as_bytes(),
-    )
-    .unwrap_err()
-    .to_string();
-    assert!(err.contains("params.min 9007199254740992 must be from 0 to 9007199254740991"), "{err}");
-    // Quoted, the same words are strings.
-    let quoted = src.replacen("kind: admission", "kind: \"yes\"", 1);
-    let err = Pack::load(quoted.as_bytes()).unwrap_err().to_string();
-    assert!(err.contains("scope.kind must be admission, got \"yes\""), "{err}");
 }
 
 /// baseline_test.go TestBaselineFixtures: admission-baseline@1 and its
@@ -397,7 +313,7 @@ fn baseline_fixtures() {
         );
         b
     };
-    let p = Pack::load(&read("pack-source.yaml")).unwrap_or_else(|e| panic!("{e}"));
+    let p = Pack::load(&read("pack-definition.json")).unwrap_or_else(|e| panic!("{e}"));
     let set: Value = serde_json::from_slice(&read("cases.json")).unwrap();
     let cases = set["cases"].as_array().unwrap();
     assert!(
@@ -432,8 +348,7 @@ fn baseline_fixtures() {
 /// checkpoint (Go's zero time) shows no age, and fails, whatever min_days is.
 #[test]
 fn key_age_fails_without_a_first_checkpoint() {
-    let src = ladder_source();
-    let p = Pack::load(src.as_bytes()).unwrap();
+    let p = Pack::load(&ladder_source()).unwrap();
     let now = Timestamp::parse_rfc3339("2026-10-30T12:00:00Z").unwrap();
     for first in [None, Some(Timestamp::go_zero())] {
         let mut input = Inputs::at(now);

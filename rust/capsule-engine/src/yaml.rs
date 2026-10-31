@@ -1,19 +1,15 @@
 // SPDX-License-Identifier: Apache-2.0
 
-//! The YAML subset the embedded pack, wicket and fold definitions and the
-//! admission packs are written in, read as gopkg.in/yaml.v3 reads them for
-//! the Go port (go/pack, go/admission): block mappings and sequences,
-//! single-line flow sequences and flow mappings of scalars, plain and quoted
-//! scalars, folded and literal block scalars, and comments. Anything else
-//! (anchors, tags, nested flow collections, multi-line plain scalars, a
-//! plain scalar YAML would read as a float, a timestamp or an integer in any
-//! form but plain decimal, a plain scalar holding ": ") is refused rather
-//! than guessed at.
-//!
-//! An embedded definition is then held to the digest its pack cites, so a
-//! misread value fails the load. An admission pack is authored, and pinned
-//! only by the digest of its bytes, so for it this reader is the trust
-//! boundary: what it cannot read exactly, it refuses.
+//! The YAML subset the embedded pack, wicket and fold definitions are written
+//! in, read as gopkg.in/yaml.v3 reads them for the Go port (go/pack): block
+//! mappings and sequences, single-line flow sequences of scalars, plain and
+//! quoted scalars, folded and literal block scalars, and comments. Anything
+//! else (anchors, tags, flow mappings, nested flow collections, multi-line
+//! plain scalars, a plain scalar YAML would read as a float, a timestamp or
+//! an integer in any form but plain decimal, a plain scalar holding ": ") is
+//! refused rather than guessed at. Every definition read here is then held
+//! to the digest its pack cites, so a misread value fails the load. The
+//! admission evaluator reads no YAML: it reads a compiled pack-definition.json.
 
 use crate::canon;
 
@@ -52,105 +48,12 @@ impl Line<'_> {
 struct Parser<'a> {
     lines: Vec<Line<'a>>,
     pos: usize,
-    notes: Notes,
-}
-
-/// What the parser notes about plain scalars, in document order, for a
-/// reader that refuses them (go/admission yaml11Boolean, plainScalars).
-#[derive(Default)]
-struct Notes {
-    /// The first plain scalar YAML 1.1 reads as a boolean and YAML 1.2 as a
-    /// string.
-    yaml11: Option<String>,
-    /// Set for an admission pack: plain scalars are held to the plain
-    /// scalar rule (plain_rule_holds).
-    admission: bool,
-    /// The refusal of the first plain scalar outside the rule.
-    rule: Option<String>,
-}
-
-/// go/admission plainWords: the boolean and null words YAML 1.2 reads as
-/// non-strings, beside the YAML 1.1 booleans.
-const PLAIN_WORDS: [&str; 9] = ["true", "True", "TRUE", "false", "False", "FALSE", "null", "Null", "NULL"];
-
-/// go/admission plainScalars' rule, which holds in every YAML reader rather
-/// than in one resolver: a plain scalar is empty, a decimal integer
-/// (^(0|-?[1-9][0-9]*)$), a dotted version (^[0-9]+\.[0-9]+\.[0-9]+$), or
-/// text whose first character is none of 0123456789+-.~< (what numbers,
-/// timestamps, nulls and merges start with) and that is no boolean or null
-/// word.
-fn plain_rule_holds(v: &str) -> bool {
-    let digits = |s: &str| !s.is_empty() && s.bytes().all(|b| b.is_ascii_digit());
-    let decimal = v == "0" || {
-        let d = v.strip_prefix('-').unwrap_or(v);
-        digits(d) && !d.starts_with('0')
-    };
-    let version = {
-        let parts: Vec<&str> = v.split('.').collect();
-        parts.len() == 3 && parts.iter().all(|p| digits(p))
-    };
-    v.is_empty()
-        || decimal
-        || version
-        || !(v.starts_with(|c| "0123456789+-.~<".contains(c))
-            || YAML11_BOOLEANS.contains(&v)
-            || PLAIN_WORDS.contains(&v))
-}
-
-/// go/admission yaml11Booleans: the plain scalars YAML 1.1 reads as booleans
-/// and YAML 1.2 reads as strings (true and false are booleans in both).
-const YAML11_BOOLEANS: [&str; 16] =
-    ["y", "Y", "yes", "Yes", "YES", "n", "N", "no", "No", "NO", "on", "On", "ON", "off", "Off", "OFF"];
-
-/// Notes `v`, a plain scalar on line `number`, when it is the first YAML 1.1
-/// boolean or the first YAML 1.2 boolean seen (go/admission yaml11Boolean
-/// and plainScalars walk keys and values in document order).
-fn note_plain(notes: &mut Notes, v: &str, number: usize) {
-    if notes.yaml11.is_none() && YAML11_BOOLEANS.contains(&v) {
-        notes.yaml11 = Some(v.to_string());
-    }
-    if notes.admission && notes.rule.is_none() && !plain_rule_holds(v) {
-        notes.rule = Some(format!("line {number}: quote {v:?}: YAML readers do not all read it as the same string"));
-    }
-}
-
-/// Whether a plain scalar is kept as text without being resolved: under the
-/// admission rule, one outside it is noted and refused by the loader, so it
-/// never reaches a resolver that would read it another way.
-fn held_as_text(notes: &Notes, v: &str) -> bool {
-    notes.admission && !plain_rule_holds(v)
-}
-
-/// A parsed document, and the first plain scalar in it that YAML 1.1 reads
-/// as a boolean and YAML 1.2 as a string, if any.
-pub(crate) struct Document {
-    pub(crate) node: Node,
-    pub(crate) yaml11_boolean: Option<String>,
-    /// Under parse_admission, the refusal of the first plain scalar outside
-    /// the plain scalar rule (go/admission plainScalars).
-    pub(crate) plain_rule: Option<String>,
 }
 
 type Result<T> = std::result::Result<T, String>;
 
 /// Parses one YAML document of the supported subset.
 pub(crate) fn parse(doc: &str) -> Result<Node> {
-    parse_document(doc).map(|d| d.node)
-}
-
-/// parse for an admission pack: notes the first plain YAML 1.1 boolean
-/// (go/admission yaml11Boolean) and the first plain scalar outside the plain
-/// scalar rule (plainScalars), keeping that one as text.
-pub(crate) fn parse_admission(doc: &str) -> Result<Document> {
-    parse_with(doc, true)
-}
-
-/// parse, noting the first plain YAML 1.1 boolean.
-pub(crate) fn parse_document(doc: &str) -> Result<Document> {
-    parse_with(doc, false)
-}
-
-fn parse_with(doc: &str, admission: bool) -> Result<Document> {
     let mut lines = Vec::new();
     for (i, raw) in doc.split('\n').enumerate() {
         let raw = raw.strip_suffix('\r').unwrap_or(raw);
@@ -160,10 +63,10 @@ fn parse_with(doc: &str, admission: bool) -> Result<Document> {
         }
         lines.push(Line { indent: raw.len() - body.len(), text: body.trim_end(), raw, number: i + 1 });
     }
-    let mut p = Parser { lines, pos: 0, notes: Notes { admission, ..Notes::default() } };
+    let mut p = Parser { lines, pos: 0 };
     p.skip_blank();
     let Some(first) = p.current() else {
-        return Ok(Document { node: Node::Null, yaml11_boolean: None, plain_rule: None });
+        return Ok(Node::Null);
     };
     if first.text == "---" || first.text.starts_with("%") {
         return Err(format!("line {}: document markers and directives are not supported", first.number));
@@ -174,7 +77,7 @@ fn parse_with(doc: &str, admission: bool) -> Result<Document> {
     if let Some(l) = p.current() {
         return Err(format!("line {}: unexpected content after the document", l.number));
     }
-    Ok(Document { node, yaml11_boolean: p.notes.yaml11, plain_rule: p.notes.rule })
+    Ok(node)
 }
 
 impl<'a> Parser<'a> {
@@ -213,8 +116,7 @@ impl<'a> Parser<'a> {
             if let Some(e) = anchor_or_tag(text) {
                 return Err(format!("line {number}: {e}"));
             }
-            let (key, rest) = split_key(text, &mut self.notes, number)
-                .ok_or_else(|| format!("line {number}: expected a mapping key"))?;
+            let (key, rest) = split_key(text).ok_or_else(|| format!("line {number}: expected a mapping key"))?;
             if members.iter().any(|(k, _)| *k == key) {
                 return Err(format!("line {number}: mapping key {key:?} already defined"));
             }
@@ -243,7 +145,7 @@ impl<'a> Parser<'a> {
                 items.push(self.value("", indent, false, number)?);
                 continue;
             }
-            if split_key(rest, &mut Notes::default(), number).is_some() {
+            if split_key(rest).is_some() {
                 // "- key: value" opens a mapping at the column of its key.
                 let column = line.indent + (line.text.len() - rest.len());
                 let raw = line.raw;
@@ -265,7 +167,7 @@ impl<'a> Parser<'a> {
         }
         // "key: # note" holds no value: the comment is not the value.
         if !rest.is_empty() && !rest.starts_with('#') {
-            return inline(rest, number, &mut self.notes);
+            return inline(rest, number);
         }
         self.skip_blank();
         match self.current() {
@@ -352,8 +254,8 @@ impl<'a> Parser<'a> {
 }
 
 /// A mapping line's key and the rest after its colon, or None when the line
-/// is not "key:" or "key: value". A plain key is noted in `first`.
-fn split_key<'t>(text: &'t str, notes: &mut Notes, number: usize) -> Option<(String, &'t str)> {
+/// is not "key:" or "key: value".
+fn split_key(text: &str) -> Option<(String, &str)> {
     if text.starts_with('"') || text.starts_with('\'') {
         let (key, used) = quoted(text).ok()?;
         let after = &text[used..];
@@ -373,9 +275,7 @@ fn split_key<'t>(text: &'t str, notes: &mut Notes, number: usize) -> Option<(Str
     if key.is_empty() || key.contains(" #") {
         return None;
     }
-    let key = key.trim_end();
-    note_plain(notes, key, number);
-    Some((key.to_string(), rest))
+    Some((key.trim_end().to_string(), rest))
 }
 
 /// The items of a single-line flow collection opening `rest` with `open`,
@@ -428,10 +328,8 @@ fn flow_items(rest: &str, open: char, close: char) -> Result<Vec<&str>> {
     Err("a flow collection must close on its line".into())
 }
 
-/// One scalar in a flow collection: quoted, or plain (noted in `first`).
-fn flow_scalar(item: &str, notes: &mut Notes, number: usize) -> Result<Node> {
-    // The non-specific tag "!", which yaml.v3 ignores: the scalar after it.
-    let item = item.strip_prefix("! ").map_or(item, str::trim_start);
+/// One scalar in a flow sequence: quoted, or plain.
+fn flow_scalar(item: &str) -> Result<Node> {
     if item.starts_with('"') || item.starts_with('\'') {
         let (v, used) = quoted(item)?;
         if used != item.len() {
@@ -439,20 +337,13 @@ fn flow_scalar(item: &str, notes: &mut Notes, number: usize) -> Result<Node> {
         }
         return Ok(Node::Str(v));
     }
-    note_plain(notes, item, number);
-    if held_as_text(notes, item) {
-        return Ok(Node::Str(item.to_string()));
-    }
     plain(item)
 }
 
-/// An inline value: a quoted scalar, a flow sequence or flow mapping of
-/// scalars, or a plain scalar. Each plain scalar is noted in `first`.
-fn inline(rest: &str, number: usize, notes: &mut Notes) -> Result<Node> {
+/// An inline value: a quoted scalar, a flow sequence of scalars, or a plain
+/// scalar.
+fn inline(rest: &str, number: usize) -> Result<Node> {
     let err = |e: String| format!("line {number}: {e}");
-    // The non-specific tag "!", which yaml.v3 ignores: `v: ! text` reads as
-    // the plain `text`, held to the same rule. Any other tag is refused.
-    let rest = rest.strip_prefix("! ").map_or(rest, str::trim_start);
     if rest.starts_with('"') || rest.starts_with('\'') {
         let (v, used) = quoted(rest).map_err(err)?;
         let tail = &rest[used..];
@@ -463,54 +354,15 @@ fn inline(rest: &str, number: usize, notes: &mut Notes) -> Result<Node> {
     }
     if rest.starts_with('[') {
         let items = flow_items(rest, '[', ']').map_err(err)?;
-        return items
-            .into_iter()
-            .map(|i| flow_scalar(i, notes, number).map_err(err))
-            .collect::<Result<_>>()
-            .map(Node::Seq);
+        return items.into_iter().map(|i| flow_scalar(i).map_err(err)).collect::<Result<_>>().map(Node::Seq);
     }
     if rest.starts_with('{') {
-        let mut members: Vec<(String, Node)> = Vec::new();
-        for item in flow_items(rest, '{', '}').map_err(err)? {
-            // A key, ": ", and a scalar value; the separator is the first
-            // ": " after a quoted key, or the first in a plain one.
-            let (key, value) = if item.starts_with('"') || item.starts_with('\'') {
-                let (k, used) = quoted(item).map_err(err)?;
-                let after = &item[used..];
-                let v = after.strip_prefix(": ").or_else(|| (after == ":").then_some(""));
-                (k, v.ok_or_else(|| err(format!("flow mapping item {item:?} is not key: value")))?)
-            } else {
-                let (k, v) = match item.find(": ") {
-                    Some(i) => (item[..i].trim_end(), &item[i + 2..]),
-                    None => (
-                        item.strip_suffix(':')
-                            .ok_or_else(|| err(format!("flow mapping item {item:?} is not key: value")))?,
-                        "",
-                    ),
-                };
-                if k.is_empty() || k.starts_with(['&', '*', '!', '?', '-']) {
-                    return Err(err(format!("flow mapping key {k:?} is not supported")));
-                }
-                note_plain(notes, k, number);
-                (k.to_string(), v)
-            };
-            let value = value.trim();
-            let node = if value.is_empty() { Node::Null } else { flow_scalar(value, notes, number).map_err(err)? };
-            if members.iter().any(|(k, _)| *k == key) {
-                return Err(err(format!("mapping key {key:?} already defined")));
-            }
-            members.push((key, node));
-        }
-        return Ok(Node::Map(members));
+        return Err(err("a flow mapping is not supported".into()));
     }
     let v = match rest.find(" #") {
         Some(i) => rest[..i].trim_end(),
         None => rest,
     };
-    note_plain(notes, v, number);
-    if held_as_text(notes, v) {
-        return Ok(Node::Str(v.to_string()));
-    }
     plain(v).map_err(err)
 }
 
@@ -551,11 +403,7 @@ fn quoted(text: &str) -> Result<(String, usize)> {
     Err("unterminated quoted scalar".into())
 }
 
-/// A plain scalar, resolved as yaml.v3's core schema resolves it, for the
-/// forms go/canon FromYAML accepts: null, a boolean, a decimal integer, or a
-/// string. A float, a timestamp or an integer in another form is refused.
-/// go/admission plainScalars' refusal of an anchor, an alias or a tag at the
-/// start of `text`.
+/// The refusal of an anchor, an alias or a tag at the start of `text`.
 fn anchor_or_tag(text: &str) -> Option<&'static str> {
     if text.starts_with(['&', '*']) {
         Some("anchors and aliases are not read")
@@ -566,6 +414,9 @@ fn anchor_or_tag(text: &str) -> Option<&'static str> {
     }
 }
 
+/// A plain scalar, resolved as yaml.v3's core schema resolves it, for the
+/// forms go/canon FromYAML accepts: null, a boolean, a decimal integer, or a
+/// string. A float, a timestamp or an integer in another form is refused.
 fn plain(v: &str) -> Result<Node> {
     if let Some(e) = anchor_or_tag(v) {
         return Err(e.into());
@@ -587,9 +438,8 @@ fn plain(v: &str) -> Result<Node> {
         "false" | "False" | "FALSE" => return Ok(Node::Bool(false)),
         _ => {}
     }
-    // go/admission decimalInt, ^-?(0|[1-9][0-9]*)$: the one integer form.
-    // "-0" also matches; it is refused here so a string read from an integer
-    // (yaml.v3 takes the scalar's text) is its decimal text.
+    // Plain decimal is the one integer form read; "-0" is refused, as its
+    // canonical form would not be the text written.
     let digits = v.strip_prefix('-').unwrap_or(v);
     let decimal = !digits.is_empty()
         && digits.bytes().all(|b| b.is_ascii_digit())
@@ -600,7 +450,7 @@ fn plain(v: &str) -> Result<Node> {
     }
     match numeric_tag(v) {
         Some("!!int") => Err(format!("write the integer {v:?} in plain decimal")),
-        Some(tag) => Err(format!("{v:?} reads as {tag}; no pack value is one (quote a string)")),
+        Some(tag) => Err(format!("{v:?} reads as {tag}, which no definition holds (quote a string)")),
         None => Ok(Node::Str(v.to_string())),
     }
 }
@@ -795,9 +645,7 @@ mod tests {
             "a: 010\n",
             "a: 2026-10-29\n",
             "a: &x 1\n",
-            "a: {b: {c: d}}\n",
-            "a: {b: c} d\n",
-            "a: {b}\n",
+            "a: {b: c}\n",
             "a: 1\na: 2\n",
             "a: b\n  c\n",
             "a: >-\n  x\n    y\n",

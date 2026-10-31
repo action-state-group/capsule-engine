@@ -2,7 +2,8 @@
 
 //! The admission pack loader (go/admission/pack.go): the admission pack
 //! profile v0 (evidencebook-skills#51), a pack-source.yaml with scope.kind
-//! admission. The loader refuses a pack that breaks the admission design
+//! admission, compiled to pack-definition.json, which is what this module
+//! reads. The loader refuses a pack that breaks the admission design
 //! rules (capsule-engine#265), so a pack cannot opt out of them: only
 //! platform, own_history and operator rows decide NO, a judged row only caps
 //! a tier, a missing input never defaults to GO, and a pack has no field a
@@ -12,8 +13,7 @@ use std::collections::BTreeMap;
 
 use super::band::Unit;
 use super::{Error, Verdict};
-use crate::canon;
-use crate::yaml::{self, Node};
+use crate::canon::{self, Value};
 
 /// pack.go Record: a row's on_fail when its result is sealed and decides
 /// nothing.
@@ -70,6 +70,16 @@ pub(crate) fn param_max(name: &str) -> Option<i64> {
         _ => None,
     }
 }
+
+/// pack.go scaleMax and decadeMax: the bounds on an accept scale and a tier
+/// ceiling, so a band's decade (digits + scale) stays far inside an int.
+const SCALE_MAX: i64 = 30;
+const DECADE_MAX: i64 = 60;
+
+/// pack.go maxAsksMax and deadlineSMax: the bounds on the budget, as the lint
+/// holds them.
+const MAX_ASKS_MAX: i64 = 1000;
+const DEADLINE_S_MAX: i64 = 100 * 365 * 24 * 3600;
 
 /// A loaded admission pack (pack.go Pack).
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -142,106 +152,115 @@ impl Pack {
         &self.version
     }
 
-    /// pack.go Pack.Digest: the SHA-256 of the pack-source.yaml bytes as
-    /// loaded, which the decision cites.
+    /// pack.go Pack.Digest, the definition_digest: the SHA-256 of the
+    /// pack-definition.json bytes as loaded, which the decision cites beside
+    /// pack_id.
     pub fn digest(&self) -> &str {
         &self.digest
     }
 }
 
-// ---- strict decoding, as yaml.v3 decodes into sourceFile with KnownFields --
+// ---- strict decoding, as encoding/json decodes into sourceFile with
+// DisallowUnknownFields ---------------------------------------------------------
 
 type Decoded<T> = Result<T, String>;
 
-/// A struct's fields (yaml.v3 decoding a mapping into a struct with
-/// KnownFields): null is the zero struct; a key not taken is refused.
+/// A struct's fields (encoding/json decoding an object into a struct with
+/// DisallowUnknownFields): null is the zero struct; a key not taken is
+/// refused.
 struct Struct<'a> {
     what: String,
-    members: &'a [(String, Node)],
+    members: &'a [(String, Value)],
     taken: Vec<&'static str>,
 }
 
 impl<'a> Struct<'a> {
-    fn of(node: &'a Node, what: impl Into<String>) -> Decoded<Struct<'a>> {
+    fn of(v: &'a Value, what: impl Into<String>) -> Decoded<Struct<'a>> {
         let what = what.into();
-        match node {
-            Node::Map(members) => Ok(Struct { what, members, taken: Vec::new() }),
-            Node::Null => Ok(Struct { what, members: &[], taken: Vec::new() }),
-            _ => Err(format!("{what}: cannot unmarshal into a mapping")),
+        match v {
+            Value::Obj(members) => Ok(Struct { what, members, taken: Vec::new() }),
+            Value::Null => Ok(Struct { what, members: &[], taken: Vec::new() }),
+            _ => Err(format!("cannot unmarshal into {what}, an object")),
         }
     }
 
-    fn get(&mut self, key: &'static str) -> Option<&'a Node> {
+    fn get(&mut self, key: &'static str) -> Option<&'a Value> {
         self.taken.push(key);
         self.members.iter().find(|(k, _)| k == key).map(|(_, v)| v)
     }
 
     fn string(&mut self, key: &'static str) -> Decoded<String> {
         let what = format!("{}.{key}", self.what);
-        self.get(key).map_or(Ok(String::new()), |n| string(n, &what))
+        self.get(key).map_or(Ok(String::new()), |v| string(v, &what))
     }
 
-    /// yaml.v3 KnownFields: "field X not found in type ...".
+    fn int(&mut self, key: &'static str) -> Decoded<Option<i64>> {
+        let what = format!("{}.{key}", self.what);
+        self.get(key).map_or(Ok(None), |v| int(v, &what))
+    }
+
+    /// encoding/json DisallowUnknownFields: `unknown field "x"`.
     fn done(self) -> Decoded<()> {
         match self.members.iter().find(|(k, _)| !self.taken.contains(&k.as_str())) {
-            Some((k, _)) => Err(format!("{}: field {k} not found", self.what)),
+            Some((k, _)) => Err(format!("unknown field {k:?}")),
             None => Ok(()),
         }
     }
 }
 
-/// yaml.v3 decoding a scalar into a string: its text (an integer as written,
-/// which this reader holds only in plain decimal form), "" for null. A
-/// boolean is refused here, where yaml.v3 would take its text: a row id or
-/// tier read from `True` would otherwise change case.
-fn string(n: &Node, what: &str) -> Decoded<String> {
-    match n {
-        Node::Str(s) => Ok(s.clone()),
-        Node::Int(i) => Ok(i.to_string()),
-        Node::Null => Ok(String::new()),
-        Node::Bool(_) => Err(format!("{what}: a boolean is not read as a string; quote it")),
-        _ => Err(format!("{what}: cannot unmarshal a collection into a string")),
+/// encoding/json decoding into a string: a string; null leaves it "".
+fn string(v: &Value, what: &str) -> Decoded<String> {
+    match v {
+        Value::Str(s) => Ok(s.clone()),
+        Value::Null => Ok(String::new()),
+        _ => Err(format!("cannot unmarshal into {what}, a string")),
     }
 }
 
-/// yaml.v3 decoding into an int: an integer; null is None (a pointer) or 0.
-fn int(n: &Node, what: &str) -> Decoded<Option<i64>> {
-    match n {
-        Node::Int(i) => Ok(Some(*i)),
-        Node::Null => Ok(None),
-        _ => Err(format!("{what}: cannot unmarshal into an integer")),
+/// encoding/json decoding into a *int: an integer, or None for null.
+fn int(v: &Value, what: &str) -> Decoded<Option<i64>> {
+    match v {
+        Value::Int(i) => Ok(Some(*i)),
+        Value::Null => Ok(None),
+        _ => Err(format!("cannot unmarshal into {what}, an integer")),
     }
 }
 
-fn seq<'a>(n: Option<&'a Node>, what: &str) -> Decoded<&'a [Node]> {
-    match n {
-        None | Some(Node::Null) => Ok(&[]),
-        Some(Node::Seq(items)) => Ok(items),
-        Some(_) => Err(format!("{what}: cannot unmarshal into a sequence")),
+fn array<'a>(v: Option<&'a Value>, what: &str) -> Decoded<&'a [Value]> {
+    match v {
+        None | Some(Value::Null) => Ok(&[]),
+        Some(Value::Arr(items)) => Ok(items),
+        Some(_) => Err(format!("cannot unmarshal into {what}, an array")),
     }
 }
 
-fn map<'a>(n: Option<&'a Node>, what: &str) -> Decoded<&'a [(String, Node)]> {
-    match n {
-        None | Some(Node::Null) => Ok(&[]),
-        Some(Node::Map(m)) => Ok(m),
-        Some(_) => Err(format!("{what}: cannot unmarshal into a mapping")),
+fn object<'a>(v: Option<&'a Value>, what: &str) -> Decoded<&'a [(String, Value)]> {
+    match v {
+        None | Some(Value::Null) => Ok(&[]),
+        Some(Value::Obj(m)) => Ok(m),
+        Some(_) => Err(format!("cannot unmarshal into {what}, an object")),
     }
 }
 
-fn int_map(n: Option<&Node>, what: &str) -> Decoded<BTreeMap<String, i64>> {
-    map(n, what)?.iter().map(|(k, v)| Ok((k.clone(), int(v, &format!("{what}.{k}"))?.unwrap_or(0)))).collect()
+fn strings(v: Option<&Value>, what: &str) -> Decoded<Vec<String>> {
+    array(v, what)?.iter().map(|i| string(i, &format!("{what}[]"))).collect()
 }
 
-/// The source file's rows as decoded (pack.go sourceFile.Rows).
+/// A map of name to *int (max_decade, params): None where the value is null.
+fn int_map(v: Option<&Value>, what: &str) -> Decoded<BTreeMap<String, Option<i64>>> {
+    object(v, what)?.iter().map(|(k, n)| Ok((k.clone(), int(n, &format!("{what}.{k}"))?))).collect()
+}
+
+/// The pack's rows as decoded (pack.go sourceFile.Rows).
 struct RawRow<'a> {
     id: String,
     statement: String,
     source: String,
     check: String,
-    params: Option<BTreeMap<String, i64>>,
+    params: BTreeMap<String, Option<i64>>,
     from: String,
-    on_fail: Option<&'a Node>,
+    /// The on_fail value as given (json.RawMessage), None when absent.
+    on_fail: Option<&'a Value>,
     ask: Option<String>,
 }
 
@@ -279,36 +298,25 @@ fn verdict_of(s: &str) -> Option<Verdict> {
     }
 }
 
-/// pack.go Load's YAML pre-pass: the document parsed, then refused for a
-/// plain YAML 1.1 boolean (yaml11Boolean), and then for a plain scalar
-/// outside the plain scalar rule, an anchor, an alias or a tag
-/// (plainScalars), so a pack reads one way in every reader (the lint, the Go
-/// loader and this one) or not at all.
-pub(crate) fn pre_pass(text: &str) -> Result<yaml::Document, String> {
-    let doc = yaml::parse_admission(text)?;
-    if let Some(v) = &doc.yaml11_boolean {
-        // YAML 1.1 readers (PyYAML, so the pack's own lint) read a plain NO
-        // as false; YAML 1.2 readers read it as "NO". A pack reads the same
-        // in both or not at all.
-        return Err(format!("the plain scalar {v:?} is a boolean in YAML 1.1; quote it"));
-    }
-    if let Some(e) = &doc.plain_rule {
-        return Err(e.clone());
-    }
-    Ok(doc)
-}
+/// pack.go CompiledFormat: the format a pack-definition.json names.
+pub const COMPILED_FORMAT: &str = "admission-pack/v0";
 
 impl Pack {
-    /// pack.go Load: an admission pack from its pack-source.yaml bytes. A
-    /// pinned pack is loaded with load_pinned, which also checks the digest.
+    /// pack.go Load: an admission pack from its pack-definition.json bytes,
+    /// the pinned artifact evidencebook-skills' pack_compile.py writes from
+    /// a pack-source.yaml. The evaluator reads no YAML: two YAML readers read
+    /// one source two ways, so the compiler's is the only one. The bytes must
+    /// be exactly the JCS (RFC 8785) encoding of their own parse, which
+    /// refuses duplicate keys, other whitespace or key order and
+    /// non-integer numbers; they are then decoded strictly. A pinned pack is
+    /// loaded with load_pinned, which also checks the digest.
     pub fn load(src: &[u8]) -> Result<Pack, Error> {
         let fail = |m: String| Error(format!("admission pack: {m}"));
-        let text = std::str::from_utf8(src).map_err(|e| fail(e.to_string()))?;
-        let doc = pre_pass(text).map_err(fail)?;
-        if doc.node == Node::Null {
-            return Err(fail("EOF".into()));
+        let v = canon::parse_json(src).map_err(|e| fail(e.to_string()))?;
+        if canon::jcs(&v).ok().as_deref().map(str::as_bytes) != Some(src) {
+            return Err(fail("the bytes are not the JCS encoding of their own parse".into()));
         }
-        let (f, rows) = decode(&doc.node).map_err(fail)?;
+        let (f, rows) = decode(&v).map_err(fail)?;
         validate(src, f, rows)
     }
 
@@ -326,50 +334,41 @@ impl Pack {
     }
 }
 
-/// pack.go sourceFile, as yaml.v3 decodes it with KnownFields.
+/// pack.go sourceFile: pack-definition.json, every optional field written
+/// out. An Option marks a number that may be 0 but not absent or null.
 struct SourceFile {
+    format: String,
     pack_id: String,
     pack_version: String,
-    scope_kind: String,
     outcomes: Vec<String>,
     missing: String,
-    /// Each currency's band and scale (None where the file gives none).
+    /// Each currency's band and scale.
     accept: Vec<(String, String, Option<i64>)>,
-    tiers: Vec<(String, BTreeMap<String, i64>)>,
+    tiers: Vec<(String, BTreeMap<String, Option<i64>>)>,
     max_asks: Option<i64>,
     deadline_s: Option<i64>,
     trust_roots: TrustRoots,
 }
 
-fn strings(n: Option<&Node>, what: &str) -> Decoded<Vec<String>> {
-    seq(n, what)?.iter().map(|i| string(i, &format!("{what}[]"))).collect()
-}
-
-fn decode(node: &Node) -> Decoded<(SourceFile, Vec<RawRow<'_>>)> {
-    let mut top = Struct::of(node, "the pack")?;
+fn decode(v: &Value) -> Decoded<(SourceFile, Vec<RawRow<'_>>)> {
+    let mut top = Struct::of(v, "the pack")?;
+    let format = top.string("format")?;
     let pack_id = top.string("pack_id")?;
     let pack_version = top.string("pack_version")?;
-    let scope_kind = {
-        let mut s = Struct::of(top.get("scope").unwrap_or(&Node::Null), "scope")?;
-        let k = s.string("kind")?;
-        s.done()?;
-        k
-    };
     // source names where the pack came from; the evaluator does not read it.
     top.string("source")?;
-    let outcomes =
-        seq(top.get("outcomes"), "outcomes")?.iter().map(|o| string(o, "outcomes[]")).collect::<Decoded<_>>()?;
+    let outcomes = strings(top.get("outcomes"), "outcomes")?;
     let missing = top.string("missing")?;
     let mut accept = Vec::new();
-    for (cur, u) in map(top.get("accept"), "accept")? {
+    for (cur, u) in object(top.get("accept"), "accept")? {
         let mut s = Struct::of(u, format!("accept.{cur}"))?;
         let band = s.string("band")?;
-        let scale = s.get("scale").map_or(Ok(None), |n| int(n, &format!("accept.{cur}.scale")))?;
+        let scale = s.int("scale")?;
         s.done()?;
         accept.push((cur.clone(), band, scale));
     }
     let mut tiers = Vec::new();
-    for (i, t) in seq(top.get("tiers"), "tiers")?.iter().enumerate() {
+    for (i, t) in array(top.get("tiers"), "tiers")?.iter().enumerate() {
         let mut s = Struct::of(t, format!("tiers[{i}]"))?;
         let id = s.string("id")?;
         let max_decade = int_map(s.get("max_decade"), &format!("tiers[{i}].max_decade"))?;
@@ -377,14 +376,13 @@ fn decode(node: &Node) -> Decoded<(SourceFile, Vec<RawRow<'_>>)> {
         tiers.push((id, max_decade));
     }
     let (max_asks, deadline_s) = {
-        let mut s = Struct::of(top.get("budget").unwrap_or(&Node::Null), "budget")?;
-        let v = s.get("max_asks").map_or(Ok(None), |n| int(n, "budget.max_asks"))?;
-        let d = s.get("deadline_s").map_or(Ok(None), |n| int(n, "budget.deadline_s"))?;
+        let mut s = Struct::of(top.get("budget").unwrap_or(&Value::Null), "budget")?;
+        let v = (s.int("max_asks")?, s.int("deadline_s")?);
         s.done()?;
-        (v, d)
+        v
     };
     let trust_roots = {
-        let mut s = Struct::of(top.get("trust_roots").unwrap_or(&Node::Null), "trust_roots")?;
+        let mut s = Struct::of(top.get("trust_roots").unwrap_or(&Value::Null), "trust_roots")?;
         let t = TrustRoots {
             controllers: strings(s.get("controllers"), "trust_roots.controllers")?,
             witnesses: strings(s.get("witnesses"), "trust_roots.witnesses")?,
@@ -394,22 +392,18 @@ fn decode(node: &Node) -> Decoded<(SourceFile, Vec<RawRow<'_>>)> {
         t
     };
     let mut rows = Vec::new();
-    for (i, r) in seq(top.get("rows"), "rows")?.iter().enumerate() {
+    for (i, r) in array(top.get("rows"), "rows")?.iter().enumerate() {
         let mut s = Struct::of(r, format!("rows[{i}]"))?;
         let row = RawRow {
             id: s.string("id")?,
             statement: s.string("statement")?,
             source: s.string("source")?,
             check: s.string("check")?,
-            params: match s.get("params") {
-                None | Some(Node::Null) => None,
-                p => Some(int_map(p, &format!("rows[{i}].params"))?),
-            },
+            params: int_map(s.get("params"), &format!("rows[{i}].params"))?,
             from: s.string("from")?,
-            // A key given as null is a scalar node, as yaml.v3 holds it.
             on_fail: s.get("on_fail"),
             ask: match s.get("ask") {
-                None | Some(Node::Null) => None,
+                None | Some(Value::Null) => None,
                 Some(a) => {
                     let mut af = Struct::of(a, format!("rows[{i}].ask"))?;
                     let d = af.string("derivation")?;
@@ -424,9 +418,9 @@ fn decode(node: &Node) -> Decoded<(SourceFile, Vec<RawRow<'_>>)> {
     top.done()?;
     Ok((
         SourceFile {
+            format,
             pack_id,
             pack_version,
-            scope_kind,
             outcomes,
             missing,
             accept,
@@ -445,8 +439,8 @@ fn validate(src: &[u8], f: SourceFile, raw_rows: Vec<RawRow<'_>>) -> Result<Pack
     let mut errs: Vec<String> = Vec::new();
     let mut bad = |m: String| errs.push(m);
 
-    if f.scope_kind != "admission" {
-        bad(format!("scope.kind must be admission, got {:?}", f.scope_kind));
+    if f.format != COMPILED_FORMAT {
+        bad(format!("format must be {COMPILED_FORMAT}, got {:?}", f.format));
     }
     if !is_pack_id(&f.pack_id) {
         bad(format!("pack_id {:?} is not owner/name/version", f.pack_id));
@@ -487,6 +481,9 @@ fn validate(src: &[u8], f: SourceFile, raw_rows: Vec<RawRow<'_>>) -> Result<Pack
     for (cur, band, scale) in entries {
         match scale {
             Some(scale) if !band.is_empty() => {
+                if !(-SCALE_MAX..=SCALE_MAX).contains(scale) {
+                    bad(format!("accept.{cur}: scale {scale} must be from {} to {SCALE_MAX}", -SCALE_MAX));
+                }
                 accept.insert(cur.clone(), Unit { band: band.clone(), scale: *scale });
             }
             _ => bad(format!("accept.{cur} needs band and scale")),
@@ -511,7 +508,16 @@ fn validate(src: &[u8], f: SourceFile, raw_rows: Vec<RawRow<'_>>) -> Result<Pack
         }
         tier_index.insert(id.clone(), i);
         // The keys in sorted order (pack.go sortedKeys): a BTreeMap's.
+        let mut decades = BTreeMap::new();
         for (band, d) in max_decade {
+            let Some(d) = d else {
+                bad(format!("tier {id}: max_decade.{band} must be an integer"));
+                continue;
+            };
+            decades.insert(band.clone(), *d);
+            if !(-DECADE_MAX..=DECADE_MAX).contains(d) {
+                bad(format!("tier {id}: max_decade.{band} {d} must be from {} to {DECADE_MAX}", -DECADE_MAX));
+            }
             if !bands.contains(&band.as_str()) {
                 bad(format!("tier {id}: max_decade.{band} is not a band unit in accept"));
             }
@@ -522,7 +528,7 @@ fn validate(src: &[u8], f: SourceFile, raw_rows: Vec<RawRow<'_>>) -> Result<Pack
             }
             below.insert(band, *d);
         }
-        tiers.push(Tier { id: id.clone(), max_decade: max_decade.clone() });
+        tiers.push(Tier { id: id.clone(), max_decade: decades });
     }
     // A unit no tier names would leave a deal in it with no tier at all.
     let mut units: Vec<&str> = bands.clone();
@@ -535,22 +541,25 @@ fn validate(src: &[u8], f: SourceFile, raw_rows: Vec<RawRow<'_>>) -> Result<Pack
     }
 
     let max_asks = match f.max_asks {
-        Some(n) if n >= 0 => n,
+        Some(n) if (0..=MAX_ASKS_MAX).contains(&n) => n,
         _ => {
-            bad("budget.max_asks must be a non-negative integer".into());
+            bad(format!("budget.max_asks must be from 0 to {MAX_ASKS_MAX}"));
             0
         }
     };
     let deadline_s = match f.deadline_s {
-        Some(n) if n > 0 => n,
+        Some(n) if (1..=DEADLINE_S_MAX).contains(&n) => n,
         _ => {
-            bad("budget.deadline_s must be a positive integer".into());
+            bad(format!("budget.deadline_s must be from 1 to {DEADLINE_S_MAX}"));
             0
         }
     };
 
     let mut seen: Vec<&str> = Vec::new();
     let mut rows = Vec::new();
+    if raw_rows.is_empty() {
+        bad("rows must not be empty".into());
+    }
     for (i, r) in raw_rows.iter().enumerate() {
         let at = format!("rows[{i}] ({})", r.id);
         if !is_row_id(&r.id) {
@@ -563,7 +572,7 @@ fn validate(src: &[u8], f: SourceFile, raw_rows: Vec<RawRow<'_>>) -> Result<Pack
         if r.statement.is_empty() {
             bad(format!("{at}: statement is required"));
         }
-        let params = r.params.clone().unwrap_or_default();
+        let mut params = BTreeMap::new();
         match PREDICATES.iter().find(|(c, _, _)| *c == r.check) {
             None => bad(format!("{at}: check {:?} is not an admission predicate", r.check)),
             Some((_, source, _)) if *source != r.source => {
@@ -571,18 +580,22 @@ fn validate(src: &[u8], f: SourceFile, raw_rows: Vec<RawRow<'_>>) -> Result<Pack
             }
             Some((_, _, wants)) => {
                 for k in *wants {
-                    if !params.contains_key(*k) {
+                    // A key given as null is there, and refused below.
+                    if !r.params.contains_key(*k) {
                         bad(format!("{at}: check {} needs params.{k}", r.check));
                     }
                 }
-                for (k, v) in &params {
-                    match param_max(k) {
-                        Some(max) if wants.contains(&k.as_str()) => {
-                            if *v < 0 || *v > max {
-                                bad(format!("{at}: params.{k} {v} must be from 0 to {max}"));
-                            }
+                // In sorted order (pack.go sortedKeys): a BTreeMap's.
+                for (k, v) in &r.params {
+                    match (param_max(k).filter(|_| wants.contains(&k.as_str())), v) {
+                        (None, _) => bad(format!("{at}: check {} takes no params.{k}", r.check)),
+                        (Some(_), None) => bad(format!("{at}: params.{k} must be an integer")),
+                        (Some(max), Some(v)) if *v < 0 || *v > max => {
+                            bad(format!("{at}: params.{k} {v} must be from 0 to {max}"))
                         }
-                        _ => bad(format!("{at}: check {} takes no params.{k}", r.check)),
+                        (Some(_), Some(v)) => {
+                            params.insert(k.clone(), *v);
+                        }
                     }
                 }
             }
@@ -593,8 +606,10 @@ fn validate(src: &[u8], f: SourceFile, raw_rows: Vec<RawRow<'_>>) -> Result<Pack
         }
         let on_fail = if r.source == SOURCE_JUDGED {
             // A judged row caps a tier and never decides NO (D-23).
+            // pack.go: on_fail decoded as a map of string to string, with
+            // exactly one member, cap, not empty.
             let cap = match r.on_fail {
-                Some(Node::Map(m)) => match &m[..] {
+                Some(Value::Obj(m)) => match &m[..] {
                     [(k, v)] if k == "cap" => string(v, "on_fail.cap").ok().filter(|c| !c.is_empty()),
                     _ => None,
                 },
@@ -629,8 +644,10 @@ fn validate(src: &[u8], f: SourceFile, raw_rows: Vec<RawRow<'_>>) -> Result<Pack
             // and Cap stay zero); the pack is refused.
             on_fail.unwrap_or(OnFail::Record)
         } else {
+            // pack.go: on_fail decoded as a string; null leaves it "", and
+            // an absent one does not decode.
             let o = match r.on_fail {
-                Some(n @ (Node::Str(_) | Node::Int(_) | Node::Null)) => string(n, "on_fail").unwrap_or_default(),
+                Some(n @ (Value::Str(_) | Value::Null)) => string(n, "on_fail").unwrap_or_default(),
                 _ => {
                     bad(format!("{at}: on_fail must be NO, LIMIT or record"));
                     String::new()
@@ -705,48 +722,4 @@ fn validate(src: &[u8], f: SourceFile, raw_rows: Vec<RawRow<'_>>) -> Result<Pack
         trust_roots: f.trust_roots,
         rows,
     })
-}
-
-#[cfg(test)]
-mod tests {
-    use super::pre_pass;
-
-    /// plain_scalars_test.go TestPlainScalarRule: the shared probes in
-    /// conformance-vectors/admission/v0/plain-scalars.json, the documents
-    /// every reader of an admission pack (this loader, the Go one and the
-    /// lint) must accept or refuse alike. A refused one may be refused while
-    /// it is parsed, before the rule is reached.
-    #[test]
-    fn plain_scalar_rule() {
-        let path = concat!(env!("CARGO_MANIFEST_DIR"), "/../../conformance-vectors/admission/v0/plain-scalars.json");
-        let probes: serde_json::Value = serde_json::from_slice(&std::fs::read(path).unwrap()).unwrap();
-        let docs =
-            |k: &str| probes[k].as_array().unwrap().iter().map(|d| d.as_str().unwrap().to_string()).collect::<Vec<_>>();
-        let (accepted, refused) = (docs("accepted"), docs("refused"));
-        assert!(!accepted.is_empty() && !refused.is_empty());
-        let mut failures = Vec::new();
-        for doc in &accepted {
-            if let Err(e) = pre_pass(doc) {
-                failures.push(format!("{doc:?}: refused ({e}); want it accepted"));
-            }
-        }
-        for doc in &refused {
-            if pre_pass(doc).is_ok() {
-                failures.push(format!("{doc:?}: accepted; want it refused"));
-            }
-        }
-        assert!(failures.is_empty(), "{}", failures.join("\n"));
-    }
-
-    /// The refusal names the scalar to quote, in Go's words.
-    #[test]
-    fn the_rule_names_what_to_quote() {
-        assert_eq!(
-            pre_pass("a: x\nb: 1e3\n").err().as_deref(),
-            Some("line 2: quote \"1e3\": YAML readers do not all read it as the same string")
-        );
-        assert_eq!(pre_pass("v: !!int \"3\"\n").err().as_deref(), Some("line 1: tags are not read"));
-        assert!(pre_pass("v: ! T0\n").is_ok());
-        assert!(pre_pass("v: ! 1e3\n").is_err());
-    }
 }

@@ -79,3 +79,33 @@ func TestFresh(t *testing.T) {
 		t.Error("a checkpoint stated after now is not fresh")
 	}
 }
+
+func TestAtLeastAcrossScales(t *testing.T) {
+	accept := map[string]Unit{"msat": {Band: "sat", Scale: -3}, "sat": {Band: "sat", Scale: 0}, "ksat": {Band: "sat", Scale: 3}}
+	cases := []struct {
+		a, ac, b, bc string
+		want         bool
+	}{
+		{"1000", "msat", "1", "sat", true},
+		{"999", "msat", "1", "sat", false},
+		{"1", "ksat", "1000", "sat", true},
+		{"1", "ksat", "1001", "sat", false},
+		{"0.5", "sat", "500", "msat", true},
+		{"0.5", "sat", "501", "msat", false},
+		{"0", "sat", "0", "msat", true},
+		{"0", "sat", "1", "msat", false},
+		{"1", "msat", "0", "sat", true},
+		{"10.10", "sat", "10101", "msat", false},
+		{"10.10", "sat", "10100", "msat", true},
+	}
+	for _, c := range cases {
+		qa, err1 := quantity(c.a, c.ac, accept)
+		qb, err2 := quantity(c.b, c.bc, accept)
+		if err1 != nil || err2 != nil {
+			t.Fatal(err1, err2)
+		}
+		if got := qa.atLeast(qb); got != c.want {
+			t.Errorf("%s %s ≥ %s %s = %v, want %v", c.a, c.ac, c.b, c.bc, got, c.want)
+		}
+	}
+}

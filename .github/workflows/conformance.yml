@@ -5,8 +5,10 @@
 # decided by both sides: `vectors` holds the Python engine at this commit to
 # every expected decision (and runs the coverage gate), and `go` holds the Go
 # guard to the same files (go/guard/conformance_test.go). `rust` holds the
-# Rust port of the inference pack (rust/) to inference.json, reading the
-# pack from go/packs, so it fails when either drifts. `conformance` is the
+# Rust crate (rust/) to the same files: its guard port of the inference pack
+# to inference.json (reading the pack from go/packs) and its admission
+# evaluator to conformance-vectors/admission/v0, so it fails when either
+# drifts. `conformance` is the
 # one check branch protection requires, and fails if any job it needs failed
 # or was skipped.
 name: conformance

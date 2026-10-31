@@ -50,40 +50,50 @@ fn days_from_civil(year: i64, month: i64, day: i64) -> i64 {
     era * 146_097 + doe - 719_468
 }
 
-/// parseInstant: Go's parseRFC3339 for the RFC3339Nano layout. The forms
-/// only Go's lenient fallback parser accepts (a one-digit hour, a comma
-/// before the fraction) are refused here.
+/// parseInstant: Go's time.Parse(time.RFC3339Nano, ts), which tries the
+/// strict parseRFC3339 path and, when that fails, the general layout parser.
+/// What the second accepts beyond the first is read here too, as Go reads it
+/// (probed against Go): a one-digit hour, a comma before the fraction, and
+/// an offset hour of 24 or minute of 60. Every other form is refused.
 pub(crate) fn parse(ts: &str) -> Result<Instant, String> {
     let bad = || format!("parsing time {ts:?} as RFC 3339: not a valid instant");
     let b = ts.as_bytes();
-    if b.len() < 19 {
-        return Err(bad());
-    }
-    let num = |from: usize, to: usize, min: i64, max: i64| -> Option<i64> {
-        let mut x: i64 = 0;
-        for &c in &b[from..to] {
-            if !c.is_ascii_digit() {
-                return None;
-            }
-            x = x * 10 + i64::from(c - b'0');
+    let mut at = 0usize;
+    // `n` digits exactly, from `at`.
+    let fixed = |at: &mut usize, n: usize| -> Option<i64> {
+        let d = b.get(*at..*at + n)?;
+        if !d.iter().all(u8::is_ascii_digit) {
+            return None;
         }
-        (min..=max).contains(&x).then_some(x)
+        *at += n;
+        Some(d.iter().fold(0i64, |x, c| x * 10 + i64::from(c - b'0')))
     };
-    if !(b[4] == b'-' && b[7] == b'-' && b[10] == b'T' && b[13] == b':' && b[16] == b':') {
+    let lit = |at: &mut usize, c: u8| -> Option<()> { (b.get(*at) == Some(&c)).then(|| *at += 1) };
+    let year = fixed(&mut at, 4).ok_or_else(bad)?;
+    lit(&mut at, b'-').ok_or_else(bad)?;
+    let month = fixed(&mut at, 2).filter(|m| (1..=12).contains(m)).ok_or_else(bad)?;
+    lit(&mut at, b'-').ok_or_else(bad)?;
+    let day = fixed(&mut at, 2).ok_or_else(bad)?;
+    lit(&mut at, b'T').ok_or_else(bad)?;
+    // Go stdHour: one digit, or two.
+    let hour = match b.get(at + 1) {
+        Some(c) if c.is_ascii_digit() => fixed(&mut at, 2),
+        _ => fixed(&mut at, 1),
+    }
+    .filter(|h| (0..24).contains(h))
+    .ok_or_else(bad)?;
+    lit(&mut at, b':').ok_or_else(bad)?;
+    let minute = fixed(&mut at, 2).filter(|m| (0..60).contains(m)).ok_or_else(bad)?;
+    lit(&mut at, b':').ok_or_else(bad)?;
+    let second = fixed(&mut at, 2).filter(|s| (0..60).contains(s)).ok_or_else(bad)?;
+    if !(1..=days_in(month, year)).contains(&day) {
         return Err(bad());
     }
-    let year = num(0, 4, 0, 9999).ok_or_else(bad)?;
-    let month = num(5, 7, 1, 12).ok_or_else(bad)?;
-    let day = num(8, 10, 1, days_in(month, year)).ok_or_else(bad)?;
-    let hour = num(11, 13, 0, 23).ok_or_else(bad)?;
-    let minute = num(14, 16, 0, 59).ok_or_else(bad)?;
-    let second = num(17, 19, 0, 59).ok_or_else(bad)?;
-    let mut rest = &b[19..];
     let mut nanos: i128 = 0;
-    if rest.len() >= 2 && rest[0] == b'.' && rest[1].is_ascii_digit() {
-        let n = 1 + rest[1..].iter().take_while(|c| c.is_ascii_digit()).count();
+    if matches!(b.get(at), Some(b'.' | b',')) && b.get(at + 1).is_some_and(u8::is_ascii_digit) {
+        let n = b[at + 1..].iter().take_while(|c| c.is_ascii_digit()).count();
         // Go parseNanoseconds: at most nine digits are read.
-        let digits = &rest[1..n.min(10)];
+        let digits = &b[at + 1..at + 1 + n.min(9)];
         let mut v: i128 = 0;
         for &c in digits {
             v = v * 10 + i128::from(c - b'0');
@@ -92,23 +102,27 @@ pub(crate) fn parse(ts: &str) -> Result<Instant, String> {
             v *= 10;
         }
         nanos = v;
-        rest = &rest[n..];
+        at += 1 + n;
     }
+    let rest = &b[at..];
     let offset_secs: i64 = if rest == b"Z" {
         0
     } else {
         if rest.len() != 6 || !(rest[0] == b'+' || rest[0] == b'-') || rest[3] != b':' {
             return Err(bad());
         }
-        let digits = |r: &[u8], max: i64| -> Option<i64> {
+        let two = |r: &[u8], max: i64| -> Option<i64> {
             if !r.iter().all(u8::is_ascii_digit) {
                 return None;
             }
             let x = i64::from(r[0] - b'0') * 10 + i64::from(r[1] - b'0');
             (x <= max).then_some(x)
         };
-        let hh = digits(&rest[1..3], 23).ok_or_else(bad)?;
-        let mm = digits(&rest[4..6], 59).ok_or_else(bad)?;
+        // The general parser's offset range is > 24 and > 60, not >= (Go
+        // format.go: "some people do write offsets of 24 hours or 60
+        // minutes").
+        let hh = two(&rest[1..3], 24).ok_or_else(bad)?;
+        let mm = two(&rest[4..6], 60).ok_or_else(bad)?;
         let off = (hh * 60 + mm) * 60;
         if rest[0] == b'-' {
             -off
@@ -145,11 +159,40 @@ mod tests {
             "2026-10-29T24:00:00Z",
             "2026-10-29T12:00:60Z",
             "2026-10-29T12:00:00",
-            "2026-10-29T12:00:00+24:00",
-            "2026-10-29T12:00:00+01:60",
+            "2026-10-29T12:00:00+25:00",
+            "2026-10-29T12:00:00+01:61",
             "2026-10-29T12:00:00.Z",
+            "2026-10-29T12:00:00,Z",
+            "2026-10-29T12:0:00Z",
+            "2026-10-29T12:00:0Z",
+            "2026-1-29T12:00:00Z",
+            "2026-10-9T12:00:00Z",
+            "2026-10-29t12:00:00Z",
+            "2026-10-29T12:00:00z",
+            "2026-10-29T12:00:00+0100",
+            "2026-10-29T12:00:00+01:00:00",
+            "2026-10-29T9:5:00Z",
+            "2026-10-29T12:00:00Zx",
+            "+2026-10-29T12:00:00Z",
         ] {
             assert!(parse(ts).is_err(), "accepted {ts:?}");
+        }
+    }
+
+    /// What Go's time.Parse(RFC3339Nano) accepts beyond its strict path, at
+    /// the instants Go gives (probed with Go 1.27).
+    #[test]
+    fn accepts_what_go_s_general_parser_accepts() {
+        for (ts, unix_nanos) in [
+            ("2026-10-29T12:00:00,5Z", 1_793_275_200_500_000_000i128),
+            ("2026-10-29T1:00:00Z", 1_793_235_600_000_000_000),
+            ("2026-10-29T12:00:00+24:00", 1_793_188_800_000_000_000),
+            ("2026-10-29T12:00:00+01:60", 1_793_268_000_000_000_000),
+            ("2026-10-29T12:00:00,1234567891Z", 1_793_275_200_123_456_789),
+            ("2026-10-29T12:00:00,5+24:00", 1_793_188_800_500_000_000),
+            ("2026-10-29T00:00:00-00:00", 1_793_232_000_000_000_000),
+        ] {
+            assert_eq!(parse(ts), Ok(Instant(unix_nanos)), "{ts}");
         }
     }
 

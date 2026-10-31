@@ -14,28 +14,22 @@
 //!
 //! ```
 //! use capsule_engine::admission::{evaluate, Inputs, Pack, Timestamp, Verdict};
+//! use capsule_engine::canon;
 //!
-//! let src = br#"
-//! pack_id: asg/example/0.1.0
-//! pack_version: 0.1.0
-//! scope: {kind: admission}
-//! outcomes: ["GO", "NO"]
-//! missing: "NO"
-//! accept:
-//!   msat: {band: sat, scale: -3}
-//! tiers:
-//!   - id: T0
-//!     max_decade: {sat: 6}
-//! budget: {max_asks: 0, deadline_s: 86400}
-//! rows:
-//!   - id: deny-list
-//!     statement: The peer is not on the operator's deny list.
-//!     source: operator
-//!     check: operator.not_deny_listed
-//!     from: T0
-//!     on_fail: "NO"
-//! "#;
-//! let pack = Pack::load(src).unwrap();
+//! // A pack-definition.json is the JCS encoding of the compiled pack.
+//! let def = serde_json::json!({
+//!     "format": "admission-pack/v0", "pack_id": "asg/example/0.1.0", "pack_version": "0.1.0",
+//!     "source": "an example", "outcomes": ["GO", "NO"], "missing": "NO",
+//!     "accept": {"msat": {"band": "sat", "scale": -3}},
+//!     "tiers": [{"id": "T0", "max_decade": {"sat": 6}}],
+//!     "budget": {"max_asks": 0, "deadline_s": 86400},
+//!     "trust_roots": {"controllers": [], "witnesses": [], "judges": []},
+//!     "rows": [{"id": "deny-list", "statement": "The peer is not on the operator's deny list.",
+//!               "source": "operator", "check": "operator.not_deny_listed", "params": {},
+//!               "from": "T0", "on_fail": "NO"}],
+//! });
+//! let src = canon::jcs(&canon::from_json(&def).unwrap()).unwrap();
+//! let pack = Pack::load(src.as_bytes()).unwrap();
 //! let mut inputs = Inputs::at(Timestamp::parse_rfc3339("2026-10-30T12:00:00Z").unwrap());
 //! inputs.amount = "5000".into();
 //! inputs.currency = "msat".into();
@@ -54,7 +48,7 @@ use std::collections::BTreeMap;
 pub use band::{Band, Unit};
 pub use decision::{AskOut, Decision, Effect, PackRef, RowResult, RowStatus};
 pub use evaluate::evaluate;
-pub use pack::Pack;
+pub use pack::{Pack, COMPILED_FORMAT};
 
 use crate::instant::Instant;
 

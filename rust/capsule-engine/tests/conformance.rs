@@ -303,3 +303,28 @@ fn profile_refusals() {
     let other = decode(r#"{"rate_cap": {"max_input_msat_per_million": 5}}"#, "asg/everyday").unwrap();
     assert!(engine.with_profile(&other).is_err());
 }
+
+/// A history record whose time Go's time.Parse(RFC3339Nano) reads with a
+/// comma before the fraction is matched by dedupe, as Go matches it; one
+/// neither reads is passed over by both.
+#[test]
+fn dedupe_reads_a_record_time_as_go_does() {
+    let engine = Engine::inference().unwrap();
+    let a = Action::decode(
+        br#"{"operator": "node-a", "developer": "mesh-node@v1", "verb": "inference.purchase",
+        "action_class": "money.purchase", "taxonomy_version": "6", "timestamp": "2026-10-29T12:00:00Z",
+        "target": "node-b", "equivalence_key": "x", "input_msat_per_million": 1, "output_msat_per_million": 1}"#,
+    )
+    .unwrap();
+    let first = engine.decide(&a, &History::new()).unwrap();
+    for (ts, result) in [
+        ("2026-10-29T11:00:00,5Z", ConstraintResult::Fail),
+        ("2026-10-29T1:00:00Z", ConstraintResult::Fail),
+        ("2026-10-29 11:00:00Z", ConstraintResult::Pass),
+    ] {
+        let mut r = record_for(&a, &first, "c".repeat(64));
+        r.timestamp = ts.into();
+        let d = engine.decide(&a, &History::from(vec![r])).unwrap();
+        assert_eq!(d.constraint("dedupe").unwrap().result(), result, "{ts}");
+    }
+}

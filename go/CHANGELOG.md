@@ -6,10 +6,11 @@ and `portedDefinitions` (`guard/engine.go`).
 ## Unreleased
 
 - Added (capsule-engine#265): the package `admission`, the admission evaluator. `Load` and
-  `LoadPinned` read an admission pack (admission pack profile v0, evidencebook-skills#51) and
-  refuse one that breaks the admission rules: NO only from platform, own-history and operator
-  rows, a judged row only caps, a missing input never defaults to GO, no field a score could
-  ride in, and a plain scalar only in a form every YAML reader reads alike. `Evaluate` gives a
+  `LoadPinned` read an admission pack's `pack-definition.json` (admission pack profile v0,
+  evidencebook-skills#51, compiled there from `pack-source.yaml`): only bytes that are exactly
+  the JCS of their own parse, decoded strictly. They refuse a pack that breaks the admission
+  rules: NO only from platform, own-history and operator rows, a judged row only caps, a
+  missing input never defaults to GO, and no field a score could ride in. `Evaluate` gives a
   `Decision` (GO, ASK, LIMIT or NO, the tier, the band, each row with its count and
   denominator, the derived asks), and `Decision.Block` is the `admission_decision` block a
   caller seals. The band `(unit, decade)` is computed exactly from the amount's digits.

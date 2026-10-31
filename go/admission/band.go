@@ -76,20 +76,24 @@ func quantity(amount, currency string, accept map[string]Unit) (amountQuantity, 
 	return amountQuantity{unit: unit.Band, digits: strings.TrimLeft(m[1]+frac, "0"), exp: unit.Scale - len(frac)}, nil
 }
 
-// atLeast reports whether q ≥ r; both are in the same unit.
+// atLeast reports whether q ≥ r; both are in the same unit. It compares
+// leading decades, then the digits, padding only the shorter digit string,
+// so no comparison allocates more than its inputs.
 func (q amountQuantity) atLeast(r amountQuantity) bool {
-	// Write both over the smaller exponent, then compare as integers.
-	e := min(q.exp, r.exp)
-	a := q.digits + strings.Repeat("0", q.exp-e)
-	b := r.digits + strings.Repeat("0", r.exp-e)
-	if q.digits == "" {
-		a = ""
+	switch {
+	case r.digits == "":
+		return true
+	case q.digits == "":
+		return false
 	}
-	if r.digits == "" {
-		b = ""
+	if dq, dr := len(q.digits)-1+q.exp, len(r.digits)-1+r.exp; dq != dr {
+		return dq > dr
 	}
-	if len(a) != len(b) {
-		return len(a) > len(b)
+	a, b := q.digits, r.digits
+	if len(a) < len(b) {
+		a += strings.Repeat("0", len(b)-len(a))
+	} else {
+		b += strings.Repeat("0", len(a)-len(b))
 	}
 	return a >= b
 }

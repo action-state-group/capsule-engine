@@ -1,5 +1,6 @@
-# A test admission pack (profile v0, evidencebook-skills#51) that uses every
-# admission predicate and all four outcomes. Every number is a placeholder.
+# A test admission pack (profile v0, evidencebook-skills#51) with all four
+# outcomes and eleven of the predicates (coverage.yaml holds the rest). Every
+# number is a placeholder.
 pack_id: asg/admission_test/0.1.0
 pack_version: 0.1.0
 scope:

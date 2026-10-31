@@ -39,7 +39,7 @@ func TestBaselineFixtures(t *testing.T) {
 		}
 		return b
 	}
-	p, err := Load(read("pack-source.yaml"))
+	p, err := Load(read("pack-definition.json"))
 	if err != nil {
 		t.Fatal(err)
 	}

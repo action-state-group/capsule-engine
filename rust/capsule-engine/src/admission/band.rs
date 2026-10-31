@@ -62,8 +62,7 @@ pub(crate) fn quantity(amount: &str, currency: &str, accept: &BTreeMap<String, U
         accept.get(currency).ok_or_else(|| format!("currency {currency:?} is not in the pack's accept table"))?;
     let (int, frac) = split_amount(amount).ok_or_else(|| format!("amount {amount:?} is not a plain decimal"))?;
     let digits = format!("{int}{frac}").trim_start_matches('0').to_string();
-    // Go int arithmetic: 64-bit, wrapping.
-    Ok(Quantity { unit: unit.band.clone(), digits, exp: unit.scale.wrapping_sub(frac.len() as i64) })
+    Ok(Quantity { unit: unit.band.clone(), digits, exp: unit.scale - frac.len() as i64 })
 }
 
 /// band.go ValueBand: the band of `amount` in `currency` under `accept`. A
@@ -79,36 +78,29 @@ pub(crate) fn value_band(
     if q.digits.is_empty() {
         return Ok(None);
     }
-    Ok(Some(Band { currency: q.unit, decade: (q.digits.len() as i64 - 1).wrapping_add(q.exp) }))
+    Ok(Some(Band { currency: q.unit, decade: q.digits.len() as i64 - 1 + q.exp }))
 }
 
 impl Quantity {
     /// band.go amountQuantity.atLeast: whether self ≥ other, both in the
-    /// same unit. Go writes both over the smaller exponent and compares them
-    /// as integer strings; this compares the same numbers without writing
-    /// the zeros out, so an extreme scale cannot exhaust memory.
+    /// same unit. It compares leading decades, then the digits, padding only
+    /// the shorter digit string, so no comparison allocates more than its
+    /// inputs.
     pub(crate) fn at_least(&self, other: &Quantity) -> bool {
-        match (self.digits.is_empty(), other.digits.is_empty()) {
-            (_, true) => return true,
-            (true, false) => return false,
-            _ => {}
+        if other.digits.is_empty() {
+            return true;
         }
-        // Without leading zeros, the longer integer is the larger: its length
-        // over the smaller exponent is len(digits) + exp - min(exp).
-        let (a, b) =
-            (self.digits.len() as i128 + i128::from(self.exp), other.digits.len() as i128 + i128::from(other.exp));
-        if a != b {
-            return a > b;
+        if self.digits.is_empty() {
+            return false;
         }
-        // The same length: compare digit by digit, each padded with zeros.
-        let (x, y) = (self.digits.as_bytes(), other.digits.as_bytes());
-        for i in 0..x.len().max(y.len()) {
-            let (cx, cy) = (x.get(i).copied().unwrap_or(b'0'), y.get(i).copied().unwrap_or(b'0'));
-            if cx != cy {
-                return cx > cy;
-            }
+        // The loader bounds every scale (pack.rs SCALE_MAX), so a decade is far
+        // inside an i64.
+        let (dq, dr) = (self.digits.len() as i64 - 1 + self.exp, other.digits.len() as i64 - 1 + other.exp);
+        if dq != dr {
+            return dq > dr;
         }
-        true
+        let width = self.digits.len().max(other.digits.len());
+        format!("{:0<width$}", self.digits) >= format!("{:0<width$}", other.digits)
     }
 }
 
@@ -201,21 +193,29 @@ mod tests {
         }
     }
 
+    // band_test.go TestAtLeastAcrossScales.
     #[test]
-    fn at_least_compares_exactly() {
-        let q = |a: &str, c: &str| quantity(a, c, &accept()).unwrap();
-        assert!(q("1", "sat").at_least(&q("1000", "msat")));
-        assert!(!q("1", "sat").at_least(&q("1001", "msat")));
-        assert!(q("1.5", "USD").at_least(&q("1.50", "USDC")));
-        assert!(!q("1.49", "USD").at_least(&q("1.5", "USD")));
-        assert!(q("0", "USD").at_least(&q("0.00", "USD")));
-        assert!(!q("0", "USD").at_least(&q("0.01", "USD")));
-        assert!(q("0.01", "USD").at_least(&q("0", "USD")));
-        assert!(q("10", "USD").at_least(&q("9.99", "USD")));
-        // An extreme scale compares without writing its zeros out.
-        let mut wide = accept();
-        wide.insert("big".into(), Unit { band: "sat".into(), scale: i64::MAX / 2 });
-        assert!(quantity("1", "big", &wide).unwrap().at_least(&q("5", "sat")));
+    fn at_least_across_scales() {
+        let accept: BTreeMap<String, Unit> = [("msat", -3), ("sat", 0), ("ksat", 3)]
+            .into_iter()
+            .map(|(c, s)| (c.to_string(), Unit { band: "sat".into(), scale: s }))
+            .collect();
+        for (a, ac, b, bc, want) in [
+            ("1000", "msat", "1", "sat", true),
+            ("999", "msat", "1", "sat", false),
+            ("1", "ksat", "1000", "sat", true),
+            ("1", "ksat", "1001", "sat", false),
+            ("0.5", "sat", "500", "msat", true),
+            ("0.5", "sat", "501", "msat", false),
+            ("0", "sat", "0", "msat", true),
+            ("0", "sat", "1", "msat", false),
+            ("1", "msat", "0", "sat", true),
+            ("10.10", "sat", "10101", "msat", false),
+            ("10.10", "sat", "10100", "msat", true),
+        ] {
+            let (qa, qb) = (quantity(a, ac, &accept).unwrap(), quantity(b, bc, &accept).unwrap());
+            assert_eq!(qa.at_least(&qb), want, "{a} {ac} ≥ {b} {bc}");
+        }
     }
 
     // band_test.go TestFresh.

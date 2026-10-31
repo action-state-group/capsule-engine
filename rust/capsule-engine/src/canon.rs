@@ -87,6 +87,86 @@ pub fn from_json(v: &serde_json::Value) -> Result<Value, CanonError> {
     })
 }
 
+/// go/canon FromJSON over raw bytes: one JSON document as a Value, refusing
+/// what go/canon refuses: a duplicate object key, a number that is not an
+/// integer in int64, and anything after the one document.
+pub fn parse_json(bytes: &[u8]) -> Result<Value, CanonError> {
+    use serde::Deserialize as _;
+    let mut de = serde_json::Deserializer::from_slice(bytes);
+    let v = Strict::deserialize(&mut de).map_err(|e| CanonError(e.to_string()))?;
+    de.end().map_err(|_| CanonError("trailing data after the JSON value".into()))?;
+    Ok(v.0)
+}
+
+/// A Value read by parse_json.
+struct Strict(Value);
+
+impl<'de> serde::Deserialize<'de> for Strict {
+    fn deserialize<D: serde::Deserializer<'de>>(d: D) -> Result<Strict, D::Error> {
+        d.deserialize_any(StrictVisitor)
+    }
+}
+
+struct StrictVisitor;
+
+impl<'de> serde::de::Visitor<'de> for StrictVisitor {
+    type Value = Strict;
+
+    fn expecting(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("a JSON value with integer numbers and no duplicate key")
+    }
+
+    fn visit_unit<E>(self) -> Result<Strict, E> {
+        Ok(Strict(Value::Null))
+    }
+
+    fn visit_bool<E>(self, b: bool) -> Result<Strict, E> {
+        Ok(Strict(Value::Bool(b)))
+    }
+
+    fn visit_i64<E>(self, i: i64) -> Result<Strict, E> {
+        Ok(Strict(Value::Int(i)))
+    }
+
+    fn visit_u64<E: serde::de::Error>(self, u: u64) -> Result<Strict, E> {
+        i64::try_from(u)
+            .map(|i| Strict(Value::Int(i)))
+            .map_err(|_| E::custom(format!("{u} is not an integer in int64")))
+    }
+
+    fn visit_f64<E: serde::de::Error>(self, f: f64) -> Result<Strict, E> {
+        Err(E::custom(format!("{f} is not an integer in int64; JCS for other numbers is not implemented")))
+    }
+
+    fn visit_str<E>(self, s: &str) -> Result<Strict, E> {
+        Ok(Strict(Value::Str(s.to_string())))
+    }
+
+    fn visit_string<E>(self, s: String) -> Result<Strict, E> {
+        Ok(Strict(Value::Str(s)))
+    }
+
+    fn visit_seq<A: serde::de::SeqAccess<'de>>(self, mut seq: A) -> Result<Strict, A::Error> {
+        let mut items = Vec::new();
+        while let Some(Strict(v)) = seq.next_element()? {
+            items.push(v);
+        }
+        Ok(Strict(Value::Arr(items)))
+    }
+
+    fn visit_map<A: serde::de::MapAccess<'de>>(self, mut map: A) -> Result<Strict, A::Error> {
+        let mut members: Vec<(String, Value)> = Vec::new();
+        while let Some(k) = map.next_key::<String>()? {
+            if members.iter().any(|(m, _)| *m == k) {
+                return Err(serde::de::Error::custom(format!("duplicate object key {k:?}")));
+            }
+            let Strict(v) = map.next_value()?;
+            members.push((k, v));
+        }
+        Ok(Strict(Value::Obj(members)))
+    }
+}
+
 /// go/canon writeJCSString: RFC 8785 string serialization as
 /// agent_action_capsule implements it: the two-character escapes, \u00xx for
 /// other controls, and nothing else escaped.
@@ -200,6 +280,19 @@ mod tests {
             let v: serde_json::Value = serde_json::from_str(doc).unwrap();
             assert!(from_json(&v).is_err(), "accepted {doc}");
         }
+    }
+
+    // go/canon json_test.go TestFromJSONRefuses, over raw bytes.
+    #[test]
+    fn parse_json_refuses() {
+        for doc in
+            [r#"{"a": 1.5}"#, r#"{"a": 1e3}"#, r#"{"a": 1, "a": 2}"#, r#"{"a": 1} {}"#, r#"{"a": 9223372036854775808}"#]
+        {
+            assert!(parse_json(doc.as_bytes()).is_err(), "accepted {doc}");
+        }
+        let v = parse_json(br#"{"b": [1, true, null, "\u00e9"], "a": {"z": -3, "y": "x"}}"#).unwrap();
+        assert_eq!(digest(&v).unwrap(), "79ffbd09966fa56ba9bfb8808a72ba05b82db317304bd302f1f5c5a26d4a6240");
+        assert!(parse_json(br#"{"a": 1, "a": 1}"#).unwrap_err().0.contains("duplicate"));
     }
 
     #[test]
