@@ -5,6 +5,15 @@ and `portedDefinitions` (`guard/engine.go`).
 
 ## Unreleased
 
+- Added (capsule-engine#265): the package `admission`, the admission evaluator. `Load` and
+  `LoadPinned` read an admission pack (admission pack profile v0, evidencebook-skills#51) and
+  refuse one that breaks the admission rules: NO only from platform, own-history and operator
+  rows, a judged row only caps, a missing input never defaults to GO, no field a score could
+  ride in, and a plain scalar only in a form every YAML reader reads alike. `Evaluate` gives a
+  `Decision` (GO, ASK, LIMIT or NO, the tier, the band, each row with its count and
+  denominator, the derived asks), and `Decision.Block` is the `admission_decision` block a
+  caller seals. The band `(unit, decade)` is computed exactly from the amount's digits.
+
 - Added (capsule-engine#263): the `required_fields` check (`action_semantics_v0`). An action whose
   verb names one of the pack's action types (`pack.Pack.ActionSemantics`, new) is refused, n/a and
   fails closed, when it lacks a field that type requires. An action whose verb names none gets no

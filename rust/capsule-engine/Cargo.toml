@@ -1,0 +1,14 @@
+[package]
+name = "capsule-engine"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+publish = false
+description = "The Rust port of capsule-engine's guard, for the asg/inference pack"
+# The pack and definition files are embedded from ../../go/packs, outside
+# this package, so it cannot be packaged on its own (publish = false).
+
+[dependencies]
+hex = "0.4"
+serde_json = "1"
+sha2 = "0.10"

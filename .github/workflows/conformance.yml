@@ -4,7 +4,9 @@
 # change can (docs/design/go-guard-module.md §5, §7). The shared vectors are
 # decided by both sides: `vectors` holds the Python engine at this commit to
 # every expected decision (and runs the coverage gate), and `go` holds the Go
-# guard to the same files (go/guard/conformance_test.go). `conformance` is the
+# guard to the same files (go/guard/conformance_test.go). `rust` holds the
+# Rust port of the inference pack (rust/) to inference.json, reading the
+# pack from go/packs, so it fails when either drifts. `conformance` is the
 # one check branch protection requires, and fails if any job it needs failed
 # or was skipped.
 name: conformance
@@ -41,6 +43,24 @@ jobs:
       - name: test
         run: go test ./...
 
+  rust:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: rust
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # The runner's rustup installs the toolchain rust/rust-toolchain.toml
+      # pins, with rustfmt and clippy.
+      - name: toolchain
+        run: rustup toolchain install
+      - name: rustfmt
+        run: cargo fmt --check
+      - name: clippy
+        run: cargo clippy --locked --all-targets -- -D warnings
+      - name: test
+        run: cargo test --locked
+
   packs:
     runs-on: ubuntu-latest
     steps:
@@ -67,12 +87,13 @@ jobs:
 
   conformance:
     if: always()
-    needs: [go, packs, vectors]
+    needs: [go, rust, packs, vectors]
     runs-on: ubuntu-latest
     steps:
       - name: every job passed
         run: |
-          echo 'go: ${{ needs.go.result }}, packs: ${{ needs.packs.result }}, vectors: ${{ needs.vectors.result }}'
+          echo 'go: ${{ needs.go.result }}, rust: ${{ needs.rust.result }}, packs: ${{ needs.packs.result }}, vectors: ${{ needs.vectors.result }}'
           test '${{ needs.go.result }}' = success
+          test '${{ needs.rust.result }}' = success
           test '${{ needs.packs.result }}' = success
           test '${{ needs.vectors.result }}' = success

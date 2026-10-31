@@ -1,0 +1,103 @@
+# A test admission pack (profile v0, evidencebook-skills#51) that uses every
+# admission predicate and all four outcomes. Every number is a placeholder.
+pack_id: asg/admission_test/0.1.0
+pack_version: 0.1.0
+scope:
+  kind: admission
+source: capsule-engine#265 conformance vectors
+outcomes: ["GO", "ASK", "LIMIT", "NO"]
+missing: LIMIT
+accept:
+  msat: {band: sat, scale: -3}
+  sat: {band: sat, scale: 0}
+  USDC: {band: USD, scale: 0}
+  USD: {band: USD, scale: 0}
+tiers:
+  - id: T0
+    max_decade: {sat: 3, USD: -1}
+  - id: T1
+    max_decade: {sat: 4, USD: 0}
+  - id: T2
+    max_decade: {USD: 2}
+budget:
+  max_asks: 2
+  deadline_s: 86400
+trust_roots:
+  controllers: [ctl-trusted]
+  witnesses: [witness-a]
+  judges: [judge-a]
+rows:
+  - id: attestation
+    statement: The platform does not report the counterparty's release attestation invalid.
+    source: platform
+    check: platform.attestation_not_invalid
+    from: T0
+    on_fail: "NO"
+  - id: deny-list
+    statement: The counterparty is not on the operator's deny list.
+    source: operator
+    check: operator.not_deny_listed
+    from: T0
+    on_fail: "NO"
+  - id: adverse
+    statement: No adjudication this node holds went against the counterparty in the last 30 days.
+    source: own_history
+    check: own.no_adverse_adjudication
+    params: {window_days: 30}
+    from: T0
+    on_fail: "NO"
+  - id: halves
+    statement: This node holds at least one half the counterparty pushed.
+    source: own_history
+    check: own.held_halves
+    params: {min: 1}
+    from: T0
+    on_fail: record
+  - id: card-verified
+    statement: The counterparty's history card verifies under the key it presents.
+    source: card
+    check: card.verified
+    from: T1
+    on_fail: LIMIT
+    ask: {derivation: history_card/1}
+  - id: card-fresh
+    statement: The card's latest checkpoint is at most 7 days old.
+    source: card
+    check: card.fresh
+    params: {max_age_s: 604800}
+    from: T1
+    on_fail: LIMIT
+    ask: {derivation: history_card/1}
+  - id: key-age
+    statement: The card's first checkpoint is at least 7 days old.
+    source: card
+    check: card.key_age
+    params: {min_days: 7}
+    from: T1
+    on_fail: LIMIT
+  - id: settled
+    statement: This node's own book holds at least one settled exchange with the counterparty.
+    source: own_history
+    check: own.settled
+    params: {min: 1}
+    from: T1
+    on_fail: LIMIT
+  - id: conflicting
+    statement: No exchange with the counterparty is CONFLICTING in this node's book.
+    source: own_history
+    check: own.no_conflicting
+    from: T1
+    on_fail: LIMIT
+  - id: vouches
+    statement: At least two distinct controllers, not the counterparty's own, vouch for it.
+    source: vouch
+    check: vouch.distinct_controllers
+    params: {min: 2}
+    from: T2
+    on_fail: LIMIT
+  - id: adjacent-domain
+    statement: The disclosed history is from the same kind of work as the deal.
+    source: judged
+    check: judged
+    from: T2
+    on_fail: {cap: T1}

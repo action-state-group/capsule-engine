@@ -129,6 +129,21 @@ guard above is the reference, and CI decides the shared vectors in
 `conformance-vectors/guard/v0` with both on every pull request. See
 [go/README.md](go/README.md).
 
+### The admission evaluator (`go/admission`, `rust/`)
+
+`evaluate` for admission (capsule-engine#265): a pinned admission pack, in
+admission pack profile v0 (evidencebook-skills `docs/admission-pack-profile-v0.md`,
+a `pack-source.yaml` with `scope.kind: admission`), and what was received about a
+counterparty give a decision, GO, ASK, LIMIT or NO, with the tier and the rows
+that decided it, as the `admission_decision` block a caller seals. The pack states
+thresholds; the evaluator does the band, tier, freshness and count math. One
+evaluator in two languages: the Go package `go/admission` and the Rust crate
+`rust/capsule-engine` (module `admission`, beside `guard`, the Rust port of the
+guard for the inference pack). Both decide `conformance-vectors/admission/v0` (the
+shared vectors, `admission-baseline@1`'s fixtures and the plain scalar probes)
+the same in CI. The Rust crate is not published; a consumer pins it by git
+commit.
+
 For the parts you can use on their own (the Evidence Contract schema and
 validator, the obligation register format and its sample compiler, and the
 examples, including the Evidence Contracts in `examples/contracts/`), see

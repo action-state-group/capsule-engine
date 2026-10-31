@@ -49,3 +49,20 @@ source: the catalog for the current version, and the `go/packs/<pack>-<version>`
 frozen one. The copies under `python/tests/fixtures/packs/` must match `go/packs` byte for
 byte, and `generate_go_packs.py --check` fails CI on any drift. The design is
 `docs/design/go-guard-module.md`.
+
+## The admission evaluator ships in Go and Rust together
+
+`go/admission` and the `admission` module of `rust/capsule-engine` are one evaluator
+(capsule-engine#265). A change to either lands in the same PR with the other, and both decide
+`conformance-vectors/admission/v0` the same: `cases.json` (verdict, source, tier and the
+SHA-256 of the decision block's JCS bytes, written by `go test ./admission -update`),
+`admission-baseline-1.0.0/` (the baseline pack and fixtures, copied from evidencebook-skills
+at the commit `PROVENANCE.json` names), and `plain-scalars.json`. The pack format is
+evidencebook-skills' (admission pack profile v0); its lint, `scripts/admission_pack.py`
+there, refuses what these loaders refuse, so a change to what a loader accepts changes the
+lint in a PR of its own. The decision block is about one counterparty: it is local-only, as
+the first section says, and no path here exports it.
+
+The Rust crate also holds `guard`, the Rust port of the guard for the inference pack, which
+decides `conformance-vectors/guard/v0/inference.json` (CI job `rust`). It reads the pack from
+`go/packs`, so a new inference pack version moves Rust too.

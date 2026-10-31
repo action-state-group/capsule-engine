@@ -1,0 +1,65 @@
+# A test admission pack shaped like the Mesh default (Steven, 10-29, u126 and
+# u137): GO or NO only, NO only from the operator's config, and the base rows
+# sealed as read, deciding nothing. Every number is a placeholder.
+pack_id: asg/mesh_admission_test/0.1.0
+pack_version: 0.1.0
+scope:
+  kind: admission
+source: capsule-engine#265 conformance vectors
+outcomes: ["GO", "NO"]
+missing: "NO"
+accept:
+  msat: {band: sat, scale: -3}
+tiers:
+  - id: T0
+    max_decade: {sat: 6}
+budget:
+  max_asks: 0
+  deadline_s: 86400
+rows:
+  - id: deny-list
+    statement: The peer is not on the operator's deny list.
+    source: operator
+    check: operator.not_deny_listed
+    from: T0
+    on_fail: "NO"
+  - id: allow-list
+    statement: When the operator keeps an allow list, the peer is on it.
+    source: operator
+    check: operator.allow_listed
+    from: T0
+    on_fail: "NO"
+  - id: identity
+    statement: The peer's history card verifies under the record key it announces.
+    source: card
+    check: card.verified
+    from: T0
+    on_fail: record
+  - id: key-age
+    statement: The card's first checkpoint is at least 7 days old.
+    source: card
+    check: card.key_age
+    params: {min_days: 7}
+    from: T0
+    on_fail: record
+  - id: performed-and-settled
+    statement: This node's own book holds at least one settled exchange with the peer.
+    source: own_history
+    check: own.settled
+    params: {min: 1}
+    from: T0
+    on_fail: record
+  - id: disputes
+    statement: No adjudication this node holds went against the peer in the last 30 days.
+    source: own_history
+    check: own.no_adverse_adjudication
+    params: {window_days: 30}
+    from: T0
+    on_fail: record
+  - id: corroboration
+    statement: This node holds at least one half the peer pushed.
+    source: own_history
+    check: own.held_halves
+    params: {min: 1}
+    from: T0
+    on_fail: record
