@@ -75,12 +75,22 @@ type Pack struct {
 }
 
 // TrustRoots are the pack's trust roots (Reference v3 §3A.2 item 5): the
-// controllers, witnesses and judges whose word this pack counts. An empty
-// list trusts none.
+// controllers, witnesses and judges whose word this pack counts, and the
+// rails whose settlement objects it counts, each pinned by its adapter
+// declaration. An empty list trusts none.
 type TrustRoots struct {
 	Controllers []string
 	Witnesses   []string
 	Judges      []string
+	Rails       []RailPin
+}
+
+// RailPin names a rail by its adapter declaration: the declaration's id and
+// the SHA-256 of its bytes (AAC#406). A settlement object from a rail no pin
+// names is not checked, never a pass.
+type RailPin struct {
+	ID     string
+	Digest string
 }
 
 // Tier is one rung of the pack's ladder: a deal sits in the first tier
@@ -135,6 +145,12 @@ type sourceFile struct {
 		Controllers []string `json:"controllers"`
 		Witnesses   []string `json:"witnesses"`
 		Judges      []string `json:"judges"`
+		// Rails is written only when a pack names one, so a pack that names
+		// none keeps the bytes it compiled to before rails existed.
+		Rails []struct {
+			ID     string `json:"id"`
+			Digest string `json:"digest"`
+		} `json:"rails"`
 	} `json:"trust_roots"`
 	Rows []struct {
 		ID        string           `json:"id"`
@@ -155,6 +171,7 @@ const CompiledFormat = "admission-pack/v0"
 
 var (
 	rowIDPattern  = regexp.MustCompile(`^[a-z][a-z0-9_-]*$`)
+	digestPattern = regexp.MustCompile(`^[0-9a-f]{64}$`)
 	packIDPattern = regexp.MustCompile(`^[a-z][a-z0-9_]*/[a-z][a-z0-9_-]*/\d+\.\d+\.\d+$`)
 )
 
@@ -304,6 +321,19 @@ func Load(src []byte) (*Pack, error) {
 		}
 	}
 	p.TrustRoots = TrustRoots{Controllers: f.TrustRoots.Controllers, Witnesses: f.TrustRoots.Witnesses, Judges: f.TrustRoots.Judges}
+	for i, r := range f.TrustRoots.Rails {
+		if strings.TrimSpace(r.ID) == "" {
+			bad("trust_roots.rails[%d]: id must not be empty", i)
+		}
+		if !digestPattern.MatchString(r.Digest) {
+			bad("trust_roots.rails[%d]: digest must be 64 lowercase hex digits", i)
+		}
+		pin := RailPin{ID: r.ID, Digest: r.Digest}
+		if slices.Contains(p.TrustRoots.Rails, pin) {
+			bad("trust_roots.rails[%d]: %s is listed twice", i, r.ID)
+		}
+		p.TrustRoots.Rails = append(p.TrustRoots.Rails, pin)
+	}
 
 	seen := map[string]bool{}
 	if len(f.Rows) == 0 {
@@ -337,8 +367,8 @@ func Load(src []byte) (*Pack, error) {
 			for _, k := range sortedKeys(r.Params) {
 				if !slices.Contains(pred.params, k) {
 					bad("%s: check %s takes no params.%s", where, r.Check, k)
-				} else if v := r.Params[k]; v < 0 || v > paramMax[k] {
-					bad("%s: params.%s %d must be from 0 to %d", where, k, v, paramMax[k])
+				} else if v := r.Params[k]; v < paramMin[k] || v > paramMax[k] {
+					bad("%s: params.%s %d must be from %d to %d", where, k, v, paramMin[k], paramMax[k])
 				} else {
 					row.Params[k] = v
 				}
@@ -448,7 +478,16 @@ var paramMax = map[string]int64{
 	"min_days":    100 * 365,
 	"window_days": 100 * 365,
 	"min":         1<<53 - 1,
+	"k":           1<<53 - 1,
+	// step_decades keeps an earned limit (a card band's decade, bounded by
+	// bandDecadeMax, plus the step) far inside an int.
+	"step_decades":         decadeMax,
+	"max_adverse_permille": 1000,
 }
+
+// paramMin is a threshold's least value where it is not 0: a ladder needs
+// at least one subject in a band to earn it.
+var paramMin = map[string]int64{"k": 1}
 
 func sortedKeys[V any](m map[string]V) []string {
 	keys := make([]string, 0, len(m))
@@ -468,7 +507,8 @@ var (
 	unitKeys   = []string{"band", "scale"}
 	tierKeys   = []string{"id", "max_decade"}
 	budgetKeys = []string{"max_asks", "deadline_s"}
-	rootKeys   = []string{"controllers", "witnesses", "judges"}
+	rootKeys   = []string{"controllers", "witnesses", "judges", "rails"}
+	railKeys   = []string{"id", "digest"}
 	rowKeys    = []string{"id", "statement", "source", "check", "params", "from", "on_fail", "ask"}
 	askKeys    = []string{"derivation"}
 )
@@ -501,8 +541,16 @@ func exactKeys(src []byte) error {
 	if _, err := check("budget", top["budget"], budgetKeys); err != nil {
 		return err
 	}
-	if _, err := check("trust_roots", top["trust_roots"], rootKeys); err != nil {
+	roots, err := check("trust_roots", top["trust_roots"], rootKeys)
+	if err != nil {
 		return err
+	}
+	var rails []json.RawMessage
+	_ = json.Unmarshal(roots["rails"], &rails)
+	for i, r := range rails {
+		if _, err := check(fmt.Sprintf("trust_roots.rails[%d]", i), r, railKeys); err != nil {
+			return err
+		}
 	}
 	var tiers, rows []json.RawMessage
 	_ = json.Unmarshal(top["tiers"], &tiers)

@@ -2,6 +2,7 @@ package admission
 
 import (
 	"fmt"
+	"slices"
 	"time"
 )
 
@@ -70,6 +71,21 @@ type Card struct {
 	// Claims are the claims the card holds, with their denominator; nil when
 	// the card carries no counts (history_card/1 carries none today).
 	Claims *Claims
+	// Bands are the card's per-band counts; nil when the card carries none
+	// (no card served today does), and empty when it carries them and every
+	// band is empty.
+	Bands []BandCount
+}
+
+// BandCount is a card's count in one value band (Reference v3 §3A.14): the
+// corroborated, net-settled subjects whose net amount falls in Decade of
+// Currency, each subject banded once after netting, and how many of them
+// were resolved against the counterparty.
+type BandCount struct {
+	Currency string
+	Decade   int
+	Subjects int64
+	Adverse  int64
 }
 
 // Claims are a card's claims held out of claims made, in its window.
@@ -121,6 +137,9 @@ type Operator struct {
 type Stake struct {
 	Amount   string
 	Currency string
+	// Rail is the adapter declaration of the rail the stake is posted on;
+	// a stake counts only on a rail the pack's trust roots pin.
+	Rail RailPin
 }
 
 // Vouch is one verified vouch: the controller its signer is bound to.
@@ -155,6 +174,10 @@ type RowResult struct {
 	// held is set on a not_read row whose input was there but held nothing
 	// to read (no verdict yet about the counterparty): not a missing input.
 	held bool
+	// earned is set on a ladder row that read the card's bands and found
+	// one earned: the highest decade, in the deal's band unit, the earned
+	// history covers (the earned band plus the step).
+	earned *int
 }
 
 // AskOut is one Evidence Request a decision derives from a not_read row.
@@ -208,8 +231,9 @@ const (
 //  3. a failing row whose on_fail is NO decides NO; a not_read one gives
 //     the pack's missing default;
 //  4. the tier admitted starts at the deal's tier and drops below a LIMIT
-//     row's tier when that row fails or is not read, and to a judged row's
-//     cap when it fails;
+//     row's tier when that row fails or is not read (a ladder row, only to
+//     the tier its earned history holds), and to a judged row's cap when it
+//     fails;
 //  5. GO when the tier admitted holds the deal; otherwise ASK when a
 //     LIMIT row that did not pass carries an ask not yet made and the
 //     budget allows; otherwise LIMIT at the tier admitted. A refused,
@@ -277,8 +301,15 @@ func Evaluate(p *Pack, in Inputs) Decision {
 		case r.OnFail == LIMIT:
 			if res.Result != Pass {
 				res.Effect = LIMIT
-				if r.From-1 < admitted {
-					admitted = r.From - 1
+				to := r.From - 1
+				// A ladder row limits to the tier its earned history holds,
+				// when that is above the tier below its own (Reference v3
+				// §3A.14): history earns a limit, not a pass or a floor.
+				if res.earned != nil && d.Band != nil {
+					to = max(to, earnedTier(p, d.Band.Currency, *res.earned, dealTier))
+				}
+				if to < admitted {
+					admitted = to
 				}
 				// A stale or missing card is asked for again (admission design
 				// §4, §8): a failing row asks as a not_read one does.
@@ -359,6 +390,20 @@ func Evaluate(p *Pack, in Inputs) Decision {
 	return decide(LIMIT, SourceRows, admitted)
 }
 
+// earnedTier is the highest tier, up to dealTier, that a limit of decade
+// limit in unit holds whole: every tier up to it that names the unit has a
+// ceiling at or below limit. It is -1 when the lowest such tier's ceiling
+// is already above limit. It reaches dealTier only for a deal above the top
+// tier, whose own tier's ceiling is below the deal.
+func earnedTier(p *Pack, unit string, limit, dealTier int) int {
+	for i := 0; i <= dealTier; i++ {
+		if ceil, has := p.Tiers[i].MaxDecade[unit]; has && ceil > limit {
+			return i - 1
+		}
+	}
+	return dealTier
+}
+
 func contains(xs []string, x string) bool {
 	for _, y := range xs {
 		if y == x {
@@ -395,8 +440,80 @@ var predicates = map[string]predicate{
 	"operator.allow_listed":            {SourceOperator, nil},
 	"vouch.distinct_controllers":       {SourceVouch, []string{"min"}},
 	"stake.covers_deal":                {SourceStake, nil},
+	"card.band_history_or_stake":       {SourceCard, []string{"k", "step_decades", "max_adverse_permille"}},
 	"judged":                           {SourceJudged, nil},
 }
+
+// stakeCovers reports whether the stake covers the deal: in the same band
+// unit, its amount is at least the deal's. It is not read (read false) when
+// there is no stake, when its rail is not pinned in the trust roots (an
+// undeclared adapter is NOT_CHECKED, never a pass; AAC#406), or when a stake
+// or deal amount does not read or is in another unit.
+func stakeCovers(in Inputs, accept map[string]Unit, roots TrustRoots) (covers, read bool) {
+	if in.Stake == nil || !slices.Contains(roots.Rails, in.Stake.Rail) {
+		return false, false
+	}
+	stake, err1 := quantity(in.Stake.Amount, in.Stake.Currency, accept)
+	deal, err2 := quantity(in.Amount, in.Currency, accept)
+	if err1 != nil || err2 != nil || stake.unit != deal.unit {
+		return false, false
+	}
+	return stake.atLeast(deal), true
+}
+
+// bandDecadeMax bounds a card band's decade; a band outside it is not
+// counted.
+const bandDecadeMax = 1000
+
+// ladder reads the per-band ladder with its two roads (Reference v3
+// §3A.14): limit = max(earned band × step-up, collateral on this deal). The
+// earned band is the highest decade, in the deal's band unit, in which the
+// card shows at least k subjects with at most max_adverse_permille of them
+// resolved against the counterparty; the step-up is step_decades decades.
+// It passes when the deal's decade is within the earned band plus the step,
+// or when a stake on a pinned rail covers the deal. Card bands map through
+// accept as amounts do, and bands that map to one decade of one unit are
+// added; a currency outside accept, or a band whose counts do not read, is
+// not counted.
+func ladder(r Row, in Inputs, accept map[string]Unit, roots TrustRoots) RowResult {
+	if covers, _ := stakeCovers(in, accept, roots); covers {
+		return RowResult{Result: Pass}
+	}
+	deal, ok, err := ValueBand(in.Amount, in.Currency, accept)
+	if err != nil || !ok || in.Card.State != CardVerified || in.Card.Bands == nil {
+		return RowResult{Result: NotRead}
+	}
+	type sums struct{ subjects, adverse int64 }
+	byDecade := map[int]sums{}
+	for _, b := range in.Card.Bands {
+		u, found := accept[b.Currency]
+		if !found || u.Band != deal.Currency || b.Decade < -bandDecadeMax || b.Decade > bandDecadeMax ||
+			b.Subjects < 0 || b.Adverse < 0 || b.Adverse > b.Subjects || b.Subjects > maxSafeInteger {
+			continue
+		}
+		s := byDecade[b.Decade+u.Scale]
+		s.subjects = min(s.subjects+b.Subjects, maxSafeInteger)
+		s.adverse = min(s.adverse+b.Adverse, s.subjects)
+		byDecade[b.Decade+u.Scale] = s
+	}
+	k, permille := r.Params["k"], r.Params["max_adverse_permille"]
+	var earned *int
+	for decade, s := range byDecade {
+		// Both products stay inside int64: subjects and adverse are at
+		// most 2^53 − 1, and permille at most 1000.
+		if s.subjects >= k && s.adverse*1000 <= permille*s.subjects && (earned == nil || decade > *earned) {
+			earned = &decade
+		}
+	}
+	if earned == nil {
+		return RowResult{Result: Fail}
+	}
+	limit := *earned + int(r.Params["step_decades"])
+	return RowResult{Result: of(deal.Decade <= limit), earned: &limit}
+}
+
+// maxSafeInteger is 2^53 − 1, the largest count every JSON reader keeps.
+const maxSafeInteger = 1<<53 - 1
 
 func of(pass bool) string {
 	if pass {
@@ -548,18 +665,13 @@ func readRow(r Row, in Inputs, accept map[string]Unit, roots TrustRoots) RowResu
 			n := int64(len(distinct))
 			return counted(of(n >= r.Params["min"]), n, int64(len(in.Vouches)))
 		case "stake.covers_deal":
-			// Collateral covers the deal when, in the same band unit, its
-			// amount is at least the deal's. A stake or deal amount that does
-			// not read, or one in another unit, is not read.
-			if in.Stake == nil {
+			covers, read := stakeCovers(in, accept, roots)
+			if !read {
 				return RowResult{Result: NotRead}
 			}
-			stake, err1 := quantity(in.Stake.Amount, in.Stake.Currency, accept)
-			deal, err2 := quantity(in.Amount, in.Currency, accept)
-			if err1 != nil || err2 != nil || stake.unit != deal.unit {
-				return RowResult{Result: NotRead}
-			}
-			return RowResult{Result: of(stake.atLeast(deal))}
+			return RowResult{Result: of(covers)}
+		case "card.band_history_or_stake":
+			return ladder(r, in, accept, roots)
 		case "judged":
 			// A judge outside the trust roots is reported, not counted
 			// (SDK-SURFACE evaluate, NOT_CHECKED).

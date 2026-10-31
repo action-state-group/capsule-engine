@@ -36,7 +36,7 @@ const MAY_DECIDE_NO: [&str; 3] = [SOURCE_PLATFORM, SOURCE_OWN_HISTORY, SOURCE_OP
 
 /// evaluate.go predicates: each admission check, the source it reads and
 /// the params it takes. The list is closed and versioned with the evaluator.
-pub(crate) const PREDICATES: [(&str, &str, &[&str]); 20] = [
+pub(crate) const PREDICATES: [(&str, &str, &[&str]); 21] = [
     ("platform.attestation_not_invalid", SOURCE_PLATFORM, &[]),
     ("platform.owner_signed", SOURCE_PLATFORM, &[]),
     ("card.verified", SOURCE_CARD, &[]),
@@ -56,6 +56,7 @@ pub(crate) const PREDICATES: [(&str, &str, &[&str]); 20] = [
     ("operator.allow_listed", SOURCE_OPERATOR, &[]),
     ("vouch.distinct_controllers", SOURCE_VOUCH, &["min"]),
     ("stake.covers_deal", SOURCE_STAKE, &[]),
+    ("card.band_history_or_stake", SOURCE_CARD, &["k", "step_decades", "max_adverse_permille"]),
     ("judged", SOURCE_JUDGED, &[]),
 ];
 
@@ -66,8 +67,21 @@ pub(crate) fn param_max(name: &str) -> Option<i64> {
     match name {
         "max_age_s" => Some(100 * 365 * 24 * 3600),
         "min_days" | "window_days" => Some(100 * 365),
-        "min" => Some(canon::MAX_SAFE_INTEGER),
+        "min" | "k" => Some(canon::MAX_SAFE_INTEGER),
+        // step_decades keeps an earned limit (a card band's decade, bounded
+        // by BAND_DECADE_MAX, plus the step) far inside an i64.
+        "step_decades" => Some(DECADE_MAX),
+        "max_adverse_permille" => Some(1000),
         _ => None,
+    }
+}
+
+/// pack.go paramMin: a threshold's least value where it is not 0. A ladder
+/// needs at least one subject in a band to earn it.
+fn param_min(name: &str) -> i64 {
+    match name {
+        "k" => 1,
+        _ => 0,
     }
 }
 
@@ -100,13 +114,24 @@ pub struct Pack {
 }
 
 /// The pack's trust roots (pack.go TrustRoots; Reference v3 §3A.2 item 5):
-/// the controllers, witnesses and judges whose word this pack counts. An
-/// empty list trusts none.
+/// the controllers, witnesses and judges whose word this pack counts, and
+/// the rails whose settlement objects it counts, each pinned by its adapter
+/// declaration. An empty list trusts none.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub(crate) struct TrustRoots {
     pub(crate) controllers: Vec<String>,
     pub(crate) witnesses: Vec<String>,
     pub(crate) judges: Vec<String>,
+    pub(crate) rails: Vec<RailPin>,
+}
+
+/// A rail named by its adapter declaration (pack.go RailPin): the
+/// declaration's id and the SHA-256 of its bytes (AAC#406). A settlement
+/// object from a rail no pin names is not checked, never a pass.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct RailPin {
+    pub id: String,
+    pub digest: String,
 }
 
 /// One rung of the pack's ladder (pack.go Tier): a deal sits in the first
@@ -405,6 +430,18 @@ fn decode(v: &Value) -> Decoded<(SourceFile, Vec<RawRow<'_>>)> {
             controllers: strings(s.get("controllers"), "trust_roots.controllers")?,
             witnesses: strings(s.get("witnesses"), "trust_roots.witnesses")?,
             judges: strings(s.get("judges"), "trust_roots.judges")?,
+            // Written only when a pack pins a rail, so a pack that pins none
+            // keeps the bytes it compiled to before rails existed.
+            rails: array(s.get("rails"), "trust_roots.rails")?
+                .iter()
+                .enumerate()
+                .map(|(i, r)| {
+                    let mut p = Struct::of(r, format!("trust_roots.rails[{i}]"))?;
+                    let pin = RailPin { id: p.string("id")?, digest: p.string("digest")? };
+                    p.done()?;
+                    Ok(pin)
+                })
+                .collect::<Decoded<_>>()?,
         };
         s.done()?;
         t
@@ -582,6 +619,18 @@ fn validate(src: &[u8], f: SourceFile, raw_rows: Vec<RawRow<'_>>) -> Result<Pack
             }
         }
     }
+    for (i, pin) in f.trust_roots.rails.iter().enumerate() {
+        if pin.id.trim().is_empty() {
+            bad(format!("trust_roots.rails[{i}]: id must not be empty"));
+        }
+        // pack.go digestPattern, ^[0-9a-f]{64}$.
+        if pin.digest.len() != 64 || !pin.digest.bytes().all(|c| c.is_ascii_digit() || (b'a'..=b'f').contains(&c)) {
+            bad(format!("trust_roots.rails[{i}]: digest must be 64 lowercase hex digits"));
+        }
+        if f.trust_roots.rails[..i].contains(pin) {
+            bad(format!("trust_roots.rails[{i}]: {} is listed twice", pin.id));
+        }
+    }
 
     let mut seen: Vec<&str> = Vec::new();
     let mut rows = Vec::new();
@@ -616,7 +665,9 @@ fn validate(src: &[u8], f: SourceFile, raw_rows: Vec<RawRow<'_>>) -> Result<Pack
                 for (k, v) in &r.params {
                     match param_max(k).filter(|_| wants.contains(&k.as_str())) {
                         None => bad(format!("{at}: check {} takes no params.{k}", r.check)),
-                        Some(max) if *v < 0 || *v > max => bad(format!("{at}: params.{k} {v} must be from 0 to {max}")),
+                        Some(max) if *v < param_min(k) || *v > max => {
+                            bad(format!("{at}: params.{k} {v} must be from {} to {max}", param_min(k)))
+                        }
                         Some(_) => {
                             params.insert(k.clone(), *v);
                         }

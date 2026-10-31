@@ -10,8 +10,8 @@ use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 
 use capsule_engine::admission::{
-    evaluate, AdjudicationVerdict, Card, Claims, Inputs, Judgement, Operator, OwnHistory, Pack, Platform, Selection,
-    Stake, Timestamp, Vouch,
+    evaluate, AdjudicationVerdict, BandCount, Card, Claims, Inputs, Judgement, Operator, OwnHistory, Pack, Platform,
+    RailPin, Selection, Stake, Timestamp, Vouch,
 };
 use capsule_engine::canon;
 use serde_json::{Map, Value};
@@ -84,7 +84,7 @@ fn decode_input(raw: &Value) -> Inputs {
     let platform = object(v.get("platform").unwrap_or(&empty), &["release_attestation", "owner_signed"], "platform");
     let card = object(
         v.get("card").unwrap_or(&empty),
-        &["state", "first_checkpoint_at", "latest_checkpoint_at", "witness", "controller", "claims"],
+        &["state", "first_checkpoint_at", "latest_checkpoint_at", "witness", "controller", "claims", "bands"],
         "card",
     );
     let selection = object(v.get("selection").unwrap_or(&empty), &["state", "unanswered_disputes"], "selection");
@@ -105,6 +105,21 @@ fn decode_input(raw: &Value) -> Inputs {
         claims: null_or(card, "claims").map(|c| {
             let c = object(c, &["held", "total"], "card.claims");
             Claims { held: int(c, "held"), total: int(c, "total") }
+        }),
+        bands: null_or(card, "bands").map(|bs| {
+            bs.as_array()
+                .unwrap()
+                .iter()
+                .map(|b| {
+                    let b = object(b, &["currency", "decade", "subjects", "adverse"], "card.bands[]");
+                    BandCount {
+                        currency: text(b, "currency"),
+                        decade: int(b, "decade"),
+                        subjects: int(b, "subjects"),
+                        adverse: int(b, "adverse"),
+                    }
+                })
+                .collect()
         }),
     };
     input.selection = Selection {
@@ -151,8 +166,12 @@ fn decode_input(raw: &Value) -> Inputs {
         })
         .unwrap_or_default();
     input.stake = null_or(v, "stake").map(|s| {
-        let s = object(s, &["amount", "currency"], "stake");
-        Stake { amount: text(s, "amount"), currency: text(s, "currency") }
+        let s = object(s, &["amount", "currency", "rail"], "stake");
+        let rail = null_or(s, "rail").map_or_else(RailPin::default, |r| {
+            let r = object(r, &["id", "digest"], "stake.rail");
+            RailPin { id: text(r, "id"), digest: text(r, "digest") }
+        });
+        Stake { amount: text(s, "amount"), currency: text(s, "currency"), rail }
     });
     input.subject = text(v, "subject");
     input.judged = null_or(v, "judged")

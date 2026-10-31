@@ -1,7 +1,8 @@
 # A test admission pack (capsule-engine#265 conformance vectors) that holds
 # the predicates ladder.yaml and mesh-go-no.yaml do not: owner signing, the
 # allow list, the card's witness, claims and controller, the bound selection,
-# its disputes, and stake as a LIMIT row (two scales in one band unit).
+# its disputes, and stake as a LIMIT row on a pinned rail (two scales in one
+# band unit). history-or-stake.yaml holds the per-band ladder.
 # Every number is a placeholder.
 pack_id: asg/admission_coverage_test/0.1.0
 pack_version: 0.1.0
@@ -26,6 +27,7 @@ trust_roots:
   controllers: [ctl-trusted]
   witnesses: [witness-a]
   judges: []
+  rails: [{id: rail-a, digest: "5555555555555555555555555555555555555555555555555555555555555555"}]
 rows:
   - id: owner-signed
     statement: The platform reports the release as owner-signed.
@@ -80,7 +82,7 @@ rows:
     from: T1
     on_fail: "LIMIT"
   - id: stake
-    statement: Collateral posted on this deal covers its amount.
+    statement: Collateral posted on this deal, on a rail this pack pins, covers its amount.
     source: stake
     check: stake.covers_deal
     from: T1

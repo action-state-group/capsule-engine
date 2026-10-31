@@ -543,6 +543,187 @@
     }
    ],
    "want": "trust_roots.judges: a name must not be empty"
+  },
+  {
+   "case": "a ladder that earns from no subject",
+   "base": "packs/history-or-stake.json",
+   "ops": [
+    {
+     "set": [
+      "rows",
+      1,
+      "params",
+      "k"
+     ],
+     "value": 0
+    }
+   ],
+   "want": "params.k 0 must be from 1"
+  },
+  {
+   "case": "a ladder step out of range",
+   "base": "packs/history-or-stake.json",
+   "ops": [
+    {
+     "set": [
+      "rows",
+      1,
+      "params",
+      "step_decades"
+     ],
+     "value": 61
+    }
+   ],
+   "want": "params.step_decades 61 must be from 0 to 60"
+  },
+  {
+   "case": "a ladder dispute rate out of range",
+   "base": "packs/history-or-stake.json",
+   "ops": [
+    {
+     "set": [
+      "rows",
+      1,
+      "params",
+      "max_adverse_permille"
+     ],
+     "value": 1001
+    }
+   ],
+   "want": "params.max_adverse_permille 1001 must be from 0 to 1000"
+  },
+  {
+   "case": "a ladder without its step",
+   "base": "packs/history-or-stake.json",
+   "ops": [
+    {
+     "delete": [
+      "rows",
+      1,
+      "params",
+      "step_decades"
+     ]
+    }
+   ],
+   "want": "needs params.step_decades"
+  },
+  {
+   "case": "a ladder row decides NO",
+   "base": "packs/history-or-stake.json",
+   "ops": [
+    {
+     "set": [
+      "rows",
+      1,
+      "on_fail"
+     ],
+     "value": "NO"
+    }
+   ],
+   "want": "a card row may not decide NO"
+  },
+  {
+   "case": "a rail named, not pinned",
+   "base": "packs/history-or-stake.json",
+   "ops": [
+    {
+     "set": [
+      "trust_roots",
+      "rails"
+     ],
+     "value": [
+      "rail-a"
+     ]
+    }
+   ],
+   "want": "trust_roots.rails"
+  },
+  {
+   "case": "a rail pin with a short digest",
+   "base": "packs/history-or-stake.json",
+   "ops": [
+    {
+     "set": [
+      "trust_roots",
+      "rails",
+      0,
+      "digest"
+     ],
+     "value": "abc"
+    }
+   ],
+   "want": "digest must be 64 lowercase hex digits"
+  },
+  {
+   "case": "a rail pin with an uppercase digest",
+   "base": "packs/history-or-stake.json",
+   "ops": [
+    {
+     "set": [
+      "trust_roots",
+      "rails",
+      0,
+      "digest"
+     ],
+     "value": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+    }
+   ],
+   "want": "digest must be 64 lowercase hex digits"
+  },
+  {
+   "case": "a rail pin with no id",
+   "base": "packs/history-or-stake.json",
+   "ops": [
+    {
+     "set": [
+      "trust_roots",
+      "rails",
+      0,
+      "id"
+     ],
+     "value": ""
+    }
+   ],
+   "want": "id must not be empty"
+  },
+  {
+   "case": "a rail pinned twice",
+   "base": "packs/history-or-stake.json",
+   "ops": [
+    {
+     "set": [
+      "trust_roots",
+      "rails"
+     ],
+     "value": [
+      {
+       "digest": "5555555555555555555555555555555555555555555555555555555555555555",
+       "id": "rail-a"
+      },
+      {
+       "digest": "5555555555555555555555555555555555555555555555555555555555555555",
+       "id": "rail-a"
+      }
+     ]
+    }
+   ],
+   "want": "rail-a is listed twice"
+  },
+  {
+   "case": "a rail pin with another key",
+   "base": "packs/history-or-stake.json",
+   "ops": [
+    {
+     "set": [
+      "trust_roots",
+      "rails",
+      0,
+      "weight"
+     ],
+     "value": 2
+    }
+   ],
+   "want": "unknown field \"weight\""
   }
  ],
  "raw": [

@@ -61,6 +61,12 @@ type vectorInput struct {
 			Held  int64 `json:"held"`
 			Total int64 `json:"total"`
 		} `json:"claims"`
+		Bands *[]struct {
+			Currency string `json:"currency"`
+			Decade   int    `json:"decade"`
+			Subjects int64  `json:"subjects"`
+			Adverse  int64  `json:"adverse"`
+		} `json:"bands"`
 	} `json:"card"`
 	Selection struct {
 		State              string   `json:"state"`
@@ -86,6 +92,10 @@ type vectorInput struct {
 	Stake *struct {
 		Amount   string `json:"amount"`
 		Currency string `json:"currency"`
+		Rail     struct {
+			ID     string `json:"id"`
+			Digest string `json:"digest"`
+		} `json:"rail"`
 	} `json:"stake"`
 	Subject string `json:"subject"`
 	Judged  map[string]struct {
@@ -128,6 +138,12 @@ func decodeInput(t *testing.T, raw json.RawMessage) Inputs {
 	if v.Card.Claims != nil {
 		in.Card.Claims = &Claims{Held: v.Card.Claims.Held, Total: v.Card.Claims.Total}
 	}
+	if v.Card.Bands != nil {
+		in.Card.Bands = []BandCount{}
+		for _, b := range *v.Card.Bands {
+			in.Card.Bands = append(in.Card.Bands, BandCount{Currency: b.Currency, Decade: b.Decade, Subjects: b.Subjects, Adverse: b.Adverse})
+		}
+	}
 	for _, at := range v.Selection.UnansweredDisputes {
 		in.Selection.UnansweredDisputes = append(in.Selection.UnansweredDisputes, parseTime(t, at))
 	}
@@ -144,7 +160,8 @@ func decodeInput(t *testing.T, raw json.RawMessage) Inputs {
 		}
 	}
 	if v.Stake != nil {
-		in.Stake = &Stake{Amount: v.Stake.Amount, Currency: v.Stake.Currency}
+		in.Stake = &Stake{Amount: v.Stake.Amount, Currency: v.Stake.Currency,
+			Rail: RailPin{ID: v.Stake.Rail.ID, Digest: v.Stake.Rail.Digest}}
 	}
 	for _, vc := range v.Vouches {
 		in.Vouches = append(in.Vouches, Vouch{Controller: vc.Controller})

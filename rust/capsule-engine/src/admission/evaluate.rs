@@ -2,12 +2,13 @@
 
 //! The admission resolution (go/admission/evaluate.go Evaluate, readRow).
 
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 
 use super::band::{add, fresh, quantity, value_band, HOUR, SECOND};
 use super::decision::{AskOut, Decision, Effect, PackRef, RowResult, RowStatus};
 use super::pack::{OnFail, Pack, Row, SOURCE_JUDGED};
 use super::{Inputs, Timestamp, Verdict, CARD_UNVERIFIABLE, CARD_VERIFIED};
+use crate::canon;
 
 /// evaluate.go SourceAboveTier, SourceMissing, SourceRows: the decision
 /// sources that are not a row.
@@ -26,8 +27,9 @@ const SOURCE_ROWS: &str = "rows";
 ///  3. a failing row whose on_fail is NO decides NO; a not_read one gives
 ///     the pack's missing default;
 ///  4. the tier admitted starts at the deal's tier and drops below a LIMIT
-///     row's tier when that row fails or is not read, and to a judged row's
-///     cap when it fails;
+///     row's tier when that row fails or is not read (a ladder row, only to
+///     the tier its earned history holds), and to a judged row's cap when it
+///     fails;
 ///  5. GO when the tier admitted holds the deal; otherwise ASK when a LIMIT
 ///     row that did not pass carries an ask not yet made and the budget
 ///     allows; otherwise LIMIT at the tier admitted. A refused, unanswered
@@ -100,7 +102,15 @@ pub fn evaluate(p: &Pack, input: &Inputs) -> Decision {
             OnFail::Limit => {
                 if res.result != RowStatus::Pass {
                     res.effect = Effect::Limit;
-                    admitted = admitted.min(r.from as i64 - 1);
+                    let mut to = r.from as i64 - 1;
+                    // A ladder row limits to the tier its earned history
+                    // holds, when that is above the tier below its own
+                    // (Reference v3 §3A.14): history earns a limit, not a
+                    // pass or a floor.
+                    if let (Some(limit), Some(band)) = (res.earned, &d.band) {
+                        to = to.max(earned_tier(p, &band.currency, limit, deal_tier));
+                    }
+                    admitted = admitted.min(to);
                     // A stale or missing card is asked for again (admission
                     // design §4, §8): a failing row asks as a not_read one
                     // does.
@@ -175,6 +185,82 @@ pub fn evaluate(p: &Pack, input: &Inputs) -> Decision {
     decide(d, Verdict::Limit, SOURCE_ROWS, admitted)
 }
 
+/// evaluate.go earnedTier: the highest tier, up to `deal_tier`, that a
+/// limit of decade `limit` in `unit` holds whole: every tier up to it that
+/// names the unit has a ceiling at or below `limit`. It is -1 when the lowest
+/// such tier's ceiling is already above `limit`, and reaches `deal_tier` only
+/// for a deal above the top tier.
+fn earned_tier(p: &Pack, unit: &str, limit: i64, deal_tier: i64) -> i64 {
+    for (i, t) in p.tiers.iter().enumerate().take((deal_tier + 1).max(0) as usize) {
+        if t.max_decade.get(unit).is_some_and(|ceil| *ceil > limit) {
+            return i as i64 - 1;
+        }
+    }
+    deal_tier
+}
+
+/// evaluate.go stakeCovers: whether the stake covers the deal, in the same
+/// band unit; None (not read) when there is no stake, when its rail is not
+/// pinned in the trust roots (an undeclared adapter is NOT_CHECKED, never a
+/// pass; AAC#406), or when a stake or deal amount does not read or is in
+/// another unit.
+fn stake_covers(input: &Inputs, p: &Pack) -> Option<bool> {
+    let stake = input.stake.as_ref().filter(|s| p.trust_roots.rails.contains(&s.rail))?;
+    match (quantity(&stake.amount, &stake.currency, &p.accept), quantity(&input.amount, &input.currency, &p.accept)) {
+        (Ok(s), Ok(deal)) if s.unit == deal.unit => Some(s.at_least(&deal)),
+        _ => None,
+    }
+}
+
+/// evaluate.go bandDecadeMax: a card band outside it is not counted.
+const BAND_DECADE_MAX: i64 = 1000;
+
+/// evaluate.go ladder: the per-band ladder with its two roads (Reference v3
+/// §3A.14), limit = max(earned band × step-up, collateral on this deal).
+fn ladder(r: &Row, input: &Inputs, p: &Pack) -> RowResult {
+    if stake_covers(input, p) == Some(true) {
+        return result(RowStatus::Pass);
+    }
+    let deal = match value_band(&input.amount, &input.currency, &p.accept) {
+        Ok(Some(band)) => band,
+        _ => return result(RowStatus::NotRead),
+    };
+    let Some(bands) = input.card.bands.as_ref().filter(|_| input.card.state == CARD_VERIFIED) else {
+        return result(RowStatus::NotRead);
+    };
+    let mut by_decade: BTreeMap<i64, (i64, i64)> = BTreeMap::new();
+    for b in bands {
+        let Some(u) = p.accept.get(&b.currency) else { continue };
+        if u.band != deal.currency
+            || !(-BAND_DECADE_MAX..=BAND_DECADE_MAX).contains(&b.decade)
+            || b.subjects < 0
+            || b.adverse < 0
+            || b.adverse > b.subjects
+            || b.subjects > canon::MAX_SAFE_INTEGER
+        {
+            continue;
+        }
+        let s = by_decade.entry(b.decade + u.scale).or_insert((0, 0));
+        s.0 = (s.0 + b.subjects).min(canon::MAX_SAFE_INTEGER);
+        s.1 = (s.1 + b.adverse).min(s.0);
+    }
+    let (k, permille) = (param(r, "k"), param(r, "max_adverse_permille"));
+    // Both products stay inside i64: subjects and adverse are at most
+    // 2^53 − 1, and permille at most 1000.
+    let earned = by_decade
+        .iter()
+        .filter(|(_, (subjects, adverse))| *subjects >= k && adverse * 1000 <= permille * subjects)
+        .map(|(decade, _)| *decade)
+        .max();
+    match earned {
+        None => result(RowStatus::Fail),
+        Some(e) => {
+            let limit = e + param(r, "step_decades");
+            RowResult { earned: Some(limit), ..result(of(deal.decade <= limit)) }
+        }
+    }
+}
+
 fn of(pass: bool) -> RowStatus {
     if pass {
         RowStatus::Pass
@@ -184,7 +270,15 @@ fn of(pass: bool) -> RowStatus {
 }
 
 fn result(status: RowStatus) -> RowResult {
-    RowResult { row: String::new(), result: status, count: None, denominator: None, effect: Effect::None, held: false }
+    RowResult {
+        row: String::new(),
+        result: status,
+        count: None,
+        denominator: None,
+        effect: Effect::None,
+        held: false,
+        earned: None,
+    }
 }
 
 /// evaluate.go counted.
@@ -307,19 +401,8 @@ fn read_row(r: &Row, input: &Inputs, p: &Pack) -> RowResult {
             let n = distinct.len() as i64;
             counted(of(n >= param(r, "min")), n, input.vouches.len() as i64)
         }
-        "stake.covers_deal" => {
-            // Collateral covers the deal when, in the same band unit, its
-            // amount is at least the deal's. A stake or deal amount that does
-            // not read, or one in another unit, is not read.
-            let Some(stake) = &input.stake else { return RowResult { row: r.id.clone(), ..not_read() } };
-            match (
-                quantity(&stake.amount, &stake.currency, &p.accept),
-                quantity(&input.amount, &input.currency, &p.accept),
-            ) {
-                (Ok(s), Ok(deal)) if s.unit == deal.unit => result(of(s.at_least(&deal))),
-                _ => not_read(),
-            }
-        }
+        "stake.covers_deal" => stake_covers(input, p).map_or_else(not_read, |c| result(of(c))),
+        "card.band_history_or_stake" => ladder(r, input, p),
         // A judge outside the trust roots is reported, not counted
         // (SDK-SURFACE evaluate, NOT_CHECKED).
         "judged" => match input.judged.get(&r.id) {

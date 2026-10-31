@@ -5,6 +5,17 @@ and `portedDefinitions` (`guard/engine.go`).
 
 ## Unreleased
 
+- Added (capsule-engine#267, evidencebook-skills#79): the admission predicate
+  `card.band_history_or_stake`, the per-band ladder. A deal passes when it is within the earned band
+  plus `step_decades`, or when a stake on a pinned rail covers it. The earned band is the highest
+  decade in the deal's unit with at least `k` corroborated, net-settled subjects and an adverse share
+  within `max_adverse_permille`. A row that does not pass limits to the tier its earned history holds.
+  `Card.Bands` (new) carries the card's per-band counts. Also added: `TrustRoots.Rails`, adapter
+  declarations pinned by `{id, digest}` (AAC#406), and `Stake.Rail`.
+- Changed (capsule-engine#267): `stake.covers_deal` counts a stake only on a rail the pack pins in
+  `trust_roots.rails`, and any other stake is `not_read` (AAC#406, `NOT_CHECKED`). A pack compiled
+  before rails pins none, so it keeps its bytes and digest, but each stake it reads is now `not_read`
+  where a covering one used to pass. The change fails closed.
 - Added (capsule-engine#265): the package `admission`, the admission evaluator. `Load` and
   `LoadPinned` read an admission pack's `pack-definition.json` (admission pack profile v0,
   evidencebook-skills#51, compiled there from `pack-source.yaml`): only bytes that are exactly
