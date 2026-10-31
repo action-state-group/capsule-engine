@@ -84,6 +84,8 @@ func StandardHistoryCounts(artifact []byte) ([]BandCount, *Disputes, error) {
 			Subjects: counts[0] + counts[1], Adverse: counts[1]})
 	}
 	var disputes, r map[string]json.RawMessage
+	// A missing or non-object disputes leaves the map nil, and the check
+	// below then refuses it as Rust does.
 	_ = json.Unmarshal(card["disputes"], &disputes)
 	if json.Unmarshal(disputes["received"], &r) != nil || r == nil {
 		return nil, nil, errors.New("standard_history/1 card: disputes.received must be an object")
