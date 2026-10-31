@@ -1,0 +1,87 @@
+# A test admission pack (capsule-engine#265 conformance vectors) that holds
+# the predicates ladder.yaml and mesh-go-no.yaml do not: owner signing, the
+# allow list, the card's witness, claims and controller, the bound selection,
+# its disputes, and stake as a LIMIT row (two scales in one band unit).
+# Every number is a placeholder.
+pack_id: asg/admission_coverage_test/0.1.0
+pack_version: 0.1.0
+scope:
+  kind: admission
+source: capsule-engine#265 conformance vectors
+outcomes: ["GO", "ASK", "LIMIT", "NO"]
+missing: "LIMIT"
+accept:
+  USD: {band: USD, scale: 0}
+  USDC: {band: USD, scale: 0}
+  cents: {band: USD, scale: -2}
+tiers:
+  - id: T0
+    max_decade: {USD: 0}
+  - id: T1
+    max_decade: {USD: 2}
+budget:
+  max_asks: 2
+  deadline_s: 3600
+trust_roots:
+  controllers: [ctl-trusted]
+  witnesses: [witness-a]
+  judges: []
+rows:
+  - id: owner-signed
+    statement: The platform reports the release as owner-signed.
+    source: platform
+    check: platform.owner_signed
+    from: T0
+    on_fail: "record"
+  - id: allow-list
+    statement: When the operator keeps an allow list, the counterparty is on it.
+    source: operator
+    check: operator.allow_listed
+    from: T0
+    on_fail: "NO"
+  - id: witnessed
+    statement: A witness in the trust roots receipted the card's latest checkpoint.
+    source: card
+    check: card.witnessed
+    from: T1
+    on_fail: "LIMIT"
+  - id: claims
+    statement: The card shows at least 5 claims held.
+    source: card
+    check: card.claims_held
+    params: {min: 5}
+    from: T1
+    on_fail: "LIMIT"
+    ask: {derivation: served_summary/1}
+  - id: declared
+    statement: The card's key declares a controller.
+    source: card
+    check: card.controller_declared
+    from: T1
+    on_fail: "LIMIT"
+  - id: trusted
+    statement: The declared controller is in the trust roots.
+    source: card
+    check: card.controller_trusted
+    from: T1
+    on_fail: "LIMIT"
+  - id: selection
+    statement: A selection returned to our own ask verifies.
+    source: bound
+    check: bound.selection_verified
+    from: T1
+    on_fail: "LIMIT"
+    ask: {derivation: selection}
+  - id: disputes
+    statement: The selection shows no dispute left unanswered in the last 90 days.
+    source: bound
+    check: bound.no_unanswered_dispute
+    params: {window_days: 90}
+    from: T1
+    on_fail: "LIMIT"
+  - id: stake
+    statement: Collateral posted on this deal covers its amount.
+    source: stake
+    check: stake.covers_deal
+    from: T1
+    on_fail: "LIMIT"

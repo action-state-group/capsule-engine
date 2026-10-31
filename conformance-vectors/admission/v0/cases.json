@@ -1,0 +1,2650 @@
+{
+ "source": "capsule-engine#265: the admission evaluator's shared vectors. Go (go/admission) and Rust (rust/capsule-engine, admission) decide every case; block_sha256 is the SHA-256 of the decision block's JCS bytes, written by `go test ./admission -update`.",
+ "cases": [
+  {
+   "case": "t0-go-on-platform-rows",
+   "pack": "packs/ladder.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "500",
+    "currency": "sat",
+    "platform": {
+     "release_attestation": "valid"
+    },
+    "card": {},
+    "own": {
+     "exchanges": 0,
+     "settled": 0,
+     "held_halves": 0,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {},
+    "asks": {},
+    "asks_made": 0
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "729588413dc27482ef4e646232efc0536818113d590931400195af6b97c20c85"
+   }
+  },
+  {
+   "case": "t0-attestation-invalid",
+   "pack": "packs/ladder.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "500",
+    "currency": "sat",
+    "platform": {
+     "release_attestation": "invalid"
+    },
+    "card": {},
+    "own": {
+     "exchanges": 0,
+     "settled": 0,
+     "held_halves": 0,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {},
+    "asks": {},
+    "asks_made": 0
+   },
+   "expected": {
+    "verdict": "NO",
+    "source": "attestation",
+    "tier": null,
+    "block_sha256": "ee07a12402383252a71f16bf1fb2bedc8f491dec228b9a0c83b54588dec6b3da"
+   }
+  },
+  {
+   "case": "t0-deny-listed",
+   "pack": "packs/ladder.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "500",
+    "currency": "sat",
+    "platform": {
+     "release_attestation": "valid"
+    },
+    "card": {},
+    "own": {
+     "exchanges": 0,
+     "settled": 0,
+     "held_halves": 0,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": true
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {},
+    "asks": {},
+    "asks_made": 0
+   },
+   "expected": {
+    "verdict": "NO",
+    "source": "deny-list",
+    "tier": null,
+    "block_sha256": "68d48493b11d63c53b33c8658e830c7cbd698c535268beab9df63ab85f112e54"
+   }
+  },
+  {
+   "case": "t0-adverse-in-window",
+   "pack": "packs/ladder.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "500",
+    "currency": "sat",
+    "platform": {
+     "release_attestation": "valid"
+    },
+    "card": {},
+    "own": {
+     "exchanges": 3,
+     "settled": 2,
+     "held_halves": 1,
+     "conflicting": 0,
+     "verdicts": [
+      {
+       "at": "2026-10-20T00:00:00Z",
+       "adverse": true
+      }
+     ]
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {},
+    "asks": {},
+    "asks_made": 0
+   },
+   "expected": {
+    "verdict": "NO",
+    "source": "adverse",
+    "tier": null,
+    "block_sha256": "6a13d6c774880781cebc7fbc535c1aff7f0dcca419966e168caa30cdc640027b"
+   }
+  },
+  {
+   "case": "t0-adverse-outside-window",
+   "pack": "packs/ladder.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "500",
+    "currency": "sat",
+    "platform": {
+     "release_attestation": "valid"
+    },
+    "card": {},
+    "own": {
+     "exchanges": 3,
+     "settled": 2,
+     "held_halves": 1,
+     "conflicting": 0,
+     "verdicts": [
+      {
+       "at": "2026-09-01T00:00:00Z",
+       "adverse": true
+      }
+     ]
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {},
+    "asks": {},
+    "asks_made": 0
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "44b341662c30848fb1096bd265a3d2d7324e228deff526603d432cd09648778d"
+   }
+  },
+  {
+   "case": "t0-attestation-unknown-is-missing",
+   "pack": "packs/ladder.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "500",
+    "currency": "sat",
+    "platform": {},
+    "card": {},
+    "own": {
+     "exchanges": 0,
+     "settled": 0,
+     "held_halves": 0,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {},
+    "asks": {},
+    "asks_made": 0
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "attestation",
+    "tier": "T0",
+    "block_sha256": "3d3e46a4dbe0806153f6cf0c971dce17bf03b549632cf38b905e24dfa61e2e10"
+   }
+  },
+  {
+   "case": "t0-own-history-not-read-is-missing",
+   "pack": "packs/ladder.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "500",
+    "currency": "sat",
+    "platform": {
+     "release_attestation": "valid"
+    },
+    "card": {},
+    "own": null,
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {},
+    "asks": {},
+    "asks_made": 0
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "adverse",
+    "tier": "T0",
+    "block_sha256": "2cd397d59b4d882b2b9ee7b8f77f1be761ac076e7cc234f55ed9f89ea9340601"
+   }
+  },
+  {
+   "case": "t0-msat-band",
+   "pack": "packs/ladder.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "1000000",
+    "currency": "msat",
+    "platform": {
+     "release_attestation": "valid"
+    },
+    "card": {},
+    "own": {
+     "exchanges": 0,
+     "settled": 0,
+     "held_halves": 0,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {},
+    "asks": {},
+    "asks_made": 0
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "f4f456729d223602a44d12efeb2d1fcfb7f0227d5f58036226e2dc958e7ff54c"
+   }
+  },
+  {
+   "case": "t0-free-deal",
+   "pack": "packs/ladder.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "0",
+    "currency": "sat",
+    "platform": {
+     "release_attestation": "valid"
+    },
+    "card": {},
+    "own": {
+     "exchanges": 0,
+     "settled": 0,
+     "held_halves": 0,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {},
+    "asks": {},
+    "asks_made": 0
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "3549b45bba06d89a17f00a07b451d713bff9c02b5a416ed07161a0e2ec42b586"
+   }
+  },
+  {
+   "case": "t1-no-card-asks-once",
+   "pack": "packs/ladder.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50000",
+    "currency": "sat",
+    "platform": {
+     "release_attestation": "valid"
+    },
+    "card": {},
+    "own": {
+     "exchanges": 3,
+     "settled": 2,
+     "held_halves": 1,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {
+     "adjacent-domain": {
+      "met": true,
+      "judge": "judge-a"
+     }
+    },
+    "asks": {},
+    "asks_made": 0
+   },
+   "expected": {
+    "verdict": "ASK",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "b83be8f630e6dc11790aa61aba66bbfc65bff97d824cfa5c90cdc5d929477f17"
+   }
+  },
+  {
+   "case": "t1-card-refused-limits",
+   "pack": "packs/ladder.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50000",
+    "currency": "sat",
+    "platform": {
+     "release_attestation": "valid"
+    },
+    "card": {
+     "state": "refused"
+    },
+    "own": {
+     "exchanges": 3,
+     "settled": 2,
+     "held_halves": 1,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {
+     "adjacent-domain": {
+      "met": true,
+      "judge": "judge-a"
+     }
+    },
+    "asks": {
+     "history_card/1": "refused"
+    },
+    "asks_made": 0
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "2bba34decd5798b881e0da2fe9c73f5d5d06b2d536138bd297ad3afa369c15ea"
+   }
+  },
+  {
+   "case": "t1-ask-pending-limits",
+   "pack": "packs/ladder.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50000",
+    "currency": "sat",
+    "platform": {
+     "release_attestation": "valid"
+    },
+    "card": {},
+    "own": {
+     "exchanges": 3,
+     "settled": 2,
+     "held_halves": 1,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {
+     "adjacent-domain": {
+      "met": true,
+      "judge": "judge-a"
+     }
+    },
+    "asks": {
+     "history_card/1": "pending"
+    },
+    "asks_made": 0
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "2bba34decd5798b881e0da2fe9c73f5d5d06b2d536138bd297ad3afa369c15ea"
+   }
+  },
+  {
+   "case": "t1-ask-budget-spent-limits",
+   "pack": "packs/ladder.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50000",
+    "currency": "sat",
+    "platform": {
+     "release_attestation": "valid"
+    },
+    "card": {},
+    "own": {
+     "exchanges": 3,
+     "settled": 2,
+     "held_halves": 1,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {
+     "adjacent-domain": {
+      "met": true,
+      "judge": "judge-a"
+     }
+    },
+    "asks": {},
+    "asks_made": 2
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "2bba34decd5798b881e0da2fe9c73f5d5d06b2d536138bd297ad3afa369c15ea"
+   }
+  },
+  {
+   "case": "t1-card-unverifiable-limits",
+   "pack": "packs/ladder.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50000",
+    "currency": "sat",
+    "platform": {
+     "release_attestation": "valid"
+    },
+    "card": {
+     "state": "unverifiable"
+    },
+    "own": {
+     "exchanges": 3,
+     "settled": 2,
+     "held_halves": 1,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {
+     "adjacent-domain": {
+      "met": true,
+      "judge": "judge-a"
+     }
+    },
+    "asks": {
+     "history_card/1": "answered"
+    },
+    "asks_made": 0
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "a17f69c53e95b9f5efd94d1a9b622a6e0b4a691f1fc044fa5d1fe7ea2588d491"
+   }
+  },
+  {
+   "case": "t1-go",
+   "pack": "packs/ladder.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50000",
+    "currency": "sat",
+    "platform": {
+     "release_attestation": "valid"
+    },
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-09-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z"
+    },
+    "own": {
+     "exchanges": 3,
+     "settled": 2,
+     "held_halves": 1,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {
+     "adjacent-domain": {
+      "met": true,
+      "judge": "judge-a"
+     }
+    },
+    "asks": {},
+    "asks_made": 0
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T1",
+    "block_sha256": "73e0dc1290c49b5f504a521b77b2552042009969a571a85194b608845d15114a"
+   }
+  },
+  {
+   "case": "t1-stale-card-asks",
+   "pack": "packs/ladder.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50000",
+    "currency": "sat",
+    "platform": {
+     "release_attestation": "valid"
+    },
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-09-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-01T00:00:00Z"
+    },
+    "own": {
+     "exchanges": 3,
+     "settled": 2,
+     "held_halves": 1,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {
+     "adjacent-domain": {
+      "met": true,
+      "judge": "judge-a"
+     }
+    },
+    "asks": {},
+    "asks_made": 0
+   },
+   "expected": {
+    "verdict": "ASK",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "0cf1b22097417e0fed4f08f752991632d78b78f8be861774cb2c12da2cea5c67"
+   }
+  },
+  {
+   "case": "t1-stale-card-answered-limits",
+   "pack": "packs/ladder.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50000",
+    "currency": "sat",
+    "platform": {
+     "release_attestation": "valid"
+    },
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-09-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-01T00:00:00Z"
+    },
+    "own": {
+     "exchanges": 3,
+     "settled": 2,
+     "held_halves": 1,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {
+     "adjacent-domain": {
+      "met": true,
+      "judge": "judge-a"
+     }
+    },
+    "asks": {
+     "history_card/1": "answered"
+    },
+    "asks_made": 0
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "ed58f128aa58adb1e51d0a74e2fb71d450ba06d8d10822f51fcdcb78be8c7597"
+   }
+  },
+  {
+   "case": "t1-card-from-the-future-is-stale",
+   "pack": "packs/ladder.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50000",
+    "currency": "sat",
+    "platform": {
+     "release_attestation": "valid"
+    },
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-09-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-31T00:00:00Z"
+    },
+    "own": {
+     "exchanges": 3,
+     "settled": 2,
+     "held_halves": 1,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {
+     "adjacent-domain": {
+      "met": true,
+      "judge": "judge-a"
+     }
+    },
+    "asks": {},
+    "asks_made": 0
+   },
+   "expected": {
+    "verdict": "ASK",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "0cf1b22097417e0fed4f08f752991632d78b78f8be861774cb2c12da2cea5c67"
+   }
+  },
+  {
+   "case": "t1-key-too-young-limits",
+   "pack": "packs/ladder.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50000",
+    "currency": "sat",
+    "platform": {
+     "release_attestation": "valid"
+    },
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-10-25T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z"
+    },
+    "own": {
+     "exchanges": 3,
+     "settled": 2,
+     "held_halves": 1,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {
+     "adjacent-domain": {
+      "met": true,
+      "judge": "judge-a"
+     }
+    },
+    "asks": {},
+    "asks_made": 0
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "245c5a4f446a35f5b39df2e0b9abcbb89c47e66670432f2470c54c452f918766"
+   }
+  },
+  {
+   "case": "t1-conflicting-limits",
+   "pack": "packs/ladder.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50000",
+    "currency": "sat",
+    "platform": {
+     "release_attestation": "valid"
+    },
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-09-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z"
+    },
+    "own": {
+     "exchanges": 3,
+     "settled": 2,
+     "held_halves": 1,
+     "conflicting": 1,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {
+     "adjacent-domain": {
+      "met": true,
+      "judge": "judge-a"
+     }
+    },
+    "asks": {},
+    "asks_made": 0
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "96a12d15a5948327646a33826ec8243c4759c284d41f54e5f004dfa04c7bd414"
+   }
+  },
+  {
+   "case": "t1-judged-not-judged-does-not-cap",
+   "pack": "packs/ladder.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50000",
+    "currency": "sat",
+    "platform": {
+     "release_attestation": "valid"
+    },
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-09-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z"
+    },
+    "own": {
+     "exchanges": 3,
+     "settled": 2,
+     "held_halves": 1,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {},
+    "asks": {},
+    "asks_made": 0
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T1",
+    "block_sha256": "73e0dc1290c49b5f504a521b77b2552042009969a571a85194b608845d15114a"
+   }
+  },
+  {
+   "case": "t2-go",
+   "pack": "packs/ladder.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "platform": {
+     "release_attestation": "valid"
+    },
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-09-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z"
+    },
+    "own": {
+     "exchanges": 3,
+     "settled": 2,
+     "held_halves": 1,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [
+     {
+      "controller": "ctl-x"
+     },
+     {
+      "controller": "ctl-y"
+     }
+    ],
+    "subject": "ctl-self",
+    "judged": {
+     "adjacent-domain": {
+      "met": true,
+      "judge": "judge-a"
+     }
+    },
+    "asks": {},
+    "asks_made": 0
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T2",
+    "block_sha256": "40b49984e2e430457ed9e04043702c733807efb422b4d43cfcfe3ffbe4757d61"
+   }
+  },
+  {
+   "case": "t2-judged-caps-at-t1",
+   "pack": "packs/ladder.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "platform": {
+     "release_attestation": "valid"
+    },
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-09-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z"
+    },
+    "own": {
+     "exchanges": 3,
+     "settled": 2,
+     "held_halves": 1,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [
+     {
+      "controller": "ctl-x"
+     },
+     {
+      "controller": "ctl-y"
+     }
+    ],
+    "subject": "ctl-self",
+    "judged": {
+     "adjacent-domain": {
+      "met": false,
+      "judge": "judge-a"
+     }
+    },
+    "asks": {},
+    "asks_made": 0
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T1",
+    "block_sha256": "1b4cfb640c7bfd75c70e957a7fb7fddad8ae55fd3fae35466cef2ab1bd15255d"
+   }
+  },
+  {
+   "case": "t2-self-vouch-excluded",
+   "pack": "packs/ladder.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "platform": {
+     "release_attestation": "valid"
+    },
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-09-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z"
+    },
+    "own": {
+     "exchanges": 3,
+     "settled": 2,
+     "held_halves": 1,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [
+     {
+      "controller": "ctl-self"
+     },
+     {
+      "controller": "ctl-x"
+     },
+     {
+      "controller": "ctl-x"
+     }
+    ],
+    "subject": "ctl-self",
+    "judged": {
+     "adjacent-domain": {
+      "met": true,
+      "judge": "judge-a"
+     }
+    },
+    "asks": {},
+    "asks_made": 0
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T1",
+    "block_sha256": "afc4b99791332a45a7d8c38b8e3631b864907a23586935a17eb45463e7f6e87b"
+   }
+  },
+  {
+   "case": "above-top-tier-limits",
+   "pack": "packs/ladder.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "5000",
+    "currency": "USD",
+    "platform": {
+     "release_attestation": "valid"
+    },
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-09-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z"
+    },
+    "own": {
+     "exchanges": 3,
+     "settled": 2,
+     "held_halves": 1,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [
+     {
+      "controller": "ctl-x"
+     },
+     {
+      "controller": "ctl-y"
+     }
+    ],
+    "subject": "ctl-self",
+    "judged": {
+     "adjacent-domain": {
+      "met": true,
+      "judge": "judge-a"
+     }
+    },
+    "asks": {},
+    "asks_made": 0
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "above_tier",
+    "tier": "T2",
+    "block_sha256": "8a845b20ad17cbdad729b4e0f5dfbf6891dd1d754ad6670f741e5f8957c2571c"
+   }
+  },
+  {
+   "case": "above-top-tier-deny-listed-is-no",
+   "pack": "packs/ladder.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "5000",
+    "currency": "USD",
+    "platform": {
+     "release_attestation": "valid"
+    },
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-09-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z"
+    },
+    "own": {
+     "exchanges": 3,
+     "settled": 2,
+     "held_halves": 1,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": true
+    },
+    "vouches": [
+     {
+      "controller": "ctl-x"
+     },
+     {
+      "controller": "ctl-y"
+     }
+    ],
+    "subject": "ctl-self",
+    "judged": {
+     "adjacent-domain": {
+      "met": true,
+      "judge": "judge-a"
+     }
+    },
+    "asks": {},
+    "asks_made": 0
+   },
+   "expected": {
+    "verdict": "NO",
+    "source": "deny-list",
+    "tier": null,
+    "block_sha256": "2c13854dcf7ea4e8e19e08706977bda2821599a37a9433f1beea95ec9d4be7ab"
+   }
+  },
+  {
+   "case": "above-top-tier-lowered-by-a-row-limits-there",
+   "pack": "packs/ladder.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "5000",
+    "currency": "USD",
+    "platform": {
+     "release_attestation": "valid"
+    },
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-09-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z"
+    },
+    "own": {
+     "exchanges": 3,
+     "settled": 2,
+     "held_halves": 1,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [
+     {
+      "controller": "ctl-x"
+     }
+    ],
+    "subject": "ctl-self",
+    "judged": {
+     "adjacent-domain": {
+      "met": true,
+      "judge": "judge-a"
+     }
+    },
+    "asks": {},
+    "asks_made": 0
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T1",
+    "block_sha256": "7575fc67a2473860942b71af6fc585168bc73c2bdda382bccf6735a112a34493"
+   }
+  },
+  {
+   "case": "above-top-tier-no-card-asks",
+   "pack": "packs/ladder.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "5000",
+    "currency": "USD",
+    "platform": {
+     "release_attestation": "valid"
+    },
+    "card": {},
+    "own": {
+     "exchanges": 3,
+     "settled": 2,
+     "held_halves": 1,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [
+     {
+      "controller": "ctl-x"
+     },
+     {
+      "controller": "ctl-y"
+     }
+    ],
+    "subject": "ctl-self",
+    "judged": {
+     "adjacent-domain": {
+      "met": true,
+      "judge": "judge-a"
+     }
+    },
+    "asks": {},
+    "asks_made": 0
+   },
+   "expected": {
+    "verdict": "ASK",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "028c910ed33c8920308529794ef88c2f722d78e48ae23dd6721b1842ef9206c3"
+   }
+  },
+  {
+   "case": "above-top-tier-attestation-invalid-is-no",
+   "pack": "packs/ladder.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "5000",
+    "currency": "USD",
+    "platform": {
+     "release_attestation": "invalid"
+    },
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-09-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z"
+    },
+    "own": {
+     "exchanges": 3,
+     "settled": 2,
+     "held_halves": 1,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [
+     {
+      "controller": "ctl-x"
+     },
+     {
+      "controller": "ctl-y"
+     }
+    ],
+    "subject": "ctl-self",
+    "judged": {
+     "adjacent-domain": {
+      "met": true,
+      "judge": "judge-a"
+     }
+    },
+    "asks": {},
+    "asks_made": 0
+   },
+   "expected": {
+    "verdict": "NO",
+    "source": "attestation",
+    "tier": null,
+    "block_sha256": "b2ac862be05d03bb5c809d07e7e55811ea052b704093868ca736af586d1ca844"
+   }
+  },
+  {
+   "case": "t2-judge-outside-trust-roots-not-counted",
+   "pack": "packs/ladder.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "platform": {
+     "release_attestation": "valid"
+    },
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-09-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z"
+    },
+    "own": {
+     "exchanges": 3,
+     "settled": 2,
+     "held_halves": 1,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [
+     {
+      "controller": "ctl-x"
+     },
+     {
+      "controller": "ctl-y"
+     }
+    ],
+    "subject": "ctl-self",
+    "judged": {
+     "adjacent-domain": {
+      "met": false,
+      "judge": "judge-z"
+     }
+    },
+    "asks": {},
+    "asks_made": 0
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T2",
+    "block_sha256": "f61b71e33022152bcd07dd905996cf3c248bb034743440f48aee22b5880809cf"
+   }
+  },
+  {
+   "case": "sat-above-its-top-tier-limits-at-t1",
+   "pack": "packs/ladder.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "100000",
+    "currency": "sat",
+    "platform": {
+     "release_attestation": "valid"
+    },
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-09-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z"
+    },
+    "own": {
+     "exchanges": 3,
+     "settled": 2,
+     "held_halves": 1,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {},
+    "asks": {},
+    "asks_made": 0
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "above_tier",
+    "tier": "T1",
+    "block_sha256": "b95f64b149ac7a6a5000ee612b20b46be8a20f905ae601ae4d50e3d7c167d9e5"
+   }
+  },
+  {
+   "case": "currency-not-accepted-is-missing",
+   "pack": "packs/ladder.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "500",
+    "currency": "EUR",
+    "platform": {
+     "release_attestation": "valid"
+    },
+    "card": {},
+    "own": {
+     "exchanges": 0,
+     "settled": 0,
+     "held_halves": 0,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {},
+    "asks": {},
+    "asks_made": 0
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "missing",
+    "tier": "T0",
+    "block_sha256": "1d309d8ada71e2b05eec412281d36d0a1623c01f56ca5764342f1b37fe634aac"
+   }
+  },
+  {
+   "case": "amount-missing-is-missing",
+   "pack": "packs/ladder.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "",
+    "currency": "sat",
+    "platform": {
+     "release_attestation": "valid"
+    },
+    "card": {},
+    "own": {
+     "exchanges": 0,
+     "settled": 0,
+     "held_halves": 0,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {},
+    "asks": {},
+    "asks_made": 0
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "missing",
+    "tier": "T0",
+    "block_sha256": "1d309d8ada71e2b05eec412281d36d0a1623c01f56ca5764342f1b37fe634aac"
+   }
+  },
+  {
+   "case": "amount-not-decimal-is-missing",
+   "pack": "packs/ladder.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "1e3",
+    "currency": "sat",
+    "platform": {
+     "release_attestation": "valid"
+    },
+    "card": {},
+    "own": {
+     "exchanges": 0,
+     "settled": 0,
+     "held_halves": 0,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {},
+    "asks": {},
+    "asks_made": 0
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "missing",
+    "tier": "T0",
+    "block_sha256": "1d309d8ada71e2b05eec412281d36d0a1623c01f56ca5764342f1b37fe634aac"
+   }
+  },
+  {
+   "case": "mesh-default-go",
+   "pack": "packs/mesh-go-no.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "0",
+    "currency": "msat",
+    "platform": {},
+    "card": {},
+    "own": null,
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {},
+    "asks": {},
+    "asks_made": 0
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "bed89a11a416224a6b8b8d32ce21eb5ff68e963a41ccdb4a873f99b23c97a468"
+   }
+  },
+  {
+   "case": "mesh-deny-listed",
+   "pack": "packs/mesh-go-no.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "0",
+    "currency": "msat",
+    "platform": {
+     "release_attestation": "valid"
+    },
+    "card": {},
+    "own": {
+     "exchanges": 0,
+     "settled": 0,
+     "held_halves": 0,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": true
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {},
+    "asks": {},
+    "asks_made": 0
+   },
+   "expected": {
+    "verdict": "NO",
+    "source": "deny-list",
+    "tier": null,
+    "block_sha256": "3939447fd196d0992da64d48a6a00d40949d0c6df40b6d88b88fd45fb0ccbf4f"
+   }
+  },
+  {
+   "case": "mesh-allow-list-unlisted",
+   "pack": "packs/mesh-go-no.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "0",
+    "currency": "msat",
+    "platform": {
+     "release_attestation": "valid"
+    },
+    "card": {},
+    "own": {
+     "exchanges": 0,
+     "settled": 0,
+     "held_halves": 0,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false,
+     "allow_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {},
+    "asks": {},
+    "asks_made": 0
+   },
+   "expected": {
+    "verdict": "NO",
+    "source": "allow-list",
+    "tier": null,
+    "block_sha256": "4074dd5f07d29d589cd70c4c2df89731503c8840935d28cefcf261f54e209676"
+   }
+  },
+  {
+   "case": "mesh-allow-listed",
+   "pack": "packs/mesh-go-no.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "0",
+    "currency": "msat",
+    "platform": {
+     "release_attestation": "valid"
+    },
+    "card": {},
+    "own": {
+     "exchanges": 0,
+     "settled": 0,
+     "held_halves": 0,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false,
+     "allow_listed": true
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {},
+    "asks": {},
+    "asks_made": 0
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "058a2ed5afa7f84ff251529890fdee0340737fcc65296701120c8d174375409e"
+   }
+  },
+  {
+   "case": "mesh-adverse-is-recorded-not-no",
+   "pack": "packs/mesh-go-no.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "0",
+    "currency": "msat",
+    "platform": {
+     "release_attestation": "valid"
+    },
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-09-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z"
+    },
+    "own": {
+     "exchanges": 3,
+     "settled": 2,
+     "held_halves": 1,
+     "conflicting": 0,
+     "verdicts": [
+      {
+       "at": "2026-10-20T00:00:00Z",
+       "adverse": true
+      }
+     ]
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {},
+    "asks": {},
+    "asks_made": 0
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "3bd07045640a5d70c3830a1f6b35686a0164e6fddcc019cc42413fa86995f98c"
+   }
+  },
+  {
+   "case": "mesh-amount-missing-is-no",
+   "pack": "packs/mesh-go-no.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "",
+    "currency": "msat",
+    "platform": {
+     "release_attestation": "valid"
+    },
+    "card": {},
+    "own": {
+     "exchanges": 0,
+     "settled": 0,
+     "held_halves": 0,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {},
+    "asks": {},
+    "asks_made": 0
+   },
+   "expected": {
+    "verdict": "NO",
+    "source": "missing",
+    "tier": null,
+    "block_sha256": "b3eae4348e004fce4b86dd3fa875b0f29784bdf423721c167874b67cffa81c5d"
+   }
+  },
+  {
+   "case": "mesh-above-tier-is-no",
+   "pack": "packs/mesh-go-no.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "5000000000000",
+    "currency": "msat",
+    "platform": {
+     "release_attestation": "valid"
+    },
+    "card": {},
+    "own": {
+     "exchanges": 0,
+     "settled": 0,
+     "held_halves": 0,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {},
+    "asks": {},
+    "asks_made": 0
+   },
+   "expected": {
+    "verdict": "NO",
+    "source": "above_tier",
+    "tier": null,
+    "block_sha256": "6ccac25fb22694eed3d5a02fff49bebc54b0a607263bbf431f2457c69bdfb5d9"
+   }
+  },
+  {
+   "case": "cov-all-pass-stake-in-cents",
+   "pack": "packs/coverage.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "platform": {
+     "release_attestation": "valid",
+     "owner_signed": true
+    },
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-06-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "witness": "witness-a",
+     "controller": "ctl-trusted",
+     "claims": {
+      "held": 7,
+      "total": 9
+     }
+    },
+    "selection": {
+     "state": "verified",
+     "unanswered_disputes": []
+    },
+    "own": {
+     "exchanges": 0,
+     "settled": 0,
+     "held_halves": 0,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {},
+    "asks": {},
+    "asks_made": 0,
+    "stake": {
+     "amount": "5000",
+     "currency": "cents"
+    }
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T1",
+    "block_sha256": "c7681f095e3b87bedb9ac54c0f78109146305cdc3d425eec8750b6416e937a25"
+   }
+  },
+  {
+   "case": "cov-stake-one-cent-short",
+   "pack": "packs/coverage.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "platform": {
+     "release_attestation": "valid",
+     "owner_signed": true
+    },
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-06-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "witness": "witness-a",
+     "controller": "ctl-trusted",
+     "claims": {
+      "held": 7,
+      "total": 9
+     }
+    },
+    "selection": {
+     "state": "verified",
+     "unanswered_disputes": []
+    },
+    "own": {
+     "exchanges": 0,
+     "settled": 0,
+     "held_halves": 0,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {},
+    "asks": {},
+    "asks_made": 0,
+    "stake": {
+     "amount": "4999",
+     "currency": "cents"
+    }
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "b8ad8be845abfe47c84b53776845cad42bdc324272737759cb96e74ee5efad6c"
+   }
+  },
+  {
+   "case": "cov-stake-in-another-currency-same-unit",
+   "pack": "packs/coverage.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "platform": {
+     "release_attestation": "valid",
+     "owner_signed": true
+    },
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-06-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "witness": "witness-a",
+     "controller": "ctl-trusted",
+     "claims": {
+      "held": 7,
+      "total": 9
+     }
+    },
+    "selection": {
+     "state": "verified",
+     "unanswered_disputes": []
+    },
+    "own": {
+     "exchanges": 0,
+     "settled": 0,
+     "held_halves": 0,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {},
+    "asks": {},
+    "asks_made": 0,
+    "stake": {
+     "amount": "50.00",
+     "currency": "USDC"
+    }
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T1",
+    "block_sha256": "c7681f095e3b87bedb9ac54c0f78109146305cdc3d425eec8750b6416e937a25"
+   }
+  },
+  {
+   "case": "cov-stake-above-the-deal",
+   "pack": "packs/coverage.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "platform": {
+     "release_attestation": "valid",
+     "owner_signed": true
+    },
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-06-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "witness": "witness-a",
+     "controller": "ctl-trusted",
+     "claims": {
+      "held": 7,
+      "total": 9
+     }
+    },
+    "selection": {
+     "state": "verified",
+     "unanswered_disputes": []
+    },
+    "own": {
+     "exchanges": 0,
+     "settled": 0,
+     "held_halves": 0,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {},
+    "asks": {},
+    "asks_made": 0,
+    "stake": {
+     "amount": "50.01",
+     "currency": "USD"
+    }
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T1",
+    "block_sha256": "c7681f095e3b87bedb9ac54c0f78109146305cdc3d425eec8750b6416e937a25"
+   }
+  },
+  {
+   "case": "cov-no-stake",
+   "pack": "packs/coverage.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "platform": {
+     "release_attestation": "valid",
+     "owner_signed": true
+    },
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-06-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "witness": "witness-a",
+     "controller": "ctl-trusted",
+     "claims": {
+      "held": 7,
+      "total": 9
+     }
+    },
+    "selection": {
+     "state": "verified",
+     "unanswered_disputes": []
+    },
+    "own": {
+     "exchanges": 0,
+     "settled": 0,
+     "held_halves": 0,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {},
+    "asks": {},
+    "asks_made": 0
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "ae3c67615ea80ab2e888792ba928e9751dda3fa94e5515371e74a16f12f9be35"
+   }
+  },
+  {
+   "case": "cov-stake-unit-not-accepted",
+   "pack": "packs/coverage.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "platform": {
+     "release_attestation": "valid",
+     "owner_signed": true
+    },
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-06-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "witness": "witness-a",
+     "controller": "ctl-trusted",
+     "claims": {
+      "held": 7,
+      "total": 9
+     }
+    },
+    "selection": {
+     "state": "verified",
+     "unanswered_disputes": []
+    },
+    "own": {
+     "exchanges": 0,
+     "settled": 0,
+     "held_halves": 0,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {},
+    "asks": {},
+    "asks_made": 0,
+    "stake": {
+     "amount": "50",
+     "currency": "EUR"
+    }
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "ae3c67615ea80ab2e888792ba928e9751dda3fa94e5515371e74a16f12f9be35"
+   }
+  },
+  {
+   "case": "cov-witness-outside-roots",
+   "pack": "packs/coverage.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "platform": {
+     "release_attestation": "valid",
+     "owner_signed": true
+    },
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-06-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "witness": "witness-z",
+     "controller": "ctl-trusted",
+     "claims": {
+      "held": 7,
+      "total": 9
+     }
+    },
+    "selection": {
+     "state": "verified",
+     "unanswered_disputes": []
+    },
+    "own": {
+     "exchanges": 0,
+     "settled": 0,
+     "held_halves": 0,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {},
+    "asks": {},
+    "asks_made": 0,
+    "stake": {
+     "amount": "5000",
+     "currency": "cents"
+    }
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "04909b76f53e7d74e6d390a9cc27c5aedef01977e72ad5e4b1dfbce97cb7b23d"
+   }
+  },
+  {
+   "case": "cov-few-claims-asks",
+   "pack": "packs/coverage.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "platform": {
+     "release_attestation": "valid",
+     "owner_signed": true
+    },
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-06-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "witness": "witness-a",
+     "controller": "ctl-trusted",
+     "claims": {
+      "held": 4,
+      "total": 9
+     }
+    },
+    "selection": {
+     "state": "verified",
+     "unanswered_disputes": []
+    },
+    "own": {
+     "exchanges": 0,
+     "settled": 0,
+     "held_halves": 0,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {},
+    "asks": {},
+    "asks_made": 0,
+    "stake": {
+     "amount": "5000",
+     "currency": "cents"
+    }
+   },
+   "expected": {
+    "verdict": "ASK",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "5377b0baf5a117ad7dddda232245c7e9bbaf1acece38c247ced20eab06b02684"
+   }
+  },
+  {
+   "case": "cov-card-without-counts-asks",
+   "pack": "packs/coverage.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "platform": {
+     "release_attestation": "valid",
+     "owner_signed": true
+    },
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-06-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "witness": "witness-a",
+     "controller": "ctl-trusted",
+     "claims": null
+    },
+    "selection": {
+     "state": "verified",
+     "unanswered_disputes": []
+    },
+    "own": {
+     "exchanges": 0,
+     "settled": 0,
+     "held_halves": 0,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {},
+    "asks": {},
+    "asks_made": 0,
+    "stake": {
+     "amount": "5000",
+     "currency": "cents"
+    }
+   },
+   "expected": {
+    "verdict": "ASK",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "eae2f367bf7089958af66cb56930dbbdf9c9620a3ac6fbe3547c2af4888ecf70"
+   }
+  },
+  {
+   "case": "cov-few-claims-asked-limits",
+   "pack": "packs/coverage.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "platform": {
+     "release_attestation": "valid",
+     "owner_signed": true
+    },
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-06-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "witness": "witness-a",
+     "controller": "ctl-trusted",
+     "claims": {
+      "held": 4,
+      "total": 9
+     }
+    },
+    "selection": {
+     "state": "verified",
+     "unanswered_disputes": []
+    },
+    "own": {
+     "exchanges": 0,
+     "settled": 0,
+     "held_halves": 0,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {},
+    "asks": {
+     "served_summary/1": "answered"
+    },
+    "asks_made": 0,
+    "stake": {
+     "amount": "5000",
+     "currency": "cents"
+    }
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "7eba9c742de86f2d32689b494a45308f8481ed1600d1afb66f13c74a7fad297f"
+   }
+  },
+  {
+   "case": "cov-no-controller-declared",
+   "pack": "packs/coverage.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "platform": {
+     "release_attestation": "valid",
+     "owner_signed": true
+    },
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-06-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "witness": "witness-a",
+     "controller": "",
+     "claims": {
+      "held": 7,
+      "total": 9
+     }
+    },
+    "selection": {
+     "state": "verified",
+     "unanswered_disputes": []
+    },
+    "own": {
+     "exchanges": 0,
+     "settled": 0,
+     "held_halves": 0,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {},
+    "asks": {},
+    "asks_made": 0,
+    "stake": {
+     "amount": "5000",
+     "currency": "cents"
+    }
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "e58d8b31cf0eb4ffee8f0d05cdb7a331222c1cdf0175a0fab6434c86963015d9"
+   }
+  },
+  {
+   "case": "cov-controller-not-trusted",
+   "pack": "packs/coverage.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "platform": {
+     "release_attestation": "valid",
+     "owner_signed": true
+    },
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-06-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "witness": "witness-a",
+     "controller": "ctl-other",
+     "claims": {
+      "held": 7,
+      "total": 9
+     }
+    },
+    "selection": {
+     "state": "verified",
+     "unanswered_disputes": []
+    },
+    "own": {
+     "exchanges": 0,
+     "settled": 0,
+     "held_halves": 0,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {},
+    "asks": {},
+    "asks_made": 0,
+    "stake": {
+     "amount": "5000",
+     "currency": "cents"
+    }
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "063d52eb19ecc6cfebaa91dfc4d4cf28e06f8041288535a8b3a2812342b4006f"
+   }
+  },
+  {
+   "case": "cov-no-selection-asks",
+   "pack": "packs/coverage.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "platform": {
+     "release_attestation": "valid",
+     "owner_signed": true
+    },
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-06-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "witness": "witness-a",
+     "controller": "ctl-trusted",
+     "claims": {
+      "held": 7,
+      "total": 9
+     }
+    },
+    "selection": {},
+    "own": {
+     "exchanges": 0,
+     "settled": 0,
+     "held_halves": 0,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {},
+    "asks": {},
+    "asks_made": 0,
+    "stake": {
+     "amount": "5000",
+     "currency": "cents"
+    }
+   },
+   "expected": {
+    "verdict": "ASK",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "c198b3e8bbd2ee9c36d7c134e809cc42cc7f59f25a6adc0610f13149f0b49050"
+   }
+  },
+  {
+   "case": "cov-selection-unverifiable-limits",
+   "pack": "packs/coverage.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "platform": {
+     "release_attestation": "valid",
+     "owner_signed": true
+    },
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-06-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "witness": "witness-a",
+     "controller": "ctl-trusted",
+     "claims": {
+      "held": 7,
+      "total": 9
+     }
+    },
+    "selection": {
+     "state": "unverifiable"
+    },
+    "own": {
+     "exchanges": 0,
+     "settled": 0,
+     "held_halves": 0,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {},
+    "asks": {
+     "selection": "answered"
+    },
+    "asks_made": 0,
+    "stake": {
+     "amount": "5000",
+     "currency": "cents"
+    }
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "1384276daaa98e6d74597d9fa3eff7abdfbac03bb2aeb6811b9ac83655cc5ca7"
+   }
+  },
+  {
+   "case": "cov-dispute-in-window-limits",
+   "pack": "packs/coverage.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "platform": {
+     "release_attestation": "valid",
+     "owner_signed": true
+    },
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-06-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "witness": "witness-a",
+     "controller": "ctl-trusted",
+     "claims": {
+      "held": 7,
+      "total": 9
+     }
+    },
+    "selection": {
+     "state": "verified",
+     "unanswered_disputes": [
+      "2026-09-15T00:00:00Z",
+      "2026-10-01T00:00:00Z"
+     ]
+    },
+    "own": {
+     "exchanges": 0,
+     "settled": 0,
+     "held_halves": 0,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {},
+    "asks": {},
+    "asks_made": 0,
+    "stake": {
+     "amount": "5000",
+     "currency": "cents"
+    }
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "36a73c635daf8cfdff55a1d3c4c7c9656d83451e1a45baf36fdcea21bb63961d"
+   }
+  },
+  {
+   "case": "cov-dispute-outside-window-go",
+   "pack": "packs/coverage.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "platform": {
+     "release_attestation": "valid",
+     "owner_signed": true
+    },
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-06-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "witness": "witness-a",
+     "controller": "ctl-trusted",
+     "claims": {
+      "held": 7,
+      "total": 9
+     }
+    },
+    "selection": {
+     "state": "verified",
+     "unanswered_disputes": [
+      "2026-06-01T00:00:00Z"
+     ]
+    },
+    "own": {
+     "exchanges": 0,
+     "settled": 0,
+     "held_halves": 0,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {},
+    "asks": {},
+    "asks_made": 0,
+    "stake": {
+     "amount": "5000",
+     "currency": "cents"
+    }
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T1",
+    "block_sha256": "c7681f095e3b87bedb9ac54c0f78109146305cdc3d425eec8750b6416e937a25"
+   }
+  },
+  {
+   "case": "cov-owner-unsigned-is-recorded",
+   "pack": "packs/coverage.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "platform": {
+     "release_attestation": "valid",
+     "owner_signed": false
+    },
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-06-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "witness": "witness-a",
+     "controller": "ctl-trusted",
+     "claims": {
+      "held": 7,
+      "total": 9
+     }
+    },
+    "selection": {
+     "state": "verified",
+     "unanswered_disputes": []
+    },
+    "own": {
+     "exchanges": 0,
+     "settled": 0,
+     "held_halves": 0,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {},
+    "asks": {},
+    "asks_made": 0,
+    "stake": {
+     "amount": "5000",
+     "currency": "cents"
+    }
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T1",
+    "block_sha256": "c569772101e6e71612555d93196262aa2e3ba97e3de5afb9e0c05ffa32004c43"
+   }
+  },
+  {
+   "case": "cov-allow-list-unlisted-is-no",
+   "pack": "packs/coverage.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "platform": {
+     "release_attestation": "valid",
+     "owner_signed": true
+    },
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-06-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "witness": "witness-a",
+     "controller": "ctl-trusted",
+     "claims": {
+      "held": 7,
+      "total": 9
+     }
+    },
+    "selection": {
+     "state": "verified",
+     "unanswered_disputes": []
+    },
+    "own": {
+     "exchanges": 0,
+     "settled": 0,
+     "held_halves": 0,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false,
+     "allow_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {},
+    "asks": {},
+    "asks_made": 0,
+    "stake": {
+     "amount": "5000",
+     "currency": "cents"
+    }
+   },
+   "expected": {
+    "verdict": "NO",
+    "source": "allow-list",
+    "tier": null,
+    "block_sha256": "5752c55db55112d9cb55d798daa75d1142c4c70dc5bc5b0d8bea3f6319348a7a"
+   }
+  },
+  {
+   "case": "cov-allow-listed",
+   "pack": "packs/coverage.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "platform": {
+     "release_attestation": "valid",
+     "owner_signed": true
+    },
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-06-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "witness": "witness-a",
+     "controller": "ctl-trusted",
+     "claims": {
+      "held": 7,
+      "total": 9
+     }
+    },
+    "selection": {
+     "state": "verified",
+     "unanswered_disputes": []
+    },
+    "own": {
+     "exchanges": 0,
+     "settled": 0,
+     "held_halves": 0,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false,
+     "allow_listed": true
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {},
+    "asks": {},
+    "asks_made": 0,
+    "stake": {
+     "amount": "5000",
+     "currency": "cents"
+    }
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T1",
+    "block_sha256": "c7681f095e3b87bedb9ac54c0f78109146305cdc3d425eec8750b6416e937a25"
+   }
+  }
+ ]
+}

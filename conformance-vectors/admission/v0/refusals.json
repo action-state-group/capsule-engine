@@ -1,0 +1,595 @@
+{
+ "source": "capsule-engine#265: the admission loader's refusals. Each case applies its ops (set or delete at a path of keys and indexes) to the parsed base pack and re-encodes it as JCS, or gives its bytes outright; Load must refuse it with an error containing want. Go (go/admission) and Rust (rust/capsule-engine admission) decide every case.",
+ "cases": [
+  {
+   "case": "a card row decides NO",
+   "base": "packs/ladder.json",
+   "ops": [
+    {
+     "set": [
+      "rows",
+      4,
+      "on_fail"
+     ],
+     "value": "NO"
+    }
+   ],
+   "want": "a card row may not decide NO"
+  },
+  {
+   "case": "a vouch row decides NO",
+   "base": "packs/ladder.json",
+   "ops": [
+    {
+     "set": [
+      "rows",
+      9,
+      "on_fail"
+     ],
+     "value": "NO"
+    }
+   ],
+   "want": "a vouch row may not decide NO"
+  },
+  {
+   "case": "a judged row decides NO",
+   "base": "packs/ladder.json",
+   "ops": [
+    {
+     "set": [
+      "rows",
+      10,
+      "on_fail"
+     ],
+     "value": "NO"
+    }
+   ],
+   "want": "a judged row's on_fail must be {cap: <tier>}"
+  },
+  {
+   "case": "a cap with another key",
+   "base": "packs/ladder.json",
+   "ops": [
+    {
+     "set": [
+      "rows",
+      10,
+      "on_fail"
+     ],
+     "value": {
+      "cap": "T1",
+      "weight": 2
+     }
+    }
+   ],
+   "want": "a judged row's on_fail must be {cap: <tier>}"
+  },
+  {
+   "case": "a cap that lowers nothing",
+   "base": "packs/ladder.json",
+   "ops": [
+    {
+     "set": [
+      "rows",
+      10,
+      "on_fail"
+     ],
+     "value": {
+      "cap": "T2"
+     }
+    }
+   ],
+   "want": "cap T2 must be a tier below from T2"
+  },
+  {
+   "case": "a judged row in a pack without LIMIT",
+   "base": "packs/ladder.json",
+   "ops": [
+    {
+     "set": [
+      "outcomes"
+     ],
+     "value": [
+      "GO",
+      "ASK",
+      "NO"
+     ]
+    }
+   ],
+   "want": "a judged row caps a tier, so LIMIT must be in outcomes"
+  },
+  {
+   "case": "a missing input defaults to GO",
+   "base": "packs/ladder.json",
+   "ops": [
+    {
+     "set": [
+      "missing"
+     ],
+     "value": "GO"
+    }
+   ],
+   "want": "missing must not be GO"
+  },
+  {
+   "case": "a score field",
+   "base": "packs/ladder.json",
+   "ops": [
+    {
+     "set": [
+      "score_weights"
+     ],
+     "value": {
+      "settled": 3
+     }
+    }
+   ],
+   "want": "score_weights"
+  },
+  {
+   "case": "a row weight",
+   "base": "packs/ladder.json",
+   "ops": [
+    {
+     "set": [
+      "rows",
+      7,
+      "weight"
+     ],
+     "value": 2
+    }
+   ],
+   "want": "weight"
+  },
+  {
+   "case": "LIMIT from the lowest tier",
+   "base": "packs/ladder.json",
+   "ops": [
+    {
+     "set": [
+      "rows",
+      3,
+      "on_fail"
+     ],
+     "value": "LIMIT"
+    }
+   ],
+   "want": "cannot LIMIT"
+  },
+  {
+   "case": "an ask on a NO row",
+   "base": "packs/ladder.json",
+   "ops": [
+    {
+     "set": [
+      "rows",
+      0,
+      "ask"
+     ],
+     "value": {
+      "derivation": "history_card/1"
+     }
+    }
+   ],
+   "want": "only a LIMIT row may carry an ask"
+  },
+  {
+   "case": "an unknown predicate",
+   "base": "packs/ladder.json",
+   "ops": [
+    {
+     "set": [
+      "rows",
+      7,
+      "check"
+     ],
+     "value": "own.reputation"
+    }
+   ],
+   "want": "not an admission predicate"
+  },
+  {
+   "case": "a predicate under the wrong source",
+   "base": "packs/ladder.json",
+   "ops": [
+    {
+     "set": [
+      "rows",
+      7,
+      "source"
+     ],
+     "value": "card"
+    }
+   ],
+   "want": "reads own_history"
+  },
+  {
+   "case": "a missing threshold",
+   "base": "packs/ladder.json",
+   "ops": [
+    {
+     "set": [
+      "rows",
+      7,
+      "params"
+     ],
+     "value": {}
+    }
+   ],
+   "want": "needs params.min"
+  },
+  {
+   "case": "a null threshold",
+   "base": "packs/ladder.json",
+   "ops": [
+    {
+     "set": [
+      "rows",
+      7,
+      "params"
+     ],
+     "value": {
+      "min": null
+     }
+    }
+   ],
+   "want": "null is not a pack value"
+  },
+  {
+   "case": "a negative threshold",
+   "base": "packs/ladder.json",
+   "ops": [
+    {
+     "set": [
+      "rows",
+      7,
+      "params",
+      "min"
+     ],
+     "value": -1
+    }
+   ],
+   "want": "params.min -1 must be from 0"
+  },
+  {
+   "case": "a threshold whose duration wraps",
+   "base": "packs/ladder.json",
+   "ops": [
+    {
+     "set": [
+      "rows",
+      5,
+      "params",
+      "max_age_s"
+     ],
+     "value": 99999999999
+    }
+   ],
+   "want": "params.max_age_s 99999999999 must be from 0"
+  },
+  {
+   "case": "decades that do not rise",
+   "base": "packs/ladder.json",
+   "ops": [
+    {
+     "set": [
+      "tiers",
+      1,
+      "max_decade",
+      "sat"
+     ],
+     "value": 3
+    }
+   ],
+   "want": "does not rise"
+  },
+  {
+   "case": "a ceiling in a unit accept does not name",
+   "base": "packs/ladder.json",
+   "ops": [
+    {
+     "set": [
+      "tiers",
+      2,
+      "max_decade",
+      "Sat"
+     ],
+     "value": 9
+    }
+   ],
+   "want": "max_decade.Sat is not a band unit in accept"
+  },
+  {
+   "case": "a ceiling that falls across a skipped tier",
+   "base": "packs/ladder.json",
+   "ops": [
+    {
+     "set": [
+      "tiers",
+      2,
+      "max_decade",
+      "sat"
+     ],
+     "value": 3
+    }
+   ],
+   "want": "max_decade.sat 3 does not rise above the tier below (4)"
+  },
+  {
+   "case": "a null ceiling",
+   "base": "packs/ladder.json",
+   "ops": [
+    {
+     "set": [
+      "tiers",
+      2,
+      "max_decade",
+      "USD"
+     ],
+     "value": null
+    }
+   ],
+   "want": "null is not a pack value"
+  },
+  {
+   "case": "a ceiling out of range",
+   "base": "packs/ladder.json",
+   "ops": [
+    {
+     "set": [
+      "tiers",
+      2,
+      "max_decade",
+      "USD"
+     ],
+     "value": 99
+    }
+   ],
+   "want": "max_decade.USD 99 must be from -60 to 60"
+  },
+  {
+   "case": "a scale out of range",
+   "base": "packs/ladder.json",
+   "ops": [
+    {
+     "set": [
+      "accept",
+      "msat",
+      "scale"
+     ],
+     "value": -300
+    }
+   ],
+   "want": "scale -300 must be from -30 to 30"
+  },
+  {
+   "case": "a unit no tier names",
+   "base": "packs/ladder.json",
+   "ops": [
+    {
+     "set": [
+      "accept",
+      "EUR"
+     ],
+     "value": {
+      "band": "EUR",
+      "scale": 0
+     }
+    }
+   ],
+   "want": "band unit EUR is named by no tier"
+  },
+  {
+   "case": "an outcome the pack does not yield",
+   "base": "packs/ladder.json",
+   "ops": [
+    {
+     "set": [
+      "outcomes"
+     ],
+     "value": [
+      "GO",
+      "LIMIT",
+      "NO"
+     ]
+    },
+    {
+     "set": [
+      "rows",
+      10,
+      "on_fail"
+     ],
+     "value": {
+      "cap": "T1"
+     }
+    }
+   ],
+   "want": "ASK is not in outcomes"
+  },
+  {
+   "case": "no ask deadline",
+   "base": "packs/ladder.json",
+   "ops": [
+    {
+     "delete": [
+      "budget",
+      "deadline_s"
+     ]
+    }
+   ],
+   "want": "budget.deadline_s must be from 1 to"
+  },
+  {
+   "case": "another format",
+   "base": "packs/ladder.json",
+   "ops": [
+    {
+     "set": [
+      "format"
+     ],
+     "value": "admission-pack/v1"
+    }
+   ],
+   "want": "format must be admission-pack/v0"
+  },
+  {
+   "case": "a version that is not the id's",
+   "base": "packs/ladder.json",
+   "ops": [
+    {
+     "set": [
+      "pack_version"
+     ],
+     "value": "0.2.0"
+    }
+   ],
+   "want": "does not end in pack_version"
+  },
+  {
+   "case": "no rows",
+   "base": "packs/ladder.json",
+   "ops": [
+    {
+     "set": [
+      "rows"
+     ],
+     "value": []
+    }
+   ],
+   "want": "rows must not be empty"
+  },
+  {
+   "case": "null rows",
+   "base": "packs/ladder.json",
+   "ops": [
+    {
+     "set": [
+      "rows"
+     ],
+     "value": null
+    }
+   ],
+   "want": "null is not a pack value"
+  },
+  {
+   "case": "a budget out of range",
+   "base": "packs/ladder.json",
+   "ops": [
+    {
+     "set": [
+      "budget",
+      "max_asks"
+     ],
+     "value": 1001
+    }
+   ],
+   "want": "budget.max_asks must be from 0 to 1000"
+  },
+  {
+   "case": "a deadline out of range",
+   "base": "packs/ladder.json",
+   "ops": [
+    {
+     "set": [
+      "budget",
+      "deadline_s"
+     ],
+     "value": 3153600001
+    }
+   ],
+   "want": "budget.deadline_s must be from 1 to 3153600000"
+  },
+  {
+   "case": "a null trust root",
+   "base": "packs/ladder.json",
+   "ops": [
+    {
+     "set": [
+      "trust_roots",
+      "judges"
+     ],
+     "value": [
+      null
+     ]
+    }
+   ],
+   "want": "null is not a pack value"
+  },
+  {
+   "case": "a null optional member",
+   "base": "packs/ladder.json",
+   "ops": [
+    {
+     "set": [
+      "source"
+     ],
+     "value": null
+    }
+   ],
+   "want": "null is not a pack value"
+  },
+  {
+   "case": "an empty trust root name",
+   "base": "packs/ladder.json",
+   "ops": [
+    {
+     "set": [
+      "trust_roots",
+      "judges"
+     ],
+     "value": [
+      ""
+     ]
+    }
+   ],
+   "want": "trust_roots.judges: a name must not be empty"
+  }
+ ],
+ "raw": [
+  {
+   "case": "not JCS: whitespace",
+   "bytes": "{\"accept\":{\"USD\":{\"band\":\"USD\",\"scale\":0},\"USDC\":{\"band\":\"USD\",\"scale\":0},\"msat\":{\"band\":\"sat\",\"scale\":-3},\"sat\":{\"band\":\"sat\",\"scale\":0}},\"budget\":{\"deadline_s\":86400,\"max_asks\":2},\"format\":\"admission-pack/v0\", \"missing\":\"LIMIT\",\"outcomes\":[\"GO\",\"ASK\",\"LIMIT\",\"NO\"],\"pack_id\":\"asg/admission_test/0.1.0\",\"pack_version\":\"0.1.0\",\"rows\":[{\"check\":\"platform.attestation_not_invalid\",\"from\":\"T0\",\"id\":\"attestation\",\"on_fail\":\"NO\",\"params\":{},\"source\":\"platform\",\"statement\":\"The platform does not report the counterparty's release attestation invalid.\"},{\"check\":\"operator.not_deny_listed\",\"from\":\"T0\",\"id\":\"deny-list\",\"on_fail\":\"NO\",\"params\":{},\"source\":\"operator\",\"statement\":\"The counterparty is not on the operator's deny list.\"},{\"check\":\"own.no_adverse_adjudication\",\"from\":\"T0\",\"id\":\"adverse\",\"on_fail\":\"NO\",\"params\":{\"window_days\":30},\"source\":\"own_history\",\"statement\":\"No adjudication this node holds went against the counterparty in the last 30 days.\"},{\"check\":\"own.held_halves\",\"from\":\"T0\",\"id\":\"halves\",\"on_fail\":\"record\",\"params\":{\"min\":1},\"source\":\"own_history\",\"statement\":\"This node holds at least one half the counterparty pushed.\"},{\"ask\":{\"derivation\":\"history_card/1\"},\"check\":\"card.verified\",\"from\":\"T1\",\"id\":\"card-verified\",\"on_fail\":\"LIMIT\",\"params\":{},\"source\":\"card\",\"statement\":\"The counterparty's history card verifies under the key it presents.\"},{\"ask\":{\"derivation\":\"history_card/1\"},\"check\":\"card.fresh\",\"from\":\"T1\",\"id\":\"card-fresh\",\"on_fail\":\"LIMIT\",\"params\":{\"max_age_s\":604800},\"source\":\"card\",\"statement\":\"The card's latest checkpoint is at most 7 days old.\"},{\"check\":\"card.key_age\",\"from\":\"T1\",\"id\":\"key-age\",\"on_fail\":\"LIMIT\",\"params\":{\"min_days\":7},\"source\":\"card\",\"statement\":\"The card's first checkpoint is at least 7 days old.\"},{\"check\":\"own.settled\",\"from\":\"T1\",\"id\":\"settled\",\"on_fail\":\"LIMIT\",\"params\":{\"min\":1},\"source\":\"own_history\",\"statement\":\"This node's own book holds at least one settled exchange with the counterparty.\"},{\"check\":\"own.no_conflicting\",\"from\":\"T1\",\"id\":\"conflicting\",\"on_fail\":\"LIMIT\",\"params\":{},\"source\":\"own_history\",\"statement\":\"No exchange with the counterparty is CONFLICTING in this node's book.\"},{\"check\":\"vouch.distinct_controllers\",\"from\":\"T2\",\"id\":\"vouches\",\"on_fail\":\"LIMIT\",\"params\":{\"min\":2},\"source\":\"vouch\",\"statement\":\"At least two distinct controllers, not the counterparty's own, vouch for it.\"},{\"check\":\"judged\",\"from\":\"T2\",\"id\":\"adjacent-domain\",\"on_fail\":{\"cap\":\"T1\"},\"params\":{},\"source\":\"judged\",\"statement\":\"The disclosed history is from the same kind of work as the deal.\"}],\"source\":\"capsule-engine#265 conformance vectors\",\"tiers\":[{\"id\":\"T0\",\"max_decade\":{\"USD\":-1,\"sat\":3}},{\"id\":\"T1\",\"max_decade\":{\"USD\":0,\"sat\":4}},{\"id\":\"T2\",\"max_decade\":{\"USD\":2}}],\"trust_roots\":{\"controllers\":[\"ctl-trusted\"],\"judges\":[\"judge-a\"],\"witnesses\":[\"witness-a\"]}}",
+   "want": "not the JCS encoding"
+  },
+  {
+   "case": "not JCS: key order",
+   "bytes": "{\"zz\":0,\"accept\":{\"USD\":{\"band\":\"USD\",\"scale\":0},\"USDC\":{\"band\":\"USD\",\"scale\":0},\"msat\":{\"band\":\"sat\",\"scale\":-3},\"sat\":{\"band\":\"sat\",\"scale\":0}},\"budget\":{\"deadline_s\":86400,\"max_asks\":2},\"format\":\"admission-pack/v0\",\"missing\":\"LIMIT\",\"outcomes\":[\"GO\",\"ASK\",\"LIMIT\",\"NO\"],\"pack_id\":\"asg/admission_test/0.1.0\",\"pack_version\":\"0.1.0\",\"rows\":[{\"check\":\"platform.attestation_not_invalid\",\"from\":\"T0\",\"id\":\"attestation\",\"on_fail\":\"NO\",\"params\":{},\"source\":\"platform\",\"statement\":\"The platform does not report the counterparty's release attestation invalid.\"},{\"check\":\"operator.not_deny_listed\",\"from\":\"T0\",\"id\":\"deny-list\",\"on_fail\":\"NO\",\"params\":{},\"source\":\"operator\",\"statement\":\"The counterparty is not on the operator's deny list.\"},{\"check\":\"own.no_adverse_adjudication\",\"from\":\"T0\",\"id\":\"adverse\",\"on_fail\":\"NO\",\"params\":{\"window_days\":30},\"source\":\"own_history\",\"statement\":\"No adjudication this node holds went against the counterparty in the last 30 days.\"},{\"check\":\"own.held_halves\",\"from\":\"T0\",\"id\":\"halves\",\"on_fail\":\"record\",\"params\":{\"min\":1},\"source\":\"own_history\",\"statement\":\"This node holds at least one half the counterparty pushed.\"},{\"ask\":{\"derivation\":\"history_card/1\"},\"check\":\"card.verified\",\"from\":\"T1\",\"id\":\"card-verified\",\"on_fail\":\"LIMIT\",\"params\":{},\"source\":\"card\",\"statement\":\"The counterparty's history card verifies under the key it presents.\"},{\"ask\":{\"derivation\":\"history_card/1\"},\"check\":\"card.fresh\",\"from\":\"T1\",\"id\":\"card-fresh\",\"on_fail\":\"LIMIT\",\"params\":{\"max_age_s\":604800},\"source\":\"card\",\"statement\":\"The card's latest checkpoint is at most 7 days old.\"},{\"check\":\"card.key_age\",\"from\":\"T1\",\"id\":\"key-age\",\"on_fail\":\"LIMIT\",\"params\":{\"min_days\":7},\"source\":\"card\",\"statement\":\"The card's first checkpoint is at least 7 days old.\"},{\"check\":\"own.settled\",\"from\":\"T1\",\"id\":\"settled\",\"on_fail\":\"LIMIT\",\"params\":{\"min\":1},\"source\":\"own_history\",\"statement\":\"This node's own book holds at least one settled exchange with the counterparty.\"},{\"check\":\"own.no_conflicting\",\"from\":\"T1\",\"id\":\"conflicting\",\"on_fail\":\"LIMIT\",\"params\":{},\"source\":\"own_history\",\"statement\":\"No exchange with the counterparty is CONFLICTING in this node's book.\"},{\"check\":\"vouch.distinct_controllers\",\"from\":\"T2\",\"id\":\"vouches\",\"on_fail\":\"LIMIT\",\"params\":{\"min\":2},\"source\":\"vouch\",\"statement\":\"At least two distinct controllers, not the counterparty's own, vouch for it.\"},{\"check\":\"judged\",\"from\":\"T2\",\"id\":\"adjacent-domain\",\"on_fail\":{\"cap\":\"T1\"},\"params\":{},\"source\":\"judged\",\"statement\":\"The disclosed history is from the same kind of work as the deal.\"}],\"source\":\"capsule-engine#265 conformance vectors\",\"tiers\":[{\"id\":\"T0\",\"max_decade\":{\"USD\":-1,\"sat\":3}},{\"id\":\"T1\",\"max_decade\":{\"USD\":0,\"sat\":4}},{\"id\":\"T2\",\"max_decade\":{\"USD\":2}}],\"trust_roots\":{\"controllers\":[\"ctl-trusted\"],\"judges\":[\"judge-a\"],\"witnesses\":[\"witness-a\"]}}",
+   "want": "not the JCS encoding"
+  },
+  {
+   "case": "a duplicate key",
+   "bytes": "{\"accept\":{\"USD\":{\"band\":\"USD\",\"scale\":0},\"USDC\":{\"band\":\"USD\",\"scale\":0},\"msat\":{\"band\":\"sat\",\"scale\":-3},\"sat\":{\"band\":\"sat\",\"scale\":0}},\"budget\":{\"deadline_s\":86400,\"max_asks\":2},\"format\":\"admission-pack/v0\",\"missing\":\"LIMIT\",\"missing\":\"LIMIT\",\"outcomes\":[\"GO\",\"ASK\",\"LIMIT\",\"NO\"],\"pack_id\":\"asg/admission_test/0.1.0\",\"pack_version\":\"0.1.0\",\"rows\":[{\"check\":\"platform.attestation_not_invalid\",\"from\":\"T0\",\"id\":\"attestation\",\"on_fail\":\"NO\",\"params\":{},\"source\":\"platform\",\"statement\":\"The platform does not report the counterparty's release attestation invalid.\"},{\"check\":\"operator.not_deny_listed\",\"from\":\"T0\",\"id\":\"deny-list\",\"on_fail\":\"NO\",\"params\":{},\"source\":\"operator\",\"statement\":\"The counterparty is not on the operator's deny list.\"},{\"check\":\"own.no_adverse_adjudication\",\"from\":\"T0\",\"id\":\"adverse\",\"on_fail\":\"NO\",\"params\":{\"window_days\":30},\"source\":\"own_history\",\"statement\":\"No adjudication this node holds went against the counterparty in the last 30 days.\"},{\"check\":\"own.held_halves\",\"from\":\"T0\",\"id\":\"halves\",\"on_fail\":\"record\",\"params\":{\"min\":1},\"source\":\"own_history\",\"statement\":\"This node holds at least one half the counterparty pushed.\"},{\"ask\":{\"derivation\":\"history_card/1\"},\"check\":\"card.verified\",\"from\":\"T1\",\"id\":\"card-verified\",\"on_fail\":\"LIMIT\",\"params\":{},\"source\":\"card\",\"statement\":\"The counterparty's history card verifies under the key it presents.\"},{\"ask\":{\"derivation\":\"history_card/1\"},\"check\":\"card.fresh\",\"from\":\"T1\",\"id\":\"card-fresh\",\"on_fail\":\"LIMIT\",\"params\":{\"max_age_s\":604800},\"source\":\"card\",\"statement\":\"The card's latest checkpoint is at most 7 days old.\"},{\"check\":\"card.key_age\",\"from\":\"T1\",\"id\":\"key-age\",\"on_fail\":\"LIMIT\",\"params\":{\"min_days\":7},\"source\":\"card\",\"statement\":\"The card's first checkpoint is at least 7 days old.\"},{\"check\":\"own.settled\",\"from\":\"T1\",\"id\":\"settled\",\"on_fail\":\"LIMIT\",\"params\":{\"min\":1},\"source\":\"own_history\",\"statement\":\"This node's own book holds at least one settled exchange with the counterparty.\"},{\"check\":\"own.no_conflicting\",\"from\":\"T1\",\"id\":\"conflicting\",\"on_fail\":\"LIMIT\",\"params\":{},\"source\":\"own_history\",\"statement\":\"No exchange with the counterparty is CONFLICTING in this node's book.\"},{\"check\":\"vouch.distinct_controllers\",\"from\":\"T2\",\"id\":\"vouches\",\"on_fail\":\"LIMIT\",\"params\":{\"min\":2},\"source\":\"vouch\",\"statement\":\"At least two distinct controllers, not the counterparty's own, vouch for it.\"},{\"check\":\"judged\",\"from\":\"T2\",\"id\":\"adjacent-domain\",\"on_fail\":{\"cap\":\"T1\"},\"params\":{},\"source\":\"judged\",\"statement\":\"The disclosed history is from the same kind of work as the deal.\"}],\"source\":\"capsule-engine#265 conformance vectors\",\"tiers\":[{\"id\":\"T0\",\"max_decade\":{\"USD\":-1,\"sat\":3}},{\"id\":\"T1\",\"max_decade\":{\"USD\":0,\"sat\":4}},{\"id\":\"T2\",\"max_decade\":{\"USD\":2}}],\"trust_roots\":{\"controllers\":[\"ctl-trusted\"],\"judges\":[\"judge-a\"],\"witnesses\":[\"witness-a\"]}}",
+   "want": "duplicate"
+  },
+  {
+   "case": "a float",
+   "bytes": "{\"accept\":{\"USD\":{\"band\":\"USD\",\"scale\":0},\"USDC\":{\"band\":\"USD\",\"scale\":0},\"msat\":{\"band\":\"sat\",\"scale\":-3},\"sat\":{\"band\":\"sat\",\"scale\":0}},\"budget\":{\"deadline_s\":86400,\"max_asks\":2.0},\"format\":\"admission-pack/v0\",\"missing\":\"LIMIT\",\"outcomes\":[\"GO\",\"ASK\",\"LIMIT\",\"NO\"],\"pack_id\":\"asg/admission_test/0.1.0\",\"pack_version\":\"0.1.0\",\"rows\":[{\"check\":\"platform.attestation_not_invalid\",\"from\":\"T0\",\"id\":\"attestation\",\"on_fail\":\"NO\",\"params\":{},\"source\":\"platform\",\"statement\":\"The platform does not report the counterparty's release attestation invalid.\"},{\"check\":\"operator.not_deny_listed\",\"from\":\"T0\",\"id\":\"deny-list\",\"on_fail\":\"NO\",\"params\":{},\"source\":\"operator\",\"statement\":\"The counterparty is not on the operator's deny list.\"},{\"check\":\"own.no_adverse_adjudication\",\"from\":\"T0\",\"id\":\"adverse\",\"on_fail\":\"NO\",\"params\":{\"window_days\":30},\"source\":\"own_history\",\"statement\":\"No adjudication this node holds went against the counterparty in the last 30 days.\"},{\"check\":\"own.held_halves\",\"from\":\"T0\",\"id\":\"halves\",\"on_fail\":\"record\",\"params\":{\"min\":1},\"source\":\"own_history\",\"statement\":\"This node holds at least one half the counterparty pushed.\"},{\"ask\":{\"derivation\":\"history_card/1\"},\"check\":\"card.verified\",\"from\":\"T1\",\"id\":\"card-verified\",\"on_fail\":\"LIMIT\",\"params\":{},\"source\":\"card\",\"statement\":\"The counterparty's history card verifies under the key it presents.\"},{\"ask\":{\"derivation\":\"history_card/1\"},\"check\":\"card.fresh\",\"from\":\"T1\",\"id\":\"card-fresh\",\"on_fail\":\"LIMIT\",\"params\":{\"max_age_s\":604800},\"source\":\"card\",\"statement\":\"The card's latest checkpoint is at most 7 days old.\"},{\"check\":\"card.key_age\",\"from\":\"T1\",\"id\":\"key-age\",\"on_fail\":\"LIMIT\",\"params\":{\"min_days\":7},\"source\":\"card\",\"statement\":\"The card's first checkpoint is at least 7 days old.\"},{\"check\":\"own.settled\",\"from\":\"T1\",\"id\":\"settled\",\"on_fail\":\"LIMIT\",\"params\":{\"min\":1},\"source\":\"own_history\",\"statement\":\"This node's own book holds at least one settled exchange with the counterparty.\"},{\"check\":\"own.no_conflicting\",\"from\":\"T1\",\"id\":\"conflicting\",\"on_fail\":\"LIMIT\",\"params\":{},\"source\":\"own_history\",\"statement\":\"No exchange with the counterparty is CONFLICTING in this node's book.\"},{\"check\":\"vouch.distinct_controllers\",\"from\":\"T2\",\"id\":\"vouches\",\"on_fail\":\"LIMIT\",\"params\":{\"min\":2},\"source\":\"vouch\",\"statement\":\"At least two distinct controllers, not the counterparty's own, vouch for it.\"},{\"check\":\"judged\",\"from\":\"T2\",\"id\":\"adjacent-domain\",\"on_fail\":{\"cap\":\"T1\"},\"params\":{},\"source\":\"judged\",\"statement\":\"The disclosed history is from the same kind of work as the deal.\"}],\"source\":\"capsule-engine#265 conformance vectors\",\"tiers\":[{\"id\":\"T0\",\"max_decade\":{\"USD\":-1,\"sat\":3}},{\"id\":\"T1\",\"max_decade\":{\"USD\":0,\"sat\":4}},{\"id\":\"T2\",\"max_decade\":{\"USD\":2}}],\"trust_roots\":{\"controllers\":[\"ctl-trusted\"],\"judges\":[\"judge-a\"],\"witnesses\":[\"witness-a\"]}}",
+   "want": "admission pack"
+  },
+  {
+   "case": "trailing data",
+   "bytes": "{\"accept\":{\"USD\":{\"band\":\"USD\",\"scale\":0},\"USDC\":{\"band\":\"USD\",\"scale\":0},\"msat\":{\"band\":\"sat\",\"scale\":-3},\"sat\":{\"band\":\"sat\",\"scale\":0}},\"budget\":{\"deadline_s\":86400,\"max_asks\":2},\"format\":\"admission-pack/v0\",\"missing\":\"LIMIT\",\"outcomes\":[\"GO\",\"ASK\",\"LIMIT\",\"NO\"],\"pack_id\":\"asg/admission_test/0.1.0\",\"pack_version\":\"0.1.0\",\"rows\":[{\"check\":\"platform.attestation_not_invalid\",\"from\":\"T0\",\"id\":\"attestation\",\"on_fail\":\"NO\",\"params\":{},\"source\":\"platform\",\"statement\":\"The platform does not report the counterparty's release attestation invalid.\"},{\"check\":\"operator.not_deny_listed\",\"from\":\"T0\",\"id\":\"deny-list\",\"on_fail\":\"NO\",\"params\":{},\"source\":\"operator\",\"statement\":\"The counterparty is not on the operator's deny list.\"},{\"check\":\"own.no_adverse_adjudication\",\"from\":\"T0\",\"id\":\"adverse\",\"on_fail\":\"NO\",\"params\":{\"window_days\":30},\"source\":\"own_history\",\"statement\":\"No adjudication this node holds went against the counterparty in the last 30 days.\"},{\"check\":\"own.held_halves\",\"from\":\"T0\",\"id\":\"halves\",\"on_fail\":\"record\",\"params\":{\"min\":1},\"source\":\"own_history\",\"statement\":\"This node holds at least one half the counterparty pushed.\"},{\"ask\":{\"derivation\":\"history_card/1\"},\"check\":\"card.verified\",\"from\":\"T1\",\"id\":\"card-verified\",\"on_fail\":\"LIMIT\",\"params\":{},\"source\":\"card\",\"statement\":\"The counterparty's history card verifies under the key it presents.\"},{\"ask\":{\"derivation\":\"history_card/1\"},\"check\":\"card.fresh\",\"from\":\"T1\",\"id\":\"card-fresh\",\"on_fail\":\"LIMIT\",\"params\":{\"max_age_s\":604800},\"source\":\"card\",\"statement\":\"The card's latest checkpoint is at most 7 days old.\"},{\"check\":\"card.key_age\",\"from\":\"T1\",\"id\":\"key-age\",\"on_fail\":\"LIMIT\",\"params\":{\"min_days\":7},\"source\":\"card\",\"statement\":\"The card's first checkpoint is at least 7 days old.\"},{\"check\":\"own.settled\",\"from\":\"T1\",\"id\":\"settled\",\"on_fail\":\"LIMIT\",\"params\":{\"min\":1},\"source\":\"own_history\",\"statement\":\"This node's own book holds at least one settled exchange with the counterparty.\"},{\"check\":\"own.no_conflicting\",\"from\":\"T1\",\"id\":\"conflicting\",\"on_fail\":\"LIMIT\",\"params\":{},\"source\":\"own_history\",\"statement\":\"No exchange with the counterparty is CONFLICTING in this node's book.\"},{\"check\":\"vouch.distinct_controllers\",\"from\":\"T2\",\"id\":\"vouches\",\"on_fail\":\"LIMIT\",\"params\":{\"min\":2},\"source\":\"vouch\",\"statement\":\"At least two distinct controllers, not the counterparty's own, vouch for it.\"},{\"check\":\"judged\",\"from\":\"T2\",\"id\":\"adjacent-domain\",\"on_fail\":{\"cap\":\"T1\"},\"params\":{},\"source\":\"judged\",\"statement\":\"The disclosed history is from the same kind of work as the deal.\"}],\"source\":\"capsule-engine#265 conformance vectors\",\"tiers\":[{\"id\":\"T0\",\"max_decade\":{\"USD\":-1,\"sat\":3}},{\"id\":\"T1\",\"max_decade\":{\"USD\":0,\"sat\":4}},{\"id\":\"T2\",\"max_decade\":{\"USD\":2}}],\"trust_roots\":{\"controllers\":[\"ctl-trusted\"],\"judges\":[\"judge-a\"],\"witnesses\":[\"witness-a\"]}}\n",
+   "want": "not the JCS encoding"
+  },
+  {
+   "case": "a second value",
+   "bytes": "{\"accept\":{\"USD\":{\"band\":\"USD\",\"scale\":0},\"USDC\":{\"band\":\"USD\",\"scale\":0},\"msat\":{\"band\":\"sat\",\"scale\":-3},\"sat\":{\"band\":\"sat\",\"scale\":0}},\"budget\":{\"deadline_s\":86400,\"max_asks\":2},\"format\":\"admission-pack/v0\",\"missing\":\"LIMIT\",\"outcomes\":[\"GO\",\"ASK\",\"LIMIT\",\"NO\"],\"pack_id\":\"asg/admission_test/0.1.0\",\"pack_version\":\"0.1.0\",\"rows\":[{\"check\":\"platform.attestation_not_invalid\",\"from\":\"T0\",\"id\":\"attestation\",\"on_fail\":\"NO\",\"params\":{},\"source\":\"platform\",\"statement\":\"The platform does not report the counterparty's release attestation invalid.\"},{\"check\":\"operator.not_deny_listed\",\"from\":\"T0\",\"id\":\"deny-list\",\"on_fail\":\"NO\",\"params\":{},\"source\":\"operator\",\"statement\":\"The counterparty is not on the operator's deny list.\"},{\"check\":\"own.no_adverse_adjudication\",\"from\":\"T0\",\"id\":\"adverse\",\"on_fail\":\"NO\",\"params\":{\"window_days\":30},\"source\":\"own_history\",\"statement\":\"No adjudication this node holds went against the counterparty in the last 30 days.\"},{\"check\":\"own.held_halves\",\"from\":\"T0\",\"id\":\"halves\",\"on_fail\":\"record\",\"params\":{\"min\":1},\"source\":\"own_history\",\"statement\":\"This node holds at least one half the counterparty pushed.\"},{\"ask\":{\"derivation\":\"history_card/1\"},\"check\":\"card.verified\",\"from\":\"T1\",\"id\":\"card-verified\",\"on_fail\":\"LIMIT\",\"params\":{},\"source\":\"card\",\"statement\":\"The counterparty's history card verifies under the key it presents.\"},{\"ask\":{\"derivation\":\"history_card/1\"},\"check\":\"card.fresh\",\"from\":\"T1\",\"id\":\"card-fresh\",\"on_fail\":\"LIMIT\",\"params\":{\"max_age_s\":604800},\"source\":\"card\",\"statement\":\"The card's latest checkpoint is at most 7 days old.\"},{\"check\":\"card.key_age\",\"from\":\"T1\",\"id\":\"key-age\",\"on_fail\":\"LIMIT\",\"params\":{\"min_days\":7},\"source\":\"card\",\"statement\":\"The card's first checkpoint is at least 7 days old.\"},{\"check\":\"own.settled\",\"from\":\"T1\",\"id\":\"settled\",\"on_fail\":\"LIMIT\",\"params\":{\"min\":1},\"source\":\"own_history\",\"statement\":\"This node's own book holds at least one settled exchange with the counterparty.\"},{\"check\":\"own.no_conflicting\",\"from\":\"T1\",\"id\":\"conflicting\",\"on_fail\":\"LIMIT\",\"params\":{},\"source\":\"own_history\",\"statement\":\"No exchange with the counterparty is CONFLICTING in this node's book.\"},{\"check\":\"vouch.distinct_controllers\",\"from\":\"T2\",\"id\":\"vouches\",\"on_fail\":\"LIMIT\",\"params\":{\"min\":2},\"source\":\"vouch\",\"statement\":\"At least two distinct controllers, not the counterparty's own, vouch for it.\"},{\"check\":\"judged\",\"from\":\"T2\",\"id\":\"adjacent-domain\",\"on_fail\":{\"cap\":\"T1\"},\"params\":{},\"source\":\"judged\",\"statement\":\"The disclosed history is from the same kind of work as the deal.\"}],\"source\":\"capsule-engine#265 conformance vectors\",\"tiers\":[{\"id\":\"T0\",\"max_decade\":{\"USD\":-1,\"sat\":3}},{\"id\":\"T1\",\"max_decade\":{\"USD\":0,\"sat\":4}},{\"id\":\"T2\",\"max_decade\":{\"USD\":2}}],\"trust_roots\":{\"controllers\":[\"ctl-trusted\"],\"judges\":[\"judge-a\"],\"witnesses\":[\"witness-a\"]}}{}",
+   "want": "admission pack"
+  },
+  {
+   "case": "an unknown top-level field in JCS order",
+   "bytes": "{\"accept\":{\"USD\":{\"band\":\"USD\",\"scale\":0},\"USDC\":{\"band\":\"USD\",\"scale\":0},\"msat\":{\"band\":\"sat\",\"scale\":-3},\"sat\":{\"band\":\"sat\",\"scale\":0}},\"budget\":{\"deadline_s\":86400,\"max_asks\":2},\"format\":\"admission-pack/v0\",\"missing\":\"LIMIT\",\"outcomes\":[\"GO\",\"ASK\",\"LIMIT\",\"NO\"],\"pack_id\":\"asg/admission_test/0.1.0\",\"pack_version\":\"0.1.0\",\"rows\":[{\"check\":\"platform.attestation_not_invalid\",\"from\":\"T0\",\"id\":\"attestation\",\"on_fail\":\"NO\",\"params\":{},\"source\":\"platform\",\"statement\":\"The platform does not report the counterparty's release attestation invalid.\"},{\"check\":\"operator.not_deny_listed\",\"from\":\"T0\",\"id\":\"deny-list\",\"on_fail\":\"NO\",\"params\":{},\"source\":\"operator\",\"statement\":\"The counterparty is not on the operator's deny list.\"},{\"check\":\"own.no_adverse_adjudication\",\"from\":\"T0\",\"id\":\"adverse\",\"on_fail\":\"NO\",\"params\":{\"window_days\":30},\"source\":\"own_history\",\"statement\":\"No adjudication this node holds went against the counterparty in the last 30 days.\"},{\"check\":\"own.held_halves\",\"from\":\"T0\",\"id\":\"halves\",\"on_fail\":\"record\",\"params\":{\"min\":1},\"source\":\"own_history\",\"statement\":\"This node holds at least one half the counterparty pushed.\"},{\"ask\":{\"derivation\":\"history_card/1\"},\"check\":\"card.verified\",\"from\":\"T1\",\"id\":\"card-verified\",\"on_fail\":\"LIMIT\",\"params\":{},\"source\":\"card\",\"statement\":\"The counterparty's history card verifies under the key it presents.\"},{\"ask\":{\"derivation\":\"history_card/1\"},\"check\":\"card.fresh\",\"from\":\"T1\",\"id\":\"card-fresh\",\"on_fail\":\"LIMIT\",\"params\":{\"max_age_s\":604800},\"source\":\"card\",\"statement\":\"The card's latest checkpoint is at most 7 days old.\"},{\"check\":\"card.key_age\",\"from\":\"T1\",\"id\":\"key-age\",\"on_fail\":\"LIMIT\",\"params\":{\"min_days\":7},\"source\":\"card\",\"statement\":\"The card's first checkpoint is at least 7 days old.\"},{\"check\":\"own.settled\",\"from\":\"T1\",\"id\":\"settled\",\"on_fail\":\"LIMIT\",\"params\":{\"min\":1},\"source\":\"own_history\",\"statement\":\"This node's own book holds at least one settled exchange with the counterparty.\"},{\"check\":\"own.no_conflicting\",\"from\":\"T1\",\"id\":\"conflicting\",\"on_fail\":\"LIMIT\",\"params\":{},\"source\":\"own_history\",\"statement\":\"No exchange with the counterparty is CONFLICTING in this node's book.\"},{\"check\":\"vouch.distinct_controllers\",\"from\":\"T2\",\"id\":\"vouches\",\"on_fail\":\"LIMIT\",\"params\":{\"min\":2},\"source\":\"vouch\",\"statement\":\"At least two distinct controllers, not the counterparty's own, vouch for it.\"},{\"check\":\"judged\",\"from\":\"T2\",\"id\":\"adjacent-domain\",\"on_fail\":{\"cap\":\"T1\"},\"params\":{},\"source\":\"judged\",\"statement\":\"The disclosed history is from the same kind of work as the deal.\"}],\"source\":\"capsule-engine#265 conformance vectors\",\"tier_weights\":1,\"tiers\":[{\"id\":\"T0\",\"max_decade\":{\"USD\":-1,\"sat\":3}},{\"id\":\"T1\",\"max_decade\":{\"USD\":0,\"sat\":4}},{\"id\":\"T2\",\"max_decade\":{\"USD\":2}}],\"trust_roots\":{\"controllers\":[\"ctl-trusted\"],\"judges\":[\"judge-a\"],\"witnesses\":[\"witness-a\"]}}",
+   "want": "tier_weights"
+  },
+  {
+   "case": "a member name in another case",
+   "bytes": "{\"accept\":{\"USD\":{\"band\":\"USD\",\"scale\":0},\"USDC\":{\"band\":\"USD\",\"scale\":0},\"msat\":{\"band\":\"sat\",\"scale\":-3},\"sat\":{\"band\":\"sat\",\"scale\":0}},\"budget\":{\"deadline_s\":86400,\"max_asks\":2},\"format\":\"admission-pack/v0\",\"missing\":\"LIMIT\",\"outcomes\":[\"GO\",\"ASK\",\"LIMIT\",\"NO\"],\"pack_id\":\"asg/admission_test/0.1.0\",\"pack_version\":\"0.1.0\",\"rows\":[{\"Statement\":\"The platform does not report the counterparty's release attestation invalid.\",\"check\":\"platform.attestation_not_invalid\",\"from\":\"T0\",\"id\":\"attestation\",\"on_fail\":\"NO\",\"params\":{},\"source\":\"platform\"},{\"check\":\"operator.not_deny_listed\",\"from\":\"T0\",\"id\":\"deny-list\",\"on_fail\":\"NO\",\"params\":{},\"source\":\"operator\",\"statement\":\"The counterparty is not on the operator's deny list.\"},{\"check\":\"own.no_adverse_adjudication\",\"from\":\"T0\",\"id\":\"adverse\",\"on_fail\":\"NO\",\"params\":{\"window_days\":30},\"source\":\"own_history\",\"statement\":\"No adjudication this node holds went against the counterparty in the last 30 days.\"},{\"check\":\"own.held_halves\",\"from\":\"T0\",\"id\":\"halves\",\"on_fail\":\"record\",\"params\":{\"min\":1},\"source\":\"own_history\",\"statement\":\"This node holds at least one half the counterparty pushed.\"},{\"ask\":{\"derivation\":\"history_card/1\"},\"check\":\"card.verified\",\"from\":\"T1\",\"id\":\"card-verified\",\"on_fail\":\"LIMIT\",\"params\":{},\"source\":\"card\",\"statement\":\"The counterparty's history card verifies under the key it presents.\"},{\"ask\":{\"derivation\":\"history_card/1\"},\"check\":\"card.fresh\",\"from\":\"T1\",\"id\":\"card-fresh\",\"on_fail\":\"LIMIT\",\"params\":{\"max_age_s\":604800},\"source\":\"card\",\"statement\":\"The card's latest checkpoint is at most 7 days old.\"},{\"check\":\"card.key_age\",\"from\":\"T1\",\"id\":\"key-age\",\"on_fail\":\"LIMIT\",\"params\":{\"min_days\":7},\"source\":\"card\",\"statement\":\"The card's first checkpoint is at least 7 days old.\"},{\"check\":\"own.settled\",\"from\":\"T1\",\"id\":\"settled\",\"on_fail\":\"LIMIT\",\"params\":{\"min\":1},\"source\":\"own_history\",\"statement\":\"This node's own book holds at least one settled exchange with the counterparty.\"},{\"check\":\"own.no_conflicting\",\"from\":\"T1\",\"id\":\"conflicting\",\"on_fail\":\"LIMIT\",\"params\":{},\"source\":\"own_history\",\"statement\":\"No exchange with the counterparty is CONFLICTING in this node's book.\"},{\"check\":\"vouch.distinct_controllers\",\"from\":\"T2\",\"id\":\"vouches\",\"on_fail\":\"LIMIT\",\"params\":{\"min\":2},\"source\":\"vouch\",\"statement\":\"At least two distinct controllers, not the counterparty's own, vouch for it.\"},{\"check\":\"judged\",\"from\":\"T2\",\"id\":\"adjacent-domain\",\"on_fail\":{\"cap\":\"T1\"},\"params\":{},\"source\":\"judged\",\"statement\":\"The disclosed history is from the same kind of work as the deal.\"}],\"source\":\"capsule-engine#265 conformance vectors\",\"tiers\":[{\"id\":\"T0\",\"max_decade\":{\"USD\":-1,\"sat\":3}},{\"id\":\"T1\",\"max_decade\":{\"USD\":0,\"sat\":4}},{\"id\":\"T2\",\"max_decade\":{\"USD\":2}}],\"trust_roots\":{\"controllers\":[\"ctl-trusted\"],\"judges\":[\"judge-a\"],\"witnesses\":[\"witness-a\"]}}",
+   "want": "Statement"
+  },
+  {
+   "case": "a top-level name in another case",
+   "bytes": "{\"Rows\":[{\"check\":\"platform.attestation_not_invalid\",\"from\":\"T0\",\"id\":\"attestation\",\"on_fail\":\"NO\",\"params\":{},\"source\":\"platform\",\"statement\":\"The platform does not report the counterparty's release attestation invalid.\"},{\"check\":\"operator.not_deny_listed\",\"from\":\"T0\",\"id\":\"deny-list\",\"on_fail\":\"NO\",\"params\":{},\"source\":\"operator\",\"statement\":\"The counterparty is not on the operator's deny list.\"},{\"check\":\"own.no_adverse_adjudication\",\"from\":\"T0\",\"id\":\"adverse\",\"on_fail\":\"NO\",\"params\":{\"window_days\":30},\"source\":\"own_history\",\"statement\":\"No adjudication this node holds went against the counterparty in the last 30 days.\"},{\"check\":\"own.held_halves\",\"from\":\"T0\",\"id\":\"halves\",\"on_fail\":\"record\",\"params\":{\"min\":1},\"source\":\"own_history\",\"statement\":\"This node holds at least one half the counterparty pushed.\"},{\"ask\":{\"derivation\":\"history_card/1\"},\"check\":\"card.verified\",\"from\":\"T1\",\"id\":\"card-verified\",\"on_fail\":\"LIMIT\",\"params\":{},\"source\":\"card\",\"statement\":\"The counterparty's history card verifies under the key it presents.\"},{\"ask\":{\"derivation\":\"history_card/1\"},\"check\":\"card.fresh\",\"from\":\"T1\",\"id\":\"card-fresh\",\"on_fail\":\"LIMIT\",\"params\":{\"max_age_s\":604800},\"source\":\"card\",\"statement\":\"The card's latest checkpoint is at most 7 days old.\"},{\"check\":\"card.key_age\",\"from\":\"T1\",\"id\":\"key-age\",\"on_fail\":\"LIMIT\",\"params\":{\"min_days\":7},\"source\":\"card\",\"statement\":\"The card's first checkpoint is at least 7 days old.\"},{\"check\":\"own.settled\",\"from\":\"T1\",\"id\":\"settled\",\"on_fail\":\"LIMIT\",\"params\":{\"min\":1},\"source\":\"own_history\",\"statement\":\"This node's own book holds at least one settled exchange with the counterparty.\"},{\"check\":\"own.no_conflicting\",\"from\":\"T1\",\"id\":\"conflicting\",\"on_fail\":\"LIMIT\",\"params\":{},\"source\":\"own_history\",\"statement\":\"No exchange with the counterparty is CONFLICTING in this node's book.\"},{\"check\":\"vouch.distinct_controllers\",\"from\":\"T2\",\"id\":\"vouches\",\"on_fail\":\"LIMIT\",\"params\":{\"min\":2},\"source\":\"vouch\",\"statement\":\"At least two distinct controllers, not the counterparty's own, vouch for it.\"},{\"check\":\"judged\",\"from\":\"T2\",\"id\":\"adjacent-domain\",\"on_fail\":{\"cap\":\"T1\"},\"params\":{},\"source\":\"judged\",\"statement\":\"The disclosed history is from the same kind of work as the deal.\"}],\"accept\":{\"USD\":{\"band\":\"USD\",\"scale\":0},\"USDC\":{\"band\":\"USD\",\"scale\":0},\"msat\":{\"band\":\"sat\",\"scale\":-3},\"sat\":{\"band\":\"sat\",\"scale\":0}},\"budget\":{\"deadline_s\":86400,\"max_asks\":2},\"format\":\"admission-pack/v0\",\"missing\":\"LIMIT\",\"outcomes\":[\"GO\",\"ASK\",\"LIMIT\",\"NO\"],\"pack_id\":\"asg/admission_test/0.1.0\",\"pack_version\":\"0.1.0\",\"source\":\"capsule-engine#265 conformance vectors\",\"tiers\":[{\"id\":\"T0\",\"max_decade\":{\"USD\":-1,\"sat\":3}},{\"id\":\"T1\",\"max_decade\":{\"USD\":0,\"sat\":4}},{\"id\":\"T2\",\"max_decade\":{\"USD\":2}}],\"trust_roots\":{\"controllers\":[\"ctl-trusted\"],\"judges\":[\"judge-a\"],\"witnesses\":[\"witness-a\"]}}",
+   "want": "Rows"
+  }
+ ]
+}
