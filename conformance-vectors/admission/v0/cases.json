@@ -4058,7 +4058,7 @@
    }
   },
   {
-   "case": "hos-an-earned-limit-below-every-tier-holds-at-the-tier-below-from",
+   "case": "hos-an-earned-limit-below-every-tier-limits-to-the-lowest",
    "pack": "packs/history-or-stake.json",
    "input": {
     "now": "2026-10-30T12:00:00Z",
@@ -4087,6 +4087,114 @@
     "source": "rows",
     "tier": "T0",
     "block_sha256": "7476d4feea8b69368914be3a3c3138c0b73a576f6cb99cc44529bc571b3ec9be"
+   }
+  },
+  {
+   "case": "hos-adverse-added-past-int64-is-clamped",
+   "pack": "packs/history-or-stake.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "500",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "bands": [
+      {
+       "currency": "USD",
+       "decade": 2,
+       "subjects": 9007199254740991,
+       "adverse": 9007199254740991
+      },
+      {
+       "currency": "USD",
+       "decade": 2,
+       "subjects": 9007199254740991,
+       "adverse": 9007199254740991
+      }
+     ]
+    },
+    "asks": {
+     "served_summary/1": "answered"
+    },
+    "asks_made": 1
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "f3d37017a9db3830e4d3257c6d7ee2c63607b9699693cd9e8bad039361d73914"
+   }
+  },
+  {
+   "case": "hos-the-subjects-cap-decides-the-share",
+   "pack": "packs/history-or-stake.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "500",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "bands": [
+      {
+       "currency": "USD",
+       "decade": 1,
+       "subjects": 9007199254740991,
+       "adverse": 900719925474100
+      },
+      {
+       "currency": "USD",
+       "decade": 1,
+       "subjects": 10,
+       "adverse": 0
+      }
+     ]
+    },
+    "asks": {
+     "served_summary/1": "answered"
+    },
+    "asks_made": 1
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "f3d37017a9db3830e4d3257c6d7ee2c63607b9699693cd9e8bad039361d73914"
+   }
+  },
+  {
+   "case": "hos-t2-an-earned-limit-below-every-tier-holds-at-the-tier-below-from",
+   "pack": "packs/history-or-stake-from-t2.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "500",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "bands": [
+      {
+       "currency": "USD",
+       "decade": -3,
+       "subjects": 3,
+       "adverse": 0
+      }
+     ]
+    },
+    "asks": {
+     "served_summary/1": "answered"
+    },
+    "asks_made": 1
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T1",
+    "block_sha256": "8556113aa86b6e539869cd5b15f0b6c2b4ffc4086be9770895a4d77aaf1fcef1"
    }
   }
  ]
