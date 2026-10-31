@@ -22,6 +22,9 @@ const CARD: &str = "standard_history/1 card";
 /// decade is null (zero-amount deals) is skipped. The currency is the card's
 /// SR assetCode as written, with the decade in that asset's own unit.
 pub fn standard_history_counts(artifact: &[u8]) -> Result<(Vec<BandCount>, Disputes), Error> {
+    // The artifact must be the JCS of the card (AAC standard-history-v0 §3),
+    // exactly as pack.rs requires of a pack-definition.json.
+    is_jcs(artifact).map_err(|e| Error(format!("{CARD}: the artifact is not JCS bytes: {e}")))?;
     let card: Value = serde_json::from_slice(artifact).map_err(|e| Error(format!("{CARD}: {e}")))?;
     let card = card.as_object().ok_or_else(|| Error(format!("{CARD}: not an object")))?;
     match card.get("derivation") {
@@ -53,11 +56,12 @@ pub fn standard_history_counts(artifact: &[u8]) -> Result<(Vec<BandCount>, Dispu
         let decade = int(b.get("decade")).map_err(|e| Error(format!("{at}.decade: {e}")))?;
         out.push(BandCount { currency, decade, subjects: counts[0] + counts[1], adverse: counts[1] });
     }
-    let received = match card.get("disputes").and_then(Value::as_object).and_then(|d| d.get("received")) {
-        None | Some(Value::Null) => return Err(Error(format!("{CARD}: disputes.received is missing"))),
-        Some(Value::Object(r)) => r,
-        Some(_) => return Err(Error(format!("{CARD}: disputes.received must be an object"))),
-    };
+    let received = card
+        .get("disputes")
+        .and_then(Value::as_object)
+        .and_then(|d| d.get("received"))
+        .and_then(Value::as_object)
+        .ok_or_else(|| Error(format!("{CARD}: disputes.received must be an object")))?;
     let of = count(received, "of").map_err(|e| Error(format!("{CARD}: disputes.received.of: {e}")))?;
     let by_outcome = received
         .get("by_outcome")
@@ -68,14 +72,22 @@ pub fn standard_history_counts(artifact: &[u8]) -> Result<(Vec<BandCount>, Dispu
     Ok((out, Disputes { open, of }))
 }
 
-/// standard_history.go cardInt: a plain JSON integer of at most 2^53 − 1 in
-/// magnitude. serde_json reads a fraction or exponent form (75.0, 1e2) as a
-/// float, which is not one.
+/// standard_history.go isJCS: why `src` is not exactly the JCS encoding of
+/// its own parse.
+fn is_jcs(src: &[u8]) -> Result<(), String> {
+    let v = canon::parse_json(src).map_err(|e| e.to_string())?;
+    match canon::jcs(&v) {
+        Ok(jcs) if jcs.as_bytes() == src => Ok(()),
+        _ => Err("not the JCS encoding of their own parse".into()),
+    }
+}
+
+/// standard_history.go cardInt: a JSON integer of at most 2^53 − 1 in
+/// magnitude. The artifact is JCS, so an integer is in its one canonical form.
 fn int(v: Option<&Value>) -> Result<i64, String> {
     match v.and_then(Value::as_i64) {
         Some(n) if (-canon::MAX_SAFE_INTEGER..=canon::MAX_SAFE_INTEGER).contains(&n) => Ok(n),
         Some(_) => Err("must be an integer of at most 2^53 - 1 in magnitude".into()),
-        None if v.is_some_and(Value::is_number) => Err("must be an integer of at most 2^53 - 1 in magnitude".into()),
         None => Err("must be an integer".into()),
     }
 }

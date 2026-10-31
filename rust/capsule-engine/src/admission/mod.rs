@@ -218,9 +218,9 @@ pub struct Card {
     /// The claims the card holds, with their denominator; None when the card
     /// carries no counts (history_card/1 carries none today).
     pub claims: Option<Claims>,
-    /// The card's per-band counts; None when the card carries none (no card
-    /// served today does), and empty when it carries them and every band is
-    /// empty.
+    /// The card's per-band counts; None when the card carries none, and
+    /// empty when it carries them and every band is empty. A
+    /// standard_history/1 card carries them (`standard_history_counts`).
     pub bands: Option<Vec<BandCount>>,
     /// The card's received disputes, open out of all; None when the card
     /// carries no dispute tally. `standard_history_counts` fills `bands` and

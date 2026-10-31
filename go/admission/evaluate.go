@@ -71,9 +71,9 @@ type Card struct {
 	// Claims are the claims the card holds, with their denominator; nil when
 	// the card carries no counts (history_card/1 carries none today).
 	Claims *Claims
-	// Bands are the card's per-band counts; nil when the card carries none
-	// (no card served today does), and empty when it carries them and every
-	// band is empty.
+	// Bands are the card's per-band counts; nil when the card carries none,
+	// and empty when it carries them and every band is empty. A
+	// standard_history/1 card carries them (StandardHistoryCounts).
 	Bands []BandCount
 	// Disputes are the card's received disputes, open out of all; nil when
 	// the card carries no dispute tally. StandardHistoryCounts fills Bands

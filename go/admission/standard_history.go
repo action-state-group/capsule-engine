@@ -1,11 +1,12 @@
 package admission
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"strconv"
+
+	"github.com/action-state-group/capsule-engine/go/canon"
 )
 
 // StandardHistoryCounts reads the ladder's inputs from a standard_history/1
@@ -15,6 +16,13 @@ import (
 // verified, card form included (AAC go/standardhistory); this reads only the
 // bands and disputes members, and refuses them when they do not read.
 //
+// The artifact must be what AAC standard-history-v0 §3 says it is, the JCS
+// of the card: bytes that are exactly the JCS encoding of their own parse, as
+// a pack-definition.json must be (Load). That one rule refuses trailing data,
+// duplicate keys, other whitespace or key order, float and -0 forms, and
+// strings whose bytes do not round-trip, so Go and Rust read the same bytes
+// the same way. Members are then matched by exact key.
+//
 // A band tally maps to one BandCount: Subjects are its decided deals (held
 // plus did_not_hold) and Adverse those that did not hold; undecided deals
 // are left out. A band whose decade is null (zero-amount deals) has no band
@@ -22,26 +30,36 @@ import (
 // the decade in that asset's own unit, so a pack maps it through accept like
 // any other currency (BTC: {band: sat, scale: 8}).
 func StandardHistoryCounts(artifact []byte) ([]BandCount, *Disputes, error) {
-	// Raw members throughout: each number is read from its own text, so a
-	// quoted number or a float form is refused as the Rust reader refuses it.
-	var card struct {
-		Derivation string                       `json:"derivation"`
-		Bands      []map[string]json.RawMessage `json:"bands"`
-		Disputes   struct {
-			Received map[string]json.RawMessage `json:"received"`
-		} `json:"disputes"`
+	if err := isJCS(artifact); err != nil {
+		return nil, nil, fmt.Errorf("standard_history/1 card: the artifact is not JCS bytes: %w", err)
 	}
-	if err := json.NewDecoder(bytes.NewReader(artifact)).Decode(&card); err != nil {
-		return nil, nil, fmt.Errorf("standard_history/1 card: %w", err)
+	// Raw members throughout, decoded into maps: keys match exactly (a struct
+	// would match them case-insensitively), and each number is read from its
+	// own text.
+	var card map[string]json.RawMessage
+	if json.Unmarshal(artifact, &card) != nil || card == nil {
+		return nil, nil, errors.New("standard_history/1 card: not an object")
 	}
-	if card.Derivation != "standard_history/1" {
-		return nil, nil, fmt.Errorf("standard_history/1 card: derivation is %q", card.Derivation)
+	var derivation string
+	if raw, ok := card["derivation"]; ok && json.Unmarshal(raw, &derivation) != nil {
+		return nil, nil, errors.New("standard_history/1 card: derivation must be a string")
 	}
-	if card.Bands == nil {
+	if derivation != "standard_history/1" {
+		return nil, nil, fmt.Errorf("standard_history/1 card: derivation is %q", derivation)
+	}
+	if raw, ok := card["bands"]; !ok || string(raw) == "null" {
 		return nil, nil, errors.New("standard_history/1 card: bands is missing")
 	}
+	var tallies []json.RawMessage
+	if json.Unmarshal(card["bands"], &tallies) != nil {
+		return nil, nil, errors.New("standard_history/1 card: bands must be an array")
+	}
 	bands := []BandCount{}
-	for i, b := range card.Bands {
+	for i, raw := range tallies {
+		var b map[string]json.RawMessage
+		if json.Unmarshal(raw, &b) != nil || b == nil {
+			return nil, nil, fmt.Errorf("standard_history/1 card: bands[%d] must be an object", i)
+		}
 		where := fmt.Sprintf("standard_history/1 card: bands[%d]", i)
 		var currency string
 		if err := json.Unmarshal(b["currency"], &currency); err != nil || currency == "" {
@@ -65,9 +83,10 @@ func StandardHistoryCounts(artifact []byte) ([]BandCount, *Disputes, error) {
 		bands = append(bands, BandCount{Currency: currency, Decade: int(decade),
 			Subjects: counts[0] + counts[1], Adverse: counts[1]})
 	}
-	r := card.Disputes.Received
-	if r == nil {
-		return nil, nil, errors.New("standard_history/1 card: disputes.received is missing")
+	var disputes, r map[string]json.RawMessage
+	_ = json.Unmarshal(card["disputes"], &disputes)
+	if json.Unmarshal(disputes["received"], &r) != nil || r == nil {
+		return nil, nil, errors.New("standard_history/1 card: disputes.received must be an object")
 	}
 	of, err := cardCount(r["of"])
 	if err != nil {
@@ -84,16 +103,27 @@ func StandardHistoryCounts(artifact []byte) ([]BandCount, *Disputes, error) {
 	return bands, &Disputes{Open: open, Of: of}, nil
 }
 
+// isJCS reports why src is not exactly the JCS encoding of its own parse.
+func isJCS(src []byte) error {
+	v, err := canon.FromJSON(src)
+	if err != nil {
+		return err
+	}
+	if jcs, err := canon.JCS(v); err != nil || jcs != string(src) {
+		return errors.New("not the JCS encoding of their own parse")
+	}
+	return nil
+}
+
 // cardInt reads a card integer: a plain JSON integer of at most 2^53 − 1 in
-// magnitude (AAC standard-history-v0 §4, "Counts"). A fraction or exponent
-// form, such as 75.0 or 1e2, is not one: JCS never writes it.
+// magnitude (AAC standard-history-v0 §4, "Counts"). The artifact is JCS, so
+// an integer is in its one canonical form; a quoted number is not one.
 func cardInt(raw json.RawMessage) (int64, error) {
-	s := string(raw)
-	if s == "" || s == "null" {
+	n, err := strconv.ParseInt(string(raw), 10, 64)
+	if err != nil {
 		return 0, errors.New("must be an integer")
 	}
-	n, err := strconv.ParseInt(s, 10, 64)
-	if err != nil || n > maxSafeInteger || n < -maxSafeInteger {
+	if n > maxSafeInteger || n < -maxSafeInteger {
 		return 0, errors.New("must be an integer of at most 2^53 - 1 in magnitude")
 	}
 	return n, nil
