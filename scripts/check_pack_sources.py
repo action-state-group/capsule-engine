@@ -34,9 +34,10 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 
 import jsonschema  # noqa: E402
+from generate_go_packs import pack_digest  # noqa: E402
+
 from capsule_engine.packs.contract_validate import validate_evidence_contract  # noqa: E402
 from capsule_engine.packs.loader import PACK_SOURCE_FILE  # noqa: E402
-from generate_go_packs import pack_digest  # noqa: E402
 
 SOURCE_ROOTS = (
     ROOT / "python" / "capsule_engine" / "packs" / "catalog",
