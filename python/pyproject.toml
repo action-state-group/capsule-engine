@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "capsule-engine"
-version = "0.2.0"
+version = "0.3.0"
 description = "The thin single-node engine: guard, append-only fold compute, packs, policy activation, and the report computation for AI agent actions."
 readme = "README.md"
 # typing.NotRequired (PEP 655) is 3.11 and later.
@@ -26,18 +26,16 @@ classifiers = [
 dependencies = [
     "agent-action-capsule>=0.11.0",
     # cll.log: the CLL entry log a store directory keeps (guards/history.py),
-    # with its entry count. Pinned to the merged revision that adds the count
-    # (checkpointed-local-log#98) until its next release.
-    "checkpointed-local-log @ git+https://github.com/action-state-group/checkpointed-local-log@fe4281c10be3#subdirectory=python",
+    # with its entry count (checkpointed-local-log#98, in 0.8.0).
+    "checkpointed-local-log>=0.8.0,<0.9",
     # capsule_engine/schemas/evidence-contract-v0.json's validator entry point
     # (packs/contract_validate.py).
     "jsonschema>=4.18",
     # capsule_emit.artifact (the artifact store and its index, guards/history.py),
     # capsule_emit.produce (the producer envelope a stored record carries),
     # .period and .evidence_file (--period sugar and the thread-bundle check).
-    # Pinned to the merged revision with the index and produce
-    # (capsule-emit#381, #382) until its next release.
-    "capsule-emit @ git+https://github.com/action-state-group/capsule-emit@9defe98af14b#subdirectory=python",
+    # The index and produce (capsule-emit#381, #382) are in 0.14.0.
+    "capsule-emit>=0.14.0,<0.15",
     "pyyaml>=6.0",
 ]
 

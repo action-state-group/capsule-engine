@@ -5,6 +5,14 @@ module has its own changelog, `go/CHANGELOG.md`.
 
 ## Unreleased
 
+## 0.3.0 — 2026-10-31
+
+Python 0.3.0, a minor release with breaking changes: the engine reads and writes its records
+through a `History` over the artifact store (#255, #257), and the bundle viewer, console and report
+renderer are removed (#175, #254). It also adds the `rate_cap` check, the `required_fields` check
+and the `asg/inference/0.1.0` pack (#263, #264). Its capsule-emit and checkpointed-local-log
+requirements are PyPI versions again, not GitHub revisions.
+
 - Added (capsule-engine#263): the `rate_cap` check and its wicket `rate_cap/1.0.0`. It compares the
   advertised input and output rates of the peer an inference is bought from, in millisatoshis per
   million tokens (mesh-llm's `Pricing` units), with `max_input_msat_per_million` and
@@ -60,9 +68,9 @@ module has its own changelog, `go/CHANGELOG.md`.
   - MCP: `ledger_query` rows no longer carry `consequential`.
   - The tau2 airline reference seals its policy checks with `capsule_emit.produce.seal`, which
     writes nothing, and records them in its own history.
-  - `capsule-emit` and `checkpointed-local-log` are installed from GitHub at the merged revisions
-    this needs (capsule-emit#381, #382; checkpointed-local-log#98) until their next releases, so
-    this package cannot be released to PyPI before them.
+  - The package requires `capsule-emit>=0.14.0,<0.15` (the artifact store index and `produce`,
+    capsule-emit#381, #382) and `checkpointed-local-log>=0.8.0,<0.9` (the entry count,
+    checkpointed-local-log#98), both published to PyPI.
 
 - **Breaking** (capsule-engine#175): the engine's three rendering surfaces are removed. The engine
   computes; pages are drawn by capsule-viewer. Removed released verbs and entry points:
