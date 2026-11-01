@@ -86,7 +86,8 @@ requirements are PyPI versions again, not GitHub revisions.
   holds a local-only field, and `--share` no longer prints a URL. `--telemetry-opt-in` and
   `--telemetry-endpoint` are removed with the HTML beacon, and `CAPSULE_LEDGER_TELEMETRY_ENDPOINT` is now
   ignored without a warning. Drawing a withheld payload beside its digest moves to
-  action-state-group/capsule-viewer#105. The next release takes a minor bump.
+  action-state-group/capsule-viewer#105.
+- Changed (capsule-engine#253): the vendored CPB registry (`registry/cpb_registry.json`, `conventions.json`) is re-vendored from scitt-payload-binding fa57e7c; the machine-mandate action-hash field set gains `member`.
 - Changed (capsule-engine#234, ruling A on #214 hold A): under spend.weekly/3.1.0, a live check's
   history now lets a cancel or refund free the headroom of the partial charge it cites. It lowers
   that charge's counted amount by the amount it returns, never below the charge's sealed
