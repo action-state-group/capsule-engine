@@ -74,7 +74,7 @@ capsule_engine = [
     "guards/action_taxonomy_v*.json",
     "guards/wickets/catalog_defs/*.yaml",
     "policy/catalog_defs/*.yaml",
-    "packs/catalog/*/pack.yaml",
+    "packs/catalog/*/pack-source.yaml",
     "packs/catalog/*/AI-BOOTSTRAP.md",
     "packs/catalog/*/folds/*.yaml",
     "packs/catalog/*/wickets/*.yaml",
