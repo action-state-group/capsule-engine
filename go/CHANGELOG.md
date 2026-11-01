@@ -5,13 +5,16 @@ and `portedDefinitions` (`guard/engine.go`).
 
 ## Unreleased
 
-- Changed (capsule-engine#252): one pack format. Every embedded pack version ships its definition
-  as `pack-source.yaml` (`scope: {kind: live}`, `pack_version`, and the `check` each cited wicket
-  implements), and `LoadFrom` and `LoadPath` read it. `LoadSource` is new; its source-only fields
-  are not in the digest, so every pack keeps its digest. A directory holding both
-  `pack-source.yaml` and `pack.yaml` is refused. PROVENANCE.json lists `pack-source.yaml`, with the
-  `pack.yaml` sha256 it was converted from.
-- Deprecated (capsule-engine#252): `Load` and the `pack.yaml` read path, removed in v0.4.0.
+- Changed, breaking (capsule-engine#252): one pack format. Every embedded pack version now ships
+  its definition as `pack-source.yaml` (`scope: {kind: live}`, `pack_version`, and the `check` each
+  cited wicket implements), and no longer as `pack.yaml`: code that reads `pack.yaml` out of an
+  embedded FS (`packs.Everyday038` and the rest) gets not-exist. Load a pack with `LoadFrom`,
+  `LoadPath` or the `LoadXxx` functions, which read `pack-source.yaml`, or pass its bytes to the new
+  `LoadSource`; `Load` refuses them. The source-only fields are not in the digest, so every pack
+  keeps its digest. A directory holding both `pack-source.yaml` and `pack.yaml` is refused.
+  PROVENANCE.json lists `pack-source.yaml`, with the `pack.yaml` sha256 it was converted from.
+- Deprecated (capsule-engine#252): `Load` and reading a `pack.yaml` directory through `LoadFrom`
+  and `LoadPath`, for packs authored outside this module; removed in v0.4.0.
 
 - Added (evidencebook-skills#87): `StandardHistoryCounts` reads a verified `standard_history/1`
   card's bands and received disputes as `Card.Bands` and `Card.Disputes`. A band's subjects are its

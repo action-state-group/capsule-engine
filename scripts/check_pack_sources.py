@@ -16,7 +16,7 @@ evidencebook-skills checkout and fails unless
   computes for the same directory, so the compiled form pins the pack the
   live path runs.
 
-Usage (CI checks out evidencebook-skills at the commit vendor-drift.yml pins)::
+Usage (CI checks out evidencebook-skills at the commit conformance.yml pins, job pack-sources)::
 
     python scripts/check_pack_sources.py ../evidencebook-skills
 """

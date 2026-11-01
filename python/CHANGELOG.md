@@ -11,8 +11,9 @@ module has its own changelog, `go/CHANGELOG.md`.
   cited wicket, the `check` it implements, which must match the cited definition; an obligation may
   carry `requirement_tier`. None of these is in the definition digest, so every pack keeps its
   digest and its verdicts. The everyday, seller and inference packs, in the catalog and every frozen
-  version, now ship as `pack-source.yaml`. `load_pack_dir` reads `pack-source.yaml`, and refuses a
-  directory holding both files. `is_pack_dir` and `pack_file` are new.
+  version, now ship as `pack-source.yaml`, so code that opens their `pack.yaml` directly finds none;
+  `load_pack_dir` reads `pack-source.yaml`, and refuses a directory holding both files. `is_pack_dir`
+  and `pack_file` are new.
 - Deprecated (capsule-engine#252): reading `pack.yaml`. It stays for packs not yet moved (five
   catalog packs wait on evidencebook-skills#98) and is removed in 0.5.0.
 
