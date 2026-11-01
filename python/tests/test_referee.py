@@ -381,6 +381,22 @@ def test_an_unjoined_payment_is_not_evaluable_and_a_malformed_leg_does_not_count
     assert _claims(deal.judge())["deal-terms/delivered-before-expiry"]["verdict"] == "not_evaluable"
 
 
+def test_a_party_that_gives_no_records_is_refused(tmp_path):
+    deal = Deal(tmp_path)
+    bare = Party(half=deal.seller.half, action=ACTION, terms=deal.seller_terms)
+    with pytest.raises(RefereeError) as exc:
+        referee.judge(deal.buyer, bare, deal.legs, as_of=AS_OF, referee_key_id=deal.referee_key)
+    assert exc.value.code == "records_missing"
+
+
+def test_amounts_compare_at_any_scale_and_a_malformed_one_is_not_evaluable():
+    assert referee._same_amount(referee._amount(PRICE), referee._amount(
+        {"value": "2" + "0" * 21, "assetCode": "USD", "assetScale": 20}))
+    assert not referee._same_amount(referee._amount(PRICE), referee._amount({**PRICE, "assetCode": "EUR"}))
+    for bad in ({**PRICE, "value": "\u00b2"}, {**PRICE, "value": "01"}, {**PRICE, "assetScale": 256}, None):
+        assert referee._amount(bad) is None
+
+
 def test_an_amount_at_another_scale_is_the_same_price(tmp_path):
     def rescaled(buyer_terms, seller_terms):
         seller_terms["price"] = {"value": "20000", "assetCode": "USD", "assetScale": 3}

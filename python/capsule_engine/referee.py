@@ -82,7 +82,7 @@ record that does not verify under the key it carries; an opening that does
 not recompute its half's ``action_digest``; halves that do not answer each
 other, or that open to different parties, packs, referees or actions; a
 referee that is not the signer; a party's records signed by another key, out
-of sealed order, or about no record of its ``deal_id``; a pack the installed
+of sealed order, none at all, or none about its ``deal_id``; a pack the installed
 catalog does not hold at the named digest (fail closed: a referee is pinned to
 an engine that holds the deal's packs).
 """
@@ -293,7 +293,9 @@ def _own_records(role: str, party: Party) -> tuple[list[dict], set[str]]:
         if isinstance(party.disclosed.get(r["capsule_id"]), dict)
         and _deal_id(party.disclosed[r["capsule_id"]]).value == deal
     }
-    if records and not in_deal:
+    if not records:
+        raise RefereeError("records_missing", f"the {role} gave no records of its deal")
+    if not in_deal:
         raise RefereeError("records_other_deal", f"no {role} record is about deal {deal!r}")
     return records, in_deal
 
@@ -416,30 +418,41 @@ def _leg(rail: _Rail, kind: str) -> dict | None:
     return c[_LEG] if c else None
 
 
-def _minor(amount: object) -> tuple[str, int] | None:
-    """An amount triple as (asset, value at scale 18), so equal amounts at another scale compare equal."""
-    if not isinstance(amount, dict):
+_DIGITS = re.compile(r"^(0|[1-9][0-9]*)$")
+
+
+def _amount(value: object) -> tuple[str, int, str] | None:
+    """An amount triple as (asset, scale, digits), or ``None`` when it is not the draft's form."""
+    if not isinstance(value, dict):
         return None
-    value, code, scale = amount.get("value"), amount.get("assetCode"), amount.get("assetScale")
-    if (not isinstance(value, str) or not value.isdigit() or not isinstance(code, str) or not code
-            or not isinstance(scale, int) or isinstance(scale, bool) or not 0 <= scale <= 18):
+    digits, code, scale = value.get("value"), value.get("assetCode"), value.get("assetScale")
+    if (not isinstance(digits, str) or not _DIGITS.match(digits) or not isinstance(code, str) or not code
+            or not isinstance(scale, int) or isinstance(scale, bool) or not 0 <= scale <= 255):
         return None
-    return code, int(value) * 10 ** (18 - scale)
+    return code, scale, digits
+
+
+def _same_amount(a: tuple[str, int, str], b: tuple[str, int, str]) -> bool:
+    """Equal amounts at any two scales: the same asset, and equal digits at the larger scale."""
+    top = max(a[1], b[1])
+    return a[0] == b[0] and a[2] + "0" * (top - a[1]) == b[2] + "0" * (top - b[1])
 
 
 def _price_claim(buyer: Party, seller: Party, rail: _Rail) -> Claim:
     halves = (buyer.half, seller.half)
-    prices = _minor(buyer.terms.get("price")), _minor(seller.terms.get("price"))
+    prices = _amount(buyer.terms.get("price")), _amount(seller.terms.get("price"))
     if None in prices:
         return _terms_claim(PRICE, "INSUFFICIENT", _refs(*halves))
-    if prices[0] != prices[1]:
+    if not _same_amount(*prices):
         return _terms_claim(PRICE, "CONTRADICTED", _refs(*halves))
     payer = _leg(rail, "payer_observed")
     if rail.terms is None or payer is None or "payee_observed" not in rail.legs:
         return _terms_claim(PRICE, "INSUFFICIENT", _refs(*halves))
     cited = _refs(*halves, rail.terms, rail.legs["payer_observed"], rail.legs["payee_observed"])
-    state = rail.entry.get("payment_state")
-    if _minor(payer.get("amount")) != prices[0] or (state == "mismatch" and "amount" in rail.entry.get("differs", ())):
+    state, sent = rail.entry.get("payment_state"), _amount(payer.get("amount"))
+    if sent is None:
+        return _terms_claim(PRICE, "INSUFFICIENT", cited)
+    if not _same_amount(sent, prices[0]) or (state == "mismatch" and "amount" in rail.entry.get("differs", ())):
         return _terms_claim(PRICE, "CONTRADICTED", cited)
     if state == "agreed" and rail.entry.get("agreed_status") == "settled":
         return _terms_claim(PRICE, "SATISFIED", cited)
