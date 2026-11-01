@@ -4,8 +4,8 @@
 funnel report), `init` (install a starter pack), `constraints` (list the
 registered guard checks + action-class taxonomy), `tenant`
 (engine-instance-per-tenant provisioning), plus the evidence verbs `verify`
-(verify one ledger record or an offline bundle), and `bundle` (produce a
-self-contained verifiable slice of the ledger) -- registered only in the "full" packaging arm, same
+(verify one ledger record or an offline bundle), `bundle` (produce a
+self-contained verifiable slice of the ledger) and `referee` (judge a deal's pinned terms) -- registered only in the "full" packaging arm, same
 two-arm switch (`capsule_engine.packaging`) the original monorepo used.
 
 This is a deliberately minimal dispatcher: the original monorepo's
@@ -30,6 +30,7 @@ from . import (
     guard_cmds,
     init_cmds,
     packs_cmds,
+    referee_cmd,
     telemetry_cmd,
     tenant_cmds,
     verify_cmd,
@@ -58,6 +59,7 @@ def _build_parser(arm: str | None = None) -> argparse.ArgumentParser:
     if packaging.evidence_visible(arm):
         verify_cmd.add_parser(sub)
         bundle_cmd.add_parser(sub)
+        referee_cmd.add_parser(sub)
 
     return parser
 
@@ -101,6 +103,12 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "telemetry":
         if getattr(args, "telemetry_command", None) is None:
             args.telemetry_parser.print_help()
+            return 0
+        return args.func(args)
+
+    if args.command == "referee":
+        if getattr(args, "referee_command", None) is None:
+            args.referee_parser.print_help()
             return 0
         return args.func(args)
 
