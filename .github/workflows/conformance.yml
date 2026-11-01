@@ -87,7 +87,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: action-state-group/evidencebook-skills
-          ref: 2762d15fb3f9a790b98a977ff22d233104e1f1ec
+          ref: e35ada800b868fba8faaec430ad2319471f8b978
           path: evidencebook-skills
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:

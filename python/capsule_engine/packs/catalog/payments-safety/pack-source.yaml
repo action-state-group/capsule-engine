@@ -11,6 +11,9 @@
 # `holds_integration: stubbed` below records that the seam is deferred, not
 # silently absent.
 pack_id: asg/payments-safety/1.0.0
+pack_version: 1.0.0
+scope:
+  kind: live
 
 obligations:
   - id: caps-per-scope-window

@@ -5,7 +5,7 @@
 # This is a JUDGE/REPORT-time pack: the payload that matters is `outcomes[]`
 # below, each one a term a judge run (capsule_compiler.judge_agent) scores
 # per unit. `obligations`/`action_semantics`/`constraints`/`folds` are the
-# minimal scaffolding every pack.yaml requires (same convention
+# minimal scaffolding every pack requires (same convention
 # tests/fixtures/packs/advisory_incident_shaped/pack.yaml already uses for a
 # judge-only pack: a real but incidental dedupe obligation, not this pack's
 # actual point).
@@ -23,6 +23,9 @@
 # whatever corpus this pack is run against -- a violation raises rather than
 # silently rendering an inapplicable row.
 pack_id: asg/airline-engagement/1.0.1
+pack_version: 1.0.1
+scope:
+  kind: live
 
 obligations:
   - id: no-duplicate-judge-review

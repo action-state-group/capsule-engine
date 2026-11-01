@@ -18,7 +18,7 @@ from capsule_engine.packs.errors import (
     MISSING_REQUIRED_FIELD,
     PackDefinitionError,
 )
-from capsule_engine.packs.loader import load_pack_dir
+from capsule_engine.packs.loader import load_pack_dir, pack_file
 
 CATALOG = Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog"
 PAYMENTS_SAFETY_DIGEST = "81278051db5ca3755956b7adeaea727d333d12a0c14c51c7e030f15ea8b9666f"
@@ -28,11 +28,11 @@ INSTRUMENT = {"kind": "structured_field", "field": "task_authority_ref"}
 def _copy_payments_safety(tmp_path: Path, *, drop: tuple[str, ...] = (), **obligation_fields) -> Path:
     pack_dir = tmp_path / "pack"
     shutil.copytree(CATALOG / "payments-safety", pack_dir)
-    doc = yaml.safe_load((pack_dir / "pack.yaml").read_text())
+    doc = yaml.safe_load(pack_file(pack_dir).read_text())
     for key in drop:
         del doc["obligations"][0][key]
     doc["obligations"][0].update(obligation_fields)
-    (pack_dir / "pack.yaml").write_text(yaml.safe_dump(doc, sort_keys=False))
+    pack_file(pack_dir).write_text(yaml.safe_dump(doc, sort_keys=False))
     return pack_dir
 
 

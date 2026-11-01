@@ -27,6 +27,9 @@
 # every corpus already carries (a conversation turn, an issue comment), so
 # those stay `measurability: measured` (the default).
 pack_id: asg/standard-vendor/1.0.1
+pack_version: 1.0.1
+scope:
+  kind: live
 
 obligations:
   - id: no-duplicate-judge-verdict

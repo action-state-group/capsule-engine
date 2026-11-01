@@ -29,7 +29,7 @@ from capsule_engine.packs.errors import (
     PROMPT_TEXT_IN_PACK,
     PackDefinitionError,
 )
-from capsule_engine.packs.loader import load_pack_dir
+from capsule_engine.packs.loader import is_pack_dir, load_pack_dir, pack_file
 from capsule_engine.packs.schema import JudgePin
 
 CATALOG = Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog"
@@ -70,9 +70,9 @@ def _pack_with(tmp_path: Path, obligation: dict) -> Path:
     """payments-safety with ``obligation`` appended to its obligations."""
     pack_dir = tmp_path / "pack"
     shutil.copytree(CATALOG / "payments-safety", pack_dir)
-    doc = yaml.safe_load((pack_dir / "pack.yaml").read_text())
+    doc = yaml.safe_load(pack_file(pack_dir).read_text())
     doc["obligations"].append(obligation)
-    (pack_dir / "pack.yaml").write_text(yaml.safe_dump(doc, sort_keys=False))
+    pack_file(pack_dir).write_text(yaml.safe_dump(doc, sort_keys=False))
     return pack_dir
 
 
@@ -124,7 +124,7 @@ def test_an_undeclared_mode_and_pin_are_absent_from_the_canonical_form():
         assert "judge_pin" not in obligation
 
 
-@pytest.mark.parametrize("name", sorted(p.name for p in CATALOG.iterdir() if (p / "pack.yaml").exists()))
+@pytest.mark.parametrize("name", sorted(p.name for p in CATALOG.iterdir() if is_pack_dir(p)))
 def test_no_catalog_pack_declares_a_judged_obligation_yet(name):
     pack = load_pack_dir(CATALOG / name)
     assert all(o.mode == "structural" and o.judge_pin is None for o in pack.obligations)

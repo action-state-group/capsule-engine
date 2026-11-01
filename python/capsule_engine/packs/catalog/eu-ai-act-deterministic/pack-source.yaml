@@ -21,6 +21,9 @@
 #
 # DOC rows are presence-by-digest only and never graded "compliant".
 pack_id: asg/eu-ai-act-deterministic/0.1.0
+pack_version: 0.1.0
+scope:
+  kind: live
 
 outcomes:
 - id: EU-05d

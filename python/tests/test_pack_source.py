@@ -30,16 +30,9 @@ ROOT = Path(__file__).resolve().parents[2]
 CATALOG = ROOT / "python" / "capsule_engine" / "packs" / "catalog"
 SELLER = CATALOG / "seller"
 
-# Catalog packs still read through pack.yaml: the pack compiler does not yet
-# take their outcomes, profiles, proposers, inline wickets or fold files
-# (action-state-group/evidencebook-skills#98). Each moves when it does; no
-# pack joins this list.
-PENDING_PACK_YAML = {"airline-engagement", "eu-ai-act", "eu-ai-act-deterministic", "payments-safety", "standard-vendor"}
-
-
 def test_no_live_pack_is_added_as_pack_yaml():
-    legacy = {p.parent.name for p in CATALOG.glob("*/pack.yaml")}
-    assert legacy == PENDING_PACK_YAML
+    assert not list(CATALOG.glob("*/pack.yaml"))
+    assert {p.parent.name for p in CATALOG.glob("*/pack-source.yaml")} == {p.name for p in CATALOG.iterdir() if p.is_dir()}
     for root in (ROOT / "go" / "packs", ROOT / "python" / "tests" / "fixtures" / "packs"):
         for d in root.iterdir():
             if re.match(r"^(everyday|seller|inference)-\d", d.name):

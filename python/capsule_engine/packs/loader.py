@@ -43,8 +43,9 @@ are not in the definition digest: ``scope``, ``pack_version`` (equal to the
 version in ``pack_id``) and, on each cited wicket (``wicket_ref``), the
 ``check`` that wicket implements, which must match the cited definition. An
 obligation may also carry ``requirement_tier``, which only the compiled
-contract reads. ``pack.yaml`` is a deprecated read path, kept for packs not
-yet moved; it is removed in capsule-engine Python 0.5.0 and Go v0.4.0.
+contract reads. ``pack.yaml`` is a deprecated read path, kept for packs
+authored outside this repository; it is removed in capsule-engine Python
+0.5.0 and Go v0.4.0.
 """
 from __future__ import annotations
 
