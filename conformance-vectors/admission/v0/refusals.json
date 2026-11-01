@@ -754,6 +754,100 @@
     }
    ],
    "want": "a card row may not decide NO"
+  },
+  {
+   "case": "served periods without min_periods",
+   "base": "packs/mesh-served.json",
+   "ops": [
+    {
+     "delete": [
+      "rows",
+      4,
+      "params",
+      "min_periods"
+     ]
+    }
+   ],
+   "want": "needs params.min_periods"
+  },
+  {
+   "case": "served periods needing more than the window",
+   "base": "packs/mesh-served.json",
+   "ops": [
+    {
+     "set": [
+      "rows",
+      4,
+      "params",
+      "min_periods"
+     ],
+     "value": 5
+    }
+   ],
+   "want": "params.min_periods must be at most params.window"
+  },
+  {
+   "case": "served periods with an empty window",
+   "base": "packs/mesh-served.json",
+   "ops": [
+    {
+     "set": [
+      "rows",
+      4,
+      "params",
+      "window"
+     ],
+     "value": 0
+    }
+   ],
+   "want": "params.window 0 must be from 1 to 10000"
+  },
+  {
+   "case": "served periods counting none",
+   "base": "packs/mesh-served.json",
+   "ops": [
+    {
+     "set": [
+      "rows",
+      4,
+      "params",
+      "min_periods"
+     ],
+     "value": 0
+    }
+   ],
+   "want": "params.min_periods 0 must be from 1 to 10000"
+  },
+  {
+   "case": "served periods past the most an answer lists",
+   "base": "packs/mesh-served.json",
+   "ops": [
+    {
+     "set": [
+      "rows",
+      4,
+      "params",
+      "window"
+     ],
+     "value": 10001
+    }
+   ],
+   "want": "params.window 10001 must be from 1 to 10000"
+  },
+  {
+   "case": "served periods decide NO",
+   "base": "packs/mesh-served.json",
+   "ops": [
+    {
+     "set": [
+      "rows",
+      4,
+      "on_fail"
+     ],
+     "value": "NO"
+    }
+   ],
+   "want": "a card row may not decide NO"
   }
  ],
  "raw": [

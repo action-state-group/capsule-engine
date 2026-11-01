@@ -6,7 +6,10 @@ import "github.com/action-state-group/capsule-engine/go/canon"
 // (Mesh-LLM/capsules-plugin's admission.rs BLOCK). It keeps that block's
 // names, verdict, source, reads and rows with row and result, so loop step
 // 04 reads what it reads today, and adds tier, band, asks and each row's
-// count, denominator and effect. reads holds the policy entry only; the
+// count, denominator and effect; a card.verified row that fails with a
+// reason records it, a served periods row its label (self_reported) and the
+// periods it did not count, and a decision on a card with served periods its
+// coverage, population NOT_CHECKED. reads holds the policy entry only; the
 // caller appends what it read (the card, by its own commitment) and names
 // the counterparty by its own reference. The block is local-only: it is
 // about one counterparty and is never exported for another party.
@@ -28,6 +31,14 @@ func (d Decision) Block() canon.Value {
 		if r.Denominator != nil {
 			ms = append(ms, canon.M("denominator", canon.Int(*r.Denominator)))
 		}
+		if r.Reason != "" {
+			ms = append(ms, canon.M("reason", canon.Str(r.Reason)))
+		}
+		if nc := r.NotCounted; nc != nil {
+			ms = append(ms, canon.M("label", canon.Str("self_reported")), canon.M("not_counted", canon.Obj(
+				canon.M("below_floor", canon.Int(nc.BelowFloor)), canon.M("complementary", canon.Int(nc.Complementary)),
+				canon.M("not_listed", canon.Int(nc.NotListed)))))
+		}
 		rows[i] = canon.Obj(ms...)
 	}
 	asks := make([]canon.Value, len(d.Asks))
@@ -40,7 +51,7 @@ func (d Decision) Block() canon.Value {
 		canon.M("policy", canon.Str(d.Pack.ID)),
 		canon.M("digest", canon.Obj(canon.M("alg", canon.Str("SHA-256")), canon.M("digest", canon.Str(d.Pack.Digest)))),
 	)
-	return canon.Obj(
+	ms := []canon.Member{
 		canon.M("verdict", canon.Str(d.Verdict)),
 		canon.M("source", canon.Str(d.Source)),
 		canon.M("tier", tier),
@@ -48,5 +59,12 @@ func (d Decision) Block() canon.Value {
 		canon.M("reads", canon.Arr([]canon.Value{policy})),
 		canon.M("rows", canon.Arr(rows)),
 		canon.M("asks", canon.Arr(asks)),
-	)
+	}
+	// coverage is written only for a card with served periods, so a
+	// decision on any other card keeps its bytes.
+	if d.Coverage != nil {
+		ms = append(ms, canon.M("coverage", canon.Obj(canon.M("kind", canon.Str(d.Coverage.Kind)),
+			canon.M("population", canon.Str(d.Coverage.Population)))))
+	}
+	return canon.Obj(ms...)
 }

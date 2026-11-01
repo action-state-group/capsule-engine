@@ -74,7 +74,7 @@ pub fn standard_history_counts(artifact: &[u8]) -> Result<(Vec<BandCount>, Dispu
 
 /// standard_history.go isJCS: why `src` is not exactly the JCS encoding of
 /// its own parse.
-fn is_jcs(src: &[u8]) -> Result<(), String> {
+pub(super) fn is_jcs(src: &[u8]) -> Result<(), String> {
     let v = canon::parse_json(src).map_err(|e| e.to_string())?;
     match canon::jcs(&v) {
         Ok(jcs) if jcs.as_bytes() == src => Ok(()),
@@ -93,7 +93,7 @@ fn int(v: Option<&Value>) -> Result<i64, String> {
 }
 
 /// standard_history.go cardCount: a card integer that is 0 or more.
-fn count(m: &Map<String, Value>, k: &str) -> Result<i64, String> {
+pub(super) fn count(m: &Map<String, Value>, k: &str) -> Result<i64, String> {
     let n = int(m.get(k))?;
     if n < 0 {
         return Err("must be 0 or more".into());

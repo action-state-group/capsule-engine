@@ -16,6 +16,23 @@ and `portedDefinitions` (`guard/engine.go`).
 - Deprecated (capsule-engine#252): `Load` and reading a `pack.yaml` directory through `LoadFrom`
   and `LoadPath`, for packs authored outside this module; removed in v0.4.0.
 
+- Added (capsule-engine#273): `InferenceServiceHistoryCounts` reads a Mesh node's
+  `inference-service-history/0` Standard answer as `Card.Served`. The answer is the node's own
+  count of the exchanges it served in each closed period. The function takes the definition
+  document, the artifact, the checkpoint times and record count the caller read from the embedded
+  `history_card/1`, and the requester's `expected_pin`. It checks each History property it can
+  compute from those bytes: `definition_form`, `definition_binding`, `artifact_form`, the coverage
+  declaration, `units`, `labels`, `period_alignment`, `period_anchor`, `period_floor`, and that the
+  answer's anchor is the pin. It returns an error naming the property that fails, so the card is
+  `CardUnverifiable`; an unknown profile or a Detailed definition is refused the same way.
+  `Card.Reason` (new) carries that reason into the `card.verified` row.
+  Also added: the predicate `card.self_reported_served_periods` (params `window`, `min_periods`). It
+  counts the closed periods whose served total is published. A suppressed total, or a period the
+  answer does not list, is not counted, and is never a fail on its own. The row never adds counts
+  across periods or models. Its block entry carries `label: "self_reported"` and `not_counted` by
+  reason. A decision on such a card records `coverage` with population `NOT_CHECKED`. Decisions on
+  other cards keep their bytes. Every count stays the node's own statement, checked property by
+  property; nothing here scores or ranks a node.
 - Added (evidencebook-skills#87): `StandardHistoryCounts` reads a verified `standard_history/1`
   card's bands and received disputes as `Card.Bands` and `Card.Disputes`. A band's subjects are its
   decided deals (`held` plus `did_not_hold`), and its adverse count is `did_not_hold`; a null-decade

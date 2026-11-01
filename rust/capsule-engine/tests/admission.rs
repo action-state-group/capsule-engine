@@ -10,8 +10,9 @@ use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 
 use capsule_engine::admission::{
-    evaluate, standard_history_counts, AdjudicationVerdict, BandCount, Card, Claims, Disputes, Inputs, Judgement,
-    Operator, OwnHistory, Pack, Platform, RailPin, Selection, Stake, Timestamp, Vouch,
+    evaluate, inference_service_history_counts, standard_history_counts, AdjudicationVerdict, BandCount, Card,
+    CardCheckpoints, Claims, Disputes, Inputs, Judgement, Operator, OwnHistory, Pack, Platform, RailPin, Selection,
+    Served, ServedPeriod, Stake, Timestamp, Vouch,
 };
 use capsule_engine::canon;
 use serde_json::{Map, Value};
@@ -58,6 +59,67 @@ fn null_or<'a>(m: &'a Map<String, Value>, k: &str) -> Option<&'a Value> {
     m.get(k).filter(|v| !v.is_null())
 }
 
+/// inference_service_history_test.go servedOf: served periods as a vector
+/// writes them.
+fn served(v: &Value) -> Served {
+    let v = object(v, &["length_s", "floor", "periods"], "served");
+    Served {
+        length_s: int(v, "length_s"),
+        floor: int(v, "floor"),
+        periods: v["periods"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|p| {
+                let p = object(p, &["from", "to", "total", "suppressed"], "served.periods[]");
+                ServedPeriod {
+                    from: time(&text(p, "from")),
+                    to: time(&text(p, "to")),
+                    total: null_or(p, "total").map(|t| t.as_i64().unwrap()),
+                    suppressed: text(p, "suppressed"),
+                }
+            })
+            .collect(),
+    }
+}
+
+/// inference_service_history_test.go toVectorServed: served periods as a
+/// vector writes them.
+fn served_json(s: &Served) -> Value {
+    let periods = s
+        .periods
+        .iter()
+        .map(|p| {
+            let mut m = Map::new();
+            m.insert("from".into(), Value::String(rfc3339(p.from)));
+            m.insert("to".into(), Value::String(rfc3339(p.to)));
+            m.insert("total".into(), p.total.map_or(Value::Null, Value::from));
+            if !p.suppressed.is_empty() {
+                m.insert("suppressed".into(), Value::String(p.suppressed.clone()));
+            }
+            Value::Object(m)
+        })
+        .collect();
+    serde_json::json!({"length_s": s.length_s, "floor": s.floor, "periods": Value::Array(periods)})
+}
+
+/// A whole-second instant as YYYY-MM-DDTHH:MM:SSZ (civil from days, Howard
+/// Hinnant's algorithm).
+fn rfc3339(t: Timestamp) -> String {
+    let secs = t.unix_nanos().div_euclid(1_000_000_000) as i64;
+    let (days, rem) = (secs.div_euclid(86_400), secs.rem_euclid(86_400));
+    let z = days + 719_468;
+    let era = z.div_euclid(146_097);
+    let doe = z - era * 146_097;
+    let yoe = (doe - doe / 1460 + doe / 36_524 - doe / 146_096) / 365;
+    let doy = doe - (365 * yoe + yoe / 4 - yoe / 100);
+    let mp = (5 * doy + 2) / 153;
+    let day = doy - (153 * mp + 2) / 5 + 1;
+    let month = if mp < 10 { mp + 3 } else { mp - 9 };
+    let year = yoe + era * 400 + i64::from(month <= 2);
+    format!("{year:04}-{month:02}-{day:02}T{:02}:{:02}:{:02}Z", rem / 3600, rem % 3600 / 60, rem % 60)
+}
+
 /// conformance_test.go decodeInput: vectorInput as Inputs.
 fn decode_input(raw: &Value) -> Inputs {
     let v = object(
@@ -86,6 +148,7 @@ fn decode_input(raw: &Value) -> Inputs {
         v.get("card").unwrap_or(&empty),
         &[
             "state",
+            "reason",
             "first_checkpoint_at",
             "latest_checkpoint_at",
             "witness",
@@ -93,6 +156,7 @@ fn decode_input(raw: &Value) -> Inputs {
             "claims",
             "bands",
             "disputes",
+            "served",
         ],
         "card",
     );
@@ -107,6 +171,8 @@ fn decode_input(raw: &Value) -> Inputs {
     };
     input.card = Card {
         state: text(card, "state"),
+        reason: text(card, "reason"),
+        served: null_or(card, "served").map(served),
         first_checkpoint_at: opt_time(&text(card, "first_checkpoint_at")),
         latest_checkpoint_at: opt_time(&text(card, "latest_checkpoint_at")),
         witness: text(card, "witness"),
@@ -432,6 +498,46 @@ fn standard_history_vectors() {
                     disputes,
                     Disputes { open: d["open"].as_i64().unwrap(), of: d["of"].as_i64().unwrap() },
                     "{name}: disputes"
+                );
+            }
+        }
+    }
+}
+
+/// inference_service_history_test.go TestInferenceServiceHistoryVectors: the
+/// shared inference-service-history/0 vectors.
+#[test]
+fn inference_service_history_vectors() {
+    let raw = std::fs::read(vector_dir().join("inference-service-history.json")).unwrap();
+    let set: Value = serde_json::from_slice(&raw).unwrap();
+    let cases = set["cases"].as_array().unwrap();
+    assert!(!cases.is_empty(), "no inference-service-history/0 vectors");
+    for c in cases {
+        let name = c["case"].as_str().unwrap();
+        let card = CardCheckpoints {
+            times: c["card"]["times"].as_array().unwrap().iter().map(|t| time(t.as_str().unwrap())).collect(),
+            records: c["card"]["records"].as_i64().unwrap(),
+        };
+        let got = inference_service_history_counts(
+            c["definition"].as_str().unwrap().as_bytes(),
+            c["artifact"].as_str().unwrap().as_bytes(),
+            &card,
+            c["pin"].as_str().unwrap(),
+        );
+        match c.get("want") {
+            Some(want) => {
+                let want = want.as_str().unwrap();
+                match got {
+                    Err(e) => assert!(e.0.contains(want), "{name}: error {e}, want one containing {want:?}"),
+                    Ok(_) => panic!("{name}: read, want an error containing {want:?}"),
+                }
+            }
+            None => {
+                let got = got.unwrap_or_else(|err| panic!("{name}: {err}"));
+                assert_eq!(
+                    got.as_ref().map(served_json),
+                    c["expected"].as_object().map(|_| c["expected"].clone()),
+                    "{name}"
                 );
             }
         }

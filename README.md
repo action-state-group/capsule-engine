@@ -149,6 +149,16 @@ shared cases, the loader's refusals and `admission-baseline@1`'s fixtures) the
 same in CI. Neither reads YAML. The Rust crate is not published; a consumer pins it by git
 commit.
 
+A personal agent can admit a Mesh node from the node's `inference-service-history/0` answer
+(capsule-engine#273). `InferenceServiceHistoryCounts` (Rust `inference_service_history_counts`)
+checks the answer property by property against its definition document: the definition, the
+binding, the artifact, the coverage declaration, the units, the labels and the periods. It then
+reads the node's served periods. The pack's `card.self_reported_served_periods` row counts closed
+periods with a published served total. Those counts are the node's own statement, and the decision
+says so. Exchanges the other side's own half confirms come only from the agent's own book. The
+evaluator gives no score and no ranking of nodes; it decides about one node at a time, from the
+properties it checked.
+
 For the parts you can use on their own (the Evidence Contract schema and
 validator, the obligation register format and its sample compiler, and the
 examples, including the Evidence Contracts in `examples/contracts/`), see

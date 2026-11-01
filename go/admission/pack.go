@@ -373,6 +373,11 @@ func Load(src []byte) (*Pack, error) {
 					row.Params[k] = v
 				}
 			}
+			// A row that needs more periods than it reads could never pass.
+			if r.Check == "card.self_reported_served_periods" && len(row.Params) == 2 &&
+				row.Params["min_periods"] > row.Params["window"] {
+				bad("%s: params.min_periods must be at most params.window", where)
+			}
 		}
 		from, ok := tierIndex[r.From]
 		if !ok {
@@ -484,11 +489,16 @@ var paramMax = map[string]int64{
 	// bandDecadeMax, plus the step) far inside an int.
 	"step_decades":         decadeMax,
 	"max_adverse_permille": 1000,
+	// A served periods row reads at most as many periods as one
+	// inference-service-history answer lists.
+	"window":      ishPeriodsMax,
+	"min_periods": ishPeriodsMax,
 }
 
 // paramMin is a threshold's least value where it is not 0: a ladder needs
-// at least one subject in a band to earn it.
-var paramMin = map[string]int64{"k": 1}
+// at least one subject in a band to earn it, and a served periods row at
+// least one period to read and to count.
+var paramMin = map[string]int64{"k": 1, "window": 1, "min_periods": 1}
 
 func sortedKeys[V any](m map[string]V) []string {
 	keys := make([]string, 0, len(m))

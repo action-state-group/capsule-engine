@@ -56,10 +56,15 @@ const (
 	CardUnanswered   = "unanswered"
 )
 
-// Card is the counterparty's history_card/1 or served_summary/1 as the
-// caller verified it. A zero Card is absent.
+// Card is the counterparty's history_card/1, served_summary/1,
+// standard_history/1 or inference-service-history/0 answer as the caller
+// verified it. A zero Card is absent.
 type Card struct {
-	State              string
+	State string
+	// Reason is why the card is unverifiable, as the caller's verifier or
+	// InferenceServiceHistoryCounts gave it; the card.verified row records
+	// it. "" otherwise.
+	Reason             string
 	FirstCheckpointAt  time.Time
 	LatestCheckpointAt time.Time
 	// Witness is the witness whose receipt on the latest checkpoint the
@@ -79,6 +84,10 @@ type Card struct {
 	// the card carries no dispute tally. StandardHistoryCounts fills Bands
 	// and Disputes from a standard_history/1 card.
 	Disputes *Disputes
+	// Served are the node's self-reported served periods; nil when the card
+	// carries none. InferenceServiceHistoryCounts fills it from an
+	// inference-service-history/0 answer.
+	Served *Served
 }
 
 // Disputes are the disputes others raised about the counterparty that its
@@ -189,6 +198,20 @@ type RowResult struct {
 	// one earned: the highest decade, in the deal's band unit, the earned
 	// history covers (the earned band plus the step).
 	earned *int
+	// Reason is set on a card.verified row that fails with a reason.
+	Reason string
+	// NotCounted is set on a card.self_reported_served_periods row that
+	// read the card: the periods of its window not counted, by why. Its
+	// counts are the node's own statement (self_reported).
+	NotCounted *NotCounted
+}
+
+// NotCounted are the periods of a served periods row's window that were
+// not counted: their total suppressed below the floor or as a complement
+// (ISH §6.2), or not listed because the node's stream is younger than the
+// window. None of these is a fail on its own.
+type NotCounted struct {
+	BelowFloor, Complementary, NotListed int64
 }
 
 // AskOut is one Evidence Request a decision derives from a not_read row.
@@ -213,6 +236,16 @@ type Decision struct {
 	Rows []RowResult
 	Asks []AskOut
 	Pack PackRef
+	// Coverage is set when the card carries served periods: the counts
+	// declare the node's stream up to the anchor, and were never checked
+	// against records, so completeness is not established (ISH §4.2).
+	Coverage *Coverage
+}
+
+// Coverage is the coverage a card's counts declare, and whether its
+// population was checked.
+type Coverage struct {
+	Kind, Population string
 }
 
 // PackRef is the pack a decision cites.
@@ -257,6 +290,9 @@ const (
 // the top tier, or below the lowest), the pack's missing default decides.
 func Evaluate(p *Pack, in Inputs) Decision {
 	d := Decision{Pack: PackRef{ID: p.ID, Digest: p.Digest}}
+	if in.Card.Served != nil {
+		d.Coverage = &Coverage{Kind: "stream_interval", Population: "NOT_CHECKED"}
+	}
 	top := len(p.Tiers) - 1
 
 	dealTier, aboveTier, missing := 0, false, false
@@ -432,28 +468,29 @@ type predicate struct {
 }
 
 var predicates = map[string]predicate{
-	"platform.attestation_not_invalid": {SourcePlatform, nil},
-	"platform.owner_signed":            {SourcePlatform, nil},
-	"card.verified":                    {SourceCard, nil},
-	"card.fresh":                       {SourceCard, []string{"max_age_s"}},
-	"card.key_age":                     {SourceCard, []string{"min_days"}},
-	"card.witnessed":                   {SourceCard, nil},
-	"card.claims_held":                 {SourceCard, []string{"min"}},
-	"card.controller_declared":         {SourceCard, nil},
-	"card.controller_trusted":          {SourceCard, nil},
-	"bound.selection_verified":         {SourceBound, nil},
-	"bound.no_unanswered_dispute":      {SourceBound, []string{"window_days"}},
-	"own.settled":                      {SourceOwnHistory, []string{"min"}},
-	"own.held_halves":                  {SourceOwnHistory, []string{"min"}},
-	"own.no_conflicting":               {SourceOwnHistory, nil},
-	"own.no_adverse_adjudication":      {SourceOwnHistory, []string{"window_days"}},
-	"operator.not_deny_listed":         {SourceOperator, nil},
-	"operator.allow_listed":            {SourceOperator, nil},
-	"vouch.distinct_controllers":       {SourceVouch, []string{"min"}},
-	"stake.covers_deal":                {SourceStake, nil},
-	"card.band_history_or_stake":       {SourceCard, []string{"k", "step_decades", "max_adverse_permille"}},
-	"card.open_disputes":               {SourceCard, []string{"max"}},
-	"judged":                           {SourceJudged, nil},
+	"platform.attestation_not_invalid":  {SourcePlatform, nil},
+	"platform.owner_signed":             {SourcePlatform, nil},
+	"card.verified":                     {SourceCard, nil},
+	"card.fresh":                        {SourceCard, []string{"max_age_s"}},
+	"card.key_age":                      {SourceCard, []string{"min_days"}},
+	"card.witnessed":                    {SourceCard, nil},
+	"card.claims_held":                  {SourceCard, []string{"min"}},
+	"card.controller_declared":          {SourceCard, nil},
+	"card.controller_trusted":           {SourceCard, nil},
+	"bound.selection_verified":          {SourceBound, nil},
+	"bound.no_unanswered_dispute":       {SourceBound, []string{"window_days"}},
+	"own.settled":                       {SourceOwnHistory, []string{"min"}},
+	"own.held_halves":                   {SourceOwnHistory, []string{"min"}},
+	"own.no_conflicting":                {SourceOwnHistory, nil},
+	"own.no_adverse_adjudication":       {SourceOwnHistory, []string{"window_days"}},
+	"operator.not_deny_listed":          {SourceOperator, nil},
+	"operator.allow_listed":             {SourceOperator, nil},
+	"vouch.distinct_controllers":        {SourceVouch, []string{"min"}},
+	"stake.covers_deal":                 {SourceStake, nil},
+	"card.band_history_or_stake":        {SourceCard, []string{"k", "step_decades", "max_adverse_permille"}},
+	"card.open_disputes":                {SourceCard, []string{"max"}},
+	"card.self_reported_served_periods": {SourceCard, []string{"window", "min_periods"}},
+	"judged":                            {SourceJudged, nil},
 }
 
 // stakeCovers reports whether the stake covers the deal: in the same band
@@ -524,6 +561,38 @@ func ladder(r Row, in Inputs, accept map[string]Unit, roots TrustRoots) RowResul
 	return RowResult{Result: of(deal.Decade <= limit), earned: &limit}
 }
 
+// servedPeriods reads the last window closed periods of the card's served
+// periods (capsule-engine#273): a period is counted when its served total is
+// published. A suppressed total, or a period not listed because the stream
+// is younger than the window, is not counted and never a fail on its own.
+// The row passes when at least min_periods are counted. It never adds
+// counts across periods or models.
+func servedPeriods(r Row, c Card) RowResult {
+	if c.State != CardVerified || c.Served == nil {
+		return RowResult{Result: NotRead}
+	}
+	window, need := r.Params["window"], r.Params["min_periods"]
+	periods := c.Served.Periods
+	if int64(len(periods)) > window {
+		periods = periods[int64(len(periods))-window:]
+	}
+	var n int64
+	nc := NotCounted{NotListed: window - int64(len(periods))}
+	for _, p := range periods {
+		switch {
+		case p.Total != nil:
+			n++
+		case p.Suppressed == SuppressedComplementary:
+			nc.Complementary++
+		default:
+			nc.BelowFloor++
+		}
+	}
+	res := counted(of(n >= need), n, window)
+	res.NotCounted = &nc
+	return res
+}
+
 // maxSafeInteger is 2^53 − 1, the largest count every JSON reader keeps.
 const maxSafeInteger = 1<<53 - 1
 
@@ -562,7 +631,7 @@ func readRow(r Row, in Inputs, accept map[string]Unit, roots TrustRoots) RowResu
 			case CardVerified:
 				return RowResult{Result: Pass}
 			case CardUnverifiable:
-				return RowResult{Result: Fail}
+				return RowResult{Result: Fail, Reason: in.Card.Reason}
 			}
 			return RowResult{Result: NotRead}
 		case "card.fresh":
@@ -692,6 +761,8 @@ func readRow(r Row, in Inputs, accept map[string]Unit, roots TrustRoots) RowResu
 			}
 			c := in.Card.Disputes
 			return counted(of(c.Open <= r.Params["max"]), c.Open, c.Of)
+		case "card.self_reported_served_periods":
+			return servedPeriods(r, in.Card)
 		case "judged":
 			// A judge outside the trust roots is reported, not counted
 			// (SDK-SURFACE evaluate, NOT_CHECKED).

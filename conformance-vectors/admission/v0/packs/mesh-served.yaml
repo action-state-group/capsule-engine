@@ -1,0 +1,62 @@
+# A test admission pack (capsule-engine#273 conformance vectors) for a
+# personal agent admitting a Mesh node from its inference-service-history/0
+# card: card.self_reported_served_periods over the node's own weekly served
+# counts, a card fresh within the eight days a weekly answer allows, asked
+# for again when stale, and confirmed exchanges recorded apart from the
+# node's own counts. Every number is a placeholder.
+pack_id: asg/admission_mesh_served_test/0.1.0
+pack_version: 0.1.0
+scope:
+  kind: admission
+source: capsule-engine#273 conformance vectors
+outcomes: ["GO", "ASK", "LIMIT", "NO"]
+missing: "LIMIT"
+accept:
+  USD: {band: USD, scale: 0}
+tiers:
+  - id: T0
+    max_decade: {USD: 0}
+  - id: T1
+    max_decade: {USD: 2}
+budget:
+  max_asks: 1
+  deadline_s: 3600
+trust_roots:
+  controllers: []
+  witnesses: []
+  judges: []
+rows:
+  - id: deny-list
+    statement: The node is not on the operator's deny list.
+    source: operator
+    check: operator.not_deny_listed
+    from: T0
+    on_fail: "NO"
+  - id: confirmed-exchanges
+    statement: Our own book holds at least one exchange with the node whose half the node's half cites.
+    source: own_history
+    check: own.held_halves
+    params: {min: 1}
+    from: T0
+    on_fail: "record"
+  - id: card-verified
+    statement: The node's card verified.
+    source: card
+    check: card.verified
+    from: T1
+    on_fail: "LIMIT"
+  - id: card-fresh
+    statement: The node's card is at most eight days old, one weekly answer and a day.
+    source: card
+    check: card.fresh
+    params: {max_age_s: 691200}
+    from: T1
+    on_fail: "LIMIT"
+    ask: {derivation: cbc96d800ad206791db7e0793b80a2720c1908468ba99692b739aa8e74aab2d8}
+  - id: served-periods
+    statement: The node's own counts show served exchanges in at least 2 of the last 4 weeks.
+    source: card
+    check: card.self_reported_served_periods
+    params: {window: 4, min_periods: 2}
+    from: T1
+    on_fail: "LIMIT"

@@ -53,6 +53,7 @@ type vectorInput struct {
 	} `json:"platform"`
 	Card struct {
 		State              string `json:"state"`
+		Reason             string `json:"reason"`
 		FirstCheckpointAt  string `json:"first_checkpoint_at"`
 		LatestCheckpointAt string `json:"latest_checkpoint_at"`
 		Witness            string `json:"witness"`
@@ -71,6 +72,7 @@ type vectorInput struct {
 			Subjects int64  `json:"subjects"`
 			Adverse  int64  `json:"adverse"`
 		} `json:"bands"`
+		Served *vectorServed `json:"served"`
 	} `json:"card"`
 	Selection struct {
 		State              string   `json:"state"`
@@ -133,7 +135,7 @@ func decodeInput(t *testing.T, raw json.RawMessage) Inputs {
 	in := Inputs{
 		Now: parseTime(t, v.Now), Amount: v.Amount, Currency: v.Currency,
 		Platform: Platform{ReleaseAttestation: v.Platform.ReleaseAttestation, OwnerSigned: v.Platform.OwnerSigned},
-		Card: Card{State: v.Card.State, FirstCheckpointAt: parseTime(t, v.Card.FirstCheckpointAt),
+		Card: Card{State: v.Card.State, Reason: v.Card.Reason, Served: servedOf(t, v.Card.Served), FirstCheckpointAt: parseTime(t, v.Card.FirstCheckpointAt),
 			LatestCheckpointAt: parseTime(t, v.Card.LatestCheckpointAt), Witness: v.Card.Witness, Controller: v.Card.Controller},
 		Selection: Selection{State: v.Selection.State},
 		Operator:  Operator{DenyListed: v.Operator.DenyListed, AllowListed: v.Operator.AllowListed},
