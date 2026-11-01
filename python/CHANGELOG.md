@@ -5,6 +5,14 @@ module has its own changelog, `go/CHANGELOG.md`.
 
 ## Unreleased
 
+## 0.3.0 — 2026-10-31
+
+Python 0.3.0, a minor release with breaking changes: the engine reads and writes its records
+through a `History` over the artifact store (#255, #257), and the bundle viewer, console and report
+renderer are removed (#175, #254). It also adds the `rate_cap` check, the `required_fields` check
+and the `asg/inference/0.1.0` pack (#263, #264). Its capsule-emit and checkpointed-local-log
+requirements are PyPI versions again, not GitHub revisions.
+
 - Added (capsule-engine#263): the `rate_cap` check and its wicket `rate_cap/1.0.0`. It compares the
   advertised input and output rates of the peer an inference is bought from, in millisatoshis per
   million tokens (mesh-llm's `Pricing` units), with `max_input_msat_per_million` and
@@ -60,9 +68,9 @@ module has its own changelog, `go/CHANGELOG.md`.
   - MCP: `ledger_query` rows no longer carry `consequential`.
   - The tau2 airline reference seals its policy checks with `capsule_emit.produce.seal`, which
     writes nothing, and records them in its own history.
-  - `capsule-emit` and `checkpointed-local-log` are installed from GitHub at the merged revisions
-    this needs (capsule-emit#381, #382; checkpointed-local-log#98) until their next releases, so
-    this package cannot be released to PyPI before them.
+  - The package requires `capsule-emit>=0.14.0,<0.15` (the artifact store index and `produce`,
+    capsule-emit#381, #382) and `checkpointed-local-log>=0.8.0,<0.9` (the entry count,
+    checkpointed-local-log#98), both published to PyPI.
 
 - **Breaking** (capsule-engine#175): the engine's three rendering surfaces are removed. The engine
   computes; pages are drawn by capsule-viewer. Removed released verbs and entry points:
@@ -78,7 +86,8 @@ module has its own changelog, `go/CHANGELOG.md`.
   holds a local-only field, and `--share` no longer prints a URL. `--telemetry-opt-in` and
   `--telemetry-endpoint` are removed with the HTML beacon, and `CAPSULE_LEDGER_TELEMETRY_ENDPOINT` is now
   ignored without a warning. Drawing a withheld payload beside its digest moves to
-  action-state-group/capsule-viewer#105. The next release takes a minor bump.
+  action-state-group/capsule-viewer#105.
+- Changed (capsule-engine#253): the vendored CPB registry (`registry/cpb_registry.json`, `conventions.json`) is re-vendored from scitt-payload-binding fa57e7c; the machine-mandate action-hash field set gains `member`.
 - Changed (capsule-engine#234, ruling A on #214 hold A): under spend.weekly/3.1.0, a live check's
   history now lets a cancel or refund free the headroom of the partial charge it cites. It lowers
   that charge's counted amount by the amount it returns, never below the charge's sealed
