@@ -5,6 +5,17 @@ module has its own changelog, `go/CHANGELOG.md`.
 
 ## Unreleased
 
+- Added (capsule-engine#271): the contract-named referee, `capsule_engine.referee` and
+  `capsule-engine referee judge`. A deal's terms name the referee by key; given both halves, the
+  openings of their commitments, each party's own deal records and the settlement legs, it seals
+  one Evidence Result in the referee's book. The Result judges the shared deal terms under
+  `ec:deal-terms@1` (`price-agreed`, `item-agreed`, `delivered-before-expiry`,
+  `paid-before-release`) and each party's own pack over that party's own records only, never the
+  other party's pack. A rule its pack declares `declared_not_measured` reads `not_evaluable` and
+  names the field it waits on. The same inputs give the same bytes. It refuses a deal whose halves
+  name another referee, records not signed by the party's book key, and a pack the catalog does not
+  hold at the named digest. `verify_referee_result` is the receiving party's check.
+
 ## 0.3.0 — 2026-10-31
 
 Python 0.3.0, a minor release with breaking changes: the engine reads and writes its records

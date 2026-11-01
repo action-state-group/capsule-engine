@@ -59,6 +59,7 @@ the test suite passes (`pip install pytest "mcp<2"`, then `python -m pytest` in 
 | `capsule-engine packs propose --pack NAME` | A read-only measurability report for any pack over a JSONL corpus. |
 | `capsule-engine verify CAPSULE_ID` | Verify one stored record (`--store`), or a whole bundle file (`--bundle`). |
 | `capsule-engine bundle` | Write a self-contained, verifiable slice of the ledger. |
+| `capsule-engine referee judge` | The referee a deal's terms name: recompute the shared deal terms and each party's own pack, and seal an Evidence Result in the referee's book (`referee.py`). |
 
 `verify` and `bundle` are present unless `CAPSULE_LEDGER_ARM=guards-only`
 (`packaging.py`), which keeps the guard checks and dry-run and hides the
@@ -86,6 +87,9 @@ capsule-emit ledger (`--ledger`).
 - `policy/` — the policy manifest: a lockfile of active fold/wicket
   definitions cited by digest, never by copy.
 - `report/` — the dry-run report and the Evidence Result, as data (no rendering).
+- `referee.py` — the contract-named referee: the shared deal terms under
+  `ec:deal-terms@1` and each party's own pack over its own records, as one
+  Evidence Result, sealed in the referee's book.
 - `mcp/`, `telemetry/`, `holds/` — MCP server surface, telemetry, and
   reservation-as-capsule engine-side plumbing.
 - `cli/` — the `capsule-engine` command (above).
