@@ -18,7 +18,7 @@ from pathlib import Path
 import pytest
 from agent_action_capsule.canonical import jcs
 from agent_action_capsule.contracts import ReferenceEntry
-from capsule_emit import read_ledger, settlement
+from capsule_emit import read_ledger, seal, settlement
 from capsule_emit.bilateral import seal_action, seal_request
 from capsule_emit.signing import resolve_signer
 
@@ -37,6 +37,8 @@ SELLER = load_pack_dir(CATALOG / "seller")
 AS_OF = "2026-11-01T12:00:00Z"
 PRICE = {"value": "2000", "assetCode": "USD", "assetScale": 2}
 ACTION = "buy"
+BUYER_DEAL = "deal-5f275e037cc84ac7"
+SELLER_DEAL = "deal-e22da7020675c691"
 
 
 @pytest.fixture(autouse=True)
@@ -62,7 +64,7 @@ class Deal:
     """One deal sealed across three books; the knobs are the lab faults."""
 
     def __init__(self, tmp_path: Path, *, seller_price=PRICE, received=PRICE, sent_at="2026-11-01T10:05:00Z",
-                 received_at="2026-11-01T10:30:00Z", seller_referee=None, rail=True) -> None:
+                 received_at="2026-11-01T10:30:00Z", seller_referee=None, rail=True, terms_edit=None) -> None:
         self.buyer_book, self.seller_book = _book(tmp_path, "buyer"), _book(tmp_path, "seller")
         self.referee_book, self.other_book = _book(tmp_path, "referee"), _book(tmp_path, "other")
         self.referee_key = _key(self.referee_book)
@@ -72,19 +74,22 @@ class Deal:
             "item": "synthetic widget box",
             "price": PRICE,
             "expires_at": "2026-11-01T11:00:00Z",
-            "buyer": {"operator": "buyer-co", "book_key_id": buyer_recs[0]["key_id"], "pack": _pack_ref(EVERYDAY)},
-            "seller": {"operator": "seller-co", "book_key_id": seller_recs[0]["key_id"], "pack": _pack_ref(SELLER)},
+            "buyer": {"operator": "buyer-co", "book_key_id": buyer_recs[0]["key_id"], "deal_id": BUYER_DEAL,
+                      "pack": _pack_ref(EVERYDAY)},
+            "seller": {"operator": "seller-co", "book_key_id": seller_recs[0]["key_id"], "deal_id": SELLER_DEAL,
+                       "pack": _pack_ref(SELLER)},
             "referee": named,
         }
         self.seller_terms = copy.deepcopy(self.terms)
         self.seller_terms["price"] = seller_price
         if seller_referee is not None:
             self.seller_terms["referee"] = seller_referee
+        if terms_edit is not None:
+            terms_edit(self.terms, self.seller_terms)
         req = seal_request("buyer-co", "goose@test", ACTION, referee.action_digest(ACTION, self.terms),
                            ledger=self.buyer_book, extra_compute={"peer": "seller-co"})
         resp = seal_action("seller-co", "goose@test", ACTION, referee.action_digest(ACTION, self.seller_terms),
-                           req.capsule_id, ledger=self.seller_book,
-                           extra_compute={"peer": "buyer-co", "request_capsule_id": req.capsule_id})
+                           req.capsule_id, ledger=self.seller_book, extra_compute={"peer": "buyer-co"})
         self.buyer = Party(half=req.capsule, action=ACTION, terms=self.terms, records=buyer_recs,
                            disclosed=load_disclosed(BUYER_RECORDS), withheld=load_withheld(BUYER_RECORDS))
         self.seller = Party(half=resp.capsule, action=ACTION, terms=self.seller_terms, records=seller_recs,
@@ -253,21 +258,134 @@ def test_an_opening_that_does_not_open_its_half_is_refused(tmp_path):
 
 
 def test_a_pack_the_catalog_does_not_hold_at_that_digest_is_refused(tmp_path):
+    def unknown(*both):
+        for terms in both:
+            terms["buyer"]["pack"]["definition_digest"] = "00" * 32
+
+    with pytest.raises(RefereeError) as exc:
+        Deal(tmp_path, terms_edit=unknown).judge()
+    assert exc.value.code == "pack_not_held"
+
+
+def test_a_party_cannot_name_its_own_pack_or_book_alone(tmp_path):
+    def lenient(buyer_terms, seller_terms):
+        seller_terms["seller"]["pack"] = _pack_ref(EVERYDAY)
+
+    with pytest.raises(RefereeError) as exc:
+        Deal(tmp_path, terms_edit=lenient).judge()
+    assert exc.value.code == "terms_disagree"
+
+
+def test_halves_that_do_not_answer_each_other_are_refused(tmp_path):
     deal = Deal(tmp_path)
-    terms = copy.deepcopy(deal.terms)
-    terms["buyer"]["pack"]["definition_digest"] = "00" * 32
-    half = seal_request("buyer-co", "goose@test", ACTION, referee.action_digest(ACTION, terms),
-                        ledger=deal.buyer_book).capsule
-    seller_half = seal_action("seller-co", "goose@test", ACTION, referee.action_digest(ACTION, deal.seller_terms),
-                              half["capsule_id"], ledger=deal.seller_book,
-                              extra_compute={"request_capsule_id": half["capsule_id"]}).capsule
-    buyer = Party(half=half, action=ACTION, terms=terms, records=deal.buyer.records,
-                  disclosed=deal.buyer.disclosed, withheld=deal.buyer.withheld)
-    seller = Party(half=seller_half, action=ACTION, terms=deal.seller_terms, records=deal.seller.records,
+    stray = seal_action("seller-co", "goose@test", ACTION, referee.action_digest(ACTION, deal.seller_terms),
+                        "ab" * 32, ledger=deal.seller_book).capsule
+    seller = Party(half=stray, action=ACTION, terms=deal.seller_terms, records=deal.seller.records,
                    disclosed=deal.seller.disclosed, withheld=deal.seller.withheld)
     with pytest.raises(RefereeError) as exc:
-        referee.judge(buyer, seller, [], as_of=AS_OF, referee_key_id=deal.referee_key)
-    assert exc.value.code == "pack_not_held"
+        referee.judge(deal.buyer, seller, deal.legs, as_of=AS_OF, referee_key_id=deal.referee_key)
+    assert exc.value.code == "halves_unpaired"
+
+
+def test_a_half_that_does_not_verify_and_a_bad_as_of_are_refused(tmp_path):
+    deal = Deal(tmp_path)
+    tampered = copy.deepcopy(deal.buyer.half)
+    tampered["operator"] = "someone-else"
+    bad = Party(half=tampered, action=ACTION, terms=deal.terms, records=deal.buyer.records,
+                disclosed=deal.buyer.disclosed, withheld=deal.buyer.withheld)
+    with pytest.raises(RefereeError) as exc:
+        referee.judge(bad, deal.seller, deal.legs, as_of=AS_OF, referee_key_id=deal.referee_key)
+    assert exc.value.code == "half_unverified"
+    with pytest.raises(RefereeError) as exc:
+        referee.judge(deal.buyer, deal.seller, deal.legs, as_of="2026-11-01", referee_key_id=deal.referee_key)
+    assert exc.value.code == "as_of_malformed"
+
+
+def test_records_out_of_sealed_order_or_about_another_deal_are_refused(tmp_path):
+    deal = Deal(tmp_path)
+    reordered = Party(half=deal.buyer.half, action=ACTION, terms=deal.terms, records=list(reversed(deal.buyer.records)),
+                      disclosed=deal.buyer.disclosed, withheld=deal.buyer.withheld)
+    with pytest.raises(RefereeError) as exc:
+        referee.judge(reordered, deal.seller, deal.legs, as_of=AS_OF, referee_key_id=deal.referee_key)
+    assert exc.value.code == "records_out_of_order"
+
+    def elsewhere(*both):
+        for terms in both:
+            terms["buyer"]["deal_id"] = "deal-another"
+
+    with pytest.raises(RefereeError) as exc:
+        Deal(tmp_path / "x", terms_edit=elsewhere).judge()
+    assert exc.value.code == "records_other_deal"
+
+
+def test_a_record_given_twice_is_judged_once(tmp_path):
+    deal = Deal(tmp_path)
+    twice = Party(half=deal.buyer.half, action=ACTION, terms=deal.terms,
+                  records=[r for r in deal.buyer.records for _ in (0, 1)],
+                  disclosed=deal.buyer.disclosed, withheld=deal.buyer.withheld)
+    doc = referee.judge(twice, deal.seller, deal.legs, as_of=AS_OF, referee_key_id=deal.referee_key)
+    assert jcs(doc) == jcs(deal.judge())
+
+
+def test_the_result_cites_only_halves_legs_records_and_pack_definitions(tmp_path):
+    deal = Deal(tmp_path)
+    allowed = {deal.buyer.half["capsule_id"], deal.seller.half["capsule_id"], EVERYDAY.definition_digest(),
+               SELLER.definition_digest(), *(c["capsule_id"] for c in deal.legs),
+               *(r["capsule_id"] for r in deal.buyer.records), *(r["capsule_id"] for r in deal.seller.records)}
+    doc = deal.judge()
+    for c in doc["claims"]:
+        assert _cited(c) <= allowed, c["id"]
+        assert set(c["presentation"].get("evidence") and [e["digest"] for e in c["presentation"]["evidence"]]
+                   or []) <= allowed
+
+
+def test_a_later_delivery_leg_cannot_move_the_release_or_the_delivery(tmp_path):
+    deal = Deal(tmp_path, sent_at="2026-11-01T09:59:00Z")
+    tref = deal.legs[0]["capsule_id"]
+    delivery = {"content_digest": "ab" * 32}
+    for book, operator, role, direction in ((deal.seller_book, "seller-co", "payee", "sent"),
+                                            (deal.buyer_book, "buyer-co", "payer", "received")):
+        member = settlement.build_leg("delivered", role, terms_ref=tref, observed_at="2026-11-01T11:30:00Z",
+                                      delivery={**delivery, "direction": direction})
+        deal.legs.append(settlement.seal_leg(member, operator=operator, ledger=book).capsule)
+    claims = _claims(deal.judge())
+    assert claims["deal-terms/paid-before-release"]["verdict"] == "not_met"
+    assert claims["deal-terms/delivered-before-expiry"]["verdict"] == "met"
+
+
+def test_a_second_terms_leg_takes_the_one_the_buyer_paid_against(tmp_path):
+    deal = Deal(tmp_path, received={**PRICE, "value": "1500"})
+    cite = ReferenceEntry(type="agent-action-capsule", digest_alg="SHA-256",
+                          digest=deal.seller.half["capsule_id"], citation_purpose="responds_to")
+    member = settlement.build_leg("terms", "payee", amount=settlement.amount("1500", "USD", 2))
+    deal.legs.append(settlement.seal_leg(member, operator="seller-co", ledger=deal.seller_book,
+                                         references=[cite]).capsule)
+    assert _claims(deal.judge())["deal-terms/price-agreed"]["verdict"] == "not_met"
+
+
+def test_an_unjoined_payment_is_not_evaluable_and_a_malformed_leg_does_not_count(tmp_path):
+    deal = Deal(tmp_path)
+    payee = next(c for c in deal.legs if c["settlement"]["leg"] == "payee_observed")
+    deal.legs.remove(payee)
+    member = {k: v for k, v in payee["settlement"].items() if k != "receive_fee"}
+    deal.legs.append(settlement.seal_leg(member, operator="seller-co", ledger=deal.seller_book).capsule)
+    assert _claims(deal.judge())["deal-terms/price-agreed"]["verdict"] == "not_evaluable"
+
+    deal = Deal(tmp_path / "y")
+    received = next(c for c in deal.legs if c["settlement"]["leg"] == "delivered"
+                    and c["settlement"]["delivery"]["direction"] == "received")
+    deal.legs.remove(received)
+    forged = seal(dict(received["settlement"], sealer_role="payee"), action="settlement.delivered",
+                  operator="buyer-co", ledger=deal.buyer_book)
+    deal.legs.append(forged.capsule)
+    assert _claims(deal.judge())["deal-terms/delivered-before-expiry"]["verdict"] == "not_evaluable"
+
+
+def test_an_amount_at_another_scale_is_the_same_price(tmp_path):
+    def rescaled(buyer_terms, seller_terms):
+        seller_terms["price"] = {"value": "20000", "assetCode": "USD", "assetScale": 3}
+
+    assert _claims(Deal(tmp_path, terms_edit=rescaled).judge())["deal-terms/price-agreed"]["verdict"] == "met"
 
 
 def test_a_sealed_result_verifies_for_the_party_and_one_from_another_key_is_refused(tmp_path):
@@ -339,3 +457,14 @@ def test_the_cli_reports_a_malformed_dispute_file_as_a_usage_error(tmp_path):
     bad.write_text("[]")
     assert main(["referee", "judge", "--dispute", str(bad), "--ledger", str(tmp_path / "book"),
                  "--as-of", AS_OF, "--out", str(tmp_path / "r.json")]) == 2
+
+
+def test_an_in_scope_na_is_a_gap_claim_and_an_out_of_scope_one_is_excluded():
+    from capsule_engine.guards.capsule import ConstraintOutcome, not_applicable_evidence
+
+    def outcome(**kw):
+        return ConstraintOutcome(id="caps", result="n/a", evidence=dict(not_applicable_evidence("caps", **kw)))
+
+    assert referee._not_settled(outcome(in_scope=False)) is None
+    assert referee._not_settled(outcome(in_scope=True, missing_field="spend_minor")) == ("NOT_FOUND", "GAP")
+    assert referee._not_settled(outcome(in_scope=True)) == ("UNKNOWN", "UNKNOWN")

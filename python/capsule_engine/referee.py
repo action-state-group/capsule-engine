@@ -16,14 +16,18 @@ deal's own terms::
 
     {"item": <text>,
      "price": {"value": <decimal string>, "assetCode": <text>, "assetScale": <int>},
-     "expires_at": <RFC 3339, UTC, seconds, Z>,
-     "buyer":  {"operator": <text>, "book_key_id": <64 hex>, "pack": {"pack_id", "definition_digest"}},
-     "seller": {"operator": <text>, "book_key_id": <64 hex>, "pack": {"pack_id", "definition_digest"}},
+     "expires_at": <RFC 3339 UTC>,
+     "buyer":  {"operator": <text>, "book_key_id": <64 hex>, "deal_id": <text>,
+                "pack": {"pack_id", "definition_digest"}},
+     "seller": {... the same members ...},
      "referee": {"key_id": <64 hex>, "mailbox": <text>}}
 
 ``price`` is the settlement draft's exact amount triple (capsule-emit
-``settlement.amount``), so it compares with the rail proof without a currency
-table. ``book_key_id`` is the key a party's deal records are signed with.
+``settlement.amount``), compared with the rail proof at a common scale.
+``book_key_id`` is the key a party's deal records are signed with, and
+``deal_id`` the party's own deal (x-deal-v0) those records are about. Both
+halves must open to the same ``buyer``, ``seller`` and ``referee`` entries and
+the same ``action``: no party chooses its own pack, book or referee alone.
 
 **What it judges.**
 
@@ -31,40 +35,56 @@ table. ``book_key_id`` is the key a party's deal records are signed with.
 (:data:`DEAL_TERMS_CONTRACT`), tier ``recomputed``:
 
 - ``price-agreed``: both halves open to the same ``price``, the payer's
-  observation sent exactly that amount, and the payee's observation agrees with
-  it (the settlement draft's ``agreed`` state, under the halves' keys);
+  observation sent that amount, and the payee's observation agrees with it as
+  settled (the settlement draft's ``agreed`` state, under the halves' keys);
 - ``item-agreed``: both halves open to the same ``item``;
 - ``delivered-before-expiry``: both halves open to the same ``expires_at``,
-  and the buyer observed the delivery at or before it;
+  and the buyer's first observation of the delivery is at or before it;
 - ``paid-before-release``: the payee observed the payment settled at or before
-  the seller sent the delivery.
+  the seller's first observation of sending the delivery.
 
 A disagreement is ``not_met`` and cites the records that disagree. An input
-that is missing (no rail proof, no delivery leg) is ``INSUFFICIENT`` and
-``not_evaluable``, never ``not_met``.
+that is missing or unusable (no rail proof, no delivery leg, a leg the
+settlement draft refuses, a payment the two sides do not join) is
+``INSUFFICIENT`` and ``not_evaluable``, never ``not_met``.
 
-(b) Each party's own pack, over that party's own records only: the pack its
-own half's terms name for its role, replayed through ``GuardEngine``
-(``report/replay.py``). The buyer is never judged under the seller's pack, nor
-the seller under the buyer's. One claim per rule per decision that rule
-settled (pass ``met``, fail ``not_met``); a rule that did not apply is
-counted in ``excluded_not_applicable``, never a claim. A rule the pack
-declares ``declared_not_measured`` is one ``not_evaluable`` claim per party
-(sufficiency ``GAP``) whose ``analysis`` names its ``evidence_instrument``.
+The rail proof is the terms leg the seller sealed citing one of the deal's
+halves; when the seller sealed several, the one the buyer's first payment
+observation answers. A leg counts only when it passes the draft's structure
+checks and is signed by its side's half key.
+
+(b) Each party's own pack, over that party's own records only: the pack both
+halves name for that role, replayed through ``GuardEngine``
+(``report/replay.py``) over the party's records in sealed order. The buyer is
+never judged under the seller's pack, nor the seller under the buyer's. Only
+decisions on records of the party's named ``deal_id`` become claims; its
+other records are history the replay reads. One claim per rule per decision:
+pass ``met``, fail ``not_met``. An ``n/a`` the rule's check reports in scope,
+for a missing field, is ``GAP``/``not_evaluable`` (``UNKNOWN`` when the
+evidence names no cause); one out of scope, or a rule whose selector did not
+match, is counted in ``excluded_not_applicable`` and is no claim, as
+``report/result_from_folds.py`` projects a constraint. A rule the pack
+declares ``declared_not_measured`` is one ``GAP``/``not_evaluable`` claim per
+party whose ``analysis`` names its ``evidence_instrument``.
 
 **Deterministic.** ``generated_at`` is the given as-of instant; claims are
-ordered by contract, requirement, party and record; nothing comes from a
-clock, a random value or a model. The same inputs give the same document.
+ordered by contract, requirement and id; nothing comes from a clock, a random
+value or a model. The same inputs give the same document.
 
-**Refusals** (:class:`RefereeError`): a half or a record that does not verify
-under the key it carries; an opening that does not recompute its half's
-``action_digest``; halves that do not answer each other; halves that name
-different referees, or a referee that is not the signer; a party's records
-signed by a key other than its ``book_key_id``; a pack the catalog does not
-hold at the named digest.
+**What the Result discloses.** Digests of the halves, the legs, the party's
+records and the pack definition, and the verdicts. Never an opening, a terms
+value or a decision's evidence: evidence objects can hold a caller's
+equivalence key, whose digest is guessable (AGENTS.md, local-only fields), so
+none is cited. No decision capsule leaves the referee.
 
-The Result carries digests only: no opening, no terms value, no decision
-evidence. It cites a decision's evidence by digest, as a sealed decision does.
+**Refusals** (:class:`RefereeError`, with a stable ``code``): a half or a
+record that does not verify under the key it carries; an opening that does
+not recompute its half's ``action_digest``; halves that do not answer each
+other, or that open to different parties, packs, referees or actions; a
+referee that is not the signer; a party's records signed by another key, out
+of sealed order, or about no record of its ``deal_id``; a pack the installed
+catalog does not hold at the named digest (fail closed: a referee is pinned to
+an engine that holds the deal's packs).
 """
 from __future__ import annotations
 
@@ -73,12 +93,12 @@ import re
 import tempfile
 from collections.abc import Sequence
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from functools import cache
 from pathlib import Path
 from typing import Any
 
-from agent_action_capsule import json_digest
+import jsonschema
 from agent_action_capsule.canonical import jcs
 from agent_action_capsule.contracts import ReferenceEntry
 from capsule_emit import seal
@@ -89,7 +109,8 @@ from capsule_emit.verification import verify_capsule
 from .guards.checks import RUNNABLE_CHECKS
 from .packs import install_pack, load_pack_dir, obligation_results
 from .packs.schema import PackDefinition
-from .report.replay import replay
+from .report.errors import ResultError
+from .report.replay import _deal_id, replay
 from .report.result import (
     AnalysisCarrier,
     Claim,
@@ -109,6 +130,7 @@ __all__ = [
     "RefereeError",
     "action_digest",
     "judge",
+    "result_digest",
     "seal_result",
     "verify_referee_result",
 ]
@@ -122,9 +144,11 @@ RESULT_BLOCK = "referee_result"
 RESULT_SCHEMA = "capsule-engine/referee-result/v1"
 
 ROLES = ("buyer", "seller")
+_SHARED = ("buyer", "seller", "referee")
 _HEX64 = re.compile(r"^[0-9a-f]{64}$")
-_INSTANT = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
+_INSTANT = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$")
 _CATALOG = Path(__file__).parent / "packs" / "catalog"
+_LEG = _settlement.SETTLEMENT_MEMBER
 
 
 class RefereeError(ValueError):
@@ -154,22 +178,44 @@ def action_digest(action: str, terms: Any) -> str:
     return hashlib.sha256(jcs({"action": action, "terms": terms})).hexdigest()
 
 
+def result_digest(doc: dict) -> str:
+    """The digest a sealed Result names: SHA-256 of the Result's JCS bytes."""
+    return hashlib.sha256(jcs(doc)).hexdigest()
+
+
 def _compute(capsule: dict) -> dict:
-    return (capsule.get("model_attestation") or {}).get("compute_attestation") or {}
+    ma = capsule.get("model_attestation")
+    ca = ma.get("compute_attestation") if isinstance(ma, dict) else None
+    return ca if isinstance(ca, dict) else {}
 
 
-def _authentic(capsule: dict) -> bool:
+def _authentic(capsule: object) -> bool:
     """The capsule recomputes and its signature verifies under the key_id it carries."""
-    return verify_capsule(capsule).ok and verify_capsule_signature_tristate(capsule)[0] is AuthorshipVerdict.AUTHORED
+    return (isinstance(capsule, dict) and verify_capsule(capsule).ok
+            and verify_capsule_signature_tristate(capsule)[0] is AuthorshipVerdict.AUTHORED)
 
 
 def _instant(value: object) -> datetime | None:
+    """An RFC 3339 UTC instant (``Z``, optional fraction of a second), or ``None``."""
     if not isinstance(value, str) or not _INSTANT.match(value):
         return None
     try:
-        return datetime.strptime(value, "%Y-%m-%dT%H:%M:%SZ")
+        return datetime.fromisoformat(value[:-1]).replace(tzinfo=timezone.utc)
     except ValueError:
         return None
+
+
+def _cited(capsule: dict) -> set[str]:
+    """The capsule ids a capsule points back at: its chain parent and its references."""
+    out = set()
+    chain = capsule.get("chain")
+    if isinstance(chain, dict) and isinstance(chain.get("parent_capsule_id"), str):
+        out.add(chain["parent_capsule_id"])
+    refs = capsule.get("references")
+    for r in refs if isinstance(refs, list) else ():
+        if isinstance(r, dict) and r.get("type") == "agent-action-capsule" and isinstance(r.get("digest"), str):
+            out.add(r["digest"])
+    return out
 
 
 def _hex(value: object, what: str) -> str:
@@ -190,35 +236,66 @@ def _check_half(role: str, party: Party) -> None:
 
 
 def _check_pair(buyer: Party, seller: Party) -> None:
-    """One half answers the other: the responder's ``request_capsule_id`` is the requester's half."""
+    """One half answers the other: the responder names the requester's half, by its
+    ``request_capsule_id`` or as capsule-emit links it (chain parent or a reference)."""
     b, s = buyer.half, seller.half
-    pairs = ((b, s), (s, b))
-    if not any(_compute(req).get("role") == "requester" and _compute(resp).get("role") == "responder"
-               and _compute(resp).get("request_capsule_id") == req.get("capsule_id") for req, resp in pairs):
-        raise RefereeError("halves_unpaired", "neither half answers the other")
     if b.get("key_id") == s.get("key_id"):
         raise RefereeError("halves_unpaired", "both halves are signed by one key")
+    for req, resp in ((b, s), (s, b)):
+        if _compute(req).get("role") != "requester" or _compute(resp).get("role") != "responder":
+            continue
+        named = _cited(resp) | {_compute(resp).get("request_capsule_id")}
+        if req.get("capsule_id") in named:
+            return
+    raise RefereeError("halves_unpaired", "neither half answers the other")
 
 
-def _named_referee(buyer: Party, seller: Party) -> str:
-    named = []
-    for role, party in (("buyer", buyer), ("seller", seller)):
-        ref = party.terms.get("referee")
-        if not isinstance(ref, dict):
-            raise RefereeError("referee_unnamed", f"the {role}'s terms name no referee")
-        named.append((_hex(ref.get("key_id"), "referee.key_id"), ref.get("mailbox")))
-    if named[0] != named[1]:
-        raise RefereeError("referee_disagrees", "the two halves name different referees")
-    return named[0][0]
+def _check_shared(buyer: Party, seller: Party) -> str:
+    """Both halves open to the same parties, referee and action; returns the referee key."""
+    if buyer.action != seller.action:
+        raise RefereeError("terms_disagree", "the two halves open to different actions")
+    for member in _SHARED:
+        if buyer.terms.get(member) != seller.terms.get(member):
+            raise RefereeError("referee_disagrees" if member == "referee" else "terms_disagree",
+                               f"the two halves open to different {member} entries")
+    ref = buyer.terms.get("referee")
+    if not isinstance(ref, dict):
+        raise RefereeError("referee_unnamed", "the terms name no referee")
+    return _hex(ref.get("key_id"), "referee.key_id")
 
 
-def _check_records(role: str, party: Party) -> None:
-    key = _hex(party.terms[role].get("book_key_id"), f"{role}.book_key_id")
+def _own_records(role: str, party: Party) -> tuple[list[dict], set[str]]:
+    """The party's records, once each, checked; and the ids of those about its deal."""
+    entry = party.terms[role]
+    key = _hex(entry.get("book_key_id"), f"{role}.book_key_id")
+    deal = entry.get("deal_id")
+    if not isinstance(deal, str) or not deal:
+        raise RefereeError("terms_malformed", f"{role}.deal_id must be non-empty text")
+    records: list[dict] = []
+    seen: set[str] = set()
     for rec in party.records:
-        if rec.get("key_id") != key:
+        if not isinstance(rec, dict) or rec.get("key_id") != key:
             raise RefereeError("records_foreign", f"a {role} record is not signed by the {role}'s book key")
         if not _authentic(rec):
             raise RefereeError("records_unverified", f"a {role} record does not verify")
+        if rec["capsule_id"] not in seen:
+            seen.add(rec["capsule_id"])
+            records.append(rec)
+    # Sealed order: timestamps never go back, and a record follows its chain parent.
+    stamps = [str(r.get("timestamp", "")) for r in records]
+    at = {r["capsule_id"]: i for i, r in enumerate(records)}
+    parents = [((r.get("chain") or {}).get("parent_capsule_id") if isinstance(r.get("chain"), dict) else None)
+               for r in records]
+    if stamps != sorted(stamps) or any(p in at and at[p] >= i for i, p in enumerate(parents)):
+        raise RefereeError("records_out_of_order", f"the {role}'s records are not in sealed order")
+    in_deal = {
+        r["capsule_id"] for r in records
+        if isinstance(party.disclosed.get(r["capsule_id"]), dict)
+        and _deal_id(party.disclosed[r["capsule_id"]]).value == deal
+    }
+    if records and not in_deal:
+        raise RefereeError("records_other_deal", f"no {role} record is about deal {deal!r}")
+    return records, in_deal
 
 
 @cache
@@ -230,10 +307,10 @@ def _catalog() -> dict[str, PackDefinition]:
     return packs
 
 
-def _pack_for(role: str, party: Party) -> PackDefinition:
-    ref = party.terms[role].get("pack")
+def _pack_for(role: str, terms: dict) -> PackDefinition:
+    ref = terms[role].get("pack")
     if not isinstance(ref, dict):
-        raise RefereeError("pack_unnamed", f"the {role}'s terms name no pack")
+        raise RefereeError("pack_unnamed", f"the terms name no pack for the {role}")
     pack = _catalog().get(ref.get("pack_id"))
     if pack is None or pack.definition_digest() != ref.get("definition_digest"):
         raise RefereeError("pack_not_held", f"no pack {ref.get('pack_id')!r} at the named digest")
@@ -245,10 +322,10 @@ def _pack_for(role: str, party: Party) -> PackDefinition:
 # ---------------------------------------------------------------------------
 
 
-def _refs(*capsules: dict) -> tuple[DigestRef, ...]:
+def _refs(*capsules: dict | None) -> tuple[DigestRef, ...]:
     seen: list[str] = []
     for c in capsules:
-        if c["capsule_id"] not in seen:
+        if c is not None and c["capsule_id"] not in seen:
             seen.append(c["capsule_id"])
     return tuple(DigestRef(digest=cid) for cid in seen)
 
@@ -276,71 +353,97 @@ def _terms_claim(requirement: str, status: str, evidence: tuple[DigestRef, ...])
 
 @dataclass(frozen=True)
 class _Rail:
-    """The settlement the seller's terms leg opened for this deal, its legs by kind."""
+    """The settlement the seller's terms leg opened for this deal, and its legs by kind."""
 
     terms: dict | None = None
     legs: dict[str, dict] = field(default_factory=dict)
-    agreed: bool = False
+    entry: dict = field(default_factory=dict)
 
 
-def _rail(legs: Sequence[dict], buyer: Party, seller: Party) -> _Rail:
-    """The rail proof for this deal: the terms leg the seller sealed citing one of
-    the deal's halves, and the newest leg of each kind answering it under the
-    party's own key (payer: the buyer's half key, payee: the seller's)."""
+def _usable(c: object) -> bool:
+    """An authentic capsule whose settlement member passes the draft's structure checks."""
+    return (_authentic(c) and isinstance(c.get(_LEG), dict)
+            and not _settlement.structure_failures(c[_LEG]))
+
+
+def _rail(legs: Sequence[object], buyer: Party, seller: Party) -> _Rail:
+    """The rail proof for this deal (module docstring). Of the legs of one kind
+    signed by the side's half key, the newest observation counts for the payer and
+    payee observations (pending, then settled) and the first for each delivery."""
     payer, payee = buyer.half["key_id"], seller.half["key_id"]
     halves = {buyer.half["capsule_id"], seller.half["capsule_id"]}
-    authentic = [c for c in legs if isinstance(c, dict) and _settlement.SETTLEMENT_MEMBER in c and _authentic(c)]
-    terms = [
-        c for c in authentic
-        if c[_settlement.SETTLEMENT_MEMBER].get("leg") == "terms" and c.get("key_id") == payee
-        and any(r.get("digest") in halves for r in c.get("references") or [])
-    ]
-    if len(terms) != 1:
-        return _Rail()
-    t = terms[0]
-    want = {"payer_observed": payer, "payee_observed": payee, "delivered": None}
-    by_kind: dict[str, dict] = {}
-    for c in authentic:
-        s = c[_settlement.SETTLEMENT_MEMBER]
-        kind = s.get("leg")
-        if kind not in want or s.get("terms_ref") != t["capsule_id"]:
+    usable = [c for c in legs if _usable(c)]
+    terms = {
+        c["capsule_id"]: c for c in usable
+        if c[_LEG]["leg"] == "terms" and c.get("key_id") == payee and _cited(c) & halves
+    }
+    by_kind: dict[str, list[dict]] = {}
+    for c in usable:
+        s = c[_LEG]
+        if s["leg"] == "terms" or s.get("terms_ref") not in terms:
             continue
-        if kind == "delivered":
-            direction = (s.get("delivery") or {}).get("direction")
-            if direction not in ("sent", "received"):
-                continue
-            kind = f"delivered:{direction}"
-            key = payee if direction == "sent" else payer
+        if s["leg"] == "delivered":
+            kind = f"delivered:{s['delivery']['direction']}"
+            key = payee if s["delivery"]["direction"] == "sent" else payer
         else:
-            key = want[kind]
-        if c.get("key_id") != key:
-            continue
-        prior = by_kind.get(kind)
-        if prior is None or (str(s.get("observed_at")), c["capsule_id"]) > (
-                str(prior[_settlement.SETTLEMENT_MEMBER].get("observed_at")), prior["capsule_id"]):
-            by_kind[kind] = c
-    chosen = [t, *by_kind.values()]
-    report = _settlement.verify_settlements(chosen, key_policy={"payer": payer, "payee": payee})
-    entry = next((e for e in report.settlements if e.get("terms") == t["capsule_id"]), {})
-    return _Rail(terms=t, legs=by_kind, agreed=entry.get("payment_state") == "agreed")
+            kind, key = s["leg"], payer if s["leg"] == "payer_observed" else payee
+        if c.get("key_id") == key and _instant(s.get("observed_at")) is not None:
+            by_kind.setdefault(kind, []).append(c)
+
+    def order(c: dict) -> tuple[datetime, str]:
+        return _instant(c[_LEG]["observed_at"]), c["capsule_id"]
+
+    if len(terms) == 1:
+        chosen = next(iter(terms))
+    else:
+        paid = sorted(by_kind.get("payer_observed", []), key=order)
+        if not paid:
+            return _Rail()
+        chosen = paid[0][_LEG]["terms_ref"]
+    picked: dict[str, dict] = {}
+    for kind, found in by_kind.items():
+        found = sorted((c for c in found if c[_LEG]["terms_ref"] == chosen), key=order)
+        if found:
+            picked[kind] = found[-1] if kind.endswith("_observed") else found[0]
+    report = _settlement.verify_settlements([terms[chosen], *picked.values()],
+                                            key_policy={"payer": payer, "payee": payee})
+    entry = next((e for e in report.settlements if e.get("terms") == chosen), {})
+    return _Rail(terms=terms[chosen], legs=picked, entry=entry)
 
 
 def _leg(rail: _Rail, kind: str) -> dict | None:
     c = rail.legs.get(kind)
-    return c[_settlement.SETTLEMENT_MEMBER] if c else None
+    return c[_LEG] if c else None
+
+
+def _minor(amount: object) -> tuple[str, int] | None:
+    """An amount triple as (asset, value at scale 18), so equal amounts at another scale compare equal."""
+    if not isinstance(amount, dict):
+        return None
+    value, code, scale = amount.get("value"), amount.get("assetCode"), amount.get("assetScale")
+    if (not isinstance(value, str) or not value.isdigit() or not isinstance(code, str) or not code
+            or not isinstance(scale, int) or isinstance(scale, bool) or not 0 <= scale <= 18):
+        return None
+    return code, int(value) * 10 ** (18 - scale)
 
 
 def _price_claim(buyer: Party, seller: Party, rail: _Rail) -> Claim:
     halves = (buyer.half, seller.half)
-    if buyer.terms.get("price") != seller.terms.get("price"):
+    prices = _minor(buyer.terms.get("price")), _minor(seller.terms.get("price"))
+    if None in prices:
+        return _terms_claim(PRICE, "INSUFFICIENT", _refs(*halves))
+    if prices[0] != prices[1]:
         return _terms_claim(PRICE, "CONTRADICTED", _refs(*halves))
-    payer, payee = _leg(rail, "payer_observed"), _leg(rail, "payee_observed")
-    if rail.terms is None or payer is None or payee is None:
+    payer = _leg(rail, "payer_observed")
+    if rail.terms is None or payer is None or "payee_observed" not in rail.legs:
         return _terms_claim(PRICE, "INSUFFICIENT", _refs(*halves))
     cited = _refs(*halves, rail.terms, rail.legs["payer_observed"], rail.legs["payee_observed"])
-    if payer.get("amount") != seller.terms.get("price") or not rail.agreed:
+    state = rail.entry.get("payment_state")
+    if _minor(payer.get("amount")) != prices[0] or (state == "mismatch" and "amount" in rail.entry.get("differs", ())):
         return _terms_claim(PRICE, "CONTRADICTED", cited)
-    return _terms_claim(PRICE, "SATISFIED", cited)
+    if state == "agreed" and rail.entry.get("agreed_status") == "settled":
+        return _terms_claim(PRICE, "SATISFIED", cited)
+    return _terms_claim(PRICE, "INSUFFICIENT", cited)
 
 
 def _item_claim(buyer: Party, seller: Party) -> Claim:
@@ -352,17 +455,18 @@ def _item_claim(buyer: Party, seller: Party) -> Claim:
 
 
 def _delivered_claim(buyer: Party, seller: Party, rail: _Rail) -> Claim:
-    if buyer.terms.get("expires_at") != seller.terms.get("expires_at"):
-        return _terms_claim(DELIVERED, "CONTRADICTED", _refs(buyer.half, seller.half))
+    halves = _refs(buyer.half, seller.half)
+    expiries = _instant(buyer.terms.get("expires_at")), _instant(seller.terms.get("expires_at"))
+    if None in expiries:
+        return _terms_claim(DELIVERED, "INSUFFICIENT", halves)
+    if expiries[0] != expiries[1]:
+        return _terms_claim(DELIVERED, "CONTRADICTED", halves)
     received = _leg(rail, "delivered:received")
-    expires = _instant(seller.terms.get("expires_at"))
-    if received is None or expires is None:
-        return _terms_claim(DELIVERED, "INSUFFICIENT", _refs(buyer.half, seller.half))
+    if received is None:
+        return _terms_claim(DELIVERED, "INSUFFICIENT", halves)
     cited = _refs(buyer.half, seller.half, rail.terms, rail.legs["delivered:received"])
-    at = _instant(received.get("observed_at"))
-    if at is None:
-        return _terms_claim(DELIVERED, "INSUFFICIENT", cited)
-    return _terms_claim(DELIVERED, "SATISFIED" if at <= expires else "CONTRADICTED", cited)
+    ok = _instant(received["observed_at"]) <= expiries[0]
+    return _terms_claim(DELIVERED, "SATISFIED" if ok else "CONTRADICTED", cited)
 
 
 def _paid_claim(buyer: Party, seller: Party, rail: _Rail) -> Claim:
@@ -370,10 +474,7 @@ def _paid_claim(buyer: Party, seller: Party, rail: _Rail) -> Claim:
     if paid is None or sent is None:
         return _terms_claim(PAID, "INSUFFICIENT", _refs(buyer.half, seller.half))
     cited = _refs(buyer.half, seller.half, rail.terms, rail.legs["payee_observed"], rail.legs["delivered:sent"])
-    paid_at, sent_at = _instant(paid.get("observed_at")), _instant(sent.get("observed_at"))
-    if paid_at is None or sent_at is None:
-        return _terms_claim(PAID, "INSUFFICIENT", cited)
-    ok = paid.get("status") == "settled" and paid_at <= sent_at
+    ok = paid["status"] == "settled" and _instant(paid["observed_at"]) <= _instant(sent["observed_at"])
     return _terms_claim(PAID, "SATISFIED" if ok else "CONTRADICTED", cited)
 
 
@@ -382,12 +483,12 @@ def _paid_claim(buyer: Party, seller: Party, rail: _Rail) -> Claim:
 # ---------------------------------------------------------------------------
 
 
-def _replay(pack: PackDefinition, party: Party):
+def _replay(pack: PackDefinition, party: Party, records: list[dict]):
     with tempfile.TemporaryDirectory() as tmp:
         installed = install_pack(pack, project_dir=Path(tmp) / "referee", mode="observe")
         resolved = installed.resolved
         return replay(
-            list(party.records),
+            records,
             caps_fold=resolved.caps_fold(),
             caps_minor=resolved.caps_minor(),
             per_action_minor=resolved.per_action_minor(),
@@ -400,57 +501,62 @@ def _replay(pack: PackDefinition, party: Party):
         )
 
 
-def _pack_claims(role: str, party: Party) -> tuple[list[Claim], int]:
-    pack = _pack_for(role, party)
-    contract_ref = pack.pack_id.rsplit("/", 1)
-    contract_ref = f"{contract_ref[0]}@{contract_ref[1]}"
+def _not_settled(outcome) -> tuple[str, str] | None:
+    """An ``n/a`` constraint projected as ``result_from_folds`` does: ``None`` when out
+    of scope (excluded), else (status, sufficiency): NOT_FOUND/GAP for a named missing
+    field, UNKNOWN/UNKNOWN when the evidence names no cause."""
+    evidence = outcome.evidence if outcome is not None and isinstance(outcome.evidence, dict) else {}
+    if evidence.get("in_scope") is False:
+        return None
+    if evidence.get("in_scope") is True and evidence.get("missing_field"):
+        return "NOT_FOUND", "GAP"
+    return "UNKNOWN", "UNKNOWN"
+
+
+def _pack_claims(role: str, party: Party, terms: dict, records: list[dict], in_deal: set[str]) -> tuple[list[Claim], int]:
+    pack = _pack_for(role, terms)
+    name, version = pack.pack_id.rsplit("/", 1)
+    contract_ref = f"{name}@{version}"
+    pack_ref = (DigestRef(digest=pack.definition_digest()),)
     claims: list[Claim] = []
     excluded = 0
+
+    def claim(claim_id: str, rule: str, status: str, sufficiency: str, verdict: str, evidence, presentation=None):
+        claims.append(Claim(
+            id=claim_id, contract_ref=contract_ref, requirement_ref=rule, tier="recomputed", grade="self-attested",
+            sufficiency=sufficiency, verdict=verdict, evidence=evidence, proofs=(),
+            presentation=presentation or DisclosureCarrier(status=status, evidence=evidence),
+        ))
+
     for o in pack.obligations:
         if o.measurability == "declared_not_measured":
-            pack_ref = (DigestRef(digest=pack.definition_digest()),)
-            instrument = o.evidence_instrument.field or o.evidence_instrument.name if o.evidence_instrument else None
-            claims.append(Claim(
-                id=f"{role}/{o.id}",
-                contract_ref=contract_ref,
-                requirement_ref=o.id,
-                tier="recomputed",
-                grade="self-attested",
-                sufficiency="GAP",
-                verdict="not_evaluable",
-                evidence=pack_ref,
-                proofs=(),
-                presentation=AnalysisCarrier(
-                    status="NOT_FOUND",
-                    summary=f"The pack does not measure this rule yet: it waits on the {instrument} field, "
-                            "which no record carries.",
-                ),
+            ins = o.evidence_instrument
+            instrument = (ins.field or ins.name) if ins is not None else "unnamed"
+            claim(f"{role}/{o.id}", o.id, "NOT_FOUND", "GAP", "not_evaluable", pack_ref, AnalysisCarrier(
+                status="NOT_FOUND",
+                summary=f"The pack does not measure this rule yet: it waits on the {instrument} field, "
+                        "which no record carries.",
             ))
-    for sourced in _replay(pack, party).decisions:
+    by_id = {o.id: o for o in pack.obligations}
+    for sourced in _replay(pack, party, records).decisions:
         record_id = sourced.record["capsule_id"]
+        if record_id not in in_deal:
+            continue
         outcomes = {c.id: c for c in sourced.decision.constraints}
+        evidence = (DigestRef(digest=record_id),)
         for res in obligation_results(pack, sourced.decision.constraints):
-            if res.result == "n/a":
-                excluded += 1
+            claim_id = f"{role}/{res.obligation_id}/{record_id}"
+            if res.result in ("pass", "fail"):
+                met = res.result == "pass"
+                claim(claim_id, res.obligation_id, "SATISFIED" if met else "CONTRADICTED", "SATISFIED",
+                      "met" if met else "not_met", evidence)
                 continue
-            obligation = next(o for o in pack.obligations if o.id == res.obligation_id)
-            outcome = outcomes.get(obligation.check)
-            evidence = [DigestRef(digest=record_id)]
-            if outcome is not None and outcome.evidence is not None:
-                evidence.append(DigestRef(digest=json_digest(outcome.evidence)))
-            status = "SATISFIED" if res.result == "pass" else "CONTRADICTED"
-            claims.append(Claim(
-                id=f"{role}/{res.obligation_id}/{record_id}",
-                contract_ref=contract_ref,
-                requirement_ref=res.obligation_id,
-                tier="recomputed",
-                grade="self-attested",
-                sufficiency="SATISFIED",
-                verdict="met" if res.result == "pass" else "not_met",
-                evidence=tuple(evidence),
-                proofs=(),
-                presentation=DisclosureCarrier(status=status, evidence=tuple(evidence)),
-            ))
+            outcome = outcomes.get(by_id[res.obligation_id].check)
+            projected = _not_settled(outcome) if outcome is not None and outcome.result == "n/a" else None
+            if projected is None:
+                excluded += 1
+            else:
+                claim(claim_id, res.obligation_id, projected[0], projected[1], "not_evaluable", evidence)
     return claims, excluded
 
 
@@ -459,7 +565,7 @@ def _pack_claims(role: str, party: Party) -> tuple[list[Claim], int]:
 # ---------------------------------------------------------------------------
 
 
-def judge(buyer: Party, seller: Party, rail_legs: Sequence[dict], *, as_of: str, referee_key_id: str) -> dict:
+def judge(buyer: Party, seller: Party, rail_legs: Sequence[object], *, as_of: str, referee_key_id: str) -> dict:
     """The referee's Result on one deal, as an Evidence Result v0 document.
 
     *referee_key_id* is the key this referee signs with; the judgment is refused
@@ -467,14 +573,13 @@ def judge(buyer: Party, seller: Party, rail_legs: Sequence[dict], *, as_of: str,
     the module docstring.
     """
     if _instant(as_of) is None:
-        raise RefereeError("as_of_malformed", "as_of must be RFC 3339 UTC with seconds and Z")
+        raise RefereeError("as_of_malformed", "as_of must be an RFC 3339 UTC instant ending in Z")
     for role, party in (("buyer", buyer), ("seller", seller)):
         _check_half(role, party)
     _check_pair(buyer, seller)
-    if _named_referee(buyer, seller) != referee_key_id:
+    if _check_shared(buyer, seller) != referee_key_id:
         raise RefereeError("not_named_referee", "this referee's key is not the one the deal terms name")
-    for role, party in (("buyer", buyer), ("seller", seller)):
-        _check_records(role, party)
+    own = {role: _own_records(role, party) for role, party in (("buyer", buyer), ("seller", seller))}
 
     rail = _rail(rail_legs, buyer, seller)
     claims = [
@@ -485,19 +590,18 @@ def judge(buyer: Party, seller: Party, rail_legs: Sequence[dict], *, as_of: str,
     ]
     excluded = 0
     for role, party in (("buyer", buyer), ("seller", seller)):
-        own, n = _pack_claims(role, party)
-        claims += own
+        records, in_deal = own[role]
+        found, n = _pack_claims(role, party, buyer.terms, records, in_deal)
+        claims += found
         excluded += n
     claims.sort(key=lambda c: (c.contract_ref, c.requirement_ref, c.id))
-    doc = build_result(claims, generated_at=as_of, excluded_not_applicable=excluded).to_dict()
-    validate_against_schema(doc)
-    verify_result(doc)
+    try:
+        doc = build_result(claims, generated_at=as_of, excluded_not_applicable=excluded).to_dict()
+        validate_against_schema(doc)
+        verify_result(doc)
+    except (ResultError, ValueError, jsonschema.ValidationError) as exc:
+        raise RefereeError("result_invalid", str(exc)) from exc
     return doc
-
-
-def result_digest(doc: dict) -> str:
-    """The digest a sealed Result names: SHA-256 of the Result's JCS bytes."""
-    return hashlib.sha256(jcs(doc)).hexdigest()
 
 
 def seal_result(
@@ -538,8 +642,8 @@ def seal_result(
 def verify_referee_result(capsule: dict, doc: dict, *, buyer_half: dict, seller_half: dict,
                           buyer_terms: dict, seller_terms: dict) -> None:
     """A receiving party's check of a sealed Result: it verifies, it is signed by
-    the referee both halves' terms name, it cites exactly these halves, and *doc*
-    is the Result it names. Raises :class:`RefereeError`."""
+    the referee both halves' terms name, its block and its references name exactly
+    these halves, and *doc* is the Result it names. Raises :class:`RefereeError`."""
     if not _authentic(capsule):
         raise RefereeError("result_unverified", "the Result capsule does not verify under the key it carries")
     keys = {(t.get("referee") or {}).get("key_id") for t in (buyer_terms, seller_terms)}
@@ -548,9 +652,13 @@ def verify_referee_result(capsule: dict, doc: dict, *, buyer_half: dict, seller_
     block = _compute(capsule).get(RESULT_BLOCK)
     if not isinstance(block, dict) or block.get("schema") != RESULT_SCHEMA:
         raise RefereeError("not_a_result", "the capsule carries no referee Result")
-    if (block.get("buyer_half"), block.get("seller_half")) != (buyer_half["capsule_id"], seller_half["capsule_id"]):
+    halves = (buyer_half["capsule_id"], seller_half["capsule_id"])
+    if (block.get("buyer_half"), block.get("seller_half")) != halves or not set(halves) <= _cited(capsule):
         raise RefereeError("other_deal", "the Result names other halves")
     if block.get("result_digest") != result_digest(doc):
         raise RefereeError("result_mismatch", "the document is not the Result the capsule names")
-    validate_against_schema(doc)
-    verify_result(doc)
+    try:
+        validate_against_schema(doc)
+        verify_result(doc)
+    except (ResultError, ValueError, jsonschema.ValidationError) as exc:
+        raise RefereeError("result_invalid", str(exc)) from exc
