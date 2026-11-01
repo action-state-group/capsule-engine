@@ -68,7 +68,12 @@ def leaves(mmr_size):
     return n
 
 
-def case(name, defn, art, checkpoints, pin, expected=None, want=None, definition_text=None, artifact_text=None):
+PROPERTIES = ("definition_form", "definition_binding", "artifact_form", "anchor_match", "coverage_declaration_form",
+              "coverage_declaration_anchor", "units", "labels", "period_alignment", "period_anchor", "period_floor")
+
+
+def case(name, defn, art, checkpoints, pin, expected=None, want=None, definition_text=None, artifact_text=None,
+         prop=None):
     c = {"case": name,
          "definition": definition_text if definition_text is not None else jcs(defn),
          "artifact": artifact_text if artifact_text is not None else jcs(art),
@@ -76,7 +81,11 @@ def case(name, defn, art, checkpoints, pin, expected=None, want=None, definition
     if want is None:
         c["expected"] = expected
     else:
-        c["want"] = want
+        # The property the refusal names: the sealed block records it, so
+        # Go and Rust must name the same one.
+        prop = prop or want.split(":")[0]
+        assert prop in PROPERTIES, (name, prop)
+        c["want"], c["property"] = want, prop
     return c
 
 
@@ -101,7 +110,7 @@ def main():
     mpin = mart["anchor"]
     cases.append(case("mesh-service-history-1", mdef, mart, mcps, mpin, expected=served(mdef, mart)))
 
-    def mutant(name, want=None, edit_def=None, edit_art=None, rebind=True, accept=False, **kw):
+    def mutant(name, want=None, edit_def=None, edit_art=None, rebind=True, accept=False, prop=None, **kw):
         d, x = copy.deepcopy(mdef), copy.deepcopy(mart)
         if edit_def:
             edit_def(d)
@@ -114,14 +123,14 @@ def main():
         expected = None
         if accept:
             expected = served(d, x) if any(u["unit"] == "exchanges_served" for u in d["members"][1]["units"]) else None
-        cases.append(case(name, d, x, args["checkpoints"], args["pin"], expected=expected, want=want,
+        cases.append(case(name, d, x, args["checkpoints"], args["pin"], expected=expected, want=want, prop=prop,
                           definition_text=args.get("definition_text"), artifact_text=args.get("artifact_text")))
 
     mutant("mesh-unknown-profile", "definition_form: profile not known",
            edit_def=lambda d: d.update(profile="inference-service-history/1"))
     mutant("mesh-detailed-level", "definition_form: detailed level not read",
            edit_def=lambda d: d.update(level="detailed"))
-    mutant("mesh-other-counts-member", "counts shape not known",
+    mutant("mesh-other-counts-member", "counts shape not known", prop="definition_form",
            edit_def=lambda d: d["members"][1].update(name="weekly_counts"))
     mutant("mesh-unregistered-unit", "units:",
            edit_def=lambda d: d["members"][1]["units"][0].update(unit="exchanges"))
@@ -162,7 +171,7 @@ def main():
         d["members"][1]["reads"] = [None]
         d["reads"] = d["members"][0]["reads"] + [None]
     mutant("mesh-null-in-reads", "definition_form", edit_def=null_reads)
-    mutant("mesh-null-model", "counts shape not known: cells[0].dimension",
+    mutant("mesh-null-model", "counts shape not known: cells[0].dimension", prop="artifact_form",
            edit_art=lambda x: x["period_counts"]["periods"][1]["cells"][0].update(dimension={"model": None}))
     mutant("mesh-null-declared", "artifact_form", edit_art=lambda x: x.update(declared=None))
 
@@ -197,6 +206,28 @@ def main():
                 c["unit"] = "exchanges_requested"
     mutant("mesh-requested-only-reads-no-served", accept=True, edit_def=requested_only, edit_art=requested_cells)
 
+    # Arrays are read one element at a time in both, so the first bad
+    # element names the property; a counterparty's member name never does.
+    def bad_cell_then_number(x):
+        cells = x["period_counts"]["periods"][1]["cells"]
+        cells[0]["label"] = "peer_confirmed"
+        cells.append(5)
+    mutant("mesh-bad-cell-before-a-number", "labels", edit_art=bad_cell_then_number)
+
+    def bad_unit_then_number(d):
+        d["members"][1]["units"][0]["unit"] = "bogus"
+        d["members"].append(7)
+    mutant("mesh-bad-unit-before-a-number-member", "units:", edit_def=bad_unit_then_number)
+
+    def bad_unit_then_number_unit(d):
+        d["members"][1]["units"][0]["unit"] = "bogus"
+        d["members"][1]["units"].append(7)
+    mutant("mesh-bad-unit-before-a-number-unit", "units:", edit_def=bad_unit_then_number_unit)
+
+    def member_named_like_a_property(d):
+        d["members"].append({"name": "units: x", "reads": [], "units": [{"unit": "records", "where": "x"}]})
+    mutant("mesh-member-named-like-a-property", "definition_form", edit_def=member_named_like_a_property)
+
     # The AAC corpus's Standard and Detailed History cases.
     aac = json.load(open(a.aac))
     for c in aac["cases"]:
@@ -212,7 +243,7 @@ def main():
         failed = [k for k, v in props.items() if v == "FAIL"]
         name = "aac-" + c["id"]
         if defn["level"] == "detailed":
-            cases.append(case(name, defn, art, cps, pin, want="detailed level not read"))
+            cases.append(case(name, defn, art, cps, pin, want="detailed level not read", prop="definition_form"))
         elif failed:
             assert len(failed) == 1, (c["id"], failed)
             cases.append(case(name, defn, art, cps, pin, want=failed[0]))

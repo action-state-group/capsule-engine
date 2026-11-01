@@ -71,6 +71,7 @@ func TestInferenceServiceHistoryVectors(t *testing.T) {
 			} `json:"card"`
 			Pin      string          `json:"pin"`
 			Want     string          `json:"want"`
+			Property string          `json:"property"`
 			Expected json.RawMessage `json:"expected"`
 		} `json:"cases"`
 	}
@@ -88,9 +89,9 @@ func TestInferenceServiceHistoryVectors(t *testing.T) {
 		served, err := InferenceServiceHistoryCounts([]byte(c.Definition), []byte(c.Artifact), card, c.Pin)
 		if c.Want != "" {
 			var ie *InferenceServiceHistoryError
-			if !errors.As(err, &ie) || !strings.Contains(err.Error(), c.Want) ||
+			if !errors.As(err, &ie) || !strings.Contains(err.Error(), c.Want) || ie.Property != c.Property ||
 				!slices.Contains(InferenceServiceHistoryProperties, ie.Property) {
-				t.Errorf("%s: got error %v, want one containing %q", c.Case, err, c.Want)
+				t.Errorf("%s: got error %v, want one containing %q naming %s", c.Case, err, c.Want, c.Property)
 			}
 			continue
 		}

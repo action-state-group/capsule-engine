@@ -344,15 +344,9 @@ impl Definition {
     /// inference_service_history.go ishDefinitionOf: definition_form for a
     /// Standard definition (ISH §4.1, §8.3).
     fn of(def: &Map<String, Value>) -> Result<Definition, (&'static str, String)> {
-        Self::form(def).map_err(|e| match e.strip_prefix("units: ") {
-            Some(rest) => ("units", rest.to_string()),
-            None => ("definition_form", e),
-        })
-    }
-
-    fn form(def: &Map<String, Value>) -> Result<Definition, String> {
+        let bad = |why: String| ("definition_form", why);
         if !same_keys(def, &DEFINITION_KEYS) {
-            return Err("not exactly the members of a Standard definition".into());
+            return Err(bad(String::from("not exactly the members of a Standard definition")));
         }
         let name_ok = def["name"].as_str().is_some_and(is_definition_name);
         if def["level"] != json!("standard")
@@ -363,13 +357,14 @@ impl Definition {
             || !name_ok
             || !def["spec"].is_string()
         {
-            return Err("a member does not have the value the profile fixes".into());
+            return Err(bad(String::from("a member does not have the value the profile fixes")));
         }
         let excludes = strings(&def["excludes"]);
         if !excludes.is_some_and(|e| e.contains(&"requester identity")) {
-            return Err("excludes does not name requester identity".into());
+            return Err(bad(String::from("excludes does not name requester identity")));
         }
-        let members = def["members"].as_array().filter(|m| !m.is_empty()).ok_or("no members")?;
+        let members =
+            def["members"].as_array().filter(|m| !m.is_empty()).ok_or_else(|| bad(String::from("no members")))?;
         let mut d = Definition {
             members: Vec::new(),
             counts_units: Vec::new(),
@@ -384,75 +379,77 @@ impl Definition {
             let m = m
                 .as_object()
                 .filter(|m| m.keys().all(|k| MEMBER_KEYS.contains(&k.as_str())))
-                .ok_or_else(|| format!("members[{i}] is not a member"))?;
+                .ok_or_else(|| bad(format!("members[{i}] is not a member")))?;
             let name = m
                 .get("name")
                 .and_then(Value::as_str)
                 .filter(|n| !n.is_empty() && !d.members.iter().any(|o| o.name == *n))
-                .ok_or_else(|| format!("members[{i}] has no name, or one listed twice"))?;
+                .ok_or_else(|| bad(format!("members[{i}] has no name, or one listed twice")))?;
             let required =
-                m.get("required").and_then(Value::as_bool).ok_or_else(|| format!("{name} has no required"))?;
-            let reads = m.get("reads").and_then(strings).ok_or_else(|| format!("{name} has no reads"))?;
+                m.get("required").and_then(Value::as_bool).ok_or_else(|| bad(format!("{name} has no required")))?;
+            let reads = m.get("reads").and_then(strings).ok_or_else(|| bad(format!("{name} has no reads")))?;
             for r in reads {
                 if !union.contains(&r) {
                     union.push(r);
                 }
             }
             let units = m.get("units").and_then(Value::as_array).filter(|u| !u.is_empty());
-            let units = units.ok_or_else(|| format!("{name} has no units"))?;
+            let units = units.ok_or_else(|| bad(format!("{name} has no units")))?;
             let mut member_units = Vec::new();
             for (j, u) in units.iter().enumerate() {
                 let u = u.as_object().filter(|u| same_keys(u, &["unit", "where"]) && u["where"].is_string());
                 let unit = u
                     .and_then(|u| u["unit"].as_str())
-                    .ok_or_else(|| format!("{name}: units[{j}] is not {{where, unit}}"))?;
+                    .ok_or_else(|| bad(format!("{name}: units[{j}] is not {{where, unit}}")))?;
                 if !UNITS.contains(&unit) {
-                    return Err(format!("units: {name} counts in {unit:?}, which is not a unit of the profile"));
+                    return Err(("units", format!("{name} counts in {unit:?}, which is not a unit of the profile")));
                 }
                 member_units.push(unit.to_string());
             }
             if m.get("derivation").is_some_and(|v| !v.is_string()) {
-                return Err(format!("{name}: derivation is not a string"));
+                return Err(bad(format!("{name}: derivation is not a string")));
             }
             match name {
                 HISTORY_CARD => {
                     if !required || m.get("derivation") != Some(&json!("history_card/1")) {
-                        return Err("history_card is not a required history_card/1 member".into());
+                        return Err(bad(String::from("history_card is not a required history_card/1 member")));
                     }
                 }
                 COUNTS => {
                     d.counts_units = member_units;
                     has_counts = true;
                 }
-                _ => return Err(format!("counts shape not known: member {name}")),
+                _ => return Err(bad(format!("counts shape not known: member {name}"))),
             }
             d.members.push(Member { name: name.to_string(), required });
         }
         if !d.members.iter().any(|m| m.name == HISTORY_CARD) {
-            return Err("history_card is not a required history_card/1 member".into());
+            return Err(bad(String::from("history_card is not a required history_card/1 member")));
         }
         if !has_counts {
-            return Err("no counts member".into());
+            return Err(bad(String::from("no counts member")));
         }
         if strings(&def["reads"]) != Some(union) {
-            return Err("reads is not the union of the members' reads".into());
+            return Err(bad(String::from("reads is not the union of the members' reads")));
         }
         let p = def["period_policy"]
             .as_object()
             .filter(|p| same_keys(p, &POLICY_KEYS) && p["suppression"] == json!("complementary"))
-            .ok_or("period_policy is not the profile's")?;
-        d.epoch = whole_second(&p["epoch"]).ok_or("period_policy: epoch is not a whole-second UTC time")?;
+            .ok_or_else(|| bad(String::from("period_policy is not the profile's")))?;
+        d.epoch = whole_second(&p["epoch"])
+            .ok_or_else(|| bad(String::from("period_policy: epoch is not a whole-second UTC time")))?;
         let mut min_length = 0;
         for (k, v) in [("length_s", &mut d.length_s), ("min_length_s", &mut min_length), ("floor", &mut d.floor)] {
             *v = count(p, k)
                 .ok()
                 .filter(|n| *n > 0)
-                .ok_or_else(|| format!("period_policy: {k} is not a positive integer"))?;
+                .ok_or_else(|| bad(format!("period_policy: {k} is not a positive integer")))?;
         }
         if d.length_s < min_length {
-            return Err("period_policy: length_s is under min_length_s".into());
+            return Err(bad(String::from("period_policy: length_s is under min_length_s")));
         }
-        d.policy_digest = jcs_digest(&def["period_policy"]).ok_or("period_policy is malformed")?;
+        d.policy_digest =
+            jcs_digest(&def["period_policy"]).ok_or_else(|| bad(String::from("period_policy is malformed")))?;
         Ok(d)
     }
 

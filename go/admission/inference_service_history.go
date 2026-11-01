@@ -350,13 +350,16 @@ func ishDefinitionOf(def map[string]json.RawMessage) (ishDefinition, *ishError) 
 	if excludes, ok := ishStrings(def["excludes"]); !ok || !slices.Contains(excludes, "requester identity") {
 		return d, formErr("excludes does not name requester identity")
 	}
-	var members []map[string]json.RawMessage
+	// Arrays are read one element at a time, as Rust reads them, so the
+	// first bad element names the property in both.
+	var members []json.RawMessage
 	if json.Unmarshal(def["members"], &members) != nil || len(members) == 0 {
 		return d, formErr("no members")
 	}
 	var union []string
-	for i, m := range members {
-		if m == nil || !subsetKeys(m, ishMemberKeys) {
+	for i, raw := range members {
+		var m map[string]json.RawMessage
+		if json.Unmarshal(raw, &m) != nil || m == nil || !subsetKeys(m, ishMemberKeys) {
 			return d, formErr("members[%d] is not a member", i)
 		}
 		var mb ishMember
@@ -380,11 +383,13 @@ func ishDefinitionOf(def map[string]json.RawMessage) (ishDefinition, *ishError) 
 				union = append(union, r)
 			}
 		}
-		var units []map[string]json.RawMessage
+		var units []json.RawMessage
 		if json.Unmarshal(m["units"], &units) != nil || len(units) == 0 {
 			return d, formErr("%s has no units", mb.name)
 		}
-		for j, u := range units {
+		for j, rawUnit := range units {
+			var u map[string]json.RawMessage
+			_ = json.Unmarshal(rawUnit, &u) // a non-object leaves u nil, refused below
 			_, okWhere := ishString(u["where"])
 			unit, okUnit := ishString(u["unit"])
 			if !okWhere || !okUnit || !sameKeys(u, []string{"unit", "where"}) {
@@ -467,7 +472,7 @@ func (d ishDefinition) cells(raw json.RawMessage) (map[string]ishTotal, *ishErro
 	bad := func(property, format string, args ...any) *ishError {
 		return &ishError{property, fmt.Sprintf(format, args...)}
 	}
-	var cells []map[string]json.RawMessage
+	var cells []json.RawMessage
 	if json.Unmarshal(raw, &cells) != nil || cells == nil {
 		return nil, bad("artifact_form", "counts shape not known")
 	}
@@ -476,7 +481,9 @@ func (d ishDefinition) cells(raw json.RawMessage) (map[string]ishTotal, *ishErro
 		ishTotal
 	}
 	byUnit := map[string][]cell{}
-	for j, c := range cells {
+	for j, rawCell := range cells {
+		var c map[string]json.RawMessage
+		_ = json.Unmarshal(rawCell, &c) // a non-object leaves c nil, refused below
 		unit, okUnit := ishString(c["unit"])
 		if c == nil || !okUnit {
 			return nil, bad("artifact_form", "counts shape not known: cells[%d]", j)

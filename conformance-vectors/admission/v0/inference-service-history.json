@@ -68,7 +68,8 @@
     ]
    },
    "pin": "d3102687f99d898e6f83f8b7968eccc4040a2036029cb50bf4b31aab4196a9d3",
-   "want": "definition_form: profile not known"
+   "want": "definition_form: profile not known",
+   "property": "definition_form"
   },
   {
    "case": "mesh-detailed-level",
@@ -95,7 +96,8 @@
     ]
    },
    "pin": "d3102687f99d898e6f83f8b7968eccc4040a2036029cb50bf4b31aab4196a9d3",
-   "want": "definition_form: detailed level not read"
+   "want": "definition_form: detailed level not read",
+   "property": "definition_form"
   },
   {
    "case": "mesh-other-counts-member",
@@ -122,7 +124,8 @@
     ]
    },
    "pin": "d3102687f99d898e6f83f8b7968eccc4040a2036029cb50bf4b31aab4196a9d3",
-   "want": "counts shape not known"
+   "want": "counts shape not known",
+   "property": "definition_form"
   },
   {
    "case": "mesh-unregistered-unit",
@@ -149,7 +152,8 @@
     ]
    },
    "pin": "d3102687f99d898e6f83f8b7968eccc4040a2036029cb50bf4b31aab4196a9d3",
-   "want": "units:"
+   "want": "units:",
+   "property": "units"
   },
   {
    "case": "mesh-definition-not-bound",
@@ -176,7 +180,8 @@
     ]
    },
    "pin": "d3102687f99d898e6f83f8b7968eccc4040a2036029cb50bf4b31aab4196a9d3",
-   "want": "definition_binding"
+   "want": "definition_binding",
+   "property": "definition_binding"
   },
   {
    "case": "mesh-stale-or-replayed-pin",
@@ -203,7 +208,8 @@
     ]
    },
    "pin": "59a28b73bf1d9b367997d2c16ee0031ce4ff7a989bb9daf9869fed4f591652b6",
-   "want": "anchor_match"
+   "want": "anchor_match",
+   "property": "anchor_match"
   },
   {
    "case": "mesh-interval-not-to-anchor",
@@ -230,7 +236,8 @@
     ]
    },
    "pin": "d3102687f99d898e6f83f8b7968eccc4040a2036029cb50bf4b31aab4196a9d3",
-   "want": "coverage_declaration_anchor"
+   "want": "coverage_declaration_anchor",
+   "property": "coverage_declaration_anchor"
   },
   {
    "case": "mesh-live-set-other-count",
@@ -257,7 +264,8 @@
     ]
    },
    "pin": "d3102687f99d898e6f83f8b7968eccc4040a2036029cb50bf4b31aab4196a9d3",
-   "want": "coverage_declaration_form"
+   "want": "coverage_declaration_form",
+   "property": "coverage_declaration_form"
   },
   {
    "case": "mesh-card-digest-mismatch",
@@ -284,7 +292,8 @@
     ]
    },
    "pin": "d3102687f99d898e6f83f8b7968eccc4040a2036029cb50bf4b31aab4196a9d3",
-   "want": "artifact_form: the card does not match history_card_digest"
+   "want": "artifact_form: the card does not match history_card_digest",
+   "property": "artifact_form"
   },
   {
    "case": "mesh-count-labelled-peer-confirmed",
@@ -311,7 +320,8 @@
     ]
    },
    "pin": "d3102687f99d898e6f83f8b7968eccc4040a2036029cb50bf4b31aab4196a9d3",
-   "want": "labels"
+   "want": "labels",
+   "property": "labels"
   },
   {
    "case": "mesh-cell-below-floor",
@@ -338,7 +348,8 @@
     ]
    },
    "pin": "d3102687f99d898e6f83f8b7968eccc4040a2036029cb50bf4b31aab4196a9d3",
-   "want": "period_floor"
+   "want": "period_floor",
+   "property": "period_floor"
   },
   {
    "case": "mesh-anchor-not-a-boundary",
@@ -365,7 +376,8 @@
     ]
    },
    "pin": "d3102687f99d898e6f83f8b7968eccc4040a2036029cb50bf4b31aab4196a9d3",
-   "want": "period_anchor"
+   "want": "period_anchor",
+   "property": "period_anchor"
   },
   {
    "case": "mesh-week-left-out",
@@ -392,7 +404,8 @@
     ]
    },
    "pin": "d3102687f99d898e6f83f8b7968eccc4040a2036029cb50bf4b31aab4196a9d3",
-   "want": "period_alignment"
+   "want": "period_alignment",
+   "property": "period_alignment"
   },
   {
    "case": "mesh-definition-not-jcs",
@@ -419,7 +432,8 @@
     ]
    },
    "pin": "d3102687f99d898e6f83f8b7968eccc4040a2036029cb50bf4b31aab4196a9d3",
-   "want": "definition_form: the definition is not JCS bytes"
+   "want": "definition_form: the definition is not JCS bytes",
+   "property": "definition_form"
   },
   {
    "case": "mesh-requested-cell-not-declared",
@@ -446,7 +460,8 @@
     ]
    },
    "pin": "d3102687f99d898e6f83f8b7968eccc4040a2036029cb50bf4b31aab4196a9d3",
-   "want": "units:"
+   "want": "units:",
+   "property": "units"
   },
   {
    "case": "mesh-null-spec",
@@ -473,7 +488,8 @@
     ]
    },
    "pin": "d3102687f99d898e6f83f8b7968eccc4040a2036029cb50bf4b31aab4196a9d3",
-   "want": "definition_form"
+   "want": "definition_form",
+   "property": "definition_form"
   },
   {
    "case": "mesh-null-unit-where",
@@ -500,7 +516,8 @@
     ]
    },
    "pin": "d3102687f99d898e6f83f8b7968eccc4040a2036029cb50bf4b31aab4196a9d3",
-   "want": "definition_form"
+   "want": "definition_form",
+   "property": "definition_form"
   },
   {
    "case": "mesh-null-counts-derivation",
@@ -527,7 +544,8 @@
     ]
    },
    "pin": "d3102687f99d898e6f83f8b7968eccc4040a2036029cb50bf4b31aab4196a9d3",
-   "want": "definition_form"
+   "want": "definition_form",
+   "property": "definition_form"
   },
   {
    "case": "mesh-null-in-excludes",
@@ -554,7 +572,8 @@
     ]
    },
    "pin": "d3102687f99d898e6f83f8b7968eccc4040a2036029cb50bf4b31aab4196a9d3",
-   "want": "definition_form"
+   "want": "definition_form",
+   "property": "definition_form"
   },
   {
    "case": "mesh-null-in-reads",
@@ -581,7 +600,8 @@
     ]
    },
    "pin": "d3102687f99d898e6f83f8b7968eccc4040a2036029cb50bf4b31aab4196a9d3",
-   "want": "definition_form"
+   "want": "definition_form",
+   "property": "definition_form"
   },
   {
    "case": "mesh-null-model",
@@ -608,7 +628,8 @@
     ]
    },
    "pin": "d3102687f99d898e6f83f8b7968eccc4040a2036029cb50bf4b31aab4196a9d3",
-   "want": "counts shape not known: cells[0].dimension"
+   "want": "counts shape not known: cells[0].dimension",
+   "property": "artifact_form"
   },
   {
    "case": "mesh-null-declared",
@@ -635,7 +656,8 @@
     ]
    },
    "pin": "d3102687f99d898e6f83f8b7968eccc4040a2036029cb50bf4b31aab4196a9d3",
-   "want": "artifact_form"
+   "want": "artifact_form",
+   "property": "artifact_form"
   },
   {
    "case": "mesh-checkpoints-go-back",
@@ -662,7 +684,8 @@
     ]
    },
    "pin": "d3102687f99d898e6f83f8b7968eccc4040a2036029cb50bf4b31aab4196a9d3",
-   "want": "period_alignment"
+   "want": "period_alignment",
+   "property": "period_alignment"
   },
   {
    "case": "mesh-empty-first-checkpoint",
@@ -739,7 +762,8 @@
     ]
    },
    "pin": "d3102687f99d898e6f83f8b7968eccc4040a2036029cb50bf4b31aab4196a9d3",
-   "want": "period_alignment"
+   "want": "period_alignment",
+   "property": "period_alignment"
   },
   {
    "case": "mesh-no-record-lists-no-week",
@@ -766,7 +790,8 @@
     ]
    },
    "pin": "d3102687f99d898e6f83f8b7968eccc4040a2036029cb50bf4b31aab4196a9d3",
-   "want": "period_alignment"
+   "want": "period_alignment",
+   "property": "period_alignment"
   },
   {
    "case": "mesh-suppressed-total",
@@ -881,6 +906,118 @@
    "expected": null
   },
   {
+   "case": "mesh-bad-cell-before-a-number",
+   "definition": "{\"coverage_declaration\":{\"kind\":\"stream_interval\",\"rule\":\"all_records\"},\"embeds\":[\"history_card/1\"],\"excludes\":[\"requester identity\",\"per-recipient release state\",\"latency\"],\"kind\":\"projection\",\"level\":\"standard\",\"members\":[{\"derivation\":\"history_card/1\",\"name\":\"history_card\",\"reads\":[\"checkpoint: v, kind, log_id, mmr_size, root, prev_size, prev_root, key_id, timestamp, signature\",\"log: the MMR nodes of each consistency proof\"],\"required\":true,\"units\":[{\"unit\":\"checkpoints\",\"where\":\"history (one entry per checkpoint)\"},{\"unit\":\"witness_receipts\",\"where\":\"witness_receipts beside the envelope, one per receipt of a listed checkpoint\"}]},{\"claims\":{\"asserted_by\":\"provider\",\"label\":\"provider states\",\"where\":[\"periods[].cells[].dimension.model\"]},\"name\":\"period_counts\",\"reads\":[\"record: model_attestation.compute_attestation.x-mesh-poc-v1.role\",\"record: model_attestation.compute_attestation.x-mesh-lifecycle-v1.observation_point\",\"record: model_attestation.compute_attestation.x-mesh-poc-v1.serving_provenance.model_canonical_ref\",\"checkpoint: timestamp and mmr_size of the first checkpoint that covers each record\"],\"required\":true,\"units\":[{\"unit\":\"exchanges_served\",\"where\":\"periods[].cells[]\"}]}],\"name\":\"service_history/1\",\"period_policy\":{\"epoch\":\"2026-01-05T00:00:00Z\",\"floor\":5,\"length_s\":604800,\"min_length_s\":86400,\"suppression\":\"complementary\"},\"profile\":\"inference-service-history/0\",\"reads\":[\"checkpoint: v, kind, log_id, mmr_size, root, prev_size, prev_root, key_id, timestamp, signature\",\"log: the MMR nodes of each consistency proof\",\"record: model_attestation.compute_attestation.x-mesh-poc-v1.role\",\"record: model_attestation.compute_attestation.x-mesh-lifecycle-v1.observation_point\",\"record: model_attestation.compute_attestation.x-mesh-poc-v1.serving_provenance.model_canonical_ref\",\"checkpoint: timestamp and mmr_size of the first checkpoint that covers each record\"],\"spec\":\"https://github.com/Mesh-LLM/capsules-plugin/blob/main/docs/SERVICE-HISTORY.md\",\"subjects\":[\"full_history\"]}",
+   "artifact": "{\"anchor\":\"d3102687f99d898e6f83f8b7968eccc4040a2036029cb50bf4b31aab4196a9d3\",\"coverage_declaration\":{\"interval\":{\"from\":null,\"to\":\"d3102687f99d898e6f83f8b7968eccc4040a2036029cb50bf4b31aab4196a9d3\"},\"kind\":\"stream_interval\",\"live_set\":[{\"checkpoint\":\"d3102687f99d898e6f83f8b7968eccc4040a2036029cb50bf4b31aab4196a9d3\",\"count\":30,\"start\":0,\"stream\":\"corpus-node-log\"}],\"rule\":\"all_records\"},\"declared\":[\"history_card\",\"period_counts\"],\"derivation\":\"cbc96d800ad206791db7e0793b80a2720c1908468ba99692b739aa8e74aab2d8\",\"evidence_stream\":\"corpus-node-log\",\"history_card\":{\"anchor\":\"d3102687f99d898e6f83f8b7968eccc4040a2036029cb50bf4b31aab4196a9d3\",\"derivation\":\"history_card/1\",\"evidence_stream\":\"corpus-node-log\",\"history\":[{\"checkpoint\":\"d284586fa4012703781f6170706c69636174696f6e2f636c6c2d636865636b706f696e742b63626f720458208146640f02493af4fbc54fe33388e75dc2c937ae0b7727cc2b2afb1b75199a3e0fa2016f636f727075732d6e6f64652d6c6f670272636f727075732d6e6f64652d6c6f67233130a058aca6646b696e646e636c6c2d636865636b706f696e74686c6f675f73697a650a696973737565645f617474323032362d30312d30375431303a30303a30305a69707265765f73697a65006a636f6d6d69746d656e74584582582028b0909a06957d2648f8d4f84c9a01ca9041e502acd7048219aedb3f2e939e9a5820b579c75e0e25283f81087c4c838abe80ad2278e055bbdd9a51f56dc82d8c19686f707265765f636f6d6d69746d656e744058403630cb19c64687345c15c5c8044c5cad4be3bc1a6d85c38eae56c5f973e0c1e785f13bdb54a90bf8b97fe1380b7f0d17525d78f7b16d5bc96a038f591681b603\",\"consistency_from_previous\":null},{\"checkpoint\":\"d284586fa4012703781f6170706c69636174696f6e2f636c6c2d636865636b706f696e742b63626f720458208146640f02493af4fbc54fe33388e75dc2c937ae0b7727cc2b2afb1b75199a3e0fa2016f636f727075732d6e6f64652d6c6f670272636f727075732d6e6f64652d6c6f67233232a0590224a7646b696e646e636c6c2d636865636b706f696e74686c6f675f73697a6516696973737565645f617474323032362d30312d31325430303a30303a30305a69707265765f73697a650a6a636f6d6d69746d656e745845825820430a9adefc2f6c0a1d0cb7bf6e936ecc410b00ef4e21b54eb218f01e65e1a13b58202dbd6d0e1670832d89c5956d19cb7b91649ef46229ec2dffeaaa9dbf455acc716f707265765f636f6d6d69746d656e74584582582028b0909a06957d2648f8d4f84c9a01ca9041e502acd7048219aedb3f2e939e9a5820b579c75e0e25283f81087c4c838abe80ad2278e055bbdd9a51f56dc82d8c196871636f6e73697374656e63795f70726f6f66a56673697a655f610a6673697a655f6216677769746e657373828158209acb45abad7f5bdcd29187a7ea4cbde04eff86e47e4e68dd15ed8f8e71f070f78258203805a268903531a6cbb8a5d73715308cb1caaa11acc2048c751c6b80ef12d7d2582028b0909a06957d2648f8d4f84c9a01ca9041e502acd7048219aedb3f2e939e9a696e65775f7065616b73825820430a9adefc2f6c0a1d0cb7bf6e936ecc410b00ef4e21b54eb218f01e65e1a13b58202dbd6d0e1670832d89c5956d19cb7b91649ef46229ec2dffeaaa9dbf455acc71696f6c645f7065616b7382582028b0909a06957d2648f8d4f84c9a01ca9041e502acd7048219aedb3f2e939e9a5820b579c75e0e25283f81087c4c838abe80ad2278e055bbdd9a51f56dc82d8c1968584008c697ebc2917f99763df65540ca95664d024f932c5c687ac6e17763711d951052bb23388b8dde3eae116fe9454a62c73b23d2b506a73e860f8ae5832f629202\",\"consistency_from_previous\":\"840a16828158209acb45abad7f5bdcd29187a7ea4cbde04eff86e47e4e68dd15ed8f8e71f070f78258203805a268903531a6cbb8a5d73715308cb1caaa11acc2048c751c6b80ef12d7d2582028b0909a06957d2648f8d4f84c9a01ca9041e502acd7048219aedb3f2e939e9a8158202dbd6d0e1670832d89c5956d19cb7b91649ef46229ec2dffeaaa9dbf455acc71\"},{\"checkpoint\":\"d284586fa4012703781f6170706c69636174696f6e2f636c6c2d636865636b706f696e742b63626f720458208146640f02493af4fbc54fe33388e75dc2c937ae0b7727cc2b2afb1b75199a3e0fa2016f636f727075732d6e6f64652d6c6f670272636f727075732d6e6f64652d6c6f67233338a0590226a7646b696e646e636c6c2d636865636b706f696e74686c6f675f73697a651826696973737565645f617474323032362d30312d31345430383a30303a30305a69707265765f73697a65166a636f6d6d69746d656e745845825820662ccb9dc4b7ee5bf1a27afc7c79208508c9a04bd0e456aa52fb22e69c2c009a582037050ed1f8895e7ad7fc928cc5fd629131b7b1c3d64e1cb8b1a94296cc0b55e66f707265765f636f6d6d69746d656e745845825820430a9adefc2f6c0a1d0cb7bf6e936ecc410b00ef4e21b54eb218f01e65e1a13b58202dbd6d0e1670832d89c5956d19cb7b91649ef46229ec2dffeaaa9dbf455acc7171636f6e73697374656e63795f70726f6f66a56673697a655f61166673697a655f621826677769746e657373828158209a1d11dc50b72287914059af8c7638f357a1d78b5678850fe02a0eec2b358fc1825820c58dd181b6e0c203d79a2f5de504cb97ba640caac8982128218172ca5e58956e5820430a9adefc2f6c0a1d0cb7bf6e936ecc410b00ef4e21b54eb218f01e65e1a13b696e65775f7065616b73825820662ccb9dc4b7ee5bf1a27afc7c79208508c9a04bd0e456aa52fb22e69c2c009a582037050ed1f8895e7ad7fc928cc5fd629131b7b1c3d64e1cb8b1a94296cc0b55e6696f6c645f7065616b73825820430a9adefc2f6c0a1d0cb7bf6e936ecc410b00ef4e21b54eb218f01e65e1a13b58202dbd6d0e1670832d89c5956d19cb7b91649ef46229ec2dffeaaa9dbf455acc715840c592ce216c652e241907c07c343b7a84ee7bb1cb211d9366dcb676fa25b64f28bee0a28f8ada97cd354dd2abb0b493409667b97a5ea325c4cf394d75f90aca00\",\"consistency_from_previous\":\"84161826828158209a1d11dc50b72287914059af8c7638f357a1d78b5678850fe02a0eec2b358fc1825820c58dd181b6e0c203d79a2f5de504cb97ba640caac8982128218172ca5e58956e5820430a9adefc2f6c0a1d0cb7bf6e936ecc410b00ef4e21b54eb218f01e65e1a13b81582037050ed1f8895e7ad7fc928cc5fd629131b7b1c3d64e1cb8b1a94296cc0b55e6\"},{\"checkpoint\":\"d284586fa4012703781f6170706c69636174696f6e2f636c6c2d636865636b706f696e742b63626f720458208146640f02493af4fbc54fe33388e75dc2c937ae0b7727cc2b2afb1b75199a3e0fa2016f636f727075732d6e6f64652d6c6f670272636f727075732d6e6f64652d6c6f67233536a059026ca7646b696e646e636c6c2d636865636b706f696e74686c6f675f73697a651838696973737565645f617474323032362d30312d31395430303a30303a30305a69707265765f73697a6518266a636f6d6d69746d656e745889845820662ccb9dc4b7ee5bf1a27afc7c79208508c9a04bd0e456aa52fb22e69c2c009a58201fbdbb66b9d13ffb901471f012339f31f87bf52362411a942a26a9df88642f6a5820a1ec4b67f6e8e0119bb0673509aeb7cf1dc7f0d06ac82fc0509fae147ddbabfc5820945afc32a8ff86bf0751d8a201a646e0f9758becd0f2f779c33f6cc3242e8ea36f707265765f636f6d6d69746d656e745845825820662ccb9dc4b7ee5bf1a27afc7c79208508c9a04bd0e456aa52fb22e69c2c009a582037050ed1f8895e7ad7fc928cc5fd629131b7b1c3d64e1cb8b1a94296cc0b55e671636f6e73697374656e63795f70726f6f66a56673697a655f6118266673697a655f621838677769746e6573738280815820cbfc0f47b1c47a7d988e27dbb815bd996e423b5995bc2440bce03d0deb3d9dba696e65775f7065616b73845820662ccb9dc4b7ee5bf1a27afc7c79208508c9a04bd0e456aa52fb22e69c2c009a58201fbdbb66b9d13ffb901471f012339f31f87bf52362411a942a26a9df88642f6a5820a1ec4b67f6e8e0119bb0673509aeb7cf1dc7f0d06ac82fc0509fae147ddbabfc5820945afc32a8ff86bf0751d8a201a646e0f9758becd0f2f779c33f6cc3242e8ea3696f6c645f7065616b73825820662ccb9dc4b7ee5bf1a27afc7c79208508c9a04bd0e456aa52fb22e69c2c009a582037050ed1f8895e7ad7fc928cc5fd629131b7b1c3d64e1cb8b1a94296cc0b55e658400af43773c303d8d1e079ef00f32e29285aee5f8c1ff922c42493ed1eed2115e65863d4d754ad65b42063b6e038bddf3f13170e9e8f9507c0cabde4c0b0d42a03\",\"consistency_from_previous\":\"84182618388280815820cbfc0f47b1c47a7d988e27dbb815bd996e423b5995bc2440bce03d0deb3d9dba825820a1ec4b67f6e8e0119bb0673509aeb7cf1dc7f0d06ac82fc0509fae147ddbabfc5820945afc32a8ff86bf0751d8a201a646e0f9758becd0f2f779c33f6cc3242e8ea3\"}],\"subject\":{\"full_history\":null}},\"history_card_digest\":\"39148ceb130fe85d889c2be3a63ba670d4f42cde74acdb7d9f16ccb1647edf98\",\"period_counts\":{\"periods\":[{\"cells\":[{\"dimension\":{\"model\":\"a\"},\"label\":\"self_reported\",\"suppressed\":\"complementary\",\"unit\":\"exchanges_served\",\"value\":null},{\"dimension\":{\"model\":\"b\"},\"label\":\"self_reported\",\"suppressed\":\"below_floor\",\"unit\":\"exchanges_served\",\"value\":null},{\"dimension\":null,\"label\":\"self_reported\",\"unit\":\"exchanges_served\",\"value\":12}],\"from\":\"2026-01-05T00:00:00Z\",\"to\":\"2026-01-12T00:00:00Z\"},{\"cells\":[{\"dimension\":{\"model\":\"a\"},\"label\":\"peer_confirmed\",\"unit\":\"exchanges_served\",\"value\":6},{\"dimension\":{\"model\":\"b\"},\"label\":\"self_reported\",\"unit\":\"exchanges_served\",\"value\":12},{\"dimension\":null,\"label\":\"self_reported\",\"unit\":\"exchanges_served\",\"value\":18},5],\"from\":\"2026-01-12T00:00:00Z\",\"to\":\"2026-01-19T00:00:00Z\"}],\"policy\":\"0d4b28af7ebfca01a49c1ad59e74b7d9bff0e6712dd3478b4ee35b8ff6af5150\"},\"subject\":{\"full_history\":null}}",
+   "card": {
+    "checkpoints": [
+     {
+      "at": "2026-01-07T10:00:00Z",
+      "records": 6
+     },
+     {
+      "at": "2026-01-12T00:00:00Z",
+      "records": 12
+     },
+     {
+      "at": "2026-01-14T08:00:00Z",
+      "records": 20
+     },
+     {
+      "at": "2026-01-19T00:00:00Z",
+      "records": 30
+     }
+    ]
+   },
+   "pin": "d3102687f99d898e6f83f8b7968eccc4040a2036029cb50bf4b31aab4196a9d3",
+   "want": "labels",
+   "property": "labels"
+  },
+  {
+   "case": "mesh-bad-unit-before-a-number-member",
+   "definition": "{\"coverage_declaration\":{\"kind\":\"stream_interval\",\"rule\":\"all_records\"},\"embeds\":[\"history_card/1\"],\"excludes\":[\"requester identity\",\"per-recipient release state\",\"latency\"],\"kind\":\"projection\",\"level\":\"standard\",\"members\":[{\"derivation\":\"history_card/1\",\"name\":\"history_card\",\"reads\":[\"checkpoint: v, kind, log_id, mmr_size, root, prev_size, prev_root, key_id, timestamp, signature\",\"log: the MMR nodes of each consistency proof\"],\"required\":true,\"units\":[{\"unit\":\"checkpoints\",\"where\":\"history (one entry per checkpoint)\"},{\"unit\":\"witness_receipts\",\"where\":\"witness_receipts beside the envelope, one per receipt of a listed checkpoint\"}]},{\"claims\":{\"asserted_by\":\"provider\",\"label\":\"provider states\",\"where\":[\"periods[].cells[].dimension.model\"]},\"name\":\"period_counts\",\"reads\":[\"record: model_attestation.compute_attestation.x-mesh-poc-v1.role\",\"record: model_attestation.compute_attestation.x-mesh-lifecycle-v1.observation_point\",\"record: model_attestation.compute_attestation.x-mesh-poc-v1.serving_provenance.model_canonical_ref\",\"checkpoint: timestamp and mmr_size of the first checkpoint that covers each record\"],\"required\":true,\"units\":[{\"unit\":\"bogus\",\"where\":\"periods[].cells[]\"}]},7],\"name\":\"service_history/1\",\"period_policy\":{\"epoch\":\"2026-01-05T00:00:00Z\",\"floor\":5,\"length_s\":604800,\"min_length_s\":86400,\"suppression\":\"complementary\"},\"profile\":\"inference-service-history/0\",\"reads\":[\"checkpoint: v, kind, log_id, mmr_size, root, prev_size, prev_root, key_id, timestamp, signature\",\"log: the MMR nodes of each consistency proof\",\"record: model_attestation.compute_attestation.x-mesh-poc-v1.role\",\"record: model_attestation.compute_attestation.x-mesh-lifecycle-v1.observation_point\",\"record: model_attestation.compute_attestation.x-mesh-poc-v1.serving_provenance.model_canonical_ref\",\"checkpoint: timestamp and mmr_size of the first checkpoint that covers each record\"],\"spec\":\"https://github.com/Mesh-LLM/capsules-plugin/blob/main/docs/SERVICE-HISTORY.md\",\"subjects\":[\"full_history\"]}",
+   "artifact": "{\"anchor\":\"d3102687f99d898e6f83f8b7968eccc4040a2036029cb50bf4b31aab4196a9d3\",\"coverage_declaration\":{\"interval\":{\"from\":null,\"to\":\"d3102687f99d898e6f83f8b7968eccc4040a2036029cb50bf4b31aab4196a9d3\"},\"kind\":\"stream_interval\",\"live_set\":[{\"checkpoint\":\"d3102687f99d898e6f83f8b7968eccc4040a2036029cb50bf4b31aab4196a9d3\",\"count\":30,\"start\":0,\"stream\":\"corpus-node-log\"}],\"rule\":\"all_records\"},\"declared\":[\"history_card\",\"period_counts\"],\"derivation\":\"82eca0d26ece204f1f323233f4e2ce83ae85e0303a9d55aa7fb2fd9ed80b7112\",\"evidence_stream\":\"corpus-node-log\",\"history_card\":{\"anchor\":\"d3102687f99d898e6f83f8b7968eccc4040a2036029cb50bf4b31aab4196a9d3\",\"derivation\":\"history_card/1\",\"evidence_stream\":\"corpus-node-log\",\"history\":[{\"checkpoint\":\"d284586fa4012703781f6170706c69636174696f6e2f636c6c2d636865636b706f696e742b63626f720458208146640f02493af4fbc54fe33388e75dc2c937ae0b7727cc2b2afb1b75199a3e0fa2016f636f727075732d6e6f64652d6c6f670272636f727075732d6e6f64652d6c6f67233130a058aca6646b696e646e636c6c2d636865636b706f696e74686c6f675f73697a650a696973737565645f617474323032362d30312d30375431303a30303a30305a69707265765f73697a65006a636f6d6d69746d656e74584582582028b0909a06957d2648f8d4f84c9a01ca9041e502acd7048219aedb3f2e939e9a5820b579c75e0e25283f81087c4c838abe80ad2278e055bbdd9a51f56dc82d8c19686f707265765f636f6d6d69746d656e744058403630cb19c64687345c15c5c8044c5cad4be3bc1a6d85c38eae56c5f973e0c1e785f13bdb54a90bf8b97fe1380b7f0d17525d78f7b16d5bc96a038f591681b603\",\"consistency_from_previous\":null},{\"checkpoint\":\"d284586fa4012703781f6170706c69636174696f6e2f636c6c2d636865636b706f696e742b63626f720458208146640f02493af4fbc54fe33388e75dc2c937ae0b7727cc2b2afb1b75199a3e0fa2016f636f727075732d6e6f64652d6c6f670272636f727075732d6e6f64652d6c6f67233232a0590224a7646b696e646e636c6c2d636865636b706f696e74686c6f675f73697a6516696973737565645f617474323032362d30312d31325430303a30303a30305a69707265765f73697a650a6a636f6d6d69746d656e745845825820430a9adefc2f6c0a1d0cb7bf6e936ecc410b00ef4e21b54eb218f01e65e1a13b58202dbd6d0e1670832d89c5956d19cb7b91649ef46229ec2dffeaaa9dbf455acc716f707265765f636f6d6d69746d656e74584582582028b0909a06957d2648f8d4f84c9a01ca9041e502acd7048219aedb3f2e939e9a5820b579c75e0e25283f81087c4c838abe80ad2278e055bbdd9a51f56dc82d8c196871636f6e73697374656e63795f70726f6f66a56673697a655f610a6673697a655f6216677769746e657373828158209acb45abad7f5bdcd29187a7ea4cbde04eff86e47e4e68dd15ed8f8e71f070f78258203805a268903531a6cbb8a5d73715308cb1caaa11acc2048c751c6b80ef12d7d2582028b0909a06957d2648f8d4f84c9a01ca9041e502acd7048219aedb3f2e939e9a696e65775f7065616b73825820430a9adefc2f6c0a1d0cb7bf6e936ecc410b00ef4e21b54eb218f01e65e1a13b58202dbd6d0e1670832d89c5956d19cb7b91649ef46229ec2dffeaaa9dbf455acc71696f6c645f7065616b7382582028b0909a06957d2648f8d4f84c9a01ca9041e502acd7048219aedb3f2e939e9a5820b579c75e0e25283f81087c4c838abe80ad2278e055bbdd9a51f56dc82d8c1968584008c697ebc2917f99763df65540ca95664d024f932c5c687ac6e17763711d951052bb23388b8dde3eae116fe9454a62c73b23d2b506a73e860f8ae5832f629202\",\"consistency_from_previous\":\"840a16828158209acb45abad7f5bdcd29187a7ea4cbde04eff86e47e4e68dd15ed8f8e71f070f78258203805a268903531a6cbb8a5d73715308cb1caaa11acc2048c751c6b80ef12d7d2582028b0909a06957d2648f8d4f84c9a01ca9041e502acd7048219aedb3f2e939e9a8158202dbd6d0e1670832d89c5956d19cb7b91649ef46229ec2dffeaaa9dbf455acc71\"},{\"checkpoint\":\"d284586fa4012703781f6170706c69636174696f6e2f636c6c2d636865636b706f696e742b63626f720458208146640f02493af4fbc54fe33388e75dc2c937ae0b7727cc2b2afb1b75199a3e0fa2016f636f727075732d6e6f64652d6c6f670272636f727075732d6e6f64652d6c6f67233338a0590226a7646b696e646e636c6c2d636865636b706f696e74686c6f675f73697a651826696973737565645f617474323032362d30312d31345430383a30303a30305a69707265765f73697a65166a636f6d6d69746d656e745845825820662ccb9dc4b7ee5bf1a27afc7c79208508c9a04bd0e456aa52fb22e69c2c009a582037050ed1f8895e7ad7fc928cc5fd629131b7b1c3d64e1cb8b1a94296cc0b55e66f707265765f636f6d6d69746d656e745845825820430a9adefc2f6c0a1d0cb7bf6e936ecc410b00ef4e21b54eb218f01e65e1a13b58202dbd6d0e1670832d89c5956d19cb7b91649ef46229ec2dffeaaa9dbf455acc7171636f6e73697374656e63795f70726f6f66a56673697a655f61166673697a655f621826677769746e657373828158209a1d11dc50b72287914059af8c7638f357a1d78b5678850fe02a0eec2b358fc1825820c58dd181b6e0c203d79a2f5de504cb97ba640caac8982128218172ca5e58956e5820430a9adefc2f6c0a1d0cb7bf6e936ecc410b00ef4e21b54eb218f01e65e1a13b696e65775f7065616b73825820662ccb9dc4b7ee5bf1a27afc7c79208508c9a04bd0e456aa52fb22e69c2c009a582037050ed1f8895e7ad7fc928cc5fd629131b7b1c3d64e1cb8b1a94296cc0b55e6696f6c645f7065616b73825820430a9adefc2f6c0a1d0cb7bf6e936ecc410b00ef4e21b54eb218f01e65e1a13b58202dbd6d0e1670832d89c5956d19cb7b91649ef46229ec2dffeaaa9dbf455acc715840c592ce216c652e241907c07c343b7a84ee7bb1cb211d9366dcb676fa25b64f28bee0a28f8ada97cd354dd2abb0b493409667b97a5ea325c4cf394d75f90aca00\",\"consistency_from_previous\":\"84161826828158209a1d11dc50b72287914059af8c7638f357a1d78b5678850fe02a0eec2b358fc1825820c58dd181b6e0c203d79a2f5de504cb97ba640caac8982128218172ca5e58956e5820430a9adefc2f6c0a1d0cb7bf6e936ecc410b00ef4e21b54eb218f01e65e1a13b81582037050ed1f8895e7ad7fc928cc5fd629131b7b1c3d64e1cb8b1a94296cc0b55e6\"},{\"checkpoint\":\"d284586fa4012703781f6170706c69636174696f6e2f636c6c2d636865636b706f696e742b63626f720458208146640f02493af4fbc54fe33388e75dc2c937ae0b7727cc2b2afb1b75199a3e0fa2016f636f727075732d6e6f64652d6c6f670272636f727075732d6e6f64652d6c6f67233536a059026ca7646b696e646e636c6c2d636865636b706f696e74686c6f675f73697a651838696973737565645f617474323032362d30312d31395430303a30303a30305a69707265765f73697a6518266a636f6d6d69746d656e745889845820662ccb9dc4b7ee5bf1a27afc7c79208508c9a04bd0e456aa52fb22e69c2c009a58201fbdbb66b9d13ffb901471f012339f31f87bf52362411a942a26a9df88642f6a5820a1ec4b67f6e8e0119bb0673509aeb7cf1dc7f0d06ac82fc0509fae147ddbabfc5820945afc32a8ff86bf0751d8a201a646e0f9758becd0f2f779c33f6cc3242e8ea36f707265765f636f6d6d69746d656e745845825820662ccb9dc4b7ee5bf1a27afc7c79208508c9a04bd0e456aa52fb22e69c2c009a582037050ed1f8895e7ad7fc928cc5fd629131b7b1c3d64e1cb8b1a94296cc0b55e671636f6e73697374656e63795f70726f6f66a56673697a655f6118266673697a655f621838677769746e6573738280815820cbfc0f47b1c47a7d988e27dbb815bd996e423b5995bc2440bce03d0deb3d9dba696e65775f7065616b73845820662ccb9dc4b7ee5bf1a27afc7c79208508c9a04bd0e456aa52fb22e69c2c009a58201fbdbb66b9d13ffb901471f012339f31f87bf52362411a942a26a9df88642f6a5820a1ec4b67f6e8e0119bb0673509aeb7cf1dc7f0d06ac82fc0509fae147ddbabfc5820945afc32a8ff86bf0751d8a201a646e0f9758becd0f2f779c33f6cc3242e8ea3696f6c645f7065616b73825820662ccb9dc4b7ee5bf1a27afc7c79208508c9a04bd0e456aa52fb22e69c2c009a582037050ed1f8895e7ad7fc928cc5fd629131b7b1c3d64e1cb8b1a94296cc0b55e658400af43773c303d8d1e079ef00f32e29285aee5f8c1ff922c42493ed1eed2115e65863d4d754ad65b42063b6e038bddf3f13170e9e8f9507c0cabde4c0b0d42a03\",\"consistency_from_previous\":\"84182618388280815820cbfc0f47b1c47a7d988e27dbb815bd996e423b5995bc2440bce03d0deb3d9dba825820a1ec4b67f6e8e0119bb0673509aeb7cf1dc7f0d06ac82fc0509fae147ddbabfc5820945afc32a8ff86bf0751d8a201a646e0f9758becd0f2f779c33f6cc3242e8ea3\"}],\"subject\":{\"full_history\":null}},\"history_card_digest\":\"39148ceb130fe85d889c2be3a63ba670d4f42cde74acdb7d9f16ccb1647edf98\",\"period_counts\":{\"periods\":[{\"cells\":[{\"dimension\":{\"model\":\"a\"},\"label\":\"self_reported\",\"suppressed\":\"complementary\",\"unit\":\"exchanges_served\",\"value\":null},{\"dimension\":{\"model\":\"b\"},\"label\":\"self_reported\",\"suppressed\":\"below_floor\",\"unit\":\"exchanges_served\",\"value\":null},{\"dimension\":null,\"label\":\"self_reported\",\"unit\":\"exchanges_served\",\"value\":12}],\"from\":\"2026-01-05T00:00:00Z\",\"to\":\"2026-01-12T00:00:00Z\"},{\"cells\":[{\"dimension\":{\"model\":\"a\"},\"label\":\"self_reported\",\"unit\":\"exchanges_served\",\"value\":6},{\"dimension\":{\"model\":\"b\"},\"label\":\"self_reported\",\"unit\":\"exchanges_served\",\"value\":12},{\"dimension\":null,\"label\":\"self_reported\",\"unit\":\"exchanges_served\",\"value\":18}],\"from\":\"2026-01-12T00:00:00Z\",\"to\":\"2026-01-19T00:00:00Z\"}],\"policy\":\"0d4b28af7ebfca01a49c1ad59e74b7d9bff0e6712dd3478b4ee35b8ff6af5150\"},\"subject\":{\"full_history\":null}}",
+   "card": {
+    "checkpoints": [
+     {
+      "at": "2026-01-07T10:00:00Z",
+      "records": 6
+     },
+     {
+      "at": "2026-01-12T00:00:00Z",
+      "records": 12
+     },
+     {
+      "at": "2026-01-14T08:00:00Z",
+      "records": 20
+     },
+     {
+      "at": "2026-01-19T00:00:00Z",
+      "records": 30
+     }
+    ]
+   },
+   "pin": "d3102687f99d898e6f83f8b7968eccc4040a2036029cb50bf4b31aab4196a9d3",
+   "want": "units:",
+   "property": "units"
+  },
+  {
+   "case": "mesh-bad-unit-before-a-number-unit",
+   "definition": "{\"coverage_declaration\":{\"kind\":\"stream_interval\",\"rule\":\"all_records\"},\"embeds\":[\"history_card/1\"],\"excludes\":[\"requester identity\",\"per-recipient release state\",\"latency\"],\"kind\":\"projection\",\"level\":\"standard\",\"members\":[{\"derivation\":\"history_card/1\",\"name\":\"history_card\",\"reads\":[\"checkpoint: v, kind, log_id, mmr_size, root, prev_size, prev_root, key_id, timestamp, signature\",\"log: the MMR nodes of each consistency proof\"],\"required\":true,\"units\":[{\"unit\":\"checkpoints\",\"where\":\"history (one entry per checkpoint)\"},{\"unit\":\"witness_receipts\",\"where\":\"witness_receipts beside the envelope, one per receipt of a listed checkpoint\"}]},{\"claims\":{\"asserted_by\":\"provider\",\"label\":\"provider states\",\"where\":[\"periods[].cells[].dimension.model\"]},\"name\":\"period_counts\",\"reads\":[\"record: model_attestation.compute_attestation.x-mesh-poc-v1.role\",\"record: model_attestation.compute_attestation.x-mesh-lifecycle-v1.observation_point\",\"record: model_attestation.compute_attestation.x-mesh-poc-v1.serving_provenance.model_canonical_ref\",\"checkpoint: timestamp and mmr_size of the first checkpoint that covers each record\"],\"required\":true,\"units\":[{\"unit\":\"bogus\",\"where\":\"periods[].cells[]\"},7]}],\"name\":\"service_history/1\",\"period_policy\":{\"epoch\":\"2026-01-05T00:00:00Z\",\"floor\":5,\"length_s\":604800,\"min_length_s\":86400,\"suppression\":\"complementary\"},\"profile\":\"inference-service-history/0\",\"reads\":[\"checkpoint: v, kind, log_id, mmr_size, root, prev_size, prev_root, key_id, timestamp, signature\",\"log: the MMR nodes of each consistency proof\",\"record: model_attestation.compute_attestation.x-mesh-poc-v1.role\",\"record: model_attestation.compute_attestation.x-mesh-lifecycle-v1.observation_point\",\"record: model_attestation.compute_attestation.x-mesh-poc-v1.serving_provenance.model_canonical_ref\",\"checkpoint: timestamp and mmr_size of the first checkpoint that covers each record\"],\"spec\":\"https://github.com/Mesh-LLM/capsules-plugin/blob/main/docs/SERVICE-HISTORY.md\",\"subjects\":[\"full_history\"]}",
+   "artifact": "{\"anchor\":\"d3102687f99d898e6f83f8b7968eccc4040a2036029cb50bf4b31aab4196a9d3\",\"coverage_declaration\":{\"interval\":{\"from\":null,\"to\":\"d3102687f99d898e6f83f8b7968eccc4040a2036029cb50bf4b31aab4196a9d3\"},\"kind\":\"stream_interval\",\"live_set\":[{\"checkpoint\":\"d3102687f99d898e6f83f8b7968eccc4040a2036029cb50bf4b31aab4196a9d3\",\"count\":30,\"start\":0,\"stream\":\"corpus-node-log\"}],\"rule\":\"all_records\"},\"declared\":[\"history_card\",\"period_counts\"],\"derivation\":\"dfe9a6c8312799d83be0dca721324201f02237bf6874890acfa4aadd894be99f\",\"evidence_stream\":\"corpus-node-log\",\"history_card\":{\"anchor\":\"d3102687f99d898e6f83f8b7968eccc4040a2036029cb50bf4b31aab4196a9d3\",\"derivation\":\"history_card/1\",\"evidence_stream\":\"corpus-node-log\",\"history\":[{\"checkpoint\":\"d284586fa4012703781f6170706c69636174696f6e2f636c6c2d636865636b706f696e742b63626f720458208146640f02493af4fbc54fe33388e75dc2c937ae0b7727cc2b2afb1b75199a3e0fa2016f636f727075732d6e6f64652d6c6f670272636f727075732d6e6f64652d6c6f67233130a058aca6646b696e646e636c6c2d636865636b706f696e74686c6f675f73697a650a696973737565645f617474323032362d30312d30375431303a30303a30305a69707265765f73697a65006a636f6d6d69746d656e74584582582028b0909a06957d2648f8d4f84c9a01ca9041e502acd7048219aedb3f2e939e9a5820b579c75e0e25283f81087c4c838abe80ad2278e055bbdd9a51f56dc82d8c19686f707265765f636f6d6d69746d656e744058403630cb19c64687345c15c5c8044c5cad4be3bc1a6d85c38eae56c5f973e0c1e785f13bdb54a90bf8b97fe1380b7f0d17525d78f7b16d5bc96a038f591681b603\",\"consistency_from_previous\":null},{\"checkpoint\":\"d284586fa4012703781f6170706c69636174696f6e2f636c6c2d636865636b706f696e742b63626f720458208146640f02493af4fbc54fe33388e75dc2c937ae0b7727cc2b2afb1b75199a3e0fa2016f636f727075732d6e6f64652d6c6f670272636f727075732d6e6f64652d6c6f67233232a0590224a7646b696e646e636c6c2d636865636b706f696e74686c6f675f73697a6516696973737565645f617474323032362d30312d31325430303a30303a30305a69707265765f73697a650a6a636f6d6d69746d656e745845825820430a9adefc2f6c0a1d0cb7bf6e936ecc410b00ef4e21b54eb218f01e65e1a13b58202dbd6d0e1670832d89c5956d19cb7b91649ef46229ec2dffeaaa9dbf455acc716f707265765f636f6d6d69746d656e74584582582028b0909a06957d2648f8d4f84c9a01ca9041e502acd7048219aedb3f2e939e9a5820b579c75e0e25283f81087c4c838abe80ad2278e055bbdd9a51f56dc82d8c196871636f6e73697374656e63795f70726f6f66a56673697a655f610a6673697a655f6216677769746e657373828158209acb45abad7f5bdcd29187a7ea4cbde04eff86e47e4e68dd15ed8f8e71f070f78258203805a268903531a6cbb8a5d73715308cb1caaa11acc2048c751c6b80ef12d7d2582028b0909a06957d2648f8d4f84c9a01ca9041e502acd7048219aedb3f2e939e9a696e65775f7065616b73825820430a9adefc2f6c0a1d0cb7bf6e936ecc410b00ef4e21b54eb218f01e65e1a13b58202dbd6d0e1670832d89c5956d19cb7b91649ef46229ec2dffeaaa9dbf455acc71696f6c645f7065616b7382582028b0909a06957d2648f8d4f84c9a01ca9041e502acd7048219aedb3f2e939e9a5820b579c75e0e25283f81087c4c838abe80ad2278e055bbdd9a51f56dc82d8c1968584008c697ebc2917f99763df65540ca95664d024f932c5c687ac6e17763711d951052bb23388b8dde3eae116fe9454a62c73b23d2b506a73e860f8ae5832f629202\",\"consistency_from_previous\":\"840a16828158209acb45abad7f5bdcd29187a7ea4cbde04eff86e47e4e68dd15ed8f8e71f070f78258203805a268903531a6cbb8a5d73715308cb1caaa11acc2048c751c6b80ef12d7d2582028b0909a06957d2648f8d4f84c9a01ca9041e502acd7048219aedb3f2e939e9a8158202dbd6d0e1670832d89c5956d19cb7b91649ef46229ec2dffeaaa9dbf455acc71\"},{\"checkpoint\":\"d284586fa4012703781f6170706c69636174696f6e2f636c6c2d636865636b706f696e742b63626f720458208146640f02493af4fbc54fe33388e75dc2c937ae0b7727cc2b2afb1b75199a3e0fa2016f636f727075732d6e6f64652d6c6f670272636f727075732d6e6f64652d6c6f67233338a0590226a7646b696e646e636c6c2d636865636b706f696e74686c6f675f73697a651826696973737565645f617474323032362d30312d31345430383a30303a30305a69707265765f73697a65166a636f6d6d69746d656e745845825820662ccb9dc4b7ee5bf1a27afc7c79208508c9a04bd0e456aa52fb22e69c2c009a582037050ed1f8895e7ad7fc928cc5fd629131b7b1c3d64e1cb8b1a94296cc0b55e66f707265765f636f6d6d69746d656e745845825820430a9adefc2f6c0a1d0cb7bf6e936ecc410b00ef4e21b54eb218f01e65e1a13b58202dbd6d0e1670832d89c5956d19cb7b91649ef46229ec2dffeaaa9dbf455acc7171636f6e73697374656e63795f70726f6f66a56673697a655f61166673697a655f621826677769746e657373828158209a1d11dc50b72287914059af8c7638f357a1d78b5678850fe02a0eec2b358fc1825820c58dd181b6e0c203d79a2f5de504cb97ba640caac8982128218172ca5e58956e5820430a9adefc2f6c0a1d0cb7bf6e936ecc410b00ef4e21b54eb218f01e65e1a13b696e65775f7065616b73825820662ccb9dc4b7ee5bf1a27afc7c79208508c9a04bd0e456aa52fb22e69c2c009a582037050ed1f8895e7ad7fc928cc5fd629131b7b1c3d64e1cb8b1a94296cc0b55e6696f6c645f7065616b73825820430a9adefc2f6c0a1d0cb7bf6e936ecc410b00ef4e21b54eb218f01e65e1a13b58202dbd6d0e1670832d89c5956d19cb7b91649ef46229ec2dffeaaa9dbf455acc715840c592ce216c652e241907c07c343b7a84ee7bb1cb211d9366dcb676fa25b64f28bee0a28f8ada97cd354dd2abb0b493409667b97a5ea325c4cf394d75f90aca00\",\"consistency_from_previous\":\"84161826828158209a1d11dc50b72287914059af8c7638f357a1d78b5678850fe02a0eec2b358fc1825820c58dd181b6e0c203d79a2f5de504cb97ba640caac8982128218172ca5e58956e5820430a9adefc2f6c0a1d0cb7bf6e936ecc410b00ef4e21b54eb218f01e65e1a13b81582037050ed1f8895e7ad7fc928cc5fd629131b7b1c3d64e1cb8b1a94296cc0b55e6\"},{\"checkpoint\":\"d284586fa4012703781f6170706c69636174696f6e2f636c6c2d636865636b706f696e742b63626f720458208146640f02493af4fbc54fe33388e75dc2c937ae0b7727cc2b2afb1b75199a3e0fa2016f636f727075732d6e6f64652d6c6f670272636f727075732d6e6f64652d6c6f67233536a059026ca7646b696e646e636c6c2d636865636b706f696e74686c6f675f73697a651838696973737565645f617474323032362d30312d31395430303a30303a30305a69707265765f73697a6518266a636f6d6d69746d656e745889845820662ccb9dc4b7ee5bf1a27afc7c79208508c9a04bd0e456aa52fb22e69c2c009a58201fbdbb66b9d13ffb901471f012339f31f87bf52362411a942a26a9df88642f6a5820a1ec4b67f6e8e0119bb0673509aeb7cf1dc7f0d06ac82fc0509fae147ddbabfc5820945afc32a8ff86bf0751d8a201a646e0f9758becd0f2f779c33f6cc3242e8ea36f707265765f636f6d6d69746d656e745845825820662ccb9dc4b7ee5bf1a27afc7c79208508c9a04bd0e456aa52fb22e69c2c009a582037050ed1f8895e7ad7fc928cc5fd629131b7b1c3d64e1cb8b1a94296cc0b55e671636f6e73697374656e63795f70726f6f66a56673697a655f6118266673697a655f621838677769746e6573738280815820cbfc0f47b1c47a7d988e27dbb815bd996e423b5995bc2440bce03d0deb3d9dba696e65775f7065616b73845820662ccb9dc4b7ee5bf1a27afc7c79208508c9a04bd0e456aa52fb22e69c2c009a58201fbdbb66b9d13ffb901471f012339f31f87bf52362411a942a26a9df88642f6a5820a1ec4b67f6e8e0119bb0673509aeb7cf1dc7f0d06ac82fc0509fae147ddbabfc5820945afc32a8ff86bf0751d8a201a646e0f9758becd0f2f779c33f6cc3242e8ea3696f6c645f7065616b73825820662ccb9dc4b7ee5bf1a27afc7c79208508c9a04bd0e456aa52fb22e69c2c009a582037050ed1f8895e7ad7fc928cc5fd629131b7b1c3d64e1cb8b1a94296cc0b55e658400af43773c303d8d1e079ef00f32e29285aee5f8c1ff922c42493ed1eed2115e65863d4d754ad65b42063b6e038bddf3f13170e9e8f9507c0cabde4c0b0d42a03\",\"consistency_from_previous\":\"84182618388280815820cbfc0f47b1c47a7d988e27dbb815bd996e423b5995bc2440bce03d0deb3d9dba825820a1ec4b67f6e8e0119bb0673509aeb7cf1dc7f0d06ac82fc0509fae147ddbabfc5820945afc32a8ff86bf0751d8a201a646e0f9758becd0f2f779c33f6cc3242e8ea3\"}],\"subject\":{\"full_history\":null}},\"history_card_digest\":\"39148ceb130fe85d889c2be3a63ba670d4f42cde74acdb7d9f16ccb1647edf98\",\"period_counts\":{\"periods\":[{\"cells\":[{\"dimension\":{\"model\":\"a\"},\"label\":\"self_reported\",\"suppressed\":\"complementary\",\"unit\":\"exchanges_served\",\"value\":null},{\"dimension\":{\"model\":\"b\"},\"label\":\"self_reported\",\"suppressed\":\"below_floor\",\"unit\":\"exchanges_served\",\"value\":null},{\"dimension\":null,\"label\":\"self_reported\",\"unit\":\"exchanges_served\",\"value\":12}],\"from\":\"2026-01-05T00:00:00Z\",\"to\":\"2026-01-12T00:00:00Z\"},{\"cells\":[{\"dimension\":{\"model\":\"a\"},\"label\":\"self_reported\",\"unit\":\"exchanges_served\",\"value\":6},{\"dimension\":{\"model\":\"b\"},\"label\":\"self_reported\",\"unit\":\"exchanges_served\",\"value\":12},{\"dimension\":null,\"label\":\"self_reported\",\"unit\":\"exchanges_served\",\"value\":18}],\"from\":\"2026-01-12T00:00:00Z\",\"to\":\"2026-01-19T00:00:00Z\"}],\"policy\":\"0d4b28af7ebfca01a49c1ad59e74b7d9bff0e6712dd3478b4ee35b8ff6af5150\"},\"subject\":{\"full_history\":null}}",
+   "card": {
+    "checkpoints": [
+     {
+      "at": "2026-01-07T10:00:00Z",
+      "records": 6
+     },
+     {
+      "at": "2026-01-12T00:00:00Z",
+      "records": 12
+     },
+     {
+      "at": "2026-01-14T08:00:00Z",
+      "records": 20
+     },
+     {
+      "at": "2026-01-19T00:00:00Z",
+      "records": 30
+     }
+    ]
+   },
+   "pin": "d3102687f99d898e6f83f8b7968eccc4040a2036029cb50bf4b31aab4196a9d3",
+   "want": "units:",
+   "property": "units"
+  },
+  {
+   "case": "mesh-member-named-like-a-property",
+   "definition": "{\"coverage_declaration\":{\"kind\":\"stream_interval\",\"rule\":\"all_records\"},\"embeds\":[\"history_card/1\"],\"excludes\":[\"requester identity\",\"per-recipient release state\",\"latency\"],\"kind\":\"projection\",\"level\":\"standard\",\"members\":[{\"derivation\":\"history_card/1\",\"name\":\"history_card\",\"reads\":[\"checkpoint: v, kind, log_id, mmr_size, root, prev_size, prev_root, key_id, timestamp, signature\",\"log: the MMR nodes of each consistency proof\"],\"required\":true,\"units\":[{\"unit\":\"checkpoints\",\"where\":\"history (one entry per checkpoint)\"},{\"unit\":\"witness_receipts\",\"where\":\"witness_receipts beside the envelope, one per receipt of a listed checkpoint\"}]},{\"claims\":{\"asserted_by\":\"provider\",\"label\":\"provider states\",\"where\":[\"periods[].cells[].dimension.model\"]},\"name\":\"period_counts\",\"reads\":[\"record: model_attestation.compute_attestation.x-mesh-poc-v1.role\",\"record: model_attestation.compute_attestation.x-mesh-lifecycle-v1.observation_point\",\"record: model_attestation.compute_attestation.x-mesh-poc-v1.serving_provenance.model_canonical_ref\",\"checkpoint: timestamp and mmr_size of the first checkpoint that covers each record\"],\"required\":true,\"units\":[{\"unit\":\"exchanges_served\",\"where\":\"periods[].cells[]\"}]},{\"name\":\"units: x\",\"reads\":[],\"units\":[{\"unit\":\"records\",\"where\":\"x\"}]}],\"name\":\"service_history/1\",\"period_policy\":{\"epoch\":\"2026-01-05T00:00:00Z\",\"floor\":5,\"length_s\":604800,\"min_length_s\":86400,\"suppression\":\"complementary\"},\"profile\":\"inference-service-history/0\",\"reads\":[\"checkpoint: v, kind, log_id, mmr_size, root, prev_size, prev_root, key_id, timestamp, signature\",\"log: the MMR nodes of each consistency proof\",\"record: model_attestation.compute_attestation.x-mesh-poc-v1.role\",\"record: model_attestation.compute_attestation.x-mesh-lifecycle-v1.observation_point\",\"record: model_attestation.compute_attestation.x-mesh-poc-v1.serving_provenance.model_canonical_ref\",\"checkpoint: timestamp and mmr_size of the first checkpoint that covers each record\"],\"spec\":\"https://github.com/Mesh-LLM/capsules-plugin/blob/main/docs/SERVICE-HISTORY.md\",\"subjects\":[\"full_history\"]}",
+   "artifact": "{\"anchor\":\"d3102687f99d898e6f83f8b7968eccc4040a2036029cb50bf4b31aab4196a9d3\",\"coverage_declaration\":{\"interval\":{\"from\":null,\"to\":\"d3102687f99d898e6f83f8b7968eccc4040a2036029cb50bf4b31aab4196a9d3\"},\"kind\":\"stream_interval\",\"live_set\":[{\"checkpoint\":\"d3102687f99d898e6f83f8b7968eccc4040a2036029cb50bf4b31aab4196a9d3\",\"count\":30,\"start\":0,\"stream\":\"corpus-node-log\"}],\"rule\":\"all_records\"},\"declared\":[\"history_card\",\"period_counts\"],\"derivation\":\"d561975f516bf13361f4946e1095ea7960894fb0b2ab973bbbecd3ff1d54f5e2\",\"evidence_stream\":\"corpus-node-log\",\"history_card\":{\"anchor\":\"d3102687f99d898e6f83f8b7968eccc4040a2036029cb50bf4b31aab4196a9d3\",\"derivation\":\"history_card/1\",\"evidence_stream\":\"corpus-node-log\",\"history\":[{\"checkpoint\":\"d284586fa4012703781f6170706c69636174696f6e2f636c6c2d636865636b706f696e742b63626f720458208146640f02493af4fbc54fe33388e75dc2c937ae0b7727cc2b2afb1b75199a3e0fa2016f636f727075732d6e6f64652d6c6f670272636f727075732d6e6f64652d6c6f67233130a058aca6646b696e646e636c6c2d636865636b706f696e74686c6f675f73697a650a696973737565645f617474323032362d30312d30375431303a30303a30305a69707265765f73697a65006a636f6d6d69746d656e74584582582028b0909a06957d2648f8d4f84c9a01ca9041e502acd7048219aedb3f2e939e9a5820b579c75e0e25283f81087c4c838abe80ad2278e055bbdd9a51f56dc82d8c19686f707265765f636f6d6d69746d656e744058403630cb19c64687345c15c5c8044c5cad4be3bc1a6d85c38eae56c5f973e0c1e785f13bdb54a90bf8b97fe1380b7f0d17525d78f7b16d5bc96a038f591681b603\",\"consistency_from_previous\":null},{\"checkpoint\":\"d284586fa4012703781f6170706c69636174696f6e2f636c6c2d636865636b706f696e742b63626f720458208146640f02493af4fbc54fe33388e75dc2c937ae0b7727cc2b2afb1b75199a3e0fa2016f636f727075732d6e6f64652d6c6f670272636f727075732d6e6f64652d6c6f67233232a0590224a7646b696e646e636c6c2d636865636b706f696e74686c6f675f73697a6516696973737565645f617474323032362d30312d31325430303a30303a30305a69707265765f73697a650a6a636f6d6d69746d656e745845825820430a9adefc2f6c0a1d0cb7bf6e936ecc410b00ef4e21b54eb218f01e65e1a13b58202dbd6d0e1670832d89c5956d19cb7b91649ef46229ec2dffeaaa9dbf455acc716f707265765f636f6d6d69746d656e74584582582028b0909a06957d2648f8d4f84c9a01ca9041e502acd7048219aedb3f2e939e9a5820b579c75e0e25283f81087c4c838abe80ad2278e055bbdd9a51f56dc82d8c196871636f6e73697374656e63795f70726f6f66a56673697a655f610a6673697a655f6216677769746e657373828158209acb45abad7f5bdcd29187a7ea4cbde04eff86e47e4e68dd15ed8f8e71f070f78258203805a268903531a6cbb8a5d73715308cb1caaa11acc2048c751c6b80ef12d7d2582028b0909a06957d2648f8d4f84c9a01ca9041e502acd7048219aedb3f2e939e9a696e65775f7065616b73825820430a9adefc2f6c0a1d0cb7bf6e936ecc410b00ef4e21b54eb218f01e65e1a13b58202dbd6d0e1670832d89c5956d19cb7b91649ef46229ec2dffeaaa9dbf455acc71696f6c645f7065616b7382582028b0909a06957d2648f8d4f84c9a01ca9041e502acd7048219aedb3f2e939e9a5820b579c75e0e25283f81087c4c838abe80ad2278e055bbdd9a51f56dc82d8c1968584008c697ebc2917f99763df65540ca95664d024f932c5c687ac6e17763711d951052bb23388b8dde3eae116fe9454a62c73b23d2b506a73e860f8ae5832f629202\",\"consistency_from_previous\":\"840a16828158209acb45abad7f5bdcd29187a7ea4cbde04eff86e47e4e68dd15ed8f8e71f070f78258203805a268903531a6cbb8a5d73715308cb1caaa11acc2048c751c6b80ef12d7d2582028b0909a06957d2648f8d4f84c9a01ca9041e502acd7048219aedb3f2e939e9a8158202dbd6d0e1670832d89c5956d19cb7b91649ef46229ec2dffeaaa9dbf455acc71\"},{\"checkpoint\":\"d284586fa4012703781f6170706c69636174696f6e2f636c6c2d636865636b706f696e742b63626f720458208146640f02493af4fbc54fe33388e75dc2c937ae0b7727cc2b2afb1b75199a3e0fa2016f636f727075732d6e6f64652d6c6f670272636f727075732d6e6f64652d6c6f67233338a0590226a7646b696e646e636c6c2d636865636b706f696e74686c6f675f73697a651826696973737565645f617474323032362d30312d31345430383a30303a30305a69707265765f73697a65166a636f6d6d69746d656e745845825820662ccb9dc4b7ee5bf1a27afc7c79208508c9a04bd0e456aa52fb22e69c2c009a582037050ed1f8895e7ad7fc928cc5fd629131b7b1c3d64e1cb8b1a94296cc0b55e66f707265765f636f6d6d69746d656e745845825820430a9adefc2f6c0a1d0cb7bf6e936ecc410b00ef4e21b54eb218f01e65e1a13b58202dbd6d0e1670832d89c5956d19cb7b91649ef46229ec2dffeaaa9dbf455acc7171636f6e73697374656e63795f70726f6f66a56673697a655f61166673697a655f621826677769746e657373828158209a1d11dc50b72287914059af8c7638f357a1d78b5678850fe02a0eec2b358fc1825820c58dd181b6e0c203d79a2f5de504cb97ba640caac8982128218172ca5e58956e5820430a9adefc2f6c0a1d0cb7bf6e936ecc410b00ef4e21b54eb218f01e65e1a13b696e65775f7065616b73825820662ccb9dc4b7ee5bf1a27afc7c79208508c9a04bd0e456aa52fb22e69c2c009a582037050ed1f8895e7ad7fc928cc5fd629131b7b1c3d64e1cb8b1a94296cc0b55e6696f6c645f7065616b73825820430a9adefc2f6c0a1d0cb7bf6e936ecc410b00ef4e21b54eb218f01e65e1a13b58202dbd6d0e1670832d89c5956d19cb7b91649ef46229ec2dffeaaa9dbf455acc715840c592ce216c652e241907c07c343b7a84ee7bb1cb211d9366dcb676fa25b64f28bee0a28f8ada97cd354dd2abb0b493409667b97a5ea325c4cf394d75f90aca00\",\"consistency_from_previous\":\"84161826828158209a1d11dc50b72287914059af8c7638f357a1d78b5678850fe02a0eec2b358fc1825820c58dd181b6e0c203d79a2f5de504cb97ba640caac8982128218172ca5e58956e5820430a9adefc2f6c0a1d0cb7bf6e936ecc410b00ef4e21b54eb218f01e65e1a13b81582037050ed1f8895e7ad7fc928cc5fd629131b7b1c3d64e1cb8b1a94296cc0b55e6\"},{\"checkpoint\":\"d284586fa4012703781f6170706c69636174696f6e2f636c6c2d636865636b706f696e742b63626f720458208146640f02493af4fbc54fe33388e75dc2c937ae0b7727cc2b2afb1b75199a3e0fa2016f636f727075732d6e6f64652d6c6f670272636f727075732d6e6f64652d6c6f67233536a059026ca7646b696e646e636c6c2d636865636b706f696e74686c6f675f73697a651838696973737565645f617474323032362d30312d31395430303a30303a30305a69707265765f73697a6518266a636f6d6d69746d656e745889845820662ccb9dc4b7ee5bf1a27afc7c79208508c9a04bd0e456aa52fb22e69c2c009a58201fbdbb66b9d13ffb901471f012339f31f87bf52362411a942a26a9df88642f6a5820a1ec4b67f6e8e0119bb0673509aeb7cf1dc7f0d06ac82fc0509fae147ddbabfc5820945afc32a8ff86bf0751d8a201a646e0f9758becd0f2f779c33f6cc3242e8ea36f707265765f636f6d6d69746d656e745845825820662ccb9dc4b7ee5bf1a27afc7c79208508c9a04bd0e456aa52fb22e69c2c009a582037050ed1f8895e7ad7fc928cc5fd629131b7b1c3d64e1cb8b1a94296cc0b55e671636f6e73697374656e63795f70726f6f66a56673697a655f6118266673697a655f621838677769746e6573738280815820cbfc0f47b1c47a7d988e27dbb815bd996e423b5995bc2440bce03d0deb3d9dba696e65775f7065616b73845820662ccb9dc4b7ee5bf1a27afc7c79208508c9a04bd0e456aa52fb22e69c2c009a58201fbdbb66b9d13ffb901471f012339f31f87bf52362411a942a26a9df88642f6a5820a1ec4b67f6e8e0119bb0673509aeb7cf1dc7f0d06ac82fc0509fae147ddbabfc5820945afc32a8ff86bf0751d8a201a646e0f9758becd0f2f779c33f6cc3242e8ea3696f6c645f7065616b73825820662ccb9dc4b7ee5bf1a27afc7c79208508c9a04bd0e456aa52fb22e69c2c009a582037050ed1f8895e7ad7fc928cc5fd629131b7b1c3d64e1cb8b1a94296cc0b55e658400af43773c303d8d1e079ef00f32e29285aee5f8c1ff922c42493ed1eed2115e65863d4d754ad65b42063b6e038bddf3f13170e9e8f9507c0cabde4c0b0d42a03\",\"consistency_from_previous\":\"84182618388280815820cbfc0f47b1c47a7d988e27dbb815bd996e423b5995bc2440bce03d0deb3d9dba825820a1ec4b67f6e8e0119bb0673509aeb7cf1dc7f0d06ac82fc0509fae147ddbabfc5820945afc32a8ff86bf0751d8a201a646e0f9758becd0f2f779c33f6cc3242e8ea3\"}],\"subject\":{\"full_history\":null}},\"history_card_digest\":\"39148ceb130fe85d889c2be3a63ba670d4f42cde74acdb7d9f16ccb1647edf98\",\"period_counts\":{\"periods\":[{\"cells\":[{\"dimension\":{\"model\":\"a\"},\"label\":\"self_reported\",\"suppressed\":\"complementary\",\"unit\":\"exchanges_served\",\"value\":null},{\"dimension\":{\"model\":\"b\"},\"label\":\"self_reported\",\"suppressed\":\"below_floor\",\"unit\":\"exchanges_served\",\"value\":null},{\"dimension\":null,\"label\":\"self_reported\",\"unit\":\"exchanges_served\",\"value\":12}],\"from\":\"2026-01-05T00:00:00Z\",\"to\":\"2026-01-12T00:00:00Z\"},{\"cells\":[{\"dimension\":{\"model\":\"a\"},\"label\":\"self_reported\",\"unit\":\"exchanges_served\",\"value\":6},{\"dimension\":{\"model\":\"b\"},\"label\":\"self_reported\",\"unit\":\"exchanges_served\",\"value\":12},{\"dimension\":null,\"label\":\"self_reported\",\"unit\":\"exchanges_served\",\"value\":18}],\"from\":\"2026-01-12T00:00:00Z\",\"to\":\"2026-01-19T00:00:00Z\"}],\"policy\":\"0d4b28af7ebfca01a49c1ad59e74b7d9bff0e6712dd3478b4ee35b8ff6af5150\"},\"subject\":{\"full_history\":null}}",
+   "card": {
+    "checkpoints": [
+     {
+      "at": "2026-01-07T10:00:00Z",
+      "records": 6
+     },
+     {
+      "at": "2026-01-12T00:00:00Z",
+      "records": 12
+     },
+     {
+      "at": "2026-01-14T08:00:00Z",
+      "records": 20
+     },
+     {
+      "at": "2026-01-19T00:00:00Z",
+      "records": 30
+     }
+    ]
+   },
+   "pin": "d3102687f99d898e6f83f8b7968eccc4040a2036029cb50bf4b31aab4196a9d3",
+   "want": "definition_form",
+   "property": "definition_form"
+  },
+  {
    "case": "aac-standard-served-only",
    "definition": "{\"coverage_declaration\":{\"kind\":\"stream_interval\",\"rule\":\"all_records\"},\"embeds\":[\"history_card/1\"],\"excludes\":[\"requester identity\",\"per-recipient release state\"],\"kind\":\"projection\",\"level\":\"standard\",\"members\":[{\"derivation\":\"history_card/1\",\"name\":\"history_card\",\"reads\":[\"checkpoint: key_id, log_size, root, timestamp, sig\",\"receipt: checkpoint, witness, sig\"],\"required\":true,\"units\":[{\"unit\":\"checkpoints\",\"where\":\"history (one entry per checkpoint)\"},{\"unit\":\"witness_receipts\",\"where\":\"history[].receipts\"}]},{\"claims\":{\"asserted_by\":\"provider\",\"label\":\"provider states\",\"where\":[\"periods[].cells[].dimension\"]},\"name\":\"period_counts\",\"reads\":[\"record: role\",\"record: committed_at\",\"record: model claim\"],\"required\":true,\"units\":[{\"unit\":\"exchanges_served\",\"where\":\"periods[].cells[]\"}]}],\"name\":\"service_history_example/0\",\"period_policy\":{\"epoch\":\"2026-10-01T00:00:00Z\",\"floor\":5,\"length_s\":86400,\"min_length_s\":86400,\"suppression\":\"complementary\"},\"profile\":\"inference-service-history/0\",\"reads\":[\"checkpoint: key_id, log_size, root, timestamp, sig\",\"receipt: checkpoint, witness, sig\",\"record: role\",\"record: committed_at\",\"record: model claim\"],\"spec\":\"vectors/inference-service-history-v0/README.md\",\"subjects\":[\"full_history\"]}",
    "artifact": "{\"anchor\":\"986d9ce04951d01be619c32aea64b442887991a5290ec09c6e8789b121efe82b\",\"coverage_declaration\":{\"interval\":{\"from\":null,\"to\":\"986d9ce04951d01be619c32aea64b442887991a5290ec09c6e8789b121efe82b\"},\"kind\":\"stream_interval\",\"live_set\":[{\"checkpoint\":\"986d9ce04951d01be619c32aea64b442887991a5290ec09c6e8789b121efe82b\",\"count\":52,\"start\":0,\"stream\":\"node-stream-1\"}],\"rule\":\"all_records\"},\"declared\":[\"history_card\",\"period_counts\"],\"derivation\":\"33b0f73df37d8eb21f37fbe68bc1fa5dee24c841e277e0f62111509c5233aadb\",\"evidence_stream\":\"node-stream-1\",\"history_card\":{\"anchor\":\"986d9ce04951d01be619c32aea64b442887991a5290ec09c6e8789b121efe82b\",\"derivation\":\"history_card/1\",\"evidence_stream\":\"node-stream-1\",\"history\":[{\"checkpoint\":{\"key_id\":\"af27e35f070d376f87ce0859973d34fa82204d5086c127d1e646eff5f1c2336d\",\"log_size\":10,\"root\":\"de0987b06677b858f53a16b331dd578f9e52bca2eb6c2d64cd317bd1178cce9e\",\"sig\":\"ce7b98cfebdb9c90dadc9aed9e82d0b870fded3e0b035b924835e99a7e369cdf33524787eddeb54dfd75cdb280628dc1703035f763d7cc9b3842b70a5137fb0b\",\"timestamp\":\"2026-10-01T12:00:00Z\"},\"receipts\":[]},{\"checkpoint\":{\"key_id\":\"af27e35f070d376f87ce0859973d34fa82204d5086c127d1e646eff5f1c2336d\",\"log_size\":25,\"root\":\"b60f1bbfa5d7cdc97569bda8cbcf4822d956ee1ba8b083580d32dcc3e72523d3\",\"sig\":\"9f674e59b41785fd5964780fe12d63da03312f2906daf19e804bee9dee9c08587cd44596eb120a16676c4f66596a0c1a15983e66a8aebd325b6e9b69db593801\",\"timestamp\":\"2026-10-02T12:00:00Z\"},\"receipts\":[{\"checkpoint\":\"f29fe95379dd02077c0cbf82bb20e24fface22d841efd05bc12327428e56aa02\",\"sig\":\"ac09c395c194b4465ffbc3fa1895fdbd5b8c1581a9e9dba12836854039104d342daa564f42a842ccc982484cde8efef4382e977db2a240d97f07cbaa0da5740d\",\"witness\":\"1b43682b0facfa5f2da0875193a1bb75c66019817cc24baef79041838e315caf\"}]},{\"checkpoint\":{\"key_id\":\"af27e35f070d376f87ce0859973d34fa82204d5086c127d1e646eff5f1c2336d\",\"log_size\":38,\"root\":\"89361a3d627694703450ff5da168e82a7ded5642c56e8aa329ee3214e528906d\",\"sig\":\"752291dbb6edee4dce89cd5d696885eb28b9ed69fd9c42ab07ad1ba3e987961138d09963c4030cbcd62baaf21c8799bdab7cc09cbd09293c224adaf20d121108\",\"timestamp\":\"2026-10-03T12:00:00Z\"},\"receipts\":[{\"checkpoint\":\"6baec6c648fddd66165bdd3fefa7bc4de874d761103415c1705a23e30cb86df5\",\"sig\":\"6da068cd0d507fd713d50cd5d64cb5211834695d8bf9a3f6f14e43922ba72fd938e5c7a1f6bdcc72832070bcd200e0b59a9e68b82ecf58fc404a7a830dda5a0a\",\"witness\":\"1b43682b0facfa5f2da0875193a1bb75c66019817cc24baef79041838e315caf\"}]},{\"checkpoint\":{\"key_id\":\"af27e35f070d376f87ce0859973d34fa82204d5086c127d1e646eff5f1c2336d\",\"log_size\":52,\"root\":\"25ea72187660ac33caf8d312eef4a20b4341cfe3be35f89d305efdb8cba0ad96\",\"sig\":\"b52d45f56f6d74fc6dab46d44753504be944e8f1506ae405f9cd8ecc0426aaa43e4cd53cea090c640e22426be163fe883a6d9e2cc867525d26aa5373d46bf30d\",\"timestamp\":\"2026-10-04T00:00:00Z\"},\"receipts\":[{\"checkpoint\":\"986d9ce04951d01be619c32aea64b442887991a5290ec09c6e8789b121efe82b\",\"sig\":\"5b3ba3e722dc3c1991276dd2f8139f6abe717ae4541ba885b19c7ece385266b876abb32bf98e8175bce730bf7b4137f5e8e26e8dd84843714e718202d73a5401\",\"witness\":\"b17daa07f7c09eef302209d7ffa6ea67dd9387d5797e95aee2b9dd7631e66804\"}]}],\"subject\":{\"full_history\":null}},\"history_card_digest\":\"f2ef6f6a4682e64dd53ceab50e7995066e8c9831c775fec207740e55d8787169\",\"period_counts\":{\"periods\":[{\"cells\":[{\"dimension\":{\"model\":\"model-a\"},\"label\":\"self_reported\",\"unit\":\"exchanges_served\",\"value\":12},{\"dimension\":{\"model\":\"model-b\"},\"label\":\"self_reported\",\"unit\":\"exchanges_served\",\"value\":7},{\"dimension\":null,\"label\":\"self_reported\",\"unit\":\"exchanges_served\",\"value\":19}],\"from\":\"2026-10-01T00:00:00Z\",\"to\":\"2026-10-02T00:00:00Z\"},{\"cells\":[{\"dimension\":{\"model\":\"model-a\"},\"label\":\"self_reported\",\"suppressed\":\"complementary\",\"unit\":\"exchanges_served\",\"value\":null},{\"dimension\":{\"model\":\"model-b\"},\"label\":\"self_reported\",\"suppressed\":\"below_floor\",\"unit\":\"exchanges_served\",\"value\":null},{\"dimension\":null,\"label\":\"self_reported\",\"unit\":\"exchanges_served\",\"value\":12}],\"from\":\"2026-10-02T00:00:00Z\",\"to\":\"2026-10-03T00:00:00Z\"},{\"cells\":[{\"dimension\":{\"model\":\"model-a\"},\"label\":\"self_reported\",\"unit\":\"exchanges_served\",\"value\":6},{\"dimension\":{\"model\":\"model-b\"},\"label\":\"self_reported\",\"unit\":\"exchanges_served\",\"value\":5},{\"dimension\":null,\"label\":\"self_reported\",\"unit\":\"exchanges_served\",\"value\":11}],\"from\":\"2026-10-03T00:00:00Z\",\"to\":\"2026-10-04T00:00:00Z\"}],\"policy\":\"a0ee3985ee4440cd0c12384e7a6d20c512893850caa9c20d53bc3951b50f1600\"},\"subject\":{\"full_history\":null}}",
@@ -952,7 +1089,8 @@
     ]
    },
    "pin": "986d9ce04951d01be619c32aea64b442887991a5290ec09c6e8789b121efe82b",
-   "want": "units"
+   "want": "units",
+   "property": "units"
   },
   {
    "case": "aac-mutant-standard-count-labelled-peer-confirmed",
@@ -979,7 +1117,8 @@
     ]
    },
    "pin": "986d9ce04951d01be619c32aea64b442887991a5290ec09c6e8789b121efe82b",
-   "want": "labels"
+   "want": "labels",
+   "property": "labels"
   },
   {
    "case": "aac-mutant-overlapping-period",
@@ -1006,7 +1145,8 @@
     ]
    },
    "pin": "986d9ce04951d01be619c32aea64b442887991a5290ec09c6e8789b121efe82b",
-   "want": "period_alignment"
+   "want": "period_alignment",
+   "property": "period_alignment"
   },
   {
    "case": "aac-mutant-duplicate-period",
@@ -1033,7 +1173,8 @@
     ]
    },
    "pin": "986d9ce04951d01be619c32aea64b442887991a5290ec09c6e8789b121efe82b",
-   "want": "period_alignment"
+   "want": "period_alignment",
+   "property": "period_alignment"
   },
   {
    "case": "aac-mutant-open-period",
@@ -1060,7 +1201,8 @@
     ]
    },
    "pin": "986d9ce04951d01be619c32aea64b442887991a5290ec09c6e8789b121efe82b",
-   "want": "period_alignment"
+   "want": "period_alignment",
+   "property": "period_alignment"
   },
   {
    "case": "aac-mutant-answered-at-open-anchor",
@@ -1091,7 +1233,8 @@
     ]
    },
    "pin": "4ec4bcc4a22dd6e872ea567f4cf6a741225eac1cbb101d97ebecd4811a93a858",
-   "want": "period_anchor"
+   "want": "period_anchor",
+   "property": "period_anchor"
   },
   {
    "case": "aac-mutant-short-period",
@@ -1118,7 +1261,8 @@
     ]
    },
    "pin": "986d9ce04951d01be619c32aea64b442887991a5290ec09c6e8789b121efe82b",
-   "want": "period_alignment"
+   "want": "period_alignment",
+   "property": "period_alignment"
   },
   {
    "case": "aac-mutant-omitted-first-period",
@@ -1145,7 +1289,8 @@
     ]
    },
    "pin": "986d9ce04951d01be619c32aea64b442887991a5290ec09c6e8789b121efe82b",
-   "want": "period_alignment"
+   "want": "period_alignment",
+   "property": "period_alignment"
   },
   {
    "case": "aac-mutant-omitted-period",
@@ -1172,7 +1317,8 @@
     ]
    },
    "pin": "986d9ce04951d01be619c32aea64b442887991a5290ec09c6e8789b121efe82b",
-   "want": "period_alignment"
+   "want": "period_alignment",
+   "property": "period_alignment"
   },
   {
    "case": "aac-mutant-omitted-last-period",
@@ -1199,7 +1345,8 @@
     ]
    },
    "pin": "986d9ce04951d01be619c32aea64b442887991a5290ec09c6e8789b121efe82b",
-   "want": "period_alignment"
+   "want": "period_alignment",
+   "property": "period_alignment"
   },
   {
    "case": "aac-mutant-cell-below-floor",
@@ -1226,7 +1373,8 @@
     ]
    },
    "pin": "986d9ce04951d01be619c32aea64b442887991a5290ec09c6e8789b121efe82b",
-   "want": "period_floor"
+   "want": "period_floor",
+   "property": "period_floor"
   },
   {
    "case": "aac-mutant-complementary-not-suppressed",
@@ -1253,7 +1401,8 @@
     ]
    },
    "pin": "986d9ce04951d01be619c32aea64b442887991a5290ec09c6e8789b121efe82b",
-   "want": "period_floor"
+   "want": "period_floor",
+   "property": "period_floor"
   },
   {
    "case": "aac-detailed-peer-confirmed",
@@ -1280,7 +1429,8 @@
     ]
    },
    "pin": "986d9ce04951d01be619c32aea64b442887991a5290ec09c6e8789b121efe82b",
-   "want": "detailed level not read"
+   "want": "detailed level not read",
+   "property": "definition_form"
   },
   {
    "case": "aac-mutant-labelled-corroborated",
@@ -1307,7 +1457,8 @@
     ]
    },
    "pin": "986d9ce04951d01be619c32aea64b442887991a5290ec09c6e8789b121efe82b",
-   "want": "detailed level not read"
+   "want": "detailed level not read",
+   "property": "definition_form"
   },
   {
    "case": "aac-mutant-same-key-halves-labelled-peer-confirmed",
@@ -1334,7 +1485,8 @@
     ]
    },
    "pin": "986d9ce04951d01be619c32aea64b442887991a5290ec09c6e8789b121efe82b",
-   "want": "detailed level not read"
+   "want": "detailed level not read",
+   "property": "definition_form"
   },
   {
    "case": "aac-mutant-unjoined-halves-labelled-peer-confirmed",
@@ -1361,7 +1513,8 @@
     ]
    },
    "pin": "986d9ce04951d01be619c32aea64b442887991a5290ec09c6e8789b121efe82b",
-   "want": "detailed level not read"
+   "want": "detailed level not read",
+   "property": "definition_form"
   },
   {
    "case": "aac-mutant-uncited-halves-labelled-peer-confirmed",
@@ -1388,7 +1541,8 @@
     ]
    },
    "pin": "986d9ce04951d01be619c32aea64b442887991a5290ec09c6e8789b121efe82b",
-   "want": "detailed level not read"
+   "want": "detailed level not read",
+   "property": "definition_form"
   },
   {
    "case": "aac-mutant-one-sided-labelled-peer-confirmed",
@@ -1415,7 +1569,8 @@
     ]
    },
    "pin": "986d9ce04951d01be619c32aea64b442887991a5290ec09c6e8789b121efe82b",
-   "want": "detailed level not read"
+   "want": "detailed level not read",
+   "property": "definition_form"
   },
   {
    "case": "aac-mutant-untrusted-peer-labelled-peer-confirmed",
@@ -1442,7 +1597,8 @@
     ]
    },
    "pin": "986d9ce04951d01be619c32aea64b442887991a5290ec09c6e8789b121efe82b",
-   "want": "detailed level not read"
+   "want": "detailed level not read",
+   "property": "definition_form"
   }
  ]
 }

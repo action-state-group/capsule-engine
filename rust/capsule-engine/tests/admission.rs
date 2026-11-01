@@ -536,8 +536,11 @@ fn inference_service_history_vectors() {
                 let want = want.as_str().unwrap();
                 match got {
                     Err(e) => assert!(
-                        e.to_string().contains(want) && INFERENCE_SERVICE_HISTORY_PROPERTIES.contains(&e.property),
-                        "{name}: error {e}, want one containing {want:?}"
+                        e.to_string().contains(want)
+                            && Some(e.property) == c["property"].as_str()
+                            && INFERENCE_SERVICE_HISTORY_PROPERTIES.contains(&e.property),
+                        "{name}: error {e}, want one containing {want:?} naming {}",
+                        c["property"]
                     ),
                     Ok(_) => panic!("{name}: read, want an error containing {want:?}"),
                 }
