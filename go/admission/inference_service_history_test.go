@@ -2,8 +2,10 @@ package admission
 
 import (
 	"encoding/json"
+	"errors"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 	"time"
@@ -62,8 +64,10 @@ func TestInferenceServiceHistoryVectors(t *testing.T) {
 			Definition string `json:"definition"`
 			Artifact   string `json:"artifact"`
 			Card       struct {
-				Times   []string `json:"times"`
-				Records int64    `json:"records"`
+				Checkpoints []struct {
+					At      string `json:"at"`
+					Records int64  `json:"records"`
+				} `json:"checkpoints"`
 			} `json:"card"`
 			Pin      string          `json:"pin"`
 			Want     string          `json:"want"`
@@ -77,13 +81,15 @@ func TestInferenceServiceHistoryVectors(t *testing.T) {
 		t.Fatal("no inference-service-history/0 vectors")
 	}
 	for _, c := range set.Cases {
-		card := CardCheckpoints{Records: c.Card.Records}
-		for _, at := range c.Card.Times {
-			card.Times = append(card.Times, parseTime(t, at))
+		var card CardCheckpoints
+		for _, cp := range c.Card.Checkpoints {
+			card.Checkpoints = append(card.Checkpoints, CardCheckpoint{At: parseTime(t, cp.At), Records: cp.Records})
 		}
 		served, err := InferenceServiceHistoryCounts([]byte(c.Definition), []byte(c.Artifact), card, c.Pin)
 		if c.Want != "" {
-			if err == nil || !strings.Contains(err.Error(), c.Want) {
+			var ie *InferenceServiceHistoryError
+			if !errors.As(err, &ie) || !strings.Contains(err.Error(), c.Want) ||
+				!slices.Contains(InferenceServiceHistoryProperties, ie.Property) {
 				t.Errorf("%s: got error %v, want one containing %q", c.Case, err, c.Want)
 			}
 			continue

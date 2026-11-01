@@ -4482,14 +4482,70 @@
     "currency": "USD",
     "card": {
      "state": "unverifiable",
-     "reason": "inference-service-history/0 answer: definition_form: profile not known"
+     "reason": "definition_form"
     }
    },
    "expected": {
     "verdict": "ASK",
     "source": "rows",
     "tier": "T0",
-    "block_sha256": "f30aa6804b3d8a5d3e27d1b2e5a8763d2da33f7b911c1d45e057f4105f5a5f3b"
+    "block_sha256": "66f2fc915e9da382e6c720eb5aa5a8c2b20bad9c88e70c9a10187a2b1cbc0bcd"
+   }
+  },
+  {
+   "case": "mesh-served-complementary-week-limits",
+   "pack": "packs/mesh-served.json",
+   "input": {
+    "now": "2026-01-20T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-07T10:00:00Z",
+     "latest_checkpoint_at": "2026-01-19T00:00:00Z",
+     "served": {
+      "length_s": 604800,
+      "floor": 5,
+      "periods": [
+       {
+        "from": "2026-01-05T00:00:00Z",
+        "to": "2026-01-12T00:00:00Z",
+        "total": null,
+        "suppressed": "complementary"
+       },
+       {
+        "from": "2026-01-12T00:00:00Z",
+        "to": "2026-01-19T00:00:00Z",
+        "total": 18
+       }
+      ]
+     }
+    }
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "9b8c8552fb3a1082b28741e73d2d7a1fb493d141d8aa3019795f67b690b3fcec"
+   }
+  },
+  {
+   "case": "mesh-served-free-text-reason-not-recorded",
+   "pack": "packs/mesh-served.json",
+   "input": {
+    "now": "2026-01-20T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "unverifiable",
+     "reason": "inference-service-history/0 answer: units: cells[0] counts in \"\\u0001\""
+    }
+   },
+   "expected": {
+    "verdict": "ASK",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "c2784c0c02ff7d37edee135f991993649369d4fcfc2d796a88ce3dd97b0fd445"
    }
   }
  ]

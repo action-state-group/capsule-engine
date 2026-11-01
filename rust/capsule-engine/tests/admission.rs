@@ -11,8 +11,8 @@ use std::path::{Path, PathBuf};
 
 use capsule_engine::admission::{
     evaluate, inference_service_history_counts, standard_history_counts, AdjudicationVerdict, BandCount, Card,
-    CardCheckpoints, Claims, Disputes, Inputs, Judgement, Operator, OwnHistory, Pack, Platform, RailPin, Selection,
-    Served, ServedPeriod, Stake, Timestamp, Vouch,
+    CardCheckpoint, CardCheckpoints, Claims, Disputes, Inputs, Judgement, Operator, OwnHistory, Pack, Platform,
+    RailPin, Selection, Served, ServedPeriod, Stake, Timestamp, Vouch, INFERENCE_SERVICE_HISTORY_PROPERTIES,
 };
 use capsule_engine::canon;
 use serde_json::{Map, Value};
@@ -515,8 +515,15 @@ fn inference_service_history_vectors() {
     for c in cases {
         let name = c["case"].as_str().unwrap();
         let card = CardCheckpoints {
-            times: c["card"]["times"].as_array().unwrap().iter().map(|t| time(t.as_str().unwrap())).collect(),
-            records: c["card"]["records"].as_i64().unwrap(),
+            checkpoints: c["card"]["checkpoints"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|cp| CardCheckpoint {
+                    at: time(cp["at"].as_str().unwrap()),
+                    records: cp["records"].as_i64().unwrap(),
+                })
+                .collect(),
         };
         let got = inference_service_history_counts(
             c["definition"].as_str().unwrap().as_bytes(),
@@ -528,7 +535,10 @@ fn inference_service_history_vectors() {
             Some(want) => {
                 let want = want.as_str().unwrap();
                 match got {
-                    Err(e) => assert!(e.0.contains(want), "{name}: error {e}, want one containing {want:?}"),
+                    Err(e) => assert!(
+                        e.to_string().contains(want) && INFERENCE_SERVICE_HISTORY_PROPERTIES.contains(&e.property),
+                        "{name}: error {e}, want one containing {want:?}"
+                    ),
                     Ok(_) => panic!("{name}: read, want an error containing {want:?}"),
                 }
             }

@@ -7,7 +7,10 @@ use std::collections::{BTreeMap, BTreeSet};
 use super::band::{add, fresh, quantity, value_band, HOUR, SECOND};
 use super::decision::{AskOut, Coverage, Decision, Effect, NotCounted, PackRef, RowResult, RowStatus};
 use super::pack::{OnFail, Pack, Row, SOURCE_JUDGED};
-use super::{Inputs, Timestamp, Verdict, CARD_UNVERIFIABLE, CARD_VERIFIED, SUPPRESSED_COMPLEMENTARY};
+use super::{
+    Inputs, Timestamp, Verdict, CARD_UNVERIFIABLE, CARD_VERIFIED, INFERENCE_SERVICE_HISTORY_PROPERTIES,
+    SUPPRESSED_COMPLEMENTARY,
+};
 use crate::canon;
 
 /// evaluate.go SourceAboveTier, SourceMissing, SourceRows: the decision
@@ -351,7 +354,11 @@ fn read_row(r: &Row, input: &Inputs, p: &Pack) -> RowResult {
         "platform.owner_signed" => input.platform.owner_signed.map_or_else(not_read, |s| result(of(s))),
         "card.verified" => match input.card.state.as_str() {
             CARD_VERIFIED => result(RowStatus::Pass),
-            CARD_UNVERIFIABLE => RowResult { reason: input.card.reason.clone(), ..result(RowStatus::Fail) },
+            CARD_UNVERIFIABLE => {
+                let reason = &input.card.reason;
+                let known = INFERENCE_SERVICE_HISTORY_PROPERTIES.contains(&reason.as_str());
+                RowResult { reason: if known { reason.clone() } else { String::new() }, ..result(RowStatus::Fail) }
+            }
             _ => not_read(),
         },
         "card.fresh" if !verified => not_read(),

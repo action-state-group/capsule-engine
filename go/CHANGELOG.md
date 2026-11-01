@@ -19,13 +19,15 @@ and `portedDefinitions` (`guard/engine.go`).
 - Added (capsule-engine#273): `InferenceServiceHistoryCounts` reads a Mesh node's
   `inference-service-history/0` Standard answer as `Card.Served`. The answer is the node's own
   count of the exchanges it served in each closed period. The function takes the definition
-  document, the artifact, the checkpoint times and record count the caller read from the embedded
-  `history_card/1`, and the requester's `expected_pin`. It checks each History property it can
+  document, the artifact, the checkpoints (time and records covered) the caller read from the
+  embedded `history_card/1`, and the requester's `expected_pin`. The periods start at the first
+  checkpoint that commits a record (ISH §6.3). It checks each History property it can
   compute from those bytes: `definition_form`, `definition_binding`, `artifact_form`, the coverage
   declaration, `units`, `labels`, `period_alignment`, `period_anchor`, `period_floor`, and that the
-  answer's anchor is the pin. It returns an error naming the property that fails, so the card is
-  `CardUnverifiable`; an unknown profile or a Detailed definition is refused the same way.
-  `Card.Reason` (new) carries that reason into the `card.verified` row.
+  answer's anchor is the pin. A refusal is an `*InferenceServiceHistoryError` naming the property
+  that fails, so the card is `CardUnverifiable`; an unknown profile or a Detailed definition is
+  refused the same way. `Card.Reason` (new) carries that property into the `card.verified` row,
+  which records only a name from `InferenceServiceHistoryProperties`, never the detail.
   Also added: the predicate `card.self_reported_served_periods` (params `window`, `min_periods`). It
   counts the closed periods whose served total is published. A suppressed total, or a period the
   answer does not list, is not counted, and is never a fail on its own. The row never adds counts

@@ -4,7 +4,6 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"regexp"
 	"slices"
@@ -47,14 +46,39 @@ const (
 
 // CardCheckpoints is what the caller read from the answer's embedded
 // history_card/1 when it verified the card as a direct history_card/1
-// answer (ISH §5.2): its checkpoint times in order, the stream's first to
-// the anchor, and the number of records the anchor covers. The card's
-// checkpoint form is the node's (a Mesh node's are COSE), so it is read by
-// the caller's card verifier, never here.
+// answer (ISH §5.2): its checkpoints in order, the stream's first to the
+// anchor. The card's checkpoint form is the node's (a Mesh node's are
+// COSE), so it is read by the caller's card verifier, never here.
 type CardCheckpoints struct {
-	Times   []time.Time
+	Checkpoints []CardCheckpoint
+}
+
+// CardCheckpoint is one checkpoint of the card: its time, and the number of
+// records of the stream it covers (a log size in records, not in tree
+// nodes).
+type CardCheckpoint struct {
+	At      time.Time
 	Records int64
 }
+
+// InferenceServiceHistoryError is why an answer is refused: the History
+// property that does not hold, one of InferenceServiceHistoryProperties,
+// and the detail. A caller records Property as Card.Reason; the detail can
+// echo the counterparty's own strings, so it stays out of the decision.
+type InferenceServiceHistoryError struct {
+	Property, Detail string
+}
+
+func (e *InferenceServiceHistoryError) Error() string {
+	return "inference-service-history/0 answer: " + e.Property + ": " + e.Detail
+}
+
+// InferenceServiceHistoryProperties are the properties an
+// InferenceServiceHistoryError names (ISH §4.2, §6.3, §8.3, and
+// anchor_match for the requester's pin).
+var InferenceServiceHistoryProperties = []string{"definition_form", "definition_binding", "artifact_form",
+	"anchor_match", "coverage_declaration_form", "coverage_declaration_anchor", "units", "labels",
+	"period_alignment", "period_anchor", "period_floor"}
 
 const (
 	ishProfile     = "inference-service-history/0"
@@ -99,10 +123,10 @@ var (
 // shape of ISH §9 (unregistered, SH-12): the shape the Mesh plugin serves.
 // Served holds the exchanges_served totals; nil when the answer counts no
 // served exchanges. Exchanges in another unit are checked and never added
-// to them (ISH §5.1).
+// to them (ISH §5.1). A refusal is an *InferenceServiceHistoryError.
 func InferenceServiceHistoryCounts(definition, artifact []byte, card CardCheckpoints, pin string) (*Served, error) {
 	fail := func(property, format string, args ...any) error {
-		return fmt.Errorf("inference-service-history/0 answer: %s: %s", property, fmt.Sprintf(format, args...))
+		return &InferenceServiceHistoryError{property, fmt.Sprintf(format, args...)}
 	}
 	if err := isJCS(definition); err != nil {
 		return nil, fail("definition_form", "the definition is not JCS bytes: %v", err)
@@ -117,9 +141,9 @@ func InferenceServiceHistoryCounts(definition, artifact []byte, card CardCheckpo
 	if level, _ := ishString(def["level"]); level == "detailed" {
 		return nil, fail("definition_form", "detailed level not read")
 	}
-	d, err := ishDefinitionOf(def)
-	if err != nil {
-		return nil, fail("definition_form", "%v", err)
+	d, derr := ishDefinitionOf(def)
+	if derr != nil {
+		return nil, fail(derr.property, "%s", derr.reason)
 	}
 	sum := sha256.Sum256(definition)
 	digest := hex.EncodeToString(sum[:])
@@ -134,8 +158,8 @@ func InferenceServiceHistoryCounts(definition, artifact []byte, card CardCheckpo
 	if derivation, _ := ishString(art["derivation"]); derivation != digest {
 		return nil, fail("definition_binding", "the artifact's derivation is not the digest of the definition")
 	}
-	var declared []string
-	if json.Unmarshal(art["declared"], &declared) != nil || !slices.IsSorted(declared) || len(slices.Compact(slices.Clone(declared))) != len(declared) {
+	declared, ok := ishStrings(art["declared"])
+	if !ok || !slices.IsSorted(declared) || len(slices.Compact(slices.Clone(declared))) != len(declared) {
 		return nil, fail("artifact_form", "declared is not a sorted list of member names")
 	}
 	for _, m := range d.members {
@@ -196,17 +220,24 @@ func InferenceServiceHistoryCounts(definition, artifact []byte, card CardCheckpo
 	if to, _ := ishString(interval["to"]); to != anchor {
 		return nil, fail("coverage_declaration_anchor", "interval.to is not the anchor")
 	}
+	// The periods (ISH §6.3), against the card's checkpoints, which never go
+	// back in time or in size.
+	cps := card.Checkpoints
+	if len(cps) == 0 {
+		return nil, fail("period_alignment", "the card lists no checkpoint")
+	}
+	for i := 1; i < len(cps); i++ {
+		if cps[i].At.Before(cps[i-1].At) || cps[i].Records < cps[i-1].Records {
+			return nil, fail("period_alignment", "the card's checkpoints go back in time or in size")
+		}
+	}
+	last := cps[len(cps)-1]
 	liveSet, err := canon.JCS(canon.Arr([]canon.Value{canon.Obj(canon.M("checkpoint", canon.Str(anchor)),
-		canon.M("count", canon.Int(card.Records)), canon.M("start", canon.Int(0)), canon.M("stream", canon.Str(stream)))}))
+		canon.M("count", canon.Int(last.Records)), canon.M("start", canon.Int(0)), canon.M("stream", canon.Str(stream)))}))
 	if err != nil || string(cov["live_set"]) != liveSet {
 		return nil, fail("coverage_declaration_form", "live_set is not the anchor's records in the answer's stream")
 	}
-
-	// The periods (ISH §6.3), against the card's checkpoint times.
-	if len(card.Times) == 0 {
-		return nil, fail("period_alignment", "the card lists no checkpoint")
-	}
-	anchorAt := card.Times[len(card.Times)-1]
+	anchorAt := last.At
 	if anchorAt.Nanosecond() != 0 || !d.onBoundary(anchorAt.Unix()) {
 		return nil, fail("period_anchor", "the anchor's time is not a period boundary")
 	}
@@ -221,18 +252,22 @@ func InferenceServiceHistoryCounts(definition, artifact []byte, card CardCheckpo
 	if json.Unmarshal(counts["periods"], &listed) != nil || listed == nil {
 		return nil, fail("artifact_form", "counts shape not known")
 	}
-	// Every closed period, from the one the stream's first checkpoint
-	// commits into (the one it ends, at a boundary) to the one the anchor
-	// closes, each once, in order.
-	first := d.periodOf(card.Times[0].Unix())
-	if d.onBoundary(card.Times[0].Unix()) && card.Times[0].Nanosecond() == 0 {
-		first--
-	}
+	// Every closed period, from the one the first checkpoint that commits a
+	// record commits into (the one it ends, at a boundary) to the one the
+	// anchor closes, each once, in order. Where no checkpoint commits a
+	// record, no period is listed.
 	end := d.periodOf(anchorAt.Unix())
+	first := end
+	if i := slices.IndexFunc(cps, func(c CardCheckpoint) bool { return c.Records > 0 }); i >= 0 {
+		first = d.periodOf(cps[i].At.Unix())
+		if d.onBoundary(cps[i].At.Unix()) && cps[i].At.Nanosecond() == 0 {
+			first--
+		}
+	}
 	if end-first > ishPeriodsMax {
 		return nil, fail("period_alignment", "more than %d periods", ishPeriodsMax)
 	}
-	if int64(len(listed)) != max(end-first, 0) {
+	if int64(len(listed)) != end-first {
 		return nil, fail("period_alignment", "the closed periods are not each listed once")
 	}
 	served := &Served{LengthS: d.lengthS, Floor: d.floor}
@@ -296,10 +331,13 @@ func floorDiv(a, b int64) int64 {
 // union of the members' reads, and a period_policy that conforms (§6.1).
 // The only counts member read is period_counts; any other is a shape not
 // known.
-func ishDefinitionOf(def map[string]json.RawMessage) (ishDefinition, error) {
+func ishDefinitionOf(def map[string]json.RawMessage) (ishDefinition, *ishError) {
 	var d ishDefinition
+	formErr := func(format string, args ...any) *ishError {
+		return &ishError{"definition_form", fmt.Sprintf(format, args...)}
+	}
 	if !sameKeys(def, ishDefinitionKeys) {
-		return d, errors.New("not exactly the members of a Standard definition")
+		return d, formErr("not exactly the members of a Standard definition")
 	}
 	name, _ := ishString(def["name"])
 	_, spec := ishString(def["spec"])
@@ -307,36 +345,35 @@ func ishDefinitionOf(def map[string]json.RawMessage) (ishDefinition, error) {
 		string(def["embeds"]) != `["history_card/1"]` || string(def["subjects"]) != `["full_history"]` ||
 		string(def["coverage_declaration"]) != `{"kind":"stream_interval","rule":"all_records"}` ||
 		!ishNameRe.MatchString(name) || !spec {
-		return d, errors.New("a member does not have the value the profile fixes")
+		return d, formErr("a member does not have the value the profile fixes")
 	}
-	var excludes []string
-	if json.Unmarshal(def["excludes"], &excludes) != nil || !slices.Contains(excludes, "requester identity") {
-		return d, errors.New("excludes does not name requester identity")
+	if excludes, ok := ishStrings(def["excludes"]); !ok || !slices.Contains(excludes, "requester identity") {
+		return d, formErr("excludes does not name requester identity")
 	}
 	var members []map[string]json.RawMessage
 	if json.Unmarshal(def["members"], &members) != nil || len(members) == 0 {
-		return d, errors.New("no members")
+		return d, formErr("no members")
 	}
 	var union []string
 	for i, m := range members {
 		if m == nil || !subsetKeys(m, ishMemberKeys) {
-			return d, fmt.Errorf("members[%d] is not a member", i)
+			return d, formErr("members[%d] is not a member", i)
 		}
 		var mb ishMember
 		var ok bool
 		if mb.name, ok = ishString(m["name"]); !ok || mb.name == "" ||
 			slices.ContainsFunc(d.members, func(o ishMember) bool { return o.name == mb.name }) {
-			return d, fmt.Errorf("members[%d] has no name, or one listed twice", i)
+			return d, formErr("members[%d] has no name, or one listed twice", i)
 		}
 		switch string(m["required"]) {
 		case "true", "false":
 			mb.required = string(m["required"]) == "true"
 		default:
-			return d, fmt.Errorf("%s has no required", mb.name)
+			return d, formErr("%s has no required", mb.name)
 		}
-		var reads []string
-		if json.Unmarshal(m["reads"], &reads) != nil || reads == nil {
-			return d, fmt.Errorf("%s has no reads", mb.name)
+		reads, ok := ishStrings(m["reads"])
+		if !ok {
+			return d, formErr("%s has no reads", mb.name)
 		}
 		for _, r := range reads {
 			if !slices.Contains(union, r) {
@@ -345,54 +382,53 @@ func ishDefinitionOf(def map[string]json.RawMessage) (ishDefinition, error) {
 		}
 		var units []map[string]json.RawMessage
 		if json.Unmarshal(m["units"], &units) != nil || len(units) == 0 {
-			return d, fmt.Errorf("%s has no units", mb.name)
+			return d, formErr("%s has no units", mb.name)
 		}
 		for j, u := range units {
 			_, okWhere := ishString(u["where"])
 			unit, okUnit := ishString(u["unit"])
 			if !okWhere || !okUnit || !sameKeys(u, []string{"unit", "where"}) {
-				return d, fmt.Errorf("%s: units[%d] is not {where, unit}", mb.name, j)
+				return d, formErr("%s: units[%d] is not {where, unit}", mb.name, j)
 			}
 			if !slices.Contains(ishUnits, unit) {
-				return d, fmt.Errorf("units: %s counts in %q, which is not a unit of the profile", mb.name, unit)
+				return d, &ishError{"units", fmt.Sprintf("%s counts in %q, which is not a unit of the profile", mb.name, unit)}
 			}
 			mb.units = append(mb.units, unit)
 		}
 		if raw, ok := m["derivation"]; ok {
 			if _, isStr := ishString(raw); !isStr {
-				return d, fmt.Errorf("%s: derivation is not a string", mb.name)
+				return d, formErr("%s: derivation is not a string", mb.name)
 			}
 		}
 		switch mb.name {
 		case ishHistoryCard:
 			if !mb.required || string(m["derivation"]) != `"history_card/1"` {
-				return d, errors.New("history_card is not a required history_card/1 member")
+				return d, formErr("history_card is not a required history_card/1 member")
 			}
 		case ishCounts:
 			d.counts = mb
 		default:
-			return d, fmt.Errorf("counts shape not known: member %s", mb.name)
+			return d, formErr("counts shape not known: member %s", mb.name)
 		}
 		d.members = append(d.members, mb)
 	}
 	if !slices.ContainsFunc(d.members, func(m ishMember) bool { return m.name == ishHistoryCard }) {
-		return d, errors.New("history_card is not a required history_card/1 member")
+		return d, formErr("history_card is not a required history_card/1 member")
 	}
 	if d.counts.name == "" {
-		return d, errors.New("no counts member")
+		return d, formErr("no counts member")
 	}
-	var reads []string
-	if json.Unmarshal(def["reads"], &reads) != nil || !slices.Equal(reads, union) || reads == nil {
-		return d, errors.New("reads is not the union of the members' reads")
+	if reads, ok := ishStrings(def["reads"]); !ok || !slices.Equal(reads, union) {
+		return d, formErr("reads is not the union of the members' reads")
 	}
 	var p map[string]json.RawMessage
 	if json.Unmarshal(def["period_policy"], &p) != nil || !sameKeys(p, ishPolicyKeys) ||
 		string(p["suppression"]) != `"complementary"` {
-		return d, errors.New("period_policy is not the profile's")
+		return d, formErr("period_policy is not the profile's")
 	}
 	epoch, ok := ishTime(p["epoch"])
 	if !ok {
-		return d, errors.New("period_policy: epoch is not a whole-second UTC time")
+		return d, formErr("period_policy: epoch is not a whole-second UTC time")
 	}
 	var minLength int64
 	for _, x := range []struct {
@@ -401,12 +437,12 @@ func ishDefinitionOf(def map[string]json.RawMessage) (ishDefinition, error) {
 	}{{"length_s", &d.lengthS}, {"min_length_s", &minLength}, {"floor", &d.floor}} {
 		n, err := cardInt(p[x.k])
 		if err != nil || n <= 0 {
-			return d, fmt.Errorf("period_policy: %s is not a positive integer", x.k)
+			return d, formErr("period_policy: %s is not a positive integer", x.k)
 		}
 		*x.v = n
 	}
 	if d.lengthS < minLength {
-		return d, errors.New("period_policy: length_s is under min_length_s")
+		return d, formErr("period_policy: length_s is under min_length_s")
 	}
 	d.epoch = epoch.Unix()
 	sum := sha256.Sum256(def["period_policy"])
@@ -454,9 +490,14 @@ func (d ishDefinition) cells(raw json.RawMessage) (map[string]ishTotal, *ishErro
 		// A dimension is null on the unit's total, or one stated value.
 		dim := ""
 		if string(c["dimension"]) != "null" {
-			var m map[string]string
+			var m map[string]json.RawMessage
 			if json.Unmarshal(c["dimension"], &m) != nil || len(m) != 1 {
 				return nil, bad("artifact_form", "counts shape not known: cells[%d].dimension", j)
+			}
+			for _, v := range m {
+				if _, ok := ishString(v); !ok {
+					return nil, bad("artifact_form", "counts shape not known: cells[%d].dimension", j)
+				}
 			}
 			dim = string(c["dimension"])
 		}
@@ -522,12 +563,32 @@ func (d ishDefinition) cells(raw json.RawMessage) (map[string]ishTotal, *ishErro
 	return totals, nil
 }
 
+// ishString reads a JSON string. encoding/json would read null as "", so
+// null is refused here, as Rust refuses it.
 func ishString(raw json.RawMessage) (string, bool) {
 	var s string
-	if raw == nil || json.Unmarshal(raw, &s) != nil {
+	if raw == nil || string(raw) == "null" || json.Unmarshal(raw, &s) != nil {
 		return "", false
 	}
 	return s, true
+}
+
+// ishStrings reads a JSON array of strings, null refused as a whole and as
+// an element.
+func ishStrings(raw json.RawMessage) ([]string, bool) {
+	var items []json.RawMessage
+	if raw == nil || string(raw) == "null" || json.Unmarshal(raw, &items) != nil {
+		return nil, false
+	}
+	out := make([]string, 0, len(items))
+	for _, it := range items {
+		s, ok := ishString(it)
+		if !ok {
+			return nil, false
+		}
+		out = append(out, s)
+	}
+	return out, true
 }
 
 // ishTime reads a profile time: a whole second in UTC, written

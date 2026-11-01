@@ -51,8 +51,8 @@ pub use band::{Band, Unit};
 pub use decision::{AskOut, Coverage, Decision, Effect, NotCounted, PackRef, RowResult, RowStatus};
 pub use evaluate::evaluate;
 pub use inference_service_history::{
-    inference_service_history_counts, CardCheckpoints, Served, ServedPeriod, SUPPRESSED_BELOW_FLOOR,
-    SUPPRESSED_COMPLEMENTARY,
+    inference_service_history_counts, CardCheckpoint, CardCheckpoints, InferenceServiceHistoryError, Served,
+    ServedPeriod, INFERENCE_SERVICE_HISTORY_PROPERTIES, SUPPRESSED_BELOW_FLOOR, SUPPRESSED_COMPLEMENTARY,
 };
 pub use pack::{Pack, RailPin, COMPILED_FORMAT};
 pub use standard_history::standard_history_counts;
@@ -213,9 +213,11 @@ pub const CARD_UNANSWERED: &str = "unanswered";
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Card {
     pub state: String,
-    /// Why the card is unverifiable, as the caller's verifier or
-    /// `inference_service_history_counts` gave it; the card.verified row
-    /// records it. "" otherwise.
+    /// Why the card is unverifiable: the History property an
+    /// `InferenceServiceHistoryError` names. The card.verified row records it
+    /// when it is one of INFERENCE_SERVICE_HISTORY_PROPERTIES, and never any
+    /// other text, so the sealed block holds no counterparty string. ""
+    /// otherwise.
     pub reason: String,
     pub first_checkpoint_at: Option<Timestamp>,
     pub latest_checkpoint_at: Option<Timestamp>,

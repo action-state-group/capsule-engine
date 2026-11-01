@@ -8,7 +8,7 @@ use serde_json::{json, Map, Value};
 use sha2::{Digest as _, Sha256};
 
 use super::standard_history::{count, is_jcs};
-use super::{Error, Timestamp};
+use super::Timestamp;
 use crate::canon;
 
 /// inference_service_history.go Served: the node's own count of the
@@ -47,14 +47,54 @@ pub const SUPPRESSED_COMPLEMENTARY: &str = "complementary";
 
 /// inference_service_history.go CardCheckpoints: what the caller read from
 /// the answer's embedded history_card/1 when it verified the card as a
-/// direct history_card/1 answer (ISH §5.2): its checkpoint times in order,
-/// the stream's first to the anchor, and the number of records the anchor
-/// covers.
+/// direct history_card/1 answer (ISH §5.2): its checkpoints in order, the
+/// stream's first to the anchor.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct CardCheckpoints {
-    pub times: Vec<Timestamp>,
+    pub checkpoints: Vec<CardCheckpoint>,
+}
+
+/// inference_service_history.go CardCheckpoint: one checkpoint's time, and
+/// the number of records of the stream it covers.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct CardCheckpoint {
+    pub at: Timestamp,
     pub records: i64,
 }
+
+/// inference_service_history.go InferenceServiceHistoryError: why an
+/// answer is refused, the History property that does not hold (one of
+/// INFERENCE_SERVICE_HISTORY_PROPERTIES) and the detail. A caller records
+/// `property` as `Card::reason`; the detail can echo the counterparty's own
+/// strings, so it stays out of the decision.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct InferenceServiceHistoryError {
+    pub property: &'static str,
+    pub detail: String,
+}
+
+impl std::fmt::Display for InferenceServiceHistoryError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "inference-service-history/0 answer: {}: {}", self.property, self.detail)
+    }
+}
+
+impl std::error::Error for InferenceServiceHistoryError {}
+
+/// inference_service_history.go InferenceServiceHistoryProperties.
+pub const INFERENCE_SERVICE_HISTORY_PROPERTIES: [&str; 11] = [
+    "definition_form",
+    "definition_binding",
+    "artifact_form",
+    "anchor_match",
+    "coverage_declaration_form",
+    "coverage_declaration_anchor",
+    "units",
+    "labels",
+    "period_alignment",
+    "period_anchor",
+    "period_floor",
+];
 
 const PROFILE: &str = "inference-service-history/0";
 const COUNTS: &str = "period_counts";
@@ -109,8 +149,8 @@ pub fn inference_service_history_counts(
     artifact: &[u8],
     card: &CardCheckpoints,
     pin: &str,
-) -> Result<Option<Served>, Error> {
-    let fail = |property: &str, why: String| Error(format!("inference-service-history/0 answer: {property}: {why}"));
+) -> Result<Option<Served>, InferenceServiceHistoryError> {
+    let fail = |property: &'static str, detail: String| InferenceServiceHistoryError { property, detail };
     is_jcs(definition).map_err(|e| fail("definition_form", format!("the definition is not JCS bytes: {e}")))?;
     let def: Value = serde_json::from_slice(definition).map_err(|e| fail("definition_form", e.to_string()))?;
     let def = def.as_object().ok_or_else(|| fail("definition_form", "the definition is not an object".into()))?;
@@ -120,7 +160,7 @@ pub fn inference_service_history_counts(
     if def.get("level").and_then(Value::as_str) == Some("detailed") {
         return Err(fail("definition_form", "detailed level not read".into()));
     }
-    let d = Definition::of(def).map_err(|e| fail("definition_form", e))?;
+    let d = Definition::of(def).map_err(|(property, why)| fail(property, why))?;
     let digest = canon::sha256_hex(definition);
 
     is_jcs(artifact).map_err(|e| fail("artifact_form", format!("the artifact is not JCS bytes: {e}")))?;
@@ -132,11 +172,7 @@ pub fn inference_service_history_counts(
     // As Go decodes it into a []string: null is empty, and anything but an
     // array of strings is refused.
     let not_sorted = || fail("artifact_form", "declared is not a sorted list of member names".into());
-    let declared: Vec<&str> = match art.get("declared") {
-        Some(Value::Null) => Vec::new(),
-        Some(v) => strings(v).ok_or_else(not_sorted)?,
-        None => return Err(not_sorted()),
-    };
+    let declared = art.get("declared").and_then(strings).ok_or_else(not_sorted)?;
     if !declared.windows(2).all(|w| w[0] < w[1]) {
         return Err(not_sorted());
     }
@@ -209,18 +245,23 @@ pub fn inference_service_history_counts(
     if interval["to"].as_str() != Some(anchor) {
         return Err(fail("coverage_declaration_anchor", "interval.to is not the anchor".into()));
     }
-    if cov["live_set"] != json!([{"checkpoint": anchor, "count": card.records, "start": 0, "stream": stream}]) {
+    // The periods (ISH §6.3), against the card's checkpoints, which never go
+    // back in time or in size.
+    let cps = &card.checkpoints;
+    let Some(last) = cps.last() else {
+        return Err(fail("period_alignment", "the card lists no checkpoint".into()));
+    };
+    if cps.windows(2).any(|w| w[1].at < w[0].at || w[1].records < w[0].records) {
+        return Err(fail("period_alignment", "the card's checkpoints go back in time or in size".into()));
+    }
+    if cov["live_set"] != json!([{"checkpoint": anchor, "count": last.records, "start": 0, "stream": stream}]) {
         return Err(fail(
             "coverage_declaration_form",
             "live_set is not the anchor's records in the answer's stream".into(),
         ));
     }
 
-    // The periods (ISH §6.3), against the card's checkpoint times.
-    let (Some(first_at), Some(anchor_at)) = (card.times.first(), card.times.last()) else {
-        return Err(fail("period_alignment", "the card lists no checkpoint".into()));
-    };
-    let (anchor_s, anchor_ns) = split(*anchor_at);
+    let (anchor_s, anchor_ns) = split(last.at);
     if anchor_ns != 0 || !d.on_boundary(anchor_s) {
         return Err(fail("period_anchor", "the anchor's time is not a period boundary".into()));
     }
@@ -230,19 +271,23 @@ pub fn inference_service_history_counts(
         return Err(fail("period_alignment", "the counts name another policy".into()));
     }
     let listed = counts["periods"].as_array().ok_or_else(shape)?;
-    // Every closed period, from the one the stream's first checkpoint
-    // commits into (the one it ends, at a boundary) to the one the anchor
-    // closes, each once, in order.
-    let (first_s, first_ns) = split(*first_at);
-    let mut first = d.period_of(first_s);
-    if d.on_boundary(first_s) && first_ns == 0 {
-        first -= 1;
-    }
+    // Every closed period, from the one the first checkpoint that commits a
+    // record commits into (the one it ends, at a boundary) to the one the
+    // anchor closes, each once, in order. Where no checkpoint commits a
+    // record, no period is listed.
     let end = d.period_of(anchor_s);
+    let mut first = end;
+    if let Some(c) = cps.iter().find(|c| c.records > 0) {
+        let (first_s, first_ns) = split(c.at);
+        first = d.period_of(first_s);
+        if d.on_boundary(first_s) && first_ns == 0 {
+            first -= 1;
+        }
+    }
     if end - first > PERIODS_MAX {
         return Err(fail("period_alignment", format!("more than {PERIODS_MAX} periods")));
     }
-    if listed.len() as i64 != (end - first).max(0) {
+    if listed.len() as i64 != end - first {
         return Err(fail("period_alignment", "the closed periods are not each listed once".into()));
     }
     let mut served = Served { length_s: d.length_s, floor: d.floor, periods: Vec::new() };
@@ -298,7 +343,14 @@ struct Total {
 impl Definition {
     /// inference_service_history.go ishDefinitionOf: definition_form for a
     /// Standard definition (ISH §4.1, §8.3).
-    fn of(def: &Map<String, Value>) -> Result<Definition, String> {
+    fn of(def: &Map<String, Value>) -> Result<Definition, (&'static str, String)> {
+        Self::form(def).map_err(|e| match e.strip_prefix("units: ") {
+            Some(rest) => ("units", rest.to_string()),
+            None => ("definition_form", e),
+        })
+    }
+
+    fn form(def: &Map<String, Value>) -> Result<Definition, String> {
         if !same_keys(def, &DEFINITION_KEYS) {
             return Err("not exactly the members of a Standard definition".into());
         }

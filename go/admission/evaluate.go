@@ -61,9 +61,11 @@ const (
 // verified it. A zero Card is absent.
 type Card struct {
 	State string
-	// Reason is why the card is unverifiable, as the caller's verifier or
-	// InferenceServiceHistoryCounts gave it; the card.verified row records
-	// it. "" otherwise.
+	// Reason is why the card is unverifiable: the History property an
+	// InferenceServiceHistoryError names. The card.verified row records it
+	// when it is one of InferenceServiceHistoryProperties, and never any
+	// other text, so the sealed block holds no counterparty string. ""
+	// otherwise.
 	Reason             string
 	FirstCheckpointAt  time.Time
 	LatestCheckpointAt time.Time
@@ -198,7 +200,8 @@ type RowResult struct {
 	// one earned: the highest decade, in the deal's band unit, the earned
 	// history covers (the earned band plus the step).
 	earned *int
-	// Reason is set on a card.verified row that fails with a reason.
+	// Reason is set on a card.verified row that fails with a reason from
+	// InferenceServiceHistoryProperties.
 	Reason string
 	// NotCounted is set on a card.self_reported_served_periods row that
 	// read the card: the periods of its window not counted, by why. Its
@@ -631,7 +634,11 @@ func readRow(r Row, in Inputs, accept map[string]Unit, roots TrustRoots) RowResu
 			case CardVerified:
 				return RowResult{Result: Pass}
 			case CardUnverifiable:
-				return RowResult{Result: Fail, Reason: in.Card.Reason}
+				res := RowResult{Result: Fail}
+				if slices.Contains(InferenceServiceHistoryProperties, in.Card.Reason) {
+					res.Reason = in.Card.Reason
+				}
+				return res
 			}
 			return RowResult{Result: NotRead}
 		case "card.fresh":

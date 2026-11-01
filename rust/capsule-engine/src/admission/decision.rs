@@ -66,7 +66,8 @@ pub struct RowResult {
     /// highest decade, in the deal's band unit, the earned history covers
     /// (the earned band plus the step).
     pub(crate) earned: Option<i64>,
-    /// Set on a card.verified row that fails with a reason.
+    /// Set on a card.verified row that fails with a reason from
+    /// INFERENCE_SERVICE_HISTORY_PROPERTIES.
     pub reason: String,
     /// Set on a card.self_reported_served_periods row that read the card:
     /// the periods of its window not counted, by why. Its counts are the
