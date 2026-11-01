@@ -101,6 +101,7 @@ from typing import Any
 import jsonschema
 from agent_action_capsule.canonical import jcs
 from agent_action_capsule.contracts import ReferenceEntry
+from agent_action_capsule.settlement import amount_ok as _settlement_amount_ok
 from capsule_emit import seal
 from capsule_emit import settlement as _settlement
 from capsule_emit.signing import AuthorshipVerdict, verify_capsule_signature_tristate
@@ -418,24 +419,23 @@ def _leg(rail: _Rail, kind: str) -> dict | None:
     return c[_LEG] if c else None
 
 
-_DIGITS = re.compile(r"^(0|[1-9][0-9]*)$")
+def _amount(value: object) -> dict | None:
+    """An amount triple in the settlement draft's form (``amount_ok``), or ``None``."""
+    return value if _settlement_amount_ok(value) else None
 
 
-def _amount(value: object) -> tuple[str, int, str] | None:
-    """An amount triple as (asset, scale, digits), or ``None`` when it is not the draft's form."""
-    if not isinstance(value, dict):
-        return None
-    digits, code, scale = value.get("value"), value.get("assetCode"), value.get("assetScale")
-    if (not isinstance(digits, str) or not _DIGITS.match(digits) or not isinstance(code, str) or not code
-            or not isinstance(scale, int) or isinstance(scale, bool) or not 0 <= scale <= 255):
-        return None
-    return code, scale, digits
+def _same_amount(a: dict, b: dict) -> bool:
+    """The settlement draft's amount equality (``agent_action_capsule.settlement``):
+    the same asset, and the same count of units at the larger scale, compared as
+    digit strings with no leading zeros."""
+    if a["assetCode"] != b["assetCode"]:
+        return False
+    top = max(a["assetScale"], b["assetScale"])
 
+    def units(m: dict) -> str:
+        return (m["value"] + "0" * (top - m["assetScale"])).lstrip("0") or "0"
 
-def _same_amount(a: tuple[str, int, str], b: tuple[str, int, str]) -> bool:
-    """Equal amounts at any two scales: the same asset, and equal digits at the larger scale."""
-    top = max(a[1], b[1])
-    return a[0] == b[0] and a[2] + "0" * (top - a[1]) == b[2] + "0" * (top - b[1])
+    return units(a) == units(b)
 
 
 def _price_claim(buyer: Party, seller: Party, rail: _Rail) -> Claim:

@@ -389,12 +389,18 @@ def test_a_party_that_gives_no_records_is_refused(tmp_path):
     assert exc.value.code == "records_missing"
 
 
-def test_amounts_compare_at_any_scale_and_a_malformed_one_is_not_evaluable():
-    assert referee._same_amount(referee._amount(PRICE), referee._amount(
-        {"value": "2" + "0" * 21, "assetCode": "USD", "assetScale": 20}))
-    assert not referee._same_amount(referee._amount(PRICE), referee._amount({**PRICE, "assetCode": "EUR"}))
-    for bad in ({**PRICE, "value": "\u00b2"}, {**PRICE, "value": "01"}, {**PRICE, "assetScale": 256}, None):
-        assert referee._amount(bad) is None
+def test_amount_equality_is_the_settlement_drafts():
+    from agent_action_capsule.settlement import _amounts_equal
+
+    values = ("0", "2", "20", "200", "2000", "20000", "1" + "0" * 30)
+    triples = [{"value": v, "assetCode": c, "assetScale": s}
+               for v in values for c in ("USD", "EUR") for s in (0, 1, 2, 3, 20, 255)]
+    for a in triples:
+        for b in triples:
+            assert referee._same_amount(a, b) == _amounts_equal(a, b), (a, b)
+    for bad in ({**PRICE, "value": "\u00b2"}, {**PRICE, "value": "01"}, {**PRICE, "value": "2000\n"},
+                {**PRICE, "assetScale": 256}, {**PRICE, "assetScale": True}, {**PRICE, "extra": 1}, None):
+        assert referee._amount(bad) is None, bad
 
 
 def test_an_amount_at_another_scale_is_the_same_price(tmp_path):
