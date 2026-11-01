@@ -15,29 +15,29 @@ import (
 
 func vendoredPackYAML(t *testing.T) []byte {
 	t.Helper()
-	b, err := fs.ReadFile(packs.Everyday038, path.Join(packs.Everyday038Dir, "pack.yaml"))
+	b, err := fs.ReadFile(packs.Everyday038, path.Join(packs.Everyday038Dir, "pack-source.yaml"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	return b
 }
 
-// everyday037PackYAML is the frozen asg/everyday/0.3.7 pack.yaml: the
+// everyday037PackYAML is the frozen asg/everyday/0.3.7 pack-source.yaml: the
 // engine digests of its edited copies were computed at 7339028.
 func everyday037PackYAML(t *testing.T) []byte {
 	t.Helper()
-	b, err := fs.ReadFile(packs.Everyday037, path.Join(packs.Everyday037Dir, "pack.yaml"))
+	b, err := fs.ReadFile(packs.Everyday037, path.Join(packs.Everyday037Dir, "pack-source.yaml"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	return b
 }
 
-// writePack writes a pack.yaml into a fresh directory and returns it.
+// writePack writes a pack-source.yaml into a fresh directory and returns it.
 func writePack(t *testing.T, data []byte) string {
 	t.Helper()
 	dir := t.TempDir()
-	if err := os.WriteFile(filepath.Join(dir, "pack.yaml"), data, 0o600); err != nil {
+	if err := os.WriteFile(filepath.Join(dir, "pack-source.yaml"), data, 0o600); err != nil {
 		t.Fatal(err)
 	}
 	return dir
@@ -78,7 +78,7 @@ func TestEditedCopyOfAPinnedPackIsRefused(t *testing.T) {
 	if bytes.Equal(edited, vendoredPackYAML(t)) {
 		t.Fatal("edit did not apply")
 	}
-	unpinned, err := Load(edited, packs.Everyday038, packs.Everyday038Dir)
+	unpinned, err := LoadSource(edited, packs.Everyday038, packs.Everyday038Dir)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -110,11 +110,11 @@ func TestEditedCitationIsRefused(t *testing.T) {
 
 func TestLoadPathWithoutAPack(t *testing.T) {
 	if _, err := LoadPath(t.TempDir(), builtInCatalog); err == nil {
-		t.Fatal("loaded a directory with no pack.yaml")
+		t.Fatal("loaded a directory with no pack definition")
 	}
 }
 
-// copyVendoredPack copies the whole vendored pack directory (pack.yaml,
+// copyVendoredPack copies the whole vendored pack directory (pack-source.yaml,
 // wickets/, folds/) to disk, applying edit to one file.
 func copyVendoredPack(t *testing.T, editFile string, edit func([]byte) []byte) string {
 	t.Helper()
@@ -196,7 +196,7 @@ func TestEditedWicketWithMatchingCitationFailsThePin(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	packYAML := filepath.Join(dir, "pack.yaml")
+	packYAML := filepath.Join(dir, "pack-source.yaml")
 	b, err := os.ReadFile(packYAML)
 	if err != nil {
 		t.Fatal(err)
@@ -230,16 +230,16 @@ func TestEditedFoldFileIsRefused(t *testing.T) {
 	}
 }
 
-// builtInCatalog is the catalog a pack.yaml-only source resolves against in
+// builtInCatalog is the catalog a definition-only source resolves against in
 // these tests: asg/everyday/0.3.8's definitions.
 var builtInCatalog = Catalog{FS: packs.Everyday038, Dir: packs.Everyday038Dir}
 
-// Without a fallback catalog, a pack.yaml-only source's citations resolve
+// Without a fallback catalog, a definition-only source's citations resolve
 // against nothing.
 func TestAPackYAMLAloneNeedsACatalog(t *testing.T) {
 	dir := writePack(t, vendoredPackYAML(t))
 	if _, err := LoadPath(dir, Catalog{}); err == nil {
-		t.Fatal("a pack.yaml-only source with no catalog loaded")
+		t.Fatal("a definition-only source with no catalog loaded")
 	}
 	if _, err := LoadPath(dir, builtInCatalog); err != nil {
 		t.Fatal(err)

@@ -111,6 +111,15 @@ UNKNOWN_CATALOG_REF = "unknown_catalog_ref"
 CATALOG_REF_DIGEST_MISMATCH = "catalog_ref_digest_mismatch"
 RETIRED_CATALOG_REF = "retired_catalog_ref"
 
+# pack-source.yaml (one pack format, capsule-engine#252): a live pack source
+# declares scope.kind live and a pack_version, and names on each cited
+# wicket the check it implements. A directory with both a pack-source.yaml
+# and a pack.yaml has no one definition, so it is refused.
+INVALID_PACK_SOURCE_SCOPE = "invalid_pack_source_scope"
+PACK_VERSION_MISMATCH = "pack_version_mismatch"
+CONSTRAINT_CHECK_MISMATCH = "constraint_check_mismatch"
+AMBIGUOUS_PACK_SOURCE = "ambiguous_pack_source"
+
 # Registry-pin verification (pins.py) -- a distinct failure family from
 # pack.yaml parsing: these are trust/integrity failures against a pins
 # source (a local file today, a live capsule-registry fetch later), not

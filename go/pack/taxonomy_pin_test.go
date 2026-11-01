@@ -36,9 +36,9 @@ func TestTheTaxonomyPinIsDigestCovered(t *testing.T) {
 	i := strings.Index(y, "\n# The action taxonomy this pack was authored against.")
 	j := strings.Index(y, "\nbootstrap:")
 	if i < 0 || j < i {
-		t.Fatal("the vendored pack.yaml has no taxonomy block before bootstrap")
+		t.Fatal("the vendored pack-source.yaml has no taxonomy block before bootstrap")
 	}
-	p, err := Load([]byte(y[:i]+"\n"+y[j:]), packs.Everyday037, packs.Everyday037Dir)
+	p, err := LoadSource([]byte(y[:i]+"\n"+y[j:]), packs.Everyday037, packs.Everyday037Dir)
 	if err != nil {
 		t.Fatal(err)
 	}

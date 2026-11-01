@@ -28,6 +28,9 @@
 # Statements name what is detected and recorded -- the observable, never an
 # intent. Every rule declares NEVER: a failure refuses.
 pack_id: asg/inference/0.1.0
+pack_version: 0.1.0
+scope:
+  kind: live
 
 obligations:
   - id: r01-rate-caps
@@ -63,11 +66,14 @@ action_semantics:
 
 constraints:
   - wicket_ref: rate_cap/1.0.0
+    check: rate_cap
     digest: a2628f677ddbeb6cdd6a62ac44403b51ac03f878b40e1c8d1627c95039c13d93
   # An empty deny list until the profile sets one.
   - wicket_ref: counterparty_list/1.0.0
+    check: counterparty_list
     digest: d95162931a6c1f88c763f2fd221d63b238888c1bdd7c6d594123ee5671e18f65
   - wicket_ref: dedupe/1.0.0
+    check: dedupe
     digest: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
 
 # The loader requires a fold. No check of this pack reads one: rate_cap reads

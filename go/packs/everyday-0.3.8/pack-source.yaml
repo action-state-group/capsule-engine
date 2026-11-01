@@ -50,6 +50,9 @@
 # flags as in 0.3.7. The pack binds one gate version, so rules 1, 4 and 15-18
 # cite 1.2.0 too, with the same selectors and outcomes.
 pack_id: asg/everyday/0.3.8
+pack_version: 0.3.8
+scope:
+  kind: live
 
 obligations:
   # -- DO ------------------------------------------------------------------
@@ -323,28 +326,36 @@ constraints:
   # rolling total sums captures. 5.1.0 counts every executed act in that
   # total, not only an accepted decision (guards/wickets/catalog_defs/caps.v5.1.yaml).
   - wicket_ref: caps/5.1.0
+    check: caps
     digest: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
     scope: [operator]
   - wicket_ref: dedupe/1.0.0
+    check: dedupe
     digest: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
   - wicket_ref: destination_rail/1.0.0
+    check: destination_rail
     digest: 4d76251eba138b37e6be3e83390072315ebcea42cd8d790f7e9765ecf1f63429
   - wicket_ref: counterparty_identity_change/1.0.0
+    check: counterparty_identity_change
     digest: 0cfb1cb380b355abb88ea385334f3bb31f2e145269a2768022f85005665fc6fe
   - wicket_ref: credential_pattern/1.0.0
+    check: credential_pattern
     digest: 3617fdcaa39c03cf70a3254490328ccee5eaac0faba7cd52d9e3dc3fc50336c0
   - wicket_ref: recurring_charge/1.0.0
+    check: recurring_charge
     digest: ea4ae204e5dc33f3a28e5e15471f404f20d4f8fca193d355a099a4a7e08b082e
   # Named selectors over the action taxonomy; reads the declared class,
   # leaves a disclosure to a platform to recipient_role (1.1.0), and splits
   # personal_disclosure into a new class and a new party, each passing over
   # a repeat the producer reports (1.2.0).
   - wicket_ref: action_class_gate/1.2.0
+    check: action_class_gate
     digest: 39a7c5b94173a4c8496b338028b8680ba20ac65543802c67e419577acce097bf
   # A purchase from a merchant the operator has no accepted or carried-out
   # act with. 3.0.0 counts an act that asked, was approved and was executed;
   # 4.0.0 also flags a purchase that names no merchant (no payee named).
   - wicket_ref: counterparty_seen_before/4.0.0
+    check: counterparty_seen_before
     digest: c7c20d9e57cb0a75184b9c6c4d037c9bea813a7b1105c581defd4481acf964b0
   # Each reads one number, one member of a closed set, or one opaque
   # reference from the action, never an object or text. The 1.1.0
@@ -352,21 +363,29 @@ constraints:
   # recipient_role/1.1.0 also reads the classes a disclosure to a platform
   # names, and passes only email.
   - wicket_ref: recipient_role/1.1.0
+    check: recipient_role
     digest: 57cb99bde24b5ae41ae214f4d2db0e8f20cbdf7ba31170b65da0561afdc499e1
   - wicket_ref: refundability/1.1.0
+    check: refundability
     digest: 1a471c09254a3db872c34a5e59d9e05e6da47cb396695a6cb6bf2bc055f4d811
   - wicket_ref: material_fields_changed/1.1.0
+    check: material_fields_changed
     digest: e8cd02743203d17cd0de9d548f85ec5b6b6135e80aba63136ae507ac84660042
   - wicket_ref: offer_fields_changed/1.1.0
+    check: offer_fields_changed
     digest: f62c034140827beaa4b8ee13da8b56e4583994a973bc789d4a11812f9727a953
   # A message to a recipient the operator has not written to before.
   - wicket_ref: recipient_seen_before/1.0.0
+    check: recipient_seen_before
     digest: df8803e9c4bdab9deff48e772fcd21ff813d00157068dd250a8a5c6b45cd6c44
   - wicket_ref: channel_change/1.1.0
+    check: channel_change
     digest: f84770c7571a0932629667c4df38f447777f8dc5dfcdfdf29b37514c1eee1ad1
   - wicket_ref: upfront_amount/1.1.0
+    check: upfront_amount
     digest: 2311833db12bf9465dcb5ecdd9f7aca079dbf638a19ed6dd18d607aad1811c10
   - wicket_ref: task_authority/1.1.0
+    check: task_authority
     digest: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
 
 folds:

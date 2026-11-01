@@ -58,19 +58,19 @@ ROOT = Path(__file__).parent.parent / "capsule_engine"
 PACK_DIR = ROOT / "packs" / "catalog" / "seller"
 FROZEN_0_1_0_DIR = Path(__file__).parent / "fixtures" / "packs" / "seller-0.1.0"
 PACK_0_1_0_DIGEST = "7b854f0f0feb51381d936ad992bef659234d77a799a2a319585a856f65a19c77"
-PACK_0_1_0_FILE_SHA256 = "b03b7ebb491cdd250bedfba47fcaaa0e60f0316a88a2698db7b886ef5f4753e6"
+PACK_0_1_0_FILE_SHA256 = "3aa6ecfb612d51d66aa9fe3ae1f7ddce0aa5d83ff1ded8c092c1e35b8dc60161"
 FROZEN_0_1_1_DIR = Path(__file__).parent / "fixtures" / "packs" / "seller-0.1.1"
 PACK_0_1_1_DIGEST = "65e41f7e9a2a9cffc0f71027f8e7c5b70f3ccf2751e6cb95ba1c81649b41e1ac"
-PACK_0_1_1_FILE_SHA256 = "edb54be219fdcd31602c5a8eebe159e31d8107e29a13a80496c7ed952972688e"
+PACK_0_1_1_FILE_SHA256 = "60535f0fab8651caefbd4d7d63682e9dd179c9af13e7dbbe2b791b09166d3940"
 FROZEN_0_1_2_DIR = Path(__file__).parent / "fixtures" / "packs" / "seller-0.1.2"
 PACK_0_1_2_DIGEST = "e599c5aff8d4171d5e58cae33fdc7022e4ee3762d1a884bb6e6098aca532a353"
-PACK_0_1_2_FILE_SHA256 = "6174f336f929bfce8bc64bbe34ddab71d57de2951766561796d8685f9dc39f35"
+PACK_0_1_2_FILE_SHA256 = "0b4b36861671dd2bc9b5b03ede71f7703c614d3f63810ff22550504c5db00e15"
 FROZEN_0_1_3_DIR = Path(__file__).parent / "fixtures" / "packs" / "seller-0.1.3"
 PACK_0_1_3_DIGEST = "f0068688317b0cae3c40e839d7cff0137991aca466a878f9b558356f1808321a"
-PACK_0_1_3_FILE_SHA256 = "4fc21dd877f8858786aad3bd219f1b8b6d5bc328e7447ae2d20a38137616917e"
+PACK_0_1_3_FILE_SHA256 = "549c23879aea4eeb49ab1f61cbda705a3026a2f7b9a5a6e2db1e29de6b8931b7"
 FROZEN_0_1_4_DIR = Path(__file__).parent / "fixtures" / "packs" / "seller-0.1.4"
 PACK_0_1_4_DIGEST = "c14c8f8176a933f97c8a04064f6634f8f0e422178f71c4a531ac01631f529e5b"
-PACK_0_1_4_FILE_SHA256 = "c45e7a7d31c1910dd487137056a6fb6564be1664ad267aeb20d8f6c43cb58e72"
+PACK_0_1_4_FILE_SHA256 = "3abdaa167e2af976f45870000ddadf8eb6116a3a7d241f113ef132c51de57efa"
 CATALOG = Catalog(ROOT / "guards" / "wickets" / "catalog_defs")
 
 PACK = load_pack_dir(PACK_DIR)
@@ -141,7 +141,7 @@ def test_the_address_is_measured_by_the_release_rule_not_the_gate():
 
 
 def test_0_1_0_is_kept_byte_for_byte_and_still_loads_at_its_digest():
-    frozen = FROZEN_0_1_0_DIR / "pack.yaml"
+    frozen = FROZEN_0_1_0_DIR / "pack-source.yaml"
     assert hashlib.sha256(frozen.read_bytes()).hexdigest() == PACK_0_1_0_FILE_SHA256
     pack = load_pack_dir(FROZEN_0_1_0_DIR)
     assert pack.pack_id == "asg/seller/0.1.0"
@@ -149,7 +149,7 @@ def test_0_1_0_is_kept_byte_for_byte_and_still_loads_at_its_digest():
 
 
 def test_0_1_1_is_kept_byte_for_byte_and_still_loads_at_its_digest():
-    frozen = FROZEN_0_1_1_DIR / "pack.yaml"
+    frozen = FROZEN_0_1_1_DIR / "pack-source.yaml"
     assert hashlib.sha256(frozen.read_bytes()).hexdigest() == PACK_0_1_1_FILE_SHA256
     pack = load_pack_dir(FROZEN_0_1_1_DIR)
     assert pack.pack_id == "asg/seller/0.1.1"
@@ -157,7 +157,7 @@ def test_0_1_1_is_kept_byte_for_byte_and_still_loads_at_its_digest():
 
 
 def test_0_1_2_is_kept_byte_for_byte_and_still_loads_at_its_digest():
-    frozen = FROZEN_0_1_2_DIR / "pack.yaml"
+    frozen = FROZEN_0_1_2_DIR / "pack-source.yaml"
     assert hashlib.sha256(frozen.read_bytes()).hexdigest() == PACK_0_1_2_FILE_SHA256
     pack = load_pack_dir(FROZEN_0_1_2_DIR)
     assert pack.pack_id == "asg/seller/0.1.2"
@@ -165,7 +165,7 @@ def test_0_1_2_is_kept_byte_for_byte_and_still_loads_at_its_digest():
 
 
 def test_0_1_3_is_kept_byte_for_byte_and_still_loads_at_its_digest():
-    frozen = FROZEN_0_1_3_DIR / "pack.yaml"
+    frozen = FROZEN_0_1_3_DIR / "pack-source.yaml"
     assert hashlib.sha256(frozen.read_bytes()).hexdigest() == PACK_0_1_3_FILE_SHA256
     pack = load_pack_dir(FROZEN_0_1_3_DIR)
     assert pack.pack_id == "asg/seller/0.1.3"
@@ -173,7 +173,7 @@ def test_0_1_3_is_kept_byte_for_byte_and_still_loads_at_its_digest():
 
 
 def test_0_1_4_is_kept_byte_for_byte_and_still_loads_at_its_digest():
-    frozen = FROZEN_0_1_4_DIR / "pack.yaml"
+    frozen = FROZEN_0_1_4_DIR / "pack-source.yaml"
     assert hashlib.sha256(frozen.read_bytes()).hexdigest() == PACK_0_1_4_FILE_SHA256
     pack = load_pack_dir(FROZEN_0_1_4_DIR)
     assert pack.pack_id == "asg/seller/0.1.4"
@@ -493,10 +493,10 @@ def _copy(tmp_path: Path) -> Path:
                                        "price_floor/2.0.1"])
 def test_a_definition_cited_at_another_digest_is_refused_at_load(tmp_path, wicket_id):
     pack_dir = _copy(tmp_path)
-    data = yaml.safe_load((pack_dir / "pack.yaml").read_text())
+    data = yaml.safe_load((pack_dir / "pack-source.yaml").read_text())
     (entry,) = [c for c in data["constraints"] if c["wicket_ref"] == wicket_id]
     entry["digest"] = CATALOG.get("recipient_role/1.0.0").digest  # a real digest, of another definition
-    (pack_dir / "pack.yaml").write_text(yaml.safe_dump(data, sort_keys=False))
+    (pack_dir / "pack-source.yaml").write_text(yaml.safe_dump(data, sort_keys=False))
     with pytest.raises(PackDefinitionError):
         load_pack_dir(pack_dir)
 

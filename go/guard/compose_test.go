@@ -10,14 +10,14 @@ import (
 	"github.com/action-state-group/capsule-engine/go/packs"
 )
 
-// composedEngine is an engine over the vendored everyday pack.yaml under a
+// composedEngine is an engine over the vendored everyday pack-source.yaml under a
 // test-only pack id, with extra obligations, constraints and folds appended,
 // each citing a definition in the vendored catalog by digest. It lets a
 // check the shipped pack does not cite yet run through NewEngine and Check
 // exactly as a pack citing it would.
 func composedEngine(t *testing.T, obligations, constraints, folds string) *Engine {
 	t.Helper()
-	raw, err := fs.ReadFile(packs.Everyday038, path.Join(packs.Everyday038Dir, "pack.yaml"))
+	raw, err := fs.ReadFile(packs.Everyday038, path.Join(packs.Everyday038Dir, "pack-source.yaml"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -25,7 +25,7 @@ func composedEngine(t *testing.T, obligations, constraints, folds string) *Engin
 	y = strings.Replace(y, "\naction_semantics:", obligations+"\naction_semantics:", 1)
 	y = strings.Replace(y, "\nfolds:", constraints+"\nfolds:", 1)
 	y = strings.Replace(y, "\nholds_integration:", folds+"\nholds_integration:", 1)
-	p, err := pack.Load([]byte(y), packs.Everyday038, packs.Everyday038Dir)
+	p, err := pack.LoadSource([]byte(y), packs.Everyday038, packs.Everyday038Dir)
 	if err != nil {
 		t.Fatalf("compose: %v", err)
 	}

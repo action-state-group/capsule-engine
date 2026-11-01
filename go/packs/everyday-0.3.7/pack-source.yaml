@@ -39,30 +39,10 @@
 # recipient (capsulectl's first telling); the pack has no recipient to count
 # it by. Nothing else changes: every other disclosure is flagged and checked
 # as in 0.3.6.
-#
-# 0.3.8 no longer flags a repeat of what the user already told the same party
-# (#188). Rules 11 and 12 (action_class_gate/1.2.0) each read one input the
-# producer reports from its record of what it told whom, not sealed again
-# with the verdict: rule 11 does not flag a disclosure whose every class was
-# told to this recipient before (repeat_disclosures), and rule 12 does not
-# flag one to a recipient told any class before, in this deal or another
-# (recipient_told_before). With either input missing or malformed, its rule
-# flags as in 0.3.7. The pack binds one gate version, so rules 1, 4 and 15-18
-# cite 1.2.0 too, with the same selectors and outcomes.
-#
-# 0.3.9 changes wording only (capsule-engine#182); no rule decides differently.
-# Rule 3's statement ends with the ruled title, "Your details go only to the
-# merchant filling your order, a listing platform, or you" (a statement
-# opens with its verb, so the title closes it), and a platform is defined
-# once, here and in the seller pack: the marketplace, booking site or mail
-# relay between you and the other party. Every id, check and definition is
-# 0.3.8's; only the pack's statements and so its definition digest move, and
-# 0.3.8 stays frozen at its own. The checker's reason for rules 11 and 12 no
-# longer names a selector or an action class: "Asks: first time sharing your
-# {class} with {party}", worded from the role and classes rule 3's check
-# recorded, and every other gate rule's reason is a sentence that names
-# neither.
-pack_id: asg/everyday/0.3.9
+pack_id: asg/everyday/0.3.7
+pack_version: 0.3.7
+scope:
+  kind: live
 
 obligations:
   # -- DO ------------------------------------------------------------------
@@ -90,12 +70,11 @@ obligations:
       Checks the role of whoever receives a personal-data disclosure
       (disclosure.personal), from the closed set fulfilling_merchant,
       platform, third_party or self, and records the role it read. It passes
-      for the fulfilling merchant or the user, and for a platform (the
-      marketplace, booking site or mail relay between you and the other
-      party) only when every class of data the disclosure names is email; it
-      records those class names, never who the recipient is or what the disclosure
-      contains. Your details go only to the merchant filling your order, a
-      listing platform, or you.
+      for the fulfilling merchant or the user, and for a platform (a
+      marketplace, booking site or mail relay acting between the user and
+      the counterparty) only when every class of data the disclosure names
+      is email; it records those class names, never who the recipient is or
+      what the disclosure contains.
     check: recipient_role
     default_disposition: DO
   - id: r04-prepare-without-committing
@@ -162,30 +141,24 @@ obligations:
     default_disposition: ASK
   - id: r11-home-address-to-an-individual
     statement: >-
-      Flags an action declared as disclosing personal data
-      (disclosure.personal) unless every class of data it names is one the
-      producer reports as already told to this same recipient, or unless it
-      goes to a platform, which rule 3 decides. It records the class. It
-      reads the class, the recipient's role, the classes disclosed and the
-      classes reported as told before, so it flags a class new to this
-      recipient whatever it contains. It does not yet tell a home address
-      sent to an individual from one sent to a merchant fulfilling an order.
-      With no report of what was told before, it flags.
+      Flags every action declared as disclosing personal data
+      (disclosure.personal) except one to a platform, which rule 3 decides,
+      and records the class. It reads the class and that role only, so it
+      flags a disclosure whatever it contains and whoever else receives it;
+      telling a home address sent to an individual apart from one sent to a
+      fulfilling merchant is not measured yet.
     check: action_class_gate
-    selector: personal_disclosure_new_class
+    selector: personal_disclosure
     default_disposition: ASK
   - id: r12-personal-contact-to-a-new-party
     statement: >-
-      Flags an action declared as disclosing personal data
-      (disclosure.personal) to a recipient the producer does not report as
-      told any class of data before, in this deal or another, unless it goes
-      to a platform, which rule 3 decides. It records the class. It reads the
-      class, the recipient's role and that report only; a party the user
-      dealt with but never told anything is new. A recipient told anything
-      before is not flagged again here, even for a new phone number or
-      email; rule 11 flags the new class. With no report, it flags.
+      Flags every action declared as disclosing personal data
+      (disclosure.personal) except one to a platform, which rule 3 decides,
+      and records the class. It reads the class and that role only; whether
+      the disclosure carries a personal phone number or email, and whether
+      the recipient is new, is not measured yet.
     check: action_class_gate
-    selector: personal_disclosure_new_party
+    selector: personal_disclosure
     default_disposition: ASK
   - id: r13-message-to-a-new-recipient
     statement: >-
@@ -337,28 +310,34 @@ constraints:
   # rolling total sums captures. 5.1.0 counts every executed act in that
   # total, not only an accepted decision (guards/wickets/catalog_defs/caps.v5.1.yaml).
   - wicket_ref: caps/5.1.0
+    check: caps
     digest: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
     scope: [operator]
   - wicket_ref: dedupe/1.0.0
+    check: dedupe
     digest: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
   - wicket_ref: destination_rail/1.0.0
+    check: destination_rail
     digest: 4d76251eba138b37e6be3e83390072315ebcea42cd8d790f7e9765ecf1f63429
   - wicket_ref: counterparty_identity_change/1.0.0
+    check: counterparty_identity_change
     digest: 0cfb1cb380b355abb88ea385334f3bb31f2e145269a2768022f85005665fc6fe
   - wicket_ref: credential_pattern/1.0.0
+    check: credential_pattern
     digest: 3617fdcaa39c03cf70a3254490328ccee5eaac0faba7cd52d9e3dc3fc50336c0
   - wicket_ref: recurring_charge/1.0.0
+    check: recurring_charge
     digest: ea4ae204e5dc33f3a28e5e15471f404f20d4f8fca193d355a099a4a7e08b082e
-  # Named selectors over the action taxonomy; reads the declared class,
-  # leaves a disclosure to a platform to recipient_role (1.1.0), and splits
-  # personal_disclosure into a new class and a new party, each passing over
-  # a repeat the producer reports (1.2.0).
-  - wicket_ref: action_class_gate/1.2.0
-    digest: 39a7c5b94173a4c8496b338028b8680ba20ac65543802c67e419577acce097bf
+  # Named selectors over the action taxonomy; reads the declared class, and
+  # leaves a disclosure to a platform to recipient_role (1.1.0).
+  - wicket_ref: action_class_gate/1.1.0
+    check: action_class_gate
+    digest: 817a3d537b024689e7fcc20d37e5253f77075274c5b7d863dcc25eac39bc8f2b
   # A purchase from a merchant the operator has no accepted or carried-out
   # act with. 3.0.0 counts an act that asked, was approved and was executed;
   # 4.0.0 also flags a purchase that names no merchant (no payee named).
   - wicket_ref: counterparty_seen_before/4.0.0
+    check: counterparty_seen_before
     digest: c7c20d9e57cb0a75184b9c6c4d037c9bea813a7b1105c581defd4481acf964b0
   # Each reads one number, one member of a closed set, or one opaque
   # reference from the action, never an object or text. The 1.1.0
@@ -366,21 +345,29 @@ constraints:
   # recipient_role/1.1.0 also reads the classes a disclosure to a platform
   # names, and passes only email.
   - wicket_ref: recipient_role/1.1.0
+    check: recipient_role
     digest: 57cb99bde24b5ae41ae214f4d2db0e8f20cbdf7ba31170b65da0561afdc499e1
   - wicket_ref: refundability/1.1.0
+    check: refundability
     digest: 1a471c09254a3db872c34a5e59d9e05e6da47cb396695a6cb6bf2bc055f4d811
   - wicket_ref: material_fields_changed/1.1.0
+    check: material_fields_changed
     digest: e8cd02743203d17cd0de9d548f85ec5b6b6135e80aba63136ae507ac84660042
   - wicket_ref: offer_fields_changed/1.1.0
+    check: offer_fields_changed
     digest: f62c034140827beaa4b8ee13da8b56e4583994a973bc789d4a11812f9727a953
   # A message to a recipient the operator has not written to before.
   - wicket_ref: recipient_seen_before/1.0.0
+    check: recipient_seen_before
     digest: df8803e9c4bdab9deff48e772fcd21ff813d00157068dd250a8a5c6b45cd6c44
   - wicket_ref: channel_change/1.1.0
+    check: channel_change
     digest: f84770c7571a0932629667c4df38f447777f8dc5dfcdfdf29b37514c1eee1ad1
   - wicket_ref: upfront_amount/1.1.0
+    check: upfront_amount
     digest: 2311833db12bf9465dcb5ecdd9f7aca079dbf638a19ed6dd18d607aad1811c10
   - wicket_ref: task_authority/1.1.0
+    check: task_authority
     digest: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
 
 folds:
@@ -476,12 +463,6 @@ fixtures:
       outcome: deny
     - id: platform-disclosure-naming-no-class
       outcome: deny
-    - id: first-telling-to-a-merchant
-      outcome: escalate
-    - id: repeat-telling-to-a-merchant
-      outcome: allow
-    - id: new-class-to-a-merchant-told-before
-      outcome: escalate
 
 # The action taxonomy this pack was authored against. The taxonomy decides
 # whether a gated class asks or refuses on a failure (its approver_role), so

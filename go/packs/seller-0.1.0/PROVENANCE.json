@@ -5,9 +5,10 @@
   "source_commit": "ba76a97a0fb5b41333b1b76a489060221e51ea45",
   "source_ref": "capsule-engine PR #122 merge commit on main (packs: asg/seller/0.1.0, the seller's own rules in one pack). The pack cites dedupe, action_class_gate and task_authority/1.1.0 at the same digests as asg/everyday/0.3.4; the other definitions are the seller pack's own or catalog versions everyday does not cite.",
   "files": {
-    "pack.yaml": {
+    "pack-source.yaml": {
       "source_path": "capsule_engine/packs/catalog/seller/pack.yaml",
-      "sha256": "b03b7ebb491cdd250bedfba47fcaaa0e60f0316a88a2698db7b886ef5f4753e6"
+      "sha256": "3aa6ecfb612d51d66aa9fe3ae1f7ddce0aa5d83ff1ded8c092c1e35b8dc60161",
+      "converted_from_pack_yaml_sha256": "b03b7ebb491cdd250bedfba47fcaaa0e60f0316a88a2698db7b886ef5f4753e6"
     },
     "wickets/action_class_gate.yaml": {
       "source_path": "capsule_engine/guards/wickets/catalog_defs/action_class_gate.yaml",

@@ -151,7 +151,7 @@ func TestSellerPinsTheVendoredTaxonomy(t *testing.T) {
 // An edited copy of the seller pack is not asg/seller/0.1.0: the pin
 // refuses it rather than load it under that name.
 func TestEditedSellerPackFailsThePin(t *testing.T) {
-	dir := copyPackDir(t, packs.Seller010, packs.Seller010Dir, "pack.yaml", replace("card and p2p)", "card)"))
+	dir := copyPackDir(t, packs.Seller010, packs.Seller010Dir, "pack-source.yaml", replace("card and p2p)", "card)"))
 	_, err := LoadPath(dir, builtInCatalog)
 	var pe *PinnedDigestError
 	if !errors.As(err, &pe) || pe.PackID != "asg/seller/0.1.0" || pe.Pinned != sellerDigest || pe.Digest == sellerDigest {

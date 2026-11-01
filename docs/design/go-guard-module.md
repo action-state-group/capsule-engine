@@ -266,7 +266,7 @@ parameters needed, those are the only test edits PR A makes. The Python package 
 
 Go `embed` cannot read outside the module directory, so the module cannot embed the catalog
 directly. Instead, `go/packs/` is a generated tree in Muse's current layout: one
-`<pack>-<version>/` directory per pack version (pack.yaml, the wicket and fold definitions it
+`<pack>-<version>/` directory per pack version (pack-source.yaml, the wicket and fold definitions it
 cites, PROVENANCE.json), plus `engine/action_taxonomy.json`. `scripts/generate_go_packs.py` writes it,
 together with `packs/embed.go` (one `embed.FS` per version, and `All` over the whole tree,
 `engine/PROVENANCE.json` included) and the pack registry that `go/pack` reads (the `LoadXxx`
@@ -274,7 +274,7 @@ functions and `source.go`'s pack list, which are hand-written in Muse today).
 
 The generator has four sources and nothing else:
 
-- `python/capsule_engine/packs/catalog/<pack>/pack.yaml`;
+- `python/capsule_engine/packs/catalog/<pack>/pack-source.yaml` (a `pack.yaml` until #252);
 - `python/capsule_engine/guards/wickets/catalog_defs/`;
 - `python/capsule_engine/folds/catalog_defs/` (spend.weekly, counterparty.seen_before,
   disclosure.\*);
@@ -285,15 +285,16 @@ Two kinds of pack version go into the tree:
 - **The current version** of each pack the Go guard serves (everyday, seller) is written from
   the catalog at HEAD.
 - **Frozen versions** (everyday 0.3.4-0.3.7, seller 0.1.0-0.1.4, plus whichever version is
-  current when the next one lands) keep their committed pack.yaml. Each PROVENANCE.json names
-  the commit the pack.yaml came from. Their definition files must still equal `catalog_defs`,
+  current when the next one lands) keep their committed pack-source.yaml. Each PROVENANCE.json
+  names the commit the pack came from (and, for a version vendored before #252, the sha256 of the
+  pack.yaml it was converted from). Their definition files must still equal `catalog_defs`,
   which keeps every version. They move over byte for byte from Muse in PR A.
 
 CI (§7, `packs` job) checks:
 
 - the tree, `embed.go` and the registry regenerate with no difference;
 - every wicket, fold and taxonomy file under `go/packs` is byte-identical to its source;
-- the current version's pack.yaml is the catalog's, and every frozen pack.yaml the Python tests
+- the current version's pack-source.yaml is the catalog's, and every frozen one the Python tests
   keep under `python/tests/fixtures/packs/` is the `go/packs` one, byte for byte;
 - every engine digest in a PROVENANCE.json equals what the Python engine computes for that
   directory today.

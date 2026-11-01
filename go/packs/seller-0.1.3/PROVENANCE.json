@@ -5,9 +5,10 @@
   "source_commit": "08cd96d03b6b23e0a7b71169dd5c24ea0381ff04",
   "source_ref": "capsule-engine 08cd96d (merge of PR #139, 'seller 0.1.3 counts the agent's claim in the deal as the required statement'; branch commits a54222d and 2c02db9). asg/seller/0.1.3 is 0.1.2 with required_disclosure/1.1.0 in place of required_disclosure/1.0.0 and the fold disclosure.statement_seen/1.0.0 added; every other definition it cites is byte-identical to 0.1.2's copy, and only rule s05-required-statement-made-first's statement text changes.",
   "files": {
-    "pack.yaml": {
+    "pack-source.yaml": {
       "source_path": "capsule_engine/packs/catalog/seller/pack.yaml",
-      "sha256": "4fc21dd877f8858786aad3bd219f1b8b6d5bc328e7447ae2d20a38137616917e"
+      "sha256": "549c23879aea4eeb49ab1f61cbda705a3026a2f7b9a5a6e2db1e29de6b8931b7",
+      "converted_from_pack_yaml_sha256": "4fc21dd877f8858786aad3bd219f1b8b6d5bc328e7447ae2d20a38137616917e"
     },
     "wickets/dedupe.yaml": {
       "source_path": "capsule_engine/guards/wickets/catalog_defs/dedupe.yaml",

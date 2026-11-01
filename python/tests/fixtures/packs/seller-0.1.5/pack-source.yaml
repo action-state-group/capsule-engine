@@ -123,13 +123,10 @@
 # bundle"), refused but never recorded as a failure. The sentence marks
 # are every Unicode 17.0 sentence terminator and every line break.
 # capsulectl asks the user before every such claim. No other rule changes.
-#
-# 0.1.6 changes wording only (capsule-engine#182); no rule decides differently.
-# s01's statement defines a platform as in the everyday pack: the marketplace,
-# booking site or mail relay between you and the other party. Every id, check and
-# definition is 0.1.5's; only the statement and so the pack's definition
-# digest move, and 0.1.5 stays frozen at its own.
-pack_id: asg/seller/0.1.6
+pack_id: asg/seller/0.1.5
+pack_version: 0.1.5
+scope:
+  kind: live
 
 obligations:
   # -- DO ------------------------------------------------------------------
@@ -138,8 +135,7 @@ obligations:
       Checks who receives a personal-data disclosure (disclosure.personal):
       buyer, platform, third_party or self (the user). It passes for a buyer
       or self; other rules decide which data a buyer may get. For a platform
-      (the marketplace, booking site or mail relay between you and the other
-      party), it
+      (the marketplace, booking site or mail relay the sale is listed on), it
       passes only when every class the disclosure names is email or
       pickup_area, the listing's public area and never the exact spot.
       Otherwise it refuses. It records the role and the class names, never
@@ -287,41 +283,53 @@ action_semantics:
 
 constraints:
   - wicket_ref: dedupe/1.0.0
+    check: dedupe
     digest: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
   - wicket_ref: verify_before_dispatch/1.0.0
+    check: verify_before_dispatch
     digest: a721624813f785de49f3dcef2090662e7045bc393e59db72defcdbf47269453c
   # The counterparty is the buyer: roles buyer | platform | third_party |
   # self, where a platform may be given the user's email and the listing's
   # public pickup area only.
   - wicket_ref: seller.recipient_role/1.2.0
+    check: recipient_role
     digest: 6216addfa4e53b746dd72ec6dd4986758e064d2885e007b0fa546e2d42d189d1
   - wicket_ref: price_floor/2.0.1
+    check: price_floor
     digest: c39f858b52a9697a70450680d90d0bbd0cb4e4eb79925d18e67623d587404977
   # The classes the user ordered, where capsulectl's task authority seals them.
   - wicket_ref: promise_requires_approval/1.1.0
+    check: promise_requires_approval
     digest: 52514fb625b208f2f04d900d115468b526c01ec34c5630fe3ae68ed86eefe386
   # The user's own authenticity claim, attributed and marked unverified, passes.
   - wicket_ref: promise_never/1.1.0
+    check: promise_never
     digest: ed9e02ed17cbd08a0f846023e7091e7636d504ba1f18c6b9173e0a2443d92b8b
   # A class stated to the buyer, in the deal, or by the sale's listings in force.
   - wicket_ref: required_disclosure/1.2.0
+    check: required_disclosure
     digest: cae962303066286b3c391a6c1a2f5f5db6742865fb84e1932ad68515a423224f
   # An offer that answers no proposal (no_proposal) is not applicable.
   - wicket_ref: offer_expiry/1.1.0
+    check: offer_expiry
     digest: e55083b32ffe5e9415d3ef6455398b42187d9de76aba9f6cc735f3ea71f590f1
   # One sale, several buyer threads: one accepted commitment.
   - wicket_ref: seller.single_commitment/1.0.0
+    check: single_commitment
     digest: 91960c9a9d62b8f15778b6b626a0f0305fa795ab88dd11bd93101294fc56882e
   # The rails a buyer may pay on, as an allow-list, at the commit and on a
   # sale: cash only in person, the payment apps counted as p2p.
   - wicket_ref: seller.destination_rail/1.1.0
+    check: destination_rail
     digest: a86844bd3b5132ae5fb04e9009c5c6907ea43c1609df713c45055dd04bcdbe0e
   - wicket_ref: task_authority/1.1.0
+    check: task_authority
     digest: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   # Contact details reach only the buyer who accepted, in the accepting
   # deal; the public pickup area reaches any buyer; a disclosure to a
   # platform reaches no buyer and is left to s01.
   - wicket_ref: seller.release_on_acceptance/1.2.0
+    check: release_on_acceptance
     digest: 854718b637f2f4a06c37d3ba49bccc8b44ca8832878b339a0ac988963256a832
 
 folds:

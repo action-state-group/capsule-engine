@@ -5,9 +5,10 @@
   "source_commit": "21975ce45837cb11418e2ea931d531d6dfd61979",
   "source_ref": "capsule-engine PR #125 merge commit on main (personal data reaches a counterparty only after that counterparty's acceptance): asg/seller/0.1.1 cites seller.release_on_acceptance/1.0.0 for its rule s13 in place of 0.1.0's action_class_gate rule s02; every other definition it cites is byte-identical to 0.1.0's.",
   "files": {
-    "pack.yaml": {
+    "pack-source.yaml": {
       "source_path": "capsule_engine/packs/catalog/seller/pack.yaml",
-      "sha256": "edb54be219fdcd31602c5a8eebe159e31d8107e29a13a80496c7ed952972688e"
+      "sha256": "60535f0fab8651caefbd4d7d63682e9dd179c9af13e7dbbe2b791b09166d3940",
+      "converted_from_pack_yaml_sha256": "edb54be219fdcd31602c5a8eebe159e31d8107e29a13a80496c7ed952972688e"
     },
     "wickets/caps.yaml": {
       "source_path": "capsule_engine/guards/wickets/catalog_defs/caps.yaml",

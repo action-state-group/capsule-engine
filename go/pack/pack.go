@@ -192,6 +192,9 @@ type rawObligation struct {
 	// check and names the instrument its missing input would arrive in.
 	Measurability      string         `yaml:"measurability"`
 	EvidenceInstrument *rawInstrument `yaml:"evidence_instrument"`
+	// RequirementTier is read only from a pack-source.yaml, where only the
+	// compiled Evidence Contract uses it; it is not in the digest.
+	RequirementTier string `yaml:"requirement_tier"`
 }
 
 // rawInstrument is schema.py EvidenceInstrument: kind structured_field with a
@@ -224,6 +227,10 @@ type rawConstraint struct {
 	WicketRef string   `yaml:"wicket_ref"`
 	Digest    string   `yaml:"digest"`
 	Scope     []string `yaml:"scope"`
+	// Check is the check the cited wicket implements, named in a
+	// pack-source.yaml so the source compiles without a wicket catalog. It
+	// must be the cited definition's check.
+	Check string `yaml:"check"`
 }
 
 type rawFold struct {
@@ -256,7 +263,11 @@ type rawOutcome struct {
 }
 
 type rawPack struct {
-	PackID           string              `yaml:"pack_id"`
+	PackID string `yaml:"pack_id"`
+	// Scope and PackVersion are read only from a pack-source.yaml; neither
+	// is in the digest.
+	Scope            *rawScope           `yaml:"scope"`
+	PackVersion      string              `yaml:"pack_version"`
 	Obligations      []rawObligation     `yaml:"obligations"`
 	ActionSemantics  []rawActionSemantic `yaml:"action_semantics"`
 	Constraints      []rawConstraint     `yaml:"constraints"`
@@ -268,6 +279,12 @@ type rawPack struct {
 	Fixtures  yaml.Node `yaml:"fixtures"`
 	Bootstrap string    `yaml:"bootstrap"`
 }
+
+type rawScope struct {
+	Kind string `yaml:"kind"`
+}
+
+var requirementTiers = []string{"must_have", "informational"}
 
 type rawTaxonomy struct {
 	Version string `yaml:"taxonomy_version"`
@@ -292,7 +309,7 @@ func decodeStrict(data []byte, out *rawPack) error {
 	dec := yaml.NewDecoder(bytes.NewReader(data))
 	dec.KnownFields(true)
 	if err := dec.Decode(out); err != nil {
-		return fmt.Errorf("pack.yaml (a key this port does not canonicalise is refused): %w", err)
+		return fmt.Errorf("pack definition (a key this port does not canonicalise is refused): %w", err)
 	}
 	return nil
 }
@@ -361,16 +378,36 @@ func oneOf(what, v string, allowed []string) error {
 	return nil
 }
 
+// LoadSource reads pack-source.yaml bytes (one pack format,
+// capsule-engine#252): the pack.yaml shape plus scope.kind live, a
+// pack_version equal to the version in pack_id, and on each cited wicket the
+// check it implements (capsule-engine packs/loader.py _read_pack_source). It
+// then loads the pack as Load does; the source-only fields are not in the
+// digest.
+func LoadSource(source []byte, catalogFS fs.FS, catalogDir string) (Pack, error) {
+	return load(source, true, catalogFS, catalogDir)
+}
+
 // Load reads pack.yaml bytes, resolves each constraint's wicket_ref and each
 // fold_ref against the definitions in catalogDir/wickets and catalogDir/folds
 // of catalogFS (refusing a cited digest the definition does not produce, as
 // the engine loader does), and computes the definition digest.
+//
+// Deprecated: pack.yaml is read only for packs not yet moved to
+// pack-source.yaml (LoadSource); this read path is removed in v0.4.0.
 func Load(packYAML []byte, catalogFS fs.FS, catalogDir string) (Pack, error) {
+	return load(packYAML, false, catalogFS, catalogDir)
+}
+
+func load(data []byte, source bool, catalogFS fs.FS, catalogDir string) (Pack, error) {
 	var raw rawPack
-	if err := decodeStrict(packYAML, &raw); err != nil {
+	if err := decodeStrict(data, &raw); err != nil {
 		return Pack{}, err
 	}
 	if err := nonEmpty("pack_id", raw.PackID); err != nil {
+		return Pack{}, err
+	}
+	if err := checkSourceFields(raw, source); err != nil {
 		return Pack{}, err
 	}
 	wickets, err := loadWickets(catalogFS, path.Join(catalogDir, "wickets"))
@@ -398,6 +435,9 @@ func Load(packYAML []byte, catalogFS fs.FS, catalogDir string) (Pack, error) {
 		}
 		if w.digest != c.Digest {
 			return Pack{}, &CitationDigestError{PackID: raw.PackID, Field: fmt.Sprintf("constraints[%d]", i), Ref: c.WicketRef, Cited: c.Digest, Computed: w.digest}
+		}
+		if source && c.Check != w.check {
+			return Pack{}, fmt.Errorf("constraints[%d] cites %q, whose check is %q, but names check=%q", i, c.WicketRef, w.check, c.Check)
 		}
 		if w.check == "caps" && c.Scope == nil {
 			return Pack{}, fmt.Errorf("constraints[%d]: a caps constraint must declare scope", i)
@@ -582,6 +622,42 @@ func Load(packYAML []byte, catalogFS fs.FS, catalogDir string) (Pack, error) {
 	}
 	return Pack{ID: raw.PackID, DefinitionDigest: digest, Rules: rules, Wickets: cited, Folds: citedFolds, catalog: foldDefs, Taxonomy: pin,
 		ActionSemantics: actionSemantics}, nil
+}
+
+// checkSourceFields checks the fields only a pack-source.yaml carries: there,
+// scope is exactly {kind: live} (an after_the_fact or admission source is
+// compiled by evidencebook-skills, not loaded as a guard pack), pack_version
+// is the version in pack_id, and a requirement_tier is a known tier; a
+// pack.yaml carries none of them.
+func checkSourceFields(raw rawPack, source bool) error {
+	if !source {
+		named := raw.Scope != nil || raw.PackVersion != ""
+		for _, c := range raw.Constraints {
+			named = named || c.Check != ""
+		}
+		for _, o := range raw.Obligations {
+			named = named || o.RequirementTier != ""
+		}
+		if named {
+			return errors.New("scope, pack_version, a constraint's check and requirement_tier belong in a pack-source.yaml, not a pack.yaml")
+		}
+		return nil
+	}
+	if raw.Scope == nil || raw.Scope.Kind != "live" {
+		return errors.New("a pack-source.yaml the engine loads declares scope: {kind: live} (an after_the_fact or admission pack source is compiled by evidencebook-skills' pack_compile.py)")
+	}
+	version := raw.PackID[strings.LastIndex(raw.PackID, "/")+1:]
+	if raw.PackVersion != version {
+		return fmt.Errorf("pack_version=%q must equal the version in pack_id %q (%q)", raw.PackVersion, raw.PackID, version)
+	}
+	for i, o := range raw.Obligations {
+		if o.RequirementTier != "" {
+			if err := oneOf(fmt.Sprintf("obligations[%d].requirement_tier", i), o.RequirementTier, requirementTiers); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
 
 // checkTaxonomyPin is capsule-engine packs/loader.py _parse_taxonomy_pin

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
-//! The pack loader (go/pack pack.go Load and loadFrom, fold.go): reads a
-//! pack.yaml, resolves each wicket and fold citation against the definitions
+//! The pack loader (go/pack pack.go LoadSource and loadFrom, fold.go): reads a
+//! pack-source.yaml, resolves each wicket and fold citation against the definitions
 //! shipped beside it at exactly the cited digest, checks its taxonomy pin
 //! against the vendored table, and computes the definition digest, which a
 //! pack naming a vendored pack_id must match. The files are the Go port's
@@ -15,11 +15,11 @@ use super::Error;
 use crate::canon::{self, Value};
 use crate::yaml::{self, Fields, Node};
 
-/// One embedded pack version directory: its pack.yaml, the definitions it
+/// One embedded pack version directory: its pack-source.yaml, the definitions it
 /// ships, and its PROVENANCE.json sidecar (go/packs/<dir>).
 pub(crate) struct Embedded {
     pub(crate) dir: &'static str,
-    pub(crate) pack_yaml: &'static str,
+    pub(crate) source: &'static str,
     pub(crate) wickets: &'static [(&'static str, &'static str)],
     pub(crate) folds: &'static [(&'static str, &'static str)],
     pub(crate) provenance: &'static str,
@@ -28,7 +28,7 @@ pub(crate) struct Embedded {
 /// go/packs/inference-0.1.0, asg/inference/0.1.0.
 pub(crate) const INFERENCE_0_1_0: Embedded = Embedded {
     dir: "inference-0.1.0",
-    pack_yaml: include_str!("../../../../go/packs/inference-0.1.0/pack.yaml"),
+    source: include_str!("../../../../go/packs/inference-0.1.0/pack-source.yaml"),
     wickets: &[
         ("counterparty_list.yaml", include_str!("../../../../go/packs/inference-0.1.0/wickets/counterparty_list.yaml")),
         ("dedupe.yaml", include_str!("../../../../go/packs/inference-0.1.0/wickets/dedupe.yaml")),
@@ -45,6 +45,9 @@ pub(crate) const INFERENCE_0_1_0: Embedded = Embedded {
 /// its PROVENANCE.json.
 pub(crate) const ACTION_TAXONOMY: &str = include_str!("../../../../go/packs/engine/action_taxonomy.json");
 const TAXONOMY_PROVENANCE: &str = include_str!("../../../../go/packs/engine/PROVENANCE.json");
+
+/// go/pack requirementTiers: read only by the compiled Evidence Contract.
+const REQUIREMENT_TIERS: [&str; 2] = ["must_have", "informational"];
 
 /// go/pack defaultDispositions.
 const DEFAULT_DISPOSITIONS: [&str; 3] = ["DO", "ASK", "NEVER"];
@@ -322,11 +325,30 @@ pub(crate) fn load(e: &Embedded) -> Result<Pack, Error> {
         }
     }
 
-    let node = yaml::parse(e.pack_yaml).map_err(|m| fail(format!("pack.yaml: {m}")))?;
-    let mut top = Fields::of(&node, "pack.yaml").map_err(fail)?;
+    let node = yaml::parse(e.source).map_err(|m| fail(format!("pack-source.yaml: {m}")))?;
+    let mut top = Fields::of(&node, "pack-source.yaml").map_err(fail)?;
     let pack_id = top.str("pack_id").map_err(fail)?;
     if pack_id.trim().is_empty() {
         return Err(fail("pack_id is required".into()));
+    }
+    // go/pack checkSourceFields: scope is exactly {kind: live} and
+    // pack_version is the version in pack_id; neither is in the digest.
+    let kind = match top.get("scope") {
+        Some(s) => {
+            let mut sf = Fields::of(s, "scope").map_err(fail)?;
+            let kind = sf.str("kind").map_err(fail)?;
+            sf.done().map_err(fail)?;
+            kind
+        }
+        None => String::new(),
+    };
+    if kind != "live" {
+        return Err(fail("a pack-source.yaml the engine loads declares scope: {kind: live}".into()));
+    }
+    let version = pack_id.rsplit('/').next().unwrap_or_default();
+    let pack_version = top.str("pack_version").map_err(fail)?;
+    if pack_version != version {
+        return Err(fail(format!("pack_version={pack_version:?} must equal the version in pack_id {pack_id:?}")));
     }
 
     let mut cited = Vec::new();
@@ -336,6 +358,7 @@ pub(crate) fn load(e: &Embedded) -> Result<Pack, Error> {
         let wicket_ref = cf.str("wicket_ref").map_err(fail)?;
         let digest = cf.str("digest").map_err(fail)?;
         let scope = cf.opt_strs("scope").map_err(fail)?;
+        let named_check = cf.str("check").map_err(fail)?;
         cf.done().map_err(fail)?;
         if wicket_ref.is_empty() {
             return Err(fail(format!("constraints[{i}]: only wicket_ref citations are supported by this port")));
@@ -347,6 +370,12 @@ pub(crate) fn load(e: &Embedded) -> Result<Pack, Error> {
             return Err(fail(format!(
                 "constraints[{i}] cites {wicket_ref:?} at digest {digest}, but the definition digests to {}",
                 w.digest
+            )));
+        }
+        if named_check != w.check {
+            return Err(fail(format!(
+                "constraints[{i}] cites {wicket_ref:?}, whose check is {:?}, but names check={named_check:?}",
+                w.check
             )));
         }
         if w.check == "caps" && scope.is_none() {
@@ -375,6 +404,7 @@ pub(crate) fn load(e: &Embedded) -> Result<Pack, Error> {
         let grade = of.str("re_derivability_grade").map_err(fail)?;
         let disposition = of.str("default_disposition").map_err(fail)?;
         let measurability = of.str("measurability").map_err(fail)?;
+        let tier = of.str("requirement_tier").map_err(fail)?;
         // selector and evidence_instrument are not read, so done() refuses
         // them: no rule of this pack is declared_not_measured or bound to a
         // selector.
@@ -388,6 +418,11 @@ pub(crate) fn load(e: &Embedded) -> Result<Pack, Error> {
         if !DEFAULT_DISPOSITIONS.contains(&disposition.as_str()) {
             return Err(fail(format!(
                 "obligations[{id:?}].default_disposition={disposition:?} must be one of {DEFAULT_DISPOSITIONS:?}"
+            )));
+        }
+        if !(tier.is_empty() || REQUIREMENT_TIERS.contains(&tier.as_str())) {
+            return Err(fail(format!(
+                "obligations[{id:?}].requirement_tier={tier:?} must be one of {REQUIREMENT_TIERS:?}"
             )));
         }
         if !(measurability.is_empty() || measurability == "measured") {
@@ -517,4 +552,45 @@ pub(crate) fn load(e: &Embedded) -> Result<Pack, Error> {
 /// Whether a wicket config is a mapping with `key`.
 fn config_has(config: &Node, key: &str) -> bool {
     matches!(config, Node::Map(m) if m.iter().any(|(k, _)| k == key))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// The embedded inference pack-source.yaml with one edit.
+    fn edited(old: &str, new: &str) -> Result<Pack, Error> {
+        assert!(INFERENCE_0_1_0.source.contains(old), "no {old:?}");
+        let source: &'static str = Box::leak(INFERENCE_0_1_0.source.replacen(old, new, 1).into_boxed_str());
+        load(&Embedded { source, ..INFERENCE_0_1_0 })
+    }
+
+    /// go/pack TestASourceIsRefusedWhenItsSourceFieldsAreWrong: a source
+    /// whose scope, pack_version, cited check or requirement_tier is wrong
+    /// is refused, naming the field.
+    #[test]
+    fn a_source_with_wrong_source_fields_is_refused() {
+        for (old, new, want) in [
+            ("kind: live", "kind: after_the_fact", "scope"),
+            ("pack_version: 0.1.0", "pack_version: 0.1.1", "pack_version"),
+            (
+                "wicket_ref: rate_cap/1.0.0\n    check: rate_cap",
+                "wicket_ref: rate_cap/1.0.0\n    check: dedupe",
+                "whose check is",
+            ),
+            (
+                "default_disposition: NEVER",
+                "default_disposition: NEVER\n    requirement_tier: optional",
+                "requirement_tier",
+            ),
+        ] {
+            let err = edited(old, new).err().unwrap_or_else(|| panic!("{old:?} -> {new:?} loaded"));
+            assert!(format!("{err:?}").contains(want), "{err:?}");
+        }
+        assert!(edited(
+            "default_disposition: NEVER",
+            "default_disposition: NEVER\n    requirement_tier: informational"
+        )
+        .is_ok());
+    }
 }

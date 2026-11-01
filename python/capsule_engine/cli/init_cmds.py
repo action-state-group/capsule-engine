@@ -39,6 +39,7 @@ from ..packs import (
     PackDefinitionError,
     RegistryPinError,
     install_pack,
+    is_pack_dir,
     load_pack_dir,
     load_pins_file,
     record_pack_activation,
@@ -56,14 +57,14 @@ _SECRET_ENV = "CAPSULE_MCP_SIGNING_SECRET"
 def _available_packs(catalog_dir: Path) -> list[str]:
     if not catalog_dir.is_dir():
         return []
-    return sorted(p.name for p in catalog_dir.iterdir() if (p / "pack.yaml").is_file())
+    return sorted(p.name for p in catalog_dir.iterdir() if is_pack_dir(p))
 
 
 def _cmd_init(args: argparse.Namespace) -> int:
     catalog_dir = Path(args.pack_catalog_dir) if args.pack_catalog_dir else BUILTIN_PACK_CATALOG_DIR
     pack_dir = catalog_dir / args.pack
 
-    if not (pack_dir / "pack.yaml").is_file():
+    if not is_pack_dir(pack_dir):
         available = _available_packs(catalog_dir)
         print(f"capsule init: no pack named {args.pack!r} in {catalog_dir}", file=sys.stderr)
         print(f"  available packs: {available or '<none>'}", file=sys.stderr)
