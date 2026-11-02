@@ -51,10 +51,13 @@ convention as `airline-engagement`:**
 **Before sealing a single verdict, run the oracle check:**
 
 ```python
+from pathlib import Path
+
+import capsule_engine.packs
 from capsule_engine.packs.loader import load_pack_dir
 from capsule_engine.packs.corpus_verify import verify_declared_not_measured
 
-pack = load_pack_dir("capsule_engine/packs/catalog/standard-vendor")
+pack = load_pack_dir(Path(capsule_engine.packs.__file__).parent / "catalog" / "standard-vendor")
 verify_declared_not_measured(pack, corpus)  # corpus: iterable of unit dicts
 ```
 

@@ -31,7 +31,7 @@ Reports are aggregated across installs; nothing here computes or stores an
 individual verdict about your own usage.
 
 Turn on with: {ENV_VAR}=1
-Check current status any time: capsule telemetry status
+Check current status any time: capsule-engine telemetry status
 Turn off: set {ENV_VAR}=0, or unset {ENV_VAR} and {LEGACY_ENV_VAR} (the pre-rename name,
 still read until 0.5.0)
 """

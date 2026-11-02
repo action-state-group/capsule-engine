@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""`capsule telemetry`: disclosure/status, and the 6-metric funnel report
+"""`capsule-engine telemetry`: disclosure/status, and the 6-metric funnel report
 generator -- a reporting tool over already-collected events, not the
 collection itself. See ``capsule_engine/telemetry/`` for the instrumentation."""
 from __future__ import annotations
