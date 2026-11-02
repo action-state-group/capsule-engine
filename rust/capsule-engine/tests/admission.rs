@@ -12,7 +12,7 @@ use std::path::{Path, PathBuf};
 use capsule_engine::admission::{
     evaluate, inference_service_history_counts, standard_history_counts, AdjudicationVerdict, BandCount, Card,
     CardCheckpoint, CardCheckpoints, Claims, Disputes, Inputs, Judgement, Operator, OwnHistory, Pack, Platform,
-    RailPin, Selection, Served, ServedPeriod, Stake, Timestamp, Vouch, INFERENCE_SERVICE_HISTORY_PROPERTIES,
+    RailPin, Receipts, Selection, Served, ServedPeriod, Stake, Timestamp, Vouch, INFERENCE_SERVICE_HISTORY_PROPERTIES,
 };
 use capsule_engine::canon;
 use serde_json::{Map, Value};
@@ -62,12 +62,9 @@ fn null_or<'a>(m: &'a Map<String, Value>, k: &str) -> Option<&'a Value> {
 /// inference_service_history_test.go servedOf: served periods as a vector
 /// writes them.
 fn served(v: &Value) -> Served {
-    let v = object(v, &["length_s", "floor", "periods"], "served");
-    Served {
-        length_s: int(v, "length_s"),
-        floor: int(v, "floor"),
-        periods: v["periods"]
-            .as_array()
+    let v = object(v, &["length_s", "floor", "periods", "verdicts", "verdicts_only"], "served");
+    let periods = |list: &Value| -> Vec<ServedPeriod> {
+        list.as_array()
             .unwrap()
             .iter()
             .map(|p| {
@@ -79,28 +76,44 @@ fn served(v: &Value) -> Served {
                     suppressed: text(p, "suppressed"),
                 }
             })
-            .collect(),
+            .collect()
+    };
+    Served {
+        length_s: int(v, "length_s"),
+        floor: int(v, "floor"),
+        periods: periods(&v["periods"]),
+        verdicts: null_or(v, "verdicts").map(periods),
+        verdicts_only: v.get("verdicts_only").and_then(Value::as_bool).unwrap_or(false),
     }
 }
 
 /// inference_service_history_test.go toVectorServed: served periods as a
 /// vector writes them.
 fn served_json(s: &Served) -> Value {
-    let periods = s
-        .periods
-        .iter()
-        .map(|p| {
-            let mut m = Map::new();
-            m.insert("from".into(), Value::String(rfc3339(p.from)));
-            m.insert("to".into(), Value::String(rfc3339(p.to)));
-            m.insert("total".into(), p.total.map_or(Value::Null, Value::from));
-            if !p.suppressed.is_empty() {
-                m.insert("suppressed".into(), Value::String(p.suppressed.clone()));
-            }
-            Value::Object(m)
-        })
-        .collect();
-    serde_json::json!({"length_s": s.length_s, "floor": s.floor, "periods": Value::Array(periods)})
+    let periods = |list: &[ServedPeriod]| -> Value {
+        Value::Array(
+            list.iter()
+                .map(|p| {
+                    let mut m = Map::new();
+                    m.insert("from".into(), Value::String(rfc3339(p.from)));
+                    m.insert("to".into(), Value::String(rfc3339(p.to)));
+                    m.insert("total".into(), p.total.map_or(Value::Null, Value::from));
+                    if !p.suppressed.is_empty() {
+                        m.insert("suppressed".into(), Value::String(p.suppressed.clone()));
+                    }
+                    Value::Object(m)
+                })
+                .collect(),
+        )
+    };
+    let mut out = serde_json::json!({"length_s": s.length_s, "floor": s.floor, "periods": periods(&s.periods)});
+    if let Some(v) = &s.verdicts {
+        out["verdicts"] = periods(v);
+    }
+    if s.verdicts_only {
+        out["verdicts_only"] = Value::Bool(true);
+    }
+    out
 }
 
 /// A whole-second instant as YYYY-MM-DDTHH:MM:SSZ (civil from days, Howard
@@ -157,6 +170,7 @@ fn decode_input(raw: &Value) -> Inputs {
             "bands",
             "disputes",
             "served",
+            "receipts",
         ],
         "card",
     );
@@ -173,6 +187,10 @@ fn decode_input(raw: &Value) -> Inputs {
         state: text(card, "state"),
         reason: text(card, "reason"),
         served: null_or(card, "served").map(served),
+        receipts: null_or(card, "receipts").map(|r| {
+            let r = object(r, &["counted", "checkpoints"], "card.receipts");
+            Receipts { counted: int(r, "counted"), checkpoints: int(r, "checkpoints") }
+        }),
         first_checkpoint_at: opt_time(&text(card, "first_checkpoint_at")),
         latest_checkpoint_at: opt_time(&text(card, "latest_checkpoint_at")),
         witness: text(card, "witness"),

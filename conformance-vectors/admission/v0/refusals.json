@@ -848,6 +848,53 @@
     }
    ],
    "want": "a card row may not decide NO"
+  },
+  {
+   "case": "referee verdicts need more periods than they read",
+   "base": "admission-node-baseline-1.0.0/pack-definition.json",
+   "ops": [
+    {
+     "set": [
+      "rows",
+      6,
+      "params",
+      "min_periods"
+     ],
+     "value": 5
+    }
+   ],
+   "want": "params.min_periods must be at most params.window"
+  },
+  {
+   "case": "referee verdicts decide NO",
+   "base": "admission-node-baseline-1.0.0/pack-definition.json",
+   "ops": [
+    {
+     "set": [
+      "rows",
+      6,
+      "on_fail"
+     ],
+     "value": "NO"
+    }
+   ],
+   "want": "a card row may not decide NO"
+  },
+  {
+   "case": "witness receipts take a window",
+   "base": "admission-node-baseline-1.0.0/pack-definition.json",
+   "ops": [
+    {
+     "set": [
+      "rows",
+      5,
+      "params",
+      "window"
+     ],
+     "value": 4
+    }
+   ],
+   "want": "takes no params.window"
   }
  ],
  "raw": [

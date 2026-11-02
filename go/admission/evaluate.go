@@ -90,6 +90,19 @@ type Card struct {
 	// carries none. InferenceServiceHistoryCounts fills it from an
 	// inference-service-history/0 answer.
 	Served *Served
+	// Receipts are the witness receipts the caller counted on the card's
+	// checkpoints; nil when the caller counted none (capsule-engine#276).
+	Receipts *Receipts
+}
+
+// Receipts are the witness receipts on a card's checkpoints (ISH §5.2): the
+// receipts the caller verified offline under a witness key its policy
+// configures, out of the card's checkpoints. A receipt under a key the
+// policy does not configure is shown by the caller and not counted here.
+// The count is the verifier's, not the node's statement.
+type Receipts struct {
+	Counted     int64 `json:"counted"`
+	Checkpoints int64 `json:"checkpoints"`
 }
 
 // Disputes are the disputes others raised about the counterparty that its
@@ -493,6 +506,8 @@ var predicates = map[string]predicate{
 	"card.band_history_or_stake":        {SourceCard, []string{"k", "step_decades", "max_adverse_permille"}},
 	"card.open_disputes":                {SourceCard, []string{"max"}},
 	"card.self_reported_served_periods": {SourceCard, []string{"window", "min_periods"}},
+	"card.referee_verdicts":             {SourceCard, []string{"window", "min_periods"}},
+	"card.witness_receipts":             {SourceCard, []string{"min"}},
 	"judged":                            {SourceJudged, nil},
 }
 
@@ -571,11 +586,36 @@ func ladder(r Row, in Inputs, accept map[string]Unit, roots TrustRoots) RowResul
 // The row passes when at least min_periods are counted. It never adds
 // counts across periods or models.
 func servedPeriods(r Row, c Card) RowResult {
-	if c.State != CardVerified || c.Served == nil {
+	if c.State != CardVerified || c.Served == nil || c.Served.VerdictsOnly {
 		return RowResult{Result: NotRead}
 	}
+	return periodsCounted(r, c.Served.Periods)
+}
+
+// refereeVerdicts reads the last window closed periods of the card's
+// referee_verdicts cell for the corroborated class as servedPeriods reads
+// served totals (capsule-engine#276): a period is counted when that cell is
+// published above zero. A zero, a suppressed cell and a period with no such
+// cell are not counted. The four classes stay separate counts (ISH §5.3): no
+// other class is read, and none is added to it, to the served totals or
+// across periods.
+func refereeVerdicts(r Row, c Card) RowResult {
+	if c.State != CardVerified || c.Served == nil || c.Served.Verdicts == nil {
+		return RowResult{Result: NotRead}
+	}
+	periods := make([]ServedPeriod, len(c.Served.Verdicts))
+	for i, p := range c.Served.Verdicts {
+		periods[i] = p
+		if p.Total != nil && *p.Total == 0 {
+			periods[i].Total = nil
+			periods[i].Suppressed = SuppressedBelowFloor
+		}
+	}
+	return periodsCounted(r, periods)
+}
+
+func periodsCounted(r Row, periods []ServedPeriod) RowResult {
 	window, need := r.Params["window"], r.Params["min_periods"]
-	periods := c.Served.Periods
 	if int64(len(periods)) > window {
 		periods = periods[int64(len(periods))-window:]
 	}
@@ -770,6 +810,16 @@ func readRow(r Row, in Inputs, accept map[string]Unit, roots TrustRoots) RowResu
 			return counted(of(c.Open <= r.Params["max"]), c.Open, c.Of)
 		case "card.self_reported_served_periods":
 			return servedPeriods(r, in.Card)
+		case "card.referee_verdicts":
+			return refereeVerdicts(r, in.Card)
+		case "card.witness_receipts":
+			// Receipts count checkpoints, never exchanges, and stand beside
+			// the served periods: no figure adds them (ISH §5.1).
+			if in.Card.State != CardVerified || in.Card.Receipts == nil {
+				return RowResult{Result: NotRead}
+			}
+			c := in.Card.Receipts
+			return counted(of(c.Counted >= r.Params["min"]), c.Counted, c.Checkpoints)
 		case "judged":
 			// A judge outside the trust roots is reported, not counted
 			// (SDK-SURFACE evaluate, NOT_CHECKED).

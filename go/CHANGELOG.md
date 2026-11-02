@@ -5,6 +5,16 @@ and `portedDefinitions` (`guard/engine.go`).
 
 ## Unreleased
 
+- Added (capsule-engine#276): the node baseline pack `asg/admission_node_baseline/1.0.0`
+  (vectors in `conformance-vectors/admission/v0/admission-node-baseline-1.0.0`, source in
+  evidencebook-skills), and two predicates. `card.witness_receipts` (param `min`) reads the new
+  `Card.Receipts`, the witness receipts the caller counted on the card's checkpoints out of the
+  checkpoints. `card.referee_verdicts` (params `window`, `min_periods`) reads the new
+  `Served.Verdicts`, the closed periods' `referee_verdicts` totals, as the served periods row reads
+  served totals; verdict classes are not read (ISH SH-14). `InferenceServiceHistoryCounts` now fills
+  `Verdicts` when the answer declares the unit; an answer that declares only that unit sets
+  `VerdictsOnly`. The three counts are never added to one another, and a count the card does not
+  carry is not read, so the pack's `missing` decides. Decisions on existing cards keep their bytes.
 - Changed, breaking (capsule-engine#252): one pack format. Every embedded pack version now ships
   its definition as `pack-source.yaml` (`scope: {kind: live}`, `pack_version`, and the `check` each
   cited wicket implements), and no longer as `pack.yaml`: code that reads `pack.yaml` out of an

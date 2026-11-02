@@ -374,7 +374,7 @@ func Load(src []byte) (*Pack, error) {
 				}
 			}
 			// A row that needs more periods than it reads could never pass.
-			if r.Check == "card.self_reported_served_periods" && len(row.Params) == 2 &&
+			if (r.Check == "card.self_reported_served_periods" || r.Check == "card.referee_verdicts") && len(row.Params) == 2 &&
 				row.Params["min_periods"] > row.Params["window"] {
 				bad("%s: params.min_periods must be at most params.window", where)
 			}

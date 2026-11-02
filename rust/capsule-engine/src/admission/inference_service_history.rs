@@ -25,6 +25,15 @@ pub struct Served {
     pub length_s: i64,
     pub floor: i64,
     pub periods: Vec<ServedPeriod>,
+    /// inference_service_history.go Served.Verdicts: the closed periods'
+    /// referee_verdicts totals (ISH §5.3); empty when the answer counts no
+    /// referee verdicts. Classes are not read (SH-14) and the totals are
+    /// never added to `periods` (ISH §5.1).
+    pub verdicts: Option<Vec<ServedPeriod>>,
+    /// inference_service_history.go Served.VerdictsOnly: the answer counts
+    /// referee verdicts and no served exchanges; `periods` is then empty and
+    /// not read.
+    pub verdicts_only: bool,
 }
 
 /// inference_service_history.go ServedPeriod: one closed period's
@@ -100,6 +109,7 @@ const PROFILE: &str = "inference-service-history/0";
 const COUNTS: &str = "period_counts";
 const HISTORY_CARD: &str = "history_card";
 const SERVED: &str = "exchanges_served";
+const VERDICTS: &str = "referee_verdicts";
 const LABEL: &str = "self_reported";
 /// inference_service_history.go ishPeriodsMax: the most periods one answer
 /// may list, over 190 years of weeks.
@@ -290,7 +300,12 @@ pub fn inference_service_history_counts(
     if listed.len() as i64 != end - first {
         return Err(fail("period_alignment", "the closed periods are not each listed once".into()));
     }
-    let mut served = Served { length_s: d.length_s, floor: d.floor, periods: Vec::new() };
+    let mut served =
+        Served { length_s: d.length_s, floor: d.floor, periods: Vec::new(), verdicts: None, verdicts_only: false };
+    let has_served = d.counts_units.iter().any(|u| u == SERVED);
+    if d.counts_units.iter().any(|u| u == VERDICTS) {
+        served.verdicts = Some(Vec::new());
+    }
     for (i, raw) in listed.iter().enumerate() {
         let k = first + i as i64;
         let p = raw.as_object().filter(|p| same_keys(p, &["cells", "from", "to"])).ok_or_else(shape)?;
@@ -302,21 +317,23 @@ pub fn inference_service_history_counts(
             return Err(fail("period_alignment", format!("periods[{i}] is not the policy's next closed period")));
         }
         let totals = d.cells(&p["cells"]).map_err(|(property, why)| fail(property, format!("periods[{i}]: {why}")))?;
-        let mut sp = ServedPeriod {
+        let period = |total: &Total| ServedPeriod {
             from: Timestamp::from_unix_nanos(i128::from(from) * NANOS),
             to: Timestamp::from_unix_nanos(i128::from(to) * NANOS),
-            total: None,
-            suppressed: String::new(),
+            total: total.value,
+            suppressed: total.suppressed.clone(),
         };
         if let Some((_, total)) = totals.iter().find(|(u, _)| *u == SERVED) {
-            sp.total = total.value;
-            sp.suppressed = total.suppressed.clone();
+            served.periods.push(period(total));
         }
-        served.periods.push(sp);
+        if let Some((_, total)) = totals.iter().find(|(u, _)| *u == VERDICTS) {
+            served.verdicts.get_or_insert_with(Vec::new).push(period(total));
+        }
     }
-    if !d.counts_units.iter().any(|u| u == SERVED) {
+    if !has_served && served.verdicts.is_none() {
         return Ok(None);
     }
+    served.verdicts_only = !has_served;
     Ok(Some(served))
 }
 
