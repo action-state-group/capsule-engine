@@ -36,7 +36,7 @@ const MAY_DECIDE_NO: [&str; 3] = [SOURCE_PLATFORM, SOURCE_OWN_HISTORY, SOURCE_OP
 
 /// evaluate.go predicates: each admission check, the source it reads and
 /// the params it takes. The list is closed and versioned with the evaluator.
-pub(crate) const PREDICATES: [(&str, &str, &[&str]); 22] = [
+pub(crate) const PREDICATES: [(&str, &str, &[&str]); 23] = [
     ("platform.attestation_not_invalid", SOURCE_PLATFORM, &[]),
     ("platform.owner_signed", SOURCE_PLATFORM, &[]),
     ("card.verified", SOURCE_CARD, &[]),
@@ -58,6 +58,7 @@ pub(crate) const PREDICATES: [(&str, &str, &[&str]); 22] = [
     ("stake.covers_deal", SOURCE_STAKE, &[]),
     ("card.band_history_or_stake", SOURCE_CARD, &["k", "step_decades", "max_adverse_permille"]),
     ("card.open_disputes", SOURCE_CARD, &["max"]),
+    ("card.self_reported_served_periods", SOURCE_CARD, &["window", "min_periods"]),
     ("judged", SOURCE_JUDGED, &[]),
 ];
 
@@ -73,15 +74,19 @@ pub(crate) fn param_max(name: &str) -> Option<i64> {
         // by BAND_DECADE_MAX, plus the step) far inside an i64.
         "step_decades" => Some(DECADE_MAX),
         "max_adverse_permille" => Some(1000),
+        // A served periods row reads at most as many periods as one
+        // inference-service-history answer lists.
+        "window" | "min_periods" => Some(super::inference_service_history::PERIODS_MAX),
         _ => None,
     }
 }
 
 /// pack.go paramMin: a threshold's least value where it is not 0. A ladder
-/// needs at least one subject in a band to earn it.
+/// needs at least one subject in a band to earn it, and a served periods row
+/// at least one period to read and to count.
 fn param_min(name: &str) -> i64 {
     match name {
-        "k" => 1,
+        "k" | "window" | "min_periods" => 1,
         _ => 0,
     }
 }
@@ -672,6 +677,13 @@ fn validate(src: &[u8], f: SourceFile, raw_rows: Vec<RawRow<'_>>) -> Result<Pack
                         Some(_) => {
                             params.insert(k.clone(), *v);
                         }
+                    }
+                }
+                // A row that needs more periods than it reads could never
+                // pass.
+                if let (Some(need), Some(window)) = (params.get("min_periods"), params.get("window")) {
+                    if r.check == "card.self_reported_served_periods" && need > window {
+                        bad(format!("{at}: params.min_periods must be at most params.window"));
                     }
                 }
             }

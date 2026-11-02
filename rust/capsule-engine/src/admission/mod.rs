@@ -41,14 +41,19 @@
 mod band;
 mod decision;
 mod evaluate;
+mod inference_service_history;
 mod pack;
 mod standard_history;
 
 use std::collections::BTreeMap;
 
 pub use band::{Band, Unit};
-pub use decision::{AskOut, Decision, Effect, PackRef, RowResult, RowStatus};
+pub use decision::{AskOut, Coverage, Decision, Effect, NotCounted, PackRef, RowResult, RowStatus};
 pub use evaluate::evaluate;
+pub use inference_service_history::{
+    inference_service_history_counts, CardCheckpoint, CardCheckpoints, InferenceServiceHistoryError, Served,
+    ServedPeriod, INFERENCE_SERVICE_HISTORY_PROPERTIES, SUPPRESSED_BELOW_FLOOR, SUPPRESSED_COMPLEMENTARY,
+};
 pub use pack::{Pack, RailPin, COMPILED_FORMAT};
 pub use standard_history::standard_history_counts;
 
@@ -201,12 +206,19 @@ pub const CARD_UNVERIFIABLE: &str = "unverifiable";
 pub const CARD_REFUSED: &str = "refused";
 pub const CARD_UNANSWERED: &str = "unanswered";
 
-/// The counterparty's history_card/1 or served_summary/1 as the caller
-/// verified it (evaluate.go Card). An empty state is absent. An absent
+/// The counterparty's history_card/1, served_summary/1, standard_history/1
+/// or inference-service-history/0 answer as the caller verified it
+/// (evaluate.go Card). An empty state is absent. An absent
 /// checkpoint is read as Go's zero time, 0001-01-01T00:00:00Z.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Card {
     pub state: String,
+    /// Why the card is unverifiable: the History property an
+    /// `InferenceServiceHistoryError` names. The card.verified row records it
+    /// when it is one of INFERENCE_SERVICE_HISTORY_PROPERTIES, and never any
+    /// other text, so the sealed block holds no counterparty string. ""
+    /// otherwise.
+    pub reason: String,
     pub first_checkpoint_at: Option<Timestamp>,
     pub latest_checkpoint_at: Option<Timestamp>,
     /// The witness whose receipt on the latest checkpoint the caller
@@ -226,6 +238,10 @@ pub struct Card {
     /// carries no dispute tally. `standard_history_counts` fills `bands` and
     /// `disputes` from a standard_history/1 card.
     pub disputes: Option<Disputes>,
+    /// The node's self-reported served periods; None when the card carries
+    /// none. `inference_service_history_counts` fills it from an
+    /// inference-service-history/0 answer.
+    pub served: Option<Served>,
 }
 
 /// The disputes others raised about the counterparty that its card shows:

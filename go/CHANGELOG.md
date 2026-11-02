@@ -15,6 +15,26 @@ and `portedDefinitions` (`guard/engine.go`).
   PROVENANCE.json lists `pack-source.yaml`, with the `pack.yaml` sha256 it was converted from.
 - Deprecated (capsule-engine#252): `Load` and reading a `pack.yaml` directory through `LoadFrom`
   and `LoadPath`, for packs authored outside this module; removed in v0.4.0.
+
+- Added (capsule-engine#273): `InferenceServiceHistoryCounts` reads a Mesh node's
+  `inference-service-history/0` Standard answer as `Card.Served`. The answer is the node's own
+  count of the exchanges it served in each closed period. The function takes the definition
+  document, the artifact, the checkpoints (time and records covered) the caller read from the
+  embedded `history_card/1`, and the requester's `expected_pin`. The periods start at the first
+  checkpoint that commits a record (ISH §6.3). It checks each History property it can
+  compute from those bytes: `definition_form`, `definition_binding`, `artifact_form`, the coverage
+  declaration, `units`, `labels`, `period_alignment`, `period_anchor`, `period_floor`, and that the
+  answer's anchor is the pin (`anchor_match`). A refusal is an `*InferenceServiceHistoryError` naming the property
+  that fails, so the card is `CardUnverifiable`; an unknown profile or a Detailed definition is
+  refused the same way. `capsule-engine admission evaluate` (#278) reads `card.reason` and `card.served` in its input. `Card.Reason` (new) carries that property into the `card.verified` row,
+  which records only a name from `InferenceServiceHistoryProperties`, never the detail.
+  Also added: the predicate `card.self_reported_served_periods` (params `window`, `min_periods`). It
+  counts the closed periods whose served total is published. A suppressed total, or a period the
+  answer does not list, is not counted, and is never a fail on its own. The row never adds counts
+  across periods or models. Its block entry carries `label: "self_reported"` and `not_counted` by
+  reason. A decision on such a card records `coverage` with population `NOT_CHECKED`. Decisions on
+  other cards keep their bytes. Every count stays the node's own statement, checked property by
+  property; nothing here scores or ranks a node.
 - Added (capsule-engine#278): the command `capsule-engine admission evaluate`, for callers that are
   not Go (the Python evidence facade, evidencebook#332), and `admission.DecodeInputs`, the JSON form
   of `Inputs` that the conformance vectors and the command share. The command reads a pack and the

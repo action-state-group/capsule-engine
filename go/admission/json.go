@@ -21,6 +21,7 @@ type wireInputs struct {
 	} `json:"platform"`
 	Card struct {
 		State              string `json:"state"`
+		Reason             string `json:"reason"`
 		FirstCheckpointAt  string `json:"first_checkpoint_at"`
 		LatestCheckpointAt string `json:"latest_checkpoint_at"`
 		Witness            string `json:"witness"`
@@ -39,6 +40,16 @@ type wireInputs struct {
 			Subjects int64  `json:"subjects"`
 			Adverse  int64  `json:"adverse"`
 		} `json:"bands"`
+		Served *struct {
+			LengthS int64 `json:"length_s"`
+			Floor   int64 `json:"floor"`
+			Periods []struct {
+				From       string `json:"from"`
+				To         string `json:"to"`
+				Total      *int64 `json:"total"`
+				Suppressed string `json:"suppressed"`
+			} `json:"periods"`
+		} `json:"served"`
 	} `json:"card"`
 	Selection struct {
 		State              string   `json:"state"`
@@ -107,7 +118,7 @@ func DecodeInputs(raw []byte) (Inputs, error) {
 	in := Inputs{
 		Now: at(v.Now), Amount: v.Amount, Currency: v.Currency,
 		Platform: Platform{ReleaseAttestation: v.Platform.ReleaseAttestation, OwnerSigned: v.Platform.OwnerSigned},
-		Card: Card{State: v.Card.State, FirstCheckpointAt: at(v.Card.FirstCheckpointAt),
+		Card: Card{State: v.Card.State, Reason: v.Card.Reason, FirstCheckpointAt: at(v.Card.FirstCheckpointAt),
 			LatestCheckpointAt: at(v.Card.LatestCheckpointAt), Witness: v.Card.Witness, Controller: v.Card.Controller},
 		Selection: Selection{State: v.Selection.State},
 		Operator:  Operator{DenyListed: v.Operator.DenyListed, AllowListed: v.Operator.AllowListed},
@@ -123,6 +134,13 @@ func DecodeInputs(raw []byte) (Inputs, error) {
 		in.Card.Bands = []BandCount{}
 		for _, b := range *v.Card.Bands {
 			in.Card.Bands = append(in.Card.Bands, BandCount{Currency: b.Currency, Decade: b.Decade, Subjects: b.Subjects, Adverse: b.Adverse})
+		}
+	}
+	if v.Card.Served != nil {
+		in.Card.Served = &Served{LengthS: v.Card.Served.LengthS, Floor: v.Card.Served.Floor}
+		for _, p := range v.Card.Served.Periods {
+			in.Card.Served.Periods = append(in.Card.Served.Periods, ServedPeriod{From: at(p.From), To: at(p.To),
+				Total: p.Total, Suppressed: p.Suppressed})
 		}
 	}
 	for _, s := range v.Selection.UnansweredDisputes {

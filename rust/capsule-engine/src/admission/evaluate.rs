@@ -5,9 +5,12 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use super::band::{add, fresh, quantity, value_band, HOUR, SECOND};
-use super::decision::{AskOut, Decision, Effect, PackRef, RowResult, RowStatus};
+use super::decision::{AskOut, Coverage, Decision, Effect, NotCounted, PackRef, RowResult, RowStatus};
 use super::pack::{OnFail, Pack, Row, SOURCE_JUDGED};
-use super::{Inputs, Timestamp, Verdict, CARD_UNVERIFIABLE, CARD_VERIFIED};
+use super::{
+    Inputs, Timestamp, Verdict, CARD_UNVERIFIABLE, CARD_VERIFIED, INFERENCE_SERVICE_HISTORY_PROPERTIES,
+    SUPPRESSED_COMPLEMENTARY,
+};
 use crate::canon;
 
 /// evaluate.go SourceAboveTier, SourceMissing, SourceRows: the decision
@@ -46,6 +49,11 @@ pub fn evaluate(p: &Pack, input: &Inputs) -> Decision {
         rows: Vec::new(),
         asks: Vec::new(),
         pack: PackRef { id: p.id.clone(), digest: p.digest.clone() },
+        coverage: input
+            .card
+            .served
+            .as_ref()
+            .map(|_| Coverage { kind: "stream_interval".into(), population: "NOT_CHECKED".into() }),
     };
     // The loader refuses a pack with no tier.
     let mut top = p.tiers.len() as i64 - 1;
@@ -278,7 +286,35 @@ fn result(status: RowStatus) -> RowResult {
         effect: Effect::None,
         held: false,
         earned: None,
+        reason: String::new(),
+        not_counted: None,
     }
+}
+
+/// evaluate.go servedPeriods: the last `window` closed periods of the
+/// card's served periods (capsule-engine#273). A period is counted when its
+/// served total is published; a suppressed total, or a period not listed
+/// because the stream is younger than the window, is not counted and never
+/// a fail on its own. The row passes when at least `min_periods` are
+/// counted. It never adds counts across periods or models.
+fn served_periods(r: &Row, input: &Inputs) -> RowResult {
+    let served = match (&input.card.served, input.card.state == CARD_VERIFIED) {
+        (Some(s), true) => s,
+        _ => return result(RowStatus::NotRead),
+    };
+    let (window, need) = (param(r, "window"), param(r, "min_periods"));
+    let periods = &served.periods;
+    let periods = &periods[periods.len().saturating_sub(window as usize)..];
+    let mut n = 0i64;
+    let mut nc = NotCounted { not_listed: window - periods.len() as i64, ..NotCounted::default() };
+    for p in periods {
+        match (p.total, p.suppressed.as_str()) {
+            (Some(_), _) => n += 1,
+            (None, SUPPRESSED_COMPLEMENTARY) => nc.complementary += 1,
+            (None, _) => nc.below_floor += 1,
+        }
+    }
+    RowResult { not_counted: Some(nc), ..counted(of(n >= need), n, window) }
 }
 
 /// evaluate.go counted.
@@ -318,7 +354,11 @@ fn read_row(r: &Row, input: &Inputs, p: &Pack) -> RowResult {
         "platform.owner_signed" => input.platform.owner_signed.map_or_else(not_read, |s| result(of(s))),
         "card.verified" => match input.card.state.as_str() {
             CARD_VERIFIED => result(RowStatus::Pass),
-            CARD_UNVERIFIABLE => result(RowStatus::Fail),
+            CARD_UNVERIFIABLE => {
+                let reason = &input.card.reason;
+                let known = INFERENCE_SERVICE_HISTORY_PROPERTIES.contains(&reason.as_str());
+                RowResult { reason: if known { reason.clone() } else { String::new() }, ..result(RowStatus::Fail) }
+            }
             _ => not_read(),
         },
         "card.fresh" if !verified => not_read(),
@@ -409,6 +449,7 @@ fn read_row(r: &Row, input: &Inputs, p: &Pack) -> RowResult {
             (Some(c), true) => counted(of(c.open <= param(r, "max")), c.open, c.of),
             _ => not_read(),
         },
+        "card.self_reported_served_periods" => served_periods(r, input),
         // A judge outside the trust roots is reported, not counted
         // (SDK-SURFACE evaluate, NOT_CHECKED).
         "judged" => match input.judged.get(&r.id) {
