@@ -7,7 +7,7 @@
 #
 # Four configurations:
 #   pack: asg/everyday/0.3.5 (caps/5.0.0 over spend.weekly/3.0.0, a 2500
-#         per-action limit), the released pack.yaml the engine keeps under
+#         per-action limit), the released pack-source.yaml the engine keeps under
 #         tests/fixtures/packs/everyday-0.3.5 from a710636c on (the catalog
 #         pack before), built and installed as the acceptance test does. From
 #         0.3.1 its counterparty_seen_before denies a first purchase from a
@@ -124,7 +124,7 @@ def main(sha):
     with tempfile.TemporaryDirectory() as tmp:
         pack_dir = Path(tmp) / "pack"
         shutil.copytree(PACK_DIR, pack_dir)
-        assert "wicket_ref: caps/5.0.0" in (pack_dir / "pack.yaml").read_text(), "this pack does not cite caps/5.0.0"
+        assert "wicket_ref: caps/5.0.0" in (pack_dir / "pack-source.yaml").read_text(), "this pack does not cite caps/5.0.0"
         signer = _signer()
         store = LedgerStore(Path(tmp) / "ledger")
         try:

@@ -5,7 +5,7 @@ module has its own changelog, `go/CHANGELOG.md`.
 
 ## Unreleased
 
-- Changed (capsule-engine#252): one pack format. A pack is authored as `pack-source.yaml` with
+- Changed, breaking (capsule-engine#252): one pack format. A pack is authored as `pack-source.yaml` with
   `scope: {kind: live}`, the format evidencebook-skills' `pack_compile.py` compiles to an Evidence
   Contract. It is the `pack.yaml` shape plus `pack_version` (the version in `pack_id`) and, on each
   cited wicket, the `check` it implements, which must match the cited definition; an obligation may

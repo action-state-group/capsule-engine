@@ -393,8 +393,9 @@ func LoadSource(source []byte, catalogFS fs.FS, catalogDir string) (Pack, error)
 // of catalogFS (refusing a cited digest the definition does not produce, as
 // the engine loader does), and computes the definition digest.
 //
-// Deprecated: pack.yaml is read only for packs not yet moved to
-// pack-source.yaml (LoadSource); this read path is removed in v0.4.0.
+// Deprecated: pack.yaml is a deprecated read path, kept for packs authored
+// outside this repository; read pack-source.yaml with LoadSource. This read
+// path is removed in v0.4.0.
 func Load(packYAML []byte, catalogFS fs.FS, catalogDir string) (Pack, error) {
 	return load(packYAML, false, catalogFS, catalogDir)
 }
