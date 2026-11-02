@@ -10,8 +10,10 @@ and `portedDefinitions` (`guard/engine.go`).
   evidencebook-skills), and two predicates. `card.witness_receipts` (param `min`) reads the new
   `Card.Receipts`, the witness receipts the caller counted on the card's checkpoints out of the
   checkpoints. `card.referee_verdicts` (params `window`, `min_periods`) reads the new
-  `Served.Verdicts`, the closed periods' `referee_verdicts` totals, as the served periods row reads
-  served totals; verdict classes are not read (ISH SH-14). `InferenceServiceHistoryCounts` now fills
+  `Served.Verdicts`, the closed periods' `referee_verdicts` cell of one class, `corroborated`
+  (dimension `{"verdict": "corroborated"}`, vector-only: ISH SH-12, SH-14), as the served periods
+  row reads served totals; a period counts when that cell is published above zero, and the four
+  classes are never added to one another. `InferenceServiceHistoryCounts` now fills
   `Verdicts` when the answer declares the unit; an answer that declares only that unit sets
   `VerdictsOnly`. The three counts are never added to one another, and a count the card does not
   carry is not read, so the pack's `missing` decides. Decisions on existing cards keep their bytes.

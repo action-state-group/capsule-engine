@@ -9,7 +9,7 @@ use super::decision::{AskOut, Coverage, Decision, Effect, NotCounted, PackRef, R
 use super::pack::{OnFail, Pack, Row, SOURCE_JUDGED};
 use super::{
     Inputs, Served, ServedPeriod, Timestamp, Verdict, CARD_UNVERIFIABLE, CARD_VERIFIED,
-    INFERENCE_SERVICE_HISTORY_PROPERTIES, SUPPRESSED_COMPLEMENTARY,
+    INFERENCE_SERVICE_HISTORY_PROPERTIES, SUPPRESSED_BELOW_FLOOR, SUPPRESSED_COMPLEMENTARY,
 };
 use crate::canon;
 
@@ -304,13 +304,26 @@ fn served_periods(r: &Row, input: &Inputs) -> RowResult {
     }
 }
 
-/// evaluate.go refereeVerdicts: the same read over the card's referee verdict
-/// totals (capsule-engine#276). The total is the node's own statement (ISH
-/// §5.3) in a unit of its own, never added to the served totals; verdict
-/// classes are not read.
+/// evaluate.go refereeVerdicts: the last `window` closed periods of the
+/// card's referee_verdicts cell for the corroborated class, read as
+/// served_periods reads served totals (capsule-engine#276). A period is
+/// counted when that cell is published above zero; a zero, a suppressed cell
+/// and a period with no such cell are not counted. The four classes stay
+/// separate counts (ISH §5.3): no other class is read and none is added.
 fn referee_verdicts(r: &Row, input: &Inputs) -> RowResult {
     match (&input.card.served, input.card.state == CARD_VERIFIED) {
-        (Some(Served { verdicts: Some(v), .. }), true) => periods_counted(r, v),
+        (Some(Served { verdicts: Some(v), .. }), true) => {
+            let periods: Vec<ServedPeriod> = v
+                .iter()
+                .map(|p| match p.total {
+                    Some(0) => {
+                        ServedPeriod { total: None, suppressed: SUPPRESSED_BELOW_FLOOR.to_string(), ..p.clone() }
+                    }
+                    _ => p.clone(),
+                })
+                .collect();
+            periods_counted(r, &periods)
+        }
         _ => result(RowStatus::NotRead),
     }
 }

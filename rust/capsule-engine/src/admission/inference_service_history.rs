@@ -26,9 +26,12 @@ pub struct Served {
     pub floor: i64,
     pub periods: Vec<ServedPeriod>,
     /// inference_service_history.go Served.Verdicts: the closed periods'
-    /// referee_verdicts totals (ISH §5.3); None when the answer counts no
-    /// referee verdicts. Classes are not read (SH-14) and the totals are
-    /// never added to `periods` (ISH §5.1).
+    /// referee_verdicts cells for the corroborated class (ISH §5.3), one per
+    /// period, with neither value nor reason where the answer has no such
+    /// cell; None when the answer counts no referee verdicts. The class is
+    /// the cell whose dimension is {"verdict": "corroborated"} (vector-only,
+    /// SH-12, SH-14); the classes are never added to one another or to
+    /// `periods` (ISH §5.1).
     pub verdicts: Option<Vec<ServedPeriod>>,
     /// inference_service_history.go Served.VerdictsOnly: the answer counts
     /// referee verdicts and no served exchanges; `periods` is then empty and
@@ -110,6 +113,10 @@ const COUNTS: &str = "period_counts";
 const HISTORY_CARD: &str = "history_card";
 const SERVED: &str = "exchanges_served";
 const VERDICTS: &str = "referee_verdicts";
+/// The cell card.referee_verdicts reads: the corroborated class of a verdict
+/// count (vector-only, SH-12). Go ishVerdictDimension and ishCorroborated.
+const VERDICT_DIMENSION: &str = "verdict";
+const CORROBORATED: &str = "corroborated";
 const LABEL: &str = "self_reported";
 /// inference_service_history.go ishPeriodsMax: the most periods one answer
 /// may list, over 190 years of weeks.
@@ -316,7 +323,8 @@ pub fn inference_service_history_counts(
         if from != d.start_of(k) || to != d.start_of(k + 1) {
             return Err(fail("period_alignment", format!("periods[{i}] is not the policy's next closed period")));
         }
-        let totals = d.cells(&p["cells"]).map_err(|(property, why)| fail(property, format!("periods[{i}]: {why}")))?;
+        let (totals, corroborated) =
+            d.cells(&p["cells"]).map_err(|(property, why)| fail(property, format!("periods[{i}]: {why}")))?;
         let period = |total: &Total| ServedPeriod {
             from: Timestamp::from_unix_nanos(i128::from(from) * NANOS),
             to: Timestamp::from_unix_nanos(i128::from(to) * NANOS),
@@ -326,9 +334,10 @@ pub fn inference_service_history_counts(
         if let Some((_, total)) = totals.iter().find(|(u, _)| *u == SERVED) {
             served.periods.push(period(total));
         }
-        if let Some((_, total)) = totals.iter().find(|(u, _)| *u == VERDICTS) {
+        if totals.iter().any(|(u, _)| *u == VERDICTS) {
+            let cell = corroborated.unwrap_or(Total { value: None, suppressed: String::new() });
             if let Some(v) = served.verdicts.as_mut() {
-                v.push(period(total));
+                v.push(period(&cell));
             }
         }
     }
@@ -338,6 +347,10 @@ pub fn inference_service_history_counts(
     served.verdicts_only = !has_served;
     Ok(Some(served))
 }
+
+/// What `cells` returns: each declared unit's total, and the corroborated
+/// referee_verdicts cell.
+type Cells = (Vec<(String, Total)>, Option<Total>);
 
 struct Member {
     name: String,
@@ -485,11 +498,13 @@ impl Definition {
     }
 
     /// inference_service_history.go cells: one period's cells (ISH §6.2,
-    /// §7.3, §5.1), and each declared unit's total.
-    fn cells(&self, raw: &Value) -> Result<Vec<(String, Total)>, (&'static str, String)> {
+    /// §7.3, §5.1), each declared unit's total, and the referee_verdicts cell
+    /// of the corroborated class (None when the period has none).
+    fn cells(&self, raw: &Value) -> Result<Cells, (&'static str, String)> {
         let cells = raw.as_array().ok_or(("artifact_form", "counts shape not known".to_string()))?;
         // (unit, dimension, total) per cell; the dimension is "" on a total.
         let mut seen: Vec<(String, String, Total)> = Vec::new();
+        let mut corroborated = None;
         for (j, c) in cells.iter().enumerate() {
             let shape = || ("artifact_form", format!("counts shape not known: cells[{j}]"));
             let c = c.as_object().ok_or_else(shape)?;
@@ -529,6 +544,12 @@ impl Definition {
                 }
                 _ => return Err(("period_floor", format!("cells[{j}] is neither published nor suppressed"))),
             };
+            if unit == VERDICTS
+                && c.get("dimension").and_then(|d| d.get(VERDICT_DIMENSION)).and_then(Value::as_str)
+                    == Some(CORROBORATED)
+            {
+                corroborated = Some(total.clone());
+            }
             seen.push((unit.to_string(), dim, total));
         }
         let mut totals = Vec::new();
@@ -552,7 +573,7 @@ impl Definition {
                 return Err(("period_floor", format!("the {unit} cells do not add up to the total")));
             }
         }
-        Ok(totals)
+        Ok((totals, corroborated))
     }
 }
 

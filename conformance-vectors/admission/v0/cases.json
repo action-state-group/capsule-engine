@@ -4857,6 +4857,58 @@
    }
   },
   {
+   "case": "node-baseline-large-deal-zero-corroborated-week-limits",
+   "pack": "admission-node-baseline-1.0.0/pack-definition.json",
+   "input": {
+    "now": "2026-01-20T12:00:00Z",
+    "amount": "5000",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-07T10:00:00Z",
+     "latest_checkpoint_at": "2026-01-19T00:00:00Z",
+     "served": {
+      "length_s": 604800,
+      "floor": 5,
+      "periods": [
+       {
+        "from": "2026-01-05T00:00:00Z",
+        "to": "2026-01-12T00:00:00Z",
+        "total": 12
+       },
+       {
+        "from": "2026-01-12T00:00:00Z",
+        "to": "2026-01-19T00:00:00Z",
+        "total": 18
+       }
+      ],
+      "verdicts": [
+       {
+        "from": "2026-01-05T00:00:00Z",
+        "to": "2026-01-12T00:00:00Z",
+        "total": 0
+       },
+       {
+        "from": "2026-01-12T00:00:00Z",
+        "to": "2026-01-19T00:00:00Z",
+        "total": 9
+       }
+      ]
+     },
+     "receipts": {
+      "counted": 2,
+      "checkpoints": 5
+     }
+    }
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T1",
+    "block_sha256": "7db41bcae763722e4df06c230b2213838c597f7a9978b83acb992f263a46776c"
+   }
+  },
+  {
    "case": "node-baseline-large-deal-verdicts-only-limits",
    "pack": "admission-node-baseline-1.0.0/pack-definition.json",
    "input": {
