@@ -30,6 +30,7 @@ type wireInputs struct {
 			Held  int64 `json:"held"`
 			Total int64 `json:"total"`
 		} `json:"claims"`
+		Stapled  bool `json:"stapled"`
 		Disputes *struct {
 			Open int64 `json:"open"`
 			Of   int64 `json:"of"`
@@ -127,7 +128,7 @@ func DecodeInputs(raw []byte) (Inputs, error) {
 		Now: at(v.Now), Amount: v.Amount, Currency: v.Currency,
 		Platform: Platform{ReleaseAttestation: v.Platform.ReleaseAttestation, OwnerSigned: v.Platform.OwnerSigned},
 		Card: Card{State: v.Card.State, Reason: v.Card.Reason, FirstCheckpointAt: at(v.Card.FirstCheckpointAt),
-			LatestCheckpointAt: at(v.Card.LatestCheckpointAt), Witness: v.Card.Witness, Controller: v.Card.Controller},
+			LatestCheckpointAt: at(v.Card.LatestCheckpointAt), Witness: v.Card.Witness, Controller: v.Card.Controller, Stapled: v.Card.Stapled},
 		Selection: Selection{State: v.Selection.State},
 		Operator:  Operator{DenyListed: v.Operator.DenyListed, AllowListed: v.Operator.AllowListed},
 		Subject:   v.Subject, Asks: v.Asks, AsksMade: v.AsksMade,

@@ -484,6 +484,11 @@ fn read_row(r: &Row, input: &Inputs, p: &Pack) -> RowResult {
             (Some(c), true) => counted(of(c.counted >= param(r, "min")), c.counted, c.checkpoints),
             _ => not_read(),
         },
+        // The holder mints a staple's nonce, so a replay inside the
+        // freshness window still works; a pack keeps a stapled card to the
+        // lowest tier with a LIMIT row from T1 that asks (D-31).
+        "card.not_stapled" if verified => result(of(!input.card.stapled)),
+        "card.not_stapled" => not_read(),
         // A judge outside the trust roots is reported, not counted
         // (SDK-SURFACE evaluate, NOT_CHECKED).
         "judged" => match input.judged.get(&r.id) {
