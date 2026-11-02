@@ -89,7 +89,7 @@ catalog):
    recipient's role and those two inputs, never what the action contains.
    Eight rules
    cite this check, and each names the one selector it is measured by
-   (`selector:` in `pack.yaml`): a rule fails or passes only when its
+   (`selector:` in `pack-source.yaml`): a rule fails or passes only when its
    selector matched the action's class, and does not apply otherwise, so a
    booking fails the booking rule and no other. A class with no row in the
    taxonomy fails all eight, because the gate fails closed. A flagged class
@@ -136,7 +136,7 @@ not: a sale is money coming in.
 
 **Rules declared not measured.** 3 of the 27 rules need an input no action
 records yet: a message classified as committing, where an instruction came
-from, and the user's control state. Each one is in `pack.yaml` with `measurability:
+from, and the user's control state. Each one is in `pack-source.yaml` with `measurability:
 declared_not_measured` and the `evidence_instrument` field its input would
 arrive in. It cites no check and is never evaluated: a decision record
 carries nothing for it. Do not invent those fields to make a rule apply.

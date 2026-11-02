@@ -2,6 +2,7 @@ package pack
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/fs"
 	"os"
@@ -81,8 +82,8 @@ type Catalog struct {
 // pack source carrying its own wickets/ or folds/ directory is its own
 // catalog: every definition it ships is read and digested, so an edited
 // definition no longer matches the pack's citation (or, if the citation was
-// edited too, the pack no longer matches its pin). A source holding only a
-// pack.yaml resolves against fallback, the built-in catalog its caller names,
+// edited too, the pack no longer matches its pin). A source holding only its
+// definition file resolves against fallback, the built-in catalog its caller names,
 // as capsule-engine resolves against its own. With no fallback it resolves
 // against nothing, so a citation does not resolve.
 func catalogFor(packFS fs.FS, dir string, fallback Catalog) (fs.FS, string) {
@@ -97,7 +98,39 @@ func catalogFor(packFS fs.FS, dir string, fallback Catalog) (fs.FS, string) {
 	return fallback.FS, fallback.Dir
 }
 
-// LoadFrom loads the pack whose pack.yaml is in dir of packFS, resolving its
+// SourceFile is a pack's definition file (one pack format,
+// capsule-engine#252). LegacyFile is the pack.yaml read path, deprecated and
+// removed in v0.4.0.
+const (
+	SourceFile = "pack-source.yaml"
+	LegacyFile = "pack.yaml"
+)
+
+// readDefinition reads the definition file in dir of packFS: its
+// pack-source.yaml, else its deprecated pack.yaml. A directory holding both
+// is refused, since the two could define different packs.
+func readDefinition(packFS fs.FS, dir string) (data []byte, source bool, err error) {
+	data, err = fs.ReadFile(packFS, path.Join(dir, SourceFile))
+	switch {
+	case err == nil:
+		if _, legacy := fs.Stat(packFS, path.Join(dir, LegacyFile)); legacy == nil {
+			return nil, false, fmt.Errorf("pack: %s holds both %s and %s; keep only %s", dir, SourceFile, LegacyFile, SourceFile)
+		}
+		return data, true, nil
+	case !errors.Is(err, fs.ErrNotExist):
+		return nil, false, fmt.Errorf("pack: %w", err)
+	}
+	data, err = fs.ReadFile(packFS, path.Join(dir, LegacyFile))
+	if err != nil {
+		if errors.Is(err, fs.ErrNotExist) {
+			return nil, false, fmt.Errorf("pack: no %s in %s", SourceFile, dir)
+		}
+		return nil, false, fmt.Errorf("pack: %w", err)
+	}
+	return data, false, nil
+}
+
+// LoadFrom loads the pack whose pack-source.yaml (or deprecated pack.yaml) is in dir of packFS, resolving its
 // citations against its own definitions, only at their exact digests. A
 // pack naming a vendored pack_id must digest to that pack's pinned digest: an
 // edited copy of asg/everyday/0.2.1 is not asg/everyday/0.2.1, and is refused
@@ -108,12 +141,12 @@ func LoadFrom(packFS fs.FS, dir string) (Pack, error) {
 
 // loadFrom is LoadFrom with the source named as label in errors.
 func loadFrom(packFS fs.FS, dir, label string, fallback Catalog) (Pack, error) {
-	data, err := fs.ReadFile(packFS, path.Join(dir, "pack.yaml"))
+	data, source, err := readDefinition(packFS, dir)
 	if err != nil {
-		return Pack{}, fmt.Errorf("pack: %w", err)
+		return Pack{}, err
 	}
 	catalogFS, catalogDir := catalogFor(packFS, dir, fallback)
-	p, err := Load(data, catalogFS, catalogDir)
+	p, err := load(data, source, catalogFS, catalogDir)
 	if err != nil {
 		return Pack{}, fmt.Errorf("pack in %s: %w", label, err)
 	}
@@ -127,8 +160,9 @@ func loadFrom(packFS fs.FS, dir, label string, fallback Catalog) (Pack, error) {
 	return p, nil
 }
 
-// LoadPath loads the pack in a directory on disk (its pack.yaml). A
-// directory holding only a pack.yaml resolves its citations against
+// LoadPath loads the pack in a directory on disk (its pack-source.yaml, or
+// deprecated pack.yaml). A directory holding only its definition file
+// resolves its citations against
 // fallback (catalogFor).
 func LoadPath(dir string, fallback Catalog) (Pack, error) {
 	return loadFrom(os.DirFS(dir), ".", dir, fallback)

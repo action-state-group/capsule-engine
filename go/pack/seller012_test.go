@@ -124,7 +124,7 @@ func TestSeller012Is011WithoutCaps(t *testing.T) {
 
 // An edited copy of asg/seller/0.1.2 is refused by its pin, as 0.1.1's is.
 func TestEditedSeller012FailsThePin(t *testing.T) {
-	dir := copyPackDir(t, packs.Seller012, packs.Seller012Dir, "pack.yaml", replace("No approval clears it.", "An approval clears it."))
+	dir := copyPackDir(t, packs.Seller012, packs.Seller012Dir, "pack-source.yaml", replace("No approval clears it.", "An approval clears it."))
 	_, err := LoadPath(dir, builtInCatalog)
 	var pe *PinnedDigestError
 	if !errors.As(err, &pe) || pe.PackID != "asg/seller/0.1.2" || pe.Pinned != seller012Digest || pe.Digest == seller012Digest {

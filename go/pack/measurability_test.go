@@ -9,7 +9,7 @@ import (
 
 func shippedYAML(t *testing.T) string {
 	t.Helper()
-	b, err := packs.Everyday037.ReadFile(packs.Everyday037Dir + "/pack.yaml")
+	b, err := packs.Everyday037.ReadFile(packs.Everyday037Dir + "/pack-source.yaml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -37,7 +37,7 @@ func TestMeasurabilityRefusals(t *testing.T) {
 		if edited == y {
 			t.Fatalf("%s: edit did not apply", name)
 		}
-		if _, err := Load([]byte(edited), packs.Everyday037, packs.Everyday037Dir); err == nil {
+		if _, err := LoadSource([]byte(edited), packs.Everyday037, packs.Everyday037Dir); err == nil {
 			t.Errorf("%s: accepted", name)
 		}
 	}

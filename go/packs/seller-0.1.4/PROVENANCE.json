@@ -5,9 +5,10 @@
   "source_commit": "7339028ab2117d6c7adec89a26cd5022b8ac7140",
   "source_ref": "capsule-engine #173 squash merge on main, 7339028 (asg/seller/0.1.4: 0.1.3 with seller.recipient_role/1.1.0, which adds the platform role passing only email (role_classes), and seller.release_on_acceptance/1.1.0, not applicable to a disclosure to a platform (except_recipient_roles). Every other definition 0.1.3 cites is byte-identical at 7339028. asg/seller/0.1.3 stays vendored and frozen at packs/seller-0.1.3.)",
   "files": {
-    "pack.yaml": {
+    "pack-source.yaml": {
       "source_path": "capsule_engine/packs/catalog/seller/pack.yaml",
-      "sha256": "c45e7a7d31c1910dd487137056a6fb6564be1664ad267aeb20d8f6c43cb58e72"
+      "sha256": "3abdaa167e2af976f45870000ddadf8eb6116a3a7d241f113ef132c51de57efa",
+      "converted_from_pack_yaml_sha256": "c45e7a7d31c1910dd487137056a6fb6564be1664ad267aeb20d8f6c43cb58e72"
     },
     "folds/disclosure.class_seen.yaml": {
       "source_path": "capsule_engine/folds/catalog_defs/disclosure.class_seen.yaml",

@@ -5,6 +5,18 @@ module has its own changelog, `go/CHANGELOG.md`.
 
 ## Unreleased
 
+- Changed, breaking (capsule-engine#252): one pack format. A pack is authored as `pack-source.yaml` with
+  `scope: {kind: live}`, the format evidencebook-skills' `pack_compile.py` compiles to an Evidence
+  Contract. It is the `pack.yaml` shape plus `pack_version` (the version in `pack_id`) and, on each
+  cited wicket, the `check` it implements, which must match the cited definition; an obligation may
+  carry `requirement_tier`. None of these is in the definition digest, so every pack keeps its
+  digest and its verdicts. Every catalog pack, and every frozen everyday, seller and inference
+  version, now ships as `pack-source.yaml`, so code that opens their `pack.yaml` directly finds none;
+  `load_pack_dir` reads `pack-source.yaml`, and refuses a directory holding both files. `is_pack_dir`
+  and `pack_file` are new.
+- Deprecated (capsule-engine#252): reading `pack.yaml`, kept for packs authored outside this
+  package; removed in 0.5.0.
+
 - Added (capsule-engine#271): the contract-named referee, `capsule_engine.referee` and
   `capsule-engine referee judge`. A deal's terms name the referee by key, and each party's book key,
   deal and pack; both halves must open to the same entries. Given both halves, the openings of their

@@ -83,7 +83,7 @@ def add_parser(sub: argparse._SubParsersAction) -> argparse.ArgumentParser:
         "propose",
         help="GENERIC READ-ONLY measurability report for any pack over a JSONL corpus",
     )
-    p_propose.add_argument("--pack", required=True, help="path to a pack directory (pack.yaml)")
+    p_propose.add_argument("--pack", required=True, help="path to a pack directory (pack-source.yaml)")
     p_propose.add_argument("--corpus", default=None, help="path to a JSONL file of units shaped {'messages': [...]}")
     p_propose.add_argument(
         "--entity-key",

@@ -88,7 +88,7 @@ from pathlib import Path
 from agent_action_capsule import json_digest
 
 from capsule_engine.guards.wickets.loader import load_definition_file as load_wicket_file
-from capsule_engine.packs import load_pack_dir
+from capsule_engine.packs import is_pack_dir, load_pack_dir, pack_file
 from capsule_engine.policy.profile import parse_profile
 from capsule_engine.report.live_check import decide_check_input, decide_sale_bundle, decide_steps
 
@@ -109,7 +109,7 @@ def _pack(directory: str):
 
 
 def _with_bootstrap(directory: Path) -> Path:
-    """A pack directory the loader accepts. A pack.yaml naming a bootstrap
+    """A pack directory the loader accepts. A pack naming a bootstrap
     file that is not embedded loads from a copy with an empty stand-in: the
     bootstrap's bytes are not inside the pack's digest."""
     import shutil
@@ -117,7 +117,7 @@ def _with_bootstrap(directory: Path) -> Path:
 
     import yaml
 
-    bootstrap = (yaml.safe_load((directory / "pack.yaml").read_text()) or {}).get("bootstrap")
+    bootstrap = (yaml.safe_load(pack_file(directory).read_text()) or {}).get("bootstrap")
     if not bootstrap or (directory / bootstrap).exists():
         return directory
     copy = Path(tempfile.mkdtemp()) / directory.name
@@ -261,7 +261,7 @@ def seed(directory: Path, pack: str | None = None) -> Path:
     """A new set from every input under ``directory``: each case on the
     current pack for its input, or, given ``pack``, frozen on that embedded
     pack."""
-    if pack is not None and not (PACKS / pack / "pack.yaml").is_file():
+    if pack is not None and not is_pack_dir(PACKS / pack):
         raise ValueError(f"{pack} is not an embedded pack (a directory of {PACKS.relative_to(ROOT)})")
     cases = []
     for path in sorted(directory.rglob("*.json")):
@@ -324,7 +324,7 @@ def main(argv: list[str] | None = None) -> int:
             # it is frozen on the pack it names.
             _, pack = _kind_and_pack(json.loads(source.read_text()))
             if case.get("frozen") is True:
-                if not (PACKS / case["pack"] / "pack.yaml").is_file():
+                if not is_pack_dir(PACKS / case["pack"]):
                     problems.append(f"{name}: frozen on {case['pack']}, which is not an embedded pack")
                     continue
             elif pack != case["pack"]:

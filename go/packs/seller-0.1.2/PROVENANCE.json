@@ -5,9 +5,10 @@
   "source_commit": "e0e664de1ede4febae31931579ebe85497b4b120",
   "source_ref": "capsule-engine e0e664d (\"a pack may cite no caps definition\"), merged by PR #128 as 2ba51d4ddd82a9c1121f264e04f862b7a0d65658; pack.yaml is byte-identical at e0e664d, 2ba51d4 and origin/main c878edf. asg/seller/0.1.2 is 0.1.1 without caps/1.0.0 and spend.weekly/1.0.0, which 0.1.1 cited only so the engine would run; every other definition it cites, and every rule, is byte-identical to 0.1.1's.",
   "files": {
-    "pack.yaml": {
+    "pack-source.yaml": {
       "source_path": "capsule_engine/packs/catalog/seller/pack.yaml",
-      "sha256": "6174f336f929bfce8bc64bbe34ddab71d57de2951766561796d8685f9dc39f35"
+      "sha256": "0b4b36861671dd2bc9b5b03ede71f7703c614d3f63810ff22550504c5db00e15",
+      "converted_from_pack_yaml_sha256": "6174f336f929bfce8bc64bbe34ddab71d57de2951766561796d8685f9dc39f35"
     },
     "wickets/dedupe.yaml": {
       "source_path": "capsule_engine/guards/wickets/catalog_defs/dedupe.yaml",

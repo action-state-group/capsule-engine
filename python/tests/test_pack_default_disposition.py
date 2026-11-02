@@ -15,7 +15,7 @@ import pytest
 import yaml
 
 from capsule_engine.packs.errors import INVALID_DEFAULT_DISPOSITION, PackDefinitionError
-from capsule_engine.packs.loader import load_pack_dir
+from capsule_engine.packs.loader import load_pack_dir, pack_file
 
 CATALOG = Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog"
 
@@ -38,9 +38,9 @@ def test_existing_catalog_pack_digests_are_unchanged(pack_name):
 def _copy_payments_safety(tmp_path: Path, **obligation_fields) -> Path:
     pack_dir = tmp_path / "pack"
     shutil.copytree(CATALOG / "payments-safety", pack_dir)
-    doc = yaml.safe_load((pack_dir / "pack.yaml").read_text())
+    doc = yaml.safe_load(pack_file(pack_dir).read_text())
     doc["obligations"][0].update(obligation_fields)
-    (pack_dir / "pack.yaml").write_text(yaml.safe_dump(doc, sort_keys=False))
+    pack_file(pack_dir).write_text(yaml.safe_dump(doc, sort_keys=False))
     return pack_dir
 
 

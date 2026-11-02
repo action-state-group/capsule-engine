@@ -23,7 +23,7 @@ The module holds no product's choices. The caller passes:
 
 - which pack version to check each party role against (the module has
   `pack.LoadEveryday038`, `pack.LoadSeller015`, ..., and no default);
-- the catalog a pack.yaml-only source resolves against (`pack.LoadPath(dir,
+- the catalog a source holding only its `pack-source.yaml` resolves against (`pack.LoadPath(dir,
   pack.Catalog{...})`);
 - the copy audiences it reads a carried thread's report for
   (`guard.SaleVerification.CopyAudiences`; nil reads the engine's);

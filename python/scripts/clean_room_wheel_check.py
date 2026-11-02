@@ -9,7 +9,9 @@ the package (or a file missing from package-data) passes there and fails
 for anyone who ``pip install``s the wheel. This script exercises the
 schema-backed calls end to end on what the wheel actually ships:
 ``build_result`` -> ``verify_result`` -> ``validate_against_schema`` on a
-real Result, and ``validate_evidence_contract`` on a real contract.
+real Result, ``validate_evidence_contract`` on a real contract, and
+``load_pack_dir`` on every built-in catalog pack (its ``pack-source.yaml``
+and the files it names are package-data).
 
 Usage: python clean_room_wheel_check.py <examples/contracts dir>
 (the contract fixtures are read as input data; no repo code is imported).
@@ -26,6 +28,7 @@ import jsonschema
 
 import capsule_engine
 from capsule_engine.packs.contract_validate import validate_evidence_contract
+from capsule_engine.packs.loader import is_pack_dir, load_pack_dir
 from capsule_engine.report.result import (
     Claim,
     DigestRef,
@@ -93,8 +96,18 @@ def main(argv: list[str]) -> int:
         validate_evidence_contract(json.loads(path.read_text(encoding="utf-8")))
     _expect_invalid(lambda: validate_evidence_contract({}), "Evidence Contract")
 
+    catalog = Path(capsule_engine.__file__).resolve().parent / "packs" / "catalog"
+    pack_dirs = sorted(d for d in catalog.iterdir() if d.is_dir() and d.name != "__pycache__")
+    if not pack_dirs:
+        sys.exit(f"no built-in catalog packs in {catalog}")
+    for d in pack_dirs:
+        if not is_pack_dir(d):
+            sys.exit(f"built-in catalog pack {d.name} has no pack-source.yaml in the wheel")
+        load_pack_dir(d)
+
     print(f"clean-room OK: capsule_engine from {Path(capsule_engine.__file__).resolve().parent}")
-    print(f"  Result built, verified and schema-validated; {len(contracts)} example contracts validated")
+    print(f"  Result built, verified and schema-validated; {len(contracts)} example contracts validated;")
+    print(f"  {len(pack_dirs)} built-in catalog packs loaded")
     return 0
 
 

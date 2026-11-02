@@ -22,7 +22,7 @@ import sys
 from pathlib import Path
 
 from ..envcompat import env_get
-from ..packs import PackDefinitionError, load_pack_dir
+from ..packs import PackDefinitionError, is_pack_dir, load_pack_dir
 from ..tenants import TenantProvisionError, init_tenant, list_tenants, upgrade_tenant
 
 __all__ = ["add_parser"]
@@ -36,7 +36,7 @@ _SECRET_ENV = "CAPSULE_MCP_SIGNING_SECRET"
 def _available_packs(catalog_dir: Path) -> list[str]:
     if not catalog_dir.is_dir():
         return []
-    return sorted(p.name for p in catalog_dir.iterdir() if (p / "pack.yaml").is_file())
+    return sorted(p.name for p in catalog_dir.iterdir() if is_pack_dir(p))
 
 
 def _load_pack(args: argparse.Namespace, *, verb: str):
@@ -47,7 +47,7 @@ def _load_pack(args: argparse.Namespace, *, verb: str):
         return None, None
     catalog_dir = Path(args.pack_catalog_dir) if args.pack_catalog_dir else BUILTIN_PACK_CATALOG_DIR
     pack_dir = catalog_dir / args.pack
-    if not (pack_dir / "pack.yaml").is_file():
+    if not is_pack_dir(pack_dir):
         available = _available_packs(catalog_dir)
         print(f"capsule tenant {verb}: no pack named {args.pack!r} in {catalog_dir}", file=sys.stderr)
         print(f"  available packs: {available or '<none>'}", file=sys.stderr)

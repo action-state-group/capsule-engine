@@ -179,9 +179,9 @@ def test_binding_a_rule_to_the_whole_gate_result_brings_back_the_false_fail(deci
 def _pack_with(tmp_path: Path, old: str, new: str) -> Path:
     pack_dir = tmp_path / "everyday"
     shutil.copytree(PACK_DIR, pack_dir)
-    text = (pack_dir / "pack.yaml").read_text()
+    text = (pack_dir / "pack-source.yaml").read_text()
     assert text.count(old) == 1
-    (pack_dir / "pack.yaml").write_text(text.replace(old, new))
+    (pack_dir / "pack-source.yaml").write_text(text.replace(old, new))
     return pack_dir
 
 
@@ -190,7 +190,7 @@ def _pack_with(tmp_path: Path, old: str, new: str) -> Path:
     [
         ("    selector: public_posting\n", "    selector: public_postings\n", "unknown_obligation_selector"),
         ("    selector: public_posting\n", "", "missing_obligation_selector"),
-        ("    check: refundability\n", "    check: refundability\n    selector: public_posting\n",
+        ("not measured yet.\n    check: refundability\n", "not measured yet.\n    check: refundability\n    selector: public_posting\n",
          "invalid_obligation_selector"),
         ("    evidence_instrument: {kind: structured_field, field: user_control_state}\n",
          "    evidence_instrument: {kind: structured_field, field: user_control_state}\n    selector: public_posting\n",

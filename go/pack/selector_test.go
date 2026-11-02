@@ -8,15 +8,15 @@ import (
 	"github.com/action-state-group/capsule-engine/go/packs"
 )
 
-// loadEdited loads the vendored pack.yaml with one edit, against the
+// loadEdited loads the vendored pack-source.yaml with one edit, against the
 // vendored catalog.
 func loadEdited(t *testing.T, old, new string) (Pack, error) {
 	t.Helper()
 	y := string(vendoredPackYAML(t))
 	if !strings.Contains(y, old) {
-		t.Fatalf("the vendored pack.yaml has no %q", old)
+		t.Fatalf("the vendored pack-source.yaml has no %q", old)
 	}
-	return Load([]byte(strings.Replace(y, old, new, 1)), packs.Everyday038, packs.Everyday038Dir)
+	return LoadSource([]byte(strings.Replace(y, old, new, 1)), packs.Everyday038, packs.Everyday038Dir)
 }
 
 // capsule-engine packs/loader.py _obligation_selector at a5e9e30: an
@@ -45,7 +45,7 @@ func TestObligationSelectorIsRequiredAndClosed(t *testing.T) {
 func TestTheSelectorIsDigestCovered(t *testing.T) {
 	const engineDigest = "f82ef8375dc152e04e0a56d107821b88c3240f076b64fb96739ca4cfd71e2261"
 	y := string(everyday037PackYAML(t))
-	p, err := Load([]byte(strings.Replace(y, "selector: booking_create", "selector: booking_cancel", 1)), packs.Everyday037, packs.Everyday037Dir)
+	p, err := LoadSource([]byte(strings.Replace(y, "selector: booking_create", "selector: booking_cancel", 1)), packs.Everyday037, packs.Everyday037Dir)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -111,6 +111,7 @@ func TestFrozen035IsPinned(t *testing.T) {
 func retiredIDIsPinned(t *testing.T, id, digest string) {
 	t.Helper()
 	y := strings.Replace(string(vendoredPackYAML(t)), "pack_id: asg/everyday/0.3.8", "pack_id: "+id, 1)
+	y = strings.Replace(y, "pack_version: 0.3.8", "pack_version: "+id[strings.LastIndex(id, "/")+1:], 1)
 	_, err := LoadPath(writePack(t, []byte(y)), builtInCatalog)
 	var pe *PinnedDigestError
 	if !errors.As(err, &pe) || pe.PackID != id || pe.Pinned != digest || pe.Digest == pe.Pinned {

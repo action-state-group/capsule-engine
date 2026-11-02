@@ -4,7 +4,7 @@
 A pack directory looks like::
 
     payments-safety/
-      pack.yaml               # this module's own top-level shape
+      pack-source.yaml        # this module's own top-level shape
       wickets/                # not read directly -- constraints are inline
       folds/
         spend_weekly.yaml     # a real fold definition (folds/definition.py)
@@ -34,6 +34,18 @@ makes its claims entirely through outcomes, and requiring an unused forward
 triple just to satisfy this loader would be a fake declaration, not a real
 one. A pack declaring NEITHER outcomes nor the forward triple is still
 rejected -- see ``load_pack_dir``.
+
+**One pack format** (capsule-engine#252; evidencebook-skills SEAMS ruling 1):
+a pack is authored as ``pack-source.yaml`` with ``scope: {kind: live}``, the
+format evidencebook-skills' ``scripts/pack_compile.py`` compiles to an
+Evidence Contract. It is the ``pack.yaml`` shape plus source-only fields that
+are not in the definition digest: ``scope``, ``pack_version`` (equal to the
+version in ``pack_id``) and, on each cited wicket (``wicket_ref``), the
+``check`` that wicket implements, which must match the cited definition. An
+obligation may also carry ``requirement_tier``, which only the compiled
+contract reads. ``pack.yaml`` is a deprecated read path, kept for packs
+authored outside this repository; it is removed in capsule-engine Python
+0.5.0 and Go v0.4.0.
 """
 from __future__ import annotations
 
@@ -68,7 +80,9 @@ from ..guards.wickets.definition import parse_definition as parse_wicket_definit
 from ..guards.wickets.errors import WicketDefinitionError
 from ..guards.wickets.retired import RetiredDefinition, retired_entry
 from .errors import (
+    AMBIGUOUS_PACK_SOURCE,
     CATALOG_REF_DIGEST_MISMATCH,
+    CONSTRAINT_CHECK_MISMATCH,
     DUPLICATE_ACTION_TYPE,
     DUPLICATE_CONSTRAINT_WICKET_ID,
     DUPLICATE_OBLIGATION_ID,
@@ -94,6 +108,7 @@ from .errors import (
     INVALID_OBLIGATION_SELECTOR,
     INVALID_OUTCOME,
     INVALID_PACK_ID,
+    INVALID_PACK_SOURCE_SCOPE,
     INVALID_PROFILE_ID,
     INVALID_RE_DERIVABILITY_GRADE,
     INVALID_SCOPE_CENSUS,
@@ -112,6 +127,7 @@ from .errors import (
     MISSING_REQUIRED_FIELD,
     OBLIGATION_CHECK_NOT_DECLARED,
     PACK_NOT_FOUND,
+    PACK_VERSION_MISMATCH,
     PROMPT_TEXT_IN_PACK,
     RETIRED_CATALOG_REF,
     SCOPE_MISMATCH,
@@ -1380,13 +1396,92 @@ def _parse_profiles(raw: Any, *, outcomes: tuple[EvidenceContract, ...]) -> tupl
     return tuple(out)
 
 
-def load_pack_dir(pack_dir: str | Path) -> PackDefinition:
-    """Load and fully validate a pack directory's ``pack.yaml`` (plus every
-    fold file and inline constraint it references) into a ``PackDefinition``."""
+PACK_SOURCE_FILE = "pack-source.yaml"
+# Deprecated: removed in capsule-engine Python 0.5.0 and Go v0.4.0.
+LEGACY_PACK_FILE = "pack.yaml"
+
+# Read only from a pack-source.yaml; not in the definition digest.
+_SOURCE_ONLY_KEYS = ("scope", "pack_version")
+REQUIREMENT_TIER_VALUES = frozenset({"must_have", "informational"})
+
+
+def is_pack_dir(path: str | Path) -> bool:
+    """Whether path holds a pack definition file (either name)."""
+    path = Path(path)
+    return (path / PACK_SOURCE_FILE).is_file() or (path / LEGACY_PACK_FILE).is_file()
+
+
+def pack_file(pack_dir: str | Path) -> Path | None:
+    """The definition file of a pack directory: its ``pack-source.yaml``, else
+    its (deprecated) ``pack.yaml``, else None. A directory holding both is
+    refused, since the two could define different packs."""
     pack_dir = Path(pack_dir)
-    pack_yaml_path = pack_dir / "pack.yaml"
-    if not pack_yaml_path.is_file():
-        raise PackDefinitionError(PACK_NOT_FOUND, f"no pack.yaml found in {pack_dir} -- every pack directory must have one")
+    source, legacy = pack_dir / PACK_SOURCE_FILE, pack_dir / LEGACY_PACK_FILE
+    if source.is_file() and legacy.is_file():
+        raise PackDefinitionError(
+            AMBIGUOUS_PACK_SOURCE,
+            f"{pack_dir} holds both {PACK_SOURCE_FILE} and {LEGACY_PACK_FILE}; keep only {PACK_SOURCE_FILE}",
+        )
+    if source.is_file():
+        return source
+    if legacy.is_file():
+        return legacy
+    return None
+
+
+def _read_pack_source(data: dict, pack_id: str) -> None:
+    """Validate a pack-source.yaml's source-only fields: ``scope.kind`` is
+    ``live`` (an ``after_the_fact`` or ``admission`` source is compiled by
+    evidencebook-skills, not loaded as a guard pack), ``pack_version`` is the
+    version in ``pack_id``, and any ``requirement_tier`` is a known tier."""
+    scope = data.get("scope")
+    if not (isinstance(scope, dict) and set(scope) == {"kind"} and scope["kind"] == "live"):
+        raise PackDefinitionError(
+            INVALID_PACK_SOURCE_SCOPE,
+            f"scope={scope!r}: a {PACK_SOURCE_FILE} the engine loads declares exactly 'scope: {{kind: live}}' "
+            "(an after_the_fact or admission pack source is compiled by evidencebook-skills' pack_compile.py)",
+        )
+    version = pack_id.rsplit("/", 1)[1]
+    if data.get("pack_version") != version:
+        raise PackDefinitionError(
+            PACK_VERSION_MISMATCH,
+            f"pack_version={data.get('pack_version')!r} must equal the version in pack_id {pack_id!r} ({version!r})",
+        )
+    for idx, entry in enumerate(data.get("obligations") or ()):
+        tier = entry.get("requirement_tier") if isinstance(entry, dict) else None
+        if tier is not None and tier not in REQUIREMENT_TIER_VALUES:
+            raise PackDefinitionError(
+                INVALID_TIER,
+                f"obligations[{idx}].requirement_tier={tier!r} must be one of {sorted(REQUIREMENT_TIER_VALUES)}",
+            )
+
+
+def _check_cited_checks(raw: Any, constraints: tuple[WicketDefinition, ...]) -> None:
+    """In a pack-source.yaml every cited wicket (``wicket_ref``) names the
+    check it implements, so the source compiles without a wicket catalog; it
+    must be the cited definition's check."""
+    for idx, (entry, definition) in enumerate(zip(raw or (), constraints, strict=True)):
+        if not (isinstance(entry, dict) and "wicket_ref" in entry):
+            continue
+        if entry.get("check") != definition.check:
+            raise PackDefinitionError(
+                CONSTRAINT_CHECK_MISMATCH,
+                f"constraints[{idx}] cites {definition.wicket_id!r}, whose check is {definition.check!r}, "
+                f"but names check={entry.get('check')!r}",
+            )
+
+
+def load_pack_dir(pack_dir: str | Path) -> PackDefinition:
+    """Load and fully validate a pack directory's ``pack-source.yaml`` (or its
+    deprecated ``pack.yaml``), plus every fold file and inline constraint it
+    references, into a ``PackDefinition``."""
+    pack_dir = Path(pack_dir)
+    pack_yaml_path = pack_file(pack_dir)
+    if pack_yaml_path is None:
+        raise PackDefinitionError(
+            PACK_NOT_FOUND, f"no {PACK_SOURCE_FILE} found in {pack_dir} -- every pack directory must have one"
+        )
+    is_source = pack_yaml_path.name == PACK_SOURCE_FILE
 
     try:
         data = yaml.safe_load(pack_yaml_path.read_text())
@@ -1402,6 +1497,14 @@ def load_pack_dir(pack_dir: str | Path) -> PackDefinition:
             "(e.g. 'asg/payments-safety/1.0.0') -- the publisher segment is a registered namespace "
             "prefix (registry-architecture ruling, 2026-08-10), not a display name",
         )
+    if is_source:
+        _read_pack_source(data, pack_id)
+    else:
+        for key in _SOURCE_ONLY_KEYS:
+            if key in data:
+                raise PackDefinitionError(
+                    MALFORMED_PACK, f"{key!r} belongs in a {PACK_SOURCE_FILE}; {pack_yaml_path} is a {LEGACY_PACK_FILE}"
+                )
 
     # outcomes[] parsed before the forward obligations/action_semantics/constraints
     # triple: a pack declaring at least one outcome is backward-only-eligible,
@@ -1411,6 +1514,8 @@ def load_pack_dir(pack_dir: str | Path) -> PackDefinition:
     allow_empty_forward = bool(outcomes)
 
     constraints, constraint_scopes = _parse_constraints(data.get("constraints"), allow_empty=allow_empty_forward)
+    if is_source:
+        _check_cited_checks(data.get("constraints"), constraints)
     declared_checks = {c.check for c in constraints}
     check_selectors = {c.check: frozenset(c.config["selectors"]) for c in constraints if "selectors" in c.config}
     obligations = _parse_obligations(

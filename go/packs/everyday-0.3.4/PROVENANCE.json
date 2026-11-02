@@ -5,9 +5,10 @@
   "source_commit": "97a2aff71b8293f70dc335e6fb6a5fbe1ada31d0",
   "source_ref": "capsule-engine PR #121 merge commit on main (asg/everyday/0.3.4: counterparty_seen_before/3.0.0 over the new fold counterparty.seen_before/3.0.0, which counts a carried_out record beside an accepted one, so an act that asked, was approved to proceed and was executed makes its counterparty known; r02 and r06 statements say so. Everything else 0.3.3 cites is unchanged.)",
   "files": {
-    "pack.yaml": {
+    "pack-source.yaml": {
       "source_path": "capsule_engine/packs/catalog/everyday/pack.yaml",
-      "sha256": "410d091a6725650222fffeba1550516fdf74c097e6293d3e5655e2e95e7b3646"
+      "sha256": "06b90532c8d4ba3a5f75b980bb961e2aca07574853678380691c728c7e1e87d5",
+      "converted_from_pack_yaml_sha256": "410d091a6725650222fffeba1550516fdf74c097e6293d3e5655e2e95e7b3646"
     },
     "wickets/action_class_gate.yaml": {
       "source_path": "capsule_engine/guards/wickets/catalog_defs/action_class_gate.yaml",

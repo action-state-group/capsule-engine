@@ -6,17 +6,17 @@ the module directory, so ``go/packs/`` holds a copy of each pack version the
 Go guard serves. This script is the only thing that writes it. Its sources are
 this repository's own:
 
-* ``python/capsule_engine/packs/catalog/<pack>/pack.yaml`` (the current version);
+* ``python/capsule_engine/packs/catalog/<pack>/pack-source.yaml`` (the current version);
 * ``python/capsule_engine/guards/wickets/catalog_defs/`` and
   ``python/capsule_engine/folds/catalog_defs/`` (every definition version);
 * ``python/capsule_engine/guards/action_taxonomy.json``.
 
-A pack version directory, once written, is frozen: its pack.yaml and
+A pack version directory, once written, is frozen: its pack-source.yaml and
 PROVENANCE.json are never rewritten, so an older pinned pack keeps loading at
 its digest. Only the current version of a served pack is written, and only
-when its directory is missing. It holds the pack.yaml, the definitions it
+when its directory is missing. It holds the pack-source.yaml, the definitions it
 cites, and the definitions the previous version's directory held (so a
-pack.yaml-only source citing them still resolves, as before).
+source holding only its definition file and citing them still resolves, as before).
 
 Generated Go: ``go/packs/embed.go`` (one ``embed.FS`` per version, ``All``
 over the whole tree, and ``ActionTaxonomy``) and ``go/pack/registry_gen.go``
@@ -28,14 +28,14 @@ version, which the Go guard's tests hold its ported definitions against.
 ``--check`` writes nothing and fails on any difference:
 
 * the current version of each served pack is present, with the catalog's
-  pack.yaml byte for byte;
+  pack-source.yaml byte for byte;
 * every definition file under ``go/packs`` equals its namesake in catalog_defs;
 * every PROVENANCE.json's ``engine_definition_digest`` equals what this
   engine computes for that directory today, and each listed file's sha256
   holds;
 * every frozen version the Python tests keep under
   ``python/tests/fixtures/packs/<pack>-<version>`` that ``go/packs`` also
-  holds has the ``go/packs`` pack.yaml byte for byte (``go/packs`` is the
+  holds has the ``go/packs`` pack-source.yaml byte for byte (``go/packs`` is the
   record of a frozen version; the fixture adds the AI-BOOTSTRAP.md it was
   released with, which ``go/packs`` does not vendor);
 * ``engine/action_taxonomy.json`` and its PROVENANCE.json are what this script
@@ -64,7 +64,7 @@ from capsule_engine.folds.loader import load_definition_file as load_fold_file
 from capsule_engine.guards.classes import TAXONOMY_DIGEST, TAXONOMY_VERSION
 from capsule_engine.guards.wickets.loader import load_definition_file as load_wicket_file
 from capsule_engine.guards.wickets.retired import RETIRED
-from capsule_engine.packs.loader import load_pack_dir
+from capsule_engine.packs.loader import PACK_SOURCE_FILE, load_pack_dir, pack_file
 
 ROOT = Path(__file__).resolve().parent.parent
 CATALOG = ROOT / "python" / "capsule_engine" / "packs" / "catalog"
@@ -116,13 +116,13 @@ def _definitions(directory: Path, load, id_attr: str) -> dict[str, tuple[Path, s
 
 
 def pack_digest(directory: Path) -> str:
-    """The engine's definition digest of a pack directory. A pack.yaml naming a
+    """The engine's definition digest of a pack directory. A pack naming a
     bootstrap file that is not vendored loads with an empty stand-in: the
     bootstrap's bytes are not inside the digest."""
     with tempfile.TemporaryDirectory() as tmp:
         copy = Path(tmp) / directory.name
         shutil.copytree(directory, copy)
-        bootstrap = (yaml.safe_load((copy / "pack.yaml").read_text()) or {}).get("bootstrap")
+        bootstrap = (yaml.safe_load(pack_file(copy).read_text()) or {}).get("bootstrap")
         if bootstrap and not (copy / bootstrap).exists():
             (copy / bootstrap).write_text("")
         return load_pack_dir(copy).definition_digest()
@@ -137,13 +137,13 @@ def _cited(pack_yaml: Path) -> tuple[list[str], list[str]]:
 
 def _new_version_dir(name: str, problems: list[str], write: bool) -> None:
     """Write the current version of a served pack when its directory is missing."""
-    source = CATALOG / name / "pack.yaml"
+    source = CATALOG / name / PACK_SOURCE_FILE
     pack = load_pack_dir(CATALOG / name)
     version = pack.pack_id.rsplit("/", 1)[1]
     target = PACKS / f"{name}-{version}"
     if target.exists():
-        if (target / "pack.yaml").read_bytes() != source.read_bytes():
-            problems.append(f"{target.name}/pack.yaml is not the catalog's {name} pack.yaml")
+        if (target / PACK_SOURCE_FILE).read_bytes() != source.read_bytes():
+            problems.append(f"{target.name}/{PACK_SOURCE_FILE} is not the catalog's {name} {PACK_SOURCE_FILE}")
         return
     if not write:
         problems.append(f"{target.name} is missing: the catalog's {name} pack is {pack.pack_id}")
@@ -171,7 +171,7 @@ def _new_version_dir(name: str, problems: list[str], write: bool) -> None:
                     ident = getattr(definition, "wicket_id" if sub == "wickets" else "fold_id")
                     catalog_only[kind][ident] = definition.definition_digest()
     target.mkdir(parents=True)
-    shutil.copyfile(source, target / "pack.yaml")
+    shutil.copyfile(source, target / PACK_SOURCE_FILE)
     for rel, src in sorted(files.items()):
         (target / rel).parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(src, target / rel)
@@ -208,9 +208,11 @@ def _check_tree(problems: list[str]) -> None:
             path = directory / rel
             if not path.is_file() or _sha256(path) != entry.get("sha256"):
                 problems.append(f"{directory.name}/{rel}: sha256 is not the one PROVENANCE.json records")
-        fixture = FIXTURE_PACKS / directory.name / "pack.yaml"
-        if fixture.is_file() and fixture.read_bytes() != (directory / "pack.yaml").read_bytes():
-            problems.append(f"python/tests/fixtures/packs/{directory.name}/pack.yaml is not {directory.name}/pack.yaml")
+        fixture = FIXTURE_PACKS / directory.name / PACK_SOURCE_FILE
+        if fixture.is_file() and fixture.read_bytes() != (directory / PACK_SOURCE_FILE).read_bytes():
+            problems.append(
+                f"python/tests/fixtures/packs/{directory.name}/{PACK_SOURCE_FILE} is not {directory.name}/{PACK_SOURCE_FILE}"
+            )
 
 
 def render_taxonomy_provenance() -> str:
@@ -250,7 +252,7 @@ def render_embed() -> str:
         pack_id = json.loads((directory / "PROVENANCE.json").read_text())["pack_id"]
         lines += [
             "",
-            f"// {name} is {pack_id}: its pack.yaml, the definitions it cites, and",
+            f"// {name} is {pack_id}: its pack-source.yaml, the definitions it cites, and",
             "// PROVENANCE.json.",
             "//",
             f"//go:embed {directory.name}",

@@ -46,7 +46,7 @@ FROZEN_0_3_3_DIR = REPO / "tests" / "fixtures" / "packs" / "everyday-0.3.3"
 PACK_0_3_3_DIGEST = "d153219b9b5f7ad8eb4805eb718aab81a5dfa29a6a1d977301559fc167268752"
 FROZEN_0_3_2_DIR = REPO / "tests" / "fixtures" / "packs" / "everyday-0.3.2"
 PACK_0_3_2_DIGEST = "6f333fa8b7a7e137abe6c61e5a32097ed06d493479a018807cbf4d2e4f5da7b2"
-PACK_0_3_2_FILE_SHA256 = "b2d5408cc71ea6b70b6c2318dc633c459cd2cab1dca4e6eaaf880bc7fc583f24"
+PACK_0_3_2_FILE_SHA256 = "ef4ae89a2cbc352f2a5b71982b8e4174407198334b914a7b56f514f71f08720c"
 WICKETS = REPO / "capsule_engine" / "guards" / "wickets" / "catalog_defs"
 SALE = "marketplace.sale"
 
@@ -172,9 +172,9 @@ def test_the_catalog_pins_the_taxonomy_this_engine_ships():
 def test_the_catalog_pack_does_not_load_under_another_taxonomy(tmp_path):
     copy = tmp_path / "everyday"
     shutil.copytree(PACK_DIR, copy)
-    text = (copy / "pack.yaml").read_text()
+    text = (copy / "pack-source.yaml").read_text()
     assert text.count(TAXONOMY_DIGEST) == 1
-    (copy / "pack.yaml").write_text(text.replace(TAXONOMY_DIGEST, "0" * 64))
+    (copy / "pack-source.yaml").write_text(text.replace(TAXONOMY_DIGEST, "0" * 64))
     with pytest.raises(PackDefinitionError) as exc_info:
         load_pack_dir(copy)
     assert exc_info.value.reason == TAXONOMY_PIN_MISMATCH
@@ -211,7 +211,7 @@ def test_caps_leaves_a_sale_out_of_scope(decide):
 
 
 def test_the_frozen_0_3_2_is_the_released_bytes_and_loads_at_its_digest():
-    assert hashlib.sha256((FROZEN_0_3_2_DIR / "pack.yaml").read_bytes()).hexdigest() == PACK_0_3_2_FILE_SHA256
+    assert hashlib.sha256((FROZEN_0_3_2_DIR / "pack-source.yaml").read_bytes()).hexdigest() == PACK_0_3_2_FILE_SHA256
     pack = load_pack_dir(FROZEN_0_3_2_DIR)
     assert pack.pack_id == "asg/everyday/0.3.2"
     assert pack.taxonomy is None

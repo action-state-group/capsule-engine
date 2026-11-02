@@ -25,9 +25,10 @@
       "source_path": "capsule_engine/folds/catalog_defs/spend.weekly.yaml",
       "sha256": "f5cde341828bd77e403abdee234430271c46b549ca8d7aa4ee2cb21287f76159"
     },
-    "pack.yaml": {
+    "pack-source.yaml": {
       "source_path": "capsule_engine/packs/catalog/everyday/pack.yaml",
-      "sha256": "30bdfa165b6ba9d451b5c184e3dd49043d8d185d066623a29f3fb1b8c5e49f98"
+      "sha256": "951d5970463abdbd8e612d45814269e2c55d47292ea31ac0887843b78e461c18",
+      "converted_from_pack_yaml_sha256": "30bdfa165b6ba9d451b5c184e3dd49043d8d185d066623a29f3fb1b8c5e49f98"
     },
     "wickets/action_class_gate.yaml": {
       "source_path": "capsule_engine/guards/wickets/catalog_defs/action_class_gate.yaml",

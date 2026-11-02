@@ -73,7 +73,7 @@ def _gate(name: str, path: Path) -> list[str]:
 
 def test_the_scan_covers_every_pack_file_but_the_ledger():
     assert len(SCANNED) == len(ALL_FILES) - 1
-    assert {p.name for p in SCANNED} >= {"pack.yaml", "AI-BOOTSTRAP.md", "decision_table.yaml", "gold_labels.yaml"}
+    assert {p.name for p in SCANNED} >= {"pack-source.yaml", "AI-BOOTSTRAP.md", "decision_table.yaml", "gold_labels.yaml"}
 
 
 @pytest.mark.parametrize("name", sorted(GATES))

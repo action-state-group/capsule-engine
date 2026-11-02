@@ -12,7 +12,7 @@ today).
 from .enforce import accept_thresholds, enforce_pack, profile_for_accepted
 from .errors import PackDefinitionError, RegistryPinError
 from .install import InstalledPack, build_engine, install_pack, record_pack_activation
-from .loader import load_pack_dir
+from .loader import is_pack_dir, load_pack_dir, pack_file
 from .obligation_results import ObligationResult, obligation_results
 from .pins import load_pins_file, verify_pins
 from .schema import ActionSemantic, Obligation, PackDefinition, PackFixtures, ProposerStub
@@ -25,6 +25,8 @@ __all__ = [
     "ProposerStub",
     "PackFixtures",
     "load_pack_dir",
+    "is_pack_dir",
+    "pack_file",
     "ObligationResult",
     "obligation_results",
     "PackDefinitionError",

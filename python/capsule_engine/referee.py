@@ -108,7 +108,7 @@ from capsule_emit.signing import AuthorshipVerdict, verify_capsule_signature_tri
 from capsule_emit.verification import verify_capsule
 
 from .guards.checks import RUNNABLE_CHECKS
-from .packs import install_pack, load_pack_dir, obligation_results
+from .packs import install_pack, is_pack_dir, load_pack_dir, obligation_results
 from .packs.schema import PackDefinition
 from .report.errors import ResultError
 from .report.replay import _deal_id, replay
@@ -304,7 +304,7 @@ def _own_records(role: str, party: Party) -> tuple[list[dict], set[str]]:
 @cache
 def _catalog() -> dict[str, PackDefinition]:
     packs = {}
-    for d in sorted(p for p in _CATALOG.iterdir() if (p / "pack.yaml").is_file()):
+    for d in sorted(p for p in _CATALOG.iterdir() if is_pack_dir(p)):
         pack = load_pack_dir(d)
         packs[pack.pack_id] = pack
     return packs

@@ -56,9 +56,10 @@
       "source_path": "capsule_engine/folds/catalog_defs/disclosure.statement_seen.yaml",
       "sha256": "4dade5a5045707fe340d0fe86f52045b3fe1e1eecbe3b6d6da5ef93b6a138be5"
     },
-    "pack.yaml": {
+    "pack-source.yaml": {
       "source_path": "capsule_engine/packs/catalog/seller/pack.yaml",
-      "sha256": "f3fc8290242515a24696a5b1e30536c36833ca5a95331c056ca822a50de35c53"
+      "sha256": "93a25137148b6a6201c4bcd1ac95f49277f3ff8738fe563fb4a9a6f179fdb0bc",
+      "converted_from_pack_yaml_sha256": "f3fc8290242515a24696a5b1e30536c36833ca5a95331c056ca822a50de35c53"
     },
     "wickets/dedupe.yaml": {
       "source_path": "capsule_engine/guards/wickets/catalog_defs/dedupe.yaml",

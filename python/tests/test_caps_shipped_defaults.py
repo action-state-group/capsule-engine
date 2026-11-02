@@ -40,7 +40,7 @@ def _shipped_caps_wickets() -> list[WicketDefinition]:
     core = [e.definition for e in WicketCatalog(WICKET_CATALOG_DIR).list_entries() if e.definition.check == "caps"]
     packs = [
         w
-        for pack_dir in sorted(p.parent for p in PACK_CATALOG_DIR.glob("*/pack.yaml"))
+        for pack_dir in sorted(p.parent for p in PACK_CATALOG_DIR.glob("*/pack-source.yaml"))
         for w in load_pack_dir(pack_dir).constraints
         if w.check == "caps"
     ]

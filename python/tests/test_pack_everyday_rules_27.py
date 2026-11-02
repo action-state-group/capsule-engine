@@ -17,7 +17,7 @@ from capsule_engine.packs.corpus_verify import (
     resolves_instrument,
     verify_declared_not_measured,
 )
-from capsule_engine.packs.loader import load_pack_dir
+from capsule_engine.packs.loader import is_pack_dir, load_pack_dir
 from capsule_engine.packs.schema import EvidenceInstrument
 
 CATALOG = Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog"
@@ -170,4 +170,4 @@ def test_every_other_catalog_pack_digests_as_before(name, digest):
 
 
 def test_the_pinned_set_is_every_other_catalog_pack():
-    assert {p.name for p in CATALOG.iterdir() if (p / "pack.yaml").exists()} - {"everyday"} == set(OTHER_PACK_DIGESTS)
+    assert {p.name for p in CATALOG.iterdir() if is_pack_dir(p)} - {"everyday"} == set(OTHER_PACK_DIGESTS)

@@ -5,9 +5,10 @@
   "source_commit": "7339028ab2117d6c7adec89a26cd5022b8ac7140",
   "source_ref": "capsule-engine #173 squash merge on main, 7339028 (asg/everyday/0.3.7: a platform recipient may be given the user's email. recipient_role/1.1.0 adds the platform role and role_classes {platform: [email]}; action_class_gate/1.1.0's personal_disclosure selector sets except_recipient_roles: [platform], so r11 and r12 leave a platform share to r03. Every other definition 0.3.6 cites is byte-identical at 7339028. action_class_gate/1.0.0 and recipient_role/1.0.0 stay here as catalog-only. asg/everyday/0.3.6 stays vendored and frozen at packs/everyday-0.3.6.)",
   "files": {
-    "pack.yaml": {
+    "pack-source.yaml": {
       "source_path": "capsule_engine/packs/catalog/everyday/pack.yaml",
-      "sha256": "9d003090ad99607d2a6dfaccb3303feca14d49ca32baf37e169589cbd0ae77ae"
+      "sha256": "583eb87f3471e07dbf29168d019cd1ccab31072131b58105db0acdcf17b9c1e9",
+      "converted_from_pack_yaml_sha256": "9d003090ad99607d2a6dfaccb3303feca14d49ca32baf37e169589cbd0ae77ae"
     },
     "folds/counterparty.seen_before.v2.yaml": {
       "source_path": "capsule_engine/folds/catalog_defs/counterparty.seen_before.v2.yaml",

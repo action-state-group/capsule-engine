@@ -13,7 +13,7 @@ import "embed"
 //go:embed engine everyday-0.3.4 everyday-0.3.5 everyday-0.3.6 everyday-0.3.7 everyday-0.3.8 everyday-0.3.9 inference-0.1.0 seller-0.1.0 seller-0.1.1 seller-0.1.2 seller-0.1.3 seller-0.1.4 seller-0.1.5 seller-0.1.6
 var All embed.FS
 
-// Everyday034 is asg/everyday/0.3.4: its pack.yaml, the definitions it cites, and
+// Everyday034 is asg/everyday/0.3.4: its pack-source.yaml, the definitions it cites, and
 // PROVENANCE.json.
 //
 //go:embed everyday-0.3.4
@@ -22,7 +22,7 @@ var Everyday034 embed.FS
 // Everyday034Dir is the directory of asg/everyday/0.3.4 inside Everyday034.
 const Everyday034Dir = "everyday-0.3.4"
 
-// Everyday035 is asg/everyday/0.3.5: its pack.yaml, the definitions it cites, and
+// Everyday035 is asg/everyday/0.3.5: its pack-source.yaml, the definitions it cites, and
 // PROVENANCE.json.
 //
 //go:embed everyday-0.3.5
@@ -31,7 +31,7 @@ var Everyday035 embed.FS
 // Everyday035Dir is the directory of asg/everyday/0.3.5 inside Everyday035.
 const Everyday035Dir = "everyday-0.3.5"
 
-// Everyday036 is asg/everyday/0.3.6: its pack.yaml, the definitions it cites, and
+// Everyday036 is asg/everyday/0.3.6: its pack-source.yaml, the definitions it cites, and
 // PROVENANCE.json.
 //
 //go:embed everyday-0.3.6
@@ -40,7 +40,7 @@ var Everyday036 embed.FS
 // Everyday036Dir is the directory of asg/everyday/0.3.6 inside Everyday036.
 const Everyday036Dir = "everyday-0.3.6"
 
-// Everyday037 is asg/everyday/0.3.7: its pack.yaml, the definitions it cites, and
+// Everyday037 is asg/everyday/0.3.7: its pack-source.yaml, the definitions it cites, and
 // PROVENANCE.json.
 //
 //go:embed everyday-0.3.7
@@ -49,7 +49,7 @@ var Everyday037 embed.FS
 // Everyday037Dir is the directory of asg/everyday/0.3.7 inside Everyday037.
 const Everyday037Dir = "everyday-0.3.7"
 
-// Everyday038 is asg/everyday/0.3.8: its pack.yaml, the definitions it cites, and
+// Everyday038 is asg/everyday/0.3.8: its pack-source.yaml, the definitions it cites, and
 // PROVENANCE.json.
 //
 //go:embed everyday-0.3.8
@@ -58,7 +58,7 @@ var Everyday038 embed.FS
 // Everyday038Dir is the directory of asg/everyday/0.3.8 inside Everyday038.
 const Everyday038Dir = "everyday-0.3.8"
 
-// Everyday039 is asg/everyday/0.3.9: its pack.yaml, the definitions it cites, and
+// Everyday039 is asg/everyday/0.3.9: its pack-source.yaml, the definitions it cites, and
 // PROVENANCE.json.
 //
 //go:embed everyday-0.3.9
@@ -67,7 +67,7 @@ var Everyday039 embed.FS
 // Everyday039Dir is the directory of asg/everyday/0.3.9 inside Everyday039.
 const Everyday039Dir = "everyday-0.3.9"
 
-// Inference010 is asg/inference/0.1.0: its pack.yaml, the definitions it cites, and
+// Inference010 is asg/inference/0.1.0: its pack-source.yaml, the definitions it cites, and
 // PROVENANCE.json.
 //
 //go:embed inference-0.1.0
@@ -76,7 +76,7 @@ var Inference010 embed.FS
 // Inference010Dir is the directory of asg/inference/0.1.0 inside Inference010.
 const Inference010Dir = "inference-0.1.0"
 
-// Seller010 is asg/seller/0.1.0: its pack.yaml, the definitions it cites, and
+// Seller010 is asg/seller/0.1.0: its pack-source.yaml, the definitions it cites, and
 // PROVENANCE.json.
 //
 //go:embed seller-0.1.0
@@ -85,7 +85,7 @@ var Seller010 embed.FS
 // Seller010Dir is the directory of asg/seller/0.1.0 inside Seller010.
 const Seller010Dir = "seller-0.1.0"
 
-// Seller011 is asg/seller/0.1.1: its pack.yaml, the definitions it cites, and
+// Seller011 is asg/seller/0.1.1: its pack-source.yaml, the definitions it cites, and
 // PROVENANCE.json.
 //
 //go:embed seller-0.1.1
@@ -94,7 +94,7 @@ var Seller011 embed.FS
 // Seller011Dir is the directory of asg/seller/0.1.1 inside Seller011.
 const Seller011Dir = "seller-0.1.1"
 
-// Seller012 is asg/seller/0.1.2: its pack.yaml, the definitions it cites, and
+// Seller012 is asg/seller/0.1.2: its pack-source.yaml, the definitions it cites, and
 // PROVENANCE.json.
 //
 //go:embed seller-0.1.2
@@ -103,7 +103,7 @@ var Seller012 embed.FS
 // Seller012Dir is the directory of asg/seller/0.1.2 inside Seller012.
 const Seller012Dir = "seller-0.1.2"
 
-// Seller013 is asg/seller/0.1.3: its pack.yaml, the definitions it cites, and
+// Seller013 is asg/seller/0.1.3: its pack-source.yaml, the definitions it cites, and
 // PROVENANCE.json.
 //
 //go:embed seller-0.1.3
@@ -112,7 +112,7 @@ var Seller013 embed.FS
 // Seller013Dir is the directory of asg/seller/0.1.3 inside Seller013.
 const Seller013Dir = "seller-0.1.3"
 
-// Seller014 is asg/seller/0.1.4: its pack.yaml, the definitions it cites, and
+// Seller014 is asg/seller/0.1.4: its pack-source.yaml, the definitions it cites, and
 // PROVENANCE.json.
 //
 //go:embed seller-0.1.4
@@ -121,7 +121,7 @@ var Seller014 embed.FS
 // Seller014Dir is the directory of asg/seller/0.1.4 inside Seller014.
 const Seller014Dir = "seller-0.1.4"
 
-// Seller015 is asg/seller/0.1.5: its pack.yaml, the definitions it cites, and
+// Seller015 is asg/seller/0.1.5: its pack-source.yaml, the definitions it cites, and
 // PROVENANCE.json.
 //
 //go:embed seller-0.1.5
@@ -130,7 +130,7 @@ var Seller015 embed.FS
 // Seller015Dir is the directory of asg/seller/0.1.5 inside Seller015.
 const Seller015Dir = "seller-0.1.5"
 
-// Seller016 is asg/seller/0.1.6: its pack.yaml, the definitions it cites, and
+// Seller016 is asg/seller/0.1.6: its pack-source.yaml, the definitions it cites, and
 // PROVENANCE.json.
 //
 //go:embed seller-0.1.6

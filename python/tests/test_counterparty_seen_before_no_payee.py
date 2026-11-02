@@ -42,7 +42,7 @@ WICKETS = REPO / "capsule_engine" / "guards" / "wickets" / "catalog_defs"
 # 0.3.5's released pack.yaml; 0.3.6 changed only its caps wicket and fold.
 PACK = load_pack_dir(REPO / "tests" / "fixtures" / "packs" / "everyday-0.3.5")
 FROZEN_0_3_4 = REPO / "tests" / "fixtures" / "packs" / "everyday-0.3.4"
-FROZEN_0_3_4_FILE_SHA256 = "410d091a6725650222fffeba1550516fdf74c097e6293d3e5655e2e95e7b3646"
+FROZEN_0_3_4_FILE_SHA256 = "06b90532c8d4ba3a5f75b980bb961e2aca07574853678380691c728c7e1e87d5"
 V3_WICKET_DIGEST = "9cfab71d142ca7af8912218f4c4ea194f60fb02784d8536233cb7e18eddc24a8"
 V4_WICKET_DIGEST = "c7c20d9e57cb0a75184b9c6c4d037c9bea813a7b1105c581defd4481acf964b0"
 R02, R06 = "r02-ordinary-purchase", "r06-new-merchant"
@@ -68,7 +68,7 @@ def test_everyday_0_3_5_cites_v4_and_0_3_4_is_kept_citing_v3():
     assert PACK.pack_id == "asg/everyday/0.3.5"
     assert cited["counterparty_seen_before/4.0.0"] == V4_WICKET_DIGEST
     assert "counterparty_seen_before/3.0.0" not in cited
-    assert hashlib.sha256((FROZEN_0_3_4 / "pack.yaml").read_bytes()).hexdigest() == FROZEN_0_3_4_FILE_SHA256
+    assert hashlib.sha256((FROZEN_0_3_4 / "pack-source.yaml").read_bytes()).hexdigest() == FROZEN_0_3_4_FILE_SHA256
     frozen = load_pack_dir(FROZEN_0_3_4)
     assert {c.wicket_id: c.definition_digest() for c in frozen.constraints}["counterparty_seen_before/3.0.0"] == V3_WICKET_DIGEST
 

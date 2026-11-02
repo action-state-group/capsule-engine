@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 """A pack may pin the action taxonomy it was authored against (``taxonomy:``
-in ``pack.yaml``: its ``taxonomy_version`` and the SHA-256 over its JCS
+in ``pack-source.yaml``: its ``taxonomy_version`` and the SHA-256 over its JCS
 bytes).
 
 The taxonomy decides what a gated class does on a failure -- its
@@ -40,7 +40,7 @@ EVERYDAY_0_3_2_DIGEST = "6f333fa8b7a7e137abe6c61e5a32097ed06d493479a018807cbf4d2
 def _pinned_copy(tmp_path: Path, pin: str) -> Path:
     pack_dir = tmp_path / "everyday"
     shutil.copytree(EVERYDAY, pack_dir)
-    with (pack_dir / "pack.yaml").open("a") as f:
+    with (pack_dir / "pack-source.yaml").open("a") as f:
         f.write(pin)
     return pack_dir
 

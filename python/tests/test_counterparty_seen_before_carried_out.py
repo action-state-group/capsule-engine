@@ -31,7 +31,7 @@ FOLDS = ROOT / "folds" / "catalog_defs"
 FROZEN_0_3_4 = REPO / "tests" / "fixtures" / "packs" / "everyday-0.3.4"
 PACK = load_pack_dir(FROZEN_0_3_4)
 FROZEN_0_3_3 = REPO / "tests" / "fixtures" / "packs" / "everyday-0.3.3"
-FROZEN_0_3_3_FILE_SHA256 = "f9768c624b78998528620acc0258ee0878a3e49d16df7ebbe00c84ef4e11b8ca"
+FROZEN_0_3_3_FILE_SHA256 = "7794b24a467ca64ef49a0b01453f807e95fde8f7354ad21607a387e2da2896f9"
 V2_FOLD_DIGEST = "6a1a357e4a3b950b7397c2790fe46c03f7e645d04aad1a9bb41533df9b4a4033"
 V2_WICKET_DIGEST = "c82a29eae8ef72736851d275ffa4d85e511a21d202822366d3b03bf3834c8cd0"
 V3_FOLD_DIGEST = "73dbf8cd8a36fadca0ac823d2b17592fdc457c24081bc44667f032601e914033"
@@ -84,7 +84,7 @@ def test_everyday_0_3_4_cites_v3_and_0_3_3_is_kept_citing_v2():
     cited = {c.wicket_id: c.definition_digest() for c in PACK.constraints}
     assert cited["counterparty_seen_before/3.0.0"] == V3_WICKET_DIGEST
     assert "counterparty_seen_before/2.0.0" not in cited
-    assert hashlib.sha256((FROZEN_0_3_3 / "pack.yaml").read_bytes()).hexdigest() == FROZEN_0_3_3_FILE_SHA256
+    assert hashlib.sha256((FROZEN_0_3_3 / "pack-source.yaml").read_bytes()).hexdigest() == FROZEN_0_3_3_FILE_SHA256
     frozen = load_pack_dir(FROZEN_0_3_3)
     assert {c.wicket_id: c.definition_digest() for c in frozen.constraints}["counterparty_seen_before/2.0.0"] == V2_WICKET_DIGEST
 
