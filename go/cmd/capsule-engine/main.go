@@ -39,12 +39,17 @@ func run(args []string, stdin io.Reader, stdout, stderr io.Writer) int {
 		return exitUnusable
 	}
 	fs := flag.NewFlagSet("admission evaluate", flag.ContinueOnError)
-	fs.SetOutput(stderr)
+	fs.SetOutput(io.Discard)
 	packPath := fs.String("pack", "", "admission pack-definition.json")
 	packID := fs.String("pack-id", "", "the pack_id the pack must have (with --digest)")
 	digest := fs.String("digest", "", "the definition_digest the pack must have (with --pack-id)")
 	inputPath := fs.String("input", "", "inputs as JSON; stdin when empty or -")
 	if err := fs.Parse(args[2:]); err != nil {
+		fmt.Fprintln(stderr, "capsule-engine:", err)
+		return exitUnusable
+	}
+	if fs.NArg() > 0 {
+		fmt.Fprintln(stderr, "capsule-engine: unexpected argument", fs.Arg(0))
 		return exitUnusable
 	}
 	if err := evaluate(*packPath, *packID, *digest, *inputPath, stdin, stdout); err != nil {

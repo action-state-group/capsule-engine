@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"time"
 )
 
@@ -80,13 +81,16 @@ type wireInputs struct {
 // DecodeInputs reads Inputs from their JSON form. Unknown members and
 // unparsable times are refused, so a misspelt input is never read as absent.
 func DecodeInputs(raw []byte) (Inputs, error) {
+	if t := bytes.TrimSpace(raw); len(t) == 0 || t[0] != '{' {
+		return Inputs{}, errors.New("admission input: not a JSON object")
+	}
 	var v wireInputs
 	dec := json.NewDecoder(bytes.NewReader(raw))
 	dec.DisallowUnknownFields()
 	if err := dec.Decode(&v); err != nil {
 		return Inputs{}, fmt.Errorf("admission input: %w", err)
 	}
-	if dec.More() {
+	if _, err := dec.Token(); !errors.Is(err, io.EOF) {
 		return Inputs{}, errors.New("admission input: trailing data after the JSON object")
 	}
 	var perr error

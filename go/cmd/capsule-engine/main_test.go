@@ -78,13 +78,18 @@ func TestUnusable(t *testing.T) {
 		"unknown member": {[]string{"admission", "evaluate", "--pack", pack}, `{"nwo":"2026-01-01T00:00:00Z"}`},
 		"bad time":       {[]string{"admission", "evaluate", "--pack", pack}, `{"now":"yesterday"}`},
 		"trailing data":  {[]string{"admission", "evaluate", "--pack", pack}, `{} {}`},
+		"stray brace":    {[]string{"admission", "evaluate", "--pack", pack}, `{} }`},
+		"stray bracket":  {[]string{"admission", "evaluate", "--pack", pack}, `{} ]`},
+		"null input":     {[]string{"admission", "evaluate", "--pack", pack}, `null`},
+		"stray argument": {[]string{"admission", "evaluate", "--pack", pack, "stray"}, `{}`},
+		"unknown flag":   {[]string{"admission", "evaluate", "--bogus"}, `{}`},
 		"not json":       {[]string{"admission", "evaluate", "--pack", pack}, `nope`},
 	} {
 		var out, errb bytes.Buffer
 		if code := run(tc.args, strings.NewReader(tc.stdin), &out, &errb); code != exitUnusable {
 			t.Errorf("%s: exit %d, want %d", name, code, exitUnusable)
 		}
-		if out.Len() != 0 || errb.Len() == 0 {
+		if out.Len() != 0 || errb.Len() == 0 || strings.Count(strings.TrimSpace(errb.String()), "\n") != 0 {
 			t.Errorf("%s: stdout %q, stderr %q", name, out.String(), errb.String())
 		}
 	}

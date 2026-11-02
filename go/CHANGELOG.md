@@ -15,7 +15,6 @@ and `portedDefinitions` (`guard/engine.go`).
   PROVENANCE.json lists `pack-source.yaml`, with the `pack.yaml` sha256 it was converted from.
 - Deprecated (capsule-engine#252): `Load` and reading a `pack.yaml` directory through `LoadFrom`
   and `LoadPath`, for packs authored outside this module; removed in v0.4.0.
-
 - Added (capsule-engine#278): the command `capsule-engine admission evaluate`, for callers that are
   not Go (the Python evidence facade, evidencebook#332), and `admission.DecodeInputs`, the JSON form
   of `Inputs` that the conformance vectors and the command share. The command reads a pack and the

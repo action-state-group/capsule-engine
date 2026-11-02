@@ -45,7 +45,7 @@ run the generator in the same change.
 `cmd/capsule-engine` runs the admission evaluator for a caller that is not Go:
 
 ```bash
-go install github.com/action-state-group/capsule-engine/go/cmd/capsule-engine@go/vX.Y.Z
+go install github.com/action-state-group/capsule-engine/go/cmd/capsule-engine@vX.Y.Z
 capsule-engine admission evaluate --pack pack-definition.json [--pack-id ID --digest SHA256] [--input FILE] < input.json
 ```
 
