@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from ..envcompat import LEGACY_ALIASES, env_get
 
-__all__ = ["DISCLOSURE_TEXT", "is_opted_in", "ENV_VAR"]
+__all__ = ["DISCLOSURE_TEXT", "is_opted_in", "ENV_VAR", "LEGACY_ENV_VAR"]
 
 ENV_VAR = "CAPSULE_TELEMETRY"
 LEGACY_ENV_VAR = LEGACY_ALIASES[ENV_VAR]
