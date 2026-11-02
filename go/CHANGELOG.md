@@ -26,7 +26,7 @@ and `portedDefinitions` (`guard/engine.go`).
   declaration, `units`, `labels`, `period_alignment`, `period_anchor`, `period_floor`, and that the
   answer's anchor is the pin (`anchor_match`). A refusal is an `*InferenceServiceHistoryError` naming the property
   that fails, so the card is `CardUnverifiable`; an unknown profile or a Detailed definition is
-  refused the same way. `Card.Reason` (new) carries that property into the `card.verified` row,
+  refused the same way. `capsule-engine admission evaluate` (#278) reads `card.reason` and `card.served` in its input. `Card.Reason` (new) carries that property into the `card.verified` row,
   which records only a name from `InferenceServiceHistoryProperties`, never the detail.
   Also added: the predicate `card.self_reported_served_periods` (params `window`, `min_periods`). It
   counts the closed periods whose served total is published. A suppressed total, or a period the
@@ -35,6 +35,11 @@ and `portedDefinitions` (`guard/engine.go`).
   reason. A decision on such a card records `coverage` with population `NOT_CHECKED`. Decisions on
   other cards keep their bytes. Every count stays the node's own statement, checked property by
   property; nothing here scores or ranks a node.
+- Added (capsule-engine#278): the command `capsule-engine admission evaluate`, for callers that are
+  not Go (the Python evidence facade, evidencebook#332), and `admission.DecodeInputs`, the JSON form
+  of `Inputs` that the conformance vectors and the command share. The command reads a pack and the
+  inputs as JSON and prints the decision as one JSON object, with its decision block and that
+  block's SHA-256. It decides the shared vectors as `Evaluate` does. See README.
 - Added (evidencebook-skills#87): `StandardHistoryCounts` reads a verified `standard_history/1`
   card's bands and received disputes as `Card.Bands` and `Card.Disputes`. A band's subjects are its
   decided deals (`held` plus `did_not_hold`), and its adverse count is `did_not_hold`; a null-decade

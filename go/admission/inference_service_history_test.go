@@ -37,19 +37,6 @@ func toVectorServed(s *Served) *vectorServed {
 	return out
 }
 
-func servedOf(t *testing.T, v *vectorServed) *Served {
-	t.Helper()
-	if v == nil {
-		return nil
-	}
-	s := &Served{LengthS: v.LengthS, Floor: v.Floor}
-	for _, p := range v.Periods {
-		s.Periods = append(s.Periods, ServedPeriod{From: parseTime(t, p.From), To: parseTime(t, p.To),
-			Total: p.Total, Suppressed: p.Suppressed})
-	}
-	return s
-}
-
 // The shared inference-service-history/0 vectors
 // (conformance-vectors/admission/v0/inference-service-history.json), which
 // the Rust port reads too.
@@ -142,4 +129,16 @@ func TestServedPeriodsRow(t *testing.T) {
 			t.Errorf("%+v: got %s, want not_read", c, res.Result)
 		}
 	}
+}
+
+func parseTime(t *testing.T, s string) time.Time {
+	t.Helper()
+	if s == "" {
+		return time.Time{}
+	}
+	at, err := time.Parse(time.RFC3339, s)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return at
 }
