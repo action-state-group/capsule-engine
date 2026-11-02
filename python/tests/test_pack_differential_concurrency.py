@@ -44,7 +44,7 @@ def _make_engine(ledger, project_dir):
 
 @pytest.mark.xfail(
     reason=(
-        "CONFIRMED FINDING (2026-08-11): GuardEngine.check() (capsule_ledger/guards/engine.py) holds no "
+        "CONFIRMED FINDING (2026-08-11): GuardEngine.check() (capsule_engine/guards/engine.py) holds no "
         "lock across its own read (check_caps' ledger.find()) -> decide -> append span. Two concurrent "
         "check() calls for the same developer/action_class both read the pre-write ledger state, both "
         "compute 'under cap', and both append -- the cap is not enforced under concurrency at all (this "

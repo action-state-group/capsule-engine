@@ -23,6 +23,7 @@ NANDA = FIXTURES / "nanda_transaction_ledger.jsonl"
 @pytest.fixture
 def state_dir(tmp_path, monkeypatch):
     d = tmp_path / "state"
+    monkeypatch.delenv("CAPSULE_LEDGER_STATE_DIR", raising=False)
     monkeypatch.setenv("CAPSULE_STATE_DIR", str(d))
     return d
 
@@ -30,6 +31,7 @@ def state_dir(tmp_path, monkeypatch):
 @pytest.fixture
 def opted_out(monkeypatch):
     monkeypatch.delenv(consent.ENV_VAR, raising=False)
+    monkeypatch.delenv(consent.LEGACY_ENV_VAR, raising=False)
 
 
 @pytest.fixture

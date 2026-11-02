@@ -8,11 +8,12 @@ upgrade or a fresh install silently re-enabling anything.
 """
 from __future__ import annotations
 
-from ..envcompat import env_get
+from ..envcompat import LEGACY_ALIASES, env_get
 
 __all__ = ["DISCLOSURE_TEXT", "is_opted_in", "ENV_VAR"]
 
 ENV_VAR = "CAPSULE_TELEMETRY"
+LEGACY_ENV_VAR = LEGACY_ALIASES[ENV_VAR]
 _TRUE_VALUES = {"1", "true", "on", "yes"}
 
 DISCLOSURE_TEXT = f"""\
@@ -31,7 +32,8 @@ individual verdict about your own usage.
 
 Turn on with: {ENV_VAR}=1
 Check current status any time: capsule telemetry status
-Turn off: unset {ENV_VAR} (or set it to 0)
+Turn off: set {ENV_VAR}=0, or unset {ENV_VAR} and {LEGACY_ENV_VAR} (the pre-rename name,
+still read until 0.5.0)
 """
 
 

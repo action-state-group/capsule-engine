@@ -48,3 +48,11 @@ def test_state_dir_prefers_new_and_falls_back_to_the_old_one(monkeypatch, tmp_pa
     new.parent.mkdir(parents=True)
     new.write_text("{}", encoding="utf-8")
     assert state.state_path() == new
+
+
+def test_telemetry_disclosure_names_both_off_switches(monkeypatch):
+    assert consent.ENV_VAR in consent.DISCLOSURE_TEXT and consent.LEGACY_ENV_VAR in consent.DISCLOSURE_TEXT
+    monkeypatch.setenv(consent.LEGACY_ENV_VAR, "1")
+    assert consent.is_opted_in()  # the old name alone still opts in...
+    monkeypatch.setenv(consent.ENV_VAR, "0")
+    assert not consent.is_opted_in()  # ...and the new name set to 0 turns it off
