@@ -12,6 +12,8 @@ and `portedDefinitions` (`guard/engine.go`).
   asks by pin. `Card.Controller` is documented as the caller's, already verified against a controller
   binding.
 
+- Added (capsule-engine#277, D-31): the admission predicate `card.not_stapled`, and `Card.Stapled`, which the caller sets for a card that arrived with the holder's own message and was not asked for. The row passes for a verified card that was asked for, fails for a staple, and is not read without a verified card. A pack keeps a staple to the lowest tier with a `from: T1` LIMIT row that carries an `ask`: ASK above T0, or LIMIT at T0 when the ask budget is spent. The Rust evaluator adds `Card::stapled` the same way.
+
 ## 0.3.0 — 2026-11-02
 
 A minor on v0 (RELEASING.md): a new pack version, new ported definitions and API changes, some

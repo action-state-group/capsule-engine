@@ -172,6 +172,7 @@ fn decode_input(raw: &Value) -> Inputs {
             "disputes",
             "served",
             "receipts",
+            "stapled",
         ],
         "card",
     );
@@ -219,6 +220,7 @@ fn decode_input(raw: &Value) -> Inputs {
             let d = object(d, &["open", "of"], "card.disputes");
             Disputes { open: int(d, "open"), of: int(d, "of") }
         }),
+        stapled: opt_bool(card, "stapled").unwrap_or(false),
     };
     input.selection = Selection {
         state: text(selection, "state"),
