@@ -40,6 +40,26 @@ version directory, once written, is frozen, so an older pinned pack keeps
 loading at its digest. When the catalog cuts a new version of a served pack,
 run the generator in the same change.
 
+## Admission from outside Go
+
+`cmd/capsule-engine` runs the admission evaluator for a caller that is not Go:
+
+```bash
+go install github.com/action-state-group/capsule-engine/go/cmd/capsule-engine@go/vX.Y.Z
+capsule-engine admission evaluate --pack pack-definition.json [--pack-id ID --digest SHA256] [--input FILE] < input.json
+```
+
+`--pack` is a compiled admission `pack-definition.json`; with `--pack-id` and `--digest` it must be
+exactly that pack. The input is JSON read from `--input` or stdin, in the form of a vector's `input`
+(`conformance-vectors/admission/v0/cases.json`, `admission.DecodeInputs`): unknown members and
+times that are not RFC 3339 are refused. Stdout is one JSON object: `verdict`, `source`, `tier`
+(null when none), `band`, `rows`, `asks`, `pack` (`id`, `digest`), `block` (the admission_decision
+block as JCS text) and `block_sha256`. Exit status 0 means a decision was made, whatever its verdict;
+2 means none could be (usage, unreadable or refused pack, pin mismatch, unusable input), with nothing
+on stdout and one line on stderr. The decision is about one counterparty and is local-only; the
+command prints it to the caller's stdout and exports nothing. `cmd/capsule-engine` tests it over
+every shared vector.
+
 ## Running it
 
 ```sh
