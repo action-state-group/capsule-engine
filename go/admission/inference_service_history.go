@@ -87,7 +87,9 @@ func (e *InferenceServiceHistoryError) Error() string {
 
 // InferenceServiceHistoryProperties are the properties an
 // InferenceServiceHistoryError names (ISH §4.2, §6.3, §8.3, and
-// anchor_match for the requester's pin).
+// anchor_match for the requester's ask: a pin the anchor is not, a
+// min_freshness it does not meet, or an ask that is not satisfiable as
+// stated).
 var InferenceServiceHistoryProperties = []string{"definition_form", "definition_binding", "artifact_form",
 	"anchor_match", "coverage_declaration_form", "coverage_declaration_anchor", "units", "labels",
 	"period_alignment", "period_anchor", "period_floor"}
@@ -146,14 +148,15 @@ func InferenceServiceHistoryCounts(definition, artifact []byte, card CardCheckpo
 }
 
 // CoverageAsk is the coverage the requester asked for (Evidence Request
-// §3.2): exactly one of an expected_pin, a min_freshness of a log size, or a
+// §3.2): exactly one of an expected_pin, a min_freshness of a size, or a
 // min_freshness of a time. The draft makes the forms mutually exclusive, so
 // a responder cannot swap in fresher coverage for the pin that was demanded.
 type CoverageAsk struct {
 	// ExpectedPin is the anchor the requester pinned, or "".
 	ExpectedPin string
-	// MinSize is min_freshness by size: the fewest records the answer's
-	// anchor must cover; nil when the ask is not by size.
+	// MinSize is min_freshness by size: the fewest records (the unit of
+	// CardCheckpoint.Records; a caller converts a node-count log size as for
+	// it) the answer's anchor must cover; nil when the ask is not by size.
 	MinSize *int64
 	// MinAt is min_freshness by time: the earliest time the answer's
 	// anchor may have been issued; nil when the ask is not by time.
@@ -255,15 +258,6 @@ func InferenceServiceHistoryCountsFor(definition, artifact []byte, card CardChec
 	if ask.ExpectedPin != "" && anchor != ask.ExpectedPin {
 		return nil, fail("anchor_match", "the answer's anchor is not the expected_pin requested")
 	}
-	if n := len(card.Checkpoints); n > 0 {
-		last := card.Checkpoints[n-1]
-		if ask.MinSize != nil && last.Records < *ask.MinSize {
-			return nil, fail("anchor_match", "the answer's anchor covers fewer records than the min_freshness size requested")
-		}
-		if ask.MinAt != nil && last.At.Before(*ask.MinAt) {
-			return nil, fail("anchor_match", "the answer's anchor was issued before the min_freshness time requested")
-		}
-	}
 
 	// The coverage declaration (ISH §4.2): the definition's kind and rule,
 	// and the members that depend on the anchor.
@@ -297,6 +291,15 @@ func InferenceServiceHistoryCountsFor(definition, artifact []byte, card CardChec
 		canon.M("count", canon.Int(last.Records)), canon.M("start", canon.Int(0)), canon.M("stream", canon.Str(stream)))}))
 	if err != nil || string(cov["live_set"]) != liveSet {
 		return nil, fail("coverage_declaration_form", "live_set is not the anchor's records in the answer's stream")
+	}
+	// The min_freshness asks are met by the anchor the checks above tie to the
+	// card's last checkpoint: its records and its signed time, never the
+	// reader's clock.
+	if ask.MinSize != nil && last.Records < *ask.MinSize {
+		return nil, fail("anchor_match", "the answer's anchor covers fewer records than the min_freshness size requested")
+	}
+	if ask.MinAt != nil && last.At.Before(*ask.MinAt) {
+		return nil, fail("anchor_match", "the answer's anchor was issued before the min_freshness time requested")
 	}
 	anchorAt := last.At
 	if anchorAt.Nanosecond() != 0 || !d.onBoundary(anchorAt.Unix()) {

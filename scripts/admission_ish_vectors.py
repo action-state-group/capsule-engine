@@ -163,6 +163,8 @@ def main():
            pin="", min_freshness={"size": 31})
     mutant("mesh-min-freshness-time-unmet", "anchor_match: the answer's anchor was issued before",
            pin="", min_freshness={"at": "2026-01-19T00:00:01Z"})
+    mutant("mesh-min-freshness-negative-size", "anchor_match: the ask is not exactly one", pin="",
+           min_freshness={"size": -1})
     mutant("mesh-pin-and-min-freshness", "anchor_match: the ask is not exactly one", min_freshness={"size": 1})
     mutant("mesh-two-min-freshness-forms", "anchor_match: the ask is not exactly one", pin="",
            min_freshness={"size": 1, "at": "2026-01-01T00:00:00Z"})

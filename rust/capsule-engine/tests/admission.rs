@@ -548,7 +548,7 @@ fn inference_service_history_vectors() {
         let ask = CoverageAsk {
             expected_pin: c["pin"].as_str().unwrap().to_string(),
             min_size: mf["size"].as_i64(),
-            min_at: mf["at"].as_str().map(time),
+            min_at: mf["at"].as_str().filter(|s| !s.is_empty()).map(time),
         };
         let got = inference_service_history_counts_for(
             c["definition"].as_str().unwrap().as_bytes(),

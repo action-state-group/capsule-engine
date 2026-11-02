@@ -94,6 +94,9 @@ impl std::fmt::Display for InferenceServiceHistoryError {
 impl std::error::Error for InferenceServiceHistoryError {}
 
 /// inference_service_history.go InferenceServiceHistoryProperties.
+/// `anchor_match` covers the requester's ask: a pin the anchor is not, a
+/// min_freshness it does not meet, or an ask that is not satisfiable as
+/// stated.
 pub const INFERENCE_SERVICE_HISTORY_PROPERTIES: [&str; 11] = [
     "definition_form",
     "definition_binding",
@@ -182,7 +185,9 @@ pub fn inference_service_history_counts(
 pub struct CoverageAsk {
     /// The anchor the requester pinned, or "".
     pub expected_pin: String,
-    /// min_freshness by size: the fewest records the anchor must cover.
+    /// min_freshness by size: the fewest records (the unit of
+    /// `CardCheckpoint::records`; a caller converts a node-count log size as
+    /// for it) the anchor must cover.
     pub min_size: Option<i64>,
     /// min_freshness by time: the earliest time the anchor may be issued.
     pub min_at: Option<Timestamp>,
@@ -281,20 +286,6 @@ pub fn inference_service_history_counts_for(
     if !ask.expected_pin.is_empty() && anchor != ask.expected_pin {
         return Err(fail("anchor_match", "the answer's anchor is not the expected_pin requested".into()));
     }
-    if let Some(last) = card.checkpoints.last() {
-        if ask.min_size.is_some_and(|n| last.records < n) {
-            return Err(fail(
-                "anchor_match",
-                "the answer's anchor covers fewer records than the min_freshness size requested".into(),
-            ));
-        }
-        if ask.min_at.is_some_and(|t| last.at < t) {
-            return Err(fail(
-                "anchor_match",
-                "the answer's anchor was issued before the min_freshness time requested".into(),
-            ));
-        }
-    }
 
     // The coverage declaration (ISH §4.2): the definition's kind and rule,
     // and the members that depend on the anchor.
@@ -327,6 +318,21 @@ pub fn inference_service_history_counts_for(
         return Err(fail(
             "coverage_declaration_form",
             "live_set is not the anchor's records in the answer's stream".into(),
+        ));
+    }
+    // The min_freshness asks are met by the anchor the checks above tie to the
+    // card's last checkpoint: its records and its signed time, never the
+    // reader's clock.
+    if ask.min_size.is_some_and(|n| last.records < n) {
+        return Err(fail(
+            "anchor_match",
+            "the answer's anchor covers fewer records than the min_freshness size requested".into(),
+        ));
+    }
+    if ask.min_at.is_some_and(|t| last.at < t) {
+        return Err(fail(
+            "anchor_match",
+            "the answer's anchor was issued before the min_freshness time requested".into(),
         ));
     }
 
