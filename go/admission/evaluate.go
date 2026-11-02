@@ -101,8 +101,8 @@ type Card struct {
 // policy does not configure is shown by the caller and not counted here.
 // The count is the verifier's, not the node's statement.
 type Receipts struct {
-	Counted     int64 `json:"counted"`
-	Checkpoints int64 `json:"checkpoints"`
+	Counted     int64
+	Checkpoints int64
 }
 
 // Disputes are the disputes others raised about the counterparty that its

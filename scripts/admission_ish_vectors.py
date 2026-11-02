@@ -50,16 +50,25 @@ def b64(s):
 
 def served(defn, art):
     """The served periods an accepted answer reads (the evaluator's view)."""
-    counts = art["period_counts"]["periods"]
-    periods = []
-    for p in counts:
-        total = next(c for c in p["cells"] if c["unit"] == "exchanges_served" and c["dimension"] is None)
-        entry = {"from": p["from"], "to": p["to"], "total": total["value"]}
-        if total["value"] is None:
-            entry["suppressed"] = total["suppressed"]
-        periods.append(entry)
+    units = [u["unit"] for m in defn["members"] if m["name"] == "period_counts" for u in m["units"]]
+
+    def totals(unit):
+        out = []
+        for p in art["period_counts"]["periods"]:
+            total = next(c for c in p["cells"] if c["unit"] == unit and c["dimension"] is None)
+            entry = {"from": p["from"], "to": p["to"], "total": total["value"]}
+            if total["value"] is None:
+                entry["suppressed"] = total["suppressed"]
+            out.append(entry)
+        return out
     pol = defn["period_policy"]
-    return {"length_s": pol["length_s"], "floor": pol["floor"], "periods": periods}
+    out = {"length_s": pol["length_s"], "floor": pol["floor"],
+           "periods": totals("exchanges_served") if "exchanges_served" in units else []}
+    if "referee_verdicts" in units:
+        out["verdicts"] = totals("referee_verdicts")
+        if "exchanges_served" not in units:
+            out["verdicts_only"] = True
+    return out
 
 
 def leaves(mmr_size):
@@ -122,7 +131,8 @@ def main():
         args.update(kw)
         expected = None
         if accept:
-            expected = served(d, x) if any(u["unit"] == "exchanges_served" for u in d["members"][1]["units"]) else None
+            expected = served(d, x) if any(u["unit"] in ("exchanges_served", "referee_verdicts")
+                                            for u in d["members"][1]["units"]) else None
         cases.append(case(name, d, x, args["checkpoints"], args["pin"], expected=expected, want=want, prop=prop,
                           definition_text=args.get("definition_text"), artifact_text=args.get("artifact_text")))
 
@@ -205,6 +215,34 @@ def main():
             for c in p["cells"]:
                 c["unit"] = "exchanges_requested"
     mutant("mesh-requested-only-reads-no-served", accept=True, edit_def=requested_only, edit_art=requested_cells)
+
+    # Referee verdict totals (capsule-engine#276): a unit of its own, read
+    # beside the served totals and never added to them.
+    def with_verdicts(values):
+        def edit(x):
+            for pr, v in zip(x["period_counts"]["periods"], values):
+                cell = {"dimension": None, "label": "self_reported", "unit": "referee_verdicts", "value": v}
+                if v is None:
+                    cell["suppressed"] = "below_floor"
+                pr["cells"].append(cell)
+        return edit
+
+    def declare_verdicts(d):
+        d["members"][1]["units"].append({"unit": "referee_verdicts", "where": "periods[].cells[]"})
+    mutant("mesh-with-referee-verdicts", accept=True, edit_def=declare_verdicts, edit_art=with_verdicts([6, 9]))
+    mutant("mesh-referee-verdict-week-suppressed", accept=True, edit_def=declare_verdicts,
+           edit_art=with_verdicts([None, 9]))
+    mutant("mesh-referee-verdict-below-floor", "period_floor", edit_def=declare_verdicts,
+           edit_art=with_verdicts([4, 9]))
+
+    def verdicts_only_def(d):
+        d["members"][1]["units"][0]["unit"] = "referee_verdicts"
+
+    def verdicts_only_art(x):
+        for pr in x["period_counts"]["periods"]:
+            for c in pr["cells"]:
+                c["unit"] = "referee_verdicts"
+    mutant("mesh-referee-verdicts-only", accept=True, edit_def=verdicts_only_def, edit_art=verdicts_only_art)
 
     # Arrays are read one element at a time in both, so the first bad
     # element names the property; a counterparty's member name never does.

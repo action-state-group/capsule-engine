@@ -26,7 +26,7 @@ pub struct Served {
     pub floor: i64,
     pub periods: Vec<ServedPeriod>,
     /// inference_service_history.go Served.Verdicts: the closed periods'
-    /// referee_verdicts totals (ISH §5.3); empty when the answer counts no
+    /// referee_verdicts totals (ISH §5.3); None when the answer counts no
     /// referee verdicts. Classes are not read (SH-14) and the totals are
     /// never added to `periods` (ISH §5.1).
     pub verdicts: Option<Vec<ServedPeriod>>,
@@ -327,7 +327,9 @@ pub fn inference_service_history_counts(
             served.periods.push(period(total));
         }
         if let Some((_, total)) = totals.iter().find(|(u, _)| *u == VERDICTS) {
-            served.verdicts.get_or_insert_with(Vec::new).push(period(total));
+            if let Some(v) = served.verdicts.as_mut() {
+                v.push(period(total));
+            }
         }
     }
     if !has_served && served.verdicts.is_none() {
