@@ -4,7 +4,7 @@
 Stored as a small JSON file outside the ledger and outside any repo --
 never ledger data, never PII: a random install id and a handful of "first
 time this happened" timestamps. Written regardless of telemetry opt-in (the
-facts are needed locally either way, e.g. for ``capsule telemetry status``);
+facts are needed locally either way, e.g. for ``capsule-engine telemetry status``);
 whether they are ever *emitted* anywhere is gated separately by
 ``consent.is_opted_in()``.
 """
