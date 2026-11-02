@@ -5,6 +5,16 @@ and `portedDefinitions` (`guard/engine.go`).
 
 ## Unreleased
 
+## 0.3.0 — 2026-11-02
+
+A minor on v0 (RELEASING.md): a new pack version, new ported definitions and API changes, some
+breaking (the history, `pack.yaml` and `ReadLedger` entries below). New pack version:
+`asg/inference/0.1.0` (`packs.Inference010`); the other embedded packs keep their digests. New
+ported definitions: `rate_cap/1.0.0` (`a2628f67...13d93`) and `counterparty_list/1.0.0`
+(`d9516293...e18f65`). New command: `capsule-engine admission evaluate` (capsule-engine#278), so
+evidencebook#332 can pin a go/ tag. Merged since v0.2.0: #256, #263, #264, #265, #266, #267,
+#268, #273, #274, #275, #276, #279, #280.
+
 - Added (capsule-engine#276): the node baseline pack `asg/admission_node_baseline/1.0.0`
   (vectors in `conformance-vectors/admission/v0/admission-node-baseline-1.0.0`, source in
   evidencebook-skills), and two predicates. `card.witness_receipts` (param `min`) reads the new
