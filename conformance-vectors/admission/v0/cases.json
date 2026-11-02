@@ -4547,6 +4547,408 @@
     "tier": "T0",
     "block_sha256": "c2784c0c02ff7d37edee135f991993649369d4fcfc2d796a88ce3dd97b0fd445"
    }
+  },
+  {
+   "case": "node-baseline-goes",
+   "pack": "admission-node-baseline-1.0.0/pack-definition.json",
+   "input": {
+    "now": "2026-01-20T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-07T10:00:00Z",
+     "latest_checkpoint_at": "2026-01-19T00:00:00Z",
+     "served": {
+      "length_s": 604800,
+      "floor": 5,
+      "periods": [
+       {
+        "from": "2026-01-05T00:00:00Z",
+        "to": "2026-01-12T00:00:00Z",
+        "total": 12
+       },
+       {
+        "from": "2026-01-12T00:00:00Z",
+        "to": "2026-01-19T00:00:00Z",
+        "total": 18
+       }
+      ]
+     },
+     "receipts": {
+      "counted": 2,
+      "checkpoints": 5
+     }
+    },
+    "own": {
+     "exchanges": 3,
+     "settled": 3,
+     "held_halves": 2,
+     "conflicting": 0
+    }
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T1",
+    "block_sha256": "921f6fd81f7da0ee94e9398cce6716c84305e2470eefe886ccac508fa410e2b0"
+   }
+  },
+  {
+   "case": "node-baseline-stale-asks",
+   "pack": "admission-node-baseline-1.0.0/pack-definition.json",
+   "input": {
+    "now": "2026-02-10T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-07T10:00:00Z",
+     "latest_checkpoint_at": "2026-01-19T00:00:00Z",
+     "served": {
+      "length_s": 604800,
+      "floor": 5,
+      "periods": [
+       {
+        "from": "2026-01-05T00:00:00Z",
+        "to": "2026-01-12T00:00:00Z",
+        "total": 12
+       },
+       {
+        "from": "2026-01-12T00:00:00Z",
+        "to": "2026-01-19T00:00:00Z",
+        "total": 18
+       }
+      ]
+     },
+     "receipts": {
+      "counted": 2,
+      "checkpoints": 5
+     }
+    }
+   },
+   "expected": {
+    "verdict": "ASK",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "42deaa47602212e67f2263bb673f73d3e5eea47876d89c7b7ca44f9b87d5d976"
+   }
+  },
+  {
+   "case": "node-baseline-no-receipts-limits",
+   "pack": "admission-node-baseline-1.0.0/pack-definition.json",
+   "input": {
+    "now": "2026-01-20T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-07T10:00:00Z",
+     "latest_checkpoint_at": "2026-01-19T00:00:00Z",
+     "served": {
+      "length_s": 604800,
+      "floor": 5,
+      "periods": [
+       {
+        "from": "2026-01-05T00:00:00Z",
+        "to": "2026-01-12T00:00:00Z",
+        "total": 12
+       },
+       {
+        "from": "2026-01-12T00:00:00Z",
+        "to": "2026-01-19T00:00:00Z",
+        "total": 18
+       }
+      ]
+     }
+    }
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "110ca595042687d1fbdd3d6a3c34a96d9bf8d91ba577c5c6ea70e9fd6fae18b5"
+   }
+  },
+  {
+   "case": "node-baseline-one-week-limits",
+   "pack": "admission-node-baseline-1.0.0/pack-definition.json",
+   "input": {
+    "now": "2026-01-20T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-07T10:00:00Z",
+     "latest_checkpoint_at": "2026-01-19T00:00:00Z",
+     "served": {
+      "length_s": 604800,
+      "floor": 5,
+      "periods": [
+       {
+        "from": "2026-01-05T00:00:00Z",
+        "to": "2026-01-12T00:00:00Z",
+        "total": null,
+        "suppressed": "below_floor"
+       },
+       {
+        "from": "2026-01-12T00:00:00Z",
+        "to": "2026-01-19T00:00:00Z",
+        "total": 18
+       }
+      ]
+     },
+     "receipts": {
+      "counted": 2,
+      "checkpoints": 5
+     }
+    }
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "5068e44e50dd0d40b299d3396e8528463b59518c39b9800186491cd0b62f6fa3"
+   }
+  },
+  {
+   "case": "node-baseline-large-deal-no-verdicts-limits",
+   "pack": "admission-node-baseline-1.0.0/pack-definition.json",
+   "input": {
+    "now": "2026-01-20T12:00:00Z",
+    "amount": "5000",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-07T10:00:00Z",
+     "latest_checkpoint_at": "2026-01-19T00:00:00Z",
+     "served": {
+      "length_s": 604800,
+      "floor": 5,
+      "periods": [
+       {
+        "from": "2026-01-05T00:00:00Z",
+        "to": "2026-01-12T00:00:00Z",
+        "total": 12
+       },
+       {
+        "from": "2026-01-12T00:00:00Z",
+        "to": "2026-01-19T00:00:00Z",
+        "total": 18
+       }
+      ]
+     },
+     "receipts": {
+      "counted": 2,
+      "checkpoints": 5
+     }
+    }
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T1",
+    "block_sha256": "df4814db0b608d5d5b26851c8151ee6460bf666cea14bf44a06deb167ca3fd27"
+   }
+  },
+  {
+   "case": "node-baseline-large-deal-verdicts-goes",
+   "pack": "admission-node-baseline-1.0.0/pack-definition.json",
+   "input": {
+    "now": "2026-01-20T12:00:00Z",
+    "amount": "5000",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-07T10:00:00Z",
+     "latest_checkpoint_at": "2026-01-19T00:00:00Z",
+     "served": {
+      "length_s": 604800,
+      "floor": 5,
+      "periods": [
+       {
+        "from": "2026-01-05T00:00:00Z",
+        "to": "2026-01-12T00:00:00Z",
+        "total": 12
+       },
+       {
+        "from": "2026-01-12T00:00:00Z",
+        "to": "2026-01-19T00:00:00Z",
+        "total": 18
+       }
+      ],
+      "verdicts": [
+       {
+        "from": "2026-01-05T00:00:00Z",
+        "to": "2026-01-12T00:00:00Z",
+        "total": 6
+       },
+       {
+        "from": "2026-01-12T00:00:00Z",
+        "to": "2026-01-19T00:00:00Z",
+        "total": 9
+       }
+      ]
+     },
+     "receipts": {
+      "counted": 2,
+      "checkpoints": 5
+     }
+    }
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T2",
+    "block_sha256": "8c41128d7fde8c392421d75e5ea70a58b2f7d9b789b3783767ce8938bd0c96f7"
+   }
+  },
+  {
+   "case": "node-baseline-large-deal-one-verdict-week-limits",
+   "pack": "admission-node-baseline-1.0.0/pack-definition.json",
+   "input": {
+    "now": "2026-01-20T12:00:00Z",
+    "amount": "5000",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-07T10:00:00Z",
+     "latest_checkpoint_at": "2026-01-19T00:00:00Z",
+     "served": {
+      "length_s": 604800,
+      "floor": 5,
+      "periods": [
+       {
+        "from": "2026-01-05T00:00:00Z",
+        "to": "2026-01-12T00:00:00Z",
+        "total": 12
+       },
+       {
+        "from": "2026-01-12T00:00:00Z",
+        "to": "2026-01-19T00:00:00Z",
+        "total": 18
+       }
+      ],
+      "verdicts": [
+       {
+        "from": "2026-01-05T00:00:00Z",
+        "to": "2026-01-12T00:00:00Z",
+        "total": null,
+        "suppressed": "below_floor"
+       },
+       {
+        "from": "2026-01-12T00:00:00Z",
+        "to": "2026-01-19T00:00:00Z",
+        "total": 9
+       }
+      ]
+     },
+     "receipts": {
+      "counted": 2,
+      "checkpoints": 5
+     }
+    }
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T1",
+    "block_sha256": "d8e4d48554c66edc598e851e50aa553fc5cf6d0967ca5ce02c2cfa86b4812559"
+   }
+  },
+  {
+   "case": "node-baseline-large-deal-zero-corroborated-week-limits",
+   "pack": "admission-node-baseline-1.0.0/pack-definition.json",
+   "input": {
+    "now": "2026-01-20T12:00:00Z",
+    "amount": "5000",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-07T10:00:00Z",
+     "latest_checkpoint_at": "2026-01-19T00:00:00Z",
+     "served": {
+      "length_s": 604800,
+      "floor": 5,
+      "periods": [
+       {
+        "from": "2026-01-05T00:00:00Z",
+        "to": "2026-01-12T00:00:00Z",
+        "total": 12
+       },
+       {
+        "from": "2026-01-12T00:00:00Z",
+        "to": "2026-01-19T00:00:00Z",
+        "total": 18
+       }
+      ],
+      "verdicts": [
+       {
+        "from": "2026-01-05T00:00:00Z",
+        "to": "2026-01-12T00:00:00Z",
+        "total": 0
+       },
+       {
+        "from": "2026-01-12T00:00:00Z",
+        "to": "2026-01-19T00:00:00Z",
+        "total": 9
+       }
+      ]
+     },
+     "receipts": {
+      "counted": 2,
+      "checkpoints": 5
+     }
+    }
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T1",
+    "block_sha256": "d8e4d48554c66edc598e851e50aa553fc5cf6d0967ca5ce02c2cfa86b4812559"
+   }
+  },
+  {
+   "case": "node-baseline-large-deal-verdicts-only-limits",
+   "pack": "admission-node-baseline-1.0.0/pack-definition.json",
+   "input": {
+    "now": "2026-01-20T12:00:00Z",
+    "amount": "5000",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-07T10:00:00Z",
+     "latest_checkpoint_at": "2026-01-19T00:00:00Z",
+     "served": {
+      "length_s": 604800,
+      "floor": 5,
+      "periods": [],
+      "verdicts": [
+       {
+        "from": "2026-01-05T00:00:00Z",
+        "to": "2026-01-12T00:00:00Z",
+        "total": 6
+       },
+       {
+        "from": "2026-01-12T00:00:00Z",
+        "to": "2026-01-19T00:00:00Z",
+        "total": 9
+       }
+      ],
+      "verdicts_only": true
+     },
+     "receipts": {
+      "counted": 2,
+      "checkpoints": 5
+     }
+    }
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "1fbf1093f89d37c129749113b32f244ec20c0f932cc633135d273862e4b42d93"
+   }
   }
  ]
 }

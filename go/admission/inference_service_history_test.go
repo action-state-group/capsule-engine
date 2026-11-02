@@ -23,6 +23,9 @@ type vectorServed struct {
 	LengthS int64          `json:"length_s"`
 	Floor   int64          `json:"floor"`
 	Periods []vectorPeriod `json:"periods"`
+	// Verdicts is absent when the answer counts no referee verdicts.
+	Verdicts     *[]vectorPeriod `json:"verdicts,omitempty"`
+	VerdictsOnly bool            `json:"verdicts_only,omitempty"`
 }
 
 func toVectorServed(s *Served) *vectorServed {
@@ -34,6 +37,15 @@ func toVectorServed(s *Served) *vectorServed {
 		out.Periods = append(out.Periods, vectorPeriod{From: p.From.UTC().Format(time.RFC3339),
 			To: p.To.UTC().Format(time.RFC3339), Total: p.Total, Suppressed: p.Suppressed})
 	}
+	if s.Verdicts != nil {
+		vs := []vectorPeriod{}
+		for _, p := range s.Verdicts {
+			vs = append(vs, vectorPeriod{From: p.From.UTC().Format(time.RFC3339),
+				To: p.To.UTC().Format(time.RFC3339), Total: p.Total, Suppressed: p.Suppressed})
+		}
+		out.Verdicts = &vs
+	}
+	out.VerdictsOnly = s.VerdictsOnly
 	return out
 }
 

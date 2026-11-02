@@ -49,7 +49,15 @@ type wireInputs struct {
 				Total      *int64 `json:"total"`
 				Suppressed string `json:"suppressed"`
 			} `json:"periods"`
+			Verdicts *[]struct {
+				From       string `json:"from"`
+				To         string `json:"to"`
+				Total      *int64 `json:"total"`
+				Suppressed string `json:"suppressed"`
+			} `json:"verdicts"`
+			VerdictsOnly bool `json:"verdicts_only"`
 		} `json:"served"`
+		Receipts *Receipts `json:"receipts"`
 	} `json:"card"`
 	Selection struct {
 		State              string   `json:"state"`
@@ -142,7 +150,16 @@ func DecodeInputs(raw []byte) (Inputs, error) {
 			in.Card.Served.Periods = append(in.Card.Served.Periods, ServedPeriod{From: at(p.From), To: at(p.To),
 				Total: p.Total, Suppressed: p.Suppressed})
 		}
+		if v.Card.Served.Verdicts != nil {
+			in.Card.Served.Verdicts = []ServedPeriod{}
+			for _, p := range *v.Card.Served.Verdicts {
+				in.Card.Served.Verdicts = append(in.Card.Served.Verdicts, ServedPeriod{From: at(p.From), To: at(p.To),
+					Total: p.Total, Suppressed: p.Suppressed})
+			}
+		}
+		in.Card.Served.VerdictsOnly = v.Card.Served.VerdictsOnly
 	}
+	in.Card.Receipts = v.Card.Receipts
 	for _, s := range v.Selection.UnansweredDisputes {
 		in.Selection.UnansweredDisputes = append(in.Selection.UnansweredDisputes, at(s))
 	}

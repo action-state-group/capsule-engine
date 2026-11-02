@@ -159,6 +159,16 @@ says so. Exchanges the other side's own half confirms come only from the agent's
 evaluator gives no score and no ranking of nodes; it decides about one node at a time, from the
 properties it checked.
 
+The node baseline pack (`asg/admission_node_baseline`, capsule-engine#276; source and compile in
+evidencebook-skills `packs/admission-node-baseline`) reads three counts of such an answer, each in
+its own unit and never added to another: the node's own served periods, the witness receipts the
+verifier counted on the card's checkpoints (`card.witness_receipts`, a count over the card's
+checkpoints; the witness keys that count sit outside the pack and its digest, with the caller),
+and the node's corroborated referee verdicts when its answer carries them
+(`card.referee_verdicts`, applied to larger deals only; the four verdict classes stay separate
+counts and only the corroborated one is read). A Mesh answer carries no referee verdicts,
+so a larger deal with a Mesh node is limited. A count that cannot be read limits and never passes.
+
 For the parts you can use on their own (the Evidence Contract schema and
 validator, the obligation register format and its sample compiler, and the
 examples, including the Evidence Contracts in `examples/contracts/`), see

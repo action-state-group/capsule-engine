@@ -36,7 +36,7 @@ const MAY_DECIDE_NO: [&str; 3] = [SOURCE_PLATFORM, SOURCE_OWN_HISTORY, SOURCE_OP
 
 /// evaluate.go predicates: each admission check, the source it reads and
 /// the params it takes. The list is closed and versioned with the evaluator.
-pub(crate) const PREDICATES: [(&str, &str, &[&str]); 23] = [
+pub(crate) const PREDICATES: [(&str, &str, &[&str]); 25] = [
     ("platform.attestation_not_invalid", SOURCE_PLATFORM, &[]),
     ("platform.owner_signed", SOURCE_PLATFORM, &[]),
     ("card.verified", SOURCE_CARD, &[]),
@@ -59,6 +59,8 @@ pub(crate) const PREDICATES: [(&str, &str, &[&str]); 23] = [
     ("card.band_history_or_stake", SOURCE_CARD, &["k", "step_decades", "max_adverse_permille"]),
     ("card.open_disputes", SOURCE_CARD, &["max"]),
     ("card.self_reported_served_periods", SOURCE_CARD, &["window", "min_periods"]),
+    ("card.referee_verdicts", SOURCE_CARD, &["window", "min_periods"]),
+    ("card.witness_receipts", SOURCE_CARD, &["min"]),
     ("judged", SOURCE_JUDGED, &[]),
 ];
 
@@ -682,7 +684,9 @@ fn validate(src: &[u8], f: SourceFile, raw_rows: Vec<RawRow<'_>>) -> Result<Pack
                 // A row that needs more periods than it reads could never
                 // pass.
                 if let (Some(need), Some(window)) = (params.get("min_periods"), params.get("window")) {
-                    if r.check == "card.self_reported_served_periods" && need > window {
+                    if (r.check == "card.self_reported_served_periods" || r.check == "card.referee_verdicts")
+                        && need > window
+                    {
                         bad(format!("{at}: params.min_periods must be at most params.window"));
                     }
                 }

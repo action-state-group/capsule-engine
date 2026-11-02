@@ -25,6 +25,18 @@ type Served struct {
 	LengthS int64
 	Floor   int64
 	Periods []ServedPeriod
+	// Verdicts are the closed periods' referee_verdicts cells for the
+	// corroborated class (ISH §5.3), one per period, each with its value or
+	// its suppression reason; a period whose answer carries no such cell has
+	// neither. Nil when the answer counts no referee verdicts. The class is
+	// the cell whose dimension is {"verdict": "corroborated"}: the profile
+	// leaves how a class sits in a cell to vectors (SH-12, SH-14). The four
+	// classes stay separate counts and are never added to one another or to
+	// Periods (ISH §5.1, §5.3).
+	Verdicts []ServedPeriod
+	// VerdictsOnly is set when the answer counts referee verdicts and no
+	// served exchanges: Periods is then empty and is not read.
+	VerdictsOnly bool
 }
 
 // ServedPeriod is one closed period's exchanges_served total.
@@ -85,7 +97,12 @@ const (
 	ishCounts      = "period_counts"
 	ishHistoryCard = "history_card"
 	ishServed      = "exchanges_served"
-	ishLabel       = "self_reported"
+	ishVerdicts    = "referee_verdicts"
+	// ishVerdictDimension and ishCorroborated name the cell card.referee_verdicts
+	// reads: the corroborated class of a verdict count (vector-only, SH-12).
+	ishVerdictDimension = "verdict"
+	ishCorroborated     = "corroborated"
+	ishLabel            = "self_reported"
 	// ishPeriodsMax is the most periods one answer may list: over 190
 	// years of weeks, as the Mesh plugin bounds it.
 	ishPeriodsMax = 10_000
@@ -121,8 +138,8 @@ var (
 //
 // Only a Standard definition is read, and only counts in the period_counts
 // shape of ISH §9 (unregistered, SH-12): the shape the Mesh plugin serves.
-// Served holds the exchanges_served totals; nil when the answer counts no
-// served exchanges. Exchanges in another unit are checked and never added
+// Served holds the exchanges_served and referee_verdicts totals; nil when
+// the answer counts neither. Exchanges in another unit are checked and never added
 // to them (ISH §5.1). A refusal is an *InferenceServiceHistoryError.
 func InferenceServiceHistoryCounts(definition, artifact []byte, card CardCheckpoints, pin string) (*Served, error) {
 	fail := func(property, format string, args ...any) error {
@@ -271,6 +288,10 @@ func InferenceServiceHistoryCounts(definition, artifact []byte, card CardCheckpo
 		return nil, fail("period_alignment", "the closed periods are not each listed once")
 	}
 	served := &Served{LengthS: d.lengthS, Floor: d.floor}
+	hasServed := slices.Contains(d.counts.units, ishServed)
+	if slices.Contains(d.counts.units, ishVerdicts) {
+		served.Verdicts = []ServedPeriod{}
+	}
 	for i, raw := range listed {
 		k := first + int64(i)
 		var p map[string]json.RawMessage
@@ -282,19 +303,25 @@ func InferenceServiceHistoryCounts(definition, artifact []byte, card CardCheckpo
 		if !okFrom || !okTo || from.Unix() != d.startOf(k) || to.Unix() != d.startOf(k+1) {
 			return nil, fail("period_alignment", "periods[%d] is not the policy's next closed period", i)
 		}
-		totals, err := d.cells(p["cells"])
+		totals, corroborated, err := d.cells(p["cells"])
 		if err != nil {
 			return nil, fail(err.property, "periods[%d]: %s", i, err.reason)
 		}
-		sp := ServedPeriod{From: from, To: to}
 		if t, ok := totals[ishServed]; ok {
-			sp.Total, sp.Suppressed = t.value, t.suppressed
+			served.Periods = append(served.Periods, ServedPeriod{From: from, To: to, Total: t.value, Suppressed: t.suppressed})
 		}
-		served.Periods = append(served.Periods, sp)
+		if _, ok := totals[ishVerdicts]; ok {
+			c := ishTotal{}
+			if corroborated != nil {
+				c = *corroborated
+			}
+			served.Verdicts = append(served.Verdicts, ServedPeriod{From: from, To: to, Total: c.value, Suppressed: c.suppressed})
+		}
 	}
-	if !slices.Contains(d.counts.units, ishServed) {
+	if !hasServed && served.Verdicts == nil {
 		return nil, nil
 	}
+	served.VerdictsOnly = !hasServed
 	return served, nil
 }
 
@@ -468,48 +495,54 @@ type ishError struct{ property, reason string }
 // self_reported; each unit has exactly one total (dimension null) and a
 // dimension at most once; a published value is at least the floor; and
 // complementary suppression holds. It returns each unit's total.
-func (d ishDefinition) cells(raw json.RawMessage) (map[string]ishTotal, *ishError) {
+func (d ishDefinition) cells(raw json.RawMessage) (map[string]ishTotal, *ishTotal, *ishError) {
 	bad := func(property, format string, args ...any) *ishError {
 		return &ishError{property, fmt.Sprintf(format, args...)}
 	}
 	var cells []json.RawMessage
 	if json.Unmarshal(raw, &cells) != nil || cells == nil {
-		return nil, bad("artifact_form", "counts shape not known")
+		return nil, nil, bad("artifact_form", "counts shape not known")
 	}
 	type cell struct {
 		dim string
 		ishTotal
 	}
+	var corroborated *ishTotal
 	byUnit := map[string][]cell{}
 	for j, rawCell := range cells {
 		var c map[string]json.RawMessage
 		_ = json.Unmarshal(rawCell, &c) // a non-object leaves c nil, refused below
 		unit, okUnit := ishString(c["unit"])
 		if c == nil || !okUnit {
-			return nil, bad("artifact_form", "counts shape not known: cells[%d]", j)
+			return nil, nil, bad("artifact_form", "counts shape not known: cells[%d]", j)
 		}
 		if !slices.Contains(ishUnits, unit) || !slices.Contains(d.counts.units, unit) {
-			return nil, bad("units", "cells[%d] counts in %q, which its member does not declare", j, unit)
+			return nil, nil, bad("units", "cells[%d] counts in %q, which its member does not declare", j, unit)
 		}
 		if label, _ := ishString(c["label"]); label != ishLabel {
-			return nil, bad("labels", "cells[%d] is labelled other than self_reported", j)
+			return nil, nil, bad("labels", "cells[%d] is labelled other than self_reported", j)
 		}
 		// A dimension is null on the unit's total, or one stated value.
 		dim := ""
+		class := ""
 		if string(c["dimension"]) != "null" {
 			var m map[string]json.RawMessage
 			if json.Unmarshal(c["dimension"], &m) != nil || len(m) != 1 {
-				return nil, bad("artifact_form", "counts shape not known: cells[%d].dimension", j)
+				return nil, nil, bad("artifact_form", "counts shape not known: cells[%d].dimension", j)
 			}
-			for _, v := range m {
-				if _, ok := ishString(v); !ok {
-					return nil, bad("artifact_form", "counts shape not known: cells[%d].dimension", j)
+			for k, v := range m {
+				s, ok := ishString(v)
+				if !ok {
+					return nil, nil, bad("artifact_form", "counts shape not known: cells[%d].dimension", j)
+				}
+				if k == ishVerdictDimension {
+					class = s
 				}
 			}
 			dim = string(c["dimension"])
 		}
 		if slices.ContainsFunc(byUnit[unit], func(o cell) bool { return o.dim == dim }) {
-			return nil, bad("period_floor", "cells[%d] is listed twice", j)
+			return nil, nil, bad("period_floor", "cells[%d] is listed twice", j)
 		}
 		var t ishTotal
 		why, suppressed := ishString(c["suppressed"])
@@ -520,14 +553,17 @@ func (d ishDefinition) cells(raw json.RawMessage) (map[string]ishTotal, *ishErro
 		case !suppressed && sameKeys(c, []string{"dimension", "label", "unit", "value"}):
 			n, err := cardCount(c["value"])
 			if err != nil {
-				return nil, bad("period_floor", "cells[%d].value %v", j, err)
+				return nil, nil, bad("period_floor", "cells[%d].value %v", j, err)
 			}
 			if n < d.floor {
-				return nil, bad("period_floor", "cells[%d] is published below the floor", j)
+				return nil, nil, bad("period_floor", "cells[%d] is published below the floor", j)
 			}
 			t.value = &n
 		default:
-			return nil, bad("period_floor", "cells[%d] is neither published nor suppressed", j)
+			return nil, nil, bad("period_floor", "cells[%d] is neither published nor suppressed", j)
+		}
+		if unit == ishVerdicts && class == ishCorroborated {
+			corroborated = &t
 		}
 		byUnit[unit] = append(byUnit[unit], cell{dim, t})
 	}
@@ -543,7 +579,7 @@ func (d ishDefinition) cells(raw json.RawMessage) (map[string]ishTotal, *ishErro
 			}
 		}
 		if total == nil {
-			return nil, bad("artifact_form", "counts shape not known: no %s total", unit)
+			return nil, nil, bad("artifact_form", "counts shape not known: no %s total", unit)
 		}
 		totals[unit] = *total
 		if total.value == nil {
@@ -561,13 +597,13 @@ func (d ishDefinition) cells(raw json.RawMessage) (map[string]ishTotal, *ishErro
 			}
 		}
 		if withheld == 1 {
-			return nil, bad("period_floor", "a suppressed %s cell can be derived from the total", unit)
+			return nil, nil, bad("period_floor", "a suppressed %s cell can be derived from the total", unit)
 		}
 		if published > *total.value || (withheld == 0 && len(dims) > 0 && published != *total.value) {
-			return nil, bad("period_floor", "the %s cells do not add up to the total", unit)
+			return nil, nil, bad("period_floor", "the %s cells do not add up to the total", unit)
 		}
 	}
-	return totals, nil
+	return totals, corroborated, nil
 }
 
 // ishString reads a JSON string. encoding/json would read null as "", so

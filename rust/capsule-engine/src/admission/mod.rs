@@ -242,6 +242,19 @@ pub struct Card {
     /// none. `inference_service_history_counts` fills it from an
     /// inference-service-history/0 answer.
     pub served: Option<Served>,
+    /// The witness receipts the caller counted on the card's checkpoints;
+    /// None when it counted none (capsule-engine#276).
+    pub receipts: Option<Receipts>,
+}
+
+/// The witness receipts on a card's checkpoints (evaluate.go Receipts; ISH
+/// §5.2): those the caller verified offline under a configured witness key,
+/// out of the card's checkpoints. The count is the verifier's, not the
+/// node's statement.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct Receipts {
+    pub counted: i64,
+    pub checkpoints: i64,
 }
 
 /// The disputes others raised about the counterparty that its card shows:
