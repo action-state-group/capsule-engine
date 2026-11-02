@@ -24,7 +24,7 @@ and `portedDefinitions` (`guard/engine.go`).
   checkpoint that commits a record (ISH §6.3). It checks each History property it can
   compute from those bytes: `definition_form`, `definition_binding`, `artifact_form`, the coverage
   declaration, `units`, `labels`, `period_alignment`, `period_anchor`, `period_floor`, and that the
-  answer's anchor is the pin. A refusal is an `*InferenceServiceHistoryError` naming the property
+  answer's anchor is the pin (`anchor_match`). A refusal is an `*InferenceServiceHistoryError` naming the property
   that fails, so the card is `CardUnverifiable`; an unknown profile or a Detailed definition is
   refused the same way. `Card.Reason` (new) carries that property into the `card.verified` row,
   which records only a name from `InferenceServiceHistoryProperties`, never the detail.
