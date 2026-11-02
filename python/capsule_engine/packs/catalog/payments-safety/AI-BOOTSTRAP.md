@@ -8,7 +8,7 @@ paragraph if you already know exactly which files to point it at.
 
 ---
 
-You are helping me wire `capsule-ledger`'s `payments-safety` starter pack
+You are helping me wire `capsule-engine`'s `payments-safety` starter pack
 into this codebase. This pack governs one normalized action type,
 `payment.dispatch`, mapped to the `money.transfer` guard class. Every call
 that actually moves money -- initiates a transfer, dispatches a payout,
@@ -34,7 +34,7 @@ invent others):
    initiation, or a "dispatch payout" queue producer. Don't assume a
    specific framework; look at what's actually here.
 
-2. **For each one you find**, draft the `capsule_ledger.guards.Action` (or
+2. **For each one you find**, draft the `capsule_engine.guards.Action` (or
    the equivalent `capsule-emit` call if this codebase already emits
    capsules through an adapter) that would represent it, using ONLY the
    fields in the table above plus the standard identity fields every
@@ -44,7 +44,7 @@ invent others):
 
    Example shape for a raw `emit()` call:
    ```python
-   from capsule_ledger.guards import Action
+   from capsule_engine.guards import Action
 
    action = Action(
        verb="dispatch_payout",              # your own verb, any string

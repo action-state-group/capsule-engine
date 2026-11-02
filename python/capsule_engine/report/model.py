@@ -71,7 +71,7 @@ class DryRunReport:
     replay_command: str
     generated_at: str
     model_note: ModelNote | None = None
-    # The active policy manifest's own digest (``capsule_ledger.policy``), when
+    # The active policy manifest's own digest (``capsule_engine.policy``), when
     # one was resolved for this replay -- "evaluated under manifest <digest>"
     # (see ``cli/guard_cmds.py``). ``None`` when no manifest was configured.
     manifest_digest: str | None = None

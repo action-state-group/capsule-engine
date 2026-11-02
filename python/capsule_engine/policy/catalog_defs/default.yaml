@@ -4,8 +4,8 @@
 # `capsule manifest show` (or `resolve_manifest()`), which re-derives each
 # one from the current catalog files and fails closed on any mismatch.
 #
-# fold digest: `capsule_ledger/folds/catalog_defs/spend.weekly.yaml`
-# wicket digests: `capsule_ledger/guards/wickets/catalog_defs/*.yaml`
+# fold digest: `capsule_engine/folds/catalog_defs/spend.weekly.yaml`
+# wicket digests: `capsule_engine/guards/wickets/catalog_defs/*.yaml`
 manifest_id: default/1.0.0
 folds:
   - fold_id: spend.weekly/1.0.0

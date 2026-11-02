@@ -5,6 +5,16 @@ module has its own changelog, `go/CHANGELOG.md`.
 
 ## Unreleased
 
+- Changed (capsule-engine#177): leftover capsule-ledger names are gone. The MCP server's
+  `serverInfo.name` is now `capsule-engine` (it was `capsule-ledger`); clients key their config on the
+  name the user picks, so only a client that matches on `serverInfo.name` needs the new value. The three
+  pack `AI-BOOTSTRAP.md` files import `capsule_engine.*` (the `capsule_ledger.*` imports they named do not
+  exist), and the funnel report and the telemetry disclosure say capsule-engine. The environment
+  variables are renamed `CAPSULE_ARM`, `CAPSULE_TELEMETRY`, `CAPSULE_TELEMETRY_SINK_PATH` and
+  `CAPSULE_STATE_DIR`; the old `CAPSULE_LEDGER_*` names are still read when the new one is unset, and are
+  removed in 0.5.0. Telemetry state moves to `~/.local/state/capsule-engine`; an install whose state is
+  still in `~/.local/state/capsule-ledger` keeps reading it until the new directory has state.
+
 - Changed, breaking (capsule-engine#252): one pack format. A pack is authored as `pack-source.yaml` with
   `scope: {kind: live}`, the format evidencebook-skills' `pack_compile.py` compiles to an Evidence
   Contract. It is the `pack.yaml` shape plus `pack_version` (the version in `pack_id`) and, on each

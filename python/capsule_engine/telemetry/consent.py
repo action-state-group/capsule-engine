@@ -8,15 +8,16 @@ upgrade or a fresh install silently re-enabling anything.
 """
 from __future__ import annotations
 
-from ..envcompat import env_get
+from ..envcompat import LEGACY_ALIASES, env_get
 
-__all__ = ["DISCLOSURE_TEXT", "is_opted_in", "ENV_VAR"]
+__all__ = ["DISCLOSURE_TEXT", "is_opted_in", "ENV_VAR", "LEGACY_ENV_VAR"]
 
-ENV_VAR = "CAPSULE_LEDGER_TELEMETRY"
+ENV_VAR = "CAPSULE_TELEMETRY"
+LEGACY_ENV_VAR = LEGACY_ALIASES[ENV_VAR]
 _TRUE_VALUES = {"1", "true", "on", "yes"}
 
 DISCLOSURE_TEXT = f"""\
-capsule-ledger telemetry (off by default):
+capsule-engine telemetry (off by default):
 
 If you turn this on, this install reports six yes/no or count-shaped facts
 about how the guard package gets used -- e.g. "was a guard configured
@@ -30,8 +31,9 @@ Reports are aggregated across installs; nothing here computes or stores an
 individual verdict about your own usage.
 
 Turn on with: {ENV_VAR}=1
-Check current status any time: capsule telemetry status
-Turn off: unset {ENV_VAR} (or set it to 0)
+Check current status any time: capsule-engine telemetry status
+Turn off: set {ENV_VAR}=0, or unset {ENV_VAR} and {LEGACY_ENV_VAR} (the pre-rename name,
+still read until 0.5.0)
 """
 
 

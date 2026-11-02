@@ -1,9 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
-"""capsule-ledger MCP advisory server -- the ledger, folds, and guard checks exposed
+"""capsule-engine MCP advisory server -- the ledger, folds, and guard checks exposed
 as structured tools for any MCP-speaking harness (Claude Code, Goose, or a
 custom client), stdio transport.
 
-    python -m capsule_ledger.mcp.server        # stdio -- the default for every
+    python -m capsule_engine.mcp.server        # stdio -- the default for every
                                             # MCP host that spawns a subprocess
 
 Every tool here is a thin wrapper over the same modules the `capsule` CLI uses
@@ -44,9 +44,9 @@ from .config import ServerConfig, load_config, open_backend
 __all__ = ["mcp", "main"]
 
 mcp = FastMCP(
-    "capsule-ledger",
+    "capsule-engine",
     instructions=(
-        "Read and, for one tool, write to a local capsule-ledger control plane: an "
+        "Read and, for one tool, write to a local capsule-engine control plane: an "
         "append-only ledger of Agent Action Capsules, declarative fold "
         "aggregates over it, and the guard checks that gate consequential "
         "actions. Every read tool's answer carries its own verification data "

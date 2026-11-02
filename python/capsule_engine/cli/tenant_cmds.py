@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 """``capsule tenant`` verbs: provision/upgrade/list engine-instance-per-tenant
-deployments (``capsule_ledger.tenants``) -- the "run one whole engine
+deployments (``capsule_engine.tenants``) -- the "run one whole engine
 instance per tenant" pattern for a caller embedding this package for many
 customers. See ``docs/tenant-provisioning.md`` for the layout and the
 isolation rationale.

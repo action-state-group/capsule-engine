@@ -6,7 +6,7 @@ sealed ledger and wants a standard, vendor-neutral coverage read on it.
 
 ---
 
-You are helping me wire `capsule-ledger`'s `standard-vendor` pack into this
+You are helping me wire `capsule-engine`'s `standard-vendor` pack into this
 codebase. Unlike `airline-engagement`, this pack is NOT domain voice: every
 outcome is phrased against capsule shapes ANY emit layer already produces
 (a read chained to a write, a citation digest, a stated constraint the
@@ -45,16 +45,19 @@ convention as `airline-engagement`:**
   `evidence_instrument` names. Wire this term's `TermSpec.applicability`
   to always return `False` -- but do NOT do this for a term this pack
   declares `measured`; that is exactly the trust boundary
-  `capsule_ledger.packs.corpus_verify.verify_declared_not_measured`
+  `capsule_engine.packs.corpus_verify.verify_declared_not_measured`
   polices.
 
 **Before sealing a single verdict, run the oracle check:**
 
 ```python
-from capsule_ledger.packs.loader import load_pack_dir
-from capsule_ledger.packs.corpus_verify import verify_declared_not_measured
+from pathlib import Path
 
-pack = load_pack_dir("capsule_ledger/packs/catalog/standard-vendor")
+import capsule_engine.packs
+from capsule_engine.packs.loader import load_pack_dir
+from capsule_engine.packs.corpus_verify import verify_declared_not_measured
+
+pack = load_pack_dir(Path(capsule_engine.packs.__file__).parent / "catalog" / "standard-vendor")
 verify_declared_not_measured(pack, corpus)  # corpus: iterable of unit dicts
 ```
 

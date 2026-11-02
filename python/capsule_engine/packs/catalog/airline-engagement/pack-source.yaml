@@ -18,7 +18,7 @@
 # Before this field existed this was a hardcoded `always_false`
 # lambda in consuming code, with nothing to stop a future edit from pointing
 # it at a term with a real fail. Now it is DATA, and
-# `capsule_ledger.packs.corpus_verify.verify_declared_not_measured` is the
+# `capsule_engine.packs.corpus_verify.verify_declared_not_measured` is the
 # oracle that proves each `evidence_instrument` genuinely never resolves on
 # whatever corpus this pack is run against -- a violation raises rather than
 # silently rendering an inapplicable row.

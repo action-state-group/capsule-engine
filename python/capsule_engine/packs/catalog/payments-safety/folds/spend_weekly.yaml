@@ -1,6 +1,6 @@
 # payments-safety pack's own weekly-spend fold -- namespaced under
 # `payments_safety.` so it can coexist in a catalog directory alongside the
-# core repo's own `spend.weekly/1.0.0` (capsule_ledger/folds/catalog_defs/)
+# core repo's own `spend.weekly/1.0.0` (capsule_engine/folds/catalog_defs/)
 # without a fold_id collision. Shape is otherwise identical: sum of
 # `asg_payload.amount_minor` over accepted decisions, per developer, in a
 # rolling 7-day window -- see folds/catalog_defs/spend.weekly.yaml for the

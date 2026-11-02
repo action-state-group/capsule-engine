@@ -5,8 +5,8 @@
 # hold semantics for a deployment is opt-in and `default.yaml`'s own pinned
 # digest (test_policy_manifest.py's EXPECTED_DEFAULT_DIGEST) stays untouched.
 #
-# fold digest: capsule_ledger/folds/catalog_defs/hold.active_exposure.yaml
-# wicket digests: capsule_ledger/guards/wickets/catalog_defs/{caps_holds,hold_reconcile,dedupe,verify_before_dispatch}.yaml
+# fold digest: capsule_engine/folds/catalog_defs/hold.active_exposure.yaml
+# wicket digests: capsule_engine/guards/wickets/catalog_defs/{caps_holds,hold_reconcile,dedupe,verify_before_dispatch}.yaml
 manifest_id: holds/1.0.0
 folds:
   - fold_id: hold.active_exposure/1.0.0

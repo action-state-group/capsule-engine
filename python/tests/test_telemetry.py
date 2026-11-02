@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 """Opt-in-disclosed, aggregate-only telemetry: default-off, no PII/ledger
 content in any payload, and the CLI hooks that turn real usage into the
-six raw metric facts. See ``capsule_ledger/telemetry/`` for the modules under
+six raw metric facts. See ``capsule_engine/telemetry/`` for the modules under
 test and ``test_two_arm_packaging.py`` for the arm-visibility side of T8.
 """
 from __future__ import annotations
@@ -23,13 +23,15 @@ NANDA = FIXTURES / "nanda_transaction_ledger.jsonl"
 @pytest.fixture
 def state_dir(tmp_path, monkeypatch):
     d = tmp_path / "state"
-    monkeypatch.setenv("CAPSULE_LEDGER_STATE_DIR", str(d))
+    monkeypatch.delenv("CAPSULE_LEDGER_STATE_DIR", raising=False)
+    monkeypatch.setenv("CAPSULE_STATE_DIR", str(d))
     return d
 
 
 @pytest.fixture
 def opted_out(monkeypatch):
     monkeypatch.delenv(consent.ENV_VAR, raising=False)
+    monkeypatch.delenv(consent.LEGACY_ENV_VAR, raising=False)
 
 
 @pytest.fixture
@@ -149,7 +151,7 @@ def test_guard_dry_run_configuring_a_cap_emits_m1_when_opted_in(opted_in, state_
     sink_path = tmp_path / "events.jsonl"
     import os
 
-    os.environ["CAPSULE_LEDGER_TELEMETRY_SINK_PATH"] = str(sink_path)
+    os.environ["CAPSULE_TELEMETRY_SINK_PATH"] = str(sink_path)
     try:
         out = tmp_path / "report.json"
         rc = cli_main(
@@ -157,7 +159,7 @@ def test_guard_dry_run_configuring_a_cap_emits_m1_when_opted_in(opted_in, state_
         )
         assert rc == 0
     finally:
-        del os.environ["CAPSULE_LEDGER_TELEMETRY_SINK_PATH"]
+        del os.environ["CAPSULE_TELEMETRY_SINK_PATH"]
 
     lines = [json.loads(line) for line in sink_path.read_text().splitlines()]
     metrics = {line["metric"] for line in lines}

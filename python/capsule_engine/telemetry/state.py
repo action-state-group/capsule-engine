@@ -4,7 +4,7 @@
 Stored as a small JSON file outside the ledger and outside any repo --
 never ledger data, never PII: a random install id and a handful of "first
 time this happened" timestamps. Written regardless of telemetry opt-in (the
-facts are needed locally either way, e.g. for ``capsule telemetry status``);
+facts are needed locally either way, e.g. for ``capsule-engine telemetry status``);
 whether they are ever *emitted* anywhere is gated separately by
 ``consent.is_opted_in()``.
 """
@@ -26,9 +26,15 @@ def _utc_now() -> str:
 
 
 def state_path() -> Path:
-    override = env_get("CAPSULE_LEDGER_STATE_DIR")
-    base = Path(override) if override else Path.home() / ".local" / "state" / "capsule-ledger"
-    return base / "telemetry_state.json"
+    override = env_get("CAPSULE_STATE_DIR")
+    if override:
+        return Path(override) / "telemetry_state.json"
+    state = Path.home() / ".local" / "state"
+    path = state / "capsule-engine" / "telemetry_state.json"
+    legacy = state / "capsule-ledger" / "telemetry_state.json"
+    # An install that started under capsule-ledger keeps its install id: read the old
+    # directory while the new one has no state yet.
+    return legacy if not path.exists() and legacy.exists() else path
 
 
 @dataclass

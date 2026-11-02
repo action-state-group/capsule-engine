@@ -6,7 +6,7 @@ agent conversations you want covered by the `airline-engagement` pack.
 
 ---
 
-You are helping me wire `capsule-ledger`'s `airline-engagement` starter pack
+You are helping me wire `capsule-engine`'s `airline-engagement` starter pack
 into this codebase. Unlike `payments-safety`, this is a JUDGE/REPORT-time
 pack, not a gate-time enforcement pack: its payload is `outcomes[]` -- seven
 terms (A1-A7) a judge run scores per closed conversation, not a live
@@ -25,15 +25,18 @@ obligation your dispatch path must satisfy before acting.
   restriction-reason-cited record). Wire this term's `TermSpec.applicability`
   to always return `False` -- but do NOT do this for a term this pack
   declares `measured`; that is exactly the trust boundary
-  `capsule_ledger.packs.corpus_verify.verify_declared_not_measured` polices.
+  `capsule_engine.packs.corpus_verify.verify_declared_not_measured` polices.
 
 **Before sealing a single verdict, run the oracle check:**
 
 ```python
-from capsule_ledger.packs.loader import load_pack_dir
-from capsule_ledger.packs.corpus_verify import verify_declared_not_measured
+from pathlib import Path
 
-pack = load_pack_dir("capsule_ledger/packs/catalog/airline-engagement")
+import capsule_engine.packs
+from capsule_engine.packs.loader import load_pack_dir
+from capsule_engine.packs.corpus_verify import verify_declared_not_measured
+
+pack = load_pack_dir(Path(capsule_engine.packs.__file__).parent / "catalog" / "airline-engagement")
 verify_declared_not_measured(pack, corpus)  # corpus: iterable of {"messages": [...]} unit dicts
 ```
 
@@ -43,11 +46,3 @@ either your corpus DOES carry that record (re-declare the outcome as
 `measured` and wire a real check) or a coder pointed a real, measurable term
 at the `declared_not_measured` path to hide a fail. Either way, do not
 silently swallow this error.
-
-**If you're running two independently-implemented judge families over the
-same terms** (a re-judge / epoch-B pass), also call
-`capsule_ledger.compiler.epoch_registry.verify_same_family_caveat_integrity`
-over both epochs' `EpochOpen` registrations before rendering any report --
-it catches two epochs that are both fully deterministic-rule (no live model
-call in either) declaring different `judge_family` labels, which would
-silently suppress the same-family independence caveat.

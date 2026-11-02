@@ -122,7 +122,7 @@ def _fmt_rate(metric: ArmMetric) -> str:
 
 def render_funnel_report(report: FunnelReport) -> str:
     """Plain text: the six metrics, and nothing else."""
-    lines = ["capsule-ledger two-arm funnel report", "=" * 33, ""]
+    lines = ["capsule-engine two-arm funnel report", "=" * 36, ""]
 
     def arm_line(label: str, metrics: dict[str, ArmMetric]) -> None:
         lines.append(label)

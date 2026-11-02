@@ -9,7 +9,7 @@ logic, which is CLI-independent and directly unit-testable.
 ``ServerConfig``, ``load_config``, and ``open_backend`` are re-exported here
 from ``config.py`` -- this is the backend seam (see ``open_backend``'s own
 docstring): an alternate/remote backend implementation should depend on this
-package's public surface, not reach into ``capsule_ledger.mcp.config``.
+package's public surface, not reach into ``capsule_engine.mcp.config``.
 """
 from .config import ServerConfig, load_config, open_backend
 
