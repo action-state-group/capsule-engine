@@ -68,7 +68,11 @@ func TestInferenceServiceHistoryVectors(t *testing.T) {
 					Records int64  `json:"records"`
 				} `json:"checkpoints"`
 			} `json:"card"`
-			Pin      string          `json:"pin"`
+			Pin          string `json:"pin"`
+			MinFreshness *struct {
+				Size *int64 `json:"size"`
+				At   string `json:"at"`
+			} `json:"min_freshness"`
 			Want     string          `json:"want"`
 			Property string          `json:"property"`
 			Expected json.RawMessage `json:"expected"`
@@ -85,7 +89,15 @@ func TestInferenceServiceHistoryVectors(t *testing.T) {
 		for _, cp := range c.Card.Checkpoints {
 			card.Checkpoints = append(card.Checkpoints, CardCheckpoint{At: parseTime(t, cp.At), Records: cp.Records})
 		}
-		served, err := InferenceServiceHistoryCounts([]byte(c.Definition), []byte(c.Artifact), card, c.Pin)
+		ask := CoverageAsk{ExpectedPin: c.Pin}
+		if mf := c.MinFreshness; mf != nil {
+			ask.MinSize = mf.Size
+			if mf.At != "" {
+				at := parseTime(t, mf.At)
+				ask.MinAt = &at
+			}
+		}
+		served, err := InferenceServiceHistoryCountsFor([]byte(c.Definition), []byte(c.Artifact), card, ask)
 		if c.Want != "" {
 			var ie *InferenceServiceHistoryError
 			if !errors.As(err, &ie) || !strings.Contains(err.Error(), c.Want) || ie.Property != c.Property ||

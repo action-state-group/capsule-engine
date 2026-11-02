@@ -67,7 +67,12 @@ an admission pack is authored as `pack-source.yaml` and compiled by evidencebook
 `definition_digest` (their SHA-256), and that is all a loader reads. The test packs'
 `.json` files under `packs/` are compiled the same way from the `.yaml` beside them. A
 change to what a loader accepts changes the lint there (`scripts/admission_pack.py`) in a
-PR of its own. The decision block is about one counterparty: it is local-only, as
+PR of its own. `Card.Controller` is the caller's input and is read as given: the caller verifies a controller
+binding before filling it, and `card.controller_declared` and `card.controller_trusted` inherit
+that check (capsule-engine#284; the engine verifies none until evidencebook#193 lands). The
+inference-service-history reader takes the requester's coverage ask, exactly one of an
+`expected_pin` or a `min_freshness` by size or by time (`CoverageAsk`), and refuses an anchor that
+does not meet it as `anchor_match`. The decision block is about one counterparty: it is local-only, as
 the first section says, and no path here exports it.
 
 The Rust crate also holds `guard`, the Rust port of the guard for the inference pack, which

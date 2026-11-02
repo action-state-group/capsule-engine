@@ -87,7 +87,9 @@ func (e *InferenceServiceHistoryError) Error() string {
 
 // InferenceServiceHistoryProperties are the properties an
 // InferenceServiceHistoryError names (ISH §4.2, §6.3, §8.3, and
-// anchor_match for the requester's pin).
+// anchor_match for the requester's ask: a pin the anchor is not, a
+// min_freshness it does not meet, or an ask that is not satisfiable as
+// stated).
 var InferenceServiceHistoryProperties = []string{"definition_form", "definition_binding", "artifact_form",
 	"anchor_match", "coverage_declaration_form", "coverage_declaration_anchor", "units", "labels",
 	"period_alignment", "period_anchor", "period_floor"}
@@ -142,6 +144,33 @@ var (
 // the answer counts neither. Exchanges in another unit are checked and never added
 // to them (ISH §5.1). A refusal is an *InferenceServiceHistoryError.
 func InferenceServiceHistoryCounts(definition, artifact []byte, card CardCheckpoints, pin string) (*Served, error) {
+	return InferenceServiceHistoryCountsFor(definition, artifact, card, CoverageAsk{ExpectedPin: pin})
+}
+
+// CoverageAsk is the coverage the requester asked for (Evidence Request
+// §3.2): exactly one of an expected_pin, a min_freshness of a size, or a
+// min_freshness of a time. The draft makes the forms mutually exclusive, so
+// a responder cannot swap in fresher coverage for the pin that was demanded.
+type CoverageAsk struct {
+	// ExpectedPin is the anchor the requester pinned, or "".
+	ExpectedPin string
+	// MinSize is min_freshness by size: the fewest records (the unit of
+	// CardCheckpoint.Records; a caller converts a node-count log size as for
+	// it) the answer's anchor must cover; nil when the ask is not by size.
+	MinSize *int64
+	// MinAt is min_freshness by time: the earliest time the answer's
+	// anchor may have been issued; nil when the ask is not by time.
+	MinAt *time.Time
+}
+
+// InferenceServiceHistoryCountsFor is InferenceServiceHistoryCounts for any
+// coverage ask. A min_freshness the answer's anchor does not meet is refused
+// as anchor_match, as a pin it does not equal is: the answer is a different
+// answer to a different question, never a degraded success (§3.2). An ask
+// that is none of the three forms, or more than one, is refused the same
+// way. The anchor's size and time are the card's last checkpoint's, which
+// the live_set below must match.
+func InferenceServiceHistoryCountsFor(definition, artifact []byte, card CardCheckpoints, ask CoverageAsk) (*Served, error) {
 	fail := func(property, format string, args ...any) error {
 		return &InferenceServiceHistoryError{property, fmt.Sprintf(format, args...)}
 	}
@@ -217,7 +246,16 @@ func InferenceServiceHistoryCounts(definition, artifact []byte, card CardCheckpo
 		string(hc["evidence_stream"]) != string(art["evidence_stream"]) || string(hc["subject"]) != string(art["subject"]) {
 		return nil, fail("artifact_form", "the card is not for this answer's subject, stream and anchor")
 	}
-	if anchor != pin {
+	forms := 0
+	for _, set := range []bool{ask.ExpectedPin != "", ask.MinSize != nil, ask.MinAt != nil} {
+		if set {
+			forms++
+		}
+	}
+	if forms != 1 || (ask.MinSize != nil && *ask.MinSize < 0) {
+		return nil, fail("anchor_match", "the ask is not exactly one of expected_pin, a min_freshness size or a min_freshness time")
+	}
+	if ask.ExpectedPin != "" && anchor != ask.ExpectedPin {
 		return nil, fail("anchor_match", "the answer's anchor is not the expected_pin requested")
 	}
 
@@ -253,6 +291,15 @@ func InferenceServiceHistoryCounts(definition, artifact []byte, card CardCheckpo
 		canon.M("count", canon.Int(last.Records)), canon.M("start", canon.Int(0)), canon.M("stream", canon.Str(stream)))}))
 	if err != nil || string(cov["live_set"]) != liveSet {
 		return nil, fail("coverage_declaration_form", "live_set is not the anchor's records in the answer's stream")
+	}
+	// The min_freshness asks are met by the anchor the checks above tie to the
+	// card's last checkpoint: its records and its signed time, never the
+	// reader's clock.
+	if ask.MinSize != nil && last.Records < *ask.MinSize {
+		return nil, fail("anchor_match", "the answer's anchor covers fewer records than the min_freshness size requested")
+	}
+	if ask.MinAt != nil && last.At.Before(*ask.MinAt) {
+		return nil, fail("anchor_match", "the answer's anchor was issued before the min_freshness time requested")
 	}
 	anchorAt := last.At
 	if anchorAt.Nanosecond() != 0 || !d.onBoundary(anchorAt.Unix()) {
