@@ -21,7 +21,7 @@
 # emit today is declared
 # `measurability: declared_not_measured` naming the missing
 # `evidence_instrument` -- an honest, corpus-checkable claim
-# (`capsule_ledger.packs.corpus_verify.verify_declared_not_measured` is the
+# (`capsule_engine.packs.corpus_verify.verify_declared_not_measured` is the
 # oracle), never a silent "inapplicable". Rows tagged `mode: judged` need
 # no special instrument -- an LLM judge reads the sealed free text/prose
 # every corpus already carries (a conversation turn, an issue comment), so
