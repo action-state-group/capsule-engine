@@ -12,11 +12,11 @@ from ..envcompat import env_get
 
 __all__ = ["DISCLOSURE_TEXT", "is_opted_in", "ENV_VAR"]
 
-ENV_VAR = "CAPSULE_LEDGER_TELEMETRY"
+ENV_VAR = "CAPSULE_TELEMETRY"
 _TRUE_VALUES = {"1", "true", "on", "yes"}
 
 DISCLOSURE_TEXT = f"""\
-capsule-ledger telemetry (off by default):
+capsule-engine telemetry (off by default):
 
 If you turn this on, this install reports six yes/no or count-shaped facts
 about how the guard package gets used -- e.g. "was a guard configured

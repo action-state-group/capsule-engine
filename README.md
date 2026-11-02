@@ -61,7 +61,7 @@ the test suite passes (`pip install pytest "mcp<2"`, then `python -m pytest` in 
 | `capsule-engine bundle` | Write a self-contained, verifiable slice of the ledger. |
 | `capsule-engine referee judge` | The referee a deal's terms name: recompute the shared deal terms and each party's own pack, and seal an Evidence Result in the referee's book (`referee.py`). |
 
-`verify` and `bundle` are present unless `CAPSULE_LEDGER_ARM=guards-only`
+`verify` and `bundle` are present unless `CAPSULE_ARM=guards-only`
 (`packaging.py`), which keeps the guard checks and dry-run and hides the
 record-query verbs; the default is `full`. Run any command with `--help`.
 
@@ -108,7 +108,7 @@ capsule-emit ledger (`--ledger`).
   refreshes it and the `vendor-drift` workflow checks it.
 - `tenants.py` — engine-instance-per-tenant provisioning, behind
   `capsule-engine tenant`.
-- `packaging.py` — the `CAPSULE_LEDGER_ARM` switch (`full` or `guards-only`).
+- `packaging.py` — the `CAPSULE_ARM` switch (`full` or `guards-only`).
 - `examples/` (in the package) — runnable demos: an offline replay of
   tau2-bench airline trajectories through the guard
   (`python -m capsule_engine.examples.tau2_airline_reference --all`) and a

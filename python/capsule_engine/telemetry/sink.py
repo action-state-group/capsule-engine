@@ -42,7 +42,7 @@ class LocalJSONLSink:
 
 
 def default_sink() -> EventSink:
-    path = env_get("CAPSULE_LEDGER_TELEMETRY_SINK_PATH")
+    path = env_get("CAPSULE_TELEMETRY_SINK_PATH")
     return LocalJSONLSink(path) if path else NullSink()
 
 

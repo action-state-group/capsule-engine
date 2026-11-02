@@ -26,9 +26,15 @@ def _utc_now() -> str:
 
 
 def state_path() -> Path:
-    override = env_get("CAPSULE_LEDGER_STATE_DIR")
-    base = Path(override) if override else Path.home() / ".local" / "state" / "capsule-ledger"
-    return base / "telemetry_state.json"
+    override = env_get("CAPSULE_STATE_DIR")
+    if override:
+        return Path(override) / "telemetry_state.json"
+    state = Path.home() / ".local" / "state"
+    path = state / "capsule-engine" / "telemetry_state.json"
+    legacy = state / "capsule-ledger" / "telemetry_state.json"
+    # An install that started under capsule-ledger keeps its install id: read the old
+    # directory while the new one has no state yet.
+    return legacy if not path.exists() and legacy.exists() else path
 
 
 @dataclass

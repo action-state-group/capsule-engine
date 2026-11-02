@@ -23,7 +23,7 @@ NANDA = FIXTURES / "nanda_transaction_ledger.jsonl"
 @pytest.fixture
 def state_dir(tmp_path, monkeypatch):
     d = tmp_path / "state"
-    monkeypatch.setenv("CAPSULE_LEDGER_STATE_DIR", str(d))
+    monkeypatch.setenv("CAPSULE_STATE_DIR", str(d))
     return d
 
 
@@ -149,7 +149,7 @@ def test_guard_dry_run_configuring_a_cap_emits_m1_when_opted_in(opted_in, state_
     sink_path = tmp_path / "events.jsonl"
     import os
 
-    os.environ["CAPSULE_LEDGER_TELEMETRY_SINK_PATH"] = str(sink_path)
+    os.environ["CAPSULE_TELEMETRY_SINK_PATH"] = str(sink_path)
     try:
         out = tmp_path / "report.json"
         rc = cli_main(
@@ -157,7 +157,7 @@ def test_guard_dry_run_configuring_a_cap_emits_m1_when_opted_in(opted_in, state_
         )
         assert rc == 0
     finally:
-        del os.environ["CAPSULE_LEDGER_TELEMETRY_SINK_PATH"]
+        del os.environ["CAPSULE_TELEMETRY_SINK_PATH"]
 
     lines = [json.loads(line) for line in sink_path.read_text().splitlines()]
     metrics = {line["metric"] for line in lines}

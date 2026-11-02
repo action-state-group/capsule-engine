@@ -18,7 +18,7 @@ history recorded all along.
 Mechanism, and why: an environment variable rather than a pip extra, a
 persistent config file, or a per-invocation CLI flag.
 
-* A pip extra (``capsule-ledger[evidence]``) implies a *dependency* difference --
+* A pip extra (``capsule-engine[evidence]``) implies a *dependency* difference --
   something extra gets installed. Nothing does: both arms import the exact
   same modules, the only difference is what's registered/rendered. An extra
   would misdescribe what actually changed.
@@ -43,11 +43,11 @@ __all__ = ["GUARDS_ONLY", "FULL", "current_arm", "evidence_visible"]
 GUARDS_ONLY = "guards-only"
 FULL = "full"
 _VALID = (GUARDS_ONLY, FULL)
-_ENV_VAR = "CAPSULE_LEDGER_ARM"
+_ENV_VAR = "CAPSULE_ARM"
 
 
 def current_arm() -> str:
-    """The active packaging arm for this process: ``$CAPSULE_LEDGER_ARM``
+    """The active packaging arm for this process: ``$CAPSULE_ARM``
      if it names a valid arm, else ``full``
     (today's existing, unchanged behavior)."""
     value = env_get(_ENV_VAR, FULL).strip().lower()
