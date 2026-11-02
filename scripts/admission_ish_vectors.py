@@ -236,7 +236,7 @@ def main():
 
     def with_verdicts(*weeks):
         def edit(x):
-            for pr, w in zip(x["period_counts"]["periods"], weeks):
+            for pr, w in zip(x["period_counts"]["periods"], weeks, strict=True):
                 pr["cells"].extend(verdict_cells(*w[0], **w[1]))
         return edit
 
