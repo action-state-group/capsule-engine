@@ -8,7 +8,7 @@
 # this wicket instead of (or alongside) the plain one.
 #
 # `fold_digest` is the real, independently-computable `definition_digest()`
-# of capsule_ledger/folds/catalog_defs/hold.active_exposure.yaml.
+# of capsule_engine/folds/catalog_defs/hold.active_exposure.yaml.
 wicket_id: caps_holds/1.0.0
 check: caps
 config:

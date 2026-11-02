@@ -34,7 +34,7 @@ numeric field the fold engine needs (``amount_minor``, integer minor units
 post-seal without invalidating the digest.
 
 ``asg_payload.manifest_digest`` (added for the policy-manifest task) is the
-active policy manifest's own ``manifest_digest()`` (``capsule_ledger.policy``) at
+active policy manifest's own ``manifest_digest()`` (``capsule_engine.policy``) at
 decision time -- "which policy governed this decision" is checkable directly
 off the capsule, never a separate, possibly-stale lookup. Omitted (not just
 null) when no manifest is configured, same as every other optional

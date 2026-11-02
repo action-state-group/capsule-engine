@@ -294,7 +294,7 @@ class GuardEngine:
         # approver only when every selector that failed it is one of these.
         # Empty by default: with no pack, the gate refuses as it always has.
         self.ask_gate_selectors = ask_gate_selectors
-        # The active policy manifest's own digest (``capsule_ledger.policy.
+        # The active policy manifest's own digest (``capsule_engine.policy.
         # resolve_manifest(...).manifest_digest``), pinned onto every
         # decision capsule this engine produces (``build_decision_capsule``'s
         # ``manifest_digest`` param) so "which policy governed this

@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 """Opt-in-disclosed, aggregate-only telemetry: default-off, no PII/ledger
 content in any payload, and the CLI hooks that turn real usage into the
-six raw metric facts. See ``capsule_ledger/telemetry/`` for the modules under
+six raw metric facts. See ``capsule_engine/telemetry/`` for the modules under
 test and ``test_two_arm_packaging.py`` for the arm-visibility side of T8.
 """
 from __future__ import annotations

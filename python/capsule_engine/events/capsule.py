@@ -67,7 +67,7 @@ def build_event_capsule(
 ) -> dict:
     """Build a passive administrative record: a degradation/recovery event
     (gap window, rebuild range, operator alert), a policy-manifest
-    activation (``capsule_ledger.policy``), or similar -- never a gate decision.
+    activation (``capsule_engine.policy``), or similar -- never a gate decision.
     ``action_type: "fyi"`` per the reference library's own convention
     ("passive observation; the emit tier records what happened but does not
     gate or decide"). Requires a live ``signer`` for the same reason a

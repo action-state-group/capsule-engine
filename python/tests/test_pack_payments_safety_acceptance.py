@@ -42,7 +42,7 @@ EPSILON_DEVELOPER = "checkout-agent-epsilon@v1"
 ZETA_DEVELOPER = "checkout-agent-zeta@v1"
 INSTALL_TOOL_DEVELOPER = "capsule-init-tool"
 
-CAPS_MINOR = 1_000_000  # must match capsule_ledger/packs/catalog/payments-safety/pack.yaml's caps_minor
+CAPS_MINOR = 1_000_000  # must match capsule_engine/packs/catalog/payments-safety/pack-source.yaml's caps_minor
 
 SIGNER_SECRET = b"payments-safety-acceptance-fixture-fixed-key"
 
