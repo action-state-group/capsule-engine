@@ -93,6 +93,11 @@ type Card struct {
 	// Receipts are the witness receipts the caller counted on the card's
 	// checkpoints; nil when the caller counted none (capsule-engine#276).
 	Receipts *Receipts
+	// Stapled is set when the card arrived attached to the holder's own
+	// message, not as the answer to our ask. The caller decides it, as it
+	// decides State; the evaluator reads it only for card.not_stapled
+	// (capsule-engine#277).
+	Stapled bool
 }
 
 // Receipts are the witness receipts on a card's checkpoints (ISH §5.2): the
@@ -508,6 +513,7 @@ var predicates = map[string]predicate{
 	"card.self_reported_served_periods": {SourceCard, []string{"window", "min_periods"}},
 	"card.referee_verdicts":             {SourceCard, []string{"window", "min_periods"}},
 	"card.witness_receipts":             {SourceCard, []string{"min"}},
+	"card.not_stapled":                  {SourceCard, nil},
 	"judged":                            {SourceJudged, nil},
 }
 
@@ -820,6 +826,14 @@ func readRow(r Row, in Inputs, accept map[string]Unit, roots TrustRoots) RowResu
 			}
 			c := in.Card.Receipts
 			return counted(of(c.Counted >= r.Params["min"]), c.Counted, c.Checkpoints)
+		case "card.not_stapled":
+			// The holder mints a staple's nonce, so a replay inside the
+			// freshness window still works; a pack keeps a stapled card to
+			// the lowest tier with a LIMIT row from T1 that asks (D-31).
+			if in.Card.State != CardVerified {
+				return RowResult{Result: NotRead}
+			}
+			return RowResult{Result: of(!in.Card.Stapled)}
 		case "judged":
 			// A judge outside the trust roots is reported, not counted
 			// (SDK-SURFACE evaluate, NOT_CHECKED).

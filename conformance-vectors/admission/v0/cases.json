@@ -4949,6 +4949,105 @@
     "tier": "T0",
     "block_sha256": "1fbf1093f89d37c129749113b32f244ec20c0f932cc633135d273862e4b42d93"
    }
+  },
+  {
+   "case": "stapled-t0-goes",
+   "pack": "packs/stapled.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "0.5",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "stapled": true
+    }
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "38953c8783b73927c09625da501d6199a148a60a72d6066d1777c7e4a8a5368f"
+   }
+  },
+  {
+   "case": "stapled-t1-asks-and-holds-t0",
+   "pack": "packs/stapled.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "stapled": true
+    }
+   },
+   "expected": {
+    "verdict": "ASK",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "ce4d960f406f1dfb14542a0be83118cfbe8bba762473d02e5bfd3d9acf9a9795"
+   }
+  },
+  {
+   "case": "stapled-t1-no-ask-budget-limits-to-t0",
+   "pack": "packs/stapled.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "stapled": true
+    },
+    "asks_made": 1
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "e1a8d1e035212f5902544d275eee7e0decb57b992a0558d21613b39fbb7d5406"
+   }
+  },
+  {
+   "case": "asked-card-t1-goes",
+   "pack": "packs/stapled.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z"
+    }
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T1",
+    "block_sha256": "00e082ab64afba724b30f9b8499f74f2f5559178c015818476a5f567023c0ea4"
+   }
+  },
+  {
+   "case": "no-card-t1-asks-and-holds-t0",
+   "pack": "packs/stapled.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD"
+   },
+   "expected": {
+    "verdict": "ASK",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "c75ef25264dab1b7141b3bdd92e88918706f4eda4a2209046ad25eaf9862b564"
+   }
   }
  ]
 }

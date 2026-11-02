@@ -245,6 +245,10 @@ pub struct Card {
     /// The witness receipts the caller counted on the card's checkpoints;
     /// None when it counted none (capsule-engine#276).
     pub receipts: Option<Receipts>,
+    /// Set when the card arrived attached to the holder's own message, not
+    /// as the answer to our ask. The caller decides it, as it decides
+    /// `state`; read only by `card.not_stapled` (capsule-engine#277).
+    pub stapled: bool,
 }
 
 /// The witness receipts on a card's checkpoints (evaluate.go Receipts; ISH
