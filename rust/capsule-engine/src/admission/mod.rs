@@ -51,8 +51,9 @@ pub use band::{Band, Unit};
 pub use decision::{AskOut, Coverage, Decision, Effect, NotCounted, PackRef, RowResult, RowStatus};
 pub use evaluate::evaluate;
 pub use inference_service_history::{
-    inference_service_history_counts, CardCheckpoint, CardCheckpoints, InferenceServiceHistoryError, Served,
-    ServedPeriod, INFERENCE_SERVICE_HISTORY_PROPERTIES, SUPPRESSED_BELOW_FLOOR, SUPPRESSED_COMPLEMENTARY,
+    inference_service_history_counts, inference_service_history_counts_for, CardCheckpoint, CardCheckpoints,
+    CoverageAsk, InferenceServiceHistoryError, Served, ServedPeriod, INFERENCE_SERVICE_HISTORY_PROPERTIES,
+    SUPPRESSED_BELOW_FLOOR, SUPPRESSED_COMPLEMENTARY,
 };
 pub use pack::{Pack, RailPin, COMPILED_FORMAT};
 pub use standard_history::standard_history_counts;
@@ -225,7 +226,11 @@ pub struct Card {
     /// verified, or "".
     pub witness: String,
     /// The controller the card's key declares itself bound to, or "" when
-    /// it declares none.
+    /// it declares none. The engine reads it as given: the caller must have
+    /// verified a controller binding (Controller Binding v0) that ties the
+    /// card's key to this controller before filling it, and leaves it ""
+    /// otherwise (capsule-engine#284; verifying here waits on
+    /// evidencebook#193).
     pub controller: String,
     /// The claims the card holds, with their denominator; None when the card
     /// carries no counts (history_card/1 carries none today).

@@ -73,7 +73,12 @@ type Card struct {
 	// caller verified, or "".
 	Witness string
 	// Controller is the controller the card's key declares itself bound to,
-	// or "" when it declares none.
+	// or "" when it declares none. The engine reads it as given: the caller
+	// must have verified a controller binding (Controller Binding v0) that
+	// ties the card's key to this controller before filling it, and leaves
+	// it "" otherwise. card.controller_declared and card.controller_trusted
+	// only inherit that check (capsule-engine#284; verifying here waits on
+	// evidencebook#193).
 	Controller string
 	// Claims are the claims the card holds, with their denominator; nil when
 	// the card carries no counts (history_card/1 carries none today).

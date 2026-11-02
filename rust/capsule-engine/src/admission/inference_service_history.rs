@@ -167,6 +167,37 @@ pub fn inference_service_history_counts(
     card: &CardCheckpoints,
     pin: &str,
 ) -> Result<Option<Served>, InferenceServiceHistoryError> {
+    inference_service_history_counts_for(
+        definition,
+        artifact,
+        card,
+        &CoverageAsk { expected_pin: pin.to_string(), ..CoverageAsk::default() },
+    )
+}
+
+/// inference_service_history.go CoverageAsk: the coverage the requester
+/// asked for (Evidence Request §3.2), exactly one of an expected_pin, a
+/// min_freshness by size or a min_freshness by time.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct CoverageAsk {
+    /// The anchor the requester pinned, or "".
+    pub expected_pin: String,
+    /// min_freshness by size: the fewest records the anchor must cover.
+    pub min_size: Option<i64>,
+    /// min_freshness by time: the earliest time the anchor may be issued.
+    pub min_at: Option<Timestamp>,
+}
+
+/// inference_service_history.go InferenceServiceHistoryCountsFor:
+/// `inference_service_history_counts` for any coverage ask. A min_freshness
+/// the anchor does not meet, and an ask that is not exactly one form, are
+/// refused as `anchor_match`, like a pin it does not equal.
+pub fn inference_service_history_counts_for(
+    definition: &[u8],
+    artifact: &[u8],
+    card: &CardCheckpoints,
+    ask: &CoverageAsk,
+) -> Result<Option<Served>, InferenceServiceHistoryError> {
     let fail = |property: &'static str, detail: String| InferenceServiceHistoryError { property, detail };
     is_jcs(definition).map_err(|e| fail("definition_form", format!("the definition is not JCS bytes: {e}")))?;
     let def: Value = serde_json::from_slice(definition).map_err(|e| fail("definition_form", e.to_string()))?;
@@ -240,8 +271,29 @@ pub fn inference_service_history_counts(
     {
         return Err(fail("artifact_form", "the card is not for this answer's subject, stream and anchor".into()));
     }
-    if anchor != pin {
+    let forms = [!ask.expected_pin.is_empty(), ask.min_size.is_some(), ask.min_at.is_some()];
+    if forms.iter().filter(|set| **set).count() != 1 || ask.min_size.is_some_and(|n| n < 0) {
+        return Err(fail(
+            "anchor_match",
+            "the ask is not exactly one of expected_pin, a min_freshness size or a min_freshness time".into(),
+        ));
+    }
+    if !ask.expected_pin.is_empty() && anchor != ask.expected_pin {
         return Err(fail("anchor_match", "the answer's anchor is not the expected_pin requested".into()));
+    }
+    if let Some(last) = card.checkpoints.last() {
+        if ask.min_size.is_some_and(|n| last.records < n) {
+            return Err(fail(
+                "anchor_match",
+                "the answer's anchor covers fewer records than the min_freshness size requested".into(),
+            ));
+        }
+        if ask.min_at.is_some_and(|t| last.at < t) {
+            return Err(fail(
+                "anchor_match",
+                "the answer's anchor was issued before the min_freshness time requested".into(),
+            ));
+        }
     }
 
     // The coverage declaration (ISH §4.2): the definition's kind and rule,

@@ -5,6 +5,13 @@ and `portedDefinitions` (`guard/engine.go`).
 
 ## Unreleased
 
+- Added (capsule-engine#284): `InferenceServiceHistoryCountsFor` and `CoverageAsk`, the requester's
+  coverage ask for an inference-service-history/0 answer: an `expected_pin`, or a `min_freshness` by
+  size (records) or by time. An anchor that does not meet the ask, and an ask that is not exactly one
+  of the three, are refused as `anchor_match`. `InferenceServiceHistoryCounts` is unchanged and
+  asks by pin. `Card.Controller` is documented as the caller's, already verified against a controller
+  binding.
+
 ## 0.3.0 — 2026-11-02
 
 A minor on v0 (RELEASING.md): a new pack version, new ported definitions and API changes, some

@@ -10,9 +10,10 @@ use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 
 use capsule_engine::admission::{
-    evaluate, inference_service_history_counts, standard_history_counts, AdjudicationVerdict, BandCount, Card,
-    CardCheckpoint, CardCheckpoints, Claims, Disputes, Inputs, Judgement, Operator, OwnHistory, Pack, Platform,
-    RailPin, Receipts, Selection, Served, ServedPeriod, Stake, Timestamp, Vouch, INFERENCE_SERVICE_HISTORY_PROPERTIES,
+    evaluate, inference_service_history_counts_for, standard_history_counts, AdjudicationVerdict, BandCount, Card,
+    CardCheckpoint, CardCheckpoints, Claims, CoverageAsk, Disputes, Inputs, Judgement, Operator, OwnHistory, Pack,
+    Platform, RailPin, Receipts, Selection, Served, ServedPeriod, Stake, Timestamp, Vouch,
+    INFERENCE_SERVICE_HISTORY_PROPERTIES,
 };
 use capsule_engine::canon;
 use serde_json::{Map, Value};
@@ -543,11 +544,17 @@ fn inference_service_history_vectors() {
                 })
                 .collect(),
         };
-        let got = inference_service_history_counts(
+        let mf = &c["min_freshness"];
+        let ask = CoverageAsk {
+            expected_pin: c["pin"].as_str().unwrap().to_string(),
+            min_size: mf["size"].as_i64(),
+            min_at: mf["at"].as_str().map(time),
+        };
+        let got = inference_service_history_counts_for(
             c["definition"].as_str().unwrap().as_bytes(),
             c["artifact"].as_str().unwrap().as_bytes(),
             &card,
-            c["pin"].as_str().unwrap(),
+            &ask,
         );
         match c.get("want") {
             Some(want) => {

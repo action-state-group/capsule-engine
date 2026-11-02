@@ -84,11 +84,15 @@ PROPERTIES = ("definition_form", "definition_binding", "artifact_form", "anchor_
 
 
 def case(name, defn, art, checkpoints, pin, expected=None, want=None, definition_text=None, artifact_text=None,
-         prop=None):
+         prop=None, min_freshness=None):
     c = {"case": name,
          "definition": definition_text if definition_text is not None else jcs(defn),
          "artifact": artifact_text if artifact_text is not None else jcs(art),
          "card": {"checkpoints": checkpoints}, "pin": pin}
+    if min_freshness is not None:
+        # The requester's min_freshness ask: {"size": records} or {"at": time}. A case with none
+        # and an empty pin has no ask at all.
+        c["min_freshness"] = min_freshness
     if want is None:
         c["expected"] = expected
     else:
@@ -136,6 +140,7 @@ def main():
             expected = served(d, x) if any(u["unit"] in ("exchanges_served", "referee_verdicts")
                                             for u in d["members"][1]["units"]) else None
         cases.append(case(name, d, x, args["checkpoints"], args["pin"], expected=expected, want=want, prop=prop,
+                          min_freshness=args.get("min_freshness"),
                           definition_text=args.get("definition_text"), artifact_text=args.get("artifact_text")))
 
     mutant("mesh-unknown-profile", "definition_form: profile not known",
@@ -149,6 +154,19 @@ def main():
     mutant("mesh-definition-not-bound", "definition_binding",
            edit_def=lambda d: d.update(spec=d["spec"] + "#changed"), rebind=False)
     mutant("mesh-stale-or-replayed-pin", "anchor_match", pin=sha("another checkpoint"))
+    # The requester's other coverage asks (Evidence Request §3.2): the anchor must meet a min_freshness, and
+    # the ask is exactly one of a pin, a size and a time. The Mesh card's anchor covers 30 records, issued at
+    # 2026-01-19T00:00:00Z.
+    mutant("mesh-min-freshness-size-met", accept=True, pin="", min_freshness={"size": 30})
+    mutant("mesh-min-freshness-time-met", accept=True, pin="", min_freshness={"at": "2026-01-19T00:00:00Z"})
+    mutant("mesh-min-freshness-size-unmet", "anchor_match: the answer's anchor covers fewer records",
+           pin="", min_freshness={"size": 31})
+    mutant("mesh-min-freshness-time-unmet", "anchor_match: the answer's anchor was issued before",
+           pin="", min_freshness={"at": "2026-01-19T00:00:01Z"})
+    mutant("mesh-pin-and-min-freshness", "anchor_match: the ask is not exactly one", min_freshness={"size": 1})
+    mutant("mesh-two-min-freshness-forms", "anchor_match: the ask is not exactly one", pin="",
+           min_freshness={"size": 1, "at": "2026-01-01T00:00:00Z"})
+    mutant("mesh-no-ask", "anchor_match: the ask is not exactly one", pin="")
     mutant("mesh-interval-not-to-anchor", "coverage_declaration_anchor",
            edit_art=lambda x: x["coverage_declaration"]["interval"].update(to=sha("elsewhere")))
     mutant("mesh-live-set-other-count", "coverage_declaration_form",
