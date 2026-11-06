@@ -4,6 +4,7 @@ actions (capsule-engine#286, for evidencebook-skills `terms test`)."""
 from __future__ import annotations
 
 import json
+import shutil
 from pathlib import Path
 
 import pytest
@@ -80,3 +81,32 @@ def test_input_that_is_not_json_exits_2(tmp_path, capsys):
     src.write_text("{")
     assert main(["packs", "evaluate", "--pack", str(PACK), "--input", str(src)]) == 2
     assert "unusable input" in capsys.readouterr().err
+
+
+def test_a_row_the_action_does_not_reach_is_not_evaluable(tmp_path, capsys):
+    seller = Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog" / "seller"
+    rc, out, _ = _run(tmp_path, capsys, [{"action_type": "message.send", "target": "x", "at": "2026-11-01T00:00:00Z"}], pack=seller)
+    assert rc == 0
+    rows = json.loads(out)["rows"]
+    row = next(r for r in rows if r["row"] == "s03-price-below-the-floor")
+    assert (row["result"], row["reason"]) == ("not_evaluable", "the rule is not configured for this action class")
+
+
+def test_a_row_no_check_measures_is_not_evaluable(tmp_path, capsys):
+    pack = tmp_path / "pack"
+    shutil.copytree(PACK, pack)
+    source = pack / "pack-source.yaml"
+    source.write_text(
+        source.read_text().replace(
+            "action_semantics:",
+            "  - id: unmeasured\n    statement: Declared, not measured.\n    measurability: declared_not_measured\n"
+            "    evidence_instrument:\n      kind: structured_field\n      field: some_field\n\naction_semantics:",
+            1,
+        )
+    )
+    rc, out, _ = _run(tmp_path, capsys, [_dispatch("2026-11-01T00:00:00Z")], pack=pack)
+    assert rc == 0
+    assert [(r["row"], r["result"]) for r in json.loads(out)["rows"]] == [
+        ("no-duplicate-dispatch", "met"),
+        ("unmeasured", "not_evaluable"),
+    ]
