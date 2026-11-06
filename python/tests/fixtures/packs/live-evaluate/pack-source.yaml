@@ -1,0 +1,29 @@
+# A small live sample for `terms test`: one obligation checked by one inline wicket.
+pack_id: asg/live-sample/0.1.0
+scope:
+  kind: live
+pack_version: 0.1.0
+
+obligations:
+  - id: no-duplicate-dispatch
+    statement: >-
+      No payment.dispatch action may be recorded twice for the same operator,
+      developer, action type and counterparty within the dedupe window.
+    check: dedupe
+
+action_semantics:
+  - action_type: payment.dispatch
+    action_class: money.transfer
+    required_fields: [amount_minor, currency, target]
+
+constraints:
+  - wicket_id: live_sample.dedupe/1.0.0
+    check: dedupe
+    config:
+      method: exact_match_index_v0
+      window_days: 30
+
+holds_integration: stubbed
+
+folds:
+  - file: folds/spend_weekly.yaml
