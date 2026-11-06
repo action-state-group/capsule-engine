@@ -86,13 +86,14 @@ def test_input_that_is_not_json_exits_2(tmp_path, capsys):
     assert "unusable input" in capsys.readouterr().err
 
 
-def test_a_row_the_action_does_not_reach_is_not_evaluable(tmp_path, capsys):
+def test_a_row_the_action_does_not_reach_is_excluded_not_applicable(tmp_path, capsys):
     seller = Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog" / "seller"
     rc, out, _ = _run(tmp_path, capsys, [{"action_type": "message.send", "target": "x", "at": "2026-11-01T00:00:00Z"}], pack=seller)
     assert rc == 0
-    rows = json.loads(out)["rows"]
-    row = next(r for r in rows if r["row"] == "s03-price-below-the-floor")
-    assert (row["result"], row["reason"]) == ("not_evaluable", "the rule is not configured for this action class")
+    doc = json.loads(out)
+    assert "s03-price-below-the-floor" not in {r["row"] for r in doc["rows"]}
+    (row,) = [r for r in doc["excluded_not_applicable"] if r["row"] == "s03-price-below-the-floor"]
+    assert row["reason"] == "the rule is not configured for this action class"
 
 
 def test_a_row_no_check_measures_is_not_evaluable(tmp_path, capsys):
@@ -121,7 +122,7 @@ def test_an_action_missing_a_required_field_is_not_met_as_met(tmp_path, capsys):
     rc, out, _ = _run(tmp_path, capsys, [{"action_type": "payment.dispatch", "target": "a", "at": "2026-11-01T00:00:00Z"}])
     assert rc == 0
     doc = json.loads(out)
-    assert doc["verdict"] == "not_evaluable"
+    assert doc["decision"] == "not_evaluable"
     assert [(r["row"], r["result"]) for r in doc["rows"]] == [("no-duplicate-dispatch", "not_evaluable")]
 
 
@@ -161,7 +162,7 @@ def test_a_pass_on_an_unevaluated_decision_is_not_evaluable_under_a_deny(tmp_pat
     assert rc == 0
     doc = json.loads(out)
     results = {r["row"]: r["result"] for r in doc["rows"]}
-    assert doc["verdict"] == "deny"
+    assert doc["decision"] == "deny"
     assert results["r27-no-commitment-beyond-task-bounds"] == "not_met"
     assert results["r05-spending-limits"] == "not_evaluable"
 

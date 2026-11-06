@@ -120,9 +120,10 @@ def _cmd_packs_evaluate(args: argparse.Namespace) -> int:
     """Decides the input's actions in order on one throwaway ledger (each
     decision is held before the next action is checked) and prints each of the
     pack's rows as the LAST action's decision leaves it: ``met`` (pass),
-    ``not_met`` (fail), or ``not_evaluable`` (the row does not apply to that
-    action, no check measures it, or the decision itself was not evaluable, so
-    a pass proves nothing). An outcome the pack declares is listed
+    ``not_met`` (fail), or ``not_evaluable`` (no check measures it, or the
+    decision itself was not evaluable, so a pass proves nothing). A row that
+    does not apply to that action is listed under ``excluded_not_applicable``,
+    not in ``rows``. An outcome the pack declares is listed
     ``not_evaluable``: outcomes are measured over a corpus
     (``packs propose``), not decided on actions. Exit 0 when the rows were decided,
     whatever they say; 2 when they could not be, with nothing on stdout and
@@ -154,16 +155,19 @@ def _cmd_packs_evaluate(args: argparse.Namespace) -> int:
         return unusable(f"unusable input: {exc}")
 
     last = decisions[-1]
-    verdict = last.verdict
+    decision = last.verdict
     # A decision with an unevaluated check, taxonomy mismatch or deal conflict proves nothing
     # for a row that passed, whichever row failed: ``verdict`` alone hides it behind a deny.
     unevaluated = bool(
         last.not_evaluated_checks or last.asked_unevaluated_checks or last.taxonomy_mismatch or last.deal_id_conflict
     )
     rows = []
+    excluded = []  # Evidence Contract: a row that does not apply is excluded, never spelled not_evaluable
     for o in pack.obligations:
         r = by_id.get(o.id)
-        if r is None:
+        if r is not None and r.result == "n/a":
+            excluded.append({"row": o.id, "reason": r.reason})
+        elif r is None:
             rows.append({"row": o.id, "result": "not_evaluable", "reason": "no check measures this row"})
         elif unevaluated and r.result == "pass":
             rows.append({"row": o.id, "result": "not_evaluable", "reason": "the action could not be evaluated, so this pass proves nothing"})
@@ -174,8 +178,9 @@ def _cmd_packs_evaluate(args: argparse.Namespace) -> int:
     out = {
         "engine": {"name": "capsule-engine", "version": __version__},
         "pack": {"id": pack.pack_id, "digest": pack.definition_digest()},
-        "verdict": verdict,
+        "decision": decision,
         "rows": rows,
+        "excluded_not_applicable": excluded,
     }
     print(json.dumps(out, indent=2, sort_keys=True))
     return 0
