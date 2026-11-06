@@ -149,24 +149,21 @@ def test_a_pack_that_is_not_utf8_exits_2(tmp_path, capsys):
     assert rc == 2 and out == "" and "pack failed to load" in err
 
 
-def test_a_pass_on_an_unevaluated_decision_is_not_evaluable_whatever_the_verdict(tmp_path, capsys, monkeypatch):
-    """When another row fails the verdict is deny, which hides that a check was
-    never evaluated; the decision's own fields decide, not the verdict."""
-    import dataclasses
-
-    from capsule_engine.report import live_check
-
-    real = live_check.decide_steps
-    monkeypatch.setattr(
-        live_check,
-        "decide_steps",
-        lambda pack, steps: [dataclasses.replace(d, not_evaluated_checks=("required_fields",)) for d in real(pack, steps)],
+def test_a_pass_on_an_unevaluated_decision_is_not_evaluable_under_a_deny(tmp_path, capsys):
+    """Two identical dispatches without a rail or recurrence: one everyday row
+    fails (the verdict is deny, which would hide that required_fields was not
+    evaluated) while another passes, and that pass proves nothing."""
+    everyday = Path(__file__).parent / "fixtures" / "packs" / "everyday-0.3.8"
+    action = {"verb": "payment.make", "target": "acct-1", "amount_minor": 100, "currency": "USD"}
+    rc, out, _ = _run(
+        tmp_path, capsys, [dict(action, at="2026-11-01T00:00:00Z"), dict(action, at="2026-11-02T00:00:00Z")], pack=everyday
     )
-    rc, out, _ = _run(tmp_path, capsys, [_dispatch("2026-11-01T00:00:00Z")])
     assert rc == 0
     doc = json.loads(out)
-    assert doc["verdict"] == "not_evaluable"
-    assert [(r["row"], r["result"]) for r in doc["rows"]] == [("no-duplicate-dispatch", "not_evaluable")]
+    results = {r["row"]: r["result"] for r in doc["rows"]}
+    assert doc["verdict"] == "deny"
+    assert results["r27-no-commitment-beyond-task-bounds"] == "not_met"
+    assert results["r05-spending-limits"] == "not_evaluable"
 
 
 def test_the_declared_action_class_is_found_by_verb():

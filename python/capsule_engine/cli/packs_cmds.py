@@ -86,7 +86,7 @@ def _evaluate_step(raw: object, pack) -> dict:
     """One case action as ``decide_steps`` takes it: ``at`` is the action's
     ``timestamp``, ``verb`` defaults to ``action_type``, and operator and
     developer default to placeholders, and ``action_class`` to the one the
-    pack's ``action_semantics`` declares for the ``action_type``. A key that is
+    pack's ``action_semantics`` declares for the action's ``verb``. A key that is
     not an ``Action`` field is refused rather than ignored, so a typo cannot
     pass a case unevaluated, and so is an action with no time: the wall clock
     would make a case's result depend on the day it runs."""
