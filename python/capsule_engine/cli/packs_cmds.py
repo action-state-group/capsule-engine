@@ -116,14 +116,28 @@ def _evaluate_step(raw: object, pack) -> dict:
     return step
 
 
+def _does_not_apply(outcome) -> bool:
+    """Whether an ``n/a`` row is out of scope for the action, as the referee reads
+    it (``referee._not_settled``): a check that did not run for a reason that
+    leaves the rule in scope (a field it needs is absent, the taxonomy versions
+    differ) is a gap, ``not_evaluable``, never an exclusion. An ``n/a`` row
+    whose check measured the action and whose selector did not match is out of scope."""
+    evidence = outcome.evidence if outcome is not None and isinstance(outcome.evidence, dict) else {}
+    if evidence.get("taxonomy_mismatch") is not None:
+        return False
+    if outcome is not None and outcome.result == "n/a":
+        return evidence.get("in_scope") is False
+    return True
+
+
 def _cmd_packs_evaluate(args: argparse.Namespace) -> int:
     """Decides the input's actions in order on one throwaway ledger (each
     decision is held before the next action is checked) and prints each of the
     pack's rows as the LAST action's decision leaves it: ``met`` (pass),
-    ``not_met`` (fail), or ``not_evaluable`` (no check measures it, or the
-    decision itself was not evaluable, so a pass proves nothing). A row that
-    does not apply to that action is listed under ``excluded_not_applicable``,
-    not in ``rows``. An outcome the pack declares is listed
+    ``not_met`` (fail), or ``not_evaluable`` (no check measures it, its check could not
+    run on this action, or the decision itself was not evaluable, so a pass
+    proves nothing). A row whose rule is out of scope for that action is listed
+    under ``excluded_not_applicable``, not in ``rows``. An outcome the pack declares is listed
     ``not_evaluable``: outcomes are measured over a corpus
     (``packs propose``), not decided on actions. Exit 0 when the rows were decided,
     whatever they say; 2 when they could not be, with nothing on stdout and
@@ -155,6 +169,7 @@ def _cmd_packs_evaluate(args: argparse.Namespace) -> int:
         return unusable(f"unusable input: {exc}")
 
     last = decisions[-1]
+    by_check = {c.id: c for c in last.constraints}
     decision = last.verdict
     # A decision with an unevaluated check, taxonomy mismatch or deal conflict proves nothing
     # for a row that passed, whichever row failed: ``verdict`` alone hides it behind a deny.
@@ -165,8 +180,10 @@ def _cmd_packs_evaluate(args: argparse.Namespace) -> int:
     excluded = []  # Evidence Contract: a row that does not apply is excluded, never spelled not_evaluable
     for o in pack.obligations:
         r = by_id.get(o.id)
-        if r is not None and r.result == "n/a":
+        if r is not None and r.result == "n/a" and _does_not_apply(by_check.get(o.check)):
             excluded.append({"row": o.id, "reason": r.reason})
+        elif r is not None and r.result == "n/a":
+            rows.append({"row": o.id, "result": "not_evaluable", "reason": r.reason})
         elif r is None:
             rows.append({"row": o.id, "result": "not_evaluable", "reason": "no check measures this row"})
         elif unevaluated and r.result == "pass":

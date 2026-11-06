@@ -173,3 +173,28 @@ def test_the_declared_action_class_is_found_by_verb():
 
     step = _evaluate_step({"verb": "payment.dispatch", "action_type": "decide", "at": "2026-11-01T00:00:00Z"}, load_pack_dir(PACK))
     assert step["action_class"] == "money.transfer"
+
+
+EVERYDAY = Path(__file__).parent / "fixtures" / "packs" / "everyday-0.3.8"
+
+
+def test_an_in_scope_row_whose_check_could_not_run_stays_not_evaluable(tmp_path, capsys):
+    """A cap is configured for payment.make but the action carries no amount_minor:
+    the rule applies and could not be evaluated, so it is a gap, not an exclusion (#288)."""
+    rc, out, _ = _run(
+        tmp_path, capsys, [{"verb": "payment.make", "target": "a", "currency": "USD", "at": "2026-11-01T00:00:00Z"}], pack=EVERYDAY
+    )
+    assert rc == 0
+    doc = json.loads(out)
+    assert {r["row"]: r["result"] for r in doc["rows"]}["r05-spending-limits"] == "not_evaluable"
+    assert "r05-spending-limits" not in {r["row"] for r in doc["excluded_not_applicable"]}
+
+
+def test_a_taxonomy_mismatch_holds_rows_but_excludes_the_out_of_scope_one(tmp_path, capsys):
+    action = {"verb": "payment.make", "target": "a", "currency": "USD", "amount_minor": 5,
+              "taxonomy_version": "bogus-9", "at": "2026-11-01T00:00:00Z"}
+    rc, out, _ = _run(tmp_path, capsys, [action], pack=EVERYDAY)
+    assert rc == 0
+    doc = json.loads(out)
+    assert [r["row"] for r in doc["excluded_not_applicable"]] == ["r23-secrets-and-authentication"]
+    assert {r["row"]: r["result"] for r in doc["rows"]}["r01-research-and-prepare"] == "not_evaluable"
