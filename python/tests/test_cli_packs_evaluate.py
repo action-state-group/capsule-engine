@@ -64,8 +64,11 @@ def test_unloadable_pack_exits_2_with_the_reason(tmp_path, capsys):
         ({"actions": []}, "at least one action"),
         ({"cases": []}, "at least one action"),
         ({"actions": ["x"]}, "must be a JSON object"),
-        ({"actions": [{"action_type": "payment.dispatch", "amount": 5}]}, "unknown action field(s): amount"),
+        ({"actions": [{"action_type": "payment.dispatch", "amount": 5, "at": "2026-11-01T00:00:00Z"}]}, "unknown action field(s): amount"),
         ({"actions": [{"at": "t", "timestamp": "t"}]}, "both 'at' and 'timestamp'"),
+        ({"actions": [{"action_type": "payment.dispatch"}]}, "needs 'at'"),
+        ({"actions": [{"action_type": "payment.dispatch", "at": 5}]}, "needs 'at'"),
+        ({"actions": [{"at": "2026-11-01T00:00:00Z", "cited_mandate_capsule_id": {"a": 1}}]}, "unusable input"),
     ],
 )
 def test_unusable_input_exits_2(tmp_path, capsys, doc, why):
@@ -110,3 +113,37 @@ def test_a_row_no_check_measures_is_not_evaluable(tmp_path, capsys):
         ("no-duplicate-dispatch", "met"),
         ("unmeasured", "not_evaluable"),
     ]
+
+
+def test_an_action_missing_a_required_field_is_not_met_as_met(tmp_path, capsys):
+    """The pack requires amount_minor and currency on a payment.dispatch: the
+    decision is refused as not evaluable, and a pass on it proves nothing."""
+    rc, out, _ = _run(tmp_path, capsys, [{"action_type": "payment.dispatch", "target": "a", "at": "2026-11-01T00:00:00Z"}])
+    assert rc == 0
+    doc = json.loads(out)
+    assert doc["verdict"] == "not_evaluable"
+    assert [(r["row"], r["result"]) for r in doc["rows"]] == [("no-duplicate-dispatch", "not_evaluable")]
+
+
+def test_a_declared_outcome_is_listed_not_evaluable(tmp_path, capsys):
+    eu = Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog" / "eu-ai-act"
+    rc, out, _ = _run(tmp_path, capsys, [{"action_type": "decide", "at": "2026-11-01T00:00:00Z"}], pack=eu)
+    assert rc == 0
+    rows = json.loads(out)["rows"]
+    assert rows and {r["result"] for r in rows} == {"not_evaluable"}
+
+
+def test_an_action_class_the_pack_declares_is_filled_in():
+    from capsule_engine.cli.packs_cmds import _evaluate_step
+    from capsule_engine.packs.loader import load_pack_dir
+
+    step = _evaluate_step({"action_type": "payment.dispatch", "at": "2026-11-01T00:00:00Z"}, load_pack_dir(PACK))
+    assert step["action_class"] == "money.transfer" and step["timestamp"] == "2026-11-01T00:00:00Z"
+
+
+def test_a_pack_that_is_not_utf8_exits_2(tmp_path, capsys):
+    pack = tmp_path / "pack"
+    pack.mkdir()
+    (pack / "pack-source.yaml").write_bytes(b"\xff\xfe\x00")
+    rc, out, err = _run(tmp_path, capsys, [_dispatch("2026-11-01T00:00:00Z")], pack=pack)
+    assert rc == 2 and out == "" and "pack failed to load" in err
