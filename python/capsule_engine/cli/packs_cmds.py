@@ -102,11 +102,12 @@ def _evaluate_step(raw: object, pack) -> dict:
             raise ValueError("an action gives both 'at' and 'timestamp'")
         step["timestamp"] = step.pop("at")
     if not isinstance(step.get("timestamp"), str) or not step["timestamp"]:
-        raise ValueError("each action needs 'at' (an RFC 3339 time string)")
+        raise ValueError("each action needs 'at' (a time string, RFC 3339)")
     step.setdefault("verb", step.get("action_type", "decide"))
+    # A pack names its action types by ``Action.verb`` (the required-fields check keys on it).
     declared = {s.action_type: s.action_class for s in pack.action_semantics}
-    if "action_class" not in step and step.get("action_type") in declared:
-        step["action_class"] = declared[step["action_type"]]
+    if "action_class" not in step and step["verb"] in declared:
+        step["action_class"] = declared[step["verb"]]
     step.setdefault("operator", _EVALUATE_PRINCIPAL)
     step.setdefault("developer", _EVALUATE_PRINCIPAL)
     unknown = sorted(set(step) - {f.name for f in dataclasses.fields(Action)})
@@ -152,13 +153,19 @@ def _cmd_packs_evaluate(args: argparse.Namespace) -> int:
     except (OSError, ValueError, TypeError, KeyError, AttributeError) as exc:  # JSONDecodeError is a ValueError
         return unusable(f"unusable input: {exc}")
 
-    verdict = decisions[-1].verdict
+    last = decisions[-1]
+    verdict = last.verdict
+    # A decision with an unevaluated check, taxonomy mismatch or deal conflict proves nothing
+    # for a row that passed, whichever row failed: ``verdict`` alone hides it behind a deny.
+    unevaluated = bool(
+        last.not_evaluated_checks or last.asked_unevaluated_checks or last.taxonomy_mismatch or last.deal_id_conflict
+    )
     rows = []
     for o in pack.obligations:
         r = by_id.get(o.id)
         if r is None:
             rows.append({"row": o.id, "result": "not_evaluable", "reason": "no check measures this row"})
-        elif verdict == "not_evaluable" and r.result == "pass":
+        elif unevaluated and r.result == "pass":
             rows.append({"row": o.id, "result": "not_evaluable", "reason": "the action could not be evaluated, so this pass proves nothing"})
         else:
             rows.append({"row": o.id, "result": _EVALUATE_RESULTS.get(r.result, "not_evaluable"), "reason": r.reason})
