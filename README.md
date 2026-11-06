@@ -57,6 +57,7 @@ the test suite passes (`pip install pytest "mcp<2"`, then `python -m pytest` in 
 | `capsule-engine tenant init` / `upgrade` / `list` | One engine instance per tenant: its own store directory, policy manifest and signing key. |
 | `capsule-engine telemetry status` / `funnel` | The telemetry disclosure and opt-in state; the funnel report. |
 | `capsule-engine packs propose --pack NAME` | A read-only measurability report for any pack over a JSONL corpus. |
+| `capsule-engine packs evaluate --pack DIR [--input FILE]` | Decides a live pack's rows on `{"actions": [...]}` (stdin when no `--input`) and prints JSON: the last decision's `verdict`, and per row `met`, `not_met` or `not_evaluable` (a pass on an unevaluable decision, a row no check measures and a declared outcome are `not_evaluable`), and the engine version. Every action needs `at`. Exit 2 when the pack or input is unusable. |
 | `capsule-engine verify CAPSULE_ID` | Verify one stored record (`--store`), or a whole bundle file (`--bundle`). |
 | `capsule-engine bundle` | Write a self-contained, verifiable slice of the ledger. |
 | `capsule-engine referee judge` | The referee a deal's terms name: recompute the shared deal terms and each party's own pack, and seal an Evidence Result in the referee's book (`referee.py`). |

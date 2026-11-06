@@ -10,6 +10,9 @@
              this mode never touches ``.capsule-setup/`` and persists
              nothing, so it carries no dependency on the setup/Candidate
              machinery that stayed in capsule-compiler.
+  evaluate -- decide a live pack's rows on a list of actions, as JSON (the
+             entry point for ``terms test``): met / not_met / not_evaluable
+             per row after the last action, plus the engine version.
 """
 from __future__ import annotations
 
@@ -74,8 +77,112 @@ def _cmd_packs_propose(args: argparse.Namespace) -> int:
     return 0
 
 
+_EVALUATE_RESULTS = {"pass": "met", "fail": "not_met"}
+# The placeholders a case's actions take when they name no operator or developer.
+_EVALUATE_PRINCIPAL = "case-operator"
+
+
+def _evaluate_step(raw: object, pack) -> dict:
+    """One case action as ``decide_steps`` takes it: ``at`` is the action's
+    ``timestamp``, ``verb`` defaults to ``action_type``, and operator and
+    developer default to placeholders, and ``action_class`` to the one the
+    pack's ``action_semantics`` declares for the action's ``verb``. A key that is
+    not an ``Action`` field is refused rather than ignored, so a typo cannot
+    pass a case unevaluated, and so is an action with no time: the wall clock
+    would make a case's result depend on the day it runs."""
+    import dataclasses
+
+    from ..guards import Action
+
+    if not isinstance(raw, dict):
+        raise ValueError("each action must be a JSON object")
+    step = dict(raw)
+    if "at" in step:
+        if "timestamp" in step:
+            raise ValueError("an action gives both 'at' and 'timestamp'")
+        step["timestamp"] = step.pop("at")
+    if not isinstance(step.get("timestamp"), str) or not step["timestamp"]:
+        raise ValueError("each action needs 'at' (a time string, RFC 3339)")
+    step.setdefault("verb", step.get("action_type", "decide"))
+    # A pack names its action types by ``Action.verb`` (the required-fields check keys on it).
+    declared = {s.action_type: s.action_class for s in pack.action_semantics}
+    if "action_class" not in step and step["verb"] in declared:
+        step["action_class"] = declared[step["verb"]]
+    step.setdefault("operator", _EVALUATE_PRINCIPAL)
+    step.setdefault("developer", _EVALUATE_PRINCIPAL)
+    unknown = sorted(set(step) - {f.name for f in dataclasses.fields(Action)})
+    if unknown:
+        raise ValueError(f"unknown action field(s): {', '.join(unknown)}")
+    return step
+
+
+def _cmd_packs_evaluate(args: argparse.Namespace) -> int:
+    """Decides the input's actions in order on one throwaway ledger (each
+    decision is held before the next action is checked) and prints each of the
+    pack's rows as the LAST action's decision leaves it: ``met`` (pass),
+    ``not_met`` (fail), or ``not_evaluable`` (the row does not apply to that
+    action, no check measures it, or the decision itself was not evaluable, so
+    a pass proves nothing). An outcome the pack declares is listed
+    ``not_evaluable``: outcomes are measured over a corpus
+    (``packs propose``), not decided on actions. Exit 0 when the rows were decided,
+    whatever they say; 2 when they could not be, with nothing on stdout and
+    the reason on stderr."""
+    from .. import __version__
+    from ..packs.obligation_results import obligation_results
+    from ..report.live_check import decide_steps
+
+    def unusable(why: str) -> int:
+        print(f"capsule-engine packs evaluate: {why}", file=sys.stderr)
+        return 2
+
+    try:
+        pack = load_pack_dir(Path(args.pack))
+    except PackDefinitionError as exc:
+        return unusable(f"pack failed to load ({exc.reason}): {exc}")
+    except (OSError, UnicodeDecodeError) as exc:
+        return unusable(f"pack failed to load: {exc}")
+    try:
+        text = sys.stdin.read() if args.input in (None, "-") else Path(args.input).read_text(encoding="utf-8")
+        doc = json.loads(text)
+        actions = doc.get("actions") if isinstance(doc, dict) else None
+        if not isinstance(actions, list) or not actions:
+            raise ValueError('input must be {"actions": [...]} with at least one action')
+        steps = [_evaluate_step(a, pack) for a in actions]
+        decisions = decide_steps(pack, steps)
+        by_id = {r.obligation_id: r for r in obligation_results(pack, decisions[-1].constraints)}
+    except (OSError, ValueError, TypeError, KeyError, AttributeError) as exc:  # JSONDecodeError is a ValueError
+        return unusable(f"unusable input: {exc}")
+
+    last = decisions[-1]
+    verdict = last.verdict
+    # A decision with an unevaluated check, taxonomy mismatch or deal conflict proves nothing
+    # for a row that passed, whichever row failed: ``verdict`` alone hides it behind a deny.
+    unevaluated = bool(
+        last.not_evaluated_checks or last.asked_unevaluated_checks or last.taxonomy_mismatch or last.deal_id_conflict
+    )
+    rows = []
+    for o in pack.obligations:
+        r = by_id.get(o.id)
+        if r is None:
+            rows.append({"row": o.id, "result": "not_evaluable", "reason": "no check measures this row"})
+        elif unevaluated and r.result == "pass":
+            rows.append({"row": o.id, "result": "not_evaluable", "reason": "the action could not be evaluated, so this pass proves nothing"})
+        else:
+            rows.append({"row": o.id, "result": _EVALUATE_RESULTS.get(r.result, "not_evaluable"), "reason": r.reason})
+    for oc in pack.outcomes:
+        rows.append({"row": oc.id, "result": "not_evaluable", "reason": "outcomes are measured over a corpus (packs propose), not decided on actions"})
+    out = {
+        "engine": {"name": "capsule-engine", "version": __version__},
+        "pack": {"id": pack.pack_id, "digest": pack.definition_digest()},
+        "verdict": verdict,
+        "rows": rows,
+    }
+    print(json.dumps(out, indent=2, sort_keys=True))
+    return 0
+
+
 def add_parser(sub: argparse._SubParsersAction) -> argparse.ArgumentParser:
-    packs = sub.add_parser("packs", help="packs-runtime verbs: propose (generic measurability report)")
+    packs = sub.add_parser("packs", help="packs-runtime verbs: propose (measurability report), evaluate (decide a live pack's rows)")
     packs_sub = packs.add_subparsers(dest="packs_command")
     packs.set_defaults(packs_parser=packs)
 
@@ -92,5 +199,13 @@ def add_parser(sub: argparse._SubParsersAction) -> argparse.ArgumentParser:
         "fold_cohort rows (e.g. task_id, session_id)",
     )
     p_propose.set_defaults(func=_cmd_packs_propose)
+
+    p_evaluate = packs_sub.add_parser(
+        "evaluate",
+        help="decide a live pack's rows on a list of actions ({'actions': [...]}), as JSON",
+    )
+    p_evaluate.add_argument("--pack", required=True, help="path to a live pack directory (pack-source.yaml)")
+    p_evaluate.add_argument("--input", default=None, help="JSON file {'actions': [...]}; stdin when omitted or -")
+    p_evaluate.set_defaults(func=_cmd_packs_evaluate)
 
     return packs
