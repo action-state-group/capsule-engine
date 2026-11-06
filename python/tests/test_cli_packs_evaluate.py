@@ -86,13 +86,14 @@ def test_input_that_is_not_json_exits_2(tmp_path, capsys):
     assert "unusable input" in capsys.readouterr().err
 
 
-def test_a_row_the_action_does_not_reach_is_not_evaluable(tmp_path, capsys):
+def test_a_row_the_action_does_not_reach_is_excluded_not_applicable(tmp_path, capsys):
     seller = Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog" / "seller"
     rc, out, _ = _run(tmp_path, capsys, [{"action_type": "message.send", "target": "x", "at": "2026-11-01T00:00:00Z"}], pack=seller)
     assert rc == 0
-    rows = json.loads(out)["rows"]
-    row = next(r for r in rows if r["row"] == "s03-price-below-the-floor")
-    assert (row["result"], row["reason"]) == ("not_evaluable", "the rule is not configured for this action class")
+    doc = json.loads(out)
+    assert "s03-price-below-the-floor" not in {r["row"] for r in doc["rows"]}
+    (row,) = [r for r in doc["excluded_not_applicable"] if r["row"] == "s03-price-below-the-floor"]
+    assert row["reason"] == "the rule is not configured for this action class"
 
 
 def test_a_row_no_check_measures_is_not_evaluable(tmp_path, capsys):
@@ -121,7 +122,7 @@ def test_an_action_missing_a_required_field_is_not_met_as_met(tmp_path, capsys):
     rc, out, _ = _run(tmp_path, capsys, [{"action_type": "payment.dispatch", "target": "a", "at": "2026-11-01T00:00:00Z"}])
     assert rc == 0
     doc = json.loads(out)
-    assert doc["verdict"] == "not_evaluable"
+    assert doc["decision"] == "not_evaluable"
     assert [(r["row"], r["result"]) for r in doc["rows"]] == [("no-duplicate-dispatch", "not_evaluable")]
 
 
@@ -161,7 +162,7 @@ def test_a_pass_on_an_unevaluated_decision_is_not_evaluable_under_a_deny(tmp_pat
     assert rc == 0
     doc = json.loads(out)
     results = {r["row"]: r["result"] for r in doc["rows"]}
-    assert doc["verdict"] == "deny"
+    assert doc["decision"] == "deny"
     assert results["r27-no-commitment-beyond-task-bounds"] == "not_met"
     assert results["r05-spending-limits"] == "not_evaluable"
 
@@ -172,3 +173,28 @@ def test_the_declared_action_class_is_found_by_verb():
 
     step = _evaluate_step({"verb": "payment.dispatch", "action_type": "decide", "at": "2026-11-01T00:00:00Z"}, load_pack_dir(PACK))
     assert step["action_class"] == "money.transfer"
+
+
+EVERYDAY = Path(__file__).parent / "fixtures" / "packs" / "everyday-0.3.8"
+
+
+def test_an_in_scope_row_whose_check_could_not_run_stays_not_evaluable(tmp_path, capsys):
+    """A cap is configured for payment.make but the action carries no amount_minor:
+    the rule applies and could not be evaluated, so it is a gap, not an exclusion (#288)."""
+    rc, out, _ = _run(
+        tmp_path, capsys, [{"verb": "payment.make", "target": "a", "currency": "USD", "at": "2026-11-01T00:00:00Z"}], pack=EVERYDAY
+    )
+    assert rc == 0
+    doc = json.loads(out)
+    assert {r["row"]: r["result"] for r in doc["rows"]}["r05-spending-limits"] == "not_evaluable"
+    assert "r05-spending-limits" not in {r["row"] for r in doc["excluded_not_applicable"]}
+
+
+def test_a_taxonomy_mismatch_holds_rows_but_excludes_the_out_of_scope_one(tmp_path, capsys):
+    action = {"verb": "payment.make", "target": "a", "currency": "USD", "amount_minor": 5,
+              "taxonomy_version": "bogus-9", "at": "2026-11-01T00:00:00Z"}
+    rc, out, _ = _run(tmp_path, capsys, [action], pack=EVERYDAY)
+    assert rc == 0
+    doc = json.loads(out)
+    assert [r["row"] for r in doc["excluded_not_applicable"]] == ["r23-secrets-and-authentication"]
+    assert {r["row"]: r["result"] for r in doc["rows"]}["r01-research-and-prepare"] == "not_evaluable"
