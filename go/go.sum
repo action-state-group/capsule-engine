@@ -1,5 +1,5 @@
-github.com/action-state-group/agent-action-capsule/go v0.7.0 h1:Vi2cN7a5jbX4oWuDpxRifzAu3qgb3OEEybxkPf176Aw=
-github.com/action-state-group/agent-action-capsule/go v0.7.0/go.mod h1:miJnjbceLMHON1PmfHKRjqlNSsy95k6qZ1jz1j3KR84=
+github.com/action-state-group/agent-action-capsule/go v0.21.0 h1:PCXDXaWP6bRBXRFqS7XxH+RKCOP3PO3EIi9/CYgNKAQ=
+github.com/action-state-group/agent-action-capsule/go v0.21.0/go.mod h1:/E7MZLjJQsp3376zHviBtVdDGA+TSu3RXK9IWvrhdpY=
 github.com/action-state-group/capsule-emit/go v0.3.1-0.20261027234055-9defe98af14b h1:GGYqlFX1dZmLl7lNDBVynOjx0z2CAsAMWrChVyDYtsk=
 github.com/action-state-group/capsule-emit/go v0.3.1-0.20261027234055-9defe98af14b/go.mod h1:TKXiVniDy7RlksGjEAF6k9rj5NcwvwdQ6EGajzhghuo=
 github.com/action-state-group/checkpointed-local-log/go v0.1.1-0.20261027220337-fe4281c10be3 h1:BpJ11u8Xi1PDtReP57niFQvsbMoEqatnelJlsr0ixu8=
