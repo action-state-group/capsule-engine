@@ -9,7 +9,7 @@ require (
 )
 
 require (
-	github.com/action-state-group/agent-action-capsule/go v0.7.0 // indirect
+	github.com/action-state-group/agent-action-capsule/go v0.21.0 // indirect
 	github.com/datatrails/go-datatrails-merklelog/mmr v0.4.2-0.20250428132117-275103a34a08 // indirect
 	github.com/fxamacker/cbor/v2 v2.9.0 // indirect
 	github.com/kr/text v0.2.0 // indirect

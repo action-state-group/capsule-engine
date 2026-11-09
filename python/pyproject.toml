@@ -24,7 +24,7 @@ classifiers = [
 # checkpointed-local-log (cll). This package's registry/ is the interim
 # vendor-of-record copy of the action-class and field conventions.
 dependencies = [
-    "agent-action-capsule>=0.11.0",
+    "agent-action-capsule>=0.16.0",
     # cll.log: the CLL entry log a store directory keeps (guards/history.py),
     # with its entry count (checkpointed-local-log#98, in 0.8.0).
     "checkpointed-local-log>=0.8.0,<0.9",
