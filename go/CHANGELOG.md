@@ -5,6 +5,7 @@ and `portedDefinitions` (`guard/engine.go`).
 
 ## Unreleased
 
+- Added (capsule-engine#269): `StoreHistory.Log()` and `StoreHistory.Artifacts()` return the CLL entry log and artifact store the history reads, for read access.
 - Added (capsule-engine#284): `InferenceServiceHistoryCountsFor` and `CoverageAsk`, the requester's
   coverage ask for an inference-service-history/0 answer: an `expected_pin`, or a `min_freshness` by
   size (records) or by time. An anchor that does not meet the ask, and an ask that is not exactly one

@@ -42,6 +42,14 @@ func NewStoreHistory(ctx context.Context, artifacts artifact.IndexStore, log Sto
 	return &StoreHistory{ctx: ctx, artifacts: artifacts, log: log}, nil
 }
 
+// Log is the CLL entry log, for read access (entries, count). The history
+// owns it: the caller does not append to it.
+func (s *StoreHistory) Log() StoreLog { return s.log }
+
+// Artifacts is the artifact store, for read access. The history owns it: the
+// caller does not put to it.
+func (s *StoreHistory) Artifacts() artifact.IndexStore { return s.artifacts }
+
 // Find reads every page of the artifact store's Find, drops the records the
 // log does not hold, and returns the rest in log order. The time bound goes
 // to the store truncated to the microsecond, the store's own precision, so

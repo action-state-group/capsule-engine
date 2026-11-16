@@ -338,3 +338,13 @@ func TestStoreHistoryReadErrors(t *testing.T) {
 		})
 	}
 }
+
+func TestStoreHistoryExposesItsStores(t *testing.T) {
+	f := newStoreFixture(t, nil)
+	if f.history.Log() != StoreLog(f.log) {
+		t.Fatal("Log() is not the log the history was built on")
+	}
+	if f.history.Artifacts() != artifact.IndexStore(f.artifacts) {
+		t.Fatal("Artifacts() is not the store the history was built on")
+	}
+}

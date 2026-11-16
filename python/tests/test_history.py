@@ -374,3 +374,17 @@ def test_verify_resolves_a_prefix_from_ids_and_reports_a_refused_dependency(tmp_
         found_id, result = history_mod.verify_stored(store, child["capsule_id"])
         assert found_id == child["capsule_id"]
         assert not result.ok and result.findings[0].code == "stored_record_invalid"
+
+
+def test_a_store_exposes_its_log_and_artifacts(tmp_path):
+    caps = [_event(n) for n in range(2)]
+    with open_store(tmp_path / "s", signer=SIGNER, create=True) as store:
+        for capsule in caps:
+            store.append(capsule)
+        assert store.log is store._log and store.log.entry_count() == 2
+        assert store.artifacts.get(caps[0]["capsule_id"]).capsule
+        with pytest.raises(AttributeError):
+            store.log = None
+    assert (tmp_path / "s" / history_mod.LOG_FILE).is_file()
+    for name in ("LOG_FILE", "ARTIFACTS_FILE", "TRUSTED_KEYS_FILE", "NAMESPACE", "parse_instant"):
+        assert name in history_mod.__all__
