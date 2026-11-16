@@ -330,14 +330,18 @@ class StoreHistory:
 
     @property
     def log(self) -> Any:
-        """The CLL entry log, for read access (entries, checkpoint state).
-        The history owns it: do not append to or close it."""
+        """The raw CLL entry log, for reading (entries, checkpoint state). The
+        history owns it. An append through it bypasses the history's lock and
+        its artifact-put-then-append order, and a committed entry with no
+        artifact makes the next open fail :meth:`check_committed`: never
+        append to or close it."""
         return self._log
 
     @property
     def artifacts(self) -> Any:
-        """The artifact store, for read access. The history owns it: do not
-        put to it or close it."""
+        """The raw artifact store, for reading. The history owns it. A put
+        through it bypasses the history's lock and its sync-before-append
+        order: never put to or close it."""
         return self._artifacts
 
     def check_committed(self) -> None:
