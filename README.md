@@ -126,6 +126,21 @@ capsule-emit ledger (`--ledger`).
 | `payments-safety/` | `asg/payments-safety/1.0.0` | Caps per scope and window, dedupe, and verify-before-dispatch on money movement, plus the spend fold. |
 | `standard-vendor/` | `asg/standard-vendor/1.0.1` | The standard outcome catalog over the general capsule vocabulary: one pack that grades any vendor's ledger. |
 
+### Countersign pack modules (`python/capsule_engine/countersign/`)
+
+The countersign engine (capsule-anchor) is neutral: it ships no pack code and loads a
+`PolicyModule` by profile id. The modules for the packs we own live here, beside the packs they
+check; the contract (`check(bundle, profile_id) -> [{name, result, detail}]`) is public, and a
+third party brings its own module. This one reads two record kinds sealed before the window,
+`method_freeze` and `declared_count`, from a payload-free v2 bundle: a freeze reads `established`,
+`failed` or `not present` (sealed before the window, and every judgment references its digest);
+a count reads `match`, `mismatch` or `not present`. Never pass/fail, never "coverage". The
+declared count's value is in the withheld payload, so the holder opts in to disclosing that one
+record's payload (`{declared_count, second_system_digest?}`, checked against the digest sealed in
+the record); the count is then compared with the certified sequence span, and with no disclosure it
+reads `not checked`, which is not `not present`. `capsule-engine packs preflight --bundle FILE --profile ID [--window-start TS]` runs the same
+checks locally before a countersignature is requested.
+
 ### The Go guard (`go/`)
 
 `go/` is the Go module `github.com/action-state-group/capsule-engine/go`, the

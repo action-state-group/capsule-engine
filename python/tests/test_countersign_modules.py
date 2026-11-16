@@ -1,0 +1,140 @@
+# SPDX-License-Identifier: Apache-2.0
+"""Countersign pack modules (capsule-engine#160): method freeze and declared count."""
+from __future__ import annotations
+
+import json
+
+from capsule_engine.cli.main import main
+from capsule_engine.countersign import PROFILE_IDS, CountersignPackModule, register_all
+
+FREEZE = "a" * 64
+
+
+def _rec(kind, ts, cid, refs=()):
+    r = {"action_id": f"{kind}-{cid[:4]}", "action_type": kind, "timestamp": ts, "capsule_id": cid}
+    if refs:
+        r["references"] = [{"type": "capsule", "digest_alg": "sha-256", "digest": d} for d in refs]
+    return r
+
+
+def _bundle(freeze_ts="2026-11-01T00:00:00Z", judged_refs=(FREEZE,), freeze=True, count=True, count_ts="2026-11-01T00:00:01Z"):
+    recs = []
+    if freeze:
+        recs.append(_rec("method_freeze", freeze_ts, FREEZE))
+    if count:
+        recs.append(_rec("declared_count", count_ts, "b" * 64))
+    recs.append(_rec("evaluation-report", "2026-11-02T00:00:00Z", "c" * 64, judged_refs))
+    recs.append(_rec("evaluation-report", "2026-11-03T00:00:00Z", "d" * 64, judged_refs))
+    return {"records": recs}
+
+
+def _by_name(results):
+    return {r.name: r for r in results}
+
+
+def test_freeze_sealed_before_window_and_referenced_is_established():
+    r = _by_name(CountersignPackModule().check(_bundle(), "outcomes/v1"))
+    assert r["method freeze"].result == "established"
+    assert r["declared count"].result == "not checked"
+
+
+def test_freeze_sealed_after_window_failed():
+    r = _by_name(CountersignPackModule().check(_bundle(freeze_ts="2026-11-02T12:00:00Z"), "outcomes/v1"))
+    assert r["method freeze"].result == "failed"
+
+
+def test_judgment_without_freeze_reference_failed():
+    r = _by_name(CountersignPackModule().check(_bundle(judged_refs=()), "outcomes/v1"))
+    assert r["method freeze"].result == "failed"
+    assert "2 of 2" in r["method freeze"].detail
+
+
+def test_absent_records_not_present():
+    r = _by_name(CountersignPackModule().check(_bundle(freeze=False, count=False), "outcomes/v1"))
+    assert r["method freeze"].result == "not present"
+    assert r["declared count"].result == "not present"
+
+
+def test_count_sealed_after_window_is_mismatch():
+    r = _by_name(CountersignPackModule().check(_bundle(count_ts="2026-11-02T06:00:00Z"), "outcomes/v1"))
+    assert r["declared count"].result == "mismatch"
+
+
+def test_explicit_window_start_governs():
+    from capsule_engine.countersign.modules import parse_window_start
+
+    m = CountersignPackModule(parse_window_start("2026-10-31T00:00:00Z"))
+    assert _by_name(m.check(_bundle(), "outcomes/v1"))["method freeze"].result == "failed"
+
+
+def test_no_window_derivable_is_not_checked():
+    r = _by_name(CountersignPackModule().check({"records": [_rec("method_freeze", "2026-11-01T00:00:00Z", FREEZE)]}, "outcomes/v1"))
+    assert r["method freeze"].result == "not checked"
+
+
+def test_vocabulary_never_pass_fail_or_coverage():
+    for b in (_bundle(), _bundle(judged_refs=()), _bundle(freeze=False, count=False)):
+        for r in CountersignPackModule().check(b, "outcomes/v1"):
+            assert r.result not in ("pass", "fail")
+            assert "coverage" not in (r.name + r.detail).lower()
+
+
+def test_register_all_registers_every_profile_id():
+    seen = {}
+
+    class Reg:
+        def register(self, pid, mod):
+            seen[pid] = mod
+
+    register_all(Reg())
+    assert set(seen) == set(PROFILE_IDS)
+
+
+def test_cli_preflight(tmp_path, capsys):
+    f = tmp_path / "b.json"
+    f.write_text(json.dumps(_bundle()))
+    assert main(["packs", "preflight", "--bundle", str(f), "--profile", "outcomes/v1"]) == 0
+    doc = json.loads(capsys.readouterr().out)
+    assert {c["name"]: c["result"] for c in doc["checks"]}["method freeze"] == "established"
+    f.write_text(json.dumps(_bundle(judged_refs=())))
+    assert main(["packs", "preflight", "--bundle", str(f), "--profile", "outcomes/v1"]) == 1
+    capsys.readouterr()
+    assert main(["packs", "preflight", "--bundle", str(f), "--profile", "nope/v1"]) == 2
+
+
+def _disclosed(payload, span=(1, 4), tamper=False):
+    from agent_action_capsule.bundle import json_digest
+
+    b = _bundle()
+    rec = next(r for r in b["records"] if r["action_type"] == "declared_count")
+    rec["model_attestation"] = {"compute_attestation": {"agent_input_digest": json_digest({"declared_count": 0} if tamper else payload)}}
+    b["disclosures"] = {rec["capsule_id"]: {"agent_input": payload}}
+    b["completeness_certificate"] = {"first_seq": span[0], "last_seq": span[1]}
+    return b
+
+
+def _count(b):
+    return _by_name(CountersignPackModule().check(b, "outcomes/v1"))["declared count"]
+
+
+def test_disclosed_count_matches_span():
+    assert _count(_disclosed({"declared_count": 4})).result == "match"
+
+
+def test_disclosed_count_differs_from_span():
+    assert _count(_disclosed({"declared_count": 3})).result == "mismatch"
+
+
+def test_disclosure_not_matching_sealed_digest_is_mismatch():
+    r = _count(_disclosed({"declared_count": 4}, tamper=True))
+    assert r.result == "mismatch" and "digest" in r.detail
+
+
+def test_disclosed_payload_must_be_closed_shape():
+    assert _count(_disclosed({"declared_count": 4, "note": "x"})).result == "mismatch"
+
+
+def test_disclosed_without_certificate_is_not_checked():
+    b = _disclosed({"declared_count": 4})
+    del b["completeness_certificate"]
+    assert _count(b).result == "not checked"

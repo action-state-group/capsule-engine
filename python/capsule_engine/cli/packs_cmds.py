@@ -10,6 +10,8 @@
              this mode never touches ``.capsule-setup/`` and persists
              nothing, so it carries no dependency on the setup/Candidate
              machinery that stayed in capsule-compiler.
+  preflight -- the countersign pack checks (method freeze, declared count)
+             run locally on a bundle before a countersignature is requested.
   evaluate -- decide a live pack's rows on a list of actions, as JSON (the
              entry point for ``terms test``): met / not_met / not_evaluable
              per row after the last action, plus the engine version.
@@ -203,6 +205,27 @@ def _cmd_packs_evaluate(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_packs_preflight(args: argparse.Namespace) -> int:
+    """Run the countersign pack checks locally on a bundle, before requesting
+    a countersignature: the same module the countersign instance loads."""
+    from ..countersign import PROFILE_IDS, CountersignPackModule
+    from ..countersign.modules import parse_window_start
+
+    if args.profile not in PROFILE_IDS:
+        print(f"capsule-engine packs preflight: unknown profile {args.profile!r}; known: {', '.join(PROFILE_IDS)}", file=sys.stderr)
+        return 2
+    try:
+        with open(args.bundle, encoding="utf-8") as fh:
+            bundle = json.load(fh)
+        window = parse_window_start(args.window_start) if args.window_start else None
+    except (OSError, ValueError) as exc:
+        print(f"capsule-engine packs preflight: {exc}", file=sys.stderr)
+        return 2
+    results = CountersignPackModule(window).check(bundle, args.profile)
+    print(json.dumps({"profile": args.profile, "checks": [vars(r) for r in results]}, indent=2))
+    return 1 if any(r.result in ("failed", "mismatch") for r in results) else 0
+
+
 def add_parser(sub: argparse._SubParsersAction) -> argparse.ArgumentParser:
     packs = sub.add_parser("packs", help="packs-runtime verbs: propose (measurability report), evaluate (decide a live pack's rows)")
     packs_sub = packs.add_subparsers(dest="packs_command")
@@ -229,5 +252,14 @@ def add_parser(sub: argparse._SubParsersAction) -> argparse.ArgumentParser:
     p_evaluate.add_argument("--pack", required=True, help="path to a live pack directory (pack-source.yaml)")
     p_evaluate.add_argument("--input", default=None, help="JSON file {'actions': [...]}; stdin when omitted or -")
     p_evaluate.set_defaults(func=_cmd_packs_evaluate)
+
+    p_pre = packs_sub.add_parser(
+        "preflight",
+        help="run the countersign method-freeze and declared-count checks on a bundle locally, as JSON",
+    )
+    p_pre.add_argument("--bundle", required=True, help="path to a v2 Evidence Bundle (JSON)")
+    p_pre.add_argument("--profile", required=True, help="countersign profile id, e.g. outcomes/v1")
+    p_pre.add_argument("--window-start", default=None, help="RFC 3339 instant the window opens (default: earliest judged record)")
+    p_pre.set_defaults(func=_cmd_packs_preflight)
 
     return packs
