@@ -221,6 +221,9 @@ def _cmd_packs_preflight(args: argparse.Namespace) -> int:
     except (OSError, ValueError) as exc:
         print(f"capsule-engine packs preflight: {exc}", file=sys.stderr)
         return 2
+    if not isinstance(bundle, dict) or not isinstance(bundle.get("records"), list):
+        print("capsule-engine packs preflight: not a bundle: expected a JSON object with a 'records' list", file=sys.stderr)
+        return 2
     results = CountersignPackModule(window).check(bundle, args.profile)
     print(json.dumps({"profile": args.profile, "checks": [vars(r) for r in results]}, indent=2))
     return 1 if any(r.result in ("failed", "mismatch") for r in results) else 0
@@ -255,7 +258,7 @@ def add_parser(sub: argparse._SubParsersAction) -> argparse.ArgumentParser:
 
     p_pre = packs_sub.add_parser(
         "preflight",
-        help="run the countersign method-freeze and declared-count checks on a bundle locally, as JSON",
+        help="run the countersign method-freeze and declared-count checks on a bundle locally, as JSON (exit 1 only on failed/mismatch; not present and not checked exit 0)",
     )
     p_pre.add_argument("--bundle", required=True, help="path to a v2 Evidence Bundle (JSON)")
     p_pre.add_argument("--profile", required=True, help="countersign profile id, e.g. outcomes/v1")

@@ -11,7 +11,9 @@ Only what a withheld bundle shows is read: ``action_type``, ``timestamp``,
 ``capsule_id`` and ``references[].digest``. Results use the countersign
 vocabulary only: ``established`` / ``failed`` / ``not present`` for the
 freeze, ``match`` / ``mismatch`` / ``not present`` for the count. Never
-pass/fail, never "coverage". A check recomputes from the bundle alone, so
+pass/fail, never "coverage". ``not checked`` (an existing countersign word)
+is used only when a check could not run: no window to compare with, or a
+count the holder did not disclose. A check recomputes from the bundle alone, so
 anyone can repeat it.
 
 The declared count VALUE is in the withheld payload. Per the ruling on
@@ -64,10 +66,23 @@ def _ts(record: dict) -> datetime | None:
 
 
 def _refs(record: dict) -> set[str]:
+    """Capsule ids this record cites, in the shape the bundle graph honors
+    (agent_action_capsule.bundle._citation_targets): a typed SHA-256
+    ``references[]`` entry or the chain parent."""
+    out: set[str] = set()
+    chain = record.get("chain")
+    if isinstance(chain, dict) and isinstance(chain.get("parent_capsule_id"), str):
+        out.add(chain["parent_capsule_id"])
     refs = record.get("references")
-    if not isinstance(refs, list):
-        return set()
-    return {r["digest"] for r in refs if isinstance(r, dict) and isinstance(r.get("digest"), str)}
+    for r in refs if isinstance(refs, list) else []:
+        if (
+            isinstance(r, dict)
+            and r.get("type") == "agent-action-capsule"
+            and r.get("digest_alg") == "SHA-256"
+            and isinstance(r.get("digest"), str)
+        ):
+            out.add(r["digest"])
+    return out
 
 
 _COUNT_KEYS = frozenset({"declared_count", "second_system_digest"})
@@ -165,8 +180,8 @@ class CountersignPackModule:
             return CheckResult(name, "mismatch", f"{len(counts)} declared_count records; the declaration is one record")
         record = counts[0]
         why = self._sealed_before(record, window)
-        if why is not None and window is not None:
-            return CheckResult(name, "mismatch", why)
+        if why is not None:
+            return CheckResult(name, "not checked" if window is None else "mismatch", why)
         raw = _raw(bundle)
         disclosed = (raw.get("disclosures") or {}).get(record.get("capsule_id")) if isinstance(raw.get("disclosures"), dict) else None
         payload = disclosed.get("agent_input") if isinstance(disclosed, dict) else None
@@ -182,6 +197,8 @@ class CountersignPackModule:
             digest = json_digest(payload)
         except (TypeError, ValueError):
             digest = None
+        if not isinstance(sealed, str):
+            return CheckResult(name, "not checked", "the record commits no agent_input_digest to compare the disclosure with")
         if digest is None or digest != sealed:
             return CheckResult(name, "mismatch", "the disclosed payload does not match the digest sealed in the record")
         count = payload.get("declared_count") if isinstance(payload, dict) else None

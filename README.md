@@ -133,13 +133,13 @@ The countersign engine (capsule-anchor) is neutral: it ships no pack code and lo
 check; the contract (`check(bundle, profile_id) -> [{name, result, detail}]`) is public, and a
 third party brings its own module. This one reads two record kinds sealed before the window,
 `method_freeze` and `declared_count`, from a payload-free v2 bundle: a freeze reads `established`,
-`failed` or `not present` (sealed before the window, and every judgment references its digest);
+`failed` or `not present`, or `not checked` when there is no window to compare with (sealed before the window, and every judgment references its digest);
 a count reads `match`, `mismatch` or `not present`. Never pass/fail, never "coverage". The
 declared count's value is in the withheld payload, so the holder opts in to disclosing that one
 record's payload (`{declared_count, second_system_digest?}`, checked against the digest sealed in
 the record); the count is then compared with the certified sequence span, and with no disclosure it
 reads `not checked`, which is not `not present`. `capsule-engine packs preflight --bundle FILE --profile ID [--window-start TS]` runs the same
-checks locally before a countersignature is requested.
+checks locally before a countersignature is requested; it exits 1 only on `failed` or `mismatch`.
 
 ### The Go guard (`go/`)
 

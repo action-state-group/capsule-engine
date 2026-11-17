@@ -13,7 +13,7 @@ FREEZE = "a" * 64
 def _rec(kind, ts, cid, refs=()):
     r = {"action_id": f"{kind}-{cid[:4]}", "action_type": kind, "timestamp": ts, "capsule_id": cid}
     if refs:
-        r["references"] = [{"type": "capsule", "digest_alg": "sha-256", "digest": d} for d in refs]
+        r["references"] = [{"type": "agent-action-capsule", "digest_alg": "SHA-256", "digest": d} for d in refs]
     return r
 
 
@@ -138,3 +138,48 @@ def test_disclosed_without_certificate_is_not_checked():
     b = _disclosed({"declared_count": 4})
     del b["completeness_certificate"]
     assert _count(b).result == "not checked"
+
+
+def test_count_with_no_window_is_not_checked_even_when_disclosed():
+    b = _disclosed({"declared_count": 4})
+    b["records"] = [r for r in b["records"] if r["action_type"] != "evaluation-report"]
+    assert _count(b).result == "not checked"
+
+
+def test_disclosure_with_no_sealed_digest_is_not_checked():
+    b = _disclosed({"declared_count": 4})
+    next(r for r in b["records"] if r["action_type"] == "declared_count").pop("model_attestation")
+    assert _count(b).result == "not checked"
+
+
+def test_reference_of_another_type_does_not_cite_the_freeze():
+    b = _bundle()
+    for r in b["records"]:
+        for ref in r.get("references", []):
+            ref["type"] = "document"
+    assert _by_name(CountersignPackModule().check(b, "outcomes/v1"))["method freeze"].result == "failed"
+
+
+def test_chain_parent_cites_the_freeze():
+    b = _bundle(judged_refs=())
+    for r in b["records"]:
+        if r["action_type"] == "evaluation-report":
+            r["chain"] = {"parent_capsule_id": FREEZE}
+    assert _by_name(CountersignPackModule().check(b, "outcomes/v1"))["method freeze"].result == "established"
+
+
+def test_module_reads_a_bundle_object_with_records_and_raw():
+    raw = _disclosed({"declared_count": 4})
+
+    class Obj:
+        records = raw["records"]
+
+    Obj.raw = raw
+    assert _count(Obj()).result == "match"
+
+
+def test_cli_preflight_rejects_a_non_bundle(tmp_path, capsys):
+    f = tmp_path / "b.json"
+    for bad in ("null", "{}", '{"records": "x"}'):
+        f.write_text(bad)
+        assert main(["packs", "preflight", "--bundle", str(f), "--profile", "outcomes/v1"]) == 2
