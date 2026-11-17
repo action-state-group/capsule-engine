@@ -36,42 +36,42 @@ def _by_name(results):
 
 def test_freeze_sealed_before_window_and_referenced_is_established():
     r = _by_name(CountersignPackModule().check(_bundle(), "asg/outcomes/1"))
-    assert r["method freeze"].result == "established"
-    assert r["declared count"].result == "not checked"
+    assert r["method_freeze"].result == "established"
+    assert r["declared_count"].result == "not checked"
 
 
 def test_freeze_sealed_after_window_failed():
     r = _by_name(CountersignPackModule().check(_bundle(freeze_ts="2026-11-02T12:00:00Z"), "asg/outcomes/1"))
-    assert r["method freeze"].result == "failed"
+    assert r["method_freeze"].result == "failed"
 
 
 def test_judgment_without_freeze_reference_failed():
     r = _by_name(CountersignPackModule().check(_bundle(judged_refs=()), "asg/outcomes/1"))
-    assert r["method freeze"].result == "failed"
-    assert "2 of 2" in r["method freeze"].detail
+    assert r["method_freeze"].result == "failed"
+    assert "2 of 2" in r["method_freeze"].detail
 
 
 def test_absent_records_not_present():
     r = _by_name(CountersignPackModule().check(_bundle(freeze=False, count=False), "asg/outcomes/1"))
-    assert r["method freeze"].result == "not present"
-    assert r["declared count"].result == "not present"
+    assert r["method_freeze"].result == "not present"
+    assert r["declared_count"].result == "not present"
 
 
 def test_count_sealed_after_window_is_failed():
     r = _by_name(CountersignPackModule().check(_bundle(count_ts="2026-11-02T06:00:00Z"), "asg/outcomes/1"))
-    assert r["declared count"].result == "failed"
+    assert r["declared_count"].result == "failed"
 
 
 def test_explicit_window_start_governs():
     from capsule_engine.countersign.modules import parse_window_start
 
     m = CountersignPackModule(parse_window_start("2026-10-31T00:00:00Z"))
-    assert _by_name(m.check(_bundle(), "asg/outcomes/1"))["method freeze"].result == "failed"
+    assert _by_name(m.check(_bundle(), "asg/outcomes/1"))["method_freeze"].result == "failed"
 
 
 def test_no_window_derivable_is_not_checked():
     r = _by_name(CountersignPackModule().check({"records": [_rec("method_freeze", "2026-11-01T00:00:00Z", FREEZE)]}, "asg/outcomes/1"))
-    assert r["method freeze"].result == "not checked"
+    assert r["method_freeze"].result == "not checked"
 
 
 def test_vocabulary_never_pass_fail_or_coverage():
@@ -97,7 +97,7 @@ def test_cli_preflight(tmp_path, capsys):
     f.write_text(json.dumps(_bundle()))
     assert main(["packs", "preflight", "--bundle", str(f), "--profile", "asg/outcomes/1"]) == 0
     doc = json.loads(capsys.readouterr().out)
-    assert {c["name"]: c["result"] for c in doc["checks"]}["method freeze"] == "established"
+    assert {c["name"]: c["result"] for c in doc["checks"]}["method_freeze"] == "established"
     f.write_text(json.dumps(_bundle(judged_refs=())))
     assert main(["packs", "preflight", "--bundle", str(f), "--profile", "asg/outcomes/1"]) == 1
     capsys.readouterr()
@@ -116,15 +116,15 @@ def _disclosed(payload, span=(1, 4), tamper=False):
 
 
 def _count(b):
-    return _by_name(CountersignPackModule().check(b, "asg/outcomes/1"))["declared count"]
+    return _by_name(CountersignPackModule().check(b, "asg/outcomes/1"))["declared_count"]
 
 
 def test_disclosed_count_matches_span():
-    assert _count(_disclosed({"declared_count": 4})).result == "match"
+    assert _count(_disclosed({"declared_count": 4})).result == "established"
 
 
 def test_disclosed_count_differs_from_span():
-    assert _count(_disclosed({"declared_count": 3})).result == "mismatch"
+    assert _count(_disclosed({"declared_count": 3})).result == "failed"
 
 
 def test_disclosure_not_matching_sealed_digest_is_refused():
@@ -173,7 +173,7 @@ def test_reference_of_another_type_does_not_cite_the_freeze():
     for r in b["records"]:
         for ref in r.get("references", []):
             ref["type"] = "document"
-    assert _by_name(CountersignPackModule().check(b, "asg/outcomes/1"))["method freeze"].result == "failed"
+    assert _by_name(CountersignPackModule().check(b, "asg/outcomes/1"))["method_freeze"].result == "failed"
 
 
 def test_chain_parent_cites_the_freeze():
@@ -181,7 +181,7 @@ def test_chain_parent_cites_the_freeze():
     for r in b["records"]:
         if r["action_type"] == "evaluation-report":
             r["chain"] = {"parent_capsule_id": FREEZE}
-    assert _by_name(CountersignPackModule().check(b, "asg/outcomes/1"))["method freeze"].result == "established"
+    assert _by_name(CountersignPackModule().check(b, "asg/outcomes/1"))["method_freeze"].result == "established"
 
 
 def test_module_reads_a_bundle_object_with_records_and_raw():
@@ -191,7 +191,7 @@ def test_module_reads_a_bundle_object_with_records_and_raw():
         records = raw["records"]
 
     Obj.raw = raw
-    assert _count(Obj()).result == "match"
+    assert _count(Obj()).result == "established"
 
 
 def test_cli_preflight_rejects_a_non_bundle(tmp_path, capsys):
@@ -204,12 +204,12 @@ def test_cli_preflight_rejects_a_non_bundle(tmp_path, capsys):
 def test_unreadable_timestamp_and_zero_judgments_are_not_checked():
     b = _bundle()
     next(r for r in b["records"] if r["action_type"] == "method_freeze")["timestamp"] = "garbage"
-    assert _by_name(CountersignPackModule().check(b, "asg/outcomes/1"))["method freeze"].result == "not checked"
+    assert _by_name(CountersignPackModule().check(b, "asg/outcomes/1"))["method_freeze"].result == "not checked"
     from capsule_engine.countersign.modules import parse_window_start
 
     only = {"records": [_rec("method_freeze", "2026-11-01T00:00:00Z", FREEZE)]}
     r = CountersignPackModule(parse_window_start("2026-11-02T00:00:00Z")).check(only, "asg/outcomes/1")
-    assert _by_name(r)["method freeze"].result == "not checked"
+    assert _by_name(r)["method_freeze"].result == "not checked"
 
 
 def test_malformed_second_system_digest_is_refused():
@@ -217,14 +217,14 @@ def test_malformed_second_system_digest_is_refused():
         _count(_disclosed({"declared_count": 4, "second_system_digest": "x"}))
     with pytest.raises(DisclosureRefused):
         _count(_disclosed({"declared_count": 4, "second_system_digest": None}))
-    assert _count(_disclosed({"declared_count": 4, "second_system_digest": "a" * 64})).result == "match"
+    assert _count(_disclosed({"declared_count": 4, "second_system_digest": "a" * 64})).result == "established"
 
 
 def test_honest_declaration_counts_every_record_in_the_range_setup_included():
     # 2 judgments + the freeze + the declaration itself = 4 records in seq 1..4
-    assert _count(_disclosed({"declared_count": 4}, span=(1, 4))).result == "match"
-    # a producer who declares only the 2 judgments reads mismatch
-    assert _count(_disclosed({"declared_count": 2}, span=(1, 4))).result == "mismatch"
+    assert _count(_disclosed({"declared_count": 4}, span=(1, 4))).result == "established"
+    # a producer who declares only the 2 judgments reads failed
+    assert _count(_disclosed({"declared_count": 2}, span=(1, 4))).result == "failed"
 
 
 def test_non_object_disclosure_is_refused_not_crashed():

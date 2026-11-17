@@ -9,10 +9,7 @@ window opens:
 
 Only what a withheld bundle shows is read: ``action_type``, ``timestamp``,
 ``capsule_id`` and ``references[].digest``. Results use the countersign
-vocabulary only: ``established`` / ``failed`` / ``not present`` for the
-freeze, ``match`` / ``mismatch`` / ``failed`` / ``not present`` for the
-count (``mismatch`` only for declared != certified span; a late or duplicate
-declaration is ``failed``). Never
+vocabulary only: capsule-anchor's five result words only (established, failed, not present, not checked, inconclusive); each result is named exactly the record's ``action_type`` so the engine counts the kind as covered. A declared count equal to the certified span is ``established``; one that differs is ``failed`` (counts in ``detail``), as is a late or duplicate declaration. Never
 pass/fail, never "coverage". ``not checked`` (an existing countersign word)
 is used only when a check could not run: no window to compare with, or a
 count the holder did not disclose. A check recomputes from the bundle alone, so
@@ -32,7 +29,6 @@ reads ``not checked``, which is not ``not present`` (no record sealed).
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any
 
@@ -50,15 +46,21 @@ PROFILE_IDS = ("asg/outcomes/1", "asg/eu-ai-act-obligations/1")
 class DisclosureRefused(ValueError):
     """A disclosed ``declared_count`` payload that must not be read: it does not
     match the digest sealed in its record, or it is not the closed shape. The
-    countersign request is refused (never read as a ``mismatch``, which means
+    countersign request is refused (never read as ``failed``, which means
     only that the declared count differs from the certified span)."""
 
 
-@dataclass(frozen=True)
-class CheckResult:
-    name: str
-    result: str
-    detail: str = ""
+class CheckResult(dict):
+    """``{name, result, detail}``. A dict, so capsule-anchor's pydantic ``CheckResult``
+    validates it (a foreign dataclass instance is rejected there), with attribute
+    reads for callers."""
+
+    def __init__(self, name: str, result: str, detail: str = "") -> None:
+        super().__init__(name=name, result=result, detail=detail)
+
+    name = property(lambda self: self["name"])
+    result = property(lambda self: self["result"])
+    detail = property(lambda self: self["detail"])
 
 
 def _records(bundle: Any) -> list[dict]:
@@ -160,7 +162,7 @@ class CountersignPackModule:
         return None
 
     def _method_freeze(self, freezes, judged, window, note) -> CheckResult:
-        name = "method freeze"
+        name = METHOD_FREEZE
         if not freezes:
             return CheckResult(name, "not present", "no method_freeze record in the bundle")
         if len(freezes) > 1:
@@ -187,7 +189,7 @@ class CountersignPackModule:
         )
 
     def _declared_count(self, counts, window, note, bundle) -> CheckResult:
-        name = "declared count"
+        name = DECLARED_COUNT
         if not counts:
             return CheckResult(name, "not present", "no declared_count record in the bundle")
         if len(counts) > 1:
@@ -225,8 +227,8 @@ class CountersignPackModule:
         if span is None:
             return CheckResult(name, "not checked", "no completeness certificate proves a sequence span to compare with")
         if count == span:
-            return CheckResult(name, "match", f"declared {count}, the certified sequence span is {span}")
-        return CheckResult(name, "mismatch", f"declared {count}, the certified sequence span is {span}")
+            return CheckResult(name, "established", f"declared count {count} equals the certified sequence span {span}")
+        return CheckResult(name, "failed", f"declared count {count} differs from the certified sequence span {span}")
 
 
 def register_all(registry: Any, module: CountersignPackModule | None = None) -> None:

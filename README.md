@@ -135,6 +135,8 @@ third party brings its own module. This module is the definition of the two reco
 read from a payload-free v2 bundle; both must be sealed before the window opens. The window start
 comes from the request or, absent that, is the earliest record that is neither kind.
 
+Results use capsule-anchor's five words (established, failed, not present, not checked, inconclusive) and are named exactly the record's `action_type`, so the countersign engine counts each kind as covered.
+
 - **`method_freeze`**: `established` when it is sealed before the window and every record other than
   the two setup kinds (the judgments) cites its `capsule_id`; `failed` when sealed late, repeated,
   or a judgment does not cite it; `not present` when absent; `not checked` when the check could not
@@ -142,18 +144,18 @@ comes from the request or, absent that, is the earliest record that is neither k
 - **`declared_count`**: its value is in the withheld payload, so the holder opts in to disclosing that
   one record's payload `{declared_count, second_system_digest?}` (once the countersign instance
   accepts such a disclosure: capsule-anchor#95; until then it is reachable only through this module
-  and the local preflight). `match` or `mismatch` compares the count with the certified sequence
+  and the local preflight). `established` (equal) or `failed` (different, both counts in the detail) compares the count with the certified sequence
   span, `last_seq - first_seq + 1` of the completeness certificate (every record in the certified
   range, so the number a producer declares counts all of them, this declaration and the freeze
   included, not only the judgments); `failed` when sealed late or declared twice; `not present` when
   absent; `not checked` when nothing was disclosed, or there is no window, certificate or sealed
   digest to compare with. A disclosed payload that does not match its sealed digest, is not the
   closed shape, or carries a malformed `second_system_digest` is refused (`DisclosureRefused`),
-  never read as a `mismatch`.
+  never read as `failed`.
 
 Never pass/fail, never "coverage". `capsule-engine packs preflight --bundle FILE --profile ID
 [--window-start TS]` runs the same checks locally before a countersignature is requested; it exits
-1 on `failed` or `mismatch` and 2 on a refused disclosure or a non-bundle. Profile ids:
+1 on `failed` and 2 on a refused disclosure or a non-bundle. Profile ids:
 `asg/outcomes/1`, `asg/eu-ai-act-obligations/1`.
 
 ### The Go guard (`go/`)
