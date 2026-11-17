@@ -42,6 +42,16 @@ func NewStoreHistory(ctx context.Context, artifacts artifact.IndexStore, log Sto
 	return &StoreHistory{ctx: ctx, artifacts: artifacts, log: log}, nil
 }
 
+// Log is the raw CLL entry log, for reading (entries, count). The history
+// owns it: an append through it skips the artifact-put-then-append order, and
+// a committed entry with no stored artifact is a store whose reads miss it.
+// The caller never appends to it.
+func (s *StoreHistory) Log() StoreLog { return s.log }
+
+// Artifacts is the raw artifact store, for reading. The history owns it: the
+// caller never puts to it.
+func (s *StoreHistory) Artifacts() artifact.IndexStore { return s.artifacts }
+
 // Find reads every page of the artifact store's Find, drops the records the
 // log does not hold, and returns the rest in log order. The time bound goes
 // to the store truncated to the microsecond, the store's own precision, so

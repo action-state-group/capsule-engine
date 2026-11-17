@@ -39,7 +39,11 @@ from agent_action_capsule.verify import verify as verify_capsule
 from .signing import Signer
 
 __all__ = [
+    "ARTIFACTS_FILE",
     "INDEX_PATHS",
+    "LOG_FILE",
+    "NAMESPACE",
+    "TRUSTED_KEYS_FILE",
     "lookup",
     "History",
     "HistoryRecord",
@@ -48,6 +52,7 @@ __all__ = [
     "Query",
     "StoreHistory",
     "open_store",
+    "parse_instant",
     "producer_identity",
     "verify_record",
     "verify_stored",
@@ -322,6 +327,22 @@ class StoreHistory:
         self._identity = identity
         self._sync = sync
         self._lock = threading.Lock()
+
+    @property
+    def log(self) -> Any:
+        """The raw CLL entry log, for reading (entries, checkpoint state). The
+        history owns it. An append through it bypasses the history's lock and
+        its artifact-put-then-append order, and a committed entry with no
+        artifact makes the next open fail :meth:`check_committed`: never
+        append to or close it."""
+        return self._log
+
+    @property
+    def artifacts(self) -> Any:
+        """The raw artifact store, for reading. The history owns it. A put
+        through it bypasses the history's lock and its sync-before-append
+        order: never put to or close it."""
+        return self._artifacts
 
     def check_committed(self) -> None:
         """Refuse a store whose log commits a record the artifact store does
