@@ -3,8 +3,11 @@
 Each entry's pack and definition lists come from the diff of `packs/*/PROVENANCE.json`
 and `portedDefinitions` (`guard/engine.go`).
 
-## Unreleased
+## 0.4.0 — 2026-11-17
 
+A minor on v0 (RELEASING.md): API additions (`StoreHistory.Log`/`Artifacts`, `CoverageAsk`, `Card.Stapled`) and a new admission predicate; no pack version or ported definition changes. Cut for the 2026-11-19 Goose ARD demo, which runs `capsule-engine admission evaluate`. Merged since v0.3.0 that touch `go/`: #281, #285, #290, #291; #283, #287, #289, #293 and #295 change the Python package or repository files only.
+
+- Changed (capsule-engine#290): the indirect agent-action-capsule go dependency moves from v0.7.0 to v0.21.0.
 - Added (capsule-engine#269): `StoreHistory.Log()` and `StoreHistory.Artifacts()` return the CLL entry log and artifact store the history reads, for read access only (they are the raw stores; an append or put through them skips the history's put-then-append order).
 - Added (capsule-engine#284): `InferenceServiceHistoryCountsFor` and `CoverageAsk`, the requester's
   coverage ask for an inference-service-history/0 answer: an `expected_pin`, or a `min_freshness` by
