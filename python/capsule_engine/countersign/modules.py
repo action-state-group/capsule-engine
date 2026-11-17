@@ -24,7 +24,10 @@ issue), the holder may opt in to disclosing that one record's ``agent_input``
 (``disclosures[capsule_id]``). The module then checks the disclosed payload
 against the digest sealed in the record, requires the closed shape
 ``{declared_count, second_system_digest?}``, and compares the count with the
-span the completeness certificate proves. With no disclosure the comparison
+span the completeness certificate proves: ``last_seq - first_seq + 1``, every
+record in the certified range. The number a producer declares therefore counts
+every record in that range, the ``declared_count`` record and the freeze
+included, not only the judgments. With no disclosure the comparison
 reads ``not checked``, which is not ``not present`` (no record sealed).
 """
 from __future__ import annotations
@@ -97,10 +100,6 @@ def _refs(record: dict) -> set[str]:
 _COUNT_KEYS = frozenset({"declared_count", "second_system_digest"})
 
 
-def _could_not_run(reason: str) -> bool:
-    return reason.startswith(("no window", "record has no readable"))
-
-
 def _raw(bundle: Any) -> dict:
     raw = bundle if isinstance(bundle, dict) else getattr(bundle, "raw", None)
     return raw if isinstance(raw, dict) else {}
@@ -147,17 +146,17 @@ class CountersignPackModule:
             return min(stamps), "window opens at the earliest judged record"
         return None, "no window start given and no judged record to infer one from"
 
-    def _sealed_before(self, record: dict, window: datetime | None) -> str | None:
-        """None when sealed before the window; else the reason it is not.
-        Callers read an unreadable timestamp or a missing window as "could not
-        run" (``not checked``), and only a readable late timestamp as a failure."""
+    def _sealed_before(self, record: dict, window: datetime | None) -> tuple[str, bool] | None:
+        """None when sealed before the window; else ``(reason, could_not_run)``.
+        An unreadable timestamp or a missing window could not run
+        (``not checked``); only a readable late timestamp is a failure."""
         if window is None:
-            return "no window start to compare against"
+            return "no window start to compare against", True
         sealed = _ts(record)
         if sealed is None:
-            return "record has no readable timestamp"
+            return "record has no readable timestamp", True
         if sealed >= window:
-            return f"sealed {sealed.isoformat()} at or after the window opened {window.isoformat()}"
+            return f"sealed {sealed.isoformat()} at or after the window opened {window.isoformat()}", False
         return None
 
     def _method_freeze(self, freezes, judged, window, note) -> CheckResult:
@@ -167,9 +166,9 @@ class CountersignPackModule:
         if len(freezes) > 1:
             return CheckResult(name, "failed", f"{len(freezes)} method_freeze records; the freeze is one record")
         freeze = freezes[0]
-        why = self._sealed_before(freeze, window)
-        if why is not None:
-            return CheckResult(name, "not checked" if _could_not_run(why) else "failed", why)
+        late = self._sealed_before(freeze, window)
+        if late is not None:
+            return CheckResult(name, "not checked" if late[1] else "failed", late[0])
         if not judged:
             return CheckResult(name, "not checked", "no judgment record in the bundle to reference the freeze")
         digest = freeze.get("capsule_id")
@@ -194,9 +193,9 @@ class CountersignPackModule:
         if len(counts) > 1:
             return CheckResult(name, "failed", f"{len(counts)} declared_count records; the declaration is one record")
         record = counts[0]
-        why = self._sealed_before(record, window)
-        if why is not None:
-            return CheckResult(name, "not checked" if _could_not_run(why) else "failed", why)
+        late = self._sealed_before(record, window)
+        if late is not None:
+            return CheckResult(name, "not checked" if late[1] else "failed", late[0])
         raw = _raw(bundle)
         disclosed = (raw.get("disclosures") or {}).get(record.get("capsule_id")) if isinstance(raw.get("disclosures"), dict) else None
         payload = disclosed.get("agent_input") if isinstance(disclosed, dict) else None

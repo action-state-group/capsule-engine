@@ -144,7 +144,8 @@ comes from the request or, absent that, is the earliest record that is neither k
   accepts such a disclosure: capsule-anchor#95; until then it is reachable only through this module
   and the local preflight). `match` or `mismatch` compares the count with the certified sequence
   span, `last_seq - first_seq + 1` of the completeness certificate (every record in the certified
-  range, setup records included); `failed` when sealed late or declared twice; `not present` when
+  range, so the number a producer declares counts all of them, this declaration and the freeze
+  included, not only the judgments); `failed` when sealed late or declared twice; `not present` when
   absent; `not checked` when nothing was disclosed, or there is no window, certificate or sealed
   digest to compare with. A disclosed payload that does not match its sealed digest, is not the
   closed shape, or carries a malformed `second_system_digest` is refused (`DisclosureRefused`),

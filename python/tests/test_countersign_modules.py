@@ -216,3 +216,10 @@ def test_malformed_second_system_digest_is_refused():
     with pytest.raises(DisclosureRefused):
         _count(_disclosed({"declared_count": 4, "second_system_digest": "x"}))
     assert _count(_disclosed({"declared_count": 4, "second_system_digest": "a" * 64})).result == "match"
+
+
+def test_honest_declaration_counts_every_record_in_the_range_setup_included():
+    # 2 judgments + the freeze + the declaration itself = 4 records in seq 1..4
+    assert _count(_disclosed({"declared_count": 4}, span=(1, 4))).result == "match"
+    # a producer who declares only the 2 judgments reads mismatch
+    assert _count(_disclosed({"declared_count": 2}, span=(1, 4))).result == "mismatch"
