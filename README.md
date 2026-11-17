@@ -131,15 +131,29 @@ capsule-emit ledger (`--ledger`).
 The countersign engine (capsule-anchor) is neutral: it ships no pack code and loads a
 `PolicyModule` by profile id. The modules for the packs we own live here, beside the packs they
 check; the contract (`check(bundle, profile_id) -> [{name, result, detail}]`) is public, and a
-third party brings its own module. This one reads two record kinds sealed before the window,
-`method_freeze` and `declared_count`, from a payload-free v2 bundle: a freeze reads `established`,
-`failed` or `not present`, or `not checked` when there is no window to compare with (sealed before the window, and every judgment references its digest);
-a count reads `match`, `mismatch` (declared differs from the certified span), `failed` (sealed late, or declared twice) or `not present`; a disclosed payload that does not match its sealed digest or is not the closed shape is refused, never read as a `mismatch`. Never pass/fail, never "coverage". The
-declared count's value is in the withheld payload, so the holder opts in to disclosing that one
-record's payload (`{declared_count, second_system_digest?}`, checked against the digest sealed in
-the record); the count is then compared with the certified sequence span, and with no disclosure it
-reads `not checked`, which is not `not present`. `capsule-engine packs preflight --bundle FILE --profile ID [--window-start TS]` runs the same
-checks locally before a countersignature is requested; it exits 1 on `failed` or `mismatch` and 2 on a refused disclosure. Profile ids: `asg/outcomes/1`, `asg/eu-ai-act-obligations/1`.
+third party brings its own module. This module is the definition of the two record kinds (their closed shapes are enforced in code),
+read from a payload-free v2 bundle; both must be sealed before the window opens. The window start
+comes from the request or, absent that, is the earliest record that is neither kind.
+
+- **`method_freeze`**: `established` when it is sealed before the window and every record other than
+  the two setup kinds (the judgments) cites its `capsule_id`; `failed` when sealed late, repeated,
+  or a judgment does not cite it; `not present` when absent; `not checked` when the check could not
+  run (no window, an unreadable timestamp, or no judgment to cite it).
+- **`declared_count`**: its value is in the withheld payload, so the holder opts in to disclosing that
+  one record's payload `{declared_count, second_system_digest?}` (once the countersign instance
+  accepts such a disclosure: capsule-anchor#95; until then it is reachable only through this module
+  and the local preflight). `match` or `mismatch` compares the count with the certified sequence
+  span, `last_seq - first_seq + 1` of the completeness certificate (every record in the certified
+  range, setup records included); `failed` when sealed late or declared twice; `not present` when
+  absent; `not checked` when nothing was disclosed, or there is no window, certificate or sealed
+  digest to compare with. A disclosed payload that does not match its sealed digest, is not the
+  closed shape, or carries a malformed `second_system_digest` is refused (`DisclosureRefused`),
+  never read as a `mismatch`.
+
+Never pass/fail, never "coverage". `capsule-engine packs preflight --bundle FILE --profile ID
+[--window-start TS]` runs the same checks locally before a countersignature is requested; it exits
+1 on `failed` or `mismatch` and 2 on a refused disclosure or a non-bundle. Profile ids:
+`asg/outcomes/1`, `asg/eu-ai-act-obligations/1`.
 
 ### The Go guard (`go/`)
 

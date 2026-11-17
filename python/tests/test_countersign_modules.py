@@ -199,3 +199,20 @@ def test_cli_preflight_rejects_a_non_bundle(tmp_path, capsys):
     for bad in ("null", "{}", '{"records": "x"}'):
         f.write_text(bad)
         assert main(["packs", "preflight", "--bundle", str(f), "--profile", "asg/outcomes/1"]) == 2
+
+
+def test_unreadable_timestamp_and_zero_judgments_are_not_checked():
+    b = _bundle()
+    next(r for r in b["records"] if r["action_type"] == "method_freeze")["timestamp"] = "garbage"
+    assert _by_name(CountersignPackModule().check(b, "asg/outcomes/1"))["method freeze"].result == "not checked"
+    from capsule_engine.countersign.modules import parse_window_start
+
+    only = {"records": [_rec("method_freeze", "2026-11-01T00:00:00Z", FREEZE)]}
+    r = CountersignPackModule(parse_window_start("2026-11-02T00:00:00Z")).check(only, "asg/outcomes/1")
+    assert _by_name(r)["method freeze"].result == "not checked"
+
+
+def test_malformed_second_system_digest_is_refused():
+    with pytest.raises(DisclosureRefused):
+        _count(_disclosed({"declared_count": 4, "second_system_digest": "x"}))
+    assert _count(_disclosed({"declared_count": 4, "second_system_digest": "a" * 64})).result == "match"

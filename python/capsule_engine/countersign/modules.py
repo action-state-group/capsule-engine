@@ -97,6 +97,10 @@ def _refs(record: dict) -> set[str]:
 _COUNT_KEYS = frozenset({"declared_count", "second_system_digest"})
 
 
+def _could_not_run(reason: str) -> bool:
+    return reason.startswith(("no window", "record has no readable"))
+
+
 def _raw(bundle: Any) -> dict:
     raw = bundle if isinstance(bundle, dict) else getattr(bundle, "raw", None)
     return raw if isinstance(raw, dict) else {}
@@ -144,7 +148,9 @@ class CountersignPackModule:
         return None, "no window start given and no judged record to infer one from"
 
     def _sealed_before(self, record: dict, window: datetime | None) -> str | None:
-        """None when sealed before the window; else the reason it is not."""
+        """None when sealed before the window; else the reason it is not.
+        Callers read an unreadable timestamp or a missing window as "could not
+        run" (``not checked``), and only a readable late timestamp as a failure."""
         if window is None:
             return "no window start to compare against"
         sealed = _ts(record)
@@ -163,9 +169,9 @@ class CountersignPackModule:
         freeze = freezes[0]
         why = self._sealed_before(freeze, window)
         if why is not None:
-            if window is None:
-                return CheckResult(name, "not checked", why)
-            return CheckResult(name, "failed", why)
+            return CheckResult(name, "not checked" if _could_not_run(why) else "failed", why)
+        if not judged:
+            return CheckResult(name, "not checked", "no judgment record in the bundle to reference the freeze")
         digest = freeze.get("capsule_id")
         missing = [r.get("action_id", "?") for r in judged if digest not in _refs(r)]
         if missing:
@@ -190,7 +196,7 @@ class CountersignPackModule:
         record = counts[0]
         why = self._sealed_before(record, window)
         if why is not None:
-            return CheckResult(name, "not checked" if window is None else "failed", why)
+            return CheckResult(name, "not checked" if _could_not_run(why) else "failed", why)
         raw = _raw(bundle)
         disclosed = (raw.get("disclosures") or {}).get(record.get("capsule_id")) if isinstance(raw.get("disclosures"), dict) else None
         payload = disclosed.get("agent_input") if isinstance(disclosed, dict) else None
@@ -210,6 +216,9 @@ class CountersignPackModule:
             return CheckResult(name, "not checked", "the record commits no agent_input_digest to compare the disclosure with")
         if digest is None or digest != sealed:
             raise DisclosureRefused("the disclosed declared_count payload does not match the digest sealed in the record")
+        second = payload.get("second_system_digest") if isinstance(payload, dict) else None
+        if second is not None and not (isinstance(second, str) and len(second) == 64 and set(second) <= set("0123456789abcdef")):
+            raise DisclosureRefused("second_system_digest is not 64 lowercase hex characters")
         count = payload.get("declared_count") if isinstance(payload, dict) else None
         if not isinstance(payload, dict) or not set(payload) <= _COUNT_KEYS or isinstance(count, bool) or not isinstance(count, int) or count < 0:
             raise DisclosureRefused("the disclosed declared_count payload is not {declared_count, second_system_digest?}")
