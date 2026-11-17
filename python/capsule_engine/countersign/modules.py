@@ -215,12 +215,12 @@ class CountersignPackModule:
             return CheckResult(name, "not checked", "the record commits no agent_input_digest to compare the disclosure with")
         if digest is None or digest != sealed:
             raise DisclosureRefused("the disclosed declared_count payload does not match the digest sealed in the record")
-        second = payload.get("second_system_digest") if isinstance(payload, dict) else None
-        if second is not None and not (isinstance(second, str) and len(second) == 64 and set(second) <= set("0123456789abcdef")):
-            raise DisclosureRefused("second_system_digest is not 64 lowercase hex characters")
         count = payload.get("declared_count") if isinstance(payload, dict) else None
         if not isinstance(payload, dict) or not set(payload) <= _COUNT_KEYS or isinstance(count, bool) or not isinstance(count, int) or count < 0:
             raise DisclosureRefused("the disclosed declared_count payload is not {declared_count, second_system_digest?}")
+        second = payload.get("second_system_digest")
+        if "second_system_digest" in payload and not (isinstance(second, str) and len(second) == 64 and set(second) <= set("0123456789abcdef")):
+            raise DisclosureRefused("second_system_digest is not 64 lowercase hex characters")
         span = _span(raw)
         if span is None:
             return CheckResult(name, "not checked", "no completeness certificate proves a sequence span to compare with")

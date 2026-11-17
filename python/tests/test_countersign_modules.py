@@ -215,6 +215,8 @@ def test_unreadable_timestamp_and_zero_judgments_are_not_checked():
 def test_malformed_second_system_digest_is_refused():
     with pytest.raises(DisclosureRefused):
         _count(_disclosed({"declared_count": 4, "second_system_digest": "x"}))
+    with pytest.raises(DisclosureRefused):
+        _count(_disclosed({"declared_count": 4, "second_system_digest": None}))
     assert _count(_disclosed({"declared_count": 4, "second_system_digest": "a" * 64})).result == "match"
 
 
@@ -223,3 +225,14 @@ def test_honest_declaration_counts_every_record_in_the_range_setup_included():
     assert _count(_disclosed({"declared_count": 4}, span=(1, 4))).result == "match"
     # a producer who declares only the 2 judgments reads mismatch
     assert _count(_disclosed({"declared_count": 2}, span=(1, 4))).result == "mismatch"
+
+
+def test_non_object_disclosure_is_refused_not_crashed():
+    from agent_action_capsule.bundle import json_digest
+
+    b = _disclosed({"declared_count": 4})
+    rec = next(r for r in b["records"] if r["action_type"] == "declared_count")
+    rec["model_attestation"]["compute_attestation"]["agent_input_digest"] = json_digest("x")
+    b["disclosures"][rec["capsule_id"]]["agent_input"] = "x"
+    with pytest.raises(DisclosureRefused):
+        _count(b)
