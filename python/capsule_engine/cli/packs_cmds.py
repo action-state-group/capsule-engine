@@ -10,7 +10,7 @@
              this mode never touches ``.capsule-setup/`` and persists
              nothing, so it carries no dependency on the setup/Candidate
              machinery that stayed in capsule-compiler.
-  preflight -- the countersign pack checks (method freeze, declared count)
+  preflight -- the countersign pack checks (method_freeze, declared_count)
              run locally on a bundle before a countersignature is requested.
   evaluate -- decide a live pack's rows on a list of actions, as JSON (the
              entry point for ``terms test``): met / not_met / not_evaluable
@@ -229,8 +229,8 @@ def _cmd_packs_preflight(args: argparse.Namespace) -> int:
     except DisclosureRefused as exc:
         print(f"capsule-engine packs preflight: disclosure refused: {exc}", file=sys.stderr)
         return 2
-    print(json.dumps({"profile": args.profile, "checks": [vars(r) for r in results]}, indent=2))
-    return 1 if any(r.result in ("failed", "mismatch") for r in results) else 0
+    print(json.dumps({"profile": args.profile, "checks": [dict(r) for r in results]}, indent=2))
+    return 1 if any(r.result == "failed" for r in results) else 0
 
 
 def add_parser(sub: argparse._SubParsersAction) -> argparse.ArgumentParser:
@@ -262,7 +262,7 @@ def add_parser(sub: argparse._SubParsersAction) -> argparse.ArgumentParser:
 
     p_pre = packs_sub.add_parser(
         "preflight",
-        help="run the countersign method-freeze and declared-count checks on a bundle locally, as JSON (exit 1 on failed/mismatch, 2 on a refused disclosure; not present and not checked exit 0)",
+        help="run the countersign method-freeze and declared-count checks on a bundle locally, as JSON (exit 1 on failed, 2 on a refused disclosure; not present and not checked exit 0)",
     )
     p_pre.add_argument("--bundle", required=True, help="path to a v2 Evidence Bundle (JSON)")
     p_pre.add_argument("--profile", required=True, help="countersign profile id, e.g. asg/outcomes/1")
