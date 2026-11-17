@@ -60,3 +60,12 @@ def test_forged_disclosure_is_refused_by_the_engine():
 def test_forged_disclosure_is_refused_by_the_module_when_the_engine_is_bypassed():
     with pytest.raises(DisclosureRefused, match="digest"):
         _statement(_raw({"declared_count": 4}, tamper=True), parse=False)
+
+
+def test_signed_bytes_and_detail_carry_no_count():
+    # ruling (b): only the countersigner sees the declared count. The statement's
+    # canonical bytes (signed and registered) and every check's detail omit it.
+    statement = _statement(_raw({"declared_count": 777}))
+    assert _checks(statement)["declared_count"].result == "failed"
+    assert b"777" not in statement.canonical_bytes()
+    assert "777" not in str(statement.model_dump())
