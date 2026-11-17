@@ -213,8 +213,8 @@ type RowResult struct {
 	Result string
 	// Count and Denominator are set on a row that counts.
 	Count, Denominator *int64
-	// Effect is what the row did to the decision: "none", NO, LIMIT, ASK or
-	// "cap".
+	// Effect is what the row did to the decision: "none", NO, LIMIT, ASK,
+	// "cap" or "lift" (the own-settled lift, profile section 4.1).
 	Effect string
 	// held is set on a not_read row whose input was there but held nothing
 	// to read (no verdict yet about the counterparty): not a missing input.
@@ -303,7 +303,9 @@ const (
 //  4. the tier admitted starts at the deal's tier and drops below a LIMIT
 //     row's tier when that row fails or is not read (a ladder row, only to
 //     the tier its earned history holds), and to a judged row's cap when it
-//     fails;
+//     fails; a passing own-settled lift (profile section 4.1) treats the
+//     card rows up to its tier as passed when the counterparty served no
+//     card (liftedRows);
 //  5. GO when the tier admitted holds the deal; otherwise ASK when a
 //     LIMIT row that did not pass carries an ask not yet made and the
 //     budget allows; otherwise LIMIT at the tier admitted. A refused,
