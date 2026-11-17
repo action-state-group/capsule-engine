@@ -46,8 +46,8 @@ PROFILE_IDS = ("asg/outcomes/1", "asg/eu-ai-act-obligations/1")
 class DisclosureRefused(ValueError):
     """A disclosed ``declared_count`` payload that must not be read: it does not
     match the digest sealed in its record, or it is not the closed shape. The
-    countersign request is refused (never read as ``failed``, which means
-    only that the declared count differs from the certified span)."""
+    countersign request is refused (never read as ``failed``, which is a result about a declaration that
+    was read: a differing count, a declaration sealed late, or one repeated)."""
 
 
 class CheckResult(dict):
