@@ -17,7 +17,15 @@ import (
 
 const baselineDir = vectorDir + "/admission-baseline-1.0.0"
 
-func TestBaselineFixtures(t *testing.T) {
+// admission-muse-buyer@1 (evidencebook-skills#154) is the baseline without
+// platform rows plus the own-settled lift of profile section 4.1.
+const museBuyerDir = vectorDir + "/admission-muse-buyer-1.0.0"
+
+func TestBaselineFixtures(t *testing.T) { checkPackFixtures(t, baselineDir) }
+
+func TestMuseBuyerFixtures(t *testing.T) { checkPackFixtures(t, museBuyerDir) }
+
+func checkPackFixtures(t *testing.T, baselineDir string) {
 	var prov struct {
 		Commit string            `json:"commit"`
 		Files  map[string]string `json:"files"`

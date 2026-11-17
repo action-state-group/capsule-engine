@@ -1,0 +1,9 @@
+{
+ "source": "action-state-group/evidencebook-skills packs/admission-muse-buyer: compiled/pack-definition.json and fixtures/cases.json (admission pack profile v0 section 4.1, evidencebook-skills#154)",
+ "commit": "15532874b61e12ac8e1b8c699597cf30d690cdc8",
+ "files": {
+  "pack-definition.json": "5f449da437bbcf60e27597d6db95e958636ca1f26a43ff3746815ed7c0629622",
+  "cases.json": "c3398bb0f2844a1df35f7a4bd1d94cc743e8ca04df860b83ecf7f51765787250"
+ },
+ "note": "Copied byte for byte; refreshed by copying both files from a later evidencebook-skills commit and updating this file. The Go and Rust evaluators decide every case (verdict, source, tier)."
+}

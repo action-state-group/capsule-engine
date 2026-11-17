@@ -173,6 +173,19 @@ pub(crate) struct Row {
     pub(crate) on_fail: OnFail,
     /// The Evidence Request derivation a not_read row asks for.
     pub(crate) ask: Option<String>,
+    /// The own-settled lift this row carries (profile section 4.1).
+    pub(crate) lift: Option<Lift>,
+}
+
+/// pack.go Lift: a row's own-settled lift. When the row passes, no row in
+/// `unless_fail` fails and the counterparty served no card, a deal up to
+/// tier `tier` is not limited by its card rows.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub(crate) struct Lift {
+    /// The index of the highest tier the lift applies to.
+    pub(crate) tier: usize,
+    /// The ids of the own_history rows whose failure blocks the lift.
+    pub(crate) unless_fail: Vec<String>,
 }
 
 impl Pack {
@@ -304,6 +317,8 @@ struct RawRow<'a> {
     /// The on_fail value as given (json.RawMessage), None when absent.
     on_fail: Option<&'a Value>,
     ask: Option<String>,
+    /// The lift as given: its tier id and unless_fail row ids.
+    lift: Option<(String, Vec<String>)>,
 }
 
 /// pack.go rowIDPattern, ^[a-z][a-z0-9_-]*$.
@@ -473,6 +488,16 @@ fn decode(v: &Value) -> Decoded<(SourceFile, Vec<RawRow<'_>>)> {
                     let d = af.string("derivation")?;
                     af.done()?;
                     Some(d)
+                }
+            },
+            lift: match s.get("lift") {
+                None => None,
+                Some(l) => {
+                    let mut lf = Struct::of(l, format!("rows[{i}].lift"))?;
+                    let tier = lf.string("tier")?;
+                    let unless = strings(lf.get("unless_fail"), &format!("rows[{i}].lift.unless_fail"))?;
+                    lf.done()?;
+                    Some((tier, unless))
                 }
             },
         };
@@ -788,6 +813,28 @@ fn validate(src: &[u8], f: SourceFile, raw_rows: Vec<RawRow<'_>>) -> Result<Pack
                 bad(format!("{at}: carries an ask, but ASK is not in outcomes"));
             }
         }
+        let lift = r.lift.as_ref().map(|(tier, unless)| {
+            let idx = match tier_index.get(tier) {
+                None => {
+                    bad(format!("{at}: lift.tier {tier:?} is not a tier"));
+                    0
+                }
+                Some(idx) => {
+                    if *idx < from.unwrap_or(0) {
+                        bad(format!("{at}: lift.tier {tier} is below the row's from {}", r.from));
+                    }
+                    *idx
+                }
+            };
+            // A lifting row decides nothing itself and rests on our own book.
+            if r.check != "own.settled" {
+                bad(format!("{at}: only an own.settled row may lift"));
+            }
+            if on_fail != OnFail::Record {
+                bad(format!("{at}: a lifting row decides nothing itself, so its on_fail must be record"));
+            }
+            Lift { tier: idx, unless_fail: unless.clone() }
+        });
         rows.push(Row {
             id: r.id.clone(),
             source: r.source.clone(),
@@ -796,8 +843,10 @@ fn validate(src: &[u8], f: SourceFile, raw_rows: Vec<RawRow<'_>>) -> Result<Pack
             from: from.unwrap_or(0),
             on_fail,
             ask: r.ask.clone().filter(|d| !d.is_empty()),
+            lift,
         });
     }
+    lint_lifts(&rows, &mut bad);
     if !errs.is_empty() {
         return Err(Error(format!("admission pack {}: {}", f.pack_id, errs.join("\n"))));
     }
@@ -815,4 +864,48 @@ fn validate(src: &[u8], f: SourceFile, raw_rows: Vec<RawRow<'_>>) -> Result<Pack
         trust_roots: f.trust_roots,
         rows,
     })
+}
+
+/// pack.go lintLifts: what a lift names across rows (profile section 4.1).
+/// Each unless_fail is a distinct other own_history row read at or below the
+/// lift tier, and a card.verified row is read from the lowest tier any card
+/// row is, so a card served and failing verification reads fail, never
+/// not_read, and still limits.
+fn lint_lifts(rows: &[Row], bad: &mut impl FnMut(String)) {
+    let card_from = rows.iter().filter(|r| r.source == "card").map(|r| r.from).min();
+    let verified_from = rows.iter().filter(|r| r.source == "card" && r.check == "card.verified").map(|r| r.from).min();
+    for r in rows {
+        let Some(lift) = &r.lift else { continue };
+        let at = format!("row {}", r.id);
+        if lift.unless_fail.is_empty() {
+            bad(format!("{at}: lift.unless_fail must be a non-empty list"));
+        }
+        let mut seen: Vec<&str> = Vec::new();
+        for x in &lift.unless_fail {
+            let named = rows.iter().find(|n| n.id == *x);
+            if seen.contains(&x.as_str()) {
+                bad(format!("{at}: lift.unless_fail lists {x} twice"));
+            } else if *x == r.id {
+                bad(format!("{at}: lift.unless_fail names the lifting row itself"));
+            } else if let Some(n) = named {
+                if n.source != "own_history" {
+                    bad(format!("{at}: lift.unless_fail {x} must be an own_history row"));
+                } else if n.from > lift.tier {
+                    bad(format!(
+                        "{at}: lift.unless_fail {x} is read above the lift tier, so never where the lift applies"
+                    ));
+                }
+            } else {
+                bad(format!("{at}: lift.unless_fail names {x:?}, which is no row"));
+            }
+            seen.push(x);
+        }
+        if let Some(cf) = card_from {
+            if verified_from.is_none_or(|v| v > cf) {
+                bad(format!(
+                    "{at}: a lift needs a card.verified row read from the lowest tier any card row is read from"
+                ));
+            }
+        }
+    }
 }

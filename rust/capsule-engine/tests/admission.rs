@@ -420,7 +420,19 @@ fn refusal_vectors() {
 /// digest; this evaluator and the Go one decide each the same.
 #[test]
 fn baseline_fixtures() {
-    let dir = vector_dir().join("admission-baseline-1.0.0");
+    check_pack_fixtures("admission-baseline-1.0.0");
+}
+
+/// baseline_test.go TestMuseBuyerFixtures: admission-muse-buyer@1
+/// (evidencebook-skills#154), the baseline without platform rows plus the
+/// own-settled lift of profile section 4.1.
+#[test]
+fn muse_buyer_fixtures() {
+    check_pack_fixtures("admission-muse-buyer-1.0.0");
+}
+
+fn check_pack_fixtures(name: &str) {
+    let dir = vector_dir().join(name);
     let prov: Value = serde_json::from_slice(&std::fs::read(dir.join("PROVENANCE.json")).unwrap()).unwrap();
     let read = |name: &str| {
         let b = std::fs::read(dir.join(name)).unwrap();

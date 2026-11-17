@@ -34,10 +34,11 @@ pub enum Effect {
     Limit,
     Ask,
     Cap,
+    Lift,
 }
 
 impl Effect {
-    /// The effect as the block names it: none, NO, LIMIT, ASK or cap.
+    /// The effect as the block names it: none, NO, LIMIT, ASK, cap or lift.
     pub fn as_str(self) -> &'static str {
         match self {
             Effect::None => "none",
@@ -45,6 +46,7 @@ impl Effect {
             Effect::Limit => "LIMIT",
             Effect::Ask => "ASK",
             Effect::Cap => "cap",
+            Effect::Lift => "lift",
         }
     }
 }

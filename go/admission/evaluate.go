@@ -352,13 +352,26 @@ func Evaluate(p *Pack, in Inputs) Decision {
 	// ask.
 	var askRows []int
 	rowOf := map[string]Row{}
+	// read holds each applicable row's result, read once so the own-settled
+	// lift (profile section 4.1) can look across rows before any LIMIT row
+	// lowers the tier.
+	read := map[string]RowResult{}
+	for _, r := range p.Rows {
+		if r.From <= dealTier {
+			read[r.ID] = readRow(r, in, p.Accept, p.TrustRoots)
+		}
+	}
+	lifted, liftRows := liftedRows(p, read, dealTier, aboveTier)
 	for _, r := range p.Rows {
 		rowOf[r.ID] = r
 		if r.From > dealTier {
 			continue
 		}
-		res := readRow(r, in, p.Accept, p.TrustRoots)
+		res := read[r.ID]
 		res.Effect = "none"
+		if liftRows[r.ID] {
+			res.Effect = "lift"
+		}
 		switch {
 		case r.Source == SourceJudged:
 			if res.Result == Fail && r.Cap < admitted {
@@ -372,7 +385,7 @@ func Evaluate(p *Pack, in Inputs) Decision {
 				missingRow = r.ID
 			}
 		case r.OnFail == LIMIT:
-			if res.Result != Pass {
+			if res.Result != Pass && !lifted[r.ID] {
 				res.Effect = LIMIT
 				to := r.From - 1
 				// A ladder row limits to the tier its earned history holds,
@@ -461,6 +474,49 @@ func Evaluate(p *Pack, in Inputs) Decision {
 	// admitted is never below the lowest tier: the loader refuses a LIMIT
 	// row there, and a cap names a tier.
 	return decide(LIMIT, SourceRows, admitted)
+}
+
+// liftedRows applies the own-settled lift (admission pack profile v0 section
+// 4.1) to a deal. It returns the card rows the lift treats as passed and the
+// lifting rows that took effect. A lift applies only to a deal at or below
+// its tier (never one above the pack's top tier), when its row passes, no row
+// in unless_fail fails, and every card row from a tier at or below its tier
+// reads not_read: nothing was served. A card that was served and verifies,
+// fails or is stale speaks for itself.
+func liftedRows(p *Pack, read map[string]RowResult, dealTier int, aboveTier bool) (lifted, liftRows map[string]bool) {
+	lifted, liftRows = map[string]bool{}, map[string]bool{}
+	if aboveTier {
+		return
+	}
+	for _, r := range p.Rows {
+		if r.Lift == nil || r.From > dealTier || dealTier > r.Lift.Tier || read[r.ID].Result != Pass {
+			continue
+		}
+		blocked := false
+		for _, x := range r.Lift.UnlessFail {
+			if res, ok := read[x]; ok && res.Result == Fail {
+				blocked = true
+			}
+		}
+		var cards []string
+		for _, c := range p.Rows {
+			if c.Source != SourceCard || c.From > r.Lift.Tier {
+				continue
+			}
+			if res, ok := read[c.ID]; ok && res.Result != NotRead {
+				blocked = true
+			}
+			cards = append(cards, c.ID)
+		}
+		if blocked {
+			continue
+		}
+		liftRows[r.ID] = true
+		for _, id := range cards {
+			lifted[id] = true
+		}
+	}
+	return
 }
 
 // earnedTier is the highest tier, up to dealTier, that a limit of decade
