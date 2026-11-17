@@ -11,7 +11,7 @@ Only what a withheld bundle shows is read: ``action_type``, ``timestamp``,
 ``capsule_id`` and ``references[].digest``. Results use only capsule-anchor's five
 result words (established, failed, not present, not checked, inconclusive); each result is named exactly the record's ``action_type`` so the engine counts the kind as covered. A declared count equal to the certified span is ``established``; one that differs is ``failed`` (``detail`` carries no count: ruling (b) lets only the countersigner see it), as is a late or duplicate declaration.
 
-Never pass/fail, never "coverage". ``not checked`` (an existing countersign word)
+Never an overall pass/fail, never "coverage". ``not checked`` (an existing countersign word)
 is used only when a check could not run: no window to compare with, or a
 count the holder did not disclose. A check recomputes from the bundle alone, so
 anyone can repeat it.

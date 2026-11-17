@@ -155,7 +155,7 @@ Results use capsule-anchor's five words (established, failed, not present, not c
 
 In the signed statement `failed` is the one word for three declared-count cases, told apart only by `detail` (which the wire does not carry today): the count differs from the certified span, the declaration was sealed after the window opened, and the declaration is repeated. `detail` never carries a count (ruling (b): only the countersigner sees it); if `detail` ever joins the wire it must stay that way.
 
-Never pass/fail, never "coverage". `capsule-engine packs preflight --bundle FILE --profile ID
+Never an overall pass/fail, never "coverage". `capsule-engine packs preflight --bundle FILE --profile ID
 [--window-start TS]` runs the same checks locally before a countersignature is requested; it exits
 1 on `failed` and 2 on a refused disclosure or a non-bundle. Profile ids:
 `asg/outcomes/1`, `asg/eu-ai-act-obligations/1`.
