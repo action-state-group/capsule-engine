@@ -10,7 +10,7 @@
              this mode never touches ``.capsule-setup/`` and persists
              nothing, so it carries no dependency on the setup/Candidate
              machinery that stayed in capsule-compiler.
-  preflight -- the countersign pack checks (method freeze, declared count)
+  preflight -- the countersign pack checks (method_freeze, declared_count)
              run locally on a bundle before a countersignature is requested.
   evaluate -- decide a live pack's rows on a list of actions, as JSON (the
              entry point for ``terms test``): met / not_met / not_evaluable

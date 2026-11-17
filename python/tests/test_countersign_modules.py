@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""Countersign pack modules (capsule-engine#160): method freeze and declared count."""
+"""Countersign pack modules (capsule-engine#160): method_freeze and declared_count."""
 from __future__ import annotations
 
 import json
