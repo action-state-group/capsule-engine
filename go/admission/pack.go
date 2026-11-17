@@ -116,6 +116,20 @@ type Row struct {
 	Cap int
 	// Ask is the Evidence Request derivation a not_read row asks for, or "".
 	Ask string
+	// Lift is the own-settled lift this row carries (profile section 4.1), or
+	// nil. Only an own.settled row that is record only carries one.
+	Lift *Lift
+}
+
+// Lift is a row's own-settled lift (admission pack profile v0 section 4.1):
+// when the row passes, no row named in UnlessFail fails and the counterparty
+// served no card, a deal up to tier Tier is not limited by its card rows.
+type Lift struct {
+	// Tier is the index of the highest tier the lift applies to.
+	Tier int
+	// UnlessFail are the ids of the own_history rows whose failure blocks
+	// the lift.
+	UnlessFail []string
 }
 
 // sourceFile is pack-definition.json: the pack source as evidencebook-skills'
@@ -163,6 +177,12 @@ type sourceFile struct {
 		Ask       *struct {
 			Derivation string `json:"derivation"`
 		} `json:"ask"`
+		// Lift is written only on a lifting row, so a pack without one
+		// keeps the bytes it compiled to before the lift existed.
+		Lift *struct {
+			Tier       string   `json:"tier"`
+			UnlessFail []string `json:"unless_fail"`
+		} `json:"lift"`
 	} `json:"rows"`
 }
 
@@ -442,8 +462,28 @@ func Load(src []byte) (*Pack, error) {
 			}
 			row.Ask = r.Ask.Derivation
 		}
+		if r.Lift != nil {
+			lift := &Lift{UnlessFail: r.Lift.UnlessFail}
+			switch idx, ok := tierIndex[r.Lift.Tier]; {
+			case !ok:
+				bad("%s: lift.tier %q is not a tier", where, r.Lift.Tier)
+			case idx < from:
+				bad("%s: lift.tier %s is below the row's from %s", where, r.Lift.Tier, r.From)
+			default:
+				lift.Tier = idx
+			}
+			// A lifting row decides nothing itself and rests on our own book.
+			if r.Check != "own.settled" {
+				bad("%s: only an own.settled row may lift", where)
+			}
+			if row.OnFail != Record {
+				bad("%s: a lifting row decides nothing itself, so its on_fail must be record", where)
+			}
+			row.Lift = lift
+		}
 		p.Rows = append(p.Rows, row)
 	}
+	lintLifts(p, bad)
 	if len(errs) > 0 {
 		return nil, fmt.Errorf("admission pack %s: %w", f.PackID, errors.Join(errs...))
 	}
@@ -520,8 +560,9 @@ var (
 	budgetKeys = []string{"max_asks", "deadline_s"}
 	rootKeys   = []string{"controllers", "witnesses", "judges", "rails"}
 	railKeys   = []string{"id", "digest"}
-	rowKeys    = []string{"id", "statement", "source", "check", "params", "from", "on_fail", "ask"}
+	rowKeys    = []string{"id", "statement", "source", "check", "params", "from", "on_fail", "ask", "lift"}
 	askKeys    = []string{"derivation"}
+	liftKeys   = []string{"tier", "unless_fail"}
 )
 
 // exactKeys refuses a member name that is not exactly one the format names.
@@ -579,6 +620,9 @@ func exactKeys(src []byte) error {
 		if _, err := check(fmt.Sprintf("rows[%d].ask", i), m["ask"], askKeys); err != nil {
 			return err
 		}
+		if _, err := check(fmt.Sprintf("rows[%d].lift", i), m["lift"], liftKeys); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -598,6 +642,60 @@ func noNulls(src []byte) error {
 		}
 		if tok == nil {
 			return errors.New("null is not a pack value")
+		}
+	}
+}
+
+// lintLifts checks what a lift names across rows (profile section 4.1): each
+// unless_fail is a distinct other own_history row read at or below the lift
+// tier, so the lift rests on our own book and every named row is read where
+// the lift applies; and a card.verified row is read from the lowest tier any
+// card row is, so a card served and failing verification reads fail, never
+// not_read, and still limits.
+func lintLifts(p *Pack, bad func(string, ...any)) {
+	byID := map[string]Row{}
+	for _, r := range p.Rows {
+		byID[r.ID] = r
+	}
+	cardFrom, verifiedFrom := -1, -1
+	for _, r := range p.Rows {
+		if r.Source != SourceCard {
+			continue
+		}
+		if cardFrom < 0 || r.From < cardFrom {
+			cardFrom = r.From
+		}
+		if r.Check == "card.verified" && (verifiedFrom < 0 || r.From < verifiedFrom) {
+			verifiedFrom = r.From
+		}
+	}
+	for _, r := range p.Rows {
+		if r.Lift == nil {
+			continue
+		}
+		where := fmt.Sprintf("row %s", r.ID)
+		if len(r.Lift.UnlessFail) == 0 {
+			bad("%s: lift.unless_fail must be a non-empty list", where)
+		}
+		seen := map[string]bool{}
+		for _, x := range r.Lift.UnlessFail {
+			named, ok := byID[x]
+			switch {
+			case seen[x]:
+				bad("%s: lift.unless_fail lists %s twice", where, x)
+			case x == r.ID:
+				bad("%s: lift.unless_fail names the lifting row itself", where)
+			case !ok:
+				bad("%s: lift.unless_fail names %q, which is no row", where, x)
+			case named.Source != SourceOwnHistory:
+				bad("%s: lift.unless_fail %s must be an own_history row", where, x)
+			case named.From > r.Lift.Tier:
+				bad("%s: lift.unless_fail %s is read above the lift tier, so never where the lift applies", where, x)
+			}
+			seen[x] = true
+		}
+		if cardFrom >= 0 && (verifiedFrom < 0 || verifiedFrom > cardFrom) {
+			bad("%s: a lift needs a card.verified row read from the lowest tier any card row is read from", where)
 		}
 	}
 }

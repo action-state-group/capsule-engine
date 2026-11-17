@@ -86,12 +86,17 @@ pub fn evaluate(p: &Pack, input: &Inputs) -> Decision {
     let (mut no_row, mut missing_row): (Option<String>, Option<String>) = (None, None);
     // Indexes into d.rows: the LIMIT rows that did not pass and carry an ask.
     let mut ask_rows: Vec<(usize, &Row)> = Vec::new();
+    // Each applicable row is read once, so the own-settled lift (profile
+    // section 4.1) can look across rows before any LIMIT row lowers the tier.
+    let read: BTreeMap<&str, RowResult> =
+        p.rows.iter().filter(|r| r.from as i64 <= deal_tier).map(|r| (r.id.as_str(), read_row(r, input, p))).collect();
+    let (lifted, lift_rows) = lifted_rows(p, &read, deal_tier, above_tier);
     for r in &p.rows {
         if r.from as i64 > deal_tier {
             continue;
         }
-        let mut res = read_row(r, input, p);
-        res.effect = Effect::None;
+        let mut res = read[r.id.as_str()].clone();
+        res.effect = if lift_rows.contains(r.id.as_str()) { Effect::Lift } else { Effect::None };
         match r.on_fail {
             OnFail::Cap(cap) if r.source == SOURCE_JUDGED => {
                 if res.result == RowStatus::Fail && (cap as i64) < admitted {
@@ -108,7 +113,7 @@ pub fn evaluate(p: &Pack, input: &Inputs) -> Decision {
                 }
             }
             OnFail::Limit => {
-                if res.result != RowStatus::Pass {
+                if res.result != RowStatus::Pass && !lifted.contains(r.id.as_str()) {
                     res.effect = Effect::Limit;
                     let mut to = r.from as i64 - 1;
                     // A ladder row limits to the tier its earned history
@@ -191,6 +196,44 @@ pub fn evaluate(p: &Pack, input: &Inputs) -> Decision {
     // admitted is never below the lowest tier: the loader refuses a LIMIT
     // row there, and a cap names a tier.
     decide(d, Verdict::Limit, SOURCE_ROWS, admitted)
+}
+
+/// evaluate.go liftedRows: the own-settled lift (admission pack profile v0
+/// section 4.1). Returns the card rows the lift treats as passed and the
+/// lifting rows that took effect. A lift applies only to a deal at or below
+/// its tier (never one above the pack's top tier), when its row passes, no
+/// row in unless_fail fails, and every card row from a tier at or below its
+/// tier reads not_read: nothing was served.
+fn lifted_rows<'a>(
+    p: &'a Pack,
+    read: &BTreeMap<&str, RowResult>,
+    deal_tier: i64,
+    above_tier: bool,
+) -> (BTreeSet<&'a str>, BTreeSet<&'a str>) {
+    let (mut lifted, mut lift_rows) = (BTreeSet::new(), BTreeSet::new());
+    if above_tier {
+        return (lifted, lift_rows);
+    }
+    for r in &p.rows {
+        let Some(lift) = &r.lift else { continue };
+        if r.from as i64 > deal_tier
+            || deal_tier > lift.tier as i64
+            || read.get(r.id.as_str()).is_none_or(|x| x.result != RowStatus::Pass)
+        {
+            continue;
+        }
+        let mut blocked =
+            lift.unless_fail.iter().any(|x| read.get(x.as_str()).is_some_and(|res| res.result == RowStatus::Fail));
+        let cards: Vec<&Row> = p.rows.iter().filter(|c| c.source == "card" && c.from <= lift.tier).collect();
+        blocked = blocked
+            || cards.iter().any(|c| read.get(c.id.as_str()).is_some_and(|res| res.result != RowStatus::NotRead));
+        if blocked {
+            continue;
+        }
+        lift_rows.insert(r.id.as_str());
+        lifted.extend(cards.iter().map(|c| c.id.as_str()));
+    }
+    (lifted, lift_rows)
 }
 
 /// evaluate.go earnedTier: the highest tier, up to `deal_tier`, that a

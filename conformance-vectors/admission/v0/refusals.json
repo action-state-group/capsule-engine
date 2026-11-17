@@ -895,6 +895,148 @@
     }
    ],
    "want": "takes no params.window"
+  },
+  {
+   "case": "a lift on a row that is not own.settled",
+   "base": "admission-muse-buyer-1.0.0/pack-definition.json",
+   "ops": [
+    {
+     "set": [
+      "rows",
+      4,
+      "lift"
+     ],
+     "value": {
+      "tier": "T1",
+      "unless_fail": [
+       "adverse-adjudication"
+      ]
+     }
+    }
+   ],
+   "want": "only an own.settled row may lift"
+  },
+  {
+   "case": "a lift at a tier that does not exist",
+   "base": "admission-muse-buyer-1.0.0/pack-definition.json",
+   "ops": [
+    {
+     "set": [
+      "rows",
+      3,
+      "lift",
+      "tier"
+     ],
+     "value": "T9"
+    }
+   ],
+   "want": "is not a tier"
+  },
+  {
+   "case": "a lift that names a card row to unless_fail",
+   "base": "admission-muse-buyer-1.0.0/pack-definition.json",
+   "ops": [
+    {
+     "set": [
+      "rows",
+      3,
+      "lift",
+      "unless_fail"
+     ],
+     "value": [
+      "card-fresh"
+     ]
+    }
+   ],
+   "want": "must be an own_history row"
+  },
+  {
+   "case": "a lift that names a row that is none",
+   "base": "admission-muse-buyer-1.0.0/pack-definition.json",
+   "ops": [
+    {
+     "set": [
+      "rows",
+      3,
+      "lift",
+      "unless_fail"
+     ],
+     "value": [
+      "nowhere"
+     ]
+    }
+   ],
+   "want": "which is no row"
+  },
+  {
+   "case": "a lift with an empty unless_fail",
+   "base": "admission-muse-buyer-1.0.0/pack-definition.json",
+   "ops": [
+    {
+     "set": [
+      "rows",
+      3,
+      "lift",
+      "unless_fail"
+     ],
+     "value": []
+    }
+   ],
+   "want": "must be a non-empty list"
+  },
+  {
+   "case": "a lift with an unknown member",
+   "base": "admission-muse-buyer-1.0.0/pack-definition.json",
+   "ops": [
+    {
+     "set": [
+      "rows",
+      3,
+      "lift",
+      "weight"
+     ],
+     "value": 1
+    }
+   ],
+   "want": "unknown field"
+  },
+  {
+   "case": "a lifting row that decides",
+   "base": "admission-muse-buyer-1.0.0/pack-definition.json",
+   "ops": [
+    {
+     "set": [
+      "rows",
+      3,
+      "from"
+     ],
+     "value": "T1"
+    },
+    {
+     "set": [
+      "rows",
+      3,
+      "on_fail"
+     ],
+     "value": "LIMIT"
+    }
+   ],
+   "want": "a lifting row decides nothing itself"
+  },
+  {
+   "case": "a lift whose card verification is read too high",
+   "base": "admission-muse-buyer-1.0.0/pack-definition.json",
+   "ops": [
+    {
+     "set": [
+      "rows",
+      5,
+      "from"
+     ],
+     "value": "T2"
+    }
+   ],
+   "want": "a lift needs a card.verified row"
   }
  ],
  "raw": [
