@@ -39,17 +39,17 @@ def _raw(payload, **kw):
 def test_matching_disclosure_is_established_and_kinds_are_covered():
     checks = _checks(_statement(_raw({"declared_count": 4})))
     assert checks["declared_count"].result == "established"
-    assert "4" in checks["declared_count"].detail
     assert checks["method_freeze"].result == "established"
     # the two kinds this module owns are covered; the judged kind is not ours
     assert checks["profile conformance"].detail == "action_type(s) with no policy-module coverage: evaluation-report"
     assert all(c.result in RESULTS for c in checks.values())
 
 
-def test_differing_count_is_failed_with_both_counts():
+def test_differing_count_is_failed_without_the_numbers():
     c = _checks(_statement(_raw({"declared_count": 3})))["declared_count"]
     assert c.result == "failed"
-    assert "3" in c.detail and "4" in c.detail
+    # the count itself never leaves the countersigner (ruling (b)); detail says only that it differs
+    assert c.detail == "the declared count differs from the certified sequence span"
 
 
 def test_forged_disclosure_is_refused_by_the_engine():

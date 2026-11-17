@@ -144,7 +144,7 @@ Results use capsule-anchor's five words (established, failed, not present, not c
 - **`declared_count`**: its value is in the withheld payload, so the holder opts in to disclosing that
   one record's payload `{declared_count, second_system_digest?}` (once the countersign instance
   accepts such a disclosure: capsule-anchor#95; until then it is reachable only through this module
-  and the local preflight). `established` (equal) or `failed` (different, both counts in the detail) compares the count with the certified sequence
+  and the local preflight). `established` (equal) or `failed` (different; the detail carries no count) compares the count with the certified sequence
   span, `last_seq - first_seq + 1` of the completeness certificate (every record in the certified
   range, so the number a producer declares counts all of them, this declaration and the freeze
   included, not only the judgments); `failed` when sealed late or declared twice; `not present` when
