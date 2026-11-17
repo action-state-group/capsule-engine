@@ -10,7 +10,9 @@ window opens:
 Only what a withheld bundle shows is read: ``action_type``, ``timestamp``,
 ``capsule_id`` and ``references[].digest``. Results use the countersign
 vocabulary only: ``established`` / ``failed`` / ``not present`` for the
-freeze, ``match`` / ``mismatch`` / ``not present`` for the count. Never
+freeze, ``match`` / ``mismatch`` / ``failed`` / ``not present`` for the
+count (``mismatch`` only for declared != certified span; a late or duplicate
+declaration is ``failed``). Never
 pass/fail, never "coverage". ``not checked`` (an existing countersign word)
 is used only when a check could not run: no window to compare with, or a
 count the holder did not disclose. A check recomputes from the bundle alone, so
@@ -39,7 +41,14 @@ _SETUP_KINDS = frozenset({METHOD_FREEZE, DECLARED_COUNT})
 
 # Public profile ids this module answers to. Registered by the deployer of a
 # countersign instance via register_all(); the neutral engine ships none.
-PROFILE_IDS = ("outcomes/v1", "eu-ai-act-obligations/v1")
+PROFILE_IDS = ("asg/outcomes/1", "asg/eu-ai-act-obligations/1")
+
+
+class DisclosureRefused(ValueError):
+    """A disclosed ``declared_count`` payload that must not be read: it does not
+    match the digest sealed in its record, or it is not the closed shape. The
+    countersign request is refused (never read as a ``mismatch``, which means
+    only that the declared count differs from the certified span)."""
 
 
 @dataclass(frozen=True)
@@ -177,11 +186,11 @@ class CountersignPackModule:
         if not counts:
             return CheckResult(name, "not present", "no declared_count record in the bundle")
         if len(counts) > 1:
-            return CheckResult(name, "mismatch", f"{len(counts)} declared_count records; the declaration is one record")
+            return CheckResult(name, "failed", f"{len(counts)} declared_count records; the declaration is one record")
         record = counts[0]
         why = self._sealed_before(record, window)
         if why is not None:
-            return CheckResult(name, "not checked" if window is None else "mismatch", why)
+            return CheckResult(name, "not checked" if window is None else "failed", why)
         raw = _raw(bundle)
         disclosed = (raw.get("disclosures") or {}).get(record.get("capsule_id")) if isinstance(raw.get("disclosures"), dict) else None
         payload = disclosed.get("agent_input") if isinstance(disclosed, dict) else None
@@ -200,10 +209,10 @@ class CountersignPackModule:
         if not isinstance(sealed, str):
             return CheckResult(name, "not checked", "the record commits no agent_input_digest to compare the disclosure with")
         if digest is None or digest != sealed:
-            return CheckResult(name, "mismatch", "the disclosed payload does not match the digest sealed in the record")
+            raise DisclosureRefused("the disclosed declared_count payload does not match the digest sealed in the record")
         count = payload.get("declared_count") if isinstance(payload, dict) else None
         if not isinstance(payload, dict) or not set(payload) <= _COUNT_KEYS or isinstance(count, bool) or not isinstance(count, int) or count < 0:
-            return CheckResult(name, "mismatch", "the disclosed payload is not {declared_count, second_system_digest?}")
+            raise DisclosureRefused("the disclosed declared_count payload is not {declared_count, second_system_digest?}")
         span = _span(raw)
         if span is None:
             return CheckResult(name, "not checked", "no completeness certificate proves a sequence span to compare with")

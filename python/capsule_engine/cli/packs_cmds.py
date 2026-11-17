@@ -208,7 +208,7 @@ def _cmd_packs_evaluate(args: argparse.Namespace) -> int:
 def _cmd_packs_preflight(args: argparse.Namespace) -> int:
     """Run the countersign pack checks locally on a bundle, before requesting
     a countersignature: the same module the countersign instance loads."""
-    from ..countersign import PROFILE_IDS, CountersignPackModule
+    from ..countersign import PROFILE_IDS, CountersignPackModule, DisclosureRefused
     from ..countersign.modules import parse_window_start
 
     if args.profile not in PROFILE_IDS:
@@ -224,7 +224,11 @@ def _cmd_packs_preflight(args: argparse.Namespace) -> int:
     if not isinstance(bundle, dict) or not isinstance(bundle.get("records"), list):
         print("capsule-engine packs preflight: not a bundle: expected a JSON object with a 'records' list", file=sys.stderr)
         return 2
-    results = CountersignPackModule(window).check(bundle, args.profile)
+    try:
+        results = CountersignPackModule(window).check(bundle, args.profile)
+    except DisclosureRefused as exc:
+        print(f"capsule-engine packs preflight: disclosure refused: {exc}", file=sys.stderr)
+        return 2
     print(json.dumps({"profile": args.profile, "checks": [vars(r) for r in results]}, indent=2))
     return 1 if any(r.result in ("failed", "mismatch") for r in results) else 0
 
@@ -258,10 +262,10 @@ def add_parser(sub: argparse._SubParsersAction) -> argparse.ArgumentParser:
 
     p_pre = packs_sub.add_parser(
         "preflight",
-        help="run the countersign method-freeze and declared-count checks on a bundle locally, as JSON (exit 1 only on failed/mismatch; not present and not checked exit 0)",
+        help="run the countersign method-freeze and declared-count checks on a bundle locally, as JSON (exit 1 on failed/mismatch, 2 on a refused disclosure; not present and not checked exit 0)",
     )
     p_pre.add_argument("--bundle", required=True, help="path to a v2 Evidence Bundle (JSON)")
-    p_pre.add_argument("--profile", required=True, help="countersign profile id, e.g. outcomes/v1")
+    p_pre.add_argument("--profile", required=True, help="countersign profile id, e.g. asg/outcomes/1")
     p_pre.add_argument("--window-start", default=None, help="RFC 3339 instant the window opens (default: earliest judged record)")
     p_pre.set_defaults(func=_cmd_packs_preflight)
 

@@ -14,6 +14,7 @@ from .modules import (
     PROFILE_IDS,
     CheckResult,
     CountersignPackModule,
+    DisclosureRefused,
     register_all,
 )
 
@@ -21,6 +22,7 @@ __all__ = [
     "CheckResult",
     "CountersignPackModule",
     "DECLARED_COUNT",
+    "DisclosureRefused",
     "METHOD_FREEZE",
     "PROFILE_IDS",
     "register_all",

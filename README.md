@@ -134,12 +134,12 @@ check; the contract (`check(bundle, profile_id) -> [{name, result, detail}]`) is
 third party brings its own module. This one reads two record kinds sealed before the window,
 `method_freeze` and `declared_count`, from a payload-free v2 bundle: a freeze reads `established`,
 `failed` or `not present`, or `not checked` when there is no window to compare with (sealed before the window, and every judgment references its digest);
-a count reads `match`, `mismatch` or `not present`. Never pass/fail, never "coverage". The
+a count reads `match`, `mismatch` (declared differs from the certified span), `failed` (sealed late, or declared twice) or `not present`; a disclosed payload that does not match its sealed digest or is not the closed shape is refused, never read as a `mismatch`. Never pass/fail, never "coverage". The
 declared count's value is in the withheld payload, so the holder opts in to disclosing that one
 record's payload (`{declared_count, second_system_digest?}`, checked against the digest sealed in
 the record); the count is then compared with the certified sequence span, and with no disclosure it
 reads `not checked`, which is not `not present`. `capsule-engine packs preflight --bundle FILE --profile ID [--window-start TS]` runs the same
-checks locally before a countersignature is requested; it exits 1 only on `failed` or `mismatch`.
+checks locally before a countersignature is requested; it exits 1 on `failed` or `mismatch` and 2 on a refused disclosure. Profile ids: `asg/outcomes/1`, `asg/eu-ai-act-obligations/1`.
 
 ### The Go guard (`go/`)
 
