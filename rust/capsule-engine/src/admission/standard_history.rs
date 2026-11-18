@@ -8,8 +8,6 @@ use serde_json::{Map, Value};
 use super::{BandCount, Disputes, Error};
 use crate::canon;
 
-const CARD: &str = "standard_history/1 card";
-
 /// standard_history.go StandardHistoryCounts: the card's per-band counts as
 /// `Card::bands`, and its received disputes as `Card::disputes` (AAC
 /// spec/standard-history-v0.md §4, §5.3; evidencebook-skills#87).
@@ -22,25 +20,40 @@ const CARD: &str = "standard_history/1 card";
 /// decade is null (zero-amount deals) is skipped. The currency is the card's
 /// SR assetCode as written, with the decade in that asset's own unit.
 pub fn standard_history_counts(artifact: &[u8]) -> Result<(Vec<BandCount>, Disputes), Error> {
+    counts(artifact, "standard_history/1")
+}
+
+/// standard_history.go StandardHistory3Counts: the same reading of a
+/// standard_history/3 card (AAC spec/standard-history-v0.md §11; evidencebook#461
+/// acceptance 7), whose `bands` and `disputes` are §4's. A card of any other
+/// derivation, /1 and /2 included, is refused by its derivation, and
+/// `standard_history_counts` refuses a /3 card the same way. The /3 members the
+/// ladder does not read are not checked here (§11.7's card_form and denominator).
+pub fn standard_history_3_counts(artifact: &[u8]) -> Result<(Vec<BandCount>, Disputes), Error> {
+    counts(artifact, "standard_history/3")
+}
+
+fn counts(artifact: &[u8], token: &str) -> Result<(Vec<BandCount>, Disputes), Error> {
+    let name = format!("{token} card");
     // The artifact must be the JCS of the card (AAC standard-history-v0 §3),
     // exactly as pack.rs requires of a pack-definition.json.
-    is_jcs(artifact).map_err(|e| Error(format!("{CARD}: the artifact is not JCS bytes: {e}")))?;
-    let card: Value = serde_json::from_slice(artifact).map_err(|e| Error(format!("{CARD}: {e}")))?;
-    let card = card.as_object().ok_or_else(|| Error(format!("{CARD}: not an object")))?;
+    is_jcs(artifact).map_err(|e| Error(format!("{name}: the artifact is not JCS bytes: {e}")))?;
+    let card: Value = serde_json::from_slice(artifact).map_err(|e| Error(format!("{name}: {e}")))?;
+    let card = card.as_object().ok_or_else(|| Error(format!("{name}: not an object")))?;
     match card.get("derivation") {
-        Some(Value::String(d)) if d == "standard_history/1" => {}
-        Some(Value::String(d)) => return Err(Error(format!("{CARD}: derivation is {d:?}"))),
-        None | Some(Value::Null) => return Err(Error(format!("{CARD}: derivation is \"\""))),
-        Some(_) => return Err(Error(format!("{CARD}: derivation must be a string"))),
+        Some(Value::String(d)) if d == token => {}
+        Some(Value::String(d)) => return Err(Error(format!("{name}: derivation is {d:?}"))),
+        None | Some(Value::Null) => return Err(Error(format!("{name}: derivation is \"\""))),
+        Some(_) => return Err(Error(format!("{name}: derivation must be a string"))),
     }
     let bands = match card.get("bands") {
-        None | Some(Value::Null) => return Err(Error(format!("{CARD}: bands is missing"))),
+        None | Some(Value::Null) => return Err(Error(format!("{name}: bands is missing"))),
         Some(Value::Array(items)) => items,
-        Some(_) => return Err(Error(format!("{CARD}: bands must be an array"))),
+        Some(_) => return Err(Error(format!("{name}: bands must be an array"))),
     };
     let mut out = Vec::new();
     for (i, b) in bands.iter().enumerate() {
-        let at = format!("{CARD}: bands[{i}]");
+        let at = format!("{name}: bands[{i}]");
         let b = b.as_object().ok_or_else(|| Error(format!("{at} must be an object")))?;
         let currency = match b.get("currency") {
             Some(Value::String(c)) if !c.is_empty() => c.clone(),
@@ -61,14 +74,14 @@ pub fn standard_history_counts(artifact: &[u8]) -> Result<(Vec<BandCount>, Dispu
         .and_then(Value::as_object)
         .and_then(|d| d.get("received"))
         .and_then(Value::as_object)
-        .ok_or_else(|| Error(format!("{CARD}: disputes.received must be an object")))?;
-    let of = count(received, "of").map_err(|e| Error(format!("{CARD}: disputes.received.of: {e}")))?;
+        .ok_or_else(|| Error(format!("{name}: disputes.received must be an object")))?;
+    let of = count(received, "of").map_err(|e| Error(format!("{name}: disputes.received.of: {e}")))?;
     let by_outcome = received
         .get("by_outcome")
         .and_then(Value::as_object)
-        .ok_or_else(|| Error(format!("{CARD}: disputes.received.by_outcome must be an object")))?;
+        .ok_or_else(|| Error(format!("{name}: disputes.received.by_outcome must be an object")))?;
     let open =
-        count(by_outcome, "open").map_err(|e| Error(format!("{CARD}: disputes.received.by_outcome.open: {e}")))?;
+        count(by_outcome, "open").map_err(|e| Error(format!("{name}: disputes.received.by_outcome.open: {e}")))?;
     Ok((out, Disputes { open, of }))
 }
 

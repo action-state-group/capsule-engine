@@ -56,7 +56,7 @@ pub use inference_service_history::{
     SUPPRESSED_BELOW_FLOOR, SUPPRESSED_COMPLEMENTARY,
 };
 pub use pack::{Pack, RailPin, COMPILED_FORMAT};
-pub use standard_history::standard_history_counts;
+pub use standard_history::{standard_history_3_counts, standard_history_counts};
 
 use crate::instant::Instant;
 

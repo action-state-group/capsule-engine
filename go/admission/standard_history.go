@@ -30,37 +30,54 @@ import (
 // the decade in that asset's own unit, so a pack maps it through accept like
 // any other currency (BTC: {band: sat, scale: 8}).
 func StandardHistoryCounts(artifact []byte) ([]BandCount, *Disputes, error) {
+	return standardHistoryCounts(artifact, "standard_history/1")
+}
+
+// StandardHistory3Counts reads the same inputs from a standard_history/3 card
+// (AAC spec/standard-history-v0.md §11; evidencebook#461 acceptance 7): its
+// bands and disputes members are §4's, so they are read as StandardHistoryCounts
+// reads a /1 card's, and a card of any other derivation, /1 and /2 included, is
+// refused by its derivation. StandardHistoryCounts refuses a /3 card the same
+// way. The /3 members the ladder does not read (outcomes, remedied,
+// not_honoured, local_times, coverage_start, not_counted) are not checked here:
+// that is the verifier's card_form and denominator (§11.7).
+func StandardHistory3Counts(artifact []byte) ([]BandCount, *Disputes, error) {
+	return standardHistoryCounts(artifact, "standard_history/3")
+}
+
+func standardHistoryCounts(artifact []byte, token string) ([]BandCount, *Disputes, error) {
+	card0 := token + " card"
 	if err := isJCS(artifact); err != nil {
-		return nil, nil, fmt.Errorf("standard_history/1 card: the artifact is not JCS bytes: %w", err)
+		return nil, nil, fmt.Errorf("%s: the artifact is not JCS bytes: %w", card0, err)
 	}
 	// Raw members throughout, decoded into maps: keys match exactly (a struct
 	// would match them case-insensitively), and each number is read from its
 	// own text.
 	var card map[string]json.RawMessage
 	if json.Unmarshal(artifact, &card) != nil || card == nil {
-		return nil, nil, errors.New("standard_history/1 card: not an object")
+		return nil, nil, errors.New(card0 + ": not an object")
 	}
 	var derivation string
 	if raw, ok := card["derivation"]; ok && json.Unmarshal(raw, &derivation) != nil {
-		return nil, nil, errors.New("standard_history/1 card: derivation must be a string")
+		return nil, nil, errors.New(card0 + ": derivation must be a string")
 	}
-	if derivation != "standard_history/1" {
-		return nil, nil, fmt.Errorf("standard_history/1 card: derivation is %q", derivation)
+	if derivation != token {
+		return nil, nil, fmt.Errorf("%s: derivation is %q", card0, derivation)
 	}
 	if raw, ok := card["bands"]; !ok || string(raw) == "null" {
-		return nil, nil, errors.New("standard_history/1 card: bands is missing")
+		return nil, nil, errors.New(card0 + ": bands is missing")
 	}
 	var tallies []json.RawMessage
 	if json.Unmarshal(card["bands"], &tallies) != nil {
-		return nil, nil, errors.New("standard_history/1 card: bands must be an array")
+		return nil, nil, errors.New(card0 + ": bands must be an array")
 	}
 	bands := []BandCount{}
 	for i, raw := range tallies {
 		var b map[string]json.RawMessage
 		if json.Unmarshal(raw, &b) != nil || b == nil {
-			return nil, nil, fmt.Errorf("standard_history/1 card: bands[%d] must be an object", i)
+			return nil, nil, fmt.Errorf("%s: bands[%d] must be an object", card0, i)
 		}
-		where := fmt.Sprintf("standard_history/1 card: bands[%d]", i)
+		where := fmt.Sprintf("%s: bands[%d]", card0, i)
 		var currency string
 		if err := json.Unmarshal(b["currency"], &currency); err != nil || currency == "" {
 			return nil, nil, fmt.Errorf("%s: currency must be a non-empty string", where)
@@ -88,19 +105,19 @@ func StandardHistoryCounts(artifact []byte) ([]BandCount, *Disputes, error) {
 	// below then refuses it as Rust does.
 	_ = json.Unmarshal(card["disputes"], &disputes)
 	if json.Unmarshal(disputes["received"], &r) != nil || r == nil {
-		return nil, nil, errors.New("standard_history/1 card: disputes.received must be an object")
+		return nil, nil, errors.New(card0 + ": disputes.received must be an object")
 	}
 	of, err := cardCount(r["of"])
 	if err != nil {
-		return nil, nil, fmt.Errorf("standard_history/1 card: disputes.received.of: %w", err)
+		return nil, nil, fmt.Errorf("%s: disputes.received.of: %w", card0, err)
 	}
 	var byOutcome map[string]json.RawMessage
 	if json.Unmarshal(r["by_outcome"], &byOutcome) != nil || byOutcome == nil {
-		return nil, nil, errors.New("standard_history/1 card: disputes.received.by_outcome must be an object")
+		return nil, nil, errors.New(card0 + ": disputes.received.by_outcome must be an object")
 	}
 	open, err := cardCount(byOutcome["open"])
 	if err != nil {
-		return nil, nil, fmt.Errorf("standard_history/1 card: disputes.received.by_outcome.open: %w", err)
+		return nil, nil, fmt.Errorf("%s: disputes.received.by_outcome.open: %w", card0, err)
 	}
 	return bands, &Disputes{Open: open, Of: of}, nil
 }
