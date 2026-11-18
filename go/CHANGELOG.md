@@ -3,6 +3,10 @@
 Each entry's pack and definition lists come from the diff of `packs/*/PROVENANCE.json`
 and `portedDefinitions` (`guard/engine.go`).
 
+## Unreleased
+
+- Added (capsule-engine#298): `StandardHistory3Counts` reads the ladder's inputs from a `standard_history/3` card (agent-action-capsule spec/standard-history-v0.md §11, a107d4af). `StandardHistoryCounts` is unchanged for `/1` and refuses a `/3` card by its derivation; `/3` refuses any other token the same way.
+
 ## 0.4.0 — 2026-11-17
 
 A minor on v0 (RELEASING.md): API additions (`StoreHistory.Log`/`Artifacts`, `CoverageAsk`, `Card.Stapled`) and a new admission predicate; no pack version or ported definition changes. Cut for the 2026-11-19 Goose ARD demo, which runs `capsule-engine admission evaluate`. Merged since v0.3.0 that touch `go/`: #281, #285, #290, #291; #283, #287, #289, #293 and #295 change the Python package or repository files only.

@@ -10,10 +10,10 @@ use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 
 use capsule_engine::admission::{
-    evaluate, inference_service_history_counts_for, standard_history_counts, AdjudicationVerdict, BandCount, Card,
-    CardCheckpoint, CardCheckpoints, Claims, CoverageAsk, Disputes, Inputs, Judgement, Operator, OwnHistory, Pack,
-    Platform, RailPin, Receipts, Selection, Served, ServedPeriod, Stake, Timestamp, Vouch,
-    INFERENCE_SERVICE_HISTORY_PROPERTIES,
+    evaluate, inference_service_history_counts_for, standard_history_3_counts, standard_history_counts,
+    AdjudicationVerdict, BandCount, Card, CardCheckpoint, CardCheckpoints, Claims, CoverageAsk, Disputes, Inputs,
+    Judgement, Operator, OwnHistory, Pack, Platform, RailPin, Receipts, Selection, Served, ServedPeriod, Stake,
+    Timestamp, Vouch, INFERENCE_SERVICE_HISTORY_PROPERTIES,
 };
 use capsule_engine::canon;
 use serde_json::{Map, Value};
@@ -497,13 +497,48 @@ fn key_age_fails_without_a_first_checkpoint() {
 /// standard_history/1 mapping vectors.
 #[test]
 fn standard_history_vectors() {
-    let raw = std::fs::read(vector_dir().join("standard-history.json")).unwrap();
+    run_standard_history_vectors("standard-history.json", standard_history_counts);
+}
+
+/// standard_history_test.go TestStandardHistory3Vectors.
+#[test]
+fn standard_history_3_vectors() {
+    run_standard_history_vectors("standard-history-3.json", standard_history_3_counts);
+}
+
+/// standard_history_test.go TestStandardHistoryReadersRefuseTheOtherToken.
+#[test]
+fn standard_history_readers_refuse_the_other_token() {
+    type Reader = fn(&[u8]) -> Result<(Vec<BandCount>, Disputes), capsule_engine::admission::Error>;
+    let pairs: [(&str, Reader); 2] =
+        [("standard-history.json", standard_history_3_counts), ("standard-history-3.json", standard_history_counts)];
+    for (file, read) in pairs {
+        let set: Value = serde_json::from_slice(&std::fs::read(vector_dir().join(file)).unwrap()).unwrap();
+        let mut n = 0;
+        for c in set["cases"].as_array().unwrap() {
+            if c.get("expected").is_none() {
+                continue;
+            }
+            n += 1;
+            match read(c["artifact"].as_str().unwrap().as_bytes()) {
+                Err(e) => assert!(e.0.contains("derivation is"), "{file} {}: {e}", c["case"]),
+                Ok(_) => panic!("{file} {}: read, want a derivation refusal", c["case"]),
+            }
+        }
+        assert!(n > 0, "{file}: no passing cards");
+    }
+}
+
+type Reader = fn(&[u8]) -> Result<(Vec<BandCount>, Disputes), capsule_engine::admission::Error>;
+
+fn run_standard_history_vectors(file: &str, read: Reader) {
+    let raw = std::fs::read(vector_dir().join(file)).unwrap();
     let set: Value = serde_json::from_slice(&raw).unwrap();
     let cases = set["cases"].as_array().unwrap();
-    assert!(!cases.is_empty(), "no standard_history/1 vectors");
+    assert!(!cases.is_empty(), "no vectors in {file}");
     for c in cases {
         let name = c["case"].as_str().unwrap();
-        let got = standard_history_counts(c["artifact"].as_str().unwrap().as_bytes());
+        let got = read(c["artifact"].as_str().unwrap().as_bytes());
         match c.get("expected") {
             None => {
                 let want = c["want"].as_str().unwrap();
