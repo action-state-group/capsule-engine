@@ -418,6 +418,10 @@ fn witness_label(card: &Card, p: &Pack) -> &'static str {
     let w = card.witness.as_str();
     if !w.is_empty() && trusts(&p.trust_roots.witnesses, w) {
         LABEL_WITNESSED
+    } else if card.receipts.is_some_and(|r| r.counted > 0) {
+        // `witness` names the latest checkpoint's witness only; a receipt the
+        // caller counted on an earlier checkpoint also witnesses the log.
+        LABEL_WITNESSED
     } else if !w.is_empty() || card.receipts.is_some_and(|r| r.presented > 0) {
         LABEL_UNKNOWN_WITNESS
     } else {

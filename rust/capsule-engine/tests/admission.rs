@@ -244,8 +244,8 @@ fn decode_input(raw: &Value) -> Inputs {
         Pin { log_size: int(p, "log_size"), digest: text(p, "digest") }
     });
     input.streams = null_or(v, "streams").map(|s| {
-        let s = object(s, &["pinned", "dropped", "new"], "streams");
-        Streams { pinned: int(s, "pinned"), dropped: int(s, "dropped"), new: int(s, "new") }
+        let s = object(s, &["pinned", "dropped"], "streams");
+        Streams { pinned: int(s, "pinned"), dropped: int(s, "dropped") }
     });
     input.selection = Selection {
         state: text(selection, "state"),

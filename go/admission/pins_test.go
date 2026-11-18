@@ -53,8 +53,9 @@ func TestWitnessLabel(t *testing.T) {
 		label string
 	}{
 		{"a counted receipt under a configured witness", Card{Witness: "witness-a"}, LabelWitnessed},
+		{"a counted receipt on an earlier checkpoint only", Card{Receipts: &Receipts{Counted: 1, Presented: 1, Checkpoints: 2}}, LabelWitnessed},
 		{"no receipt", Card{}, LabelUnwitnessed},
-		{"no receipt, receipts nil and none presented", Card{Receipts: &Receipts{Checkpoints: 2}}, LabelUnwitnessed},
+		{"no receipt presented, receipts counted none", Card{Receipts: &Receipts{Checkpoints: 2}}, LabelUnwitnessed},
 		{"receipts presented and none counted", Card{Receipts: &Receipts{Presented: 2, Checkpoints: 2}}, LabelUnknownWitness},
 		{"a witness the pack does not configure", Card{Witness: "witness-x"}, LabelUnknownWitness},
 	} {
@@ -101,7 +102,7 @@ func TestBehindPin(t *testing.T) {
 func TestDroppedStreams(t *testing.T) {
 	p := pinsPack(t)
 	in := pinsInputs(Card{})
-	in.Streams = &Streams{Pinned: 2, Dropped: 1, New: 1}
+	in.Streams = &Streams{Pinned: 2, Dropped: 1}
 	r := rowOf(t, Evaluate(p, in), "streams")
 	if r.Result != Fail || *r.Count != 1 || *r.Denominator != 2 {
 		t.Errorf("one of two pinned streams dropped: %+v", r)

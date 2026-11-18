@@ -108,7 +108,6 @@ type wireInputs struct {
 	Streams *struct {
 		Pinned  int64 `json:"pinned"`
 		Dropped int64 `json:"dropped"`
-		New     int64 `json:"new"`
 	} `json:"streams"`
 }
 
@@ -155,7 +154,7 @@ func DecodeInputs(raw []byte) (Inputs, error) {
 		in.Pin = &Pin{LogSize: v.Pin.LogSize, Digest: v.Pin.Digest}
 	}
 	if v.Streams != nil {
-		in.Streams = &Streams{Pinned: v.Streams.Pinned, Dropped: v.Streams.Dropped, New: v.Streams.New}
+		in.Streams = &Streams{Pinned: v.Streams.Pinned, Dropped: v.Streams.Dropped}
 	}
 	if v.Card.Claims != nil {
 		in.Card.Claims = &Claims{Held: v.Card.Claims.Held, Total: v.Card.Claims.Total}

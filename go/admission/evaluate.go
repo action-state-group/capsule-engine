@@ -54,11 +54,12 @@ type Pin struct {
 }
 
 // Streams counts a commitment's streams against the asker's pins for one
-// key_id: Pinned of them are pinned, Dropped of those are missing from the
-// current commitment, and New are in it with no pin. A log restarted under a
-// new stream name is a dropped stream and a new one, never a continuing one.
+// key_id: Pinned of them are pinned and Dropped of those are missing from the
+// current commitment. A stream in the commitment with no pin is new; it has
+// no pin to fail, so nothing reads it. A log restarted under a new stream
+// name is a dropped stream, never a continuing one.
 type Streams struct {
-	Pinned, Dropped, New int64
+	Pinned, Dropped int64
 }
 
 // Checkpoint is one checkpoint a card shows: its log size and digest.
@@ -159,8 +160,10 @@ type Receipts struct {
 	Counted     int64
 	Checkpoints int64
 	// Presented is the number of receipts the card carries, counted or
-	// not. Receipts that were presented and none counted label the card
-	// unknown_witness, not unwitnessed.
+	// not. The caller fills it; left at zero, a card whose receipts none
+	// counted reads unwitnessed, not unknown_witness. Receipts that were
+	// presented and none counted label the card unknown_witness. Counted is
+	// the caller's count under its own witness keys.
 	Presented int64
 }
 
@@ -761,12 +764,16 @@ func periodsCounted(r Row, periods []ServedPeriod) RowResult {
 }
 
 // witnessLabel derives a verified card's witness label from what the caller
-// counted: a counted receipt (Witness) under a configured key is witnessed;
+// counted: a counted receipt (Witness, or Receipts.Counted) is witnessed;
 // a receipt that was presented, or a witness the pack does not configure,
 // with none counting is unknown_witness; no receipt is unwitnessed.
 func witnessLabel(c Card, roots TrustRoots) string {
 	switch {
 	case c.Witness != "" && contains(roots.Witnesses, c.Witness):
+		return LabelWitnessed
+	case c.Receipts != nil && c.Receipts.Counted > 0:
+		// Witness names the latest checkpoint's witness only; a receipt the
+		// caller counted on an earlier checkpoint also witnesses the log.
 		return LabelWitnessed
 	case c.Witness != "" || (c.Receipts != nil && c.Receipts.Presented > 0):
 		return LabelUnknownWitness

@@ -5763,8 +5763,51 @@
     },
     "streams": {
      "pinned": 2,
-     "dropped": 0,
-     "new": 0
+     "dropped": 0
+    }
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T1",
+    "block_sha256": "03ec8fea5daa36e3ad27719a40fe7c203e52ea5e64799e6c8ec054c5f4f9e60f"
+   }
+  },
+  {
+   "case": "pins: witnessed-by-an-earlier-checkpoint-receipt",
+   "pack": "packs/pins.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "log_key_accepted": true,
+     "receipts": {
+      "counted": 1,
+      "checkpoints": 2,
+      "presented": 1
+     },
+     "checkpoints": [
+      {
+       "log_size": 19,
+       "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      {
+       "log_size": 25,
+       "digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      }
+     ]
+    },
+    "pin": {
+     "log_size": 19,
+     "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "streams": {
+     "pinned": 2,
+     "dropped": 0
     }
    },
    "expected": {
@@ -5803,8 +5846,7 @@
     },
     "streams": {
      "pinned": 2,
-     "dropped": 0,
-     "new": 0
+     "dropped": 0
     }
    },
    "expected": {
@@ -5848,8 +5890,7 @@
     },
     "streams": {
      "pinned": 2,
-     "dropped": 0,
-     "new": 0
+     "dropped": 0
     }
    },
    "expected": {
@@ -5889,8 +5930,7 @@
     },
     "streams": {
      "pinned": 2,
-     "dropped": 0,
-     "new": 0
+     "dropped": 0
     }
    },
    "expected": {
@@ -5930,8 +5970,7 @@
     },
     "streams": {
      "pinned": 2,
-     "dropped": 0,
-     "new": 0
+     "dropped": 0
     }
    },
    "expected": {
@@ -5970,8 +6009,7 @@
     },
     "streams": {
      "pinned": 2,
-     "dropped": 0,
-     "new": 0
+     "dropped": 0
     }
    },
    "expected": {
@@ -6012,8 +6050,7 @@
     },
     "streams": {
      "pinned": 2,
-     "dropped": 0,
-     "new": 0
+     "dropped": 0
     }
    },
    "expected": {
@@ -6053,8 +6090,7 @@
     },
     "streams": {
      "pinned": 2,
-     "dropped": 1,
-     "new": 1
+     "dropped": 1
     }
    },
    "expected": {
@@ -6090,8 +6126,7 @@
     },
     "streams": {
      "pinned": 0,
-     "dropped": 0,
-     "new": 1
+     "dropped": 0
     }
    },
    "expected": {
@@ -6127,8 +6162,7 @@
     },
     "streams": {
      "pinned": 2,
-     "dropped": 0,
-     "new": 0
+     "dropped": 0
     }
    },
    "expected": {
@@ -6168,8 +6202,7 @@
     },
     "streams": {
      "pinned": 2,
-     "dropped": 0,
-     "new": 0
+     "dropped": 0
     }
    },
    "expected": {
@@ -6205,8 +6238,7 @@
     },
     "streams": {
      "pinned": 2,
-     "dropped": 0,
-     "new": 0
+     "dropped": 0
     }
    },
    "expected": {
@@ -6236,8 +6268,7 @@
     },
     "streams": {
      "pinned": 2,
-     "dropped": 0,
-     "new": 0
+     "dropped": 0
     }
    },
    "expected": {

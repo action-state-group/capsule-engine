@@ -183,13 +183,12 @@ pub struct Pin {
 }
 
 /// A commitment's streams against the asker's pins for one key_id: `pinned`
-/// are pinned, `dropped` of those are missing from the current commitment,
-/// `new` are in it with no pin (evaluate.go Streams).
+/// are pinned and `dropped` of those are missing from the current commitment
+/// (evaluate.go Streams). A stream with no pin is new and nothing reads it.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct Streams {
     pub pinned: i64,
     pub dropped: i64,
-    pub new: i64,
 }
 
 /// One checkpoint a card shows: its log size and digest (evaluate.go
