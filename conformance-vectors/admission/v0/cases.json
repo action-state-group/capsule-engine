@@ -5732,6 +5732,520 @@
     "tier": "T1",
     "block_sha256": "93e6617b45be67084b106fd803dc68d325fdd10b7aa6ac6389c01fcf7d14bc28"
    }
+  },
+  {
+   "case": "pins: witnessed-accepted-pinned-goes",
+   "pack": "packs/pins.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "witness": "witness-a",
+     "log_key_accepted": true,
+     "checkpoints": [
+      {
+       "log_size": 19,
+       "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      {
+       "log_size": 25,
+       "digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      }
+     ]
+    },
+    "pin": {
+     "log_size": 19,
+     "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "streams": {
+     "pinned": 2,
+     "dropped": 0,
+     "new": 0
+    }
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T1",
+    "block_sha256": "03ec8fea5daa36e3ad27719a40fe7c203e52ea5e64799e6c8ec054c5f4f9e60f"
+   }
+  },
+  {
+   "case": "pins: unwitnessed-labelled",
+   "pack": "packs/pins.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "log_key_accepted": true,
+     "checkpoints": [
+      {
+       "log_size": 19,
+       "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      {
+       "log_size": 25,
+       "digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      }
+     ]
+    },
+    "pin": {
+     "log_size": 19,
+     "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "streams": {
+     "pinned": 2,
+     "dropped": 0,
+     "new": 0
+    }
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "a3ea821482bdeae21952896946bbb8a8c9d33c36b77edf405c5b3efefcb51fe7"
+   }
+  },
+  {
+   "case": "pins: unknown-witness-receipts-none-count",
+   "pack": "packs/pins.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "log_key_accepted": true,
+     "checkpoints": [
+      {
+       "log_size": 19,
+       "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      {
+       "log_size": 25,
+       "digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      }
+     ],
+     "receipts": {
+      "counted": 0,
+      "checkpoints": 2,
+      "presented": 2
+     }
+    },
+    "pin": {
+     "log_size": 19,
+     "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "streams": {
+     "pinned": 2,
+     "dropped": 0,
+     "new": 0
+    }
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "186cfc3644caa99c4e539b34430f263ff729c20ed2719fdcd008583dd2558876"
+   }
+  },
+  {
+   "case": "pins: unknown-witness-unconfigured-key",
+   "pack": "packs/pins.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "witness": "witness-x",
+     "log_key_accepted": true,
+     "checkpoints": [
+      {
+       "log_size": 19,
+       "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      {
+       "log_size": 25,
+       "digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      }
+     ]
+    },
+    "pin": {
+     "log_size": 19,
+     "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "streams": {
+     "pinned": 2,
+     "dropped": 0,
+     "new": 0
+    }
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "186cfc3644caa99c4e539b34430f263ff729c20ed2719fdcd008583dd2558876"
+   }
+  },
+  {
+   "case": "pins: log-key-not-accepted",
+   "pack": "packs/pins.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "witness": "witness-a",
+     "log_key_accepted": false,
+     "checkpoints": [
+      {
+       "log_size": 19,
+       "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      {
+       "log_size": 25,
+       "digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      }
+     ]
+    },
+    "pin": {
+     "log_size": 19,
+     "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "streams": {
+     "pinned": 2,
+     "dropped": 0,
+     "new": 0
+    }
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "3e970f59c566a358dc15d1aefbf6e7b386c28e34414a6914353d267f2c36025a"
+   }
+  },
+  {
+   "case": "pins: log-key-undecided",
+   "pack": "packs/pins.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "witness": "witness-a",
+     "checkpoints": [
+      {
+       "log_size": 19,
+       "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      {
+       "log_size": 25,
+       "digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      }
+     ]
+    },
+    "pin": {
+     "log_size": 19,
+     "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "streams": {
+     "pinned": 2,
+     "dropped": 0,
+     "new": 0
+    }
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "c8cd4eeaee19c914825e20d88b45623515ecbad9a92c93a8345d3ae370ba35ab"
+   }
+  },
+  {
+   "case": "pins: card-not-verified-reads-nothing",
+   "pack": "packs/pins.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "unverifiable",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "witness": "witness-a",
+     "log_key_accepted": true,
+     "checkpoints": [
+      {
+       "log_size": 19,
+       "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      {
+       "log_size": 25,
+       "digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      }
+     ],
+     "reason": "anchor_match"
+    },
+    "pin": {
+     "log_size": 19,
+     "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "streams": {
+     "pinned": 2,
+     "dropped": 0,
+     "new": 0
+    }
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "6a0a9c05659c5485b8faac683c813be7a758f9364e6c015cac0a761bdb6f5205"
+   }
+  },
+  {
+   "case": "pins: first-use-dropped-and-new",
+   "pack": "packs/pins.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "witness": "witness-a",
+     "log_key_accepted": true,
+     "checkpoints": [
+      {
+       "log_size": 19,
+       "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      {
+       "log_size": 25,
+       "digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      }
+     ]
+    },
+    "pin": {
+     "log_size": 19,
+     "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "streams": {
+     "pinned": 2,
+     "dropped": 1,
+     "new": 1
+    }
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "668fefcaa704bf937780910da4c1082ee9cd35eb837ee42f34826c383044ccc4"
+   }
+  },
+  {
+   "case": "pins: new-stream-has-no-pin",
+   "pack": "packs/pins.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "witness": "witness-a",
+     "log_key_accepted": true,
+     "checkpoints": [
+      {
+       "log_size": 19,
+       "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      {
+       "log_size": 25,
+       "digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      }
+     ]
+    },
+    "streams": {
+     "pinned": 0,
+     "dropped": 0,
+     "new": 1
+    }
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "f17538aa28a1bceb902c43b191644157844b29be2c5abbc520f22040e128d124"
+   }
+  },
+  {
+   "case": "pins: short-card-behind-pin",
+   "pack": "packs/pins.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "witness": "witness-a",
+     "log_key_accepted": true,
+     "checkpoints": [
+      {
+       "log_size": 14,
+       "digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      }
+     ]
+    },
+    "pin": {
+     "log_size": 19,
+     "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "streams": {
+     "pinned": 2,
+     "dropped": 0,
+     "new": 0
+    }
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "ca00fc048cbd5183ffcc7d2e76a3bd06e420f19a62ea240214a66ae362a42f92"
+   }
+  },
+  {
+   "case": "pins: fork-at-pin-log-size",
+   "pack": "packs/pins.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "witness": "witness-a",
+     "log_key_accepted": true,
+     "checkpoints": [
+      {
+       "log_size": 19,
+       "digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      },
+      {
+       "log_size": 25,
+       "digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      }
+     ]
+    },
+    "pin": {
+     "log_size": 19,
+     "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "streams": {
+     "pinned": 2,
+     "dropped": 0,
+     "new": 0
+    }
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "ca00fc048cbd5183ffcc7d2e76a3bd06e420f19a62ea240214a66ae362a42f92"
+   }
+  },
+  {
+   "case": "pins: card-ends-at-pin",
+   "pack": "packs/pins.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "witness": "witness-a",
+     "log_key_accepted": true,
+     "checkpoints": [
+      {
+       "log_size": 19,
+       "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      }
+     ]
+    },
+    "pin": {
+     "log_size": 19,
+     "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "streams": {
+     "pinned": 2,
+     "dropped": 0,
+     "new": 0
+    }
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T1",
+    "block_sha256": "03ec8fea5daa36e3ad27719a40fe7c203e52ea5e64799e6c8ec054c5f4f9e60f"
+   }
+  },
+  {
+   "case": "pins: no-checkpoints-shown",
+   "pack": "packs/pins.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "witness": "witness-a",
+     "log_key_accepted": true
+    },
+    "pin": {
+     "log_size": 19,
+     "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "streams": {
+     "pinned": 2,
+     "dropped": 0,
+     "new": 0
+    }
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "b5b403631defd2cc6d3e1258fafe29c519886ac365abac7c98c31689fc097cc5"
+   }
   }
  ]
 }

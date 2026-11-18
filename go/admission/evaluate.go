@@ -38,6 +38,33 @@ type Inputs struct {
 	// AsksMade is how many asks this counterparty has had in the pack's
 	// budget window.
 	AsksMade int
+	// Pin is the asker's first-use pin for this card's (key_id, stream): the
+	// first checkpoint it saw. nil when it holds none, which is a stream not
+	// seen before. The asker keeps the pin; the evaluator never writes one.
+	Pin *Pin
+	// Streams are the commitment's streams set against the asker's pins;
+	// nil when the card did not come with a commitment.
+	Streams *Streams
+}
+
+// Pin is a first-use pin: the checkpoint's log size and digest.
+type Pin struct {
+	LogSize int64
+	Digest  string
+}
+
+// Streams counts a commitment's streams against the asker's pins for one
+// key_id: Pinned of them are pinned, Dropped of those are missing from the
+// current commitment, and New are in it with no pin. A log restarted under a
+// new stream name is a dropped stream and a new one, never a continuing one.
+type Streams struct {
+	Pinned, Dropped, New int64
+}
+
+// Checkpoint is one checkpoint a card shows: its log size and digest.
+type Checkpoint struct {
+	LogSize int64
+	Digest  string
 }
 
 // Platform holds the platform's own facts about the counterparty.
@@ -103,7 +130,25 @@ type Card struct {
 	// decides State; the evaluator reads it only for card.not_stapled
 	// (capsule-engine#277).
 	Stapled bool
+	// LogKeyAccepted is nil when the caller has not decided, true when it
+	// accepts the checkpoint_key of the log this card shows for this
+	// responder. A label and a key age describe that log, not the responder:
+	// nothing in a card binds its log to key_id, and another commitment can
+	// staple the same public card (IP §6.2.1, P-31). The caller decides it
+	// as it decides Controller; the evaluator reads it as given.
+	LogKeyAccepted *bool
+	// Checkpoints are the checkpoints the card shows, as the caller
+	// verified them; read by card.not_behind_pin.
+	Checkpoints []Checkpoint
 }
+
+// Witness labels: what a verifier derives about a card's log, never what
+// the responder says. Not a failure by themselves; a pack decides.
+const (
+	LabelWitnessed      = "witnessed"
+	LabelUnwitnessed    = "unwitnessed"
+	LabelUnknownWitness = "unknown_witness"
+)
 
 // Receipts are the witness receipts on a card's checkpoints (ISH §5.2): the
 // receipts the caller verified offline under a witness key its policy
@@ -113,6 +158,10 @@ type Card struct {
 type Receipts struct {
 	Counted     int64
 	Checkpoints int64
+	// Presented is the number of receipts the card carries, counted or
+	// not. Receipts that were presented and none counted label the card
+	// unknown_witness, not unwitnessed.
+	Presented int64
 }
 
 // Disputes are the disputes others raised about the counterparty that its
@@ -223,6 +272,8 @@ type RowResult struct {
 	// one earned: the highest decade, in the deal's band unit, the earned
 	// history covers (the earned band plus the step).
 	earned *int
+	// Label is set on a card.witness_label row.
+	Label string
 	// Reason is set on a card.verified row that fails with a reason from
 	// InferenceServiceHistoryProperties.
 	Reason string
@@ -558,6 +609,10 @@ var predicates = map[string]predicate{
 	"card.fresh":                        {SourceCard, []string{"max_age_s"}},
 	"card.key_age":                      {SourceCard, []string{"min_days"}},
 	"card.witnessed":                    {SourceCard, nil},
+	"card.witness_label":                {SourceCard, nil},
+	"card.log_key_accepted":             {SourceCard, nil},
+	"card.not_behind_pin":               {SourceCard, nil},
+	"card.no_dropped_stream":            {SourceCard, nil},
 	"card.claims_held":                  {SourceCard, []string{"min"}},
 	"card.controller_declared":          {SourceCard, nil},
 	"card.controller_trusted":           {SourceCard, nil},
@@ -705,6 +760,35 @@ func periodsCounted(r Row, periods []ServedPeriod) RowResult {
 	return res
 }
 
+// witnessLabel derives a verified card's witness label from what the caller
+// counted: a counted receipt (Witness) under a configured key is witnessed;
+// a receipt that was presented, or a witness the pack does not configure,
+// with none counting is unknown_witness; no receipt is unwitnessed.
+func witnessLabel(c Card, roots TrustRoots) string {
+	switch {
+	case c.Witness != "" && contains(roots.Witnesses, c.Witness):
+		return LabelWitnessed
+	case c.Witness != "" || (c.Receipts != nil && c.Receipts.Presented > 0):
+		return LabelUnknownWitness
+	}
+	return LabelUnwitnessed
+}
+
+// behindPin reports whether a card must not be relied on against a held
+// pin: its last checkpoint is earlier than the pin, or it shows a different
+// digest at the pin's log size (a fork). Consistency from the pin to a later
+// checkpoint is checked by the caller, which marks the card unverifiable.
+func behindPin(cps []Checkpoint, pin Pin) bool {
+	last := int64(-1)
+	for _, c := range cps {
+		last = max(last, c.LogSize)
+		if c.LogSize == pin.LogSize && c.Digest != pin.Digest {
+			return true
+		}
+	}
+	return last < pin.LogSize
+}
+
 // maxSafeInteger is 2^53 − 1, the largest count every JSON reader keeps.
 const maxSafeInteger = 1<<53 - 1
 
@@ -770,6 +854,31 @@ func readRow(r Row, in Inputs, accept map[string]Unit, roots TrustRoots) RowResu
 				return RowResult{Result: NotRead}
 			}
 			return RowResult{Result: of(in.Card.Witness != "" && contains(roots.Witnesses, in.Card.Witness))}
+		case "card.witness_label":
+			// The label is the verifier's own: a counted receipt under a
+			// witness key in the trust roots is witnessed; receipts none of
+			// which count are unknown_witness (a responder can mint receipts
+			// of its own); no receipt is unwitnessed.
+			if in.Card.State != CardVerified {
+				return RowResult{Result: NotRead}
+			}
+			label := witnessLabel(in.Card, roots)
+			return RowResult{Result: of(label == LabelWitnessed), Label: label}
+		case "card.log_key_accepted":
+			if in.Card.State != CardVerified || in.Card.LogKeyAccepted == nil {
+				return RowResult{Result: NotRead}
+			}
+			return RowResult{Result: of(*in.Card.LogKeyAccepted)}
+		case "card.not_behind_pin":
+			if in.Card.State != CardVerified || in.Pin == nil || len(in.Card.Checkpoints) == 0 {
+				return RowResult{Result: NotRead}
+			}
+			return RowResult{Result: of(!behindPin(in.Card.Checkpoints, *in.Pin))}
+		case "card.no_dropped_stream":
+			if in.Card.State != CardVerified || in.Streams == nil {
+				return RowResult{Result: NotRead}
+			}
+			return counted(of(in.Streams.Dropped == 0), in.Streams.Dropped, in.Streams.Pinned)
 		case "card.claims_held":
 			if in.Card.State != CardVerified || in.Card.Claims == nil {
 				return RowResult{Result: NotRead}

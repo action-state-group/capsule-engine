@@ -31,6 +31,9 @@ func (d Decision) Block() canon.Value {
 		if r.Denominator != nil {
 			ms = append(ms, canon.M("denominator", canon.Int(*r.Denominator)))
 		}
+		if r.Label != "" {
+			ms = append(ms, canon.M("label", canon.Str(r.Label)))
+		}
 		if r.Reason != "" {
 			ms = append(ms, canon.M("reason", canon.Str(r.Reason)))
 		}

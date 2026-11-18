@@ -167,6 +167,37 @@ pub struct Inputs {
     pub asks: BTreeMap<String, String>,
     /// How many asks this counterparty has had in the pack's budget window.
     pub asks_made: i64,
+    /// The asker's first-use pin for this card's (key_id, stream): the first
+    /// checkpoint it saw. None when it holds none, a stream not seen before.
+    pub pin: Option<Pin>,
+    /// The commitment's streams set against the asker's pins; None when the
+    /// card did not come with a commitment.
+    pub streams: Option<Streams>,
+}
+
+/// A first-use pin: the checkpoint's log size and digest (evaluate.go Pin).
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct Pin {
+    pub log_size: i64,
+    pub digest: String,
+}
+
+/// A commitment's streams against the asker's pins for one key_id: `pinned`
+/// are pinned, `dropped` of those are missing from the current commitment,
+/// `new` are in it with no pin (evaluate.go Streams).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct Streams {
+    pub pinned: i64,
+    pub dropped: i64,
+    pub new: i64,
+}
+
+/// One checkpoint a card shows: its log size and digest (evaluate.go
+/// Checkpoint).
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct Checkpoint {
+    pub log_size: i64,
+    pub digest: String,
 }
 
 impl Inputs {
@@ -188,6 +219,8 @@ impl Inputs {
             judged: BTreeMap::new(),
             asks: BTreeMap::new(),
             asks_made: 0,
+            pin: None,
+            streams: None,
         }
     }
 }
@@ -254,7 +287,22 @@ pub struct Card {
     /// as the answer to our ask. The caller decides it, as it decides
     /// `state`; read only by `card.not_stapled` (capsule-engine#277).
     pub stapled: bool,
+    /// None when the caller has not decided, Some(true) when it accepts the
+    /// checkpoint_key of the log this card shows for this responder. A label
+    /// and a key age describe that log, not the responder (IP §6.2.1, P-31);
+    /// the caller decides it as it decides `controller`
+    /// (capsule-engine#304).
+    pub log_key_accepted: Option<bool>,
+    /// The checkpoints the card shows, as the caller verified them; read by
+    /// `card.not_behind_pin`.
+    pub checkpoints: Vec<Checkpoint>,
 }
+
+/// Witness labels: what a verifier derives about a card's log, never what
+/// the responder says (evaluate.go LabelWitnessed and the others).
+pub const LABEL_WITNESSED: &str = "witnessed";
+pub const LABEL_UNWITNESSED: &str = "unwitnessed";
+pub const LABEL_UNKNOWN_WITNESS: &str = "unknown_witness";
 
 /// The witness receipts on a card's checkpoints (evaluate.go Receipts; ISH
 /// §5.2): those the caller verified offline under a configured witness key,
@@ -264,6 +312,9 @@ pub struct Card {
 pub struct Receipts {
     pub counted: i64,
     pub checkpoints: i64,
+    /// The receipts the card carries, counted or not: presented and none
+    /// counted labels the card unknown_witness, not unwitnessed.
+    pub presented: i64,
 }
 
 /// The disputes others raised about the counterparty that its card shows:

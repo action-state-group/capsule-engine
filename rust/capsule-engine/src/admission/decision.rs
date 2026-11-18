@@ -68,6 +68,8 @@ pub struct RowResult {
     /// highest decade, in the deal's band unit, the earned history covers
     /// (the earned band plus the step).
     pub(crate) earned: Option<i64>,
+    /// Set on a card.witness_label row that read the card.
+    pub label: String,
     /// Set on a card.verified row that fails with a reason from
     /// INFERENCE_SERVICE_HISTORY_PROPERTIES.
     pub reason: String,
@@ -158,6 +160,9 @@ impl Decision {
                 }
                 if let Some(d) = r.denominator {
                     ms.push(("denominator".to_string(), Value::Int(d)));
+                }
+                if !r.label.is_empty() {
+                    ms.push(("label".to_string(), canon::s(&r.label)));
                 }
                 if !r.reason.is_empty() {
                     ms.push(("reason".to_string(), canon::s(&r.reason)));

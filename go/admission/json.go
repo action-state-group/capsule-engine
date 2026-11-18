@@ -30,7 +30,12 @@ type wireInputs struct {
 			Held  int64 `json:"held"`
 			Total int64 `json:"total"`
 		} `json:"claims"`
-		Stapled  bool `json:"stapled"`
+		Stapled        bool  `json:"stapled"`
+		LogKeyAccepted *bool `json:"log_key_accepted"`
+		Checkpoints    []struct {
+			LogSize int64  `json:"log_size"`
+			Digest  string `json:"digest"`
+		} `json:"checkpoints"`
 		Disputes *struct {
 			Open int64 `json:"open"`
 			Of   int64 `json:"of"`
@@ -96,6 +101,15 @@ type wireInputs struct {
 	} `json:"judged"`
 	Asks     map[string]string `json:"asks"`
 	AsksMade int               `json:"asks_made"`
+	Pin      *struct {
+		LogSize int64  `json:"log_size"`
+		Digest  string `json:"digest"`
+	} `json:"pin"`
+	Streams *struct {
+		Pinned  int64 `json:"pinned"`
+		Dropped int64 `json:"dropped"`
+		New     int64 `json:"new"`
+	} `json:"streams"`
 }
 
 // DecodeInputs reads Inputs from their JSON form. Unknown members and
@@ -132,6 +146,16 @@ func DecodeInputs(raw []byte) (Inputs, error) {
 		Selection: Selection{State: v.Selection.State},
 		Operator:  Operator{DenyListed: v.Operator.DenyListed, AllowListed: v.Operator.AllowListed},
 		Subject:   v.Subject, Asks: v.Asks, AsksMade: v.AsksMade,
+	}
+	in.Card.LogKeyAccepted = v.Card.LogKeyAccepted
+	for _, c := range v.Card.Checkpoints {
+		in.Card.Checkpoints = append(in.Card.Checkpoints, Checkpoint{LogSize: c.LogSize, Digest: c.Digest})
+	}
+	if v.Pin != nil {
+		in.Pin = &Pin{LogSize: v.Pin.LogSize, Digest: v.Pin.Digest}
+	}
+	if v.Streams != nil {
+		in.Streams = &Streams{Pinned: v.Streams.Pinned, Dropped: v.Streams.Dropped, New: v.Streams.New}
 	}
 	if v.Card.Claims != nil {
 		in.Card.Claims = &Claims{Held: v.Card.Claims.Held, Total: v.Card.Claims.Total}
