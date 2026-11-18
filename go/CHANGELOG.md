@@ -5,6 +5,7 @@ and `portedDefinitions` (`guard/engine.go`).
 
 ## Unreleased
 
+- Added (capsule-engine#304): the admission predicates `card.witness_label` (records the verifier's label, `witnessed`, `unwitnessed` or `unknown_witness`, on its row), `card.log_key_accepted`, `card.not_behind_pin` and `card.no_dropped_stream`, with `Inputs.Pin`, `Inputs.Streams`, `Card.LogKeyAccepted`, `Card.Checkpoints` and `Receipts.Presented`. The rust crate decides the same shared vectors (`packs/pins`). No existing decision block changes.
 - Added (capsule-engine#298): `StandardHistory3Counts` reads the ladder's inputs from a `standard_history/3` card (agent-action-capsule spec/standard-history-v0.md §11, a107d4af). `StandardHistoryCounts` is unchanged for `/1` and refuses a `/3` card by its derivation; `/3` refuses any other token the same way.
 
 ## 0.4.0 — 2026-11-17

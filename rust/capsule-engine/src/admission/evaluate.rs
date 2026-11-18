@@ -8,8 +8,9 @@ use super::band::{add, fresh, quantity, value_band, HOUR, SECOND};
 use super::decision::{AskOut, Coverage, Decision, Effect, NotCounted, PackRef, RowResult, RowStatus};
 use super::pack::{OnFail, Pack, Row, SOURCE_JUDGED};
 use super::{
-    Inputs, Served, ServedPeriod, Timestamp, Verdict, CARD_UNVERIFIABLE, CARD_VERIFIED,
-    INFERENCE_SERVICE_HISTORY_PROPERTIES, SUPPRESSED_BELOW_FLOOR, SUPPRESSED_COMPLEMENTARY,
+    Card, Checkpoint, Inputs, Pin, Served, ServedPeriod, Timestamp, Verdict, CARD_UNVERIFIABLE, CARD_VERIFIED,
+    INFERENCE_SERVICE_HISTORY_PROPERTIES, LABEL_UNKNOWN_WITNESS, LABEL_UNWITNESSED, LABEL_WITNESSED,
+    SUPPRESSED_BELOW_FLOOR, SUPPRESSED_COMPLEMENTARY,
 };
 use crate::canon;
 
@@ -329,6 +330,7 @@ fn result(status: RowStatus) -> RowResult {
         effect: Effect::None,
         held: false,
         earned: None,
+        label: String::new(),
         reason: String::new(),
         not_counted: None,
     }
@@ -409,6 +411,37 @@ fn param(r: &Row, k: &str) -> i64 {
     r.params.get(k).copied().unwrap_or(0)
 }
 
+/// evaluate.go witnessLabel: a counted receipt under a configured witness is
+/// witnessed; a receipt presented, or a witness the pack does not configure,
+/// with none counting is unknown_witness; no receipt is unwitnessed.
+fn witness_label(card: &Card, p: &Pack) -> &'static str {
+    let w = card.witness.as_str();
+    if !w.is_empty() && trusts(&p.trust_roots.witnesses, w) {
+        LABEL_WITNESSED
+    } else if card.receipts.is_some_and(|r| r.counted > 0) {
+        // `witness` names the latest checkpoint's witness only; a receipt the
+        // caller counted on an earlier checkpoint also witnesses the log.
+        LABEL_WITNESSED
+    } else if !w.is_empty() || card.receipts.is_some_and(|r| r.presented > 0) {
+        LABEL_UNKNOWN_WITNESS
+    } else {
+        LABEL_UNWITNESSED
+    }
+}
+
+/// evaluate.go behindPin: the card's last checkpoint is earlier than the
+/// pin, or it shows another digest at the pin's log size (a fork).
+fn behind_pin(cps: &[Checkpoint], pin: &Pin) -> bool {
+    let mut last = -1;
+    for c in cps {
+        last = last.max(c.log_size);
+        if c.log_size == pin.log_size && c.digest != pin.digest {
+            return true;
+        }
+    }
+    last < pin.log_size
+}
+
 /// evaluate.go readRow: one row's result; its effect is the caller's.
 fn read_row(r: &Row, input: &Inputs, p: &Pack) -> RowResult {
     let not_read = || result(RowStatus::NotRead);
@@ -443,6 +476,21 @@ fn read_row(r: &Row, input: &Inputs, p: &Pack) -> RowResult {
             let w = &input.card.witness;
             result(of(!w.is_empty() && trusts(&p.trust_roots.witnesses, w)))
         }
+        "card.witness_label" if !verified => not_read(),
+        "card.witness_label" => {
+            let label = witness_label(&input.card, p);
+            RowResult { label: label.to_string(), ..result(of(label == LABEL_WITNESSED)) }
+        }
+        "card.log_key_accepted" if !verified => not_read(),
+        "card.log_key_accepted" => input.card.log_key_accepted.map_or_else(not_read, |a| result(of(a))),
+        "card.not_behind_pin" => match (&input.pin, verified, input.card.checkpoints.is_empty()) {
+            (Some(pin), true, false) => result(of(!behind_pin(&input.card.checkpoints, pin))),
+            _ => not_read(),
+        },
+        "card.no_dropped_stream" => match (&input.streams, verified) {
+            (Some(s), true) => counted(of(s.dropped == 0), s.dropped, s.pinned),
+            _ => not_read(),
+        },
         "card.claims_held" => match (&input.card.claims, verified) {
             (Some(c), true) => counted(of(c.held >= param(r, "min")), c.held, c.total),
             _ => not_read(),

@@ -11,9 +11,9 @@ use std::path::{Path, PathBuf};
 
 use capsule_engine::admission::{
     evaluate, inference_service_history_counts_for, standard_history_3_counts, standard_history_counts,
-    AdjudicationVerdict, BandCount, Card, CardCheckpoint, CardCheckpoints, Claims, CoverageAsk, Disputes, Inputs,
-    Judgement, Operator, OwnHistory, Pack, Platform, RailPin, Receipts, Selection, Served, ServedPeriod, Stake,
-    Timestamp, Vouch, INFERENCE_SERVICE_HISTORY_PROPERTIES,
+    AdjudicationVerdict, BandCount, Card, CardCheckpoint, CardCheckpoints, Checkpoint, Claims, CoverageAsk, Disputes,
+    Inputs, Judgement, Operator, OwnHistory, Pack, Pin, Platform, RailPin, Receipts, Selection, Served, ServedPeriod,
+    Stake, Streams, Timestamp, Vouch, INFERENCE_SERVICE_HISTORY_PROPERTIES,
 };
 use capsule_engine::canon;
 use serde_json::{Map, Value};
@@ -153,6 +153,8 @@ fn decode_input(raw: &Value) -> Inputs {
             "judged",
             "asks",
             "asks_made",
+            "pin",
+            "streams",
         ],
         "input",
     );
@@ -173,6 +175,8 @@ fn decode_input(raw: &Value) -> Inputs {
             "served",
             "receipts",
             "stapled",
+            "log_key_accepted",
+            "checkpoints",
         ],
         "card",
     );
@@ -190,8 +194,8 @@ fn decode_input(raw: &Value) -> Inputs {
         reason: text(card, "reason"),
         served: null_or(card, "served").map(served),
         receipts: null_or(card, "receipts").map(|r| {
-            let r = object(r, &["counted", "checkpoints"], "card.receipts");
-            Receipts { counted: int(r, "counted"), checkpoints: int(r, "checkpoints") }
+            let r = object(r, &["counted", "checkpoints", "presented"], "card.receipts");
+            Receipts { counted: int(r, "counted"), checkpoints: int(r, "checkpoints"), presented: int(r, "presented") }
         }),
         first_checkpoint_at: opt_time(&text(card, "first_checkpoint_at")),
         latest_checkpoint_at: opt_time(&text(card, "latest_checkpoint_at")),
@@ -221,7 +225,28 @@ fn decode_input(raw: &Value) -> Inputs {
             Disputes { open: int(d, "open"), of: int(d, "of") }
         }),
         stapled: opt_bool(card, "stapled").unwrap_or(false),
+        log_key_accepted: opt_bool(card, "log_key_accepted"),
+        checkpoints: null_or(card, "checkpoints")
+            .map(|cs| {
+                cs.as_array()
+                    .unwrap()
+                    .iter()
+                    .map(|c| {
+                        let c = object(c, &["log_size", "digest"], "card.checkpoints[]");
+                        Checkpoint { log_size: int(c, "log_size"), digest: text(c, "digest") }
+                    })
+                    .collect()
+            })
+            .unwrap_or_default(),
     };
+    input.pin = null_or(v, "pin").map(|p| {
+        let p = object(p, &["log_size", "digest"], "pin");
+        Pin { log_size: int(p, "log_size"), digest: text(p, "digest") }
+    });
+    input.streams = null_or(v, "streams").map(|s| {
+        let s = object(s, &["pinned", "dropped"], "streams");
+        Streams { pinned: int(s, "pinned"), dropped: int(s, "dropped") }
+    });
     input.selection = Selection {
         state: text(selection, "state"),
         unanswered_disputes: null_or(selection, "unanswered_disputes")

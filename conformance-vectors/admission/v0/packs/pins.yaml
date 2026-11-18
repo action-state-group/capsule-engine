@@ -1,0 +1,51 @@
+# A test admission pack (capsule-engine#304 conformance vectors) for the
+# judgements of a stapled history card: the witness label, the accepted log
+# key, the asker's first-use pin and dropped streams. Every row is a LIMIT row
+# from T1, so a card that fails any of them is held to T0. Every number is a
+# placeholder.
+pack_id: asg/admission_pins_test/0.1.0
+pack_version: 0.1.0
+scope:
+  kind: admission
+source: capsule-engine#304 conformance vectors
+outcomes: ["GO", "ASK", "LIMIT", "NO"]
+missing: "LIMIT"
+accept:
+  USD: {band: USD, scale: 0}
+tiers:
+  - id: T0
+    max_decade: {USD: 0}
+  - id: T1
+    max_decade: {USD: 2}
+budget:
+  max_asks: 1
+  deadline_s: 3600
+trust_roots:
+  controllers: []
+  witnesses: [witness-a]
+  judges: []
+rows:
+  - id: log-key
+    statement: The caller accepts the card's checkpoint_key as this responder's log key.
+    source: card
+    check: card.log_key_accepted
+    from: T1
+    on_fail: "LIMIT"
+  - id: label
+    statement: A witness in the trust roots receipted the card's log, so its label is witnessed.
+    source: card
+    check: card.witness_label
+    from: T1
+    on_fail: "LIMIT"
+  - id: pin
+    statement: The card reaches the asker's pin for this stream and shows no other digest at its log size.
+    source: card
+    check: card.not_behind_pin
+    from: T1
+    on_fail: "LIMIT"
+  - id: streams
+    statement: No stream the asker pinned for this key is missing from the current commitment.
+    source: card
+    check: card.no_dropped_stream
+    from: T1
+    on_fail: "LIMIT"

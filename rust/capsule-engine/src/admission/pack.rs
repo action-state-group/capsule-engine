@@ -36,13 +36,17 @@ const MAY_DECIDE_NO: [&str; 3] = [SOURCE_PLATFORM, SOURCE_OWN_HISTORY, SOURCE_OP
 
 /// evaluate.go predicates: each admission check, the source it reads and
 /// the params it takes. The list is closed and versioned with the evaluator.
-pub(crate) const PREDICATES: [(&str, &str, &[&str]); 26] = [
+pub(crate) const PREDICATES: [(&str, &str, &[&str]); 30] = [
     ("platform.attestation_not_invalid", SOURCE_PLATFORM, &[]),
     ("platform.owner_signed", SOURCE_PLATFORM, &[]),
     ("card.verified", SOURCE_CARD, &[]),
     ("card.fresh", SOURCE_CARD, &["max_age_s"]),
     ("card.key_age", SOURCE_CARD, &["min_days"]),
     ("card.witnessed", SOURCE_CARD, &[]),
+    ("card.witness_label", SOURCE_CARD, &[]),
+    ("card.log_key_accepted", SOURCE_CARD, &[]),
+    ("card.not_behind_pin", SOURCE_CARD, &[]),
+    ("card.no_dropped_stream", SOURCE_CARD, &[]),
     ("card.claims_held", SOURCE_CARD, &["min"]),
     ("card.controller_declared", SOURCE_CARD, &[]),
     ("card.controller_trusted", SOURCE_CARD, &[]),
