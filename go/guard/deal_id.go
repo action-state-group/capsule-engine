@@ -30,8 +30,7 @@ func dealOf(agentInput json.RawMessage) (deal, source string, conflict bool) {
 	if json.Unmarshal(agentInput, &top) != nil {
 		return "", "", false
 	}
-	var block map[string]json.RawMessage
-	_ = json.Unmarshal(top["x-deal-v0"], &block)
+	block, version := profileBlockOf(top)
 	dealRaw, hasDeal := block["deal_id"]
 	chainRaw, hasChain := top["chain_id"]
 	if hasDeal && hasChain && !sameJSON(dealRaw, chainRaw) {
@@ -40,6 +39,9 @@ func dealOf(agentInput json.RawMessage) (deal, source string, conflict bool) {
 	raw, src := chainRaw, chainIDMember
 	if hasDeal {
 		raw, src = dealRaw, dealIDMember
+		if version == profileV1 {
+			src = profileMember(version, "deal_id")
+		}
 	}
 	var s string
 	if (!hasDeal && !hasChain) || json.Unmarshal(raw, &s) != nil || s == "" {

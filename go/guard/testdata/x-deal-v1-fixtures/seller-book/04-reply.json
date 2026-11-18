@@ -1,0 +1,38 @@
+{
+  "fixture": "appendix-a/seller-book/04-reply.json",
+  "expect": "valid",
+  "appendix_a_line": "47",
+  "story": "The seller's reply: row 3 met.",
+  "placement": "deal_book",
+  "record": {
+    "x-deal-v1": {
+      "profile": "x-deal-v1",
+      "canonicalization": "jcs",
+      "deal_id": "deal-6a1f0c93b27d4e58",
+      "record_type": "statement",
+      "at": "2026-11-10T14:00:00Z",
+      "seq": 4,
+      "prev": {
+        "type": "deal-record",
+        "digest_alg": "SHA-256",
+        "digest": "1278127531294435a55a6bfdd3f5b6081d1b64ea36f4ec4d7c32121d1cdb8b82"
+      },
+      "agreement_ref": {
+        "type": "deal-record",
+        "digest_alg": "SHA-256",
+        "digest": "0e91d7532b004e190000bee64a29a3b15c21cfb979c137fbba30da5335ee0215"
+      },
+      "seen": "9b32191be3361dc1e2b6054ac1c56283bdec59f6c61e190e9abedeaef571f0fb"
+    },
+    "body": {
+      "statements": [
+        {
+          "row": "as_described",
+          "value": "met"
+        }
+      ]
+    }
+  },
+  "expected_digest": "91fe1a73e93c19514fdb1f50d39339db2980ec3c312718b17cf5412b23967504",
+  "record_id": "68f7d5b890bc7f0962600bc0b290ae4862ebeec02a997955b07fdd27207a943e"
+}

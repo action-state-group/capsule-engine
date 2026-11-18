@@ -1,0 +1,41 @@
+{
+  "fixture": "appendix-a/buyer-book/03-receipt.json",
+  "expect": "valid",
+  "appendix_a_line": "40",
+  "story": "The receipt record: row 2 met; it is the named record received.",
+  "placement": "deal_book",
+  "record": {
+    "x-deal-v1": {
+      "profile": "x-deal-v1",
+      "canonicalization": "jcs",
+      "deal_id": "deal-6a1f0c93b27d4e58",
+      "record_type": "statement",
+      "at": "2026-11-04T15:00:00Z",
+      "seq": 3,
+      "prev": {
+        "type": "deal-record",
+        "digest_alg": "SHA-256",
+        "digest": "82ae32c59d91fb780bc72562f64a574bb3bd5c0c18c5e11fad54317eaaf7e04c"
+      },
+      "agreement_ref": {
+        "type": "deal-record",
+        "digest_alg": "SHA-256",
+        "digest": "02419989baf62fa35ddfc95b4bf8ee154aaebaf0da7f5b6a558317462b227c85"
+      },
+      "seen": "29e4c8d3debd2f4cefca12bd034ff7e5a4f48dc76c25ca0785250b1e67f6b885",
+      "marks": [
+        "received"
+      ]
+    },
+    "body": {
+      "statements": [
+        {
+          "row": "delivered",
+          "value": "met"
+        }
+      ]
+    }
+  },
+  "expected_digest": "04977fc5221e370f5c3857db680c6d6515d1110abc982250fef04ce7e89c355c",
+  "record_id": "82ca6367f3ed817d62f90d2c3ec7ab42b1b5be35854f9cb788213e5b31ca6493"
+}

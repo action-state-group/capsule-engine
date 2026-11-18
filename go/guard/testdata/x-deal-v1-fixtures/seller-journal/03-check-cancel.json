@@ -1,0 +1,24 @@
+{
+  "fixture": "appendix-a/seller-journal/03-check-cancel.json",
+  "expect": "valid",
+  "appendix_a_line": "68",
+  "story": "Its own rules check the act before it: cancel 60 dollars under payment reference refund-ref-7731.",
+  "placement": "journal",
+  "record": {
+    "x-deal-v1": {
+      "profile": "x-deal-v1",
+      "canonicalization": "jcs",
+      "deal_id": "deal-6a1f0c93b27d4e58",
+      "record_type": "check",
+      "at": "2026-11-25T09:00:00Z"
+    },
+    "body": {
+      "action": "cancel",
+      "amount_minor": 6000,
+      "currency": "USD",
+      "payment_ref": "refund-ref-7731",
+      "nonce": "39e56229dfd51b495bc3b59011220f2879a02fce25bb78cb3a118f3b918248ee"
+    }
+  },
+  "expected_digest": "70476288825c348ddd0e5c1a1be9f2b2eb9dbcd76c945fd95f0e894134b4fb5f"
+}

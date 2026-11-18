@@ -1,0 +1,34 @@
+{
+  "fixture": "appendix-a/buyer-journal/02-admit-ask.json",
+  "expect": "valid",
+  "appendix_a_line": "9",
+  "story": "The first admission decision: ASK, for selected records of the 10 to 100 dollar band with their proofs.",
+  "placement": "journal",
+  "record": {
+    "x-deal-v1": {
+      "profile": "x-deal-v1",
+      "canonicalization": "jcs",
+      "record_type": "admit",
+      "at": "2026-11-01T09:05:00Z"
+    },
+    "body": {
+      "outcome": "ASK",
+      "tier": "first_deal_10_100",
+      "rows": [
+        "selected_records_in_band"
+      ],
+      "asks": [
+        {
+          "type": "deal-record",
+          "digest_alg": "SHA-256",
+          "digest": "1913b98c35e7a01fdbf36e93e345f8b68b73543e697911ce2a1f7830bfa25f47"
+        }
+      ],
+      "pack_digest": "67b38b2ee2f5b469faf40c483d042b1115fd7660e5e0458b87c2bb007fd398ad",
+      "card_digest": "327c6ec0538c420f84fc41293a730ac51f7011ef89c9ffb00680e97e4168117a",
+      "answers": [],
+      "nonce": "c03fa671f1589567ce70538c4d9dd04c6f417ff0e46e79d7e0a87b4b0b07b7f1"
+    }
+  },
+  "expected_digest": "8a5b6eba4db9eecb22b96c98232730d5a46b0e0710c6c0c9216b1b2064ddb477"
+}
