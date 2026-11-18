@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
-//! The ladder's inputs from a standard_history/1 card
-//! (go/admission/standard_history.go StandardHistoryCounts).
+//! The ladder's inputs from a standard_history/1 or standard_history/3 card
+//! (go/admission/standard_history.go StandardHistoryCounts, StandardHistory3Counts).
 
 use serde_json::{Map, Value};
 
