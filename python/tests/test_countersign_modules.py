@@ -236,3 +236,19 @@ def test_non_object_disclosure_is_refused_not_crashed():
     b["disclosures"][rec["capsule_id"]]["agent_input"] = "x"
     with pytest.raises(DisclosureRefused):
         _count(b)
+
+
+def test_disclosure_refused_stands_alone_without_capsule_anchor():
+    # capsule-anchor is not an engine dependency: with it blocked, the module still imports,
+    # declares its disclosed kind, and its refusal is a plain ValueError.
+    import subprocess
+    import sys
+
+    code = (
+        "import sys; sys.modules['capsule_anchor'] = None\n"
+        "from capsule_engine.countersign import CountersignPackModule as M, DisclosureRefused as D\n"
+        "assert D.__mro__[1] is ValueError, D.__mro__\n"
+        "assert M.reads_disclosed_kinds == frozenset({'declared_count'})\n"
+    )
+    done = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, timeout=120)
+    assert done.returncode == 0, done.stderr
