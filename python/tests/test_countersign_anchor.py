@@ -69,3 +69,18 @@ def test_signed_bytes_and_detail_carry_no_count():
     assert _checks(statement)["declared_count"].result == "failed"
     assert b"987654321" not in statement.canonical_bytes()
     assert "987654321" not in str(statement.model_dump())
+
+
+def test_module_declares_the_kind_anchor_lets_a_disclosure_through_for():
+    # capsule-anchor#100 refuses a disclosures overlay unless the profile's module names the kind.
+    from capsule_anchor.countersign.policy import reads_disclosed_kinds
+
+    assert reads_disclosed_kinds(CountersignPackModule()) == frozenset({"declared_count"})
+
+
+def test_disclosure_refusal_is_anchors_typed_refusal():
+    # the router answers only a subclass of anchor's DisclosureRefused with a 422 (else a 500)
+    from capsule_anchor.countersign.policy import DisclosureRefused as AnchorDisclosureRefused
+
+    assert issubclass(DisclosureRefused, AnchorDisclosureRefused)
+    assert issubclass(DisclosureRefused, ValueError)

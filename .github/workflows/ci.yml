@@ -26,9 +26,9 @@ jobs:
       - name: install
         run: pip install -e ".[dev]"
       # test_countersign_anchor.py runs the countersign module through the real
-      # recompute_statement of capsule-anchor v0.1.2 (capsule-engine#294).
+      # recompute_statement of capsule-anchor main at #100 (capsule-engine#294, #296).
       - name: capsule-anchor (countersign compat test)
-        run: pip install "capsule-anchor @ git+https://github.com/action-state-group/capsule-anchor@4c741075860f4aef2dd6e27db2b64fefda29891d"
+        run: pip install "capsule-anchor @ git+https://github.com/action-state-group/capsule-anchor@78a69853bc83c9c65b9fe79a8270b83727c55304"
       - name: ruff
         working-directory: .
         run: ruff check --config python/pyproject.toml .
