@@ -4,8 +4,9 @@
 The countersign engine (capsule-anchor) is neutral: it ships no pack code and
 loads a ``PolicyModule`` (``check(bundle, profile_id) -> [CheckResult]``) by
 profile id. The modules for the packs we own live here, beside the packs
-they check. This package does not import capsule-anchor: a module is
-duck-typed against the bundle (``.records`` or a raw ``dict``) and returns
+they check. capsule-anchor is not a dependency: ``modules`` imports its
+``DisclosureRefused`` base only when it is installed (so its 422 applies) and otherwise falls
+back to ``ValueError``. A module is duck-typed against the bundle (``.records`` or a raw ``dict``) and returns
 results with the same ``name`` / ``result`` / ``detail`` fields.
 """
 from .modules import (

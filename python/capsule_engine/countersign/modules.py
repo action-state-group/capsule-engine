@@ -44,7 +44,13 @@ _SETUP_KINDS = frozenset({METHOD_FREEZE, DECLARED_COUNT})
 PROFILE_IDS = ("asg/outcomes/1", "asg/eu-ai-act-obligations/1")
 
 
-class DisclosureRefused(ValueError):
+try:  # capsule-anchor is not a dependency of the engine; its router catches only its own base.
+    from capsule_anchor.countersign.policy import DisclosureRefused as _AnchorDisclosureRefused
+except ImportError:  # pragma: no cover - exercised only where capsule_anchor is absent
+    _AnchorDisclosureRefused = ValueError
+
+
+class DisclosureRefused(_AnchorDisclosureRefused):
     """A disclosed ``declared_count`` payload that must not be read: it does not
     match the digest sealed in its record, or it is not the closed shape. The
     countersign request is refused (never read as ``failed``, which is a result about a declaration that
@@ -126,6 +132,10 @@ class CountersignPackModule:
     """``check(bundle, profile_id)``. ``window_start`` is the instant the
     window opens (the request names it; a v2 bundle carries none). When it is
     None the window opens at the earliest record that is neither setup kind."""
+
+    # The one kind whose disclosed ``agent_input`` this module reads; capsule-anchor
+    # refuses a ``disclosures`` overlay for any kind a profile's module does not name.
+    reads_disclosed_kinds = frozenset({DECLARED_COUNT})
 
     def __init__(self, window_start: datetime | None = None) -> None:
         self.window_start = window_start
