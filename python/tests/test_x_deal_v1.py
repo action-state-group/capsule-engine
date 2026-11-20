@@ -6,7 +6,6 @@ import json
 from pathlib import Path
 
 import pytest
-
 from agent_action_capsule import json_digest
 
 from capsule_engine.report.replay import (
