@@ -106,7 +106,7 @@ func decodeRecord(raw []byte, capsuleID string, profile json.RawMessage) (Action
 		// The engine reads such a record from its capsule header alone
 		// (report/replay.py action_for_record: Action.from_capsule), never from
 		// the body whose profile it cannot read, so a check cannot pass on what
-		// the record states in it, and the record is in no known deal.
+		// the record states in it. The reason names why it is refused.
 		profileUnread = true
 		agentInput, input.Body, input.XDeal = json.RawMessage(`{}`), map[string]json.RawMessage{}, nil
 	}
@@ -130,11 +130,17 @@ func decodeRecord(raw []byte, capsuleID string, profile json.RawMessage) (Action
 	}
 	if v, ok := input.Body["action"]; ok && string(v) != "null" {
 		fields["verb"] = v
-	} else if id, ok := nonEmptyString(header["action_id"]); ok && profileUnread {
-		// Action.from_capsule: the verb is the action_id's first segment.
-		var s string
-		_ = json.Unmarshal(id, &s)
-		fields["verb"] = encodeString(strings.SplitN(s, "/", 2)[0])
+	} else if profileUnread {
+		// Action.from_capsule: the verb is the action_id's first segment, or
+		// "unknown" with none. The body was not read, so it is not said to
+		// lack an action.
+		verb := "unknown"
+		if id, ok := nonEmptyString(header["action_id"]); ok {
+			var s string
+			_ = json.Unmarshal(id, &s)
+			verb = strings.SplitN(s, "/", 2)[0]
+		}
+		fields["verb"] = encodeString(verb)
 	} else {
 		unevaluable = append(unevaluable, "deal body has no action")
 	}
@@ -393,7 +399,7 @@ func decodeRecord(raw []byte, capsuleID string, profile json.RawMessage) (Action
 	a.unevaluable = unevaluable
 	// A record naming two deals is in no deal; every check still runs, and
 	// the report marks it (dealIDConflictRow).
-	a.dealIDConflict = conflict || profileUnread
+	a.dealIDConflict = conflict
 	a.fromRecord = true
 	var recordType string
 	if json.Unmarshal(input.XDeal["record_type"], &recordType) == nil && recordType != "" && recordType != "check" {
