@@ -122,6 +122,11 @@ func unreadableProfile(agentInput json.RawMessage) string {
 
 // minorDigits is an amount in minor units as the settlement member writes it:
 // plain digits, no sign, no leading zero.
+// maxSafeMinor is the largest amount the guard reads from a settlement member:
+// the largest integer JCS and the evidence digest carry exactly (2^53-1), the
+// same bound the Python replay holds.
+const maxSafeMinor = 1<<53 - 1
+
 var minorDigits = regexp.MustCompile(`^(0|[1-9][0-9]*)$`)
 
 var profileName = regexp.MustCompile(`^x-deal-v[0-9]+$`)
@@ -133,6 +138,9 @@ var profileName = regexp.MustCompile(`^x-deal-v[0-9]+$`)
 // body.reverses is the act reversed (v0's refs[rel=reverses]). A perform
 // states no amount.
 type v1ActRead struct {
+	// isAct is a perform or a settle: any other v1 record type keeps its own
+	// body (a check's amounts, a journal overlay's), as its v0 namesake does.
+	isAct     bool
 	settle    bool
 	leg       string
 	amount    *int64
@@ -154,6 +162,7 @@ func readV1Act(agentInput, capsule json.RawMessage) *v1ActRead {
 	}
 	_ = json.Unmarshal(agentInput, &in)
 	a := &v1ActRead{settle: in.Block.RecordType == "settle", leg: in.Body.Leg}
+	a.isAct = a.settle || in.Block.RecordType == "perform"
 	if digest, ok := typedRefDigest(in.Body.Reverses); ok {
 		var d string
 		_ = json.Unmarshal(digest, &d)
@@ -176,7 +185,7 @@ func readV1Act(agentInput, capsule json.RawMessage) *v1ActRead {
 		return a
 	}
 	n, err := strconv.ParseInt(head.Settlement.Amount.Value, 10, 64)
-	if err != nil || !minorDigits.MatchString(head.Settlement.Amount.Value) || head.Settlement.Amount.AssetCode == "" {
+	if err != nil || n > maxSafeMinor || !minorDigits.MatchString(head.Settlement.Amount.Value) || head.Settlement.Amount.AssetCode == "" {
 		a.malformed = "an x-deal-v1 settle's settlement member states no amount in minor units and currency"
 		return a
 	}

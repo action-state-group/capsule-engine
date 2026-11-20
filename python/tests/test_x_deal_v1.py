@@ -7,12 +7,15 @@ from pathlib import Path
 
 import pytest
 
+from agent_action_capsule import json_digest
+
 from capsule_engine.report.replay import (
     _PROFILE_V0,
     _PROFILE_V1,
     _block,
     _deal_id,
     act_view,
+    action_for_record,
     unreadable_profile,
 )
 
@@ -78,9 +81,28 @@ def test_a_payee_leg_is_money_in_and_names_what_it_reverses():
     assert view["body"]["reverses_ref"] == ref
 
 
-@pytest.mark.parametrize("capsule", [{}, _capsule("1.5"), _capsule("-1"), _capsule("007"), _capsule(code="")])
+@pytest.mark.parametrize("capsule", [{}, _capsule("1.5"), _capsule("-1"), _capsule("007"), _capsule(code=""), _capsule("9007199254740992")])
 def test_a_payer_settle_with_no_readable_settlement_is_unread(capsule):
     assert act_view(capsule, _settle()) is None
+
+
+def test_the_largest_readable_amount_is_two_to_the_53_minus_1():
+    assert act_view(_capsule("9007199254740991"), _settle())["body"]["amount_minor"] == 9007199254740991
+
+
+@pytest.mark.parametrize("mutate", [
+    lambda r: r.update({"x-deal-v2": {"profile": "x-deal-v2"}}),
+    lambda r: r.update({_PROFILE_V0: {"profile": _PROFILE_V0, "record_type": "check"}}),
+    lambda r: r[_PROFILE_V1].update({"profile": _PROFILE_V0}),
+])
+def test_a_checked_record_whose_profile_is_unreadable_is_refused_not_read_as_no_deal(mutate):
+    record = {_PROFILE_V1: {"profile": _PROFILE_V1, "record_type": "check", "deal_id": DEAL}, "body": {"action": "pay"}}
+    mutate(record)
+    capsule = {"capsule_id": HEX, "action_id": DEAL + "/2", "action_type": "fyi", "operator": "o", "developer": "d",
+               "timestamp": "2026-10-07T12:00:00Z",
+               "model_attestation": {"compute_attestation": {"agent_input_digest": json_digest(record)}}}
+    action = action_for_record(capsule, record)
+    assert action.deal_id_conflict
 
 
 def test_a_perform_states_no_amount_and_other_records_pass_through():

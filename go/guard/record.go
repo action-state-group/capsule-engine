@@ -991,13 +991,18 @@ func DecodeHistoryAct(raw []byte) (Record, error) {
 		input.XDeal.Counterparty, input.XDeal.DealID, input.XDeal.Refs = profBlock["counterparty"], profBlock["deal_id"], nil
 		_ = json.Unmarshal(profBlock["record_type"], &input.XDeal.RecordType)
 		v1 = readV1Act(agentInput, raw)
+		if !v1.isAct {
+			v1 = nil
+		}
 		// A payer leg with no readable settlement member is malformed (v1
 		// PROFILE.md section 5), and an act the window cannot count is
 		// refused rather than left unevaluated: it would escape the caps.
-		if v1.malformed != "" && v1.leg == "payer" {
-			return refuse(v1.malformed, nil)
+		if v1 != nil {
+			if v1.malformed != "" && v1.leg == "payer" {
+				return refuse(v1.malformed, nil)
+			}
+			got = v1.act()
 		}
-		got = v1.act()
 	}
 	// An act taken without authority (capsule-cli deal_profile.go: sealed
 	// as an outcome, never as an action): the x-deal-v0 body.unchecked, or

@@ -59,7 +59,7 @@ def v0_pay(n):
     return cap
 
 
-def v1_settle(n, leg="payer", settlement=True, reverses=None, block=None):
+def v1_settle(n, leg="payer", settlement=True, reverses=None, block=None, value="2000"):
     cap = load("pay.json")
     cap["capsule_id"] = h("settle-%s" % n)
     cap["timestamp"] = AT
@@ -73,7 +73,7 @@ def v1_settle(n, leg="payer", settlement=True, reverses=None, block=None):
     cap.pop("counterparty_profile", None)
     if settlement:
         cap["settlement"] = {"version": "0", "leg": leg, "sealer_role": leg,
-                             "amount": {"value": "2000", "assetCode": "USD", "assetScale": 2}}
+                             "amount": {"value": value, "assetCode": "USD", "assetScale": 2}}
     seal(cap)
     return cap
 
@@ -126,6 +126,11 @@ cases = {
     "v1-refund-received": envelope([v1_settle("refund", leg="payee", reverses="payment")]),
     "v1-perform-history": envelope([with_block(base, lambda ai: ai["x-deal-v1"].update(record_type="perform"))]),
     "v1-check-record": envelope([v0_pay("a")], check=v1_check()),
+    "v1-check-in-history": envelope([v1_check()]),
+    "v1-pay-over-safe": envelope([v1_settle("over", value="9007199254740992")]),
+    "v1-check-two-blocks": envelope([v0_pay("a")], check=with_block(v1_check(), two_blocks)),
+    "v1-check-unknown-version": envelope([v0_pay("a")], check=with_block(v1_check(), unknown_version)),
+    "v1-check-block-names-other": envelope([v0_pay("a")], check=with_block(v1_check(), named_other)),
     "v1-pay-no-settlement": envelope([v1_settle("nosettle", settlement=False)]),
     "v1-pay-two-blocks": envelope([with_block(base, two_blocks)]),
     "v1-pay-unknown-version": envelope([with_block(base, unknown_version)]),

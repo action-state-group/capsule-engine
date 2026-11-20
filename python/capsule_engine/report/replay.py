@@ -649,6 +649,9 @@ def names_two_deals(shown: dict) -> bool:
 
 
 _SETTLEMENT = "settlement"
+# The largest settlement amount read: 2^53-1, the largest integer JCS carries
+# exactly (the Go guard's maxSafeMinor).
+_MAX_SAFE_MINOR = 2**53 - 1
 
 
 def _v1_act_body(record: dict, disclosed: dict, body: dict) -> dict | None:
@@ -670,7 +673,7 @@ def _v1_act_body(record: dict, disclosed: dict, body: dict) -> dict | None:
     amount = (record.get(_SETTLEMENT) or {}).get("amount") if isinstance(record.get(_SETTLEMENT), dict) else None
     value = amount.get("value") if isinstance(amount, dict) else None
     code = amount.get("assetCode") if isinstance(amount, dict) else None
-    minor = int(value) if isinstance(value, str) and re.fullmatch(r"0|[1-9][0-9]*", value) and len(value) < 19 else None
+    minor = int(value) if isinstance(value, str) and re.fullmatch(r"0|[1-9][0-9]*", value) and int(value) <= _MAX_SAFE_MINOR else None
     if minor is None or not isinstance(code, str) or not code:
         if leg == "payer":
             return None
@@ -952,6 +955,12 @@ def action_for_record(record: dict, disclosed: dict | None = None, *, counterpar
     bridged = _bridge_deal_check(record, disclosed, counterparty_profile) or _bridge_transfer_funds(record)
     if bridged is not None:
         return bridged
+    if disclosed is not None and _bound(record, disclosed) and unreadable_profile(disclosed) is not None:
+        # A record whose profile cannot be read is not evaluable, never one
+        # that states nothing: the engine refuses what it would allow, naming
+        # the profile blocks the record carries.
+        names = tuple(k for k in disclosed if _PROFILE_NAME.fullmatch(k))
+        return replace(Action.from_capsule(record), deal_id_conflict=names)
     if _states_no_act(record, disclosed):
         return replace(Action.from_capsule(record), states_act=False)
     return Action.from_capsule(record)
@@ -1069,7 +1078,8 @@ def action_for_history_entry(entry: dict) -> Action | None:
     its check's (``_bridge_deal_check``). ``counterparty_profile`` still
     replaces that target, as it does a check's. ``None`` when the entry is
     not an act its capsule binds, or
-    names no class or taxonomy, or states an act taken without a check:
+    names no class or taxonomy (an x-deal-v1 perform or settle is bridged with
+    none: no class is guessed for it), or states an act taken without a check:
     what it records cannot be read as a checked act."""
     capsule, agent_input = _entry_parts(entry)
     action = _bridge_deal_check(
@@ -1460,6 +1470,9 @@ def _executed_act(capsule: dict, shown: dict | None, *, every_record_is_an_act: 
     """The act the record ``shown``, bound by ``capsule``, states was
     executed (``_taken``), or ``None`` for one that states none. An act whose
     record is not given cannot be read: its spend is ``None``."""
+    if shown is not None and unreadable_profile(shown) is not None:
+        # An act whose profile cannot be read is unread, never no act.
+        return _ExecutedAct(spend_minor=None, action_class=None)
     if shown is not None:
         shown = act_view(capsule, shown)
     if shown is None:

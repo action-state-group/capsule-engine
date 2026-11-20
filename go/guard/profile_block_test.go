@@ -107,10 +107,14 @@ func TestV1ActRead(t *testing.T) {
 	}
 	for name, capsule := range map[string]string{"no member": `{}`, "no code": `{"settlement":{"amount":{"value":"1"}}}`,
 		"negative": `{"settlement":{"amount":{"value":"-1","assetCode":"USD"}}}`, "leading zeros": `{"settlement":{"amount":{"value":"007","assetCode":"USD"}}}`, "plus sign": `{"settlement":{"amount":{"value":"+5","assetCode":"USD"}}}`,
-		"not digits": `{"settlement":{"amount":{"value":"1.5","assetCode":"USD"}}}`} {
+		"not digits":   `{"settlement":{"amount":{"value":"1.5","assetCode":"USD"}}}`,
+		"above 2^53-1": `{"settlement":{"amount":{"value":"9007199254740992","assetCode":"USD"}}}`} {
 		if got := readV1Act(agentInput, json.RawMessage(capsule)); got.malformed == "" {
 			t.Errorf("%s: read as %+v", name, got)
 		}
+	}
+	if got := readV1Act(agentInput, json.RawMessage(`{"settlement":{"amount":{"value":"9007199254740991","assetCode":"USD"}}}`)); got.malformed != "" || *got.amount != 1<<53-1 {
+		t.Errorf("2^53-1: read as %+v", got)
 	}
 	perform := readV1Act(json.RawMessage(`{"x-deal-v1":{"profile":"x-deal-v1","record_type":"perform"},"body":{}}`), json.RawMessage(`{}`))
 	if perform.malformed != "" || perform.act().AmountMinor != nil {
