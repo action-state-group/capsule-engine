@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"slices"
 	"strconv"
+	"strings"
 
 	"github.com/action-state-group/capsule-engine/go/canon"
 )
@@ -99,8 +100,15 @@ func decodeRecord(raw []byte, capsuleID string, profile json.RawMessage) (Action
 	var extra, unevaluable []string
 	// A record whose profile the guard cannot read is not evaluable, never
 	// one that states nothing.
+	profileUnread := false
 	if why := unreadableProfile(agentInput); why != "" {
 		unevaluable = append(unevaluable, why)
+		// The engine reads such a record from its capsule header alone
+		// (report/replay.py action_for_record: Action.from_capsule), never from
+		// the body whose profile it cannot read, so a check cannot pass on what
+		// the record states in it, and the record is in no known deal.
+		profileUnread = true
+		agentInput, input.Body, input.XDeal = json.RawMessage(`{}`), map[string]json.RawMessage{}, nil
 	}
 	for _, m := range recordHeaderMembers {
 		v, ok := header[m]
@@ -122,6 +130,11 @@ func decodeRecord(raw []byte, capsuleID string, profile json.RawMessage) (Action
 	}
 	if v, ok := input.Body["action"]; ok && string(v) != "null" {
 		fields["verb"] = v
+	} else if id, ok := nonEmptyString(header["action_id"]); ok && profileUnread {
+		// Action.from_capsule: the verb is the action_id's first segment.
+		var s string
+		_ = json.Unmarshal(id, &s)
+		fields["verb"] = encodeString(strings.SplitN(s, "/", 2)[0])
 	} else {
 		unevaluable = append(unevaluable, "deal body has no action")
 	}
@@ -380,7 +393,7 @@ func decodeRecord(raw []byte, capsuleID string, profile json.RawMessage) (Action
 	a.unevaluable = unevaluable
 	// A record naming two deals is in no deal; every check still runs, and
 	// the report marks it (dealIDConflictRow).
-	a.dealIDConflict = conflict
+	a.dealIDConflict = conflict || profileUnread
 	a.fromRecord = true
 	var recordType string
 	if json.Unmarshal(input.XDeal["record_type"], &recordType) == nil && recordType != "" && recordType != "check" {
