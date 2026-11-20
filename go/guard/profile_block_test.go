@@ -133,3 +133,39 @@ func TestStatementOfReadsAV1Claim(t *testing.T) {
 		}
 	}
 }
+
+// A checked record whose profile cannot be read is read from its header alone
+// (capsule-engine#309), as Python's action_for_record reads it: unevaluable,
+// and with none of what its body states. Without an action_id its verb is
+// "unknown" and its reasons name the profile alone, as Python's are.
+func TestUnreadableProfileCheckIsReadFromItsHeaderAlone(t *testing.T) {
+	for _, name := range []string{"v1-check-two-blocks", "v1-check-unknown-version", "v1-check-block-names-other", "v1-check-extra-block"} {
+		raw, err := os.ReadFile("testdata/x-deal-v1-vectors/inputs/" + name + ".input.json")
+		if err != nil {
+			t.Fatal(err)
+		}
+		a, _, err := DecodeCheckInput(raw)
+		if err != nil {
+			t.Fatalf("%s: %v", name, err)
+		}
+		if len(a.Unevaluable()) == 0 || a.ActionClass != nil || a.AmountMinor != nil || a.Target != nil {
+			t.Errorf("%s: unevaluable %v, class %v, amount %v, target %v", name, a.Unevaluable(), a.ActionClass, a.AmountMinor, a.Target)
+		}
+		var env map[string]any
+		if err := json.Unmarshal(raw, &env); err != nil {
+			t.Fatal(err)
+		}
+		delete(env["record"].(map[string]any), "action_id")
+		stripped, err := json.Marshal(env)
+		if err != nil {
+			t.Fatal(err)
+		}
+		b, _, err := DecodeCheckInput(stripped)
+		if err != nil {
+			t.Fatalf("%s without action_id: %v", name, err)
+		}
+		if len(b.Unevaluable()) != 1 || b.Verb != "unknown" {
+			t.Errorf("%s without action_id: unevaluable %v, verb %q", name, b.Unevaluable(), b.Verb)
+		}
+	}
+}
