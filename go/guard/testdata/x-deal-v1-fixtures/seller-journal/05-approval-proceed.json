@@ -1,0 +1,33 @@
+{
+  "fixture": "appendix-a/seller-journal/05-approval-proceed.json",
+  "expect": "valid",
+  "appendix_a_line": "68",
+  "story": "The owner answers the card: proceed.",
+  "placement": "journal",
+  "record": {
+    "x-deal-v1": {
+      "profile": "x-deal-v1",
+      "canonicalization": "jcs",
+      "deal_id": "deal-6a1f0c93b27d4e58",
+      "record_type": "approval",
+      "at": "2026-11-25T09:02:00Z",
+      "refs": [
+        {
+          "rel": "approves",
+          "type": "deal-record",
+          "digest_alg": "SHA-256",
+          "digest": "5a2bb6bf94a9113827a7d2b26b13159d926bf0dbb74f0658a6cd5a5a0b247065"
+        }
+      ]
+    },
+    "body": {
+      "choice": "proceed",
+      "proceed": true,
+      "approver": "user",
+      "said_commitment": "1a94e32d7af19cb119c7cb35b157f0c22c8898175548d0b108a14686d39cad3d",
+      "card_commitment": "526ca6b2066ede44cca50cb6c338de9a65a70a39385c48e594ae8c1725f7471b",
+      "nonce": "13805b7bbe1f683c868928e453b999423cc49329f652a60d14b8c03910ab3138"
+    }
+  },
+  "expected_digest": "6eac4921b41aab6fc5215aa3f2301b430f609ef07675cb4a09848c1cae526915"
+}

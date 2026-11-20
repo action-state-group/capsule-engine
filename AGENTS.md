@@ -53,6 +53,14 @@ its `definition_digest` against this engine. The copies under `python/tests/fixt
 byte, and `generate_go_packs.py --check` fails CI on any drift. The design is
 `docs/design/go-guard-module.md`.
 
+The guard and the replay read an `x-deal-v1` record beside `x-deal-v0` (#301): one profile block per
+record, read by `profileBlockOf` in Go and `_block` in Python, the version rule restated from
+evidencebook's `dealprofile.Version` because evidencebook requires this module (an import would be
+a cycle). `conformance-vectors/guard/v0/x-deal-v1-vectors.json` pairs one purchase sealed both ways,
+and `go/guard/testdata/x-deal-v1-fixtures` holds evidencebook's released Appendix A records, both
+readers decoding every one. A change to what evidencebook's profile calls a block or a record type
+moves both readers in one PR.
+
 ## The admission evaluator ships in Go and Rust together
 
 `go/admission` and the `admission` module of `rust/capsule-engine` are one evaluator

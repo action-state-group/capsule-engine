@@ -63,17 +63,18 @@ func StatementOf(capsule, agentInput json.RawMessage) (Record, bool) {
 		return Record{}, false
 	}
 	var in struct {
-		XDeal *struct {
-			RecordType json.RawMessage `json:"record_type"`
-			At         json.RawMessage `json:"at"`
-		} `json:"x-deal-v0"`
 		Body *struct {
 			SourceKind json.RawMessage `json:"source_kind"`
 			Class      json.RawMessage `json:"class"`
 		} `json:"body"`
 	}
-	if json.Unmarshal(agentInput, &in) != nil || in.XDeal == nil || in.Body == nil ||
-		!isString(in.XDeal.RecordType, claimRecordType) || !isString(in.Body.SourceKind, agentSource) {
+	if json.Unmarshal(agentInput, &in) != nil || in.Body == nil {
+		return Record{}, false
+	}
+	// An x-deal-v0 or x-deal-v1 claim (a v1 claim is a journey overlay record
+	// with v0's body).
+	block, _ := profileBlockOfInput(agentInput)
+	if block == nil || !isString(block["record_type"], claimRecordType) || !isString(in.Body.SourceKind, agentSource) {
 		return Record{}, false
 	}
 	class, ok := nonEmptyText(in.Body.Class)
@@ -87,7 +88,7 @@ func StatementOf(capsule, agentInput json.RawMessage) (Record, bool) {
 		return Record{}, false
 	}
 	var at *string
-	if ts, ok := nonEmptyText(in.XDeal.At); ok {
+	if ts, ok := nonEmptyText(block["at"]); ok {
 		at = &ts
 	}
 	return statementRecord(operator, at, class, deal, claim)

@@ -5,6 +5,8 @@ module has its own changelog, `go/CHANGELOG.md`.
 
 ## Unreleased
 
+- Added (capsule-engine#301): replay reads x-deal-v1 records (evidencebook v0.18.1) beside x-deal-v0. `_block` and `act_view` finds the one profile block; a v1 `perform` or `settle` is read as an act step and `detail_change` as `change`; the journal and journey overlay records that keep v0's bodies (`check`, `claim`, `message` and the rest) read as their v0 namesakes. A v1 `settle` in a history counts at the amount of its capsule's `settlement` member (a payer leg is money out, a payee leg money in, `body.reverses` the act reversed). Fails closed: a payer `settle` with no readable settlement member, and a history act whose record names two profile blocks, an unknown profile version, or a v1 block that does not name itself, is unread (a history entry the window cannot leave out), and a checked record in that state carries a `deal_id_conflict`, so the engine refuses it rather than reading it as no deal. A settlement amount above 2^53-1 is unreadable (the Go guard holds the same bound). `x-deal-v0` records are read as before.
+
 ## 0.4.0 — 2026-11-19
 
 Python 0.4.0, a minor release with breaking changes: live packs are authored as `pack-source.yaml` (#252), the leftover capsule-ledger names are gone (#177), and the contract-named referee, the countersign pack module and `packs evaluate` are new. Reading `pack.yaml` and the `CAPSULE_LEDGER_*` variables are deprecated and will be removed in 0.5.0.

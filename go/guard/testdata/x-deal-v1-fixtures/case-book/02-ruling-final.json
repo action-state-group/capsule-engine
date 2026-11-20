@@ -1,0 +1,46 @@
+{
+  "fixture": "appendix-a/case-book/02-ruling-final.json",
+  "expect": "valid",
+  "appendix_a_line": "after 67",
+  "story": "Nobody challenged: the same ruling, sealed again, final.",
+  "placement": "case_book",
+  "record": {
+    "x-deal-v1": {
+      "profile": "x-deal-v1",
+      "canonicalization": "jcs",
+      "deal_id": "deal-6a1f0c93b27d4e58",
+      "record_type": "ruling",
+      "at": "2026-11-21T10:00:00Z",
+      "seq": 2,
+      "prev": {
+        "type": "deal-record",
+        "digest_alg": "SHA-256",
+        "digest": "6b267a988b8c8a740551218ff0edb570dc63a33a41a0b09ac4d2ef81054c7a8e"
+      }
+    },
+    "body": {
+      "row": "as_described",
+      "keys": {
+        "buyer": "232935bcfec4f81878f57637a9c5db1b71b180b9c11ec4e87365db9723f3ba52",
+        "seller": "7aed120cea31516c35af0a8e13bfde77c4365ed00556aba1afbb3223fceb6353"
+      },
+      "against": "seller",
+      "value": "not_met",
+      "remedy": {
+        "kind": "refund",
+        "amount_minor": 6000,
+        "currency": "USD",
+        "due": "2026-11-27T23:59:59Z"
+      },
+      "read": {
+        "buyer": "7b1f37ef3e1fd334b7d4f6fac9bd39e0e614afe51fd4106333c51035a4cc5c68",
+        "seller": "68f7d5b890bc7f0962600bc0b290ae4862ebeec02a997955b07fdd27207a943e"
+      },
+      "forum": "auto:ref",
+      "rules_digest": "988138e31bd4a96f55b3ba933f681deb4551c812ee4e19555aeb843f22d7d591",
+      "final": true
+    }
+  },
+  "expected_digest": "6f7d98688119855aeb41ce4339aca260b1785162003fc3ff53850cd24c9333c3",
+  "record_id": "2e76b582de3c889391ea4b977e075144494661563e21805c8b618e626e6abc44"
+}

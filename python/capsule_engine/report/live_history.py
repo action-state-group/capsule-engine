@@ -89,6 +89,7 @@ from ..guards.statements import StatementRecord, claim_of
 from .replay import (
     MONEY_IN,
     ExecutedActs,
+    act_view,
     action_for_history_entry,
     bound_agent_input,
     deal_claim_statements,
@@ -272,7 +273,7 @@ def _stated_amount(entry: dict) -> int | None:
     ``None``: read where the act seals no ``spend_minor``, so its history
     copy carries no amount, for a caps window to count in its place
     (``STATED_AMOUNT``)."""
-    acted, unchecked = _act_member(bound_agent_input(entry))
+    acted, unchecked = _act_member(_viewed(entry, bound_agent_input(entry)))
     amount = acted.get("amount_minor") if acted is not None and not unchecked else None
     return amount if isinstance(amount, int) and not isinstance(amount, bool) else None
 
@@ -366,7 +367,7 @@ def _undecided_unreadable(entry: dict, shown: dict | None) -> bool:
     disposition = entry.get("disposition")
     if isinstance(disposition, dict) and disposition.get("decision") is not None:
         return False
-    acted, unchecked = _act_member(shown)
+    acted, unchecked = _act_member(_viewed(entry, shown))
     if acted is None:
         return True
     if unchecked or names_two_deals(shown) or acted.get("direction") == MONEY_IN:
@@ -389,6 +390,14 @@ def _in_window(caps_fold: FoldDefinition, acts: list[dict], checked: object) -> 
     placed = [{"timestamp": act.get("timestamp"), "developer": act.get("developer"), "operator": act.get("operator")}
               for act in acts]
     return in_window_count(caps_fold, placed, key_value, checked["timestamp"])
+
+
+def _viewed(entry: dict, shown: object) -> object:
+    """``shown`` as the history reads an act (``act_view``): an x-deal-v1
+    settle states its amount in its capsule's settlement member. ``None``,
+    read as an act the window cannot leave out, when that member cannot be
+    read."""
+    return act_view(entry, shown) if isinstance(shown, dict) else shown
 
 
 def _act_member(shown: object) -> tuple[dict | None, bool]:

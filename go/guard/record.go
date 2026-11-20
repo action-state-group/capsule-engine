@@ -84,16 +84,24 @@ func decodeRecord(raw []byte, capsuleID string, profile json.RawMessage) (Action
 	}
 	var input struct {
 		Body  map[string]json.RawMessage `json:"body"`
-		XDeal map[string]json.RawMessage `json:"x-deal-v0"`
+		XDeal map[string]json.RawMessage `json:"x-deal-v0"` // read only to refuse a malformed block as before
 	}
 	if err := json.Unmarshal(agentInput, &input); err != nil {
 		return Action{}, fmt.Errorf("record: agent_input: %w", err)
 	}
+	// The profile block, of x-deal-v0 or x-deal-v1 (profile_block.go).
+	var profileVersion string
+	input.XDeal, profileVersion = profileBlockOfInput(agentInput)
 	if input.Body == nil {
 		return Action{}, errors.New("record: the disclosed agent_input has no body: not a deal record")
 	}
 	fields := map[string]json.RawMessage{}
 	var extra, unevaluable []string
+	// A record whose profile the guard cannot read is not evaluable, never
+	// one that states nothing.
+	if why := unreadableProfile(agentInput); why != "" {
+		unevaluable = append(unevaluable, why)
+	}
 	for _, m := range recordHeaderMembers {
 		v, ok := header[m]
 		if !ok || string(v) == "null" {
@@ -273,8 +281,15 @@ func decodeRecord(raw []byte, capsuleID string, profile json.RawMessage) (Action
 		unevaluable = append(unevaluable, why)
 	}
 	sealed, targetSource := sealedCounterparty(agentInput, input.Body, input.XDeal)
+	perDealSource := counterpartyBlock
+	if profileVersion == profileV1 {
+		perDealSource = profileMember(profileVersion, "counterparty")
+		if targetSource == counterpartyBlock {
+			targetSource = perDealSource
+		}
+	}
 	target, hasTarget := payeeTarget(sealed)
-	hasPerDeal := hasTarget && targetSource == counterpartyBlock
+	hasPerDeal := hasTarget && targetSource == perDealSource
 	// The payee keyed per profile, read only where the engine's deal bridge
 	// reads it: on a deal check it bridges (bridgesAsCheck).
 	var ignoredInputs []string
@@ -340,7 +355,7 @@ func decodeRecord(raw []byte, capsuleID string, profile json.RawMessage) (Action
 		}
 	}
 	if hasPerDeal {
-		a.present = append(a.present, counterpartyBlock)
+		a.present = append(a.present, perDealSource)
 	}
 	a.counterpartyIDs, a.counterpartyFPAlg = sealedFingerprints(sealed)
 	_, whole := wellFormedCounterparty(sealed)
@@ -853,6 +868,16 @@ func asSealError(err error) (*sealError, bool) {
 // member or body action), or nil.
 func (a Action) Unevaluable() []string { return a.unevaluable }
 
+// act is the body of a deal act as the history decoder reads it.
+type act struct {
+	AmountMinor     json.RawMessage `json:"amount_minor"`
+	SpendMinor      json.RawMessage `json:"spend_minor"`
+	ActionClass     *string         `json:"action_class"`
+	TaxonomyVersion *string         `json:"taxonomy_version"`
+	Currency        *string         `json:"currency"`
+	Direction       *string         `json:"direction"`
+}
+
 // DecodeHistoryAct reads one earlier sealed act (an external-check-input/v0
 // history entry: a capsule with its disclosed agent_input) into the ledger
 // row the spend fold reads, from the same sources DecodeRecord uses:
@@ -929,14 +954,6 @@ func DecodeHistoryAct(raw []byte) (Record, error) {
 	}
 	// The amounts are read as sealed and parsed below (minorOf): the shape
 	// an undecided act seals is the window's to judge, not a refusal.
-	type act struct {
-		AmountMinor     json.RawMessage `json:"amount_minor"`
-		SpendMinor      json.RawMessage `json:"spend_minor"`
-		ActionClass     *string         `json:"action_class"`
-		TaxonomyVersion *string         `json:"taxonomy_version"`
-		Currency        *string         `json:"currency"`
-		Direction       *string         `json:"direction"`
-	}
 	var input struct {
 		// Type is a typed record's sealed type: an action-outcome/v0 states
 		// an act taken without authority in body.attempted.
@@ -960,7 +977,33 @@ func DecodeHistoryAct(raw []byte) (Record, error) {
 	if input.Body == nil {
 		return refuse("disclosed agent_input has no body", nil)
 	}
+	// A record the guard cannot read is refused, never taken as no act.
+	if why := unreadableProfile(agentInput); why != "" {
+		return refuse(why, nil)
+	}
 	got := input.Body.act
+	// An x-deal-v1 act (perform, settle) states no amount or direction in its
+	// body: a settle's leg travels as the Capsule's top-level settlement
+	// member (v1 PROFILE.md sections 5 and 7), read here (v1Act).
+	profBlock, version := profileBlockOfInput(agentInput)
+	var v1 *v1ActRead
+	if version == profileV1 {
+		input.XDeal.Counterparty, input.XDeal.DealID, input.XDeal.Refs = profBlock["counterparty"], profBlock["deal_id"], nil
+		_ = json.Unmarshal(profBlock["record_type"], &input.XDeal.RecordType)
+		v1 = readV1Act(agentInput, raw)
+		if !v1.isAct {
+			v1 = nil
+		}
+		// A payer leg with no readable settlement member is malformed (v1
+		// PROFILE.md section 5), and an act the window cannot count is
+		// refused rather than left unevaluated: it would escape the caps.
+		if v1 != nil {
+			if v1.malformed != "" && v1.leg == "payer" {
+				return refuse(v1.malformed, nil)
+			}
+			got = v1.act()
+		}
+	}
 	// An act taken without authority (capsule-cli deal_profile.go: sealed
 	// as an outcome, never as an action): the x-deal-v0 body.unchecked, or
 	// a typed action-outcome/v0's body.attempted (action_records.go).
@@ -1087,6 +1130,9 @@ func DecodeHistoryAct(raw []byte) (Record, error) {
 			r.ReturnedMinor = &n
 		}
 		r.ReversesRef = reversesRefOf(input.XDeal.Refs)
+		if v1 != nil {
+			r.ReversesRef, r.ReturnedMinor = v1.reverses, v1.amount
+		}
 	}
 	// The class of statement the act states, read as a check's is
 	// (representationClassOf; replay.py _bridge_deal_check reads a history

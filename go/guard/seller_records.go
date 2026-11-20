@@ -110,11 +110,12 @@ func acceptedOfferAt(bundle []byte) map[string]string {
 			Type  string                     `json:"type"`
 			At    json.RawMessage            `json:"at"`
 			Body  map[string]json.RawMessage `json:"body"`
-			XDeal map[string]json.RawMessage `json:"x-deal-v0"`
+			XDeal map[string]json.RawMessage `json:"-"`
 		}
 		if json.Unmarshal(shown, &in) != nil {
 			continue
 		}
+		in.XDeal, _ = profileBlockOfInput(shown)
 		var action, authority, recordType, from string
 		_ = json.Unmarshal(in.Body["action"], &action)
 		_ = json.Unmarshal(in.Body["authority"], &authority)

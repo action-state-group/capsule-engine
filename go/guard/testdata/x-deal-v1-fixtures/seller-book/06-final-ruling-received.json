@@ -1,0 +1,40 @@
+{
+  "fixture": "appendix-a/seller-book/06-final-ruling-received.json",
+  "expect": "valid",
+  "appendix_a_line": "after 67",
+  "story": "The seller's ruling received record for the final ruling.",
+  "placement": "deal_book",
+  "record": {
+    "x-deal-v1": {
+      "profile": "x-deal-v1",
+      "canonicalization": "jcs",
+      "deal_id": "deal-6a1f0c93b27d4e58",
+      "record_type": "statement",
+      "at": "2026-11-21T14:00:00Z",
+      "seq": 6,
+      "prev": {
+        "type": "deal-record",
+        "digest_alg": "SHA-256",
+        "digest": "b3cede60ebffccd09e75c444dfec01db39c158f1b38a9730012ecb0569a21f42"
+      },
+      "agreement_ref": {
+        "type": "deal-record",
+        "digest_alg": "SHA-256",
+        "digest": "0e91d7532b004e190000bee64a29a3b15c21cfb979c137fbba30da5335ee0215"
+      },
+      "seen": "86a0ebdea3e7972473ee9b95fe4b810ca56094a821c10a6175a72488bf2ab7f5"
+    },
+    "body": {
+      "statements": [],
+      "names": {
+        "ruling": {
+          "type": "deal-record",
+          "digest_alg": "SHA-256",
+          "digest": "6f7d98688119855aeb41ce4339aca260b1785162003fc3ff53850cd24c9333c3"
+        }
+      }
+    }
+  },
+  "expected_digest": "fa5535cf75d2f3d3471875fefa7da42777a7980f65fd9f6a4649d31e8a8976bf",
+  "record_id": "8c5f099609ad1ee9fb0c723c14809ae1462e729336b96cb9cf27e42b0e2f986a"
+}

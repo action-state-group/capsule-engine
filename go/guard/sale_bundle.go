@@ -740,6 +740,15 @@ func isBound(record jsonObject, agentInput json.RawMessage) bool {
 	return checkAgentInputDigest(record, agentInput) == nil
 }
 
+// dealBlock is a record's deal profile block of either version, as
+// profileBlockOf reads it (report/replay.py _block), nil when it has none.
+// Only the companion-profile reader uses it: the sale-thread readers here
+// read x-deal-v0 only, as report/sale_bundle.py does.
+func dealBlock(s jsonObject) jsonObject {
+	block, _ := profileBlockOf(s)
+	return block
+}
+
 func typeOf(s jsonObject) string {
 	t, _ := textOf(s["type"])
 	return t

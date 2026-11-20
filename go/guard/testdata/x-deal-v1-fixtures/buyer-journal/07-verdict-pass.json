@@ -1,0 +1,32 @@
+{
+  "fixture": "appendix-a/buyer-journal/07-verdict-pass.json",
+  "expect": "valid",
+  "appendix_a_line": "23",
+  "story": "The verdict on that one check: pass.",
+  "placement": "journal",
+  "record": {
+    "x-deal-v1": {
+      "profile": "x-deal-v1",
+      "canonicalization": "jcs",
+      "deal_id": "deal-6a1f0c93b27d4e58",
+      "record_type": "verdict",
+      "at": "2026-11-01T10:11:00Z",
+      "refs": [
+        {
+          "rel": "checks",
+          "type": "deal-record",
+          "digest_alg": "SHA-256",
+          "digest": "c92275672ad7d9779c5d0ad2d5702da4f6f235ca73c3a5c5e0a39d736005013b"
+        }
+      ]
+    },
+    "body": {
+      "result": "pass",
+      "differences": [],
+      "options": [],
+      "card_commitment": "7b9f6fe06aa834704172546896e1750d2bd7f9525ac52d2c7dbac0b75f3c7263",
+      "nonce": "3d71e7a94efde455dec1c49ff84556237e52277549167d0d178b04683ca1b2b0"
+    }
+  },
+  "expected_digest": "35544ac049d9274577d609ed1acdb4fe73ae2cf07239585202ee93da48d118ca"
+}

@@ -1,0 +1,47 @@
+{
+  "fixture": "appendix-a/buyer-book/02-payment.json",
+  "expect": "valid",
+  "appendix_a_line": "24",
+  "story": "The payment record: the payer leg, row 1 met, citing its check; it is the named record paid.",
+  "placement": "deal_book",
+  "record": {
+    "x-deal-v1": {
+      "profile": "x-deal-v1",
+      "canonicalization": "jcs",
+      "deal_id": "deal-6a1f0c93b27d4e58",
+      "record_type": "settle",
+      "at": "2026-11-01T10:15:00Z",
+      "seq": 2,
+      "prev": {
+        "type": "deal-record",
+        "digest_alg": "SHA-256",
+        "digest": "02419989baf62fa35ddfc95b4bf8ee154aaebaf0da7f5b6a558317462b227c85"
+      },
+      "agreement_ref": {
+        "type": "deal-record",
+        "digest_alg": "SHA-256",
+        "digest": "02419989baf62fa35ddfc95b4bf8ee154aaebaf0da7f5b6a558317462b227c85"
+      },
+      "seen": "f4bc4f74947fa9934274e9747b7b17e987c86ef15d15f038b0a0d24ed5772e2d",
+      "marks": [
+        "paid"
+      ]
+    },
+    "body": {
+      "leg": "payer",
+      "statements": [
+        {
+          "row": "paid_as_agreed",
+          "value": "met"
+        }
+      ],
+      "check": {
+        "type": "deal-record",
+        "digest_alg": "SHA-256",
+        "digest": "c92275672ad7d9779c5d0ad2d5702da4f6f235ca73c3a5c5e0a39d736005013b"
+      }
+    }
+  },
+  "expected_digest": "82ae32c59d91fb780bc72562f64a574bb3bd5c0c18c5e11fad54317eaaf7e04c",
+  "record_id": "bd6bdd7f472e6c6c8db6adaeb37d3d54e70e377f6ac8c7bab237f18ff0ce9bf8"
+}

@@ -223,7 +223,7 @@ func threadIndexOf(thread SaleThread) threadIndex {
 func companionProfiles(thread SaleThread) map[string]json.RawMessage {
 	found := map[string][]json.RawMessage{}
 	for _, r := range boundRecords(thread.records, thread.disclosed) {
-		block := objectOf(r[dealProfile])
+		block := dealBlock(r)
 		if recordType, _ := textOf(block["record_type"]); recordType != profileInput {
 			continue
 		}

@@ -1,0 +1,59 @@
+{
+  "fixture": "appendix-a/buyer-book/01-agreement.json",
+  "expect": "valid",
+  "appendix_a_line": "18",
+  "story": "The offerer's agreement opens the buyer's deal book and names the seller's agreement in seen; the deal starts with it.",
+  "placement": "deal_book",
+  "record": {
+    "x-deal-v1": {
+      "profile": "x-deal-v1",
+      "canonicalization": "jcs",
+      "deal_id": "deal-6a1f0c93b27d4e58",
+      "record_type": "agree",
+      "at": "2026-11-01T10:00:00Z",
+      "seq": 1,
+      "seen": "f4bc4f74947fa9934274e9747b7b17e987c86ef15d15f038b0a0d24ed5772e2d"
+    },
+    "body": {
+      "kind": "agreement",
+      "offer": {
+        "type": "deal-record",
+        "digest_alg": "SHA-256",
+        "digest": "c6a4d8dcff09e51ade5b664d89ad0a564a665e4992b5d06c52d70c8d57d6b737"
+      },
+      "rows_digest": "7c7f457f9ee333bfe71ccb4a1191074224da5d854b184205b10ecddd6c0ee1ed",
+      "side": "offerer",
+      "role": "buyer",
+      "admit": {
+        "type": "deal-record",
+        "digest_alg": "SHA-256",
+        "digest": "d69f3b3f5ec5cd7438a65b9ed8a8420893599ffd6e8b5ad3553c7c8f2a7e8bb3"
+      },
+      "intent": {
+        "type": "deal-record",
+        "digest_alg": "SHA-256",
+        "digest": "b77b53a74c6910c1e3193b2f6746e849bac40abab0367d234acf5dcb0358f454"
+      },
+      "witnesses": [
+        {
+          "key_id": "80ae629533cb26fd2bd280e9d3445f1f8f0f071b62e3712df0c698108936aad3",
+          "url": "https://witness.example"
+        }
+      ],
+      "adjudicator": {
+        "key_id": "8695e224c826802e02236ac829a007c2cebe1bf5b676509a2c35604ca710ee7b",
+        "rules_digest": "988138e31bd4a96f55b3ba933f681deb4551c812ee4e19555aeb843f22d7d591",
+        "rules_url": "https://adjudicator.example/rules"
+      },
+      "forums": [
+        "auto:ref"
+      ],
+      "counterparty_layer": true,
+      "counterparty_key": "7aed120cea31516c35af0a8e13bfde77c4365ed00556aba1afbb3223fceb6353",
+      "checkpoint_key": "6f4dbcf3a4757c293c0e092ec650786b19ec40e5e44376c7a9f50bcfc1a54b6b",
+      "shelf_log_id": "03b24c18cc9277dbaeaec74dc765c63a992e1c46013f3195dfb2c86d3794e56b"
+    }
+  },
+  "expected_digest": "02419989baf62fa35ddfc95b4bf8ee154aaebaf0da7f5b6a558317462b227c85",
+  "record_id": "64bb887db1b74b31d01c36ecf7f30d546af92d13c0cd1278ea61c232a46c04ec"
+}

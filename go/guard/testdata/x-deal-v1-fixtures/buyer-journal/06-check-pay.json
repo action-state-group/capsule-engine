@@ -1,0 +1,24 @@
+{
+  "fixture": "appendix-a/buyer-journal/06-check-pay.json",
+  "expect": "valid",
+  "appendix_a_line": "23",
+  "story": "Its own rules check the act before it: pay 60 dollars under payment reference pay-ref-7731.",
+  "placement": "journal",
+  "record": {
+    "x-deal-v1": {
+      "profile": "x-deal-v1",
+      "canonicalization": "jcs",
+      "deal_id": "deal-6a1f0c93b27d4e58",
+      "record_type": "check",
+      "at": "2026-11-01T10:10:00Z"
+    },
+    "body": {
+      "action": "pay",
+      "amount_minor": 6000,
+      "currency": "USD",
+      "payment_ref": "pay-ref-7731",
+      "nonce": "5399b4c5c3c7c040b5ac7571a2d1ae9cf5e8497d20ee116435dc11397dc0cc95"
+    }
+  },
+  "expected_digest": "c92275672ad7d9779c5d0ad2d5702da4f6f235ca73c3a5c5e0a39d736005013b"
+}

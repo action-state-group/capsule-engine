@@ -317,6 +317,52 @@ def _bound(record: dict, disclosed: dict) -> bool:
     return isinstance(bound, str) and json_digest(disclosed) == bound
 
 
+# The deal profile blocks replay reads (capsule-engine #301): x-deal-v0, and
+# x-deal-v1, whose version rule is evidencebook's dealprofile.Version (v0.18.1)
+# restated here and pinned by the shared vectors. A v1 record type is read as
+# the v0 type for the same step, so the readers below are version-blind: an act
+# carried out (perform, settle) is an action step, detail_change is a change.
+_PROFILE_V0, _PROFILE_V1 = "x-deal-v0", "x-deal-v1"
+_PROFILE_NAME = re.compile(r"^x-deal-v[0-9]+$")
+_V1_TO_V0_TYPE = {"perform": "action", "settle": "action", "detail_change": "change"}
+
+
+def _block(shown: dict) -> object:
+    """The profile block of a disclosed record: its ``x-deal-v0`` member as it
+    always was, or a valid ``x-deal-v1`` member (its ``profile`` equals its
+    name) with its record type as the v0 type for the same step. ``None`` when
+    there is none, when it names two blocks, or when a v1 block does not name
+    itself: such a record is read as no block (``unreadable_profile`` says why
+    a history holding one is not evaluable)."""
+    has0, has1 = _PROFILE_V0 in shown, _PROFILE_V1 in shown
+    if has0 and has1:
+        return None
+    if has0:
+        return shown[_PROFILE_V0]
+    block = shown.get(_PROFILE_V1)
+    if not has1 or not isinstance(block, dict) or block.get("profile") != _PROFILE_V1:
+        return None
+    record_type = block.get("record_type")
+    if isinstance(record_type, str) and record_type in _V1_TO_V0_TYPE:
+        block = {**block, "record_type": _V1_TO_V0_TYPE[record_type]}
+    return block
+
+
+def unreadable_profile(shown: dict) -> str | None:
+    """Why the profile blocks of ``shown`` cannot be read, or ``None`` when
+    they can (none, x-deal-v0, or a valid x-deal-v1). A record the engine
+    cannot read is never one that states nothing: a history holding one is
+    read as unreadable, so not knowing never means allowing."""
+    names = [k for k in shown if _PROFILE_NAME.fullmatch(k)]
+    if len(names) > 1:
+        return "the record names more than one deal profile block"
+    if names and names[0] not in (_PROFILE_V0, _PROFILE_V1):
+        return "the record's deal profile version is not one the engine reads"
+    if names == [_PROFILE_V1] and _block(shown) is None:
+        return "the record's x-deal-v1 block does not name itself as its profile"
+    return None
+
+
 def _checked_body(disclosed: dict, *, history: bool = False) -> tuple[dict, object] | None:
     """The body of a deal check (an ``x-deal-v0`` check record, or a typed
     ``proposed-action/v0``) and the counterparty block it seals, or ``None``
@@ -328,7 +374,7 @@ def _checked_body(disclosed: dict, *, history: bool = False) -> tuple[dict, obje
     ``x-deal-v0`` action step, which seals the counterparty in its block as a
     check does. An action step whose body states an act taken without a check
     (``body.unchecked``) is not read: it was never authorized."""
-    block = disclosed.get("x-deal-v0")
+    block = _block(disclosed)
     body = disclosed.get("body")
     record_type = block.get("record_type") if isinstance(block, dict) else None
     if record_type == "check" or (history and _is_action_step(disclosed) and not _taken_unchecked(body)):
@@ -349,7 +395,7 @@ _SOURCE = "source"
 def _is_check(disclosed: dict) -> bool:
     """Whether ``disclosed`` is a deal check: an ``x-deal-v0`` check record
     or a typed ``proposed-action/v0``."""
-    block = disclosed.get("x-deal-v0")
+    block = _block(disclosed)
     if isinstance(block, dict):
         return block.get("record_type") == "check"
     return disclosed.get("type") == _PROPOSED_TYPE
@@ -358,7 +404,7 @@ def _is_check(disclosed: dict) -> bool:
 def _refs(disclosed: dict) -> list:
     """A deal record's refs: an ``x-deal-v0`` record's block refs, else a
     typed record's own; ``[]`` when it has none in a list."""
-    block = disclosed.get("x-deal-v0")
+    block = _block(disclosed)
     refs = block.get("refs") if isinstance(block, dict) else disclosed.get("refs")
     return refs if isinstance(refs, list) else []
 
@@ -383,7 +429,7 @@ def _no_proposal(disclosed: dict, body: dict) -> bool | None:
 def _is_action_step(disclosed: dict) -> bool:
     """Whether ``disclosed`` is an ``x-deal-v0`` action step: an act carried
     out, as a deal seals it."""
-    block = disclosed.get("x-deal-v0")
+    block = _block(disclosed)
     return isinstance(block, dict) and block.get("record_type") == _ACTION_STEP
 
 
@@ -572,6 +618,7 @@ def _returned_minor(body: dict) -> int | None:
 # ``deal_id``, a typed record in its top-level ``chain_id``, which capsulectl
 # sets to exactly that value. Read only through ``_deal_id``.
 _DEAL_ID_FIELDS = ("x-deal-v0.deal_id", "chain_id")
+_DEAL_ID_FIELDS_V1 = ("x-deal-v1.deal_id", "chain_id")
 
 
 @dataclass(frozen=True)
@@ -587,7 +634,7 @@ def _deal_id(shown: dict) -> _DealId:
     one, else its typed ``chain_id``. A record stating both, and not the same
     value, names no deal and is a conflict: neither is picked. A stated value
     that is not a non-empty string names no deal."""
-    block = shown.get("x-deal-v0")
+    block = _block(shown)
     stated = isinstance(block, dict) and "deal_id" in block
     chained = "chain_id" in shown
     if stated and chained and block["deal_id"] != shown["chain_id"]:
@@ -599,6 +646,62 @@ def names_two_deals(shown: dict) -> bool:
     """Whether the record ``shown`` names two deals (``_deal_id``), so it is
     in none."""
     return _deal_id(shown).conflict
+
+
+_SETTLEMENT = "settlement"
+# The largest settlement amount read: 2^53-1, the largest integer JCS carries
+# exactly (the Go guard's maxSafeMinor).
+_MAX_SAFE_MINOR = 2**53 - 1
+
+
+def _v1_act_body(record: dict, disclosed: dict, body: dict) -> dict | None:
+    """The v0-shaped body of an x-deal-v1 act (perform or settle) read as the
+    act the history knows: a payer leg is money out and a payee leg money in,
+    whose amount and currency are the capsule's ``settlement`` member (v1
+    PROFILE.md sections 5 and 7), and ``body.reverses`` the act reversed. A
+    perform states no amount. ``None`` when a payer leg carries no readable
+    settlement member: such a leg is malformed, and is read as unread rather
+    than left out of the spend window, which would let it escape the caps."""
+    settle = disclosed[_PROFILE_V1].get("record_type") == "settle"
+    out: dict = {"action": "settle" if settle else "perform"}
+    reverses = body.get("reverses")
+    if reverses is not None:
+        out["reverses_ref"] = reverses
+    if not settle:
+        return out
+    leg = body.get("leg")
+    amount = (record.get(_SETTLEMENT) or {}).get("amount") if isinstance(record.get(_SETTLEMENT), dict) else None
+    value = amount.get("value") if isinstance(amount, dict) else None
+    code = amount.get("assetCode") if isinstance(amount, dict) else None
+    minor = (
+        int(value)
+        if isinstance(value, str) and re.fullmatch(r"0|[1-9][0-9]*", value) and len(value) <= len(str(_MAX_SAFE_MINOR))
+        and int(value) <= _MAX_SAFE_MINOR
+        else None
+    )
+    if minor is None or not isinstance(code, str) or not code:
+        if leg == "payer":
+            return None
+    else:
+        out["amount_minor"], out["spend_minor"], out["currency"] = minor, minor, code
+    out["direction"] = MONEY_IN if leg == "payee" else "out"
+    return out
+
+
+def act_view(capsule: dict, shown: dict | None) -> dict | None:
+    """``shown`` as the history reads an act: itself, unless it is an x-deal-v1
+    perform or settle, which states its act in the capsule's settlement member
+    and not in its body, and so is returned with the v0-shaped body
+    ``_v1_act_body`` builds. ``None`` when a payer leg's settlement member
+    cannot be read: the act is unread, never one that is left out of the
+    spend window."""
+    if not isinstance(shown, dict) or _PROFILE_V1 not in shown or not isinstance(shown[_PROFILE_V1], dict):
+        return shown
+    if shown[_PROFILE_V1].get("record_type") not in ("perform", "settle") or _block(shown) is None:
+        return shown
+    body = shown.get("body")
+    body = _v1_act_body(capsule, shown, body if isinstance(body, dict) else {})
+    return None if body is None else {**shown, "body": body}
 
 
 def _bridge_deal_check(
@@ -668,11 +771,22 @@ def _bridge_deal_check(
     it is named in ``ignored_inputs`` and the act has no target from it."""
     if disclosed is None or not _bound(record, disclosed):
         return None
+    if history and unreadable_profile(disclosed) is not None:
+        # A history act whose profile cannot be read is unread, never no act.
+        return None
+    if history:
+        # An x-deal-v1 act states its amount in the capsule's settlement
+        # member (``act_view``).
+        disclosed = act_view(record, disclosed)
+        if disclosed is None:
+            return None
     checked = _checked_body(disclosed, history=history)
     if checked is None:
         return None
     body, sealed_counterparty = checked
-    if not body.get("action_class") or not body.get("taxonomy_version"):
+    if not (history and _PROFILE_V1 in disclosed and _is_action_step(disclosed)) and (
+        not body.get("action_class") or not body.get("taxonomy_version")
+    ):
         return None
     spend = body.get("spend_minor")
     authorized = body.get("spend_authorized_minor")
@@ -714,7 +828,7 @@ def _bridge_deal_check(
         verb=str(body.get("action") or "unknown"),
         operator=record.get("operator", ""),
         developer=record.get("developer", ""),
-        action_class=body["action_class"],
+        action_class=body.get("action_class"),
         action_id=record.get("action_id") or None,
         action_type=record.get("action_type", "decide"),
         timestamp=record.get("timestamp"),
@@ -724,7 +838,7 @@ def _bridge_deal_check(
         currency=body.get("currency"),
         rail=_text(recourse.get("rail")) or _text(body.get("rail")),
         target=target,
-        taxonomy_version=body["taxonomy_version"],
+        taxonomy_version=body.get("taxonomy_version"),
         counterparty_ids=counterparty_ids,
         counterparty_fp_alg=fp_alg,
         refundable=_flag(recourse.get("refundable")),
@@ -749,7 +863,7 @@ def _bridge_deal_check(
         returned_minor=returned,
         reverses_ref=reverses,
         deal_id=deal.value,
-        deal_id_conflict=_DEAL_ID_FIELDS if deal.conflict else (),
+        deal_id_conflict=(_DEAL_ID_FIELDS_V1 if _PROFILE_V1 in disclosed else _DEAL_ID_FIELDS) if deal.conflict else (),
         counterparty_malformed=malformed,
         ignored_inputs=tuple(ignored),
     )
@@ -773,7 +887,7 @@ def statement_record(record: dict, disclosed: dict | None) -> StatementRecord | 
     replay and a live check's history."""
     if disclosed is None or not _bound(record, disclosed):
         return None
-    block = disclosed.get("x-deal-v0")
+    block = _block(disclosed)
     body = disclosed.get("body")
     if not isinstance(block, dict) or block.get("record_type") != _CLAIM or not isinstance(body, dict):
         return None
@@ -831,7 +945,7 @@ def _states_no_act(record: dict, disclosed: dict | None) -> bool:
     capsule does not bind."""
     if disclosed is None or not _bound(record, disclosed):
         return False
-    block = disclosed.get("x-deal-v0")
+    block = _block(disclosed)
     if not isinstance(block, dict):
         return disclosed.get("type") in _TYPED_NO_ACT
     record_type = block.get("record_type")
@@ -843,6 +957,12 @@ def action_for_record(record: dict, disclosed: dict | None = None, *, counterpar
     sealed, when a bundle disclosed it (``load_disclosed``).
     ``counterparty_profile`` is the payee keyed per profile for a deal check,
     from the checker input or the check's companion (module docstring)."""
+    if disclosed is not None and _bound(record, disclosed) and unreadable_profile(disclosed) is not None:
+        # A record whose profile cannot be read is not evaluable, never one
+        # that states nothing: the engine refuses what it would allow, naming
+        # the profile blocks the record carries.
+        names = tuple(k for k in disclosed if _PROFILE_NAME.fullmatch(k))
+        return replace(Action.from_capsule(record), deal_id_conflict=names)
     bridged = _bridge_deal_check(record, disclosed, counterparty_profile) or _bridge_transfer_funds(record)
     if bridged is not None:
         return bridged
@@ -963,7 +1083,8 @@ def action_for_history_entry(entry: dict) -> Action | None:
     its check's (``_bridge_deal_check``). ``counterparty_profile`` still
     replaces that target, as it does a check's. ``None`` when the entry is
     not an act its capsule binds, or
-    names no class or taxonomy, or states an act taken without a check:
+    names no class or taxonomy (an x-deal-v1 perform or settle is bridged with
+    none: no class is guessed for it), or states an act taken without a check:
     what it records cannot be read as a checked act."""
     capsule, agent_input = _entry_parts(entry)
     action = _bridge_deal_check(
@@ -1031,7 +1152,7 @@ def _companion_profiles(records: list[dict], disclosed: dict[str, dict]) -> dict
         shown = disclosed.get(record.get("capsule_id", ""))
         if shown is None or not _bound(record, shown):
             continue
-        block = shown.get("x-deal-v0")
+        block = _block(shown)
         if not isinstance(block, dict) or block.get("record_type") != _PROFILE_INPUT:
             continue
         refs = block.get("refs")
@@ -1050,7 +1171,7 @@ def _deal_records(records: list[dict], disclosed: dict[str, dict]) -> dict[str, 
     found: dict[str, dict] = {}
     for record in records:
         shown = disclosed.get(record.get("capsule_id", ""))
-        if shown is not None and isinstance(shown.get("x-deal-v0"), dict) and _bound(record, shown):
+        if shown is not None and isinstance(_block(shown), dict) and _bound(record, shown):
             found[json_digest(shown)] = shown
     return found
 
@@ -1106,7 +1227,7 @@ def _accepted_offer_at(records: list[dict], disclosed: dict[str, dict]) -> dict[
         if deal is None:
             continue
         body = shown.get("body") if isinstance(shown.get("body"), dict) else {}
-        block = shown.get("x-deal-v0")
+        block = _block(shown)
         if isinstance(block, dict) and block.get("record_type") == _MESSAGE and body.get("from") == _COUNTERPARTY:
             messages[json_digest(shown)] = (deal, _message_time(block, body))
         if shown.get("type") == _PROPOSED_TYPE and body.get("action") == _OFFER:
@@ -1170,14 +1291,14 @@ def _answered_message(shown: dict) -> str | None:
 
 
 def _record_type(shown: dict) -> str | None:
-    record_type = shown["x-deal-v0"].get("record_type")
+    record_type = _block(shown).get("record_type")
     return record_type if isinstance(record_type, str) else None
 
 
 def _only_ref(shown: dict, rel: str) -> str | None:
     """The digest of the record ``shown``'s one ``rel`` ref names, when it has
     exactly one and it is a SHA-256 ``deal-record`` ref; else ``None``."""
-    refs = shown["x-deal-v0"].get("refs")
+    refs = _block(shown).get("refs")
     found = [r for r in refs if isinstance(r, dict) and r.get("rel") == rel] if isinstance(refs, list) else []
     if len(found) != 1 or found[0].get("type") != "deal-record":
         return None
@@ -1315,7 +1436,7 @@ def _taken(shown: dict, *, every_record_is_an_act: bool) -> tuple[dict, bool] | 
     body = shown.get("body")
     if not isinstance(body, dict):
         return None
-    block = shown.get("x-deal-v0")
+    block = _block(shown)
     record_type = block.get("record_type") if isinstance(block, dict) else shown.get("type")
     if record_type in (_OUTCOME_STEP, "action-outcome/v0") or _UNCHECKED in body or _ATTEMPTED in body:
         taken = body.get(_UNCHECKED, body.get(_ATTEMPTED))
@@ -1354,6 +1475,11 @@ def _executed_act(capsule: dict, shown: dict | None, *, every_record_is_an_act: 
     """The act the record ``shown``, bound by ``capsule``, states was
     executed (``_taken``), or ``None`` for one that states none. An act whose
     record is not given cannot be read: its spend is ``None``."""
+    if shown is not None and unreadable_profile(shown) is not None:
+        # An act whose profile cannot be read is unread, never no act.
+        return _ExecutedAct(spend_minor=None, action_class=None)
+    if shown is not None:
+        shown = act_view(capsule, shown)
     if shown is None:
         return _ExecutedAct(spend_minor=None, action_class=None)
     taken = _taken(shown, every_record_is_an_act=every_record_is_an_act)
