@@ -114,6 +114,10 @@ def unknown_version(ai):
     ai["x-deal-v2"]["profile"] = "x-deal-v2"
 
 
+def extra_block(ai):
+    ai["x-deal-v2"] = {"profile": "x-deal-v2"}
+
+
 def named_other(ai):
     ai["x-deal-v1"]["profile"] = "x-deal-v0"
 
@@ -129,6 +133,7 @@ cases = {
     "v1-check-in-history": envelope([v1_check()]),
     "v1-pay-over-safe": envelope([v1_settle("over", value="9007199254740992")]),
     "v1-check-two-blocks": envelope([v0_pay("a")], check=with_block(v1_check(), two_blocks)),
+    "v1-check-extra-block": envelope([v0_pay("a")], check=with_block(v1_check(), extra_block)),
     "v1-check-unknown-version": envelope([v0_pay("a")], check=with_block(v1_check(), unknown_version)),
     "v1-check-block-names-other": envelope([v0_pay("a")], check=with_block(v1_check(), named_other)),
     "v1-pay-no-settlement": envelope([v1_settle("nosettle", settlement=False)]),

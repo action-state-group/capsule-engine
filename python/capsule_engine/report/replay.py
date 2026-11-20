@@ -673,7 +673,12 @@ def _v1_act_body(record: dict, disclosed: dict, body: dict) -> dict | None:
     amount = (record.get(_SETTLEMENT) or {}).get("amount") if isinstance(record.get(_SETTLEMENT), dict) else None
     value = amount.get("value") if isinstance(amount, dict) else None
     code = amount.get("assetCode") if isinstance(amount, dict) else None
-    minor = int(value) if isinstance(value, str) and re.fullmatch(r"0|[1-9][0-9]*", value) and int(value) <= _MAX_SAFE_MINOR else None
+    minor = (
+        int(value)
+        if isinstance(value, str) and re.fullmatch(r"0|[1-9][0-9]*", value) and len(value) <= len(str(_MAX_SAFE_MINOR))
+        and int(value) <= _MAX_SAFE_MINOR
+        else None
+    )
     if minor is None or not isinstance(code, str) or not code:
         if leg == "payer":
             return None
@@ -952,15 +957,15 @@ def action_for_record(record: dict, disclosed: dict | None = None, *, counterpar
     sealed, when a bundle disclosed it (``load_disclosed``).
     ``counterparty_profile`` is the payee keyed per profile for a deal check,
     from the checker input or the check's companion (module docstring)."""
-    bridged = _bridge_deal_check(record, disclosed, counterparty_profile) or _bridge_transfer_funds(record)
-    if bridged is not None:
-        return bridged
     if disclosed is not None and _bound(record, disclosed) and unreadable_profile(disclosed) is not None:
         # A record whose profile cannot be read is not evaluable, never one
         # that states nothing: the engine refuses what it would allow, naming
         # the profile blocks the record carries.
         names = tuple(k for k in disclosed if _PROFILE_NAME.fullmatch(k))
         return replace(Action.from_capsule(record), deal_id_conflict=names)
+    bridged = _bridge_deal_check(record, disclosed, counterparty_profile) or _bridge_transfer_funds(record)
+    if bridged is not None:
+        return bridged
     if _states_no_act(record, disclosed):
         return replace(Action.from_capsule(record), states_act=False)
     return Action.from_capsule(record)

@@ -454,7 +454,7 @@ func saleLogOpenings(bound []jsonObject, lastUnread *int, findings *[]string) sa
 		switch recordTypeOf(s) {
 		case "thread_opened":
 			var refs, named []json.RawMessage
-			_ = json.Unmarshal(dealBlock(s)["refs"], &refs)
+			_ = json.Unmarshal(objectOf(s[dealProfile])["refs"], &refs)
 			for _, raw := range refs {
 				if objectOf(raw) != nil {
 					named = append(named, raw)
@@ -742,6 +742,8 @@ func isBound(record jsonObject, agentInput json.RawMessage) bool {
 
 // dealBlock is a record's deal profile block of either version, as
 // profileBlockOf reads it (report/replay.py _block), nil when it has none.
+// Only the companion-profile reader uses it: the sale-thread readers here
+// read x-deal-v0 only, as report/sale_bundle.py does.
 func dealBlock(s jsonObject) jsonObject {
 	block, _ := profileBlockOf(s)
 	return block
@@ -753,13 +755,13 @@ func typeOf(s jsonObject) string {
 }
 
 func recordTypeOf(s jsonObject) string {
-	t, _ := textOf(dealBlock(s)["record_type"])
+	t, _ := textOf(objectOf(s[dealProfile])["record_type"])
 	return t
 }
 
 // seqOf is a record's x-deal-v0.seq, or -1.
 func seqOf(s jsonObject) int {
-	raw := dealBlock(s)["seq"]
+	raw := objectOf(s[dealProfile])["seq"]
 	var n int
 	if !isInteger(raw) || json.Unmarshal(raw, &n) != nil {
 		return -1

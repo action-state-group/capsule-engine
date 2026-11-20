@@ -255,6 +255,135 @@
    }
   },
   {
+   "case": "inputs/v1-check-extra-block.input",
+   "kind": "check-input",
+   "pack": "everyday-0.3.9",
+   "input": "go/guard/testdata/x-deal-v1-vectors/inputs/v1-check-extra-block.input.json",
+   "input_sha256": "fff5425f7db4d16aa734c7ff904b4dc6489a2a71a4a552d1ad229640f5885fed",
+   "expected": {
+    "outcome": "deny",
+    "constraints": [
+     {
+      "id": "dedupe",
+      "result": "pass",
+      "method": "exact_match_index_v0",
+      "evidence_digest": "d520c8a95b170cfa9c64cf328be15df1d3062a79ed70d466939d4629fa0ed4fa"
+     },
+     {
+      "id": "caps",
+      "result": "n/a",
+      "method": "spend.weekly/3.1.0",
+      "evidence_digest": "7a049ba37b2851287decae218ff18caac4da237c247a5188da1bd39320a2827c",
+      "reason": "no cap configured for this action class"
+     },
+     {
+      "id": "verify_before_dispatch",
+      "result": "n/a",
+      "method": "agent_action_capsule.verify",
+      "evidence_digest": "332ea7520b7c67c07d2cfa041b2a46cc04772908d9ac03eecb28f01f668e3e3d",
+      "reason": "action cites no mandate capsule"
+     },
+     {
+      "id": "destination_rail",
+      "result": "n/a",
+      "method": "set_membership_v0",
+      "evidence_digest": "904d983a236b66b3eb661b336daeee7106c22fa6f061ff91fbc737975e8eff09",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "counterparty_identity_change",
+      "result": "n/a",
+      "method": "prior_recorded_value_v0",
+      "evidence_digest": "870b0a3e1636cab6902013f7742c0b36dfd72f324d1ff9ee3cd0976aa6d19241",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "credential_pattern",
+      "result": "n/a",
+      "method": "regex_match_v0",
+      "evidence_digest": "dc643756ca81e0fe6bc3a49c9cbfd7a4d7cfdee57087820f84f034be3ed88827",
+      "reason": "the action sends no outgoing content"
+     },
+     {
+      "id": "recurring_charge",
+      "result": "n/a",
+      "method": "structured_field_v0",
+      "evidence_digest": "ed761a48bede343570feeba08dd105fb225b9caf75b52392ea84550fdcc7b0b2",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "action_class_gate",
+      "result": "fail",
+      "method": "taxonomy_selector_v0",
+      "evidence_digest": "c8410c46a8921d68168c1305a4a94805c17058eb49fc6506c47b035daafeb064"
+     },
+     {
+      "id": "counterparty_seen_before",
+      "result": "n/a",
+      "method": "counterparty.seen_before/3.0.0",
+      "evidence_digest": "029cd64fa2475bae9a0fd960a7a61c5df24d383fdf1683885fafa87ec448486e",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "recipient_role",
+      "result": "n/a",
+      "method": "set_membership_v0",
+      "evidence_digest": "32c56c444c47acdc25539d7282272764d46278442b647e53fd8079c33a5cafeb",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "refundability",
+      "result": "n/a",
+      "method": "declared_boolean_v0",
+      "evidence_digest": "7471f20fa8882393d42d3d4b38107a7be30b40e2b10ba838b30f7cc58dea0a5c",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "material_fields_changed",
+      "result": "n/a",
+      "method": "pinned_field_count_v0",
+      "evidence_digest": "e510562f4fe422536148c0153efabe41e40dffbd58bf33a9badc88d6258d49c8",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "offer_fields_changed",
+      "result": "n/a",
+      "method": "pinned_field_count_v0",
+      "evidence_digest": "5301c7f61cebf5b8c57025b54c441a38f5dab35b558c0896995e00f3ee596629",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "recipient_seen_before",
+      "result": "n/a",
+      "method": "counterparty.seen_before/2.0.0",
+      "evidence_digest": "c7a84acb724ca272de76e7ed4c699268414ba4327cd140a72c429dd565287d53",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "channel_change",
+      "result": "n/a",
+      "method": "same_record_v0",
+      "evidence_digest": "0ad91372036802d3b0b5b0baedeea673d02aa73cabedfe8f7c1dd774ddeb3e9e",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "upfront_amount",
+      "result": "n/a",
+      "method": "upfront_threshold_v0",
+      "evidence_digest": "0d0e8ae7a25e36254dd52de0a64abd81a2bbaa53230e320b8f73ebba253d54e2",
+      "reason": "the rule is not configured for this action class"
+     },
+     {
+      "id": "task_authority",
+      "result": "n/a",
+      "method": "bound_plan_containment_v0",
+      "evidence_digest": "c41e4b3a2077a40320e10ad50ccbfe5cc0efe57bd2d3dfe235357c61e8d051b9",
+      "reason": "the rule is not configured for this action class"
+     }
+    ]
+   }
+  },
+  {
    "case": "inputs/v1-check-in-history.input",
    "kind": "check-input",
    "pack": "everyday-0.3.9",

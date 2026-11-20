@@ -81,7 +81,7 @@ def test_a_payee_leg_is_money_in_and_names_what_it_reverses():
     assert view["body"]["reverses_ref"] == ref
 
 
-@pytest.mark.parametrize("capsule", [{}, _capsule("1.5"), _capsule("-1"), _capsule("007"), _capsule(code=""), _capsule("9007199254740992")])
+@pytest.mark.parametrize("capsule", [{}, _capsule("1.5"), _capsule("-1"), _capsule("007"), _capsule(code=""), _capsule("9007199254740992"), _capsule("9" * 5000)])
 def test_a_payer_settle_with_no_readable_settlement_is_unread(capsule):
     assert act_view(capsule, _settle()) is None
 
@@ -96,7 +96,8 @@ def test_the_largest_readable_amount_is_two_to_the_53_minus_1():
     lambda r: r[_PROFILE_V1].update({"profile": _PROFILE_V0}),
 ])
 def test_a_checked_record_whose_profile_is_unreadable_is_refused_not_read_as_no_deal(mutate):
-    record = {_PROFILE_V1: {"profile": _PROFILE_V1, "record_type": "check", "deal_id": DEAL}, "body": {"action": "pay"}}
+    record = {_PROFILE_V1: {"profile": _PROFILE_V1, "record_type": "check", "deal_id": DEAL},
+              "body": {"action": "pay", "action_class": "money.purchase", "taxonomy_version": "6", "amount_minor": 2000}}
     mutate(record)
     capsule = {"capsule_id": HEX, "action_id": DEAL + "/2", "action_type": "fyi", "operator": "o", "developer": "d",
                "timestamp": "2026-10-07T12:00:00Z",
