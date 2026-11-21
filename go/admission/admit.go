@@ -36,9 +36,8 @@ var ErrNoTier = errors.New("admission: a decision without a tier is not sealed a
 // card_digest and nonce the caller's (refs). Like the block, it is
 // local-only; only its digest leaves the holder, in an agreement.
 func (d Decision) Admit(refs AdmitRefs) (canon.Value, error) {
-	if d.Tier == "" {
-		return canon.Value{}, ErrNoTier
-	}
+	// The refs are checked first, so a caller's malformed refs are refused
+	// whatever the verdict.
 	asks, err := digestRefs("asks", refs.Asks)
 	if err != nil {
 		return canon.Value{}, err
@@ -52,6 +51,9 @@ func (d Decision) Admit(refs AdmitRefs) (canon.Value, error) {
 	}
 	if !digestPattern.MatchString(refs.Nonce) {
 		return canon.Value{}, errors.New("admission: admit nonce is not 64 lowercase hex")
+	}
+	if d.Tier == "" {
+		return canon.Value{}, ErrNoTier
 	}
 	rows := make([]string, len(d.Rows))
 	for i, r := range d.Rows {

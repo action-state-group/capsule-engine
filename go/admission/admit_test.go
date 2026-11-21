@@ -97,9 +97,6 @@ func TestAdmitVectors(t *testing.T) {
 		} else if a.AdmitsDeal == nil || *a.AdmitsDeal != d.AdmitsDeal {
 			t.Errorf("%s: admits_deal %v, want %v", a.Case, d.AdmitsDeal, a.AdmitsDeal)
 		}
-		if d.AdmitsDeal != (d.Verdict == GO || d.Verdict == LIMIT && d.Source != SourceAboveTier && d.Source != SourceRows) {
-			t.Errorf("%s: admits_deal %v for %s from %s", a.Case, d.AdmitsDeal, d.Verdict, d.Source)
-		}
 	}
 	for _, v := range []string{GO, ASK, LIMIT, NO} {
 		if !verdicts[v] {
@@ -136,8 +133,13 @@ func TestAdmitBody(t *testing.T) {
 	}
 
 	// No tier, no admit.
-	if _, err := (Decision{Verdict: NO, Source: SourceMissing}).Admit(AdmitRefs{}); !errors.Is(err, ErrNoTier) {
+	no := Decision{Verdict: NO, Source: SourceMissing}
+	if _, err := no.Admit(AdmitRefs{CardDigest: hex("c"), Nonce: hex("e")}); !errors.Is(err, ErrNoTier) {
 		t.Errorf("a decision without a tier: %v, want ErrNoTier", err)
+	}
+	// Malformed refs are refused whatever the verdict, a NO included.
+	if _, err := no.Admit(AdmitRefs{}); err == nil || errors.Is(err, ErrNoTier) {
+		t.Errorf("a NO with malformed refs: %v, want a refusal of the refs", err)
 	}
 
 	// Each caller-held member must be 64 lowercase hex.

@@ -223,17 +223,22 @@ func TestAdmit(t *testing.T) {
 		"no asks":                `{"answers":[],"card_digest":"` + strings.Repeat("c", 64) + `"}`,
 		"an ask that is not hex": `{"asks":["x"],"answers":[],"card_digest":"` + strings.Repeat("c", 64) + `"}`,
 		"two JSON values":        `{"asks":[],"answers":[],"card_digest":"` + strings.Repeat("c", 64) + `"} {}`,
+		"a trailing ]":           `{"asks":[],"answers":[],"card_digest":"` + strings.Repeat("c", 64) + `"}]`,
+		"a trailing }":           `{"asks":[],"answers":[],"card_digest":"` + strings.Repeat("c", 64) + `"}}`,
 		"not JSON":               `asks`,
 	} {
 		path := filepath.Join(dir, "refs.json")
 		if err := os.WriteFile(path, []byte(body), 0o600); err != nil {
 			t.Fatal(err)
 		}
-		in := `{"now":"2026-01-01T00:00:00Z","amount":"1","currency":"USD"}`
-		var out, errb bytes.Buffer
-		code := run([]string{"admission", "evaluate", "--pack", pack, "--admit", path}, strings.NewReader(in), &out, &errb)
-		if code != exitUnusable || out.Len() != 0 {
-			t.Errorf("%s: exit %d, stdout %q", name, code, out.String())
+		// The same refusal for a decision with a tier and for a NO.
+		for _, in := range []string{`{"now":"2026-01-01T00:00:00Z","amount":"1","currency":"USD"}`,
+			`{"now":"2026-01-01T00:00:00Z","amount":"1","currency":"USD","operator":{"deny_listed":true}}`} {
+			var out, errb bytes.Buffer
+			code := run([]string{"admission", "evaluate", "--pack", pack, "--admit", path}, strings.NewReader(in), &out, &errb)
+			if code != exitUnusable || out.Len() != 0 {
+				t.Errorf("%s, %s: exit %d, stdout %q", name, in, code, out.String())
+			}
 		}
 	}
 	var out2, errb2 bytes.Buffer

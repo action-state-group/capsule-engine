@@ -60,6 +60,24 @@
    "nonce": "813d82a13bd04c1be6cba5e03781836675272b3a7b3d6de709a937fd347f4349",
    "admit": "{\"answers\":[],\"asks\":[],\"card_digest\":\"43a85a3f33405e5d49116327670683d9af6fd46efb817192c182b78a8d835013\",\"nonce\":\"813d82a13bd04c1be6cba5e03781836675272b3a7b3d6de709a937fd347f4349\",\"outcome\":\"LIMIT\",\"pack_digest\":\"9eee5bce2771ed8f0523b628c4536bdfbfff80ddd8ef37f041cb55ed7d28ab66\",\"rows\":[\"attestation\",\"deny-list\",\"adverse\",\"halves\",\"card-verified\",\"card-fresh\",\"key-age\",\"settled\",\"conflicting\",\"vouches\",\"adjacent-domain\"],\"tier\":\"T2\"}",
    "admits_deal": false
+  },
+  {
+   "case": "t1-attestation-unknown-is-missing-at-t0",
+   "asks": [],
+   "answers": [],
+   "card_digest": "e2f338df02faea219788cd87daf783b74ad4d400511af73978d2d71508c018fa",
+   "nonce": "bdd7a9432ecf3cba62a8a7efca3ee233afc0f73c96782c982de3534cb91cbec9",
+   "admit": "{\"answers\":[],\"asks\":[],\"card_digest\":\"e2f338df02faea219788cd87daf783b74ad4d400511af73978d2d71508c018fa\",\"nonce\":\"bdd7a9432ecf3cba62a8a7efca3ee233afc0f73c96782c982de3534cb91cbec9\",\"outcome\":\"LIMIT\",\"pack_digest\":\"9eee5bce2771ed8f0523b628c4536bdfbfff80ddd8ef37f041cb55ed7d28ab66\",\"rows\":[\"attestation\",\"deny-list\",\"adverse\",\"halves\",\"card-verified\",\"card-fresh\",\"key-age\",\"settled\",\"conflicting\"],\"tier\":\"T0\"}",
+   "admits_deal": false
+  },
+  {
+   "case": "amount-missing-is-missing",
+   "asks": [],
+   "answers": [],
+   "card_digest": "ec8f4f295ef955f3b01cc2cc44524aee2953e8a696fd2abae60d6782e86d5133",
+   "nonce": "5bf4130ff956207cf0ed2f9a98eaec0ed0aa26f03d142a8bdd684b984f9fdc6a",
+   "admit": "{\"answers\":[],\"asks\":[],\"card_digest\":\"ec8f4f295ef955f3b01cc2cc44524aee2953e8a696fd2abae60d6782e86d5133\",\"nonce\":\"5bf4130ff956207cf0ed2f9a98eaec0ed0aa26f03d142a8bdd684b984f9fdc6a\",\"outcome\":\"LIMIT\",\"pack_digest\":\"9eee5bce2771ed8f0523b628c4536bdfbfff80ddd8ef37f041cb55ed7d28ab66\",\"rows\":[\"attestation\",\"deny-list\",\"adverse\",\"halves\"],\"tier\":\"T0\"}",
+   "admits_deal": false
   }
  ]
 }

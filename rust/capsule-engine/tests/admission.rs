@@ -725,4 +725,6 @@ fn admit_refuses_a_member_that_is_not_hex() {
     }
     d.tier = None;
     assert_eq!(d.admit(&ok), Err(AdmitError::NoTier));
+    // Malformed refs are refused whatever the verdict, a NO included.
+    assert_eq!(d.admit(&AdmitRefs::default()), Err(AdmitError::NotHex("card_digest".into())));
 }

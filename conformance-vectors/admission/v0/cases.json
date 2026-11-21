@@ -214,6 +214,38 @@
    }
   },
   {
+   "case": "t1-attestation-unknown-is-missing-at-t0",
+   "pack": "packs/ladder.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50000",
+    "currency": "sat",
+    "platform": {},
+    "card": {},
+    "own": {
+     "exchanges": 0,
+     "settled": 0,
+     "held_halves": 0,
+     "conflicting": 0,
+     "verdicts": []
+    },
+    "operator": {
+     "deny_listed": false
+    },
+    "vouches": [],
+    "subject": "",
+    "judged": {},
+    "asks": {},
+    "asks_made": 0
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "attestation",
+    "tier": "T0",
+    "block_sha256": "f4ee9a187a25d82d3892310db57e24d8ba0ad637dd06c8e5f5f31b3194ab0d5e"
+   }
+  },
+  {
    "case": "t0-own-history-not-read-is-missing",
    "pack": "packs/ladder.json",
    "input": {

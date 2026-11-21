@@ -226,7 +226,9 @@ func readAdmitRefs(path string) (*admission.AdmitRefs, error) {
 	if err := dec.Decode(&f); err != nil {
 		return nil, fmt.Errorf("--admit: %w", err)
 	}
-	if dec.More() {
+	// Anything after the one object, even a stray ] or }, is refused:
+	// Decoder.More reports only whether an array or object continues.
+	if _, err := dec.Token(); err != io.EOF {
 		return nil, errors.New("--admit: more than one JSON value")
 	}
 	if f.Asks == nil || f.Answers == nil || f.CardDigest == "" {

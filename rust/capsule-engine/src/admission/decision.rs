@@ -296,7 +296,8 @@ impl Decision {
     /// caller's. Like the block, it is local-only; only its digest leaves the
     /// holder, in an agreement.
     pub fn admit(&self, refs: &AdmitRefs) -> Result<Value, AdmitError> {
-        let tier = self.tier.as_deref().ok_or(AdmitError::NoTier)?;
+        // The refs are checked first, so a caller's malformed refs are refused
+        // whatever the verdict (admit.go).
         let asks = digest_refs("asks", &refs.asks)?;
         let answers = digest_refs("answers", &refs.answers)?;
         if !is_hex64(&refs.card_digest) {
@@ -305,6 +306,7 @@ impl Decision {
         if !is_hex64(&refs.nonce) {
             return Err(AdmitError::NotHex("nonce".into()));
         }
+        let tier = self.tier.as_deref().ok_or(AdmitError::NoTier)?;
         let rows: Vec<&str> = self.rows.iter().map(|r| r.row.as_str()).collect();
         Ok(canon::obj([
             ("outcome", canon::s(self.verdict.as_str())),
