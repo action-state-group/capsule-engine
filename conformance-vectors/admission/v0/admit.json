@@ -1,0 +1,83 @@
+{
+ "source": "admit (capsule-engine#303): each case of cases.json named here, with the caller's refs, gives the x-deal-v1 admit body as JCS text (evidencebook dealprofile/x-deal-v1/PROFILE.md, admit), or null for a decision without a tier, and admits_deal, whether an agreement may cite it (GO, or LIMIT at a tier that holds the deal); digests and nonces are SHA-256(\"admit vector\\0\" + a name), fixed values to check against. Written by go test ./admission -run TestAdmitVectors -update; the Rust port checks it.",
+ "cases": [
+  {
+   "case": "t0-go-on-platform-rows",
+   "asks": [],
+   "answers": [],
+   "card_digest": "2f483f9d95edc1ef2c7586bff536759281d0c34d2a8df9429965d0b183128ecd",
+   "nonce": "f8cfc9fbaf8c7aa89938c53484882fbfd1ead53e56d67f16278c84c3b34b9bca",
+   "admit": "{\"answers\":[],\"asks\":[],\"card_digest\":\"2f483f9d95edc1ef2c7586bff536759281d0c34d2a8df9429965d0b183128ecd\",\"nonce\":\"f8cfc9fbaf8c7aa89938c53484882fbfd1ead53e56d67f16278c84c3b34b9bca\",\"outcome\":\"GO\",\"pack_digest\":\"9eee5bce2771ed8f0523b628c4536bdfbfff80ddd8ef37f041cb55ed7d28ab66\",\"rows\":[\"attestation\",\"deny-list\",\"adverse\",\"halves\"],\"tier\":\"T0\"}",
+   "admits_deal": true
+  },
+  {
+   "case": "t1-no-card-asks-once",
+   "asks": [
+    "94fd5e8499aba5d80c4607b540405c154c698dadd6f380c0eadb5eef03e1a46e"
+   ],
+   "answers": [],
+   "card_digest": "4c86740a84e9e2afb32a1de840b068405ede442f7252d3ed64dbf90c70b24a24",
+   "nonce": "a400adad6eeda2401b4be9dee252f71a7c7b3b78c4fa3963e73c4a99a5350f53",
+   "admit": "{\"answers\":[],\"asks\":[{\"digest\":\"94fd5e8499aba5d80c4607b540405c154c698dadd6f380c0eadb5eef03e1a46e\",\"digest_alg\":\"SHA-256\",\"type\":\"deal-record\"}],\"card_digest\":\"4c86740a84e9e2afb32a1de840b068405ede442f7252d3ed64dbf90c70b24a24\",\"nonce\":\"a400adad6eeda2401b4be9dee252f71a7c7b3b78c4fa3963e73c4a99a5350f53\",\"outcome\":\"ASK\",\"pack_digest\":\"9eee5bce2771ed8f0523b628c4536bdfbfff80ddd8ef37f041cb55ed7d28ab66\",\"rows\":[\"attestation\",\"deny-list\",\"adverse\",\"halves\",\"card-verified\",\"card-fresh\",\"key-age\",\"settled\",\"conflicting\"],\"tier\":\"T0\"}",
+   "admits_deal": false
+  },
+  {
+   "case": "t0-attestation-unknown-is-missing",
+   "asks": [
+    "94fd5e8499aba5d80c4607b540405c154c698dadd6f380c0eadb5eef03e1a46e"
+   ],
+   "answers": [
+    "b752ebd2ceed2379f1342389d96e32d3d6acd6a72018998dc9c8ab0501d3c0e7"
+   ],
+   "card_digest": "cbc5d785b2bb67b0729471a00a9d1de4e3c4dc207e12bd0c25b78153d580a11e",
+   "nonce": "76683c64e0e225c7d1b0238eb54b0bf3efae9be6bc4f0c0a9018cc5d60831512",
+   "admit": "{\"answers\":[{\"digest\":\"b752ebd2ceed2379f1342389d96e32d3d6acd6a72018998dc9c8ab0501d3c0e7\",\"digest_alg\":\"SHA-256\",\"type\":\"deal-record\"}],\"asks\":[{\"digest\":\"94fd5e8499aba5d80c4607b540405c154c698dadd6f380c0eadb5eef03e1a46e\",\"digest_alg\":\"SHA-256\",\"type\":\"deal-record\"}],\"card_digest\":\"cbc5d785b2bb67b0729471a00a9d1de4e3c4dc207e12bd0c25b78153d580a11e\",\"nonce\":\"76683c64e0e225c7d1b0238eb54b0bf3efae9be6bc4f0c0a9018cc5d60831512\",\"outcome\":\"LIMIT\",\"pack_digest\":\"9eee5bce2771ed8f0523b628c4536bdfbfff80ddd8ef37f041cb55ed7d28ab66\",\"rows\":[\"attestation\",\"deny-list\",\"adverse\",\"halves\"],\"tier\":\"T0\"}",
+   "admits_deal": true
+  },
+  {
+   "case": "t0-attestation-invalid",
+   "asks": [],
+   "answers": [],
+   "card_digest": "1b3ce7eb0aa74ad1e85b5b95f8e9b35de7b9f8add0c898814e8edc5b066e5c57",
+   "nonce": "96e426d1aaccdd9a437e9e51467a1bb6cd925b28dc4f6c4eee5d7962b52f792c",
+   "admit": null,
+   "admits_deal": false
+  },
+  {
+   "case": "t1-card-refused-limits",
+   "asks": [],
+   "answers": [],
+   "card_digest": "b236ffb2916e932125499b0d129e388f852e06043c06685cc5fb7a096c3acf76",
+   "nonce": "6e5001d8f46c0c41f520650016fe7018e4607f5a91d935ee25d47123462b10e5",
+   "admit": "{\"answers\":[],\"asks\":[],\"card_digest\":\"b236ffb2916e932125499b0d129e388f852e06043c06685cc5fb7a096c3acf76\",\"nonce\":\"6e5001d8f46c0c41f520650016fe7018e4607f5a91d935ee25d47123462b10e5\",\"outcome\":\"LIMIT\",\"pack_digest\":\"9eee5bce2771ed8f0523b628c4536bdfbfff80ddd8ef37f041cb55ed7d28ab66\",\"rows\":[\"attestation\",\"deny-list\",\"adverse\",\"halves\",\"card-verified\",\"card-fresh\",\"key-age\",\"settled\",\"conflicting\"],\"tier\":\"T0\"}",
+   "admits_deal": false
+  },
+  {
+   "case": "above-top-tier-limits",
+   "asks": [],
+   "answers": [],
+   "card_digest": "43a85a3f33405e5d49116327670683d9af6fd46efb817192c182b78a8d835013",
+   "nonce": "813d82a13bd04c1be6cba5e03781836675272b3a7b3d6de709a937fd347f4349",
+   "admit": "{\"answers\":[],\"asks\":[],\"card_digest\":\"43a85a3f33405e5d49116327670683d9af6fd46efb817192c182b78a8d835013\",\"nonce\":\"813d82a13bd04c1be6cba5e03781836675272b3a7b3d6de709a937fd347f4349\",\"outcome\":\"LIMIT\",\"pack_digest\":\"9eee5bce2771ed8f0523b628c4536bdfbfff80ddd8ef37f041cb55ed7d28ab66\",\"rows\":[\"attestation\",\"deny-list\",\"adverse\",\"halves\",\"card-verified\",\"card-fresh\",\"key-age\",\"settled\",\"conflicting\",\"vouches\",\"adjacent-domain\"],\"tier\":\"T2\"}",
+   "admits_deal": false
+  },
+  {
+   "case": "t1-attestation-unknown-is-missing-at-t0",
+   "asks": [],
+   "answers": [],
+   "card_digest": "e2f338df02faea219788cd87daf783b74ad4d400511af73978d2d71508c018fa",
+   "nonce": "bdd7a9432ecf3cba62a8a7efca3ee233afc0f73c96782c982de3534cb91cbec9",
+   "admit": "{\"answers\":[],\"asks\":[],\"card_digest\":\"e2f338df02faea219788cd87daf783b74ad4d400511af73978d2d71508c018fa\",\"nonce\":\"bdd7a9432ecf3cba62a8a7efca3ee233afc0f73c96782c982de3534cb91cbec9\",\"outcome\":\"LIMIT\",\"pack_digest\":\"9eee5bce2771ed8f0523b628c4536bdfbfff80ddd8ef37f041cb55ed7d28ab66\",\"rows\":[\"attestation\",\"deny-list\",\"adverse\",\"halves\",\"card-verified\",\"card-fresh\",\"key-age\",\"settled\",\"conflicting\"],\"tier\":\"T0\"}",
+   "admits_deal": false
+  },
+  {
+   "case": "amount-missing-is-missing",
+   "asks": [],
+   "answers": [],
+   "card_digest": "ec8f4f295ef955f3b01cc2cc44524aee2953e8a696fd2abae60d6782e86d5133",
+   "nonce": "5bf4130ff956207cf0ed2f9a98eaec0ed0aa26f03d142a8bdd684b984f9fdc6a",
+   "admit": "{\"answers\":[],\"asks\":[],\"card_digest\":\"ec8f4f295ef955f3b01cc2cc44524aee2953e8a696fd2abae60d6782e86d5133\",\"nonce\":\"5bf4130ff956207cf0ed2f9a98eaec0ed0aa26f03d142a8bdd684b984f9fdc6a\",\"outcome\":\"LIMIT\",\"pack_digest\":\"9eee5bce2771ed8f0523b628c4536bdfbfff80ddd8ef37f041cb55ed7d28ab66\",\"rows\":[\"attestation\",\"deny-list\",\"adverse\",\"halves\"],\"tier\":\"T0\"}",
+   "admits_deal": false
+  }
+ ]
+}

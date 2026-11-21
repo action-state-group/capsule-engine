@@ -46,6 +46,7 @@ pub fn evaluate(p: &Pack, input: &Inputs) -> Decision {
         verdict: Verdict::No,
         source: String::new(),
         tier: None,
+        admits_deal: false,
         band: None,
         rows: Vec::new(),
         asks: Vec::new(),
@@ -153,6 +154,12 @@ pub fn evaluate(p: &Pack, input: &Inputs) -> Decision {
         d.verdict = verdict;
         d.source = source.to_string();
         d.tier = usize::try_from(tier).ok().and_then(|i| p.tiers.get(i)).map(|t| t.id.clone());
+        // A LIMIT admits the deal when its tier holds the deal's band
+        // (admission design §2): the missing default at the lowest tier on a
+        // deal in that tier. A deal above every tier, or one whose band could
+        // not be read, is not held (evaluate.go decide).
+        d.admits_deal =
+            verdict == Verdict::Go || (verdict == Verdict::Limit && !missing && !above_tier && tier >= deal_tier);
         d
     };
     if let Some(row) = no_row {

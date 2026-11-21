@@ -311,6 +311,11 @@ type Decision struct {
 	Source string
 	// Tier is the tier admitted at, or "" when there is none.
 	Tier string
+	// AdmitsDeal is set when the decision admits the deal as evaluated:
+	// GO, or LIMIT at a tier that holds the deal's band. An x-deal-v1
+	// agreement cites only such a decision's admit (capsule-engine#303).
+	// It is not part of the block.
+	AdmitsDeal bool
 	// Band is nil for a free deal or one whose band could not be read.
 	Band *Band
 	Rows []RowResult
@@ -485,6 +490,11 @@ func Evaluate(p *Pack, in Inputs) Decision {
 			}
 		}
 		d.Verdict, d.Source, d.Tier = verdict, source, tierID(tier)
+		// A LIMIT admits the deal when its tier holds the deal's band
+		// (admission design §2): the missing default at the lowest tier on
+		// a deal in that tier. A deal above every tier, or one whose band
+		// could not be read, is not held.
+		d.AdmitsDeal = verdict == GO || (verdict == LIMIT && !missing && !aboveTier && tier >= dealTier)
 		return d
 	}
 	switch {
