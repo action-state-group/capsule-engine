@@ -11,9 +11,10 @@ use std::path::{Path, PathBuf};
 
 use capsule_engine::admission::{
     evaluate, inference_service_history_counts_for, standard_history_3_counts, standard_history_counts,
-    AdjudicationVerdict, BandCount, Card, CardCheckpoint, CardCheckpoints, Checkpoint, Claims, CoverageAsk, Disputes,
-    Inputs, Judgement, Operator, OwnHistory, Pack, Pin, Platform, RailPin, Receipts, Selection, Served, ServedPeriod,
-    Stake, Streams, Timestamp, Vouch, INFERENCE_SERVICE_HISTORY_PROPERTIES,
+    AdjudicationVerdict, AdmitError, AdmitRefs, BandCount, Card, CardCheckpoint, CardCheckpoints, Checkpoint, Claims,
+    CoverageAsk, Decision, Disputes, Inputs, Judgement, Operator, OwnHistory, Pack, PackRef, Pin, Platform, RailPin,
+    Receipts, Selection, Served, ServedPeriod, Stake, Streams, Timestamp, Verdict, Vouch,
+    INFERENCE_SERVICE_HISTORY_PROPERTIES,
 };
 use capsule_engine::canon;
 use serde_json::{Map, Value};
@@ -654,4 +655,74 @@ fn inference_service_history_vectors() {
             }
         }
     }
+}
+
+/// The shared admit vectors (conformance-vectors/admission/v0/admit.json,
+/// capsule-engine#303): each names a case of cases.json and the caller's
+/// refs, and gives the x-deal-v1 admit body as JCS text (null for a decision
+/// without a tier) and whether an agreement may cite it.
+#[test]
+fn admit_vectors() {
+    let cases: Value = serde_json::from_slice(&std::fs::read(vector_dir().join("cases.json")).unwrap()).unwrap();
+    let by_name: BTreeMap<&str, &Value> =
+        cases["cases"].as_array().unwrap().iter().map(|c| (c["case"].as_str().unwrap(), c)).collect();
+    let set: Value = serde_json::from_slice(&std::fs::read(vector_dir().join("admit.json")).unwrap()).unwrap();
+    let vectors = set["cases"].as_array().unwrap();
+    assert!(!vectors.is_empty(), "no admit vectors");
+    let strings =
+        |v: &Value| -> Vec<String> { v.as_array().unwrap().iter().map(|s| s.as_str().unwrap().to_string()).collect() };
+    for a in vectors {
+        let name = a["case"].as_str().unwrap();
+        let c = by_name.get(name).unwrap_or_else(|| panic!("{name}: no such case in cases.json"));
+        let src = std::fs::read(vector_dir().join(c["pack"].as_str().unwrap())).unwrap();
+        let p = Pack::load(&src).unwrap();
+        let d = evaluate(&p, &decode_input(&c["input"]));
+        let refs = AdmitRefs {
+            asks: strings(&a["asks"]),
+            answers: strings(&a["answers"]),
+            card_digest: a["card_digest"].as_str().unwrap().into(),
+            nonce: a["nonce"].as_str().unwrap().into(),
+        };
+        let got = match d.admit(&refs) {
+            Ok(body) => Some(canon::jcs(&body).unwrap()),
+            Err(AdmitError::NoTier) => {
+                assert!(d.tier.is_none(), "{name}: NoTier at a tier");
+                None
+            }
+            Err(e) => panic!("{name}: {e}"),
+        };
+        assert_eq!(got.as_deref(), a["admit"].as_str(), "{name}: admit");
+        assert_eq!(Some(d.admits_deal), a["admits_deal"].as_bool(), "{name}: admits_deal");
+    }
+}
+
+#[test]
+fn admit_refuses_a_member_that_is_not_hex() {
+    let mut d = Decision {
+        verdict: Verdict::Go,
+        source: "rows".into(),
+        tier: Some("T1".into()),
+        admits_deal: true,
+        band: None,
+        rows: Vec::new(),
+        asks: Vec::new(),
+        pack: PackRef { id: "asg/x/1.0.0".into(), digest: "a".repeat(64) },
+        coverage: None,
+    };
+    let ok = AdmitRefs { card_digest: "c".repeat(64), nonce: "e".repeat(64), ..Default::default() };
+    // No refs are written as empty arrays, as the profile requires.
+    let body = canon::jcs(&d.admit(&ok).unwrap()).unwrap();
+    assert!(body.contains(r#""asks":[]"#) && body.contains(r#""answers":[]"#), "{body}");
+    for (what, edit) in [
+        ("asks[0]", Box::new(|r: &mut AdmitRefs| r.asks = vec!["x".into()]) as Box<dyn Fn(&mut AdmitRefs)>),
+        ("answers[0]", Box::new(|r: &mut AdmitRefs| r.answers = vec!["A".repeat(64)])),
+        ("card_digest", Box::new(|r: &mut AdmitRefs| r.card_digest = "c".repeat(63))),
+        ("nonce", Box::new(|r: &mut AdmitRefs| r.nonce = String::new())),
+    ] {
+        let mut r = ok.clone();
+        edit(&mut r);
+        assert_eq!(d.admit(&r), Err(AdmitError::NotHex(what.into())), "{what}");
+    }
+    d.tier = None;
+    assert_eq!(d.admit(&ok), Err(AdmitError::NoTier));
 }

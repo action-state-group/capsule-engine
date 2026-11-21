@@ -48,7 +48,9 @@ mod standard_history;
 use std::collections::BTreeMap;
 
 pub use band::{Band, Unit};
-pub use decision::{AskOut, Coverage, Decision, Effect, NotCounted, PackRef, RowResult, RowStatus};
+pub use decision::{
+    AdmitError, AdmitRefs, AskOut, Coverage, Decision, Effect, NotCounted, PackRef, RowResult, RowStatus,
+};
 pub use evaluate::evaluate;
 pub use inference_service_history::{
     inference_service_history_counts, inference_service_history_counts_for, CardCheckpoint, CardCheckpoints,

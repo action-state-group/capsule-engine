@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"testing"
 )
@@ -117,5 +118,126 @@ func TestPinnedAndInputFile(t *testing.T) {
 	}
 	if !bytes.Equal(out.Bytes(), out2.Bytes()) {
 		t.Errorf("pinned file run differs from stdin run")
+	}
+}
+
+// TestAdmit runs the command with --admit over the shared admit vectors:
+// the body it prints is the vector's, apart from the nonce it draws, which
+// is fresh 64 lowercase hex on every run; admits_deal is the vector's; and
+// without --admit neither member is printed.
+func TestAdmit(t *testing.T) {
+	read := func(name string, v any) {
+		raw, err := os.ReadFile(filepath.Join(vectorDir, name))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := json.Unmarshal(raw, v); err != nil {
+			t.Fatal(err)
+		}
+	}
+	var cases struct {
+		Cases []struct {
+			Case  string          `json:"case"`
+			Pack  string          `json:"pack"`
+			Input json.RawMessage `json:"input"`
+		} `json:"cases"`
+	}
+	read("cases.json", &cases)
+	var admits struct {
+		Cases []struct {
+			Case       string   `json:"case"`
+			Asks       []string `json:"asks"`
+			Answers    []string `json:"answers"`
+			CardDigest string   `json:"card_digest"`
+			Admit      *string  `json:"admit"`
+			AdmitsDeal bool     `json:"admits_deal"`
+		} `json:"cases"`
+	}
+	read("admit.json", &admits)
+	nonceRE := regexp.MustCompile(`"nonce":"([0-9a-f]{64})"`)
+	nonces := map[string]bool{}
+	for _, a := range admits.Cases {
+		var pack string
+		var input json.RawMessage
+		for _, c := range cases.Cases {
+			if c.Case == a.Case {
+				pack, input = filepath.Join(vectorDir, filepath.FromSlash(c.Pack)), c.Input
+			}
+		}
+		refs, err := json.Marshal(map[string]any{"asks": a.Asks, "answers": a.Answers, "card_digest": a.CardDigest})
+		if err != nil {
+			t.Fatal(err)
+		}
+		refsPath := filepath.Join(t.TempDir(), "refs.json")
+		if err := os.WriteFile(refsPath, refs, 0o600); err != nil {
+			t.Fatal(err)
+		}
+		var out, errb bytes.Buffer
+		if code := run([]string{"admission", "evaluate", "--pack", pack, "--admit", refsPath}, bytes.NewReader(input), &out, &errb); code != 0 {
+			t.Fatalf("%s: exit %d: %s", a.Case, code, errb.String())
+		}
+		var o struct {
+			Admit      json.RawMessage `json:"admit"`
+			AdmitsDeal *bool           `json:"admits_deal"`
+		}
+		if err := json.Unmarshal(out.Bytes(), &o); err != nil {
+			t.Fatal(err)
+		}
+		if o.AdmitsDeal == nil || *o.AdmitsDeal != a.AdmitsDeal {
+			t.Errorf("%s: admits_deal %v, want %v", a.Case, o.AdmitsDeal, a.AdmitsDeal)
+		}
+		if a.Admit == nil {
+			if string(o.Admit) != "null" {
+				t.Errorf("%s: admit %s, want null", a.Case, o.Admit)
+			}
+			continue
+		}
+		m := nonceRE.FindSubmatch(o.Admit)
+		if m == nil {
+			t.Fatalf("%s: no nonce in %s", a.Case, o.Admit)
+		}
+		if nonces[string(m[1])] {
+			t.Errorf("%s: nonce drawn twice", a.Case)
+		}
+		nonces[string(m[1])] = true
+		want := nonceRE.ReplaceAllString(*a.Admit, `"nonce":"`+string(m[1])+`"`)
+		if string(o.Admit) != want {
+			t.Errorf("%s: admit\n got %s\nwant %s", a.Case, o.Admit, want)
+		}
+	}
+
+	pack := filepath.Join(vectorDir, "admission-baseline-1.0.0", "pack-definition.json")
+	var out, errb bytes.Buffer
+	if code := run([]string{"admission", "evaluate", "--pack", pack}, strings.NewReader(`{"now":"2026-01-01T00:00:00Z"}`), &out, &errb); code != 0 {
+		t.Fatalf("exit %d: %s", code, errb.String())
+	}
+	if strings.Contains(out.String(), `"admit"`) || strings.Contains(out.String(), `"admits_deal"`) {
+		t.Errorf("without --admit: %s", out.String())
+	}
+
+	// A refs file the command cannot use is a usage error, exit 2, nothing on stdout.
+	dir := t.TempDir()
+	for name, body := range map[string]string{
+		"an unknown member":      `{"asks":[],"answers":[],"card_digest":"` + strings.Repeat("c", 64) + `","nonce":"` + strings.Repeat("e", 64) + `"}`,
+		"no card_digest":         `{"asks":[],"answers":[]}`,
+		"no asks":                `{"answers":[],"card_digest":"` + strings.Repeat("c", 64) + `"}`,
+		"an ask that is not hex": `{"asks":["x"],"answers":[],"card_digest":"` + strings.Repeat("c", 64) + `"}`,
+		"two JSON values":        `{"asks":[],"answers":[],"card_digest":"` + strings.Repeat("c", 64) + `"} {}`,
+		"not JSON":               `asks`,
+	} {
+		path := filepath.Join(dir, "refs.json")
+		if err := os.WriteFile(path, []byte(body), 0o600); err != nil {
+			t.Fatal(err)
+		}
+		in := `{"now":"2026-01-01T00:00:00Z","amount":"1","currency":"USD"}`
+		var out, errb bytes.Buffer
+		code := run([]string{"admission", "evaluate", "--pack", pack, "--admit", path}, strings.NewReader(in), &out, &errb)
+		if code != exitUnusable || out.Len() != 0 {
+			t.Errorf("%s: exit %d, stdout %q", name, code, out.String())
+		}
+	}
+	var out2, errb2 bytes.Buffer
+	if code := run([]string{"admission", "evaluate", "--pack", pack, "--admit", filepath.Join(dir, "absent.json")}, strings.NewReader(`{}`), &out2, &errb2); code != exitUnusable {
+		t.Errorf("a refs file that does not exist: exit %d", code)
 	}
 }

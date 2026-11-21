@@ -124,6 +124,10 @@ pub struct Decision {
     pub source: String,
     /// The tier admitted at; None when there is none.
     pub tier: Option<String>,
+    /// Set when the decision admits the deal as evaluated: GO, or LIMIT at a
+    /// tier that holds the deal's band. An x-deal-v1 agreement cites only
+    /// such a decision's admit (capsule-engine#303). Not part of the block.
+    pub admits_deal: bool,
     /// None for a free deal or one whose band could not be read.
     pub band: Option<Band>,
     pub rows: Vec<RowResult>,
@@ -218,5 +222,99 @@ impl Decision {
                 .push(("coverage", canon::obj([("kind", canon::s(&c.kind)), ("population", canon::s(&c.population))])));
         }
         Value::Obj(block.into_iter().map(|(k, v)| (k.to_string(), v)).collect())
+    }
+}
+
+/// The members of an x-deal-v1 admit body only the caller holds
+/// (admit.go AdmitRefs; evidencebook dealprofile/x-deal-v1/PROFILE.md,
+/// "admit"; capsule-engine#303). Each is 64 lowercase hex.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct AdmitRefs {
+    /// The SHA-256 digests of the caller's own ask deal records of this
+    /// admission, in the order it sealed them.
+    pub asks: Vec<String>,
+    /// The same for its answer records.
+    pub answers: Vec<String>,
+    /// The SHA-256 of the JCS bytes of the counterparty's card document the
+    /// decision read.
+    pub card_digest: String,
+    /// A fresh random 256-bit value, drawn for this record only (u528).
+    pub nonce: String,
+}
+
+/// Why Decision::admit wrote no body (admit.go).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum AdmitError {
+    /// A decision without a tier (a NO) is not sealed as an admit
+    /// (admit.go ErrNoTier).
+    NoTier,
+    /// A caller-held member is not 64 lowercase hex.
+    NotHex(String),
+}
+
+impl std::fmt::Display for AdmitError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            AdmitError::NoTier => {
+                f.write_str("admission: a decision without a tier is not sealed as an x-deal-v1 admit")
+            }
+            AdmitError::NotHex(what) => write!(f, "admission: admit {what} is not 64 lowercase hex"),
+        }
+    }
+}
+
+impl std::error::Error for AdmitError {}
+
+fn is_hex64(s: &str) -> bool {
+    s.len() == 64 && s.bytes().all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
+}
+
+fn digest_refs(what: &str, digests: &[String]) -> Result<Value, AdmitError> {
+    digests
+        .iter()
+        .enumerate()
+        .map(|(i, h)| {
+            if !is_hex64(h) {
+                return Err(AdmitError::NotHex(format!("{what}[{i}]")));
+            }
+            Ok(canon::obj([
+                ("type", canon::s("deal-record")),
+                ("digest_alg", canon::s("SHA-256")),
+                ("digest", canon::s(h)),
+            ]))
+        })
+        .collect::<Result<Vec<_>, _>>()
+        .map(Value::Arr)
+}
+
+impl Decision {
+    /// admit.go Decision.Admit: the decision as the body of an x-deal-v1
+    /// admit record, for the caller to seal in its own journal. outcome is
+    /// the verdict, tier the tier admitted at, rows every row the decision
+    /// read (as the pack names them), pack_digest the pack's
+    /// definition_digest, and asks, answers, card_digest and nonce the
+    /// caller's. Like the block, it is local-only; only its digest leaves the
+    /// holder, in an agreement.
+    pub fn admit(&self, refs: &AdmitRefs) -> Result<Value, AdmitError> {
+        let tier = self.tier.as_deref().ok_or(AdmitError::NoTier)?;
+        let asks = digest_refs("asks", &refs.asks)?;
+        let answers = digest_refs("answers", &refs.answers)?;
+        if !is_hex64(&refs.card_digest) {
+            return Err(AdmitError::NotHex("card_digest".into()));
+        }
+        if !is_hex64(&refs.nonce) {
+            return Err(AdmitError::NotHex("nonce".into()));
+        }
+        let rows: Vec<&str> = self.rows.iter().map(|r| r.row.as_str()).collect();
+        Ok(canon::obj([
+            ("outcome", canon::s(self.verdict.as_str())),
+            ("tier", canon::s(tier)),
+            ("rows", canon::strs(&rows)),
+            ("asks", asks),
+            ("pack_digest", canon::s(&self.pack.digest)),
+            ("card_digest", canon::s(&refs.card_digest)),
+            ("answers", answers),
+            ("nonce", canon::s(&refs.nonce)),
+        ]))
     }
 }

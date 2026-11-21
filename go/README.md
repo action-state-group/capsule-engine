@@ -46,7 +46,7 @@ run the generator in the same change.
 
 ```bash
 go install github.com/action-state-group/capsule-engine/go/cmd/capsule-engine@vX.Y.Z
-capsule-engine admission evaluate --pack pack-definition.json [--pack-id ID --digest SHA256] [--input FILE] < input.json
+capsule-engine admission evaluate --pack pack-definition.json [--pack-id ID --digest SHA256] [--input FILE] [--admit FILE] < input.json
 ```
 
 `--pack` is a compiled admission `pack-definition.json`; with `--pack-id` and `--digest` it must be
@@ -59,6 +59,18 @@ block as JCS text) and `block_sha256`. Exit status 0 means a decision was made, 
 on stdout and one line on stderr. The decision is about one counterparty and is local-only; the
 command prints it to the caller's stdout and exports nothing. `cmd/capsule-engine` tests it over
 every shared vector.
+
+With `--admit FILE`, stdout also holds `admit`, the decision as the body of an x-deal-v1 `admit`
+record for the caller to seal in its own journal (evidencebook `dealprofile/x-deal-v1/PROFILE.md`,
+`admit`; capsule-engine#303), and `admits_deal`. The file holds what only the caller has:
+`{"asks": [hex], "answers": [hex], "card_digest": hex}`, the SHA-256 digests of its own `ask` and
+`answer` deal records of this admission and of the JCS bytes of the card document it read; unknown
+or missing members are refused. The body's `rows` are every row the decision read, as the pack names
+them, and its `nonce` is drawn fresh from `crypto/rand` on every run. `admit` is null for a decision
+without a tier (a NO), which is not sealed. `admits_deal` says whether an agreement may cite the
+admit: true for GO and for LIMIT at a tier that holds the deal's band, false otherwise. The library
+call is `Decision.Admit(AdmitRefs)` (Rust `Decision::admit`), decided the same in both languages over
+`conformance-vectors/admission/v0/admit.json`.
 
 ## Running it
 
