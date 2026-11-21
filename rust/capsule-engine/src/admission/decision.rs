@@ -290,8 +290,8 @@ fn digest_refs(what: &str, digests: &[String]) -> Result<Value, AdmitError> {
 impl Decision {
     /// admit.go Decision.Admit: the decision as the body of an x-deal-v1
     /// admit record, for the caller to seal in its own journal. outcome is
-    /// the verdict, tier the tier admitted at, rows every row the decision
-    /// read (as the pack names them), pack_digest the pack's
+    /// the verdict, tier the tier admitted at, rows every row that applied
+    /// to the deal's tier, whatever its result (as the pack names them), pack_digest the pack's
     /// definition_digest, and asks, answers, card_digest and nonce the
     /// caller's. Like the block, it is local-only; only its digest leaves the
     /// holder, in an agreement.

@@ -65,8 +65,8 @@ record for the caller to seal in its own journal (evidencebook `dealprofile/x-de
 `admit`; capsule-engine#303), and `admits_deal`. The file holds what only the caller has:
 `{"asks": [hex], "answers": [hex], "card_digest": hex}`, the SHA-256 digests of its own `ask` and
 `answer` deal records of this admission and of the JCS bytes of the card document it read; unknown
-or missing members are refused. The body's `rows` are every row the decision read, as the pack names
-them, and its `nonce` is drawn fresh from `crypto/rand` on every run. `admit` is null for a decision
+or missing members are refused. The body's `rows` are every row that applied to the deal's tier, whatever
+its result (a row not read included), as the pack names them, and its `nonce` is drawn fresh from `crypto/rand` on every run. `admit` is null for a decision
 without a tier (a NO), which is not sealed. `admits_deal` says whether an agreement may cite the
 admit: true for GO and for LIMIT at a tier that holds the deal's band, false otherwise. The library
 call is `Decision.Admit(AdmitRefs)` (Rust `Decision::admit`), decided the same in both languages over
