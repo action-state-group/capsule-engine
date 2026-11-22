@@ -1,0 +1,3 @@
+{
+  "note": "The goldens are the external-check-result/v0 bytes that a product plugin's own tests assert (a private repository, internal/plugin/testdata/emit/golden at commit a39a057) for the inputs in this directory's parent. cmd/capsule-engine's TestGuardCheckGoldens requires `capsule-engine guard check` to print them byte for byte, so the two copies of the mapping cannot drift apart unnoticed. Four of them (booking-55880, pay-history-5-days, pay-history-incomplete, pay-history-taxonomy-1-acts) replace earlier files in this directory that no test asserted and that differed in the overall verdict or a reason."
+}

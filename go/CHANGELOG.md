@@ -5,6 +5,8 @@ and `portedDefinitions` (`guard/engine.go`).
 
 ## Unreleased
 
+- Added: `capsule-engine guard check [--pack ID]`, a deal profile's rules checker for the embedded packs: one `external-check-input/v0` in, one `external-check-result/v0` out (the guard's per-rule report as findings, caps split per limit, reasons shortened to one clause, `Asks: ` sentences kept whole). The packs and evidencebook's public input and result schemas are embedded. `guard/testdata/emit/golden/` now holds the bytes the product plugin that first carried this mapping asserts, and four goldens that no test asserted are replaced by them (their overall verdict or a reason differed). Adds the dependency github.com/santhosh-tekuri/jsonschema/v6 (command only). `go/guard` is unchanged.
+
 ## 0.5.0 — 2026-11-21
 
 A minor on v0 (RELEASING.md): API additions (`Decision.Admit`, `AdmitRefs`, `Decision.AdmitsDeal`, `Inputs.Pin`, `Inputs.Streams`, `StandardHistory3Counts` and the rest below), new admission predicates and the x-deal-v1 reader; no `go/packs` pack version or ported definition changes. Cut for evidencebook-deal's `deal agree` path, whose hosts run `capsule-engine admission evaluate --admit` (capsule-engine#303). Merged since v0.4.0 that touch `go/`: #300, #302, #305, #306, #310, #311; #307 and #308 change the Python package only.
