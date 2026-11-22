@@ -109,6 +109,8 @@ jobs:
         run: pip install -e "./python[dev]"
       - name: the Python engine decides every shared vector as written, and the coverage gate holds
         run: python scripts/conformance_vectors.py --check
+      - name: the Python referee decides every shared referee vector as written
+        run: python scripts/referee_vectors.py --check
 
   conformance:
     if: always()
