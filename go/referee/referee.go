@@ -2,12 +2,16 @@
 
 // Package referee is a receiving party's check of a referee's sealed Result:
 // the Go port of Python capsule_engine.referee.verify_referee_result, deciding
-// the shared vectors in conformance-vectors/referee/v0 as Python does.
+// the shared vectors in conformance-vectors/referee/v0 as Python does, except
+// that the Result document is held to AAC's Evidence Result schema
+// (agent-action-capsule/go/evidenceresult), not the older revision Python
+// vendors (capsule-engine#318; the differing vectors carry a go_expected).
 //
 // VerifyResult establishes that the Result capsule verifies under the key it
 // carries, is signed by the referee key both halves' terms name, names exactly
 // the two halves given, and is the Result document it commits to, which itself
-// verifies as an Evidence Result v0 document. BindOpenings is the check a
+// verifies as an Evidence Result v0 document under evidenceresult.Check (with no
+// cited records, so a Result with a close or calibration claim is refused). BindOpenings is the check a
 // receiver runs first, so that terms a forged file supplied cannot name their
 // own referee: each half is authentic and each opening (action, terms)
 // recomputes the action_digest its half committed to.

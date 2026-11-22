@@ -3,7 +3,6 @@
 package referee
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"os"
@@ -33,9 +32,17 @@ type vector struct {
 		OK   bool   `json:"ok"`
 		Code string `json:"code"`
 	} `json:"expected"`
+	// GoExpected is set where Go decides differently on purpose: the Result is
+	// held to AAC's Evidence Result schema, which Python's vendored one is older than
+	// (capsule-engine#318).
+	GoExpected *struct {
+		OK   bool   `json:"ok"`
+		Code string `json:"code"`
+	} `json:"go_expected"`
 }
 
-// Every case is decided as Python decides it: the same outcome or the same code.
+// Every case is decided as Python decides it: the same outcome or the same code,
+// apart from the cases that carry a go_expected, which must really differ.
 func TestSharedVectors(t *testing.T) {
 	raw, err := os.ReadFile(vectors)
 	if err != nil {
@@ -58,7 +65,14 @@ func TestSharedVectors(t *testing.T) {
 				err = VerifyResult(c.Capsule, []byte(c.Doc), Inputs{
 					BuyerHalf: c.BuyerHalf, SellerHalf: c.SellerHalf, BuyerTerms: c.BuyerTerms, SellerTerms: c.SellerTerms})
 			}
-			if c.Expected.OK {
+			want := c.Expected
+			if c.GoExpected != nil {
+				want = *c.GoExpected
+				if want == c.Expected {
+					t.Fatal("go_expected equals expected: it is not a known difference")
+				}
+			}
+			if want.OK {
 				if err != nil {
 					t.Fatalf("want ok, got %v", err)
 				}
@@ -66,10 +80,10 @@ func TestSharedVectors(t *testing.T) {
 			}
 			var re *Error
 			if !errors.As(err, &re) {
-				t.Fatalf("want code %s, got %v", c.Expected.Code, err)
+				t.Fatalf("want code %s, got %v", want.Code, err)
 			}
-			if re.Code != c.Expected.Code {
-				t.Fatalf("want code %s, got %s (%s)", c.Expected.Code, re.Code, re.Detail)
+			if re.Code != want.Code {
+				t.Fatalf("want code %s, got %s (%s)", want.Code, re.Code, re.Detail)
 			}
 			codes[re.Code] = true
 		})
@@ -79,16 +93,5 @@ func TestSharedVectors(t *testing.T) {
 		if !codes[code] {
 			t.Errorf("no vector for %s", code)
 		}
-	}
-}
-
-// The embedded schema is the frozen Python one, byte for byte.
-func TestSchemaIsPythons(t *testing.T) {
-	want, err := os.ReadFile("../../python/capsule_engine/schemas/vendor/evidence-result-v0.json")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !bytes.Equal(want, schemaBytes) {
-		t.Fatal("go/referee/evidence-result-v0.json differs from the Python vendored schema")
 	}
 }
