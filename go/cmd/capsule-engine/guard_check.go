@@ -31,7 +31,8 @@ import (
 //
 // Exit status as for the other commands: 0 when a result was printed,
 // whatever its verdict; 2 otherwise, with nothing on stdout and one line on
-// stderr that names no value from the input.
+// stderr that names no value from the input: a decode or check failure says
+// which step refused and nothing of the record.
 //
 // The checker is one self-contained binary (capsulectl copies the
 // executable alone): the packs and the schemas are embedded, nothing is read
@@ -90,9 +91,12 @@ func guardCheck(args []string, stdin io.Reader, stdout io.Writer) error {
 	if err != nil {
 		return err
 	}
+	// The guard's decode and check errors name digests and ids from the
+	// input, and one can carry a line break: none is passed on. The refusal
+	// says only which step refused.
 	a, h, err := guard.DecodeCheckInput(raw)
 	if err != nil {
-		return err
+		return errors.New("the record or its history cannot be decoded: a record's body is not the one its capsule seals, or a member is unreadable")
 	}
 	p, err := packFor(*packID, a, pin)
 	if err != nil {
@@ -111,7 +115,7 @@ func guardCheck(args []string, stdin io.Reader, stdout io.Writer) error {
 	} else {
 		d, err := e.CheckWithHistory(a, h)
 		if err != nil {
-			return err
+			return errors.New("the record cannot be checked against the pack")
 		}
 		rep = e.Report(a, d)
 	}
@@ -191,9 +195,8 @@ func rulesPinOf(raw []byte) (*rulesPin, error) {
 	if err := json.Unmarshal(raw, &env); err != nil {
 		return nil, fmt.Errorf("rules_pin is not {pack, definition_digests}")
 	}
-	if p := env.RulesPin; p != nil && p.Pack == "" && len(p.DefinitionDigests) == 0 {
-		return nil, fmt.Errorf("rules_pin names neither a pack nor a definition digest")
-	}
+	// The schema already refuses a pin that names neither a pack nor a
+	// digest, a null member and an unknown member.
 	return env.RulesPin, nil
 }
 
