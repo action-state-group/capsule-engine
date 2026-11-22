@@ -12,9 +12,9 @@
 // own referee: each half is authentic and each opening (action, terms)
 // recomputes the action_digest its half committed to.
 //
-// What is not here: judging a deal, sealing a Result, and the judge-side checks
-// of a half's terms and of how the two halves answer each other (Python's
-// _check_half terms and operator checks, _check_pair and _check_shared). A
+// What is not here: judging a deal, sealing a Result, and Python's _check_half
+// terms and operator checks, _check_pair's answer link and _check_shared (the
+// one-key check of _check_pair is BindOpenings's halves_unpaired). A
 // receiver that must also hold that a Result is about a deal its own key sealed
 // one half of does that with its own key; it is not in this package.
 //
