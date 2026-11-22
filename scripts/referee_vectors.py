@@ -36,18 +36,15 @@ import sys
 import tempfile
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
-CASES = ROOT / "conformance-vectors" / "referee" / "v0" / "cases.json"
-
-os.environ["CAPSULE_WITNESS"] = "off"
-os.environ.pop("CAPSULE_LEDGER", None)
-os.environ.pop("CAPSULE_SIGNING_KEY_PATH", None)
-
 from agent_action_capsule.canonical import jcs
 from capsule_emit import seal
 from capsule_emit.bilateral import seal_action, seal_request
+
 from capsule_engine import referee
 from capsule_engine.referee import RefereeError
+
+ROOT = Path(__file__).resolve().parent.parent
+CASES = ROOT / "conformance-vectors" / "referee" / "v0" / "cases.json"
 
 #: Every RefereeError code the receive path can raise and the Go package returns.
 CODES = (
@@ -239,6 +236,10 @@ def _dump(cases: list[dict]) -> str:
 
 
 def main(argv: list[str] | None = None) -> int:
+    # Sealing reads these when it runs, so set them here rather than before the imports.
+    os.environ["CAPSULE_WITNESS"] = "off"
+    os.environ.pop("CAPSULE_LEDGER", None)
+    os.environ.pop("CAPSULE_SIGNING_KEY_PATH", None)
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     mode = ap.add_mutually_exclusive_group(required=True)
     mode.add_argument("--generate", action="store_true", help="seal new inputs and write every case (rare)")
