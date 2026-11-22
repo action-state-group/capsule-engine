@@ -47,8 +47,15 @@ func main() {
 }
 
 func run(args []string, stdin io.Reader, stdout, stderr io.Writer) int {
+	if len(args) >= 2 && args[0] == "guard" && args[1] == "check" {
+		if err := guardCheck(args[2:], stdin, stdout); err != nil {
+			fmt.Fprintln(stderr, "capsule-engine:", err)
+			return exitUnusable
+		}
+		return 0
+	}
 	if len(args) < 2 || args[0] != "admission" || args[1] != "evaluate" {
-		fmt.Fprintln(stderr, "usage: capsule-engine admission evaluate --pack FILE [--pack-id ID --digest SHA256] [--input FILE] [--admit FILE]")
+		fmt.Fprintln(stderr, "usage: capsule-engine admission evaluate --pack FILE [--pack-id ID --digest SHA256] [--input FILE] [--admit FILE] | capsule-engine guard check [--pack ID]")
 		return exitUnusable
 	}
 	fs := flag.NewFlagSet("admission evaluate", flag.ContinueOnError)

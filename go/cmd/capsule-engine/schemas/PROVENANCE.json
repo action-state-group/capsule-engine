@@ -1,0 +1,9 @@
+{
+  "note": "Vendored byte for byte from the public copy; not part of the vendored bytes.",
+  "source_repo": "action-state-group/evidencebook",
+  "source_commit": "1ce64cf5d4a70778900a292a38527157a35f648e",
+  "files": {
+    "external-check-input-v0.schema.json": {"source_path": "dealprofile/x-deal-v0/external-check-input-v0.schema.json", "sha256": "0f6d9dc88eaabffd00d5c8c6f546a0058d28343cb87a22a7faa10ef5eeac9097"},
+    "external-check-result-v0.schema.json": {"source_path": "dealprofile/x-deal-v0/external-check-result-v0.schema.json", "sha256": "63e0d15324ee79db5426ae810dc7e9ade4c5066f076a093a5e953dc1f0744122"}
+  }
+}

@@ -72,6 +72,21 @@ admit: true for GO and for LIMIT at a tier that holds the deal's band, false oth
 call is `Decision.Admit(AdmitRefs)` (Rust `Decision::admit`), decided the same in both languages over
 `conformance-vectors/admission/v0/admit.json`.
 
+## A rules checker for a deal profile
+
+`capsule-engine guard check [--pack ID]` reads one `external-check-input/v0` on stdin and prints one
+`external-check-result/v0`: the record and its history checked with this module's guard, one finding
+per rule, caps as one finding per limit (`r05-spending-limits#per_purchase`, `#7d`). It is a deal
+profile's rules checker (`capsulectl profile update --rules-checker FILE`, pinned by sha256). The
+packs and the two schemas are embedded, so the binary stands alone; the schemas are evidencebook's
+public copies (`cmd/capsule-engine/schemas/PROVENANCE.json`). The pack is `--pack`, else the
+input's `rules_pin`, else its `party_role` (a buyer, or no `party_role`: `asg/everyday/0.3.8`; a seller:
+`asg/seller/0.1.5`). Those defaults are fixed in `partyPacks` (`cmd/capsule-engine/guard_check.go`) and move only by a change there, so a deal that must run another embedded version names it with `--pack` or a `rules_pin`. A `party_role` with no pack leaves the action unevaluable: no pack runs, and the `not_evaluable` result carries the buyer pack's id and digest because a result must name one (the goldens hold the same). Exit 0 means a result was printed; exit 2 means none could be, with one line
+on stderr that names no value from the input. It applies the pack's own limits only: a limit a person sets is not applied by this command, so a host that lets a person set limits applies them itself (the `" you set"` reason wording is dead here). The result names the pack it ran (`ruleset_id`, `definition_digest`), so a default chosen by role is always visible. The output is held
+byte for byte to `guard/testdata/emit/golden/` by `TestGuardCheckGoldens`. It is a subcommand of
+`capsule-engine` rather than the `capsulectl-engine` plugin's `engine check`, which checks an
+`engine-ruleset/v0` and runs no pack.
+
 ## Running it
 
 ```sh

@@ -5,6 +5,7 @@ go 1.27.0
 require (
 	github.com/action-state-group/capsule-emit/go v0.3.1-0.20261027234055-9defe98af14b
 	github.com/action-state-group/checkpointed-local-log/go v0.1.1-0.20261027220337-fe4281c10be3
+	github.com/santhosh-tekuri/jsonschema/v6 v6.0.3
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -15,4 +16,5 @@ require (
 	github.com/kr/text v0.2.0 // indirect
 	github.com/veraison/go-cose v1.3.0 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
+	golang.org/x/text v0.14.0 // indirect
 )
