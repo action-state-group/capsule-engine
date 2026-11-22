@@ -73,6 +73,16 @@ def bind_openings(buyer: dict, seller: dict) -> None:
         raise RefereeError("halves_unpaired", "both halves are signed by one key")
 
 
+#: Cases the Go receiver decides differently on purpose. Python is frozen on the Evidence Result
+#: revision it vendors; ``go/referee`` holds a Result to AAC's schema (capsule-engine#318), which
+#: refuses an empty ``evidence`` list and takes ``$`` as the end of the text, so a digest with a
+#: trailing newline is refused. Each case keeps Python's ``expected`` and gains ``go_expected``.
+KNOWN_GO_DIFFERENCES = {
+    "claim-with-empty-evidence": {"code": "result_invalid"},
+    "evidence-digest-with-trailing-newline": {"code": "result_invalid"},
+}
+
+
 def decide(case: dict) -> dict:
     try:
         if case["kind"] == "bind":
@@ -251,13 +261,22 @@ def main(argv: list[str] | None = None) -> int:
         CASES.write_text(_dump(_generate()))
         return 0
     cases = json.loads(CASES.read_text())["cases"]
+    names = {c["name"] for c in cases}
+    stale = sorted(set(KNOWN_GO_DIFFERENCES) - names)
+    wrong = [c["name"] for c in cases if c.get("go_expected") != KNOWN_GO_DIFFERENCES.get(c["name"])]
     changed = [c["name"] for c in cases if c["expected"] != decide(c)]
     seen = {c["expected"].get("code") for c in cases}
     missing = [c for c in CODES if c not in seen]
     if args.write:
         for c in cases:
             c["expected"] = decide(c)
+            c.pop("go_expected", None)
+            if c["name"] in KNOWN_GO_DIFFERENCES:
+                c["go_expected"] = KNOWN_GO_DIFFERENCES[c["name"]]
         CASES.write_text(_dump(cases))
+    if args.check and (stale or wrong):
+        print(f"referee vectors: go_expected is not KNOWN_GO_DIFFERENCES for {wrong}; unknown cases {stale}", file=sys.stderr)
+        return 1
     if (changed and args.check) or missing or "ok" not in {k for c in cases for k in c["expected"]}:
         print(f"referee vectors: expected differs for {changed}; codes not covered: {missing}", file=sys.stderr)
         return 1

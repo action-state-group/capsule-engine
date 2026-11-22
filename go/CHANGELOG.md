@@ -5,6 +5,8 @@ and `portedDefinitions` (`guard/engine.go`).
 
 ## Unreleased
 
+- Changed (capsule-engine#318): `go/referee`'s `VerifyResult` holds the Result document to AAC's Evidence Result v0 schema through `agent-action-capsule/go/evidenceresult.Check` (v0.21.0), not the older revision Python vendors; the embedded copy of that schema and the Go port of Python's cross-element checks are deleted. Newly refused: a claim with `evidence: []`, and an evidence digest with a trailing newline. Newly accepted: the AAC-only members (`applies_from`, `coverage_declaration`, the `out_of_scope` verdict and bucket) when well formed. A Result with a `close` or `calibration` claim is refused as `result_invalid`, because `VerifyResult` carries no cited records. The Python judge's sealed Results are all accepted (six scenarios checked); Python's own check keeps the older revision, so the two receivers now differ on those inputs, pinned by `go_expected` on two shared referee vectors (`scripts/referee_vectors.py`, `KNOWN_GO_DIFFERENCES`).
+
 ## 0.6.0 — 2026-11-21
 
 A minor on v0 (RELEASING.md): an API addition (package `go/referee`) and a new command (`capsule-engine guard check`); no `go/packs` pack version or ported definition changes. Cut for evidencebook#624, whose `book referee receive` verb calls `go/referee`. Merged since v0.5.0 that touch `go/`: #313, #316.
