@@ -161,6 +161,11 @@ def _generate() -> list[dict]:
         capsule, doc_text = with_doc(edit)
         verify(name, capsule=capsule, doc_text=doc_text)
 
+    lone = "\ud800"  # an unpaired surrogate: json.loads takes it, canonicalizing refuses it
+    verify("capsule-with-unpaired-surrogate", capsule={**good, "operator": lone})
+    verify("capsule-tampered-document-with-unpaired-surrogate", capsule=tampered, doc_text='{"x": "\\ud800"}')
+    verify("document-with-unpaired-surrogate", doc_text='{"x": "\\ud800"}')
+    verify("terms-with-unpaired-surrogate-outside-referee", buyer_terms={**deal.terms, "note": lone})
     verify("capsule-null", capsule=None)
     verify("capsule-array", capsule=[])
     verify("capsule-tampered-and-document-not-json", capsule=tampered, doc_text="not json")
@@ -173,10 +178,10 @@ def _generate() -> list[dict]:
     uncited = seal(doc, action="referee.result", operator="referee-co", verdict="assessed", ledger=deal.referee_book,
                    extra_compute={referee.RESULT_BLOCK: {**block, "buyer_half": ids[0], "seller_half": ids[1]}})
     verify("block-names-the-halves-but-references-do-not", capsule=uncited.capsule)
-    for label, listed in (("differ", [1]), ("equal", [2])):
+    for label, listed, given in (("differ", [1], [2]), ("equal", [2], [2]), ("equal-as-a-float", [2], [2.0])):
         odd = seal(doc, action="referee.result", operator="referee-co", verdict="assessed", ledger=deal.referee_book,
                    extra_compute={referee.RESULT_BLOCK: {**block, "buyer_half": listed, "seller_half": ids[1]}})
-        verify(f"half-capsule-id-is-a-list-{label}", capsule=odd.capsule, buyer_half={**deal.buyer.half, "capsule_id": [2]})
+        verify(f"half-capsule-id-is-a-list-{label}", capsule=odd.capsule, buyer_half={**deal.buyer.half, "capsule_id": given})
     capsule, doc_text = with_doc(lambda d: d["claims"][0]["evidence"].append(
         {"digest_alg": "SHA-256", "digest": "a" * 64 + "\n"}))
     verify("evidence-digest-with-trailing-newline", capsule=capsule, doc_text=doc_text)
@@ -219,6 +224,8 @@ def _generate() -> list[dict]:
     resp = seal_action("seller-co", "goose@test", fixture.ACTION, referee.action_digest(fixture.ACTION, deal.seller_terms),
                        req.capsule_id, ledger=deal.buyer_book, extra_compute={"peer": "buyer-co"})
     bind("bind-half-null", {**buyer, "half": None}, seller)
+    bind("bind-half-with-unpaired-surrogate", {**buyer, "half": {**buyer["half"], "operator": "\ud800"}}, seller)
+    bind("bind-terms-with-unpaired-surrogate", {**buyer, "terms": {**buyer["terms"], "note": "\ud800"}}, seller)
     bind("bind-halves-one-key", {**buyer, "half": req.capsule}, {**seller, "half": resp.capsule})
     for case in cases:
         case["expected"] = decide(case)
@@ -226,7 +233,9 @@ def _generate() -> list[dict]:
 
 
 def _dump(cases: list[dict]) -> str:
-    return json.dumps({"cases": cases}, indent=1, sort_keys=True, ensure_ascii=False) + "\n"
+    """One case per line, so a diff names the case that changed."""
+    lines = ",\n".join(json.dumps(c, sort_keys=True, separators=(",", ":")) for c in cases)
+    return '{"cases":[\n' + lines + "\n]}\n"
 
 
 def main(argv: list[str] | None = None) -> int:

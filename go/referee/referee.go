@@ -30,7 +30,8 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"reflect"
+	"math/big"
+	"unicode/utf8"
 
 	"github.com/action-state-group/agent-action-capsule/go/canonical"
 	"github.com/action-state-group/agent-action-capsule/go/envelope"
@@ -95,9 +96,12 @@ func ActionDigest(action string, terms any) (string, error) {
 // ResultDigest is the digest a sealed Result names: SHA-256 of the Result's
 // JCS bytes. doc is the Result's JSON.
 func ResultDigest(doc []byte) (string, error) {
-	v, err := decode(doc)
+	v, tainted, err := decode(doc)
 	if err != nil {
 		return "", err
+	}
+	if tainted {
+		return "", errors.New("the document holds an unpaired surrogate")
 	}
 	return digest(v)
 }
@@ -111,25 +115,29 @@ func digest(v any) (string, error) {
 	return hex.EncodeToString(sum[:]), nil
 }
 
-// decode reads one JSON text as Python's json.loads does (numbers kept as
-// json.Number, nothing but whitespace after the value) and as the JCS step
-// later refuses what Python's refuses (a float, an unsafe integer). It has no
-// depth bound of its own: verify.Verify grades a too-deep capsule as not
-// authentic, as Python does.
-func decode(raw []byte) (any, error) {
-	if err := canonical.CheckJSONText(raw); err != nil {
-		return nil, err
+// decode reads one JSON text as Python's json.loads does: numbers kept as
+// json.Number, nothing but whitespace after the value, invalid UTF-8 refused.
+// It has no depth bound of its own: verify.Verify grades a too-deep capsule as
+// not authentic, as Python does. An unpaired surrogate escape is accepted by
+// json.loads and refused only when the value is later canonicalized (the
+// capsule's recomputed id, the Result digest, the action digest); the value is
+// returned with tainted set, so each caller refuses where Python does, since
+// encoding/json would otherwise read the escape as U+FFFD and a signature over
+// that text could verify here and not there.
+func decode(raw []byte) (v any, tainted bool, err error) {
+	if !utf8.Valid(raw) {
+		return nil, false, errors.New("not valid UTF-8")
 	}
+	tainted = canonical.CheckJSONText(raw) != nil
 	d := json.NewDecoder(bytes.NewReader(raw))
 	d.UseNumber()
-	var v any
 	if err := d.Decode(&v); err != nil {
-		return nil, err
+		return nil, false, err
 	}
 	if _, err := d.Token(); err != io.EOF {
-		return nil, errors.New("trailing data after JSON value")
+		return nil, false, errors.New("trailing data after JSON value")
 	}
-	return v, nil
+	return v, tainted, nil
 }
 
 type object = map[string]any
@@ -178,7 +186,7 @@ func cited(capsule object) map[string]bool {
 // decodeObject reads a document that must be a JSON object; text that is not
 // JSON, or not an object, cannot be read as one.
 func decodeObject(raw []byte, what string) (object, *Error) {
-	v, err := decode(raw)
+	v, _, err := decode(raw)
 	if err != nil {
 		return nil, refuse(CodeNotAResult, "%s cannot be read: %v", what, err)
 	}
@@ -197,16 +205,16 @@ func BindOpenings(buyer, seller Party) error {
 		role string
 		p    Party
 	}{{"buyer", buyer}, {"seller", seller}} {
-		value, err := decode(side.p.Half)
+		value, tainted, err := decode(side.p.Half)
 		if err != nil {
 			return refuse(CodeNotAResult, "the %s's half cannot be read: %v", side.role, err)
 		}
-		if !authentic(value) {
+		if tainted || !authentic(value) {
 			return refuse(CodeHalfUnverified, "the %s's half does not verify under the key it carries", side.role)
 		}
-		terms, err := decode(side.p.Terms)
-		if err != nil {
-			return refuse(CodeNotAResult, "the %s's terms cannot be read: %v", side.role, err)
+		terms, tainted, err := decode(side.p.Terms)
+		if err != nil || tainted {
+			return refuse(CodeNotAResult, "the %s's terms cannot be read", side.role)
 		}
 		want, err := ActionDigest(side.p.Action, terms)
 		if err != nil {
@@ -274,23 +282,23 @@ func hashable(v any) (any, bool, *Error) {
 // returns nil or an *Error.
 func VerifyResult(capsule, doc []byte, in Inputs) error {
 	// The document is read first, as Python's callers read it before the check.
-	resultDoc, derr := decode(doc)
+	resultDoc, docTainted, derr := decode(doc)
 	if derr != nil {
 		return refuse(CodeNotAResult, "the Result document cannot be read: %v", derr)
 	}
-	value, err := decode(capsule)
+	value, tainted, err := decode(capsule)
 	if err != nil {
 		return refuse(CodeNotAResult, "the Result capsule cannot be read: %v", err)
 	}
-	if !authentic(value) {
+	if tainted || !authentic(value) {
 		return refuse(CodeResultUnverified, "the Result capsule does not verify under the key it carries")
 	}
 	c := obj(value)
-	buyerTerms, err := decode(in.BuyerTerms)
+	buyerTerms, _, err := decode(in.BuyerTerms)
 	if err != nil {
 		return refuse(CodeNotAResult, "the buyer's terms cannot be read: %v", err)
 	}
-	sellerTerms, err := decode(in.SellerTerms)
+	sellerTerms, _, err := decode(in.SellerTerms)
 	if err != nil {
 		return refuse(CodeNotAResult, "the seller's terms cannot be read: %v", err)
 	}
@@ -338,7 +346,7 @@ func VerifyResult(capsule, doc []byte, in Inputs) error {
 		return refuse(CodeOtherDeal, "the Result names other halves")
 	}
 	want, derr := digest(resultDoc)
-	if derr != nil {
+	if derr != nil || docTainted {
 		return refuse(CodeNotAResult, "the Result document cannot be read: %v", derr)
 	}
 	if block["result_digest"] != want {
@@ -354,8 +362,54 @@ func VerifyResult(capsule, doc []byte, in Inputs) error {
 	return nil
 }
 
-// sameValue is Python's ==, for decoded JSON: lists and objects by content.
-func sameValue(a, b any) bool { return reflect.DeepEqual(a, b) }
+// sameValue is Python's ==, for decoded JSON: lists and objects by content,
+// numbers by value (2 == 2.0, and True == 1).
+func sameValue(a, b any) bool {
+	if x, ok := ratOf(a); ok {
+		y, ok := ratOf(b)
+		return ok && x.Cmp(y) == 0
+	}
+	switch x := a.(type) {
+	case []any:
+		y, ok := b.([]any)
+		if !ok || len(x) != len(y) {
+			return false
+		}
+		for i := range x {
+			if !sameValue(x[i], y[i]) {
+				return false
+			}
+		}
+		return true
+	case object:
+		y, ok := b.(object)
+		if !ok || len(x) != len(y) {
+			return false
+		}
+		for k, v := range x {
+			w, ok := y[k]
+			if !ok || !sameValue(v, w) {
+				return false
+			}
+		}
+		return true
+	}
+	return a == b
+}
+
+// ratOf is a number, or a boolean as Python counts it, as an exact rational.
+func ratOf(v any) (*big.Rat, bool) {
+	switch n := v.(type) {
+	case json.Number:
+		return new(big.Rat).SetString(string(n))
+	case bool:
+		if n {
+			return big.NewRat(1, 1), true
+		}
+		return big.NewRat(0, 1), true
+	}
+	return nil, false
+}
 
 func hashableValue(v any) bool {
 	switch v.(type) {
@@ -367,7 +421,7 @@ func hashableValue(v any) bool {
 
 func contains(set []any, v any) bool {
 	for _, x := range set {
-		if x == v {
+		if sameValue(x, v) {
 			return true
 		}
 	}
