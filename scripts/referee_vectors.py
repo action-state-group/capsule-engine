@@ -45,6 +45,10 @@ from capsule_engine.referee import RefereeError
 
 ROOT = Path(__file__).resolve().parent.parent
 CASES = ROOT / "conformance-vectors" / "referee" / "v0" / "cases.json"
+#: The Results the frozen Python judge seals for the lab faults of ``tests/test_referee.py``: real judge
+#: output, one per scenario, that ``go/referee``'s check (AAC's Evidence Result gate) must accept
+#: (capsule-engine#318). Written once by ``--generate-judge-results``; ``--check`` holds Python to them.
+JUDGE_RESULTS = CASES.parent / "judge-results.json"
 
 #: Every RefereeError code the receive path can raise and the Go package returns.
 CODES = (
@@ -96,6 +100,21 @@ def decide(case: dict) -> dict:
     except (ValueError, TypeError, AttributeError, KeyError):
         return {"code": "not_a_result"}
     return {"ok": True}
+
+
+def _judge_results() -> list[dict]:
+    fixture = _load_deal_class()
+    price = fixture.PRICE
+    scenarios = {
+        "honest": {},
+        "seller-price-differs": {"seller_price": {**price, "value": "2500"}},
+        "received-differs": {"received": {**price, "value": "1"}},
+        "late-delivery": {"sent_at": "2026-11-01T12:00:00Z"},
+        "no-rail-proof": {"rail": False},
+        "release-before-payment": {"sent_at": "2026-11-01T09:00:00Z"},
+    }
+    tmp = Path(tempfile.mkdtemp(prefix="referee-judge-results-"))
+    return [{"name": name, "doc": fixture.Deal(tmp / name, **kw).judge()} for name, kw in scenarios.items()]
 
 
 def _generate() -> list[dict]:
@@ -236,6 +255,8 @@ def _generate() -> list[dict]:
     bind("bind-halves-one-key", {**buyer, "half": req.capsule}, {**seller, "half": resp.capsule})
     for case in cases:
         case["expected"] = decide(case)
+        if case["name"] in KNOWN_GO_DIFFERENCES:
+            case["go_expected"] = KNOWN_GO_DIFFERENCES[case["name"]]
     return cases
 
 
@@ -253,12 +274,17 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     mode = ap.add_mutually_exclusive_group(required=True)
     mode.add_argument("--generate", action="store_true", help="seal new inputs and write every case (rare)")
+    mode.add_argument("--generate-judge-results", action="store_true",
+                      help="run the judge on each lab fault and write judge-results.json (rare)")
     mode.add_argument("--write", action="store_true", help="recompute every expected outcome from the committed inputs")
     mode.add_argument("--check", action="store_true", help="fail if an expected outcome is not what Python gives")
     args = ap.parse_args(argv)
     if args.generate:
         CASES.parent.mkdir(parents=True, exist_ok=True)
         CASES.write_text(_dump(_generate()))
+        return 0
+    if args.generate_judge_results:
+        JUDGE_RESULTS.write_text("".join(json.dumps(r, sort_keys=True, separators=(",", ":")) + "\n" for r in _judge_results()))
         return 0
     cases = json.loads(CASES.read_text())["cases"]
     names = {c["name"] for c in cases}
@@ -274,6 +300,13 @@ def main(argv: list[str] | None = None) -> int:
             if c["name"] in KNOWN_GO_DIFFERENCES:
                 c["go_expected"] = KNOWN_GO_DIFFERENCES[c["name"]]
         CASES.write_text(_dump(cases))
+    if args.check:
+        from capsule_engine.report.result import validate_against_schema, verify_result
+
+        for line in JUDGE_RESULTS.read_text().splitlines():
+            result = json.loads(line)
+            validate_against_schema(result["doc"])
+            verify_result(result["doc"])
     if args.check and (stale or wrong):
         print(f"referee vectors: go_expected is not KNOWN_GO_DIFFERENCES for {wrong}; unknown cases {stale}", file=sys.stderr)
         return 1

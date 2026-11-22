@@ -3,7 +3,10 @@
 package referee
 
 import (
+	"bufio"
+	"encoding/json"
 	"errors"
+	"os"
 	"strings"
 	"testing"
 
@@ -41,7 +44,7 @@ func TestCheckResultIsAACs(t *testing.T) {
 		"claim in no bucket": func(d object) {
 			d["aggregate"].(object)["buckets"].(object)["met"] = []any{}
 		},
-		"close claim, no records": func(d object) {
+		"close claim without its body": func(d object) {
 			d["claims"].([]any)[0].(object)["type"] = evidenceresult.TypeClose
 		},
 	} {
@@ -75,5 +78,62 @@ func TestAACFindingIsResultInvalid(t *testing.T) {
 	}
 	if err == nil || !strings.Contains(err.Error(), "evidence-result-v0") {
 		t.Fatalf("want an AAC finding, got %v", err)
+	}
+}
+
+// The out_of_scope verdict, its bucket and the member that allows it are AAC's
+// and were refused by the older vendored schema.
+func TestCheckResultAcceptsOutOfScope(t *testing.T) {
+	doc := resultOf(t, func(d object) {
+		claim := d["claims"].([]any)[0].(object)
+		claim["verdict"] = "out_of_scope"
+		claim["type"] = evidenceresult.TypeRequirement
+		claim["out_of_scope_allowed"] = true
+		buckets := d["aggregate"].(object)["buckets"].(object)
+		buckets["met"] = []any{}
+		buckets["out_of_scope"] = []any{"c1"}
+	})
+	if err := checkResult(doc); err != nil {
+		t.Fatalf("want ok, got %v", err)
+	}
+}
+
+func TestCheckResultRefusesANonObject(t *testing.T) {
+	var re *Error
+	if err := checkResult([]any{}); !errors.As(err, &re) || re.Code != CodeResultInvalid {
+		t.Fatalf("want result_invalid, got %v", err)
+	}
+}
+
+// The Results the frozen Python judge seals for its lab faults are accepted:
+// moving to AAC's check changes no verdict on anything the judge emits.
+func TestJudgeResultsAreAccepted(t *testing.T) {
+	f, err := os.Open("../../conformance-vectors/referee/v0/judge-results.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer f.Close()
+	sc := bufio.NewScanner(f)
+	sc.Buffer(nil, 1<<24)
+	n := 0
+	for sc.Scan() {
+		var r struct {
+			Name string          `json:"name"`
+			Doc  json.RawMessage `json:"doc"`
+		}
+		if err := json.Unmarshal(sc.Bytes(), &r); err != nil {
+			t.Fatal(err)
+		}
+		v, tainted, err := decode(r.Doc)
+		if err != nil || tainted {
+			t.Fatalf("%s: %v", r.Name, err)
+		}
+		if err := checkResult(v); err != nil {
+			t.Errorf("%s: %v", r.Name, err)
+		}
+		n++
+	}
+	if n != 6 {
+		t.Fatalf("want 6 judge results, got %d", n)
 	}
 }
