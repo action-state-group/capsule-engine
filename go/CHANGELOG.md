@@ -5,7 +5,7 @@ and `portedDefinitions` (`guard/engine.go`).
 
 ## Unreleased
 
-- Added: `capsule-engine guard check [--pack ID]`, a deal profile's rules checker for the embedded packs: one `external-check-input/v0` in, one `external-check-result/v0` out (the guard's per-rule report as findings, caps split per limit, reasons shortened to one clause, `Asks: ` sentences kept whole). The packs and evidencebook's public input and result schemas are embedded. `guard/testdata/emit/golden/` now holds the bytes the product plugin that first carried this mapping asserts, and four goldens that no test asserted are replaced by them (their overall verdict or a reason differed). Adds the dependency github.com/santhosh-tekuri/jsonschema/v6 (command only). `go/guard` is unchanged.
+- Added: `capsule-engine guard check [--pack ID]`, a deal profile's rules checker for the embedded packs: one `external-check-input/v0` in, one `external-check-result/v0` out (the guard's per-rule report as findings, caps split per limit, reasons shortened to one clause, `Asks: ` sentences kept whole). The packs and evidencebook's public input and result schemas are embedded. It applies the pack's own limits only: a limit a person sets is not applied by this command, so a host that lets a person set limits applies them itself. `guard/testdata/emit/golden/` now holds this mapping's expected bytes, asserted by a test; four goldens no test asserted are replaced (the old files read `not_evaluable` where the guard, unchanged here, decides `escalate`, and one read a raw reason where the pack's `Asks: ` sentence is kept). Adds the dependency github.com/santhosh-tekuri/jsonschema/v6 (command only). `go/guard` is unchanged.
 
 ## 0.5.0 — 2026-11-21
 
