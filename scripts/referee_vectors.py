@@ -107,8 +107,10 @@ def _generate() -> list[dict]:
     good = sealed(doc)
     cases: list[dict] = []
 
-    def verify(name: str, *, capsule=None, doc_text=None, **over) -> None:
-        case = {"name": name, "kind": "verify", "capsule": copy.deepcopy(capsule if capsule is not None else good),
+    unset = object()
+
+    def verify(name: str, *, capsule=unset, doc_text=None, **over) -> None:
+        case = {"name": name, "kind": "verify", "capsule": copy.deepcopy(good if capsule is unset else capsule),
                 "doc": doc_text if doc_text is not None else text,
                 **copy.deepcopy({**halves, **terms}), **copy.deepcopy(over)}
         cases.append(case)
@@ -159,6 +161,47 @@ def _generate() -> list[dict]:
         capsule, doc_text = with_doc(edit)
         verify(name, capsule=capsule, doc_text=doc_text)
 
+    verify("capsule-null", capsule=None)
+    verify("capsule-array", capsule=[])
+    verify("capsule-tampered-and-document-not-json", capsule=tampered, doc_text="not json")
+    for label, value in (("zero", 0), ("false", False), ("empty-string", ""), ("empty-list", [])):
+        verify(f"terms-referee-{label}", buyer_terms={**deal.terms, "referee": value},
+               seller_terms={**deal.seller_terms, "referee": value})
+    fake = referee.result_digest(doc)
+    block = {"schema": referee.RESULT_SCHEMA, "result_digest": fake, "contract_ref": referee.DEAL_TERMS_CONTRACT}
+    ids = (deal.buyer.half["capsule_id"], deal.seller.half["capsule_id"])
+    uncited = seal(doc, action="referee.result", operator="referee-co", verdict="assessed", ledger=deal.referee_book,
+                   extra_compute={referee.RESULT_BLOCK: {**block, "buyer_half": ids[0], "seller_half": ids[1]}})
+    verify("block-names-the-halves-but-references-do-not", capsule=uncited.capsule)
+    for label, listed in (("differ", [1]), ("equal", [2])):
+        odd = seal(doc, action="referee.result", operator="referee-co", verdict="assessed", ledger=deal.referee_book,
+                   extra_compute={referee.RESULT_BLOCK: {**block, "buyer_half": listed, "seller_half": ids[1]}})
+        verify(f"half-capsule-id-is-a-list-{label}", capsule=odd.capsule, buyer_half={**deal.buyer.half, "capsule_id": [2]})
+    capsule, doc_text = with_doc(lambda d: d["claims"][0]["evidence"].append(
+        {"digest_alg": "SHA-256", "digest": "a" * 64 + "\n"}))
+    verify("evidence-digest-with-trailing-newline", capsule=capsule, doc_text=doc_text)
+    capsule, doc_text = with_doc(lambda d: d["claims"][0].update(contract_ref="ec:a\u00a0b@1"))
+    verify("contract-ref-with-no-break-space", capsule=capsule, doc_text=doc_text)
+
+    def with_report(summary_edit=None, claim_ref=None):
+        def edit(d):
+            claim = d["claims"][0]
+            row = {"requirement_ref": claim["requirement_ref"], "obligation_refs": [], "status": "INSUFFICIENT",
+                   "sufficiency": "INSUFFICIENT", "claim_ids": [claim["id"]], "sources": [],
+                   "independence": {"required_producers": 1, "independent_producers": 0, "correlated_records": 0,
+                                    "unattributed_records": 0, "producer_basis": "none", "met": False},
+                   "gaps": [{"kind": "no_sources_declared", "detail": "none declared", "remedy": None}]}
+            summary = {"requirements": 1, "satisfied": 0, "with_gaps": 1, "gaps": 1, "gaps_without_remedy": 1}
+            summary.update(summary_edit or {})
+            d["coverage_report"] = {"spec_version": "coverage-report/v0", "contract_ref": claim_ref or claim["contract_ref"],
+                                    "requirements": [row], "summary": summary}
+        return with_doc(edit)
+
+    for label, kwargs in (("ok", {}), ("summary-wrong", {"summary_edit": {"gaps": 2}}),
+                          ("other-contract", {"claim_ref": "ec:other@1"})):
+        capsule, doc_text = with_report(**kwargs)
+        verify(f"coverage-report-{label}", capsule=capsule, doc_text=doc_text)
+
     # bind: the openings against the signed halves.
     def side(party) -> dict:
         return {"half": party.half, "action": party.action, "terms": party.terms}
@@ -175,6 +218,7 @@ def _generate() -> list[dict]:
                        ledger=deal.buyer_book, extra_compute={"peer": "seller-co"})
     resp = seal_action("seller-co", "goose@test", fixture.ACTION, referee.action_digest(fixture.ACTION, deal.seller_terms),
                        req.capsule_id, ledger=deal.buyer_book, extra_compute={"peer": "buyer-co"})
+    bind("bind-half-null", {**buyer, "half": None}, seller)
     bind("bind-halves-one-key", {**buyer, "half": req.capsule}, {**seller, "half": resp.capsule})
     for case in cases:
         case["expected"] = decide(case)

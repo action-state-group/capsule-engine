@@ -23,10 +23,14 @@
 package referee
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"reflect"
 
 	"github.com/action-state-group/agent-action-capsule/go/canonical"
 	"github.com/action-state-group/agent-action-capsule/go/envelope"
@@ -107,7 +111,26 @@ func digest(v any) (string, error) {
 	return hex.EncodeToString(sum[:]), nil
 }
 
-func decode(raw []byte) (any, error) { return verify.DecodeCapsuleJSON(raw) }
+// decode reads one JSON text as Python's json.loads does (numbers kept as
+// json.Number, nothing but whitespace after the value) and as the JCS step
+// later refuses what Python's refuses (a float, an unsafe integer). It has no
+// depth bound of its own: verify.Verify grades a too-deep capsule as not
+// authentic, as Python does.
+func decode(raw []byte) (any, error) {
+	if err := canonical.CheckJSONText(raw); err != nil {
+		return nil, err
+	}
+	d := json.NewDecoder(bytes.NewReader(raw))
+	d.UseNumber()
+	var v any
+	if err := d.Decode(&v); err != nil {
+		return nil, err
+	}
+	if _, err := d.Token(); err != io.EOF {
+		return nil, errors.New("trailing data after JSON value")
+	}
+	return v, nil
+}
 
 type object = map[string]any
 
@@ -152,6 +175,8 @@ func cited(capsule object) map[string]bool {
 	return out
 }
 
+// decodeObject reads a document that must be a JSON object; text that is not
+// JSON, or not an object, cannot be read as one.
 func decodeObject(raw []byte, what string) (object, *Error) {
 	v, err := decode(raw)
 	if err != nil {
@@ -172,11 +197,11 @@ func BindOpenings(buyer, seller Party) error {
 		role string
 		p    Party
 	}{{"buyer", buyer}, {"seller", seller}} {
-		half, perr := decodeObject(side.p.Half, "the "+side.role+"'s half")
-		if perr != nil {
-			return perr
+		value, err := decode(side.p.Half)
+		if err != nil {
+			return refuse(CodeNotAResult, "the %s's half cannot be read: %v", side.role, err)
 		}
-		if !authentic(half) {
+		if !authentic(value) {
 			return refuse(CodeHalfUnverified, "the %s's half does not verify under the key it carries", side.role)
 		}
 		terms, err := decode(side.p.Terms)
@@ -187,7 +212,7 @@ func BindOpenings(buyer, seller Party) error {
 		if err != nil {
 			return refuse(CodeNotAResult, "the %s's opening cannot be read: %v", side.role, err)
 		}
-		if got := compute(half)["action_digest"]; got != want {
+		if got := compute(obj(value))["action_digest"]; got != want {
 			return refuse(CodeOpeningMismatch, "the %s's opening does not recompute its half's action_digest", side.role)
 		}
 	}
@@ -223,6 +248,10 @@ func refereeKey(terms any) (key any, ok bool, err *Error) {
 		if !r {
 			return nil, true, nil
 		}
+	case json.Number:
+		if f, err := r.Float64(); err == nil && f == 0 {
+			return nil, true, nil
+		}
 	case []any:
 		if len(r) == 0 {
 			return nil, true, nil
@@ -244,13 +273,19 @@ func hashable(v any) (any, bool, *Error) {
 // references name exactly these halves, and doc is the Result it names. It
 // returns nil or an *Error.
 func VerifyResult(capsule, doc []byte, in Inputs) error {
-	c, perr := decodeObject(capsule, "the Result capsule")
-	if perr != nil {
-		return perr
+	// The document is read first, as Python's callers read it before the check.
+	resultDoc, derr := decode(doc)
+	if derr != nil {
+		return refuse(CodeNotAResult, "the Result document cannot be read: %v", derr)
 	}
-	if !authentic(c) {
+	value, err := decode(capsule)
+	if err != nil {
+		return refuse(CodeNotAResult, "the Result capsule cannot be read: %v", err)
+	}
+	if !authentic(value) {
 		return refuse(CodeResultUnverified, "the Result capsule does not verify under the key it carries")
 	}
+	c := obj(value)
 	buyerTerms, err := decode(in.BuyerTerms)
 	if err != nil {
 		return refuse(CodeNotAResult, "the buyer's terms cannot be read: %v", err)
@@ -289,15 +324,18 @@ func VerifyResult(capsule, doc []byte, in Inputs) error {
 	if !bok || !sok {
 		return refuse(CodeNotAResult, "a half carries no capsule_id")
 	}
-	pointed := cited(c)
-	bs, bstr := bid.(string)
-	ss, sstr := sid.(string)
-	if block["buyer_half"] != bid || block["seller_half"] != sid || !bstr || !sstr || !pointed[bs] || !pointed[ss] {
+	// Python compares the pair of ids, then builds a set of them (which refuses
+	// an unhashable id) and checks the capsule cites both.
+	if !sameValue(block["buyer_half"], bid) || !sameValue(block["seller_half"], sid) {
 		return refuse(CodeOtherDeal, "the Result names other halves")
 	}
-	resultDoc, derr := decode(doc)
-	if derr != nil {
-		return refuse(CodeNotAResult, "the Result document cannot be read: %v", derr)
+	bs, bstr := bid.(string)
+	ss, sstr := sid.(string)
+	if !hashableValue(bid) || !hashableValue(sid) {
+		return refuse(CodeNotAResult, "a half's capsule_id is not a value")
+	}
+	if pointed := cited(c); !bstr || !sstr || !pointed[bs] || !pointed[ss] {
+		return refuse(CodeOtherDeal, "the Result names other halves")
 	}
 	want, derr := digest(resultDoc)
 	if derr != nil {
@@ -314,6 +352,17 @@ func VerifyResult(capsule, doc []byte, in Inputs) error {
 		return refuse(CodeResultInvalid, "%v", err)
 	}
 	return nil
+}
+
+// sameValue is Python's ==, for decoded JSON: lists and objects by content.
+func sameValue(a, b any) bool { return reflect.DeepEqual(a, b) }
+
+func hashableValue(v any) bool {
+	switch v.(type) {
+	case object, []any:
+		return false
+	}
+	return true
 }
 
 func contains(set []any, v any) bool {

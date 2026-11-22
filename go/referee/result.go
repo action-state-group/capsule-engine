@@ -38,6 +38,7 @@ func compiledSchema() (*jsonschema.Schema, error) {
 			return
 		}
 		c := jsonschema.NewCompiler()
+		c.UseRegexpEngine(pythonRegexp)
 		if err = c.AddResource(schemaID, doc); err != nil {
 			compiled.err = err
 			return
