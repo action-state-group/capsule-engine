@@ -13,7 +13,6 @@ import (
 	"slices"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/santhosh-tekuri/jsonschema/v6"
 
@@ -119,7 +118,7 @@ func guardCheck(args []string, stdin io.Reader, stdout io.Writer) error {
 		return err
 	}
 	if *limitsFile != "" {
-		if e, err = withPersonLimits(e, p, *limitsFile); err != nil {
+		if e, err = withPersonLimits(e, *limitsFile); err != nil {
 			return err
 		}
 	}
@@ -147,21 +146,9 @@ func guardCheck(args []string, stdin io.Reader, stdout io.Writer) error {
 	return err
 }
 
-// personLimits is the caps limits of one policy profile, as the guard reads
-// them: each is the person's, with the profile's digest as its source.
-type personLimits struct {
-	caps   map[string]map[string]int64
-	source guard.LimitSource
-}
-
-func (l personLimits) InForce(key, class string, _ time.Time) (guard.LimitInForce, bool) {
-	v, ok := l.caps[key][class]
-	return guard.LimitInForce{ValueMinor: v, Source: l.source}, ok
-}
-
 // withPersonLimits lays the profile in file over e. Its refusals name the
 // step and never a value of the file.
-func withPersonLimits(e *guard.Engine, p pack.Pack, file string) (*guard.Engine, error) {
+func withPersonLimits(e *guard.Engine, file string) (*guard.Engine, error) {
 	raw, err := os.ReadFile(file)
 	if err != nil {
 		return nil, errors.New("the limits file cannot be read")
@@ -170,23 +157,8 @@ func withPersonLimits(e *guard.Engine, p pack.Pack, file string) (*guard.Engine,
 	if err != nil {
 		return nil, errors.New("the limits file is not a valid policy-profile/v0")
 	}
-	name := p.ID
-	if i := strings.LastIndex(name, "/"); i >= 0 {
-		name = name[:i]
-	}
-	mine, ok := prof.Packs[name]
-	if !ok {
-		return e, nil
-	}
-	caps := mine.Caps
-	mine.Caps = nil
-	if mine.RateCap != nil || mine.List != nil {
-		if e, err = e.WithProfile(guard.Profile{Digest: prof.Digest, Packs: map[string]guard.ProfilePack{name: mine}}); err != nil {
-			return nil, errors.New("the limits file sets values this pack does not take")
-		}
-	}
-	if caps != nil {
-		e.WithOperatorLimits(personLimits{caps: caps, source: guard.LimitSource{Source: guard.LimitSourceProfile, ProfileDigest: prof.Digest}})
+	if e, err = e.WithPersonProfile(prof); err != nil {
+		return nil, errors.New("the limits file sets values this pack does not take")
 	}
 	return e, nil
 }

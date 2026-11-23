@@ -119,9 +119,11 @@ func TestGuardCheckLimitsRefusals(t *testing.T) {
 		t.Fatal(err)
 	}
 	for name, c := range map[string]struct{ file, stderr string }{
-		"missing":          {filepath.Join(t.TempDir(), "none.json"), "cannot be read"},
-		"not a profile":    {writeLimits(t, `{"secret-7777":1}`), "not a valid policy-profile"},
-		"unknown rate cap": {writeLimits(t, `{"format":"policy-profile/v0","packs":[{"pack":"asg/everyday","parameters":{"rate_cap":{"max_input_msat_per_million":1}}}]}`), "does not take"},
+		"missing":                            {filepath.Join(t.TempDir(), "none.json"), "cannot be read"},
+		"not a profile":                      {writeLimits(t, `{"secret-7777":1}`), "not a valid policy-profile"},
+		"class with no pack default":         {writeLimits(t, `{"format":"policy-profile/v0","packs":[{"pack":"asg/everyday","parameters":{"caps":{"per_action_minor":{"made.up.class":1}}}}]}`), "does not take"},
+		"legacy name of an undeclared class": {writeLimits(t, `{"format":"policy-profile/v0","packs":[{"pack":"asg/everyday","parameters":{"caps":{"caps_minor":{"comms.external":1}}}}]}`), "does not take"},
+		"unknown rate cap":                   {writeLimits(t, `{"format":"policy-profile/v0","packs":[{"pack":"asg/everyday","parameters":{"rate_cap":{"max_input_msat_per_million":1}}}]}`), "does not take"},
 	} {
 		t.Run(name, func(t *testing.T) {
 			code, out, stderr := runGuardCheck(t, in, "--limits", c.file)
