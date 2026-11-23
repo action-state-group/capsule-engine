@@ -8,10 +8,12 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"os"
 	"regexp"
 	"slices"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/santhosh-tekuri/jsonschema/v6"
 
@@ -36,8 +38,8 @@ import (
 //
 // The checker is one self-contained binary (capsulectl copies the
 // executable alone): the packs and the schemas are embedded, nothing is read
-// from beside it. It applies the pack's own limits; a caller that lets a
-// person set limits of their own does that outside this command.
+// from beside it. It applies the pack's own limits, and a person's own when
+// the host passes --limits (see guardCheckUsage).
 
 //go:embed schemas/external-check-input-v0.schema.json schemas/external-check-result-v0.schema.json
 var checkSchemas embed.FS
@@ -45,7 +47,16 @@ var checkSchemas embed.FS
 // --pack names an embedded pack id (for example asg/everyday/0.3.8); without
 // it the pack follows the input's rules_pin, else its party_role (buyer or
 // none asg/everyday/0.3.8, seller asg/seller/0.1.5).
-const guardCheckUsage = "usage: capsule-engine guard check [--pack ID] < external-check-input.json"
+//
+// --limits names a policy-profile/v0 file: the limits a person set, already
+// in force (the host applies any cooling-off before it writes the file). The
+// entry for the chosen pack is laid over the pack as the Go guard's
+// WithOperatorLimits (caps, marked " you set") and WithProfile (the rest)
+// do, so the result equals a host that applies the profile itself. Entries
+// for other packs are ignored. " you set" is the host's word: the checker
+// cannot know a person set the file and does not attest to it, so the flag's
+// help says "limits the host says the person set".
+const guardCheckUsage = "usage: capsule-engine guard check [--pack ID] [--limits PROFILE.json] < external-check-input.json"
 
 const externalResultSchema = "external-check-result/v0"
 
@@ -77,6 +88,7 @@ func guardCheck(args []string, stdin io.Reader, stdout io.Writer) error {
 	fs := flag.NewFlagSet("guard check", flag.ContinueOnError)
 	fs.SetOutput(io.Discard)
 	packID := fs.String("pack", "", "an embedded pack id")
+	limitsFile := fs.String("limits", "", "a policy-profile/v0 file of limits the host says the person set")
 	if err := fs.Parse(args); err != nil || fs.NArg() > 0 {
 		return errors.New(guardCheckUsage)
 	}
@@ -106,6 +118,11 @@ func guardCheck(args []string, stdin io.Reader, stdout io.Writer) error {
 	if err != nil {
 		return err
 	}
+	if *limitsFile != "" {
+		if e, err = withPersonLimits(e, p, *limitsFile); err != nil {
+			return err
+		}
+	}
 	// No path here is given an approval record: capsulectl seals none for a
 	// class of statement (guard.NoApprovalRecord).
 	e.WithoutApprovalRecords()
@@ -128,6 +145,50 @@ func guardCheck(args []string, stdin io.Reader, stdout io.Writer) error {
 	}
 	_, err = fmt.Fprintln(stdout, string(out))
 	return err
+}
+
+// personLimits is the caps limits of one policy profile, as the guard reads
+// them: each is the person's, with the profile's digest as its source.
+type personLimits struct {
+	caps   map[string]map[string]int64
+	source guard.LimitSource
+}
+
+func (l personLimits) InForce(key, class string, _ time.Time) (guard.LimitInForce, bool) {
+	v, ok := l.caps[key][class]
+	return guard.LimitInForce{ValueMinor: v, Source: l.source}, ok
+}
+
+// withPersonLimits lays the profile in file over e. Its refusals name the
+// step and never a value of the file.
+func withPersonLimits(e *guard.Engine, p pack.Pack, file string) (*guard.Engine, error) {
+	raw, err := os.ReadFile(file)
+	if err != nil {
+		return nil, errors.New("the limits file cannot be read")
+	}
+	prof, err := guard.DecodeProfile(raw)
+	if err != nil {
+		return nil, errors.New("the limits file is not a valid policy-profile/v0")
+	}
+	name := p.ID
+	if i := strings.LastIndex(name, "/"); i >= 0 {
+		name = name[:i]
+	}
+	mine, ok := prof.Packs[name]
+	if !ok {
+		return e, nil
+	}
+	caps := mine.Caps
+	mine.Caps = nil
+	if mine.RateCap != nil || mine.List != nil {
+		if e, err = e.WithProfile(guard.Profile{Digest: prof.Digest, Packs: map[string]guard.ProfilePack{name: mine}}); err != nil {
+			return nil, errors.New("the limits file sets values this pack does not take")
+		}
+	}
+	if caps != nil {
+		e.WithOperatorLimits(personLimits{caps: caps, source: guard.LimitSource{Source: guard.LimitSourceProfile, ProfileDigest: prof.Digest}})
+	}
+	return e, nil
 }
 
 // validateAgainst validates raw against an embedded schema. A failure names
