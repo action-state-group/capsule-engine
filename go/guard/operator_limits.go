@@ -1,6 +1,7 @@
 package guard
 
 import (
+	"fmt"
 	"maps"
 	"time"
 
@@ -122,4 +123,60 @@ func limitSourcesMember(window LimitSource, perAction *LimitSource) canon.Member
 // when the pack cites no caps definition.
 func (e *Engine) CapsDefaults() map[string]map[string]int64 {
 	return map[string]map[string]int64{CapsKeyWindow: maps.Clone(e.capsMinor), CapsKeyPerAction: maps.Clone(e.perActionMinor)}
+}
+
+// profileLimits is the caps limits of one policy profile, keyed by canonical
+// class: each is the person's, with the profile's digest as its source.
+type profileLimits struct {
+	caps   map[string]map[string]int64
+	source LimitSource
+}
+
+func (l profileLimits) InForce(key, class string, _ time.Time) (LimitInForce, bool) {
+	v, ok := l.caps[key][class]
+	return LimitInForce{ValueMinor: v, Source: l.source}, ok
+}
+
+// WithPersonProfile makes e decide as a host does that applies the policy
+// profile p itself: p's caps limits for e's pack become person-set limits
+// (source LimitSourceProfile, p's digest), and its rate_cap and counterparty
+// list go through WithProfile. A class is read by its canonical name
+// (caps.py resolve_caps_minor). It refuses, as resolve.py _check_profile does,
+// a caps key or class the pack declares no default for (a profile replaces a
+// default, it never adds a limit). An entry for another pack is ignored. The values are limits
+// already in force; the caller applies any cooling-off. On a refusal e is
+// left as it was.
+func (e *Engine) WithPersonProfile(p Profile) (*Engine, error) {
+	mine, ok := p.Packs[packName(e.pack.ID)]
+	if !ok {
+		return e, nil
+	}
+	defaults := e.CapsDefaults()
+	caps := map[string]map[string]int64{}
+	for key, byClass := range mine.Caps {
+		declared, ok := defaults[key]
+		if !ok {
+			return nil, fmt.Errorf("profile sets caps.%s, which no pack limit takes", key)
+		}
+		resolved, err := e.tax.resolveLimits(byClass)
+		if err != nil {
+			return nil, err
+		}
+		for class := range resolved {
+			if _, ok := declared[class]; !ok {
+				return nil, fmt.Errorf("profile sets caps.%s for class %q, which the pack declares no default for", key, class)
+			}
+		}
+		caps[key] = resolved
+	}
+	rest := ProfilePack{RateCap: mine.RateCap, List: mine.List}
+	if rest.RateCap != nil || rest.List != nil {
+		if _, err := e.WithProfile(Profile{Digest: p.Digest, Packs: map[string]ProfilePack{packName(e.pack.ID): rest}}); err != nil {
+			return nil, err
+		}
+	}
+	if len(caps) > 0 {
+		e.operatorLimits = profileLimits{caps: caps, source: LimitSource{Source: LimitSourceProfile, ProfileDigest: p.Digest}}
+	}
+	return e, nil
 }
