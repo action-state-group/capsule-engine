@@ -55,6 +55,10 @@ var checkSchemas embed.FS
 // for other packs are ignored. " you set" is the host's word: the checker
 // cannot know a person set the file and does not attest to it, so the flag's
 // help says "limits the host says the person set".
+// A passing result reads the same with or without --limits (" you set" shows
+// only on a finding), so the host, not the result, is the record that a
+// person's limits were checked; no page or receipt may imply a clean result
+// shows they were applied.
 const guardCheckUsage = "usage: capsule-engine guard check [--pack ID] [--limits PROFILE.json] < external-check-input.json"
 
 const externalResultSchema = "external-check-result/v0"
