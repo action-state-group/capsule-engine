@@ -2,7 +2,7 @@
 
 ## Check before you push
 
-Before every push: `scripts/check.sh` (about 18 min on an Apple-silicon Mac; it needs Python 3.11
+Before every push: `scripts/check.sh` (about 15 min on an Apple-silicon Mac; it needs Python 3.11
 and 3.12, Go, rustup, and network access for the pinned checkouts and for shallow clones of
 scitt-payload-binding and tau2-bench, about 450 MB, as the script's header says). It runs every
 job a pull request ran before asg-agent-team-ethan#409, so there is no second tier. Pull requests

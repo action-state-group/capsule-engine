@@ -165,7 +165,10 @@ Never an overall pass/fail, never "coverage". `capsule-engine packs preflight --
 `go/` is the Go module `github.com/action-state-group/capsule-engine/go`, the
 Go implementation of the guard for the everyday, seller and inference packs. The Python
 guard above is the reference, and CI decides the shared vectors in
-`conformance-vectors/guard/v0` with both on every pull request. See
+`conformance-vectors/guard/v0` with both: the Go side on every pull request that touches
+`python/`, `go/`, `rust/`, `conformance-vectors/` or `scripts/`
+(`.github/workflows/conformance.yml`), and the Python side nightly and on main
+(`.github/workflows/slow-suites.yml`); `scripts/check.sh` runs both before a push. See
 [go/README.md](go/README.md).
 
 ### The admission evaluator (`go/admission`, `rust/`)
