@@ -1,28 +1,37 @@
 # Cross-language conformance: the Go guard (go/) against the Python reference.
 #
-# No path filter: a Python-only change can diverge from Go as easily as a Go
-# change can (docs/design/go-guard-module.md §5, §7). The shared vectors are
-# decided by both sides: `vectors` holds the Python engine at this commit to
-# every expected decision (and runs the coverage gate), and `go` holds the Go
-# guard to the same files (go/guard/conformance_test.go). `rust` holds the
-# Rust crate (rust/) to the same files: its guard port of the inference pack
-# to inference.json (reading the pack from go/packs) and its admission
-# evaluator to conformance-vectors/admission/v0, so it fails when either
-# drifts. `conformance` is the
-# one check branch protection requires, and fails if any job it needs failed
-# or was skipped.
+# The pull request path list covers every tree these jobs read: a
+# Python-only change can diverge from Go as easily as a Go change can
+# (docs/design/go-guard-module.md §5, §7), so python/** is in it beside go/**,
+# rust/**, the shared vectors and scripts/. A push to main runs every job.
+# `go` holds the Go guard to the shared vectors
+# (go/guard/conformance_test.go). `rust` holds the Rust crate (rust/) to the
+# same files: its guard port of the inference pack to inference.json (reading
+# the pack from go/packs) and its admission evaluator to
+# conformance-vectors/admission/v0, so it fails when either drifts. The Python
+# side, which holds the engine at this commit to every expected decision and
+# runs the coverage gate, takes about 5.5 minutes and runs nightly and on main
+# in slow-suites.yml (asg-agent-team-ethan#409). `conformance` fails
+# if any job it needs failed or was skipped.
 name: conformance
 on:
   push:
     branches: [main]
   pull_request:
+    paths:
+      - ".github/workflows/conformance.yml"
+      - "python/**"
+      - "go/**"
+      - "rust/**"
+      - "conformance-vectors/**"
+      - "scripts/**"
 
 permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   go:
@@ -98,29 +107,30 @@ jobs:
         working-directory: capsule-engine
         run: python scripts/check_pack_sources.py ../evidencebook-skills
 
-  vectors:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
-        with:
-          python-version: "3.12"
-      - name: install
-        run: pip install -e "./python[dev]"
-      - name: the Python engine decides every shared vector as written, and the coverage gate holds
-        run: python scripts/conformance_vectors.py --check
-      - name: the Python referee decides every shared referee vector as written
-        run: python scripts/referee_vectors.py --check
-
   conformance:
     if: always()
-    needs: [go, rust, packs, vectors]
+    needs: [go, rust, packs]
     runs-on: ubuntu-latest
     steps:
       - name: every job passed
         run: |
-          echo 'go: ${{ needs.go.result }}, rust: ${{ needs.rust.result }}, packs: ${{ needs.packs.result }}, vectors: ${{ needs.vectors.result }}'
+          echo 'go: ${{ needs.go.result }}, rust: ${{ needs.rust.result }}, packs: ${{ needs.packs.result }}'
           test '${{ needs.go.result }}' = success
           test '${{ needs.rust.result }}' = success
           test '${{ needs.packs.result }}' = success
-          test '${{ needs.vectors.result }}' = success
+
+  report-failure:
+    needs: [go, rust, packs, pack-sources, conformance]
+    if: failure() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: open or comment on the ci-red issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TITLE: "conformance failed on main or nightly"
+          RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          ASSIGNEE: ${{ vars.CI_FAILURE_ASSIGNEE }}
+        run: bash .github/scripts/report-failure.sh

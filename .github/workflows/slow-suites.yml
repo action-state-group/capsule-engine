@@ -1,0 +1,80 @@
+# The suites too slow for the pull request path (asg-agent-team-ethan#409).
+# They run nightly, on dispatch and on a push to main that touches their
+# inputs. Before pushing a change to these paths, run `scripts/check.sh`,
+# which runs both.
+#
+# `vectors` (about 5.5 minutes) holds the Python engine at this commit to
+# every expected decision in the shared conformance vectors and runs the
+# coverage gate (docs/design/go-guard-module.md §5, §7); the Go and Rust sides
+# of the same vectors run on pull requests in conformance.yml.
+# `generate-go-packs-tests` runs python/tests/test_generate_go_packs.py (about
+# 4.5 minutes alone), which ci.yml's pull request run leaves out; the
+# `packs` job in conformance.yml still checks the generated tree on pull
+# requests.
+name: slow-suites
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/slow-suites.yml"
+      - ".github/scripts/report-failure.sh"
+      - "python/**"
+      - "go/**"
+      - "conformance-vectors/**"
+      - "scripts/**"
+  schedule:
+    - cron: "0 8 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  vectors:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - name: install
+        run: pip install -e "./python[dev]"
+      - name: the Python engine decides every shared vector as written, and the coverage gate holds
+        run: python scripts/conformance_vectors.py --check
+      - name: the Python referee decides every shared referee vector as written
+        run: python scripts/referee_vectors.py --check
+
+  generate-go-packs-tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: python
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - name: install
+        run: pip install -e ".[dev]"
+      - name: pytest (the module ci.yml's pull request run leaves out)
+        run: pytest -q -n auto tests/test_generate_go_packs.py
+
+  report-failure:
+    needs: [vectors, generate-go-packs-tests]
+    if: failure() && ((github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'schedule')
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: open or comment on the ci-red issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TITLE: "slow-suites failed on main or nightly"
+          RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          ASSIGNEE: ${{ vars.CI_FAILURE_ASSIGNEE }}
+        run: bash .github/scripts/report-failure.sh

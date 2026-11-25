@@ -1,15 +1,24 @@
+# Checks the vendored copies against their upstreams. A pull request runs it
+# only when it touches a vendored copy or its vendor script; every push to
+# main runs it, which is where upstream drift shows (asg-agent-team-ethan#409).
 name: vendor-drift
 on:
   push:
     branches: [main]
   pull_request:
+    paths:
+      - ".github/workflows/vendor-drift.yml"
+      - "python/scripts/vendor_cpb_registry.py"
+      - "python/scripts/vendor_tau2_airline_conversations.py"
+      - "python/capsule_engine/registry/**"
+      - "python/capsule_engine/examples/data/tau2_airline/**"
 
 permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   cpb-registry:
@@ -47,3 +56,19 @@ jobs:
         run: >
           python python/scripts/vendor_tau2_airline_conversations.py --check
           --tau2-results-dir ../tau2-bench/data/tau2/results/final
+
+  report-failure:
+    needs: [cpb-registry, tau2-airline-conversations]
+    if: failure() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: open or comment on the ci-red issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TITLE: "vendor-drift failed on main or nightly"
+          RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          ASSIGNEE: ${{ vars.CI_FAILURE_ASSIGNEE }}
+        run: bash .github/scripts/report-failure.sh
