@@ -1,0 +1,9 @@
+{
+ "source": "action-state-group/evidencebook-skills packs/admission-baseline: compiled/pack-definition.json and fixtures/cases.json (admission pack profile v0, evidencebook-skills#51, #280)",
+ "commit": "2a5f9e2121c626576e819fcbcf093a6b2530a50f",
+ "files": {
+  "pack-definition.json": "ef55f87faafd9f36134d390ad0491c63d3a3d6d9de707f58607fb5bb6b35ea68",
+  "cases.json": "20c8807f3905eba7b2fc35b878d72fd0bdb5559627789ec2b8ad07aa25f9dafb"
+ },
+ "note": "Copied byte for byte; refreshed by copying both files from a later evidencebook-skills commit and updating this file. The Go and Rust evaluators decide every case (verdict, source, tier)."
+}

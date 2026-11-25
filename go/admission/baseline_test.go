@@ -25,6 +25,16 @@ func TestBaselineFixtures(t *testing.T) { checkPackFixtures(t, baselineDir) }
 
 func TestMuseBuyerFixtures(t *testing.T) { checkPackFixtures(t, museBuyerDir) }
 
+// The 1.1.0 packs add the lost-disputes rows (evidencebook-skills#280); the
+// 1.0.0 copies stay while consumers pin them.
+func TestBaseline110Fixtures(t *testing.T) {
+	checkPackFixtures(t, vectorDir+"/admission-baseline-1.1.0")
+}
+
+func TestMuseBuyer110Fixtures(t *testing.T) {
+	checkPackFixtures(t, vectorDir+"/admission-muse-buyer-1.1.0")
+}
+
 func checkPackFixtures(t *testing.T, baselineDir string) {
 	var prov struct {
 		Commit string            `json:"commit"`
