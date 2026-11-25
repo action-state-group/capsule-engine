@@ -6494,6 +6494,34 @@
    }
   },
   {
+   "case": "da-strict-zero-decided-goes",
+   "pack": "packs/disputes-against-strict.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "disputes": {
+      "open": 1,
+      "of": 1,
+      "decided": {
+       "against": 0,
+       "of": 0
+      }
+     }
+    }
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T1",
+    "block_sha256": "d7acd2afb10364327076a57869dbf5ad6714e5f871846c3c9a8ba0ec38d6477d"
+   }
+  },
+  {
    "case": "od-decided-is-not-read-by-open-disputes",
    "pack": "packs/open-disputes.json",
    "input": {
