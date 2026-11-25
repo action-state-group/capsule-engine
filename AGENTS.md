@@ -68,9 +68,9 @@ moves both readers in one PR.
 `conformance-vectors/admission/v0` the same: `cases.json` (verdict, source, tier and the
 SHA-256 of the decision block's JCS bytes, written by `go test ./admission -update`),
 `refusals.json` (what the loader refuses, by edit or by bytes) and
-`admission-baseline-*/` and `admission-muse-buyer-*/` (each pack version's `pack-definition.json`
-and fixtures, copied from evidencebook-skills at the commit `PROVENANCE.json` names; a version
-stays while a consumer pins it). The evaluators read no YAML:
+the `admission-*-<version>/` pack copies (each pack version's `pack-definition.json`, with its
+fixtures when the source pack has them, copied from evidencebook-skills at the commit
+`PROVENANCE.json` names; a version stays while a consumer pins it). The evaluators read no YAML:
 an admission pack is authored as `pack-source.yaml` and compiled by evidencebook-skills'
 `pack_compile.py` to `pack-definition.json`, JCS bytes pinned by `pack_id` and
 `definition_digest` (their SHA-256), and that is all a loader reads. The test packs'
