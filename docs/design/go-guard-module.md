@@ -427,12 +427,13 @@ code implements, and a pack citing anything else is refused. That stays. CI (`pa
 ## 7. Cross-language CI
 
 One new workflow, `conformance.yml`, runs on every push to main and on every pull request that
-touches `python/`, `go/`, `rust/`, `conformance-vectors/`, `scripts/` or the workflow. Its path
-list covers Python as well as Go, because a Python-only change can diverge from Go as easily as a
-Go change can. The Python half of `vectors` takes about 5.5 minutes, so it moved to
-`slow-suites.yml`, which runs nightly and on a push to main that touches its inputs; pull requests
-run the Go side, and `scripts/check.sh` runs the Python side before a push
-(asg-agent-team-ethan#409).
+touches `python/`, `go/`, `rust/`, `conformance-vectors/`, `scripts/` or the workflow. The Python
+half of `vectors` takes about 5.5 minutes, so it moved to `slow-suites.yml`, which runs nightly,
+on manual runs, and on a push to main that touches its inputs (asg-agent-team-ethan#409). A pull
+request runs only the Go side, against the vectors as committed. So a Python-only pull request
+that makes Python diverge from Go passes its pull request checks: the divergence shows on main or
+in the nightly run, which opens a `ci-red` issue. `scripts/check.sh` runs the Python side before a
+push to catch it earlier.
 
 1. **`go`**: in `go/` with `GOWORK=off`, `go vet ./...`, `gofmt -l` (must be empty), and
    `go test ./...`. This runs the moved parity tests and the v0 runners.

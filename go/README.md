@@ -102,9 +102,13 @@ shared vectors that `guard/conformance_test.go` holds this module to.
 `guard/report_golden_test.go` holds the per-rule report's wording to
 `guard/testdata/report-goldens.json`. After a deliberate wording change, run
 `go test ./guard -run TestReportGoldens -update-report-goldens` and review the
-diff. CI runs the Go side on every pull request that touches `go/`, `python/`, `rust/`,
-`scripts/` or the vectors (`.github/workflows/conformance.yml`), and the Python side nightly and
-on main (`.github/workflows/slow-suites.yml`); `scripts/check.sh` runs both before a push.
+diff. CI runs `go test ./...` (which includes `guard/conformance_test.go` and
+`guard/report_golden_test.go`) and `generate_go_packs.py --check` on every push
+to `main` and every pull request that touches `go/`, `python/`, `rust/`,
+`scripts/`, the vectors or the workflow (`.github/workflows/conformance.yml`),
+and `conformance_vectors.py --check` nightly, on manual runs, and on pushes to
+`main` that touch its inputs (`.github/workflows/slow-suites.yml`).
+`scripts/check.sh` runs all four before a push.
 
 ## Versions
 
