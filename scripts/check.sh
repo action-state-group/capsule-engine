@@ -3,33 +3,34 @@
 # Local check before a push (asg-agent-team-ethan#409). Runs the commands CI
 # runs, with the same flags, and exits non-zero on the first failure.
 #
-#   scripts/check.sh          # before every push
-#   scripts/check.sh --full   # also vendor-drift (upstream clones)
+#   scripts/check.sh
 #
-# `check` runs every job a pull request ran before asg-agent-team-ethan#409
-# (ci.yml, conformance.yml, the publish-python build), including the parts
-# that now run only nightly and on main in slow-suites.yml: the conformance
-# vectors and all of pytest (pull requests leave out
-# tests/test_generate_go_packs.py). pytest runs in parallel here, the same
-# tests as a serial `pytest -q`. `--full` adds vendor-drift.yml, which pull
-# requests now run only when they touch a vendored copy or its vendor script:
-# shallow clones of scitt-payload-binding and tau2-bench (about 450 MB) at
-# their default branches' heads. Not run locally: neutrality.yml (its term
-# list is a CI-only secret) and dco.yml (it checks a pull request's commits).
+# It runs every job a pull request ran before asg-agent-team-ethan#409
+# (ci.yml, conformance.yml, vendor-drift.yml, the publish-python build),
+# including the parts that now run only nightly and on main in
+# slow-suites.yml (the conformance vectors and all of pytest; pull requests
+# leave out tests/test_generate_go_packs.py) or only on the pull requests
+# vendor-drift.yml's path list matches. pytest runs in parallel here, the
+# same tests as a serial `pytest -q`. Main and the nightly run nothing beyond
+# this, so there is no second tier. vendor-drift clones scitt-payload-binding
+# and tau2-bench (shallow, about 450 MB) at their default branches' heads.
+# Not run locally: neutrality.yml (its term list is a CI-only secret) and
+# dco.yml (it checks a pull request's commits).
 #
-# Needs python3.12 and python3.11 (uv finds or installs both),
-# Go at go/go.mod's version, rustup (rust/rust-toolchain.toml installs its
-# pin), git and network access for the pinned checkouts. Python runs in
-# $CHECK_VENV (default .venv), created and installed as CI installs it.
+# Needs Python 3.12 and 3.11 (with uv on PATH, `uv python install` fetches
+# them when missing; without uv, python3.12 and python3.11 on PATH), Go at
+# go/go.mod's version, rustup (rust/rust-toolchain.toml installs its pin),
+# git and network access for the pinned checkouts. Python runs in
+# $CHECK_VENV (default .venv), a Python 3.12 venv as CI uses, created and
+# installed as CI installs it.
 set -euo pipefail
 
-full=0
-case "${1:-}" in
-  "") ;;
-  --full) full=1 ;;
-  *) echo "usage: scripts/check.sh [--full]" >&2; exit 2 ;;
-esac
+if (($#)); then
+  echo "usage: scripts/check.sh" >&2
+  exit 2
+fi
 
+caller_dir=$PWD
 repo="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$repo"
 cache="${XDG_CACHE_HOME:-$HOME/.cache}/capsule-engine-check"
@@ -39,6 +40,7 @@ step() { printf '\n== %s\n' "$*"; }
 
 python_for() { # python_for 3.12 -> path of an interpreter of that version
   if command -v uv >/dev/null; then
+    uv python install -q "$1" >&2
     uv python find "$1"
   elif command -v "python$1" >/dev/null; then
     command -v "python$1"
@@ -69,9 +71,16 @@ clone_at() {
 }
 
 venv="${CHECK_VENV:-$repo/.venv}"
+# Absolute, read against the caller's directory: the steps below change it.
+[[ "$venv" = /* ]] || venv="$caller_dir/$venv"
+venv_version() { "$venv/bin/python" -c 'import sys; print("%d.%d" % sys.version_info[:2])'; }
 if [[ ! -x "$venv/bin/python" ]]; then
   step "create $venv (Python 3.12)"
   "$(python_for 3.12)" -m venv "$venv"
+elif [[ "$(venv_version)" != 3.12 ]]; then
+  echo "$venv has Python $(venv_version); CI tests with 3.12." >&2
+  echo "Remove it (rm -rf $venv) to have this script create a 3.12 one, or set CHECK_VENV." >&2
+  exit 1
 fi
 py="$venv/bin/python"
 step "install (ci.yml test; conformance packs, pack-sources; publish-python build)"
@@ -113,13 +122,11 @@ step "vectors (slow-suites.yml vectors)"
 "$py" scripts/conformance_vectors.py --check
 "$py" scripts/referee_vectors.py --check
 
-if ((full)); then
-  step "vendor-drift (vendor-drift.yml), upstream default branches"
-  clone_at "$cache/scitt-payload-binding" https://github.com/action-state-group/scitt-payload-binding.git
-  "$py" python/scripts/vendor_cpb_registry.py --check "$cache/scitt-payload-binding"
-  clone_at "$cache/tau2-bench" https://github.com/sierra-research/tau2-bench.git
-  "$py" python/scripts/vendor_tau2_airline_conversations.py --check \
-    --tau2-results-dir "$cache/tau2-bench/data/tau2/results/final"
-fi
+step "vendor-drift (vendor-drift.yml), upstream default branches"
+clone_at "$cache/scitt-payload-binding" https://github.com/action-state-group/scitt-payload-binding.git
+"$py" python/scripts/vendor_cpb_registry.py --check "$cache/scitt-payload-binding"
+clone_at "$cache/tau2-bench" https://github.com/sierra-research/tau2-bench.git
+"$py" python/scripts/vendor_tau2_airline_conversations.py --check \
+  --tau2-results-dir "$cache/tau2-bench/data/tau2/results/final"
 
 step "all checks passed"

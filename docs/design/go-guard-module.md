@@ -458,8 +458,10 @@ run the Go side, and `scripts/check.sh` runs the Python side before a push
    path list, requiring it would leave a pull request outside that list waiting on it.
 
 The coverage gate is what turns "a wicket lands once" into a rule. A PR that changes a check must
-leave a v0 case that exercises it, or `vectors` fails. The existing `ci`, `dco`, `neutrality` and
-`vendor-drift` jobs stay as they are, and `neutrality` covers `go/` and `conformance-vectors/`
+leave a v0 case that exercises it, or `vectors` fails. `ci` and `vendor-drift` changed in
+asg-agent-team-ethan#409 (`ci` leaves `tests/test_generate_go_packs.py` to `slow-suites.yml` on pull
+requests, and `vendor-drift` runs on pull requests only when they touch its inputs); `dco` and
+`neutrality` are unchanged, and `neutrality` covers `go/` and `conformance-vectors/`
 automatically.
 
 ## 8. Versioning

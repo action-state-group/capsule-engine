@@ -49,7 +49,10 @@ If a publish fails after the tag exists:
 pushed tag itself, with no workflow in between:
 
 1. Every check is green on the commit on `main`, including `conformance`, which holds the Go
-   guard to the Python reference.
+   guard and the Rust crate to the shared vectors. The Python side of those vectors runs in
+   `slow-suites` (asg-agent-team-ethan#409), which runs nightly and on a push to main only when
+   its inputs change: its latest run at or before the commit must be green, or run it by
+   `workflow_dispatch` on that commit and wait for it to pass.
 2. `go/CHANGELOG.md` has the version's entry. Its pack and definition lists come from the diff of
    `go/packs/*/PROVENANCE.json` and `portedDefinitions` since the last tag.
 3. An admin pushes `go/vX.Y.Z` at that commit. The version is fetchable as soon as the tag
