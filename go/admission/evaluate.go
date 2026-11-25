@@ -168,11 +168,27 @@ type Receipts struct {
 }
 
 // Disputes are the disputes others raised about the counterparty that its
-// card shows: those still open, out of all of them.
+// card shows: those still open, out of all of them, and, when the caller read
+// them, those decided.
 type Disputes struct {
 	Open int64 `json:"open"`
 	Of   int64 `json:"of"`
+	// Decided is nil when the caller did not read the decided disputes, so
+	// a caller that fills only Open and Of never passes card.disputes_against.
+	Decided *Decided `json:"decided,omitempty"`
 }
+
+// Decided are the disputes others raised about the counterparty that were
+// decided (AAC standard-history-v0 §5.4: for, against, split or no_finding),
+// and how many of them were decided against it (evidencebook-skills#280).
+type Decided struct {
+	Against int64 `json:"against"`
+	Of      int64 `json:"of"`
+}
+
+// ReasonNoDisputeTally is the reason a card.disputes_against row records
+// when the card verified but carries no dispute tally.
+const ReasonNoDisputeTally = "no_dispute_tally"
 
 // BandCount is a card's count in one value band (Reference v3 §3A.14): the
 // corroborated, net-settled subjects whose net amount falls in Decade of
@@ -278,7 +294,9 @@ type RowResult struct {
 	// Label is set on a card.witness_label row.
 	Label string
 	// Reason is set on a card.verified row that fails with a reason from
-	// InferenceServiceHistoryProperties.
+	// InferenceServiceHistoryProperties, and on a card.disputes_against row
+	// that reads not_read because a verified card carries no dispute tally
+	// (ReasonNoDisputeTally).
 	Reason string
 	// NotCounted is set on a card.self_reported_served_periods row that
 	// read the card: the periods of its window not counted, by why. Its
@@ -445,6 +463,10 @@ func Evaluate(p *Pack, in Inputs) Decision {
 			} else if res.Result == NotRead && !res.held && missingRow == "" {
 				missingRow = r.ID
 			}
+		case r.OnFail == LIMIT && r.RecordUnread && res.Result == NotRead && res.Reason == ReasonNoDisputeTally:
+			// on_unread record: a verified card with no dispute tally is
+			// recorded, lowering no tier (profile section 4, step 4); it does
+			// not pass either.
 		case r.OnFail == LIMIT:
 			if res.Result != Pass && !lifted[r.ID] {
 				res.Effect = LIMIT
@@ -641,6 +663,7 @@ var predicates = map[string]predicate{
 	"stake.covers_deal":                 {SourceStake, nil},
 	"card.band_history_or_stake":        {SourceCard, []string{"k", "step_decades", "max_adverse_permille"}},
 	"card.open_disputes":                {SourceCard, []string{"max"}},
+	"card.disputes_against":             {SourceCard, []string{"max"}},
 	"card.self_reported_served_periods": {SourceCard, []string{"window", "min_periods"}},
 	"card.referee_verdicts":             {SourceCard, []string{"window", "min_periods"}},
 	"card.witness_receipts":             {SourceCard, []string{"min"}},
@@ -1003,6 +1026,18 @@ func readRow(r Row, in Inputs, accept map[string]Unit, roots TrustRoots) RowResu
 			}
 			c := in.Card.Disputes
 			return counted(of(c.Open <= r.Params["max"]), c.Open, c.Of)
+		case "card.disputes_against":
+			// Disputes others raised that were decided against the
+			// counterparty, with anyone (evidencebook-skills#280). The count
+			// and denominator are recorded whether the row passes or not.
+			if in.Card.State != CardVerified {
+				return RowResult{Result: NotRead}
+			}
+			if in.Card.Disputes == nil || in.Card.Disputes.Decided == nil {
+				return RowResult{Result: NotRead, Reason: ReasonNoDisputeTally}
+			}
+			c := in.Card.Disputes.Decided
+			return counted(of(c.Against <= r.Params["max"]), c.Against, c.Of)
 		case "card.self_reported_served_periods":
 			return servedPeriods(r, in.Card)
 		case "card.referee_verdicts":

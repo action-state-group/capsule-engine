@@ -116,6 +116,12 @@ type Row struct {
 	Cap int
 	// Ask is the Evidence Request derivation a not_read row asks for, or "".
 	Ask string
+	// RecordUnread is set on a card.disputes_against row whose on_unread is
+	// record: when a verified card carries no dispute tally the row is
+	// recorded and lowers no tier (profile section 4, step 4). An unverified
+	// card and a failing row still limit. It is Sherlock2's interim for
+	// evidencebook-skills#280, until #281.
+	RecordUnread bool
 	// Lift is the own-settled lift this row carries (profile section 4.1), or
 	// nil. Only an own.settled row that is record only carries one.
 	Lift *Lift
@@ -174,7 +180,10 @@ type sourceFile struct {
 		Params    map[string]int64 `json:"params"`
 		From      string           `json:"from"`
 		OnFail    json.RawMessage  `json:"on_fail"`
-		Ask       *struct {
+		// OnUnread is written only when set, so a pack without one keeps
+		// the bytes it compiled to before it existed.
+		OnUnread *string `json:"on_unread"`
+		Ask      *struct {
 			Derivation string `json:"derivation"`
 		} `json:"ask"`
 		// Lift is written only on a lifting row, so a pack without one
@@ -462,6 +471,23 @@ func Load(src []byte) (*Pack, error) {
 			}
 			row.Ask = r.Ask.Derivation
 		}
+		if r.OnUnread != nil {
+			// Allowed on the lost-disputes row only, and never with an ask
+			// (evidencebook-skills#280).
+			if r.Check != "card.disputes_against" {
+				bad("%s: only a card.disputes_against row may carry on_unread", where)
+			}
+			if *r.OnUnread != Record {
+				bad("%s: on_unread must be record, got %q", where, *r.OnUnread)
+			}
+			if row.OnFail != LIMIT {
+				bad("%s: only a LIMIT row may carry on_unread", where)
+			}
+			if r.Ask != nil {
+				bad("%s: a row with on_unread carries no ask", where)
+			}
+			row.RecordUnread = true
+		}
 		if r.Lift != nil {
 			lift := &Lift{UnlessFail: r.Lift.UnlessFail}
 			switch idx, ok := tierIndex[r.Lift.Tier]; {
@@ -560,7 +586,7 @@ var (
 	budgetKeys = []string{"max_asks", "deadline_s"}
 	rootKeys   = []string{"controllers", "witnesses", "judges", "rails"}
 	railKeys   = []string{"id", "digest"}
-	rowKeys    = []string{"id", "statement", "source", "check", "params", "from", "on_fail", "ask", "lift"}
+	rowKeys    = []string{"id", "statement", "source", "check", "params", "from", "on_fail", "on_unread", "ask", "lift"}
 	askKeys    = []string{"derivation"}
 	liftKeys   = []string{"tier", "unless_fail"}
 )

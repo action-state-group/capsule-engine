@@ -12,7 +12,11 @@ import (
 // StandardHistoryCounts reads the ladder's inputs from a standard_history/1
 // card (AAC spec/standard-history-v0.md §4, §5.3; evidencebook-skills#87):
 // the card's per-band counts as Card.Bands, and its received disputes as
-// Card.Disputes. artifact is the card's bytes from an answer the caller has
+// Card.Disputes: open out of all, and those decided (for, against, split or
+// no_finding) with how many were against the holder (Disputes.Decided,
+// evidencebook-skills#280). Only the received side is read: an outcome is
+// stated for the holder (§5.4), so a raised dispute decided against it is the
+// holder's own complaint rejected. artifact is the card's bytes from an answer the caller has
 // verified, card form included (AAC go/standardhistory); this reads only the
 // bands and disputes members, and refuses them when they do not read.
 //
@@ -115,11 +119,19 @@ func standardHistoryCounts(artifact []byte, token string) ([]BandCount, *Dispute
 	if json.Unmarshal(r["by_outcome"], &byOutcome) != nil || byOutcome == nil {
 		return nil, nil, errors.New(card0 + ": disputes.received.by_outcome must be an object")
 	}
-	open, err := cardCount(byOutcome["open"])
-	if err != nil {
-		return nil, nil, fmt.Errorf("%s: disputes.received.by_outcome.open: %w", card0, err)
+	var outcome [5]int64
+	for i, k := range []string{"open", "for", "against", "split", "no_finding"} {
+		n, err := cardCount(byOutcome[k])
+		if err != nil {
+			return nil, nil, fmt.Errorf("%s: disputes.received.by_outcome.%s: %w", card0, k, err)
+		}
+		outcome[i] = n
 	}
-	return bands, &Disputes{Open: open, Of: of}, nil
+	// Each count is at most 2^53 − 1, so the sum stays inside int64; it is
+	// held to 2^53 − 1 as every card integer is. A verified card's outcomes
+	// partition of (§4), so it never reaches that.
+	decided := min(outcome[1]+outcome[2]+outcome[3]+outcome[4], maxSafeInteger)
+	return bands, &Disputes{Open: outcome[0], Of: of, Decided: &Decided{Against: outcome[2], Of: decided}}, nil
 }
 
 // isJCS reports why src is not exactly the JCS encoding of its own parse.

@@ -1,0 +1,49 @@
+# A test admission pack (capsule-engine#265 conformance vectors) for
+# card.disputes_against, the disputes others raised about the counterparty
+# that were decided against it (evidencebook-skills#280): one recorded row
+# and one limiting row with on_unread record, Sherlock2's interim until
+# evidencebook-skills#281 (a verified card with no dispute tally is recorded
+# and does not limit). Every number is a placeholder.
+pack_id: asg/admission_disputes_against_test/0.1.0
+pack_version: 0.1.0
+scope:
+  kind: admission
+source: capsule-engine#265 conformance vectors; evidencebook-skills#280
+outcomes: ["GO", "LIMIT", "NO"]
+missing: "LIMIT"
+accept:
+  USD: {band: USD, scale: 0}
+tiers:
+  - id: T0
+    max_decade: {USD: 0}
+  - id: T1
+    max_decade: {USD: 2}
+budget:
+  max_asks: 0
+  deadline_s: 3600
+trust_roots:
+  controllers: []
+  witnesses: []
+  judges: []
+rows:
+  - id: deny-list
+    statement: The counterparty is not on the operator's deny list.
+    source: operator
+    check: operator.not_deny_listed
+    from: T0
+    on_fail: "NO"
+  - id: disputes-against-seen
+    statement: The counterparty's card shows no dispute about it decided against it, out of the disputes decided.
+    source: card
+    check: card.disputes_against
+    params: {max: 0}
+    from: T0
+    on_fail: "record"
+  - id: disputes-against
+    statement: The counterparty's card shows no dispute about it decided against it, out of the disputes decided.
+    source: card
+    check: card.disputes_against
+    params: {max: 0}
+    from: T1
+    on_fail: "LIMIT"
+    on_unread: "record"

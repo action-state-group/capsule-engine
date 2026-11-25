@@ -10,7 +10,7 @@ use super::pack::{OnFail, Pack, Row, SOURCE_JUDGED};
 use super::{
     Card, Checkpoint, Inputs, Pin, Served, ServedPeriod, Timestamp, Verdict, CARD_UNVERIFIABLE, CARD_VERIFIED,
     INFERENCE_SERVICE_HISTORY_PROPERTIES, LABEL_UNKNOWN_WITNESS, LABEL_UNWITNESSED, LABEL_WITNESSED,
-    SUPPRESSED_BELOW_FLOOR, SUPPRESSED_COMPLEMENTARY,
+    REASON_NO_DISPUTE_TALLY, SUPPRESSED_BELOW_FLOOR, SUPPRESSED_COMPLEMENTARY,
 };
 use crate::canon;
 
@@ -114,6 +114,10 @@ pub fn evaluate(p: &Pack, input: &Inputs) -> Decision {
                     missing_row = Some(r.id.clone());
                 }
             }
+            // evaluate.go: on_unread record, a verified card with no dispute
+            // tally is recorded, lowering no tier; it does not pass either.
+            OnFail::Limit
+                if r.record_unread && res.result == RowStatus::NotRead && res.reason == REASON_NO_DISPUTE_TALLY => {}
             OnFail::Limit => {
                 if res.result != RowStatus::Pass && !lifted.contains(r.id.as_str()) {
                     res.effect = Effect::Limit;
@@ -572,6 +576,14 @@ fn read_row(r: &Row, input: &Inputs, p: &Pack) -> RowResult {
         // share (evidencebook-skills#87).
         "card.open_disputes" => match (&input.card.disputes, verified) {
             (Some(c), true) => counted(of(c.open <= param(r, "max")), c.open, c.of),
+            _ => not_read(),
+        },
+        // Disputes others raised that were decided against the counterparty,
+        // with anyone (evidencebook-skills#280); recorded whether the row
+        // passes or not.
+        "card.disputes_against" => match (input.card.disputes.and_then(|d| d.decided), verified) {
+            (Some(c), true) => counted(of(c.against <= param(r, "max")), c.against, c.of),
+            (None, true) => RowResult { reason: REASON_NO_DISPUTE_TALLY.to_string(), ..not_read() },
             _ => not_read(),
         },
         "card.self_reported_served_periods" => served_periods(r, input),

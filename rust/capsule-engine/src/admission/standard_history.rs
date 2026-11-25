@@ -5,7 +5,7 @@
 
 use serde_json::{Map, Value};
 
-use super::{BandCount, Disputes, Error};
+use super::{BandCount, Decided, Disputes, Error};
 use crate::canon;
 
 /// standard_history.go StandardHistoryCounts: the card's per-band counts as
@@ -80,9 +80,15 @@ fn counts(artifact: &[u8], token: &str) -> Result<(Vec<BandCount>, Disputes), Er
         .get("by_outcome")
         .and_then(Value::as_object)
         .ok_or_else(|| Error(format!("{name}: disputes.received.by_outcome must be an object")))?;
-    let open =
-        count(by_outcome, "open").map_err(|e| Error(format!("{name}: disputes.received.by_outcome.open: {e}")))?;
-    Ok((out, Disputes { open, of }))
+    let mut outcome = [0i64; 5];
+    for (i, k) in ["open", "for", "against", "split", "no_finding"].iter().enumerate() {
+        outcome[i] =
+            count(by_outcome, k).map_err(|e| Error(format!("{name}: disputes.received.by_outcome.{k}: {e}")))?;
+    }
+    // standard_history.go: each count is at most 2^53 - 1, and the sum is
+    // held to it as every card integer is.
+    let decided = (outcome[1] + outcome[2] + outcome[3] + outcome[4]).min(canon::MAX_SAFE_INTEGER);
+    Ok((out, Disputes { open: outcome[0], of, decided: Some(Decided { against: outcome[2], of: decided }) }))
 }
 
 /// standard_history.go isJCS: why `src` is not exactly the JCS encoding of

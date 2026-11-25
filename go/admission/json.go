@@ -37,8 +37,9 @@ type wireInputs struct {
 			Digest  string `json:"digest"`
 		} `json:"checkpoints"`
 		Disputes *struct {
-			Open int64 `json:"open"`
-			Of   int64 `json:"of"`
+			Open    int64    `json:"open"`
+			Of      int64    `json:"of"`
+			Decided *Decided `json:"decided"`
 		} `json:"disputes"`
 		Bands *[]struct {
 			Currency string `json:"currency"`
@@ -160,7 +161,7 @@ func DecodeInputs(raw []byte) (Inputs, error) {
 		in.Card.Claims = &Claims{Held: v.Card.Claims.Held, Total: v.Card.Claims.Total}
 	}
 	if v.Card.Disputes != nil {
-		in.Card.Disputes = &Disputes{Open: v.Card.Disputes.Open, Of: v.Card.Disputes.Of}
+		in.Card.Disputes = &Disputes{Open: v.Card.Disputes.Open, Of: v.Card.Disputes.Of, Decided: v.Card.Disputes.Decided}
 	}
 	if v.Card.Bands != nil {
 		in.Card.Bands = []BandCount{}
