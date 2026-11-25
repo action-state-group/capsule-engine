@@ -426,8 +426,13 @@ code implements, and a pack citing anything else is refused. That stays. CI (`pa
 
 ## 7. Cross-language CI
 
-One new workflow, `conformance.yml`, runs on every pull request and every push to main. It has
-no path filter, because a Python-only change can diverge from Go as easily as a Go change can.
+One new workflow, `conformance.yml`, runs on every push to main and on every pull request that
+touches `python/`, `go/`, `rust/`, `conformance-vectors/`, `scripts/` or the workflow. Its path
+list covers Python as well as Go, because a Python-only change can diverge from Go as easily as a
+Go change can. The Python half of `vectors` takes about 5.5 minutes, so it moved to
+`slow-suites.yml`, which runs nightly and on a push to main that touches its inputs; pull requests
+run the Go side, and `scripts/check.sh` runs the Python side before a push
+(asg-agent-team-ethan#409).
 
 1. **`go`**: in `go/` with `GOWORK=off`, `go vet ./...`, `gofmt -l` (must be empty), and
    `go test ./...`. This runs the moved parity tests and the v0 runners.
@@ -448,8 +453,9 @@ no path filter, because a Python-only change can diverge from Go as easily as a 
    A failure prints both sides' outcome, constraint table and evidence.
 3. **`packs`**: `python scripts/generate_go_packs.py --check`, plus the byte and digest checks of §3 and the
    checks of §6.
-4. **`conformance`**: needs 1-3, and fails if any of them failed or was skipped. This is the one
-   check branch protection requires. An admin sets that.
+4. **`conformance`**: needs `go`, `rust` and `packs`, and fails if any of them failed or was
+   skipped. No branch protection requires it today; while `conformance.yml` has a pull request
+   path list, requiring it would leave a pull request outside that list waiting on it.
 
 The coverage gate is what turns "a wicket lands once" into a rule. A PR that changes a check must
 leave a v0 case that exercises it, or `vectors` fails. The existing `ci`, `dco`, `neutrality` and

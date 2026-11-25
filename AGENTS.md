@@ -1,5 +1,15 @@
 # Notes for contributors and coding agents
 
+## Check before you push
+
+Before every push: `scripts/check.sh` (about N min on an Apple-silicon Mac). Before pushing a change to
+`python/scripts/vendor_*.py`, `python/capsule_engine/registry/` or
+`python/capsule_engine/examples/data/tau2_airline/`, also `scripts/check.sh --full` (about M min; needs
+network access for shallow clones of scitt-payload-binding and tau2-bench, about 450 MB). Both need
+Python 3.11 and 3.12, Go and rustup, as the script's header says. Pull requests run only the fast set;
+the Python conformance vectors and `python/tests/test_generate_go_packs.py` run nightly and on main
+(`slow-suites`). `neutrality` needs a CI-only secret and runs only in CI.
+
 ## Guard decisions with local-only fields stay on this machine
 
 Some fields are sealed into a guard decision's `asg_payload` only so that later checks on the same
@@ -37,7 +47,8 @@ wicket or fold change lands in one PR with both implementations. CI (`conformanc
 embedded packs and the ported definitions against the catalog, and decides the shared vectors
 (`conformance-vectors/guard/v0`) with both: Python at the PR's head must write every expected
 decision as committed, and Go must decide each the same, apart from the cases pinned in
-`KNOWN-DIFFERENCES.json`. A behavior change re-writes the vectors
+`KNOWN-DIFFERENCES.json`. Pull requests run the Go side; the Python side (`slow-suites`, job
+`vectors`) runs nightly and on main, and `scripts/check.sh` runs it before you push. A behavior change re-writes the vectors
 (`python scripts/conformance_vectors.py --write`) and changes Go in the same PR. When a served
 pack cuts a new version, run `scripts/generate_go_packs.py` and then `--write`, which moves every
 case to the new version, and re-pin any known difference that moved. A new check, or a

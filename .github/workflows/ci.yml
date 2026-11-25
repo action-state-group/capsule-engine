@@ -8,8 +8,8 @@ permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 defaults:
   run:
@@ -32,8 +32,11 @@ jobs:
       - name: ruff
         working-directory: .
         run: ruff check --config python/pyproject.toml .
+      # Parallel (pytest-xdist). tests/test_generate_go_packs.py (about 4.5
+      # minutes alone) runs nightly and on main in slow-suites.yml, which keeps
+      # this job near 5 minutes (asg-agent-team-ethan#409).
       - name: pytest
-        run: pytest -q
+        run: pytest -q -n auto --ignore=tests/test_generate_go_packs.py
       - name: release helper tests
         run: pytest -q ../.github/test_release.py
 
@@ -55,3 +58,22 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: build, install into a fresh venv, run the clean-room check
         run: bash scripts/clean_room_wheel.sh
+
+  report-failure:
+    needs: [test, clean-room-wheel]
+    if: failure() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    defaults:
+      run:
+        working-directory: .
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: open or comment on the ci-red issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TITLE: "ci failed on main or nightly"
+          RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          ASSIGNEE: ${{ vars.CI_FAILURE_ASSIGNEE }}
+        run: bash .github/scripts/report-failure.sh
