@@ -5,6 +5,10 @@ and `portedDefinitions` (`guard/engine.go`).
 
 ## Unreleased
 
+## 0.8.0 — 2026-11-24
+
+A minor on v0 (RELEASING.md): an API addition (`admission.Decided`, `Disputes.Decided`, `ReasonNoDisputeTally`, `Row.RecordUnread`), a new admission predicate and pack row field, and the command's rows gaining `reason`; no `go/packs` pack version or ported definition changes since v0.7.0 (`git diff go/v0.7.0..origin/main -- go/packs go/guard/engine.go` is empty). Cut for evidencebook-skills#280's ARD demo, which runs `capsule-engine admission evaluate` on a seller card with a lost dispute. Merged since v0.7.0 that touch `go/`: #322.
+
 - Added (evidencebook-skills#280): the admission predicate `card.disputes_against` (param `max`), the disputes others raised about the counterparty that were decided against it, out of those decided, read from its card; and the row field `on_unread: "record"`, allowed only on that check's `LIMIT` row with no `ask`, which records a verified card with no dispute tally (`reason: no_dispute_tally`) instead of limiting, Sherlock2's interim until evidencebook-skills#281. `Disputes` gains `Decided{Against, Of}` (nil when the caller did not read them, which reads `not_read`, never a pass); `StandardHistoryCounts` and `StandardHistory3Counts` fill it from `disputes.received.by_outcome` (`against`, and `for + against + split + no_finding`), leaving the `raised` side out (AAC standard-history-v0 §5.4). The command's `rows` carry each row's `reason`. The rust crate decides the same shared vectors (`packs/disputes-against`, `packs/disputes-against-strict`, the reader vectors and four loader refusals). No existing decision block changes.
 
 ## 0.7.0 — 2026-11-23
