@@ -319,12 +319,29 @@ pub struct Receipts {
 }
 
 /// The disputes others raised about the counterparty that its card shows:
-/// those still open, out of all of them (evaluate.go Disputes).
+/// those still open, out of all of them, and, when the caller read them,
+/// those decided (evaluate.go Disputes).
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct Disputes {
     pub open: i64,
     pub of: i64,
+    /// None when the caller did not read the decided disputes, so a caller
+    /// that fills only `open` and `of` never passes card.disputes_against.
+    pub decided: Option<Decided>,
 }
+
+/// The disputes others raised about the counterparty that were decided
+/// (for, against, split or no_finding), and how many were decided against it
+/// (evaluate.go Decided; evidencebook-skills#280).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct Decided {
+    pub against: i64,
+    pub of: i64,
+}
+
+/// evaluate.go ReasonNoDisputeTally: the reason a card.disputes_against row
+/// records when the card verified but carries no dispute tally.
+pub const REASON_NO_DISPUTE_TALLY: &str = "no_dispute_tally";
 
 /// A card's count in one value band (evaluate.go BandCount; Reference v3
 /// §3A.14): the corroborated, net-settled subjects whose net amount falls in

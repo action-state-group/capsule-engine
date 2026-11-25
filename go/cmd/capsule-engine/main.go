@@ -159,6 +159,9 @@ type row struct {
 	Effect      string `json:"effect"`
 	Count       *int64 `json:"count,omitempty"`
 	Denominator *int64 `json:"denominator,omitempty"`
+	// Reason is the block row's reason, such as no_dispute_tally on a
+	// card.disputes_against row whose verified card carries no tally.
+	Reason string `json:"reason,omitempty"`
 }
 
 type ask struct {
@@ -187,7 +190,7 @@ func encode(d admission.Decision, refs *admission.AdmitRefs) ([]byte, error) {
 		o.Band = &band{Currency: d.Band.Currency, Decade: d.Band.Decade}
 	}
 	for _, r := range d.Rows {
-		o.Rows = append(o.Rows, row{Row: r.Row, Result: r.Result, Effect: r.Effect, Count: r.Count, Denominator: r.Denominator})
+		o.Rows = append(o.Rows, row{Row: r.Row, Result: r.Result, Effect: r.Effect, Count: r.Count, Denominator: r.Denominator, Reason: r.Reason})
 	}
 	for _, a := range d.Asks {
 		o.Asks = append(o.Asks, ask{Row: a.Row, Derivation: a.Derivation, DeadlineS: a.DeadlineS})

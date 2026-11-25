@@ -12,8 +12,8 @@ use std::path::{Path, PathBuf};
 use capsule_engine::admission::{
     evaluate, inference_service_history_counts_for, standard_history_3_counts, standard_history_counts,
     AdjudicationVerdict, AdmitError, AdmitRefs, BandCount, Card, CardCheckpoint, CardCheckpoints, Checkpoint, Claims,
-    CoverageAsk, Decision, Disputes, Inputs, Judgement, Operator, OwnHistory, Pack, PackRef, Pin, Platform, RailPin,
-    Receipts, Selection, Served, ServedPeriod, Stake, Streams, Timestamp, Verdict, Vouch,
+    CoverageAsk, Decided, Decision, Disputes, Inputs, Judgement, Operator, OwnHistory, Pack, PackRef, Pin, Platform,
+    RailPin, Receipts, Selection, Served, ServedPeriod, Stake, Streams, Timestamp, Verdict, Vouch,
     INFERENCE_SERVICE_HISTORY_PROPERTIES,
 };
 use capsule_engine::canon;
@@ -222,8 +222,15 @@ fn decode_input(raw: &Value) -> Inputs {
                 .collect()
         }),
         disputes: null_or(card, "disputes").map(|d| {
-            let d = object(d, &["open", "of"], "card.disputes");
-            Disputes { open: int(d, "open"), of: int(d, "of") }
+            let d = object(d, &["open", "of", "decided"], "card.disputes");
+            Disputes {
+                open: int(d, "open"),
+                of: int(d, "of"),
+                decided: null_or(d, "decided").map(|c| {
+                    let c = object(c, &["against", "of"], "card.disputes.decided");
+                    Decided { against: int(c, "against"), of: int(c, "of") }
+                }),
+            }
         }),
         stapled: opt_bool(card, "stapled").unwrap_or(false),
         log_key_accepted: opt_bool(card, "log_key_accepted"),
@@ -590,7 +597,14 @@ fn run_standard_history_vectors(file: &str, read: Reader) {
                 let d = &e["disputes"];
                 assert_eq!(
                     disputes,
-                    Disputes { open: d["open"].as_i64().unwrap(), of: d["of"].as_i64().unwrap() },
+                    Disputes {
+                        open: d["open"].as_i64().unwrap(),
+                        of: d["of"].as_i64().unwrap(),
+                        decided: Some(Decided {
+                            against: d["decided"]["against"].as_i64().unwrap(),
+                            of: d["decided"]["of"].as_i64().unwrap(),
+                        }),
+                    },
                     "{name}: disputes"
                 );
             }

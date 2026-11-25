@@ -36,7 +36,7 @@ const MAY_DECIDE_NO: [&str; 3] = [SOURCE_PLATFORM, SOURCE_OWN_HISTORY, SOURCE_OP
 
 /// evaluate.go predicates: each admission check, the source it reads and
 /// the params it takes. The list is closed and versioned with the evaluator.
-pub(crate) const PREDICATES: [(&str, &str, &[&str]); 30] = [
+pub(crate) const PREDICATES: [(&str, &str, &[&str]); 31] = [
     ("platform.attestation_not_invalid", SOURCE_PLATFORM, &[]),
     ("platform.owner_signed", SOURCE_PLATFORM, &[]),
     ("card.verified", SOURCE_CARD, &[]),
@@ -62,6 +62,7 @@ pub(crate) const PREDICATES: [(&str, &str, &[&str]); 30] = [
     ("stake.covers_deal", SOURCE_STAKE, &[]),
     ("card.band_history_or_stake", SOURCE_CARD, &["k", "step_decades", "max_adverse_permille"]),
     ("card.open_disputes", SOURCE_CARD, &["max"]),
+    ("card.disputes_against", SOURCE_CARD, &["max"]),
     ("card.self_reported_served_periods", SOURCE_CARD, &["window", "min_periods"]),
     ("card.referee_verdicts", SOURCE_CARD, &["window", "min_periods"]),
     ("card.witness_receipts", SOURCE_CARD, &["min"]),
@@ -177,6 +178,10 @@ pub(crate) struct Row {
     pub(crate) on_fail: OnFail,
     /// The Evidence Request derivation a not_read row asks for.
     pub(crate) ask: Option<String>,
+    /// pack.go RecordUnread: on a card.disputes_against row whose on_unread
+    /// is record, a verified card with no dispute tally is recorded and
+    /// lowers no tier (evidencebook-skills#280, until #281).
+    pub(crate) record_unread: bool,
     /// The own-settled lift this row carries (profile section 4.1).
     pub(crate) lift: Option<Lift>,
 }
@@ -321,6 +326,8 @@ struct RawRow<'a> {
     /// The on_fail value as given (json.RawMessage), None when absent.
     on_fail: Option<&'a Value>,
     ask: Option<String>,
+    /// on_unread as given, None when absent.
+    on_unread: Option<String>,
     /// The lift as given: its tier id and unless_fail row ids.
     lift: Option<(String, Vec<String>)>,
 }
@@ -494,6 +501,7 @@ fn decode(v: &Value) -> Decoded<(SourceFile, Vec<RawRow<'_>>)> {
                     Some(d)
                 }
             },
+            on_unread: s.get("on_unread").map(|v| string(v, &format!("rows[{i}].on_unread"))).transpose()?,
             lift: match s.get("lift") {
                 None => None,
                 Some(l) => {
@@ -817,6 +825,22 @@ fn validate(src: &[u8], f: SourceFile, raw_rows: Vec<RawRow<'_>>) -> Result<Pack
                 bad(format!("{at}: carries an ask, but ASK is not in outcomes"));
             }
         }
+        if let Some(u) = &r.on_unread {
+            // Allowed on the lost-disputes row only, and never with an ask
+            // (pack.go; evidencebook-skills#280).
+            if r.check != "card.disputes_against" {
+                bad(format!("{at}: only a card.disputes_against row may carry on_unread"));
+            }
+            if u != RECORD {
+                bad(format!("{at}: on_unread must be record, got {u:?}"));
+            }
+            if on_fail != OnFail::Limit {
+                bad(format!("{at}: only a LIMIT row may carry on_unread"));
+            }
+            if r.ask.is_some() {
+                bad(format!("{at}: a row with on_unread carries no ask"));
+            }
+        }
         let lift = r.lift.as_ref().map(|(tier, unless)| {
             let idx = match tier_index.get(tier) {
                 None => {
@@ -847,6 +871,7 @@ fn validate(src: &[u8], f: SourceFile, raw_rows: Vec<RawRow<'_>>) -> Result<Pack
             from: from.unwrap_or(0),
             on_fail,
             ask: r.ask.clone().filter(|d| !d.is_empty()),
+            record_unread: r.on_unread.is_some(),
             lift,
         });
     }

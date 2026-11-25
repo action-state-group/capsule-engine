@@ -1037,6 +1037,92 @@
     }
    ],
    "want": "a lift needs a card.verified row"
+  },
+  {
+   "case": "on_unread on another check",
+   "base": "packs/disputes-against.json",
+   "ops": [
+    {
+     "set": [
+      "rows",
+      1,
+      "on_fail"
+     ],
+     "value": "LIMIT"
+    },
+    {
+     "set": [
+      "rows",
+      1,
+      "from"
+     ],
+     "value": "T1"
+    },
+    {
+     "set": [
+      "rows",
+      1,
+      "check"
+     ],
+     "value": "card.open_disputes"
+    },
+    {
+     "set": [
+      "rows",
+      1,
+      "on_unread"
+     ],
+     "value": "record"
+    }
+   ],
+   "want": "only a card.disputes_against row may carry on_unread"
+  },
+  {
+   "case": "on_unread other than record",
+   "base": "packs/disputes-against.json",
+   "ops": [
+    {
+     "set": [
+      "rows",
+      2,
+      "on_unread"
+     ],
+     "value": "LIMIT"
+    }
+   ],
+   "want": "on_unread must be record"
+  },
+  {
+   "case": "on_unread on a recorded row",
+   "base": "packs/disputes-against.json",
+   "ops": [
+    {
+     "set": [
+      "rows",
+      1,
+      "on_unread"
+     ],
+     "value": "record"
+    }
+   ],
+   "want": "only a LIMIT row may carry on_unread"
+  },
+  {
+   "case": "on_unread with an ask",
+   "base": "packs/disputes-against.json",
+   "ops": [
+    {
+     "set": [
+      "rows",
+      2,
+      "ask"
+     ],
+     "value": {
+      "derivation": "standard_history/1"
+     }
+    }
+   ],
+   "want": "a row with on_unread carries no ask"
   }
  ],
  "raw": [

@@ -6309,6 +6309,217 @@
     "tier": "T0",
     "block_sha256": "b5b403631defd2cc6d3e1258fafe29c519886ac365abac7c98c31689fc097cc5"
    }
+  },
+  {
+   "case": "da-none-against-goes",
+   "pack": "packs/disputes-against.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "disputes": {
+      "open": 1,
+      "of": 3,
+      "decided": {
+       "against": 0,
+       "of": 2
+      }
+     }
+    }
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T1",
+    "block_sha256": "52354bcd479c46dd2e4d3ef0f79d047bcc3de4a4894d25418f49c28eff4069da"
+   }
+  },
+  {
+   "case": "da-one-against-limits",
+   "pack": "packs/disputes-against.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "disputes": {
+      "open": 0,
+      "of": 3,
+      "decided": {
+       "against": 1,
+       "of": 3
+      }
+     }
+    }
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "08628dc7b62373034e4f69f04b72da042a637c21132c72da8c992408ef383b85"
+   }
+  },
+  {
+   "case": "da-no-tally-is-recorded-and-goes",
+   "pack": "packs/disputes-against.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z"
+    }
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T1",
+    "block_sha256": "96b111292864117b2e65dacef468ac47b1befc76879507027f36ed6c408ad901"
+   }
+  },
+  {
+   "case": "da-no-decided-is-recorded-and-goes",
+   "pack": "packs/disputes-against.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "disputes": {
+      "open": 0,
+      "of": 2
+     }
+    }
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T1",
+    "block_sha256": "96b111292864117b2e65dacef468ac47b1befc76879507027f36ed6c408ad901"
+   }
+  },
+  {
+   "case": "da-no-card-limits",
+   "pack": "packs/disputes-against.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD"
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "7224d6e0d62e235d1677f71eac069518a502593961d8013bdeb6cad51a387dd0"
+   }
+  },
+  {
+   "case": "da-unverifiable-card-limits",
+   "pack": "packs/disputes-against.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "unverifiable",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z"
+    }
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "7224d6e0d62e235d1677f71eac069518a502593961d8013bdeb6cad51a387dd0"
+   }
+  },
+  {
+   "case": "da-strict-no-tally-limits",
+   "pack": "packs/disputes-against-strict.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z"
+    }
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "27bb30c6c3308b1b0197f2428b7a8fcf9d6ceb0812674bb8ebe6405f89c8dc7f"
+   }
+  },
+  {
+   "case": "da-strict-one-against-limits",
+   "pack": "packs/disputes-against-strict.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "disputes": {
+      "open": 0,
+      "of": 1,
+      "decided": {
+       "against": 1,
+       "of": 1
+      }
+     }
+    }
+   },
+   "expected": {
+    "verdict": "LIMIT",
+    "source": "rows",
+    "tier": "T0",
+    "block_sha256": "816f507068c19b68f69d871519fc19e9f8cc0abb4cb1f6be5d0295626d955583"
+   }
+  },
+  {
+   "case": "od-decided-is-not-read-by-open-disputes",
+   "pack": "packs/open-disputes.json",
+   "input": {
+    "now": "2026-10-30T12:00:00Z",
+    "amount": "50",
+    "currency": "USD",
+    "card": {
+     "state": "verified",
+     "first_checkpoint_at": "2026-01-01T00:00:00Z",
+     "latest_checkpoint_at": "2026-10-29T00:00:00Z",
+     "disputes": {
+      "open": 0,
+      "of": 3,
+      "decided": {
+       "against": 3,
+       "of": 3
+      }
+     }
+    }
+   },
+   "expected": {
+    "verdict": "GO",
+    "source": "rows",
+    "tier": "T1",
+    "block_sha256": "1edc3b0224e6d9ac17338722e03a80941a22ea5f8c0dc3dc9dc0de0cb8c0509a"
+   }
   }
  ]
 }
