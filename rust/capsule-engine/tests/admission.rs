@@ -464,6 +464,15 @@ fn muse_buyer_fixtures() {
     check_pack_fixtures("admission-muse-buyer-1.0.0");
 }
 
+/// baseline_test.go TestBaseline110Fixtures and TestMuseBuyer110Fixtures: the
+/// 1.1.0 packs add the lost-disputes rows (evidencebook-skills#280); the 1.0.0
+/// copies stay while consumers pin them.
+#[test]
+fn packs_1_1_0_fixtures() {
+    check_pack_fixtures("admission-baseline-1.1.0");
+    check_pack_fixtures("admission-muse-buyer-1.1.0");
+}
+
 fn check_pack_fixtures(name: &str) {
     let dir = vector_dir().join(name);
     let prov: Value = serde_json::from_slice(&std::fs::read(dir.join("PROVENANCE.json")).unwrap()).unwrap();
