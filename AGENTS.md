@@ -2,9 +2,9 @@
 
 ## Check before you push
 
-Before every push: `scripts/check.sh` (about N min on an Apple-silicon Mac). Before pushing a change to
+Before every push: `scripts/check.sh` (about 18 min on an Apple-silicon Mac). Before pushing a change to
 `python/scripts/vendor_*.py`, `python/capsule_engine/registry/` or
-`python/capsule_engine/examples/data/tau2_airline/`, also `scripts/check.sh --full` (about M min; needs
+`python/capsule_engine/examples/data/tau2_airline/`, also `scripts/check.sh --full` (about 18 min as well once its clones are cached; needs
 network access for shallow clones of scitt-payload-binding and tau2-bench, about 450 MB). Both need
 Python 3.11 and 3.12, Go and rustup, as the script's header says. Pull requests run only the fast set;
 the Python conformance vectors and `python/tests/test_generate_go_packs.py` run nightly and on main
