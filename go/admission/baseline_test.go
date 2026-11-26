@@ -35,6 +35,16 @@ func TestMuseBuyer110Fixtures(t *testing.T) {
 	checkPackFixtures(t, vectorDir+"/admission-muse-buyer-1.1.0")
 }
 
+// The 1.2.0 packs ask for no served summary (evidencebook-skills#380); the
+// older copies stay while consumers pin them.
+func TestBaseline120Fixtures(t *testing.T) {
+	checkPackFixtures(t, vectorDir+"/admission-baseline-1.2.0")
+}
+
+func TestMuseBuyer120Fixtures(t *testing.T) {
+	checkPackFixtures(t, vectorDir+"/admission-muse-buyer-1.2.0")
+}
+
 func checkPackFixtures(t *testing.T, baselineDir string) {
 	var prov struct {
 		Commit string            `json:"commit"`

@@ -473,6 +473,15 @@ fn packs_1_1_0_fixtures() {
     check_pack_fixtures("admission-muse-buyer-1.1.0");
 }
 
+/// baseline_test.go TestBaseline120Fixtures and TestMuseBuyer120Fixtures: the
+/// 1.2.0 packs ask for no served summary (evidencebook-skills#380); the older
+/// copies stay while consumers pin them.
+#[test]
+fn packs_1_2_0_fixtures() {
+    check_pack_fixtures("admission-baseline-1.2.0");
+    check_pack_fixtures("admission-muse-buyer-1.2.0");
+}
+
 fn check_pack_fixtures(name: &str) {
     let dir = vector_dir().join(name);
     let prov: Value = serde_json::from_slice(&std::fs::read(dir.join("PROVENANCE.json")).unwrap()).unwrap();
