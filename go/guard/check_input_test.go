@@ -117,7 +117,7 @@ func TestTheRecordEntrysOwnItemRefStandsInForATopLevelOne(t *testing.T) {
 
 // A history entry's item_ref not in its agreed shape (a null included)
 // leaves its sale unknown, so single_commitment refuses (n/a history, fails
-// closed); the caps window reads only the declared scope, as before.
+// closed), and the caps window is not evaluable either (capsule-engine #328).
 func TestAHistoryItemRefOutOfShapeLeavesTheSaleUnknown(t *testing.T) {
 	for _, v := range []string{`"AB"`, `null`, `7`} {
 		raw := commitInput(t, func(e, _ map[string]json.RawMessage) {
