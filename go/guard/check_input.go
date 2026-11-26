@@ -65,7 +65,9 @@ func DecodeCheckInput(raw []byte) (Action, InputHistory, error) {
 	}
 	a = withProposalAt(WithItemRef(a, itemRef), entry.ProposalAt)
 	a = WithPartyRole(a, in.PartyRole)
-	h := InputHistory{Days: in.HistoryScope.Days, Complete: in.HistoryScope.Complete, TaskAuthorityRecord: in.TaskAuthorityRecord,
+	// live_history.py history_ledger: a history that is absent or null is
+	// never complete, whatever its scope declares; an empty list can be.
+	h := InputHistory{Days: in.HistoryScope.Days, Complete: in.HistoryScope.Complete && in.InputHistory != nil, TaskAuthorityRecord: in.TaskAuthorityRecord,
 		CommercialBoundsOpening: in.CommercialBoundsOpening, RepresentingOpening: objectOf(in.Record)[representingOpeningInput]}
 	for _, e := range in.InputHistory {
 		if err := h.AddEntry(e, a); err != nil {

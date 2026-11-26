@@ -938,9 +938,10 @@ type InputHistory struct {
 // saleUnknown is whether h may be missing an act of a sale, as
 // live_history.py history_ledger writes its incomplete record: its scope
 // is not declared complete (an absent history included), or an entry's
-// item_ref cannot be read. Only single_commitment and release_on_acceptance
-// read it; the caps window reads Complete alone, as before (the engine's
-// caps never reads the incomplete record).
+// item_ref cannot be read. single_commitment, release_on_acceptance and the
+// caps window read it: the engine's caps reads that one incomplete record
+// (caps.py _operator_history_incomplete), so a history whose act cannot be
+// placed in its sale leaves the window not evaluable too (capsule-engine #328).
 func (h InputHistory) saleUnknown() bool { return !h.Complete || h.itemRefUnread }
 
 // words are the words beside the check: on a replay, none is
@@ -1019,7 +1020,7 @@ func (e *Engine) windowCoverage(a Action, h InputHistory) (string, int) {
 	}
 	window := e.capsFold.windowSpec
 	switch {
-	case !h.Complete:
+	case h.saleUnknown():
 		return "the history supplied is incomplete (more acts than it holds, or some could not be read), so the " + window + " total cannot be computed", 0
 	case time.Duration(h.Days)*24*time.Hour < e.capsFold.window:
 		return fmt.Sprintf("the history supplied reaches back %d day(s); the %s total needs %s", h.Days, window, window), 0

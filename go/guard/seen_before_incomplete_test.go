@@ -175,20 +175,24 @@ func TestACompleteHistoryWithNoEarlierPaymentFailsAsBefore(t *testing.T) {
 	}
 }
 
-// A complete history holding an act whose item_ref cannot be read may be
-// missing an act (InputHistory.saleUnknown, as live_history.py writes its
-// incomplete record), while this port's caps window reads Complete alone and
-// is evaluated: counterparty_seen_before then asks on its own, with nothing
-// failed, and the report labels it as the engine does.
+// loneSeenBeforeUnevaluated decides a with counterparty_seen_before told
+// the history may be missing acts while the caps window is evaluated over
+// the same records. Since capsule-engine #328 no check input reaches this:
+// caps reads the same signal (InputHistory.saleUnknown) and is not
+// evaluable too, as the engine's caps is. The tests below drive checkWith
+// directly to keep the path where seen-before asks alone covered.
+func loneSeenBeforeUnevaluated(t *testing.T, e *Engine, a Action, h InputHistory) (Decision, error) {
+	t.Helper()
+	return e.checkWith(a, MemoryHistory(h.records()), checkInputs{history: true, historyIncomplete: true})
+}
+
+// When counterparty_seen_before is the only check not evaluated (the caps
+// window was), it asks on its own, with nothing failed, and the report
+// labels it as the engine does.
 func TestOnlySeenBeforeAsksWhenTheCapsWindowWasEvaluated(t *testing.T) {
-	a, h := checkInput(t, "pay-history-other-merchant", func(env map[string]any) {
-		env["history"].([]any)[0].(map[string]any)["item_ref"] = nil
-	})
-	if !h.Complete || !h.saleUnknown() {
-		t.Fatalf("complete=%v saleUnknown=%v", h.Complete, h.saleUnknown())
-	}
+	a, h := checkInput(t, "pay-history-other-merchant", nil)
 	e := engineFor(t, pack.LoadEveryday0310)
-	d, err := e.CheckWithHistory(a, h)
+	d, err := loneSeenBeforeUnevaluated(t, e, a, h)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -208,14 +212,12 @@ func TestOnlySeenBeforeAsksWhenTheCapsWindowWasEvaluated(t *testing.T) {
 // money.purchase, which names an approver, so the engine's seen-before
 // config is widened to a capped class that names none.
 func TestALoneUnevaluatedSeenBeforeWithNoApproverIsRefused(t *testing.T) {
-	a, h := checkInput(t, "pay-history-other-merchant", func(env map[string]any) {
-		env["history"].([]any)[0].(map[string]any)["item_ref"] = nil
-	})
+	a, h := checkInput(t, "pay-history-other-merchant", nil)
 	class := "external_commitment.other" // capped, with no approver_role
 	a.ActionClass = &class
 	e := engineFor(t, pack.LoadEveryday0310)
 	e.seenBefore.actionClasses = append(slices.Clone(e.seenBefore.actionClasses), class)
-	d, err := e.CheckWithHistory(a, h)
+	d, err := loneSeenBeforeUnevaluated(t, e, a, h)
 	if err != nil {
 		t.Fatal(err)
 	}
