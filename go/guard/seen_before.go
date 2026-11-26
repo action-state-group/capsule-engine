@@ -66,8 +66,8 @@ const (
 // historyIncompleteReason is the engine's HISTORY_INCOMPLETE_REASON. It
 // opens as caps' reason on the same history does, so the command's short
 // reason (shortReasons) reads the same for both.
-const historyIncompleteReason = "the history supplied is incomplete (more acts than it holds, or some could not be read), " +
-	"so whether this payee was paid before cannot be known"
+const historyIncompleteReason = "the history supplied is incomplete (it lists more purchases than it holds, or some could not be read), " +
+	"so the rule cannot tell whether this merchant was paid before"
 
 type seenBefore struct {
 	// id is the check: counterparty_seen_before or recipient_seen_before.

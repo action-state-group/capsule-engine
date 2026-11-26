@@ -11,11 +11,11 @@
 # across a window, not checkable by a stranger from the receipt.
 rows:
 - action_id: make_payment/everyday-fixture-baseline
-  capsule_id: 6c778e0a8b883bb8b24486d2f3a59d97b62046729fcfa4e6cdfc42edaed02325
+  capsule_id: 579571696f472d00daadaa08ef7226cac69a299ff592e8bae54db22f5e322009
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.10
-    pack_digest: 80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5
+    pack_digest: dec5460c94a9320a0aa2ad9a6b0f99b38f2b5100f11b1ceecd23f7ca8fd52950
     wickets:
       caps/5.1.0: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -35,14 +35,14 @@ rows:
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   code_identity:
     kind: source_tree_sha256
-    value: 078b434e8f26b6c1f65f08a595dd05823b0700b8b0695c87d0293735fcd5a7cb
+    value: b311575f65e6efcdae12be83723ef3d76cb65dab89a84fb33d798c5bcc7350fe
     assurance: self-attested
 - action_id: make_payment/everyday-fixture-same-account
-  capsule_id: b098ff59628e111fa6f5786cfdd1a0714730ccd8842258ab0372fa879a17c226
+  capsule_id: bafe83beaa0d53f5a5949c865b99c15bf31eb53ea1856d758b4ac82665386636
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.10
-    pack_digest: 80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5
+    pack_digest: dec5460c94a9320a0aa2ad9a6b0f99b38f2b5100f11b1ceecd23f7ca8fd52950
     wickets:
       caps/5.1.0: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -62,14 +62,14 @@ rows:
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   code_identity:
     kind: source_tree_sha256
-    value: 078b434e8f26b6c1f65f08a595dd05823b0700b8b0695c87d0293735fcd5a7cb
+    value: b311575f65e6efcdae12be83723ef3d76cb65dab89a84fb33d798c5bcc7350fe
     assurance: self-attested
 - action_id: make_payment/everyday-fixture-account-changed
-  capsule_id: fbf9915b3be7da07caf4acb33fd974554693762030f10170f044b0f42de7aa68
+  capsule_id: 0d8db3db6aaa5a28822b3f080320abd9f1cb7e8e075c538deb5f92e0132e7977
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.10
-    pack_digest: 80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5
+    pack_digest: dec5460c94a9320a0aa2ad9a6b0f99b38f2b5100f11b1ceecd23f7ca8fd52950
     wickets:
       caps/5.1.0: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -89,14 +89,14 @@ rows:
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   code_identity:
     kind: source_tree_sha256
-    value: 078b434e8f26b6c1f65f08a595dd05823b0700b8b0695c87d0293735fcd5a7cb
+    value: b311575f65e6efcdae12be83723ef3d76cb65dab89a84fb33d798c5bcc7350fe
     assurance: self-attested
 - action_id: make_payment/everyday-fixture-rail-watched
-  capsule_id: 3b0edec5a55c5275b11836be4113c94a40ac1aa928b54a285542ab0fa11d4828
+  capsule_id: 4d10546a6107a61c8e7ae72d686775ec9f3b45dcdce3a4af41db7c5fe7ac8a0e
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.10
-    pack_digest: 80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5
+    pack_digest: dec5460c94a9320a0aa2ad9a6b0f99b38f2b5100f11b1ceecd23f7ca8fd52950
     wickets:
       caps/5.1.0: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -116,14 +116,14 @@ rows:
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   code_identity:
     kind: source_tree_sha256
-    value: 078b434e8f26b6c1f65f08a595dd05823b0700b8b0695c87d0293735fcd5a7cb
+    value: b311575f65e6efcdae12be83723ef3d76cb65dab89a84fb33d798c5bcc7350fe
     assurance: self-attested
 - action_id: send_message/everyday-fixture-credential-in-content
-  capsule_id: 6266f611b0fec8957dce74ea001374df92e503625dddf956cfd2b1ef91b872d7
+  capsule_id: d72de2e5b26b6d39147a1746f68a30a4ef671c2a55bc606ff54950e903ddc1d0
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.10
-    pack_digest: 80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5
+    pack_digest: dec5460c94a9320a0aa2ad9a6b0f99b38f2b5100f11b1ceecd23f7ca8fd52950
     wickets:
       caps/5.1.0: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -143,14 +143,14 @@ rows:
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   code_identity:
     kind: source_tree_sha256
-    value: 078b434e8f26b6c1f65f08a595dd05823b0700b8b0695c87d0293735fcd5a7cb
+    value: b311575f65e6efcdae12be83723ef3d76cb65dab89a84fb33d798c5bcc7350fe
     assurance: self-attested
 - action_id: make_payment/everyday-fixture-rent
-  capsule_id: b8d182aefbe0c2d0c3fe5bfa6202d192183c8f743d7a81bc94aa8eed802702b8
+  capsule_id: 3954fcb741b9e3eef6d6273de2c7e837832bd4b4e380ffe93498eacb262d19c2
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.10
-    pack_digest: 80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5
+    pack_digest: dec5460c94a9320a0aa2ad9a6b0f99b38f2b5100f11b1ceecd23f7ca8fd52950
     wickets:
       caps/5.1.0: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -170,14 +170,14 @@ rows:
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   code_identity:
     kind: source_tree_sha256
-    value: 078b434e8f26b6c1f65f08a595dd05823b0700b8b0695c87d0293735fcd5a7cb
+    value: b311575f65e6efcdae12be83723ef3d76cb65dab89a84fb33d798c5bcc7350fe
     assurance: self-attested
 - action_id: send_message/everyday-fixture-credential-absent
-  capsule_id: 6ab77bf1e33b2221740c5c432c3e76e607214a955142b8f688a0cd2e27d47851
+  capsule_id: 1629985f8cfa77220870c431a69d1361041b622060f6218151c8396a2d4c7a34
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.10
-    pack_digest: 80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5
+    pack_digest: dec5460c94a9320a0aa2ad9a6b0f99b38f2b5100f11b1ceecd23f7ca8fd52950
     wickets:
       caps/5.1.0: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -197,14 +197,14 @@ rows:
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   code_identity:
     kind: source_tree_sha256
-    value: 078b434e8f26b6c1f65f08a595dd05823b0700b8b0695c87d0293735fcd5a7cb
+    value: b311575f65e6efcdae12be83723ef3d76cb65dab89a84fb33d798c5bcc7350fe
     assurance: self-attested
 - action_id: make_payment/everyday-fixture-dedupe-original
-  capsule_id: b53903b5cdc291472bc7fb910923bbf972a31435afdba03609c7ccac29d178d9
+  capsule_id: 199cadb889e0b674fd9f72acf66d65eea8ebd6f265fb1d8f41e973d7bd74a107
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.10
-    pack_digest: 80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5
+    pack_digest: dec5460c94a9320a0aa2ad9a6b0f99b38f2b5100f11b1ceecd23f7ca8fd52950
     wickets:
       caps/5.1.0: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -224,14 +224,14 @@ rows:
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   code_identity:
     kind: source_tree_sha256
-    value: 078b434e8f26b6c1f65f08a595dd05823b0700b8b0695c87d0293735fcd5a7cb
+    value: b311575f65e6efcdae12be83723ef3d76cb65dab89a84fb33d798c5bcc7350fe
     assurance: self-attested
 - action_id: make_payment/everyday-fixture-dedupe-repeat
-  capsule_id: b10ce4c0e57af0b15cceadd0fc53626977d7f734d39e5073a5dc8168c5aad142
+  capsule_id: 780d3d403586457a58089af91155ce7d6c82632f65c1c954b682e7f34fb8803b
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.10
-    pack_digest: 80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5
+    pack_digest: dec5460c94a9320a0aa2ad9a6b0f99b38f2b5100f11b1ceecd23f7ca8fd52950
     wickets:
       caps/5.1.0: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -251,14 +251,14 @@ rows:
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   code_identity:
     kind: source_tree_sha256
-    value: 078b434e8f26b6c1f65f08a595dd05823b0700b8b0695c87d0293735fcd5a7cb
+    value: b311575f65e6efcdae12be83723ef3d76cb65dab89a84fb33d798c5bcc7350fe
     assurance: self-attested
 - action_id: make_payment/everyday-fixture-caps-boundary
-  capsule_id: c7bd213f3eaf549c1172efb9908b92067dada23851e7631debbb1b87fd135308
+  capsule_id: fa340fc9739d526fe9b0afefe0d9248ae9c71f2007cd944e4b55eab7b4f4195a
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.10
-    pack_digest: 80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5
+    pack_digest: dec5460c94a9320a0aa2ad9a6b0f99b38f2b5100f11b1ceecd23f7ca8fd52950
     wickets:
       caps/5.1.0: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -278,14 +278,14 @@ rows:
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   code_identity:
     kind: source_tree_sha256
-    value: 078b434e8f26b6c1f65f08a595dd05823b0700b8b0695c87d0293735fcd5a7cb
+    value: b311575f65e6efcdae12be83723ef3d76cb65dab89a84fb33d798c5bcc7350fe
     assurance: self-attested
 - action_id: make_payment/everyday-fixture-caps-first-draw
-  capsule_id: 0f5619ec64577cf65ffa58085fbfd10adc6a90ddb27115dfa932796ea403cb0c
+  capsule_id: 3cd39d88c45cefc16542541d91bc8133ff7c7b0a4855d4d2b0466ce094b8a042
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.10
-    pack_digest: 80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5
+    pack_digest: dec5460c94a9320a0aa2ad9a6b0f99b38f2b5100f11b1ceecd23f7ca8fd52950
     wickets:
       caps/5.1.0: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -305,14 +305,14 @@ rows:
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   code_identity:
     kind: source_tree_sha256
-    value: 078b434e8f26b6c1f65f08a595dd05823b0700b8b0695c87d0293735fcd5a7cb
+    value: b311575f65e6efcdae12be83723ef3d76cb65dab89a84fb33d798c5bcc7350fe
     assurance: self-attested
 - action_id: make_payment/everyday-fixture-caps-over-limit
-  capsule_id: ccdfdf3bdd5bd9dd4aa73024b755a9de88066ff565b319ae4f065b55788afffd
+  capsule_id: 3b1a7ad50a7e7be7b65d6bc4c0a589b906a0358f2e48525209ef532aabc855c4
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.10
-    pack_digest: 80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5
+    pack_digest: dec5460c94a9320a0aa2ad9a6b0f99b38f2b5100f11b1ceecd23f7ca8fd52950
     wickets:
       caps/5.1.0: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -332,14 +332,14 @@ rows:
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   code_identity:
     kind: source_tree_sha256
-    value: 078b434e8f26b6c1f65f08a595dd05823b0700b8b0695c87d0293735fcd5a7cb
+    value: b311575f65e6efcdae12be83723ef3d76cb65dab89a84fb33d798c5bcc7350fe
     assurance: self-attested
 - action_id: make_payment/everyday-fixture-caps-amount-missing
-  capsule_id: e7be088827d186e0f72c24aead7bf04a58fa62abc154fd7dae5fab0d39881c48
+  capsule_id: 7d66fbdb9359e3bc3b846e620cccb1724d156f8c587bd8a98f19e6c4e98e9702
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.10
-    pack_digest: 80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5
+    pack_digest: dec5460c94a9320a0aa2ad9a6b0f99b38f2b5100f11b1ceecd23f7ca8fd52950
     wickets:
       caps/5.1.0: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -359,14 +359,14 @@ rows:
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   code_identity:
     kind: source_tree_sha256
-    value: 078b434e8f26b6c1f65f08a595dd05823b0700b8b0695c87d0293735fcd5a7cb
+    value: b311575f65e6efcdae12be83723ef3d76cb65dab89a84fb33d798c5bcc7350fe
     assurance: self-attested
 - action_id: check_balance/everyday-fixture-out-of-scope
-  capsule_id: ed8eb9c7bdd1da881a7287fcc04b4b552439e84ed3cf78631728b22ff871ff16
+  capsule_id: 052e49a5a13081a302456be0b8124b105499d5ad75963ff1e23603273146ede0
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.10
-    pack_digest: 80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5
+    pack_digest: dec5460c94a9320a0aa2ad9a6b0f99b38f2b5100f11b1ceecd23f7ca8fd52950
     wickets:
       caps/5.1.0: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -386,14 +386,14 @@ rows:
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   code_identity:
     kind: source_tree_sha256
-    value: 078b434e8f26b6c1f65f08a595dd05823b0700b8b0695c87d0293735fcd5a7cb
+    value: b311575f65e6efcdae12be83723ef3d76cb65dab89a84fb33d798c5bcc7350fe
     assurance: self-attested
 - action_id: make_payment/everyday-fixture-recurring-charge
-  capsule_id: 640095fcc46a51c8cf583cf2ae550657bbb0474cd918e595aa7cf474a7df4bdd
+  capsule_id: 30732ad0b7a7eadb13c929a7210d8878df45d30e76d831b068f4857a941e0eab
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.10
-    pack_digest: 80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5
+    pack_digest: dec5460c94a9320a0aa2ad9a6b0f99b38f2b5100f11b1ceecd23f7ca8fd52950
     wickets:
       caps/5.1.0: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -413,14 +413,14 @@ rows:
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   code_identity:
     kind: source_tree_sha256
-    value: 078b434e8f26b6c1f65f08a595dd05823b0700b8b0695c87d0293735fcd5a7cb
+    value: b311575f65e6efcdae12be83723ef3d76cb65dab89a84fb33d798c5bcc7350fe
     assurance: self-attested
 - action_id: make_payment/everyday-fixture-caps-second-first-draw
-  capsule_id: a6ebf2305f65ff4e8815dffd86e736ad7f42fb0e198e7a661224eda9247e0a2f
+  capsule_id: 482b9ec610c3ac75761271204fc438cae9541f2acdcf61d38c754f1bfffae225
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.10
-    pack_digest: 80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5
+    pack_digest: dec5460c94a9320a0aa2ad9a6b0f99b38f2b5100f11b1ceecd23f7ca8fd52950
     wickets:
       caps/5.1.0: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -440,14 +440,14 @@ rows:
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   code_identity:
     kind: source_tree_sha256
-    value: 078b434e8f26b6c1f65f08a595dd05823b0700b8b0695c87d0293735fcd5a7cb
+    value: b311575f65e6efcdae12be83723ef3d76cb65dab89a84fb33d798c5bcc7350fe
     assurance: self-attested
 - action_id: make_payment/everyday-fixture-caps-escalates
-  capsule_id: c28504a4e77d1e666ff362883906e9f895401be850de93b3d64f3b8cb33e6060
+  capsule_id: 4ba6da4cbfa0fdb52b178abcd4c0f37c4ce74878b0f539d484d8b081cf1a2f71
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.10
-    pack_digest: 80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5
+    pack_digest: dec5460c94a9320a0aa2ad9a6b0f99b38f2b5100f11b1ceecd23f7ca8fd52950
     wickets:
       caps/5.1.0: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -467,14 +467,14 @@ rows:
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   code_identity:
     kind: source_tree_sha256
-    value: 078b434e8f26b6c1f65f08a595dd05823b0700b8b0695c87d0293735fcd5a7cb
+    value: b311575f65e6efcdae12be83723ef3d76cb65dab89a84fb33d798c5bcc7350fe
     assurance: self-attested
 - action_id: make_payment/everyday-fixture-merchant-history
-  capsule_id: 326c025ec8531cd798881072addfc3af92a6841f43117dc566374a0fdf464a38
+  capsule_id: e93fd12deab595661dda14050948de25fe4e0e2f0430560505c51db418c0cb52
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.10
-    pack_digest: 80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5
+    pack_digest: dec5460c94a9320a0aa2ad9a6b0f99b38f2b5100f11b1ceecd23f7ca8fd52950
     wickets:
       caps/5.1.0: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -494,14 +494,14 @@ rows:
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   code_identity:
     kind: source_tree_sha256
-    value: 078b434e8f26b6c1f65f08a595dd05823b0700b8b0695c87d0293735fcd5a7cb
+    value: b311575f65e6efcdae12be83723ef3d76cb65dab89a84fb33d798c5bcc7350fe
     assurance: self-attested
 - action_id: make_purchase/everyday-fixture-merchant-first
-  capsule_id: 7fb656ad098a5ea9782c02a5e1460da257a92dbc1107ae6d0995b6d10dea22c2
+  capsule_id: 62c503b0ef24145f5e6f75efd6c4bf8f93264f742a0c4a34dd1daf1a07b2a9e9
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.10
-    pack_digest: 80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5
+    pack_digest: dec5460c94a9320a0aa2ad9a6b0f99b38f2b5100f11b1ceecd23f7ca8fd52950
     wickets:
       caps/5.1.0: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -521,14 +521,14 @@ rows:
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   code_identity:
     kind: source_tree_sha256
-    value: 078b434e8f26b6c1f65f08a595dd05823b0700b8b0695c87d0293735fcd5a7cb
+    value: b311575f65e6efcdae12be83723ef3d76cb65dab89a84fb33d798c5bcc7350fe
     assurance: self-attested
 - action_id: make_purchase/everyday-fixture-merchant-repeat
-  capsule_id: 3a07a24b165967f3d0b668f7ed3570d0c8fd77af1bf4113f7f669bb86f162657
+  capsule_id: 7ff21fa6d8b2ccaf6bbf9d16628fb7e4e235caa476787462ac0451752df4bedc
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.10
-    pack_digest: 80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5
+    pack_digest: dec5460c94a9320a0aa2ad9a6b0f99b38f2b5100f11b1ceecd23f7ca8fd52950
     wickets:
       caps/5.1.0: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -548,14 +548,14 @@ rows:
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   code_identity:
     kind: source_tree_sha256
-    value: 078b434e8f26b6c1f65f08a595dd05823b0700b8b0695c87d0293735fcd5a7cb
+    value: b311575f65e6efcdae12be83723ef3d76cb65dab89a84fb33d798c5bcc7350fe
     assurance: self-attested
 - action_id: book_table/everyday-fixture-booking-create
-  capsule_id: a37a74277eab5cdec36323659605b748e3ade59ef993bc0b4b5d6a3ed4c8dc1a
+  capsule_id: c53766302fbf70cc7ce2bd79d38ae4f153fffb618da58fb06729e2e402dc3f47
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.10
-    pack_digest: 80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5
+    pack_digest: dec5460c94a9320a0aa2ad9a6b0f99b38f2b5100f11b1ceecd23f7ca8fd52950
     wickets:
       caps/5.1.0: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -575,14 +575,14 @@ rows:
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   code_identity:
     kind: source_tree_sha256
-    value: 078b434e8f26b6c1f65f08a595dd05823b0700b8b0695c87d0293735fcd5a7cb
+    value: b311575f65e6efcdae12be83723ef3d76cb65dab89a84fb33d798c5bcc7350fe
     assurance: self-attested
 - action_id: do_unlisted/everyday-fixture-off-taxonomy
-  capsule_id: f93b50ed096923c4458d299059cba801dcba76c6c9ab29f121ff8d69a7c503e1
+  capsule_id: e7d0b69130c0546d005a547ca82df2f14c27c94be5ecbcb2f8d82f50babca8ae
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.10
-    pack_digest: 80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5
+    pack_digest: dec5460c94a9320a0aa2ad9a6b0f99b38f2b5100f11b1ceecd23f7ca8fd52950
     wickets:
       caps/5.1.0: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -602,14 +602,14 @@ rows:
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   code_identity:
     kind: source_tree_sha256
-    value: 078b434e8f26b6c1f65f08a595dd05823b0700b8b0695c87d0293735fcd5a7cb
+    value: b311575f65e6efcdae12be83723ef3d76cb65dab89a84fb33d798c5bcc7350fe
     assurance: self-attested
 - action_id: share_address/everyday-fixture-fulfilling-merchant
-  capsule_id: 1c392ead4be57fb1d4bec409bec5bf084fa01aedd8f534fd7ef3ce28afe4deda
+  capsule_id: b86550b9c7862d11e394d2af7f36ce848a642487823295d2b6e9134ad8e89adf
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.10
-    pack_digest: 80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5
+    pack_digest: dec5460c94a9320a0aa2ad9a6b0f99b38f2b5100f11b1ceecd23f7ca8fd52950
     wickets:
       caps/5.1.0: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -629,14 +629,14 @@ rows:
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   code_identity:
     kind: source_tree_sha256
-    value: 078b434e8f26b6c1f65f08a595dd05823b0700b8b0695c87d0293735fcd5a7cb
+    value: b311575f65e6efcdae12be83723ef3d76cb65dab89a84fb33d798c5bcc7350fe
     assurance: self-attested
 - action_id: share_address/everyday-fixture-third-party
-  capsule_id: 507b24ed1b5f89f4ade99662798eeb138b8c42faa6f53677ef7ded3ea26f4a18
+  capsule_id: 564da61b2b01f9d310340ab2d9db35a186b022592a22b4816ac7c00f9d5899a4
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.10
-    pack_digest: 80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5
+    pack_digest: dec5460c94a9320a0aa2ad9a6b0f99b38f2b5100f11b1ceecd23f7ca8fd52950
     wickets:
       caps/5.1.0: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -656,14 +656,14 @@ rows:
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   code_identity:
     kind: source_tree_sha256
-    value: 078b434e8f26b6c1f65f08a595dd05823b0700b8b0695c87d0293735fcd5a7cb
+    value: b311575f65e6efcdae12be83723ef3d76cb65dab89a84fb33d798c5bcc7350fe
     assurance: self-attested
 - action_id: make_payment/everyday-fixture-terms-in-bounds
-  capsule_id: 4f750b73f9baa8d1e97baca7d911b3b94eb4510b04b3fa365436580bf7eebbd7
+  capsule_id: 8981b49a6624e07f397c54f9de4bfd8ba1546ecf88a11519333c4f8a811f0f05
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.10
-    pack_digest: 80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5
+    pack_digest: dec5460c94a9320a0aa2ad9a6b0f99b38f2b5100f11b1ceecd23f7ca8fd52950
     wickets:
       caps/5.1.0: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -683,14 +683,14 @@ rows:
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   code_identity:
     kind: source_tree_sha256
-    value: 078b434e8f26b6c1f65f08a595dd05823b0700b8b0695c87d0293735fcd5a7cb
+    value: b311575f65e6efcdae12be83723ef3d76cb65dab89a84fb33d798c5bcc7350fe
     assurance: self-attested
 - action_id: make_payment/everyday-fixture-non-refundable
-  capsule_id: 8839d6b3411a65ad153db1d52a207ef3925c8d412b4ee79d7be4c49702696bbc
+  capsule_id: a651c85447f9c65f9d7033a001d437494fc36817c8ec4b07500887c3dcf364e9
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.10
-    pack_digest: 80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5
+    pack_digest: dec5460c94a9320a0aa2ad9a6b0f99b38f2b5100f11b1ceecd23f7ca8fd52950
     wickets:
       caps/5.1.0: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -710,14 +710,14 @@ rows:
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   code_identity:
     kind: source_tree_sha256
-    value: 078b434e8f26b6c1f65f08a595dd05823b0700b8b0695c87d0293735fcd5a7cb
+    value: b311575f65e6efcdae12be83723ef3d76cb65dab89a84fb33d798c5bcc7350fe
     assurance: self-attested
 - action_id: make_payment/everyday-fixture-material-changed
-  capsule_id: 7204f2aef46a523922def293819b3e4122979a682d0357d1a6bb2bd2e0151a69
+  capsule_id: f3c070c9b72942d3fa5406cd8f36f239ef9a90b0cd79da22c814824dea54e0a9
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.10
-    pack_digest: 80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5
+    pack_digest: dec5460c94a9320a0aa2ad9a6b0f99b38f2b5100f11b1ceecd23f7ca8fd52950
     wickets:
       caps/5.1.0: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -737,14 +737,14 @@ rows:
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   code_identity:
     kind: source_tree_sha256
-    value: 078b434e8f26b6c1f65f08a595dd05823b0700b8b0695c87d0293735fcd5a7cb
+    value: b311575f65e6efcdae12be83723ef3d76cb65dab89a84fb33d798c5bcc7350fe
     assurance: self-attested
 - action_id: make_payment/everyday-fixture-offer-differs
-  capsule_id: 6a9bc51a244eae4a0e32fe9805abc4b601ebe7bb006e231e0f93bd9c3bcc85ef
+  capsule_id: b563fcf0d10f90b545d0228bc633299917392d6544dd36b4cce36985ae3d893c
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.10
-    pack_digest: 80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5
+    pack_digest: dec5460c94a9320a0aa2ad9a6b0f99b38f2b5100f11b1ceecd23f7ca8fd52950
     wickets:
       caps/5.1.0: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -764,14 +764,14 @@ rows:
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   code_identity:
     kind: source_tree_sha256
-    value: 078b434e8f26b6c1f65f08a595dd05823b0700b8b0695c87d0293735fcd5a7cb
+    value: b311575f65e6efcdae12be83723ef3d76cb65dab89a84fb33d798c5bcc7350fe
     assurance: self-attested
 - action_id: make_payment/everyday-fixture-channel-moved
-  capsule_id: 9a4e803b327f87bedf110c47620e6377fb4214464d94a4732d3f72b0068947be
+  capsule_id: ef812e9373bd10dd04449368b3efa0a0cf87f7f84292dbc8a026a6ac19f76b9a
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.10
-    pack_digest: 80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5
+    pack_digest: dec5460c94a9320a0aa2ad9a6b0f99b38f2b5100f11b1ceecd23f7ca8fd52950
     wickets:
       caps/5.1.0: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -791,14 +791,14 @@ rows:
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   code_identity:
     kind: source_tree_sha256
-    value: 078b434e8f26b6c1f65f08a595dd05823b0700b8b0695c87d0293735fcd5a7cb
+    value: b311575f65e6efcdae12be83723ef3d76cb65dab89a84fb33d798c5bcc7350fe
     assurance: self-attested
 - action_id: make_payment/everyday-fixture-deposit-over
-  capsule_id: d4d0cd0ae34e95c8c15b525fdbdf6896cecd416bb6b445328ead646fe6296520
+  capsule_id: a9af0b26305bc186d2b3d3ad9e371c9f9e179147674db4ebba4417a3c564d7a6
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.10
-    pack_digest: 80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5
+    pack_digest: dec5460c94a9320a0aa2ad9a6b0f99b38f2b5100f11b1ceecd23f7ca8fd52950
     wickets:
       caps/5.1.0: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -818,14 +818,14 @@ rows:
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   code_identity:
     kind: source_tree_sha256
-    value: 078b434e8f26b6c1f65f08a595dd05823b0700b8b0695c87d0293735fcd5a7cb
+    value: b311575f65e6efcdae12be83723ef3d76cb65dab89a84fb33d798c5bcc7350fe
     assurance: self-attested
 - action_id: make_payment/everyday-fixture-task-inside
-  capsule_id: 392ab429bcca8e400d21376ca7c26e16f3ec9db922776f46e0e216f3a6951892
+  capsule_id: b5f8c359c861d6cd00f2f6fe3c8d87dfb05ad1b88a21fd9e6f90b763ea11623e
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.10
-    pack_digest: 80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5
+    pack_digest: dec5460c94a9320a0aa2ad9a6b0f99b38f2b5100f11b1ceecd23f7ca8fd52950
     wickets:
       caps/5.1.0: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -845,14 +845,14 @@ rows:
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   code_identity:
     kind: source_tree_sha256
-    value: 078b434e8f26b6c1f65f08a595dd05823b0700b8b0695c87d0293735fcd5a7cb
+    value: b311575f65e6efcdae12be83723ef3d76cb65dab89a84fb33d798c5bcc7350fe
     assurance: self-attested
 - action_id: make_payment/everyday-fixture-task-outside
-  capsule_id: 6aa7ec384fa5126359c121dd27c55e053e4f1209957baceee81d99a3ba2c6031
+  capsule_id: 590e538ec5bc58a20f70e3480c7f06748857bc3f3287654fdf53dfdde1950816
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.10
-    pack_digest: 80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5
+    pack_digest: dec5460c94a9320a0aa2ad9a6b0f99b38f2b5100f11b1ceecd23f7ca8fd52950
     wickets:
       caps/5.1.0: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -872,14 +872,14 @@ rows:
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   code_identity:
     kind: source_tree_sha256
-    value: 078b434e8f26b6c1f65f08a595dd05823b0700b8b0695c87d0293735fcd5a7cb
+    value: b311575f65e6efcdae12be83723ef3d76cb65dab89a84fb33d798c5bcc7350fe
     assurance: self-attested
 - action_id: sell_item/everyday-fixture-sale-in-bounds
-  capsule_id: 41e3aff9ef2969bcfedb7cdfa05f3fa3341631f5d7c67d22da3b3646759995ce
+  capsule_id: 23cc786f2719516b26dfa78cf4d49765af5b0c9ebfdbeac8046df47b372a8f20
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.10
-    pack_digest: 80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5
+    pack_digest: dec5460c94a9320a0aa2ad9a6b0f99b38f2b5100f11b1ceecd23f7ca8fd52950
     wickets:
       caps/5.1.0: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -899,14 +899,14 @@ rows:
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   code_identity:
     kind: source_tree_sha256
-    value: 078b434e8f26b6c1f65f08a595dd05823b0700b8b0695c87d0293735fcd5a7cb
+    value: b311575f65e6efcdae12be83723ef3d76cb65dab89a84fb33d798c5bcc7350fe
     assurance: self-attested
 - action_id: sell_item/everyday-fixture-sale-material-changed
-  capsule_id: 366098672e22f02c33fb5b9546bc497d941dd6f8b8ddc9630f6a14396554f366
+  capsule_id: 514cb4f3821a40bf01fe9319c3de7662470f060e183457edc3020674749b5cf4
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.10
-    pack_digest: 80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5
+    pack_digest: dec5460c94a9320a0aa2ad9a6b0f99b38f2b5100f11b1ceecd23f7ca8fd52950
     wickets:
       caps/5.1.0: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -926,14 +926,14 @@ rows:
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   code_identity:
     kind: source_tree_sha256
-    value: 078b434e8f26b6c1f65f08a595dd05823b0700b8b0695c87d0293735fcd5a7cb
+    value: b311575f65e6efcdae12be83723ef3d76cb65dab89a84fb33d798c5bcc7350fe
     assurance: self-attested
 - action_id: sell_item/everyday-fixture-sale-deposit-over
-  capsule_id: c778abc7b865dcdb1b55043fbe0ab3bbf4740c76741dd52182726809d1a3ab9d
+  capsule_id: b49b25d6e663b351327b5437d3b43e646d003b01a1324d3fcae987f0920d2a70
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.10
-    pack_digest: 80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5
+    pack_digest: dec5460c94a9320a0aa2ad9a6b0f99b38f2b5100f11b1ceecd23f7ca8fd52950
     wickets:
       caps/5.1.0: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -953,14 +953,14 @@ rows:
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   code_identity:
     kind: source_tree_sha256
-    value: 078b434e8f26b6c1f65f08a595dd05823b0700b8b0695c87d0293735fcd5a7cb
+    value: b311575f65e6efcdae12be83723ef3d76cb65dab89a84fb33d798c5bcc7350fe
     assurance: self-attested
 - action_id: make_purchase/everyday-fixture-merchant-no-payee
-  capsule_id: 01f6708a78f3e6fe247ca1e2b5a0900b45119d0b9d0e66e2087782c6afd563fb
+  capsule_id: 4308e85d6632cee8592d86b87cc6e52f781c89c523eb52cc1fae94d4c7a3bf76
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.10
-    pack_digest: 80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5
+    pack_digest: dec5460c94a9320a0aa2ad9a6b0f99b38f2b5100f11b1ceecd23f7ca8fd52950
     wickets:
       caps/5.1.0: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -980,14 +980,14 @@ rows:
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   code_identity:
     kind: source_tree_sha256
-    value: 078b434e8f26b6c1f65f08a595dd05823b0700b8b0695c87d0293735fcd5a7cb
+    value: b311575f65e6efcdae12be83723ef3d76cb65dab89a84fb33d798c5bcc7350fe
     assurance: self-attested
 - action_id: share_address/everyday-fixture-platform-email
-  capsule_id: 8e9d84c50298c969098641dac788e52e72f80cd8f26a303ad8a942b4d7721ed3
+  capsule_id: b1a14c4c124be16105ae43fe5eda123480a2804f0a0055e6da494132293d6e31
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.10
-    pack_digest: 80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5
+    pack_digest: dec5460c94a9320a0aa2ad9a6b0f99b38f2b5100f11b1ceecd23f7ca8fd52950
     wickets:
       caps/5.1.0: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -1007,14 +1007,14 @@ rows:
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   code_identity:
     kind: source_tree_sha256
-    value: 078b434e8f26b6c1f65f08a595dd05823b0700b8b0695c87d0293735fcd5a7cb
+    value: b311575f65e6efcdae12be83723ef3d76cb65dab89a84fb33d798c5bcc7350fe
     assurance: self-attested
 - action_id: share_address/everyday-fixture-platform-phone
-  capsule_id: c2cf14a35988e35e055940da92f9bbedd35edab2f23753904242fd75f3c43f39
+  capsule_id: 0e5d9044f135bd08874b39d223d83c73a7eb5267b318aa0ef7d576c4c6881274
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.10
-    pack_digest: 80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5
+    pack_digest: dec5460c94a9320a0aa2ad9a6b0f99b38f2b5100f11b1ceecd23f7ca8fd52950
     wickets:
       caps/5.1.0: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -1034,14 +1034,14 @@ rows:
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   code_identity:
     kind: source_tree_sha256
-    value: 078b434e8f26b6c1f65f08a595dd05823b0700b8b0695c87d0293735fcd5a7cb
+    value: b311575f65e6efcdae12be83723ef3d76cb65dab89a84fb33d798c5bcc7350fe
     assurance: self-attested
 - action_id: share_address/everyday-fixture-platform-home-address
-  capsule_id: a3cdcd52cd183da4c15f23900a80cb47d0a8aa193b72810d6ec5fc35dfaed344
+  capsule_id: 44671c691f879f7b58ea0a4ed0d7ef0098bd800af259bdf1cafa0cfccd039dd9
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.10
-    pack_digest: 80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5
+    pack_digest: dec5460c94a9320a0aa2ad9a6b0f99b38f2b5100f11b1ceecd23f7ca8fd52950
     wickets:
       caps/5.1.0: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -1061,14 +1061,14 @@ rows:
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   code_identity:
     kind: source_tree_sha256
-    value: 078b434e8f26b6c1f65f08a595dd05823b0700b8b0695c87d0293735fcd5a7cb
+    value: b311575f65e6efcdae12be83723ef3d76cb65dab89a84fb33d798c5bcc7350fe
     assurance: self-attested
 - action_id: share_address/everyday-fixture-platform-email-and-phone
-  capsule_id: f8725214a679b846a388ca11774628650cd1d7e47582e2fa1e59ba882ec108e2
+  capsule_id: c5b60ae3fdec28a2ad464ea664bfd2babe56a1f792f197c723d25c6f5589a239
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.10
-    pack_digest: 80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5
+    pack_digest: dec5460c94a9320a0aa2ad9a6b0f99b38f2b5100f11b1ceecd23f7ca8fd52950
     wickets:
       caps/5.1.0: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -1088,14 +1088,14 @@ rows:
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   code_identity:
     kind: source_tree_sha256
-    value: 078b434e8f26b6c1f65f08a595dd05823b0700b8b0695c87d0293735fcd5a7cb
+    value: b311575f65e6efcdae12be83723ef3d76cb65dab89a84fb33d798c5bcc7350fe
     assurance: self-attested
 - action_id: share_address/everyday-fixture-platform-no-class
-  capsule_id: 3a3fe21a062052b2916a65bf78bae9ad99308366ed4c0b85c4f845c83a5bc555
+  capsule_id: 490c9c04ba277fe885cb2d4deb394598a2445c53fda3c8f34c9cc92585e7c2d2
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.10
-    pack_digest: 80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5
+    pack_digest: dec5460c94a9320a0aa2ad9a6b0f99b38f2b5100f11b1ceecd23f7ca8fd52950
     wickets:
       caps/5.1.0: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -1115,14 +1115,14 @@ rows:
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   code_identity:
     kind: source_tree_sha256
-    value: 078b434e8f26b6c1f65f08a595dd05823b0700b8b0695c87d0293735fcd5a7cb
+    value: b311575f65e6efcdae12be83723ef3d76cb65dab89a84fb33d798c5bcc7350fe
     assurance: self-attested
 - action_id: share_address/everyday-fixture-first-telling
-  capsule_id: 74e4e7c5ef4a11e664343ccd23eed819ba663e3d99a5c3857cd95a0583a4be33
+  capsule_id: f45b88ee855ff98741bfc437088b38c297ab0784ee37bf11596a73db44d47deb
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.10
-    pack_digest: 80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5
+    pack_digest: dec5460c94a9320a0aa2ad9a6b0f99b38f2b5100f11b1ceecd23f7ca8fd52950
     wickets:
       caps/5.1.0: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -1142,14 +1142,14 @@ rows:
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   code_identity:
     kind: source_tree_sha256
-    value: 078b434e8f26b6c1f65f08a595dd05823b0700b8b0695c87d0293735fcd5a7cb
+    value: b311575f65e6efcdae12be83723ef3d76cb65dab89a84fb33d798c5bcc7350fe
     assurance: self-attested
 - action_id: share_address/everyday-fixture-repeat-telling
-  capsule_id: f4d60e2563720ec48bee044326276d4caed7ba2a168e0064b8a2930a9aa7ad58
+  capsule_id: 2bd4ea24a7e939a42ee25f9ce2ac24f887ac8afa26ad977c64640e4b9e45f7f8
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.10
-    pack_digest: 80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5
+    pack_digest: dec5460c94a9320a0aa2ad9a6b0f99b38f2b5100f11b1ceecd23f7ca8fd52950
     wickets:
       caps/5.1.0: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -1169,14 +1169,14 @@ rows:
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   code_identity:
     kind: source_tree_sha256
-    value: 078b434e8f26b6c1f65f08a595dd05823b0700b8b0695c87d0293735fcd5a7cb
+    value: b311575f65e6efcdae12be83723ef3d76cb65dab89a84fb33d798c5bcc7350fe
     assurance: self-attested
 - action_id: share_address/everyday-fixture-new-class-told-before
-  capsule_id: bb3fa8a8d4777a3d923cfe7e8f404d8267440957bd5a4bd43f32fd7f91f3ed46
+  capsule_id: 27f737c13eed09376c1a93aa35b04f71589713a3d3321a42a977130b7775c333
   evaluator_tier: recomputed
   config_identity:
     pack_id: asg/everyday/0.3.10
-    pack_digest: 80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5
+    pack_digest: dec5460c94a9320a0aa2ad9a6b0f99b38f2b5100f11b1ceecd23f7ca8fd52950
     wickets:
       caps/5.1.0: 7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8
       dedupe/1.0.0: 18ab5d489f1e5774d576b8f99897edd4f4b20f609b85683456a3e3b6b4912abb
@@ -1196,7 +1196,7 @@ rows:
       task_authority/1.1.0: 5d4e54d3a243be2cde9e64c99c1ce351b0dc04e46ed80aaadc2ba147fa9960ab
   code_identity:
     kind: source_tree_sha256
-    value: 078b434e8f26b6c1f65f08a595dd05823b0700b8b0695c87d0293735fcd5a7cb
+    value: b311575f65e6efcdae12be83723ef3d76cb65dab89a84fb33d798c5bcc7350fe
     assurance: self-attested
 - hand_authored: true
   action_id: dispatch_payout/payments-safety-fixture-caps-allow

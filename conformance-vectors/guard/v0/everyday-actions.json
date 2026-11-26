@@ -130,7 +130,7 @@
         "reason": "the rule is not configured for this action class"
        }
       ],
-      "capsule_id": "4ead8dbbfc053bfa93b711b8a24dc0ddac7cf9fded61b50b1cc89ea61ad91d1e"
+      "capsule_id": "e6f6b2ebf2d11114ce91579f5d302afecaf747dd499a2a91e294de866c85e82b"
      }
     ]
    }
@@ -263,7 +263,7 @@
         "reason": "the rule is not configured for this action class"
        }
       ],
-      "capsule_id": "f76c3122bb11562b3c2621f8ec03cfe122377f0a00fa805cff60463ddfe78187"
+      "capsule_id": "61466ed1dc21b614d69039d914aaf4c6d8e45706f86e99806076e763988e752c"
      }
     ]
    }
@@ -396,7 +396,7 @@
         "reason": "the rule is not configured for this action class"
        }
       ],
-      "capsule_id": "7253aeb1da257c2a47c36210b6a42007a76967dd55fe8c0d483de7649e680706"
+      "capsule_id": "13526e2f2615cc7ee7c4c2653a030bf1acdf2c3fcfc1b5d78db7e5b4bbec7de8"
      },
      {
       "outcome": "deny",
@@ -405,7 +405,7 @@
         "id": "dedupe",
         "result": "fail",
         "method": "exact_match_index_v0",
-        "evidence_digest": "4d867145c33e072f351125b0b47e48e34cd568fbc7038d148e4e6fda0ac2b709"
+        "evidence_digest": "3968f5551ef63c5cc9304c08088d4c5b71aad883b38f4227b1ae0c33983e534f"
        },
        {
         "id": "caps",
@@ -518,7 +518,7 @@
         "reason": "the rule is not configured for this action class"
        }
       ],
-      "capsule_id": "1318ecd63f9e06fdb96d86b12e94404d2c7c3ede663ecdfa1ad03f4180eb30ce"
+      "capsule_id": "bb45c91099481954902c07146a8b39a18e1ec1fedd308e13f703c96d9339a101"
      }
     ]
    }
@@ -651,7 +651,7 @@
         "reason": "the rule is not configured for this action class"
        }
       ],
-      "capsule_id": "d99977f9bfab480ac150de75412f46d9d499f640b09fb2c41fbe391f9fb658b8"
+      "capsule_id": "c1ddeeca24bdf5386dd942c4d7c31197ffaac3f528cf1604b6fefa9bc3a7daf2"
      }
     ]
    }
@@ -782,7 +782,7 @@
         "reason": "the action carries no task_authority_ref; the task's bounds could not be checked"
        }
       ],
-      "capsule_id": "6e24ae525d6f51f57deb25973bf9b3fc9d8edd6ab96f89d7f6df4f51d3e36bdb"
+      "capsule_id": "229cf02c260a4517ace6c843d5eabae2625d455ac1a7b577ff73b5bb90ffccbd"
      }
     ]
    }
@@ -913,7 +913,7 @@
         "reason": "the action carries no task_authority_ref; the task's bounds could not be checked"
        }
       ],
-      "capsule_id": "310e21e2625ddbeaffcb61483e62eff3e2a6a53786c2646c7c707f5b9f6074ce"
+      "capsule_id": "403457391df07c98bc807791220e1ab8114509fadbfdb935bd8bcf6a001898e8"
      },
      {
       "outcome": "escalate",
@@ -947,7 +947,7 @@
         "id": "counterparty_identity_change",
         "result": "fail",
         "method": "prior_recorded_value_v0",
-        "evidence_digest": "fe6dced9e317c3c4e26712846d141e5b3131d187fbea6967cadcd136b88d3db4"
+        "evidence_digest": "87967d2b3aa5e29a4b6d367caccb6ea1e113c5c3ae42b687d8832dd4cc428df1"
        },
        {
         "id": "credential_pattern",
@@ -1032,7 +1032,7 @@
         "reason": "the action carries no task_authority_ref; the task's bounds could not be checked"
        }
       ],
-      "capsule_id": "940654b683593bd9e58e156e1da4645efff9c4deb37f73530088a58d43c28542"
+      "capsule_id": "93382b8e1abc8afc29f230c9375e4bc77e4e0753683177488709cc0b9dedca2c"
      }
     ]
    }
@@ -1163,7 +1163,7 @@
         "reason": "the action carries no task_authority_ref; the task's bounds could not be checked"
        }
       ],
-      "capsule_id": "ca77ede398ef6958f21e6e48c7aaec75ddcc2e158d00e80a59dd51063b068db7"
+      "capsule_id": "32662063cc4f2b5cb86af53e9e71194071ba439dc5fa121145f78f78f35f252d"
      }
     ]
    }
@@ -1294,7 +1294,7 @@
         "reason": "the action carries no task_authority_ref; the task's bounds could not be checked"
        }
       ],
-      "capsule_id": "9237d2404b336523cba524da40961d6007ddd3d9ee9731e439bc0e4d61ce5c34"
+      "capsule_id": "183391b84909198b3cece3342a9d35b1400ebb1098d704dd6635a60c49b3fd9e"
      }
     ]
    }

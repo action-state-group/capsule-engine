@@ -201,11 +201,32 @@ func TestOnlySeenBeforeAsksWhenTheCapsWindowWasEvaluated(t *testing.T) {
 	if r := e.Report(a, d); r.Decision != Escalate || r.Refused {
 		t.Fatalf("report %s refused=%v", r.Decision, r.Refused)
 	}
-	// With no approver, the same decision is refused for the unevaluated
-	// check, not for caps.
-	d.Outcome = Deny
+}
+
+// With no approver for the class, the same lone unevaluated check is
+// refused, for that check and not for caps. The shipped wicket covers only
+// money.purchase, which names an approver, so the engine's seen-before
+// config is widened to a capped class that names none.
+func TestALoneUnevaluatedSeenBeforeWithNoApproverIsRefused(t *testing.T) {
+	a, h := checkInput(t, "pay-history-other-merchant", func(env map[string]any) {
+		env["history"].([]any)[0].(map[string]any)["item_ref"] = nil
+	})
+	class := "external_commitment.other" // capped, with no approver_role
+	a.ActionClass = &class
+	e := engineFor(t, pack.LoadEveryday0310)
+	e.seenBefore.actionClasses = append(slices.Clone(e.seenBefore.actionClasses), class)
+	d, err := e.CheckWithHistory(a, h)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if caps, _ := d.Constraint("caps"); caps.Result == NotApplicable {
+		t.Fatalf("caps %s %q: want it evaluated", caps.Result, caps.Pending())
+	}
+	if d.anyFailed() || d.Outcome != Deny || !slices.Equal(d.askedUnevaluated, []string{"counterparty_seen_before"}) {
+		t.Fatalf("failed=%v outcome %s asked %v", d.anyFailed(), d.Outcome, d.askedUnevaluated)
+	}
 	if r := e.Report(a, d); r.Decision != VerdictNotEvaluable || !r.Refused || r.RefusedFor != RefusedUnevaluated {
-		t.Fatalf("no approver: %s refused=%v for %q", r.Decision, r.Refused, r.RefusedFor)
+		t.Fatalf("report %s refused=%v for %q", r.Decision, r.Refused, r.RefusedFor)
 	}
 }
 

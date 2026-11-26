@@ -706,7 +706,7 @@
       "result": "n/a",
       "method": "counterparty.seen_before/3.0.0",
       "evidence_digest": "90382202d7551bb2079331b08e0d20af65e725c5a4bda427020369a44037fc57",
-      "reason": "the history supplied is incomplete (more acts than it holds, or some could not be read), so whether this payee was paid before cannot be known"
+      "reason": "the history supplied is incomplete (it lists more purchases than it holds, or some could not be read), so the rule cannot tell whether this merchant was paid before"
      },
      {
       "id": "recipient_role",

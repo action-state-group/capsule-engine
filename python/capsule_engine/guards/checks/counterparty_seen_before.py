@@ -60,8 +60,8 @@ INCOMPLETE_HISTORY_MODES = frozenset({"count", "not_evaluable"})
 # Starts as caps' history_incomplete_reason does, so a reader shortening one
 # shortens the other the same way.
 HISTORY_INCOMPLETE_REASON = (
-    "the history supplied is incomplete (more acts than it holds, or some could not be read), "
-    "so whether this payee was paid before cannot be known"
+    "the history supplied is incomplete (it lists more purchases than it holds, or some could not be read), "
+    "so the rule cannot tell whether this merchant was paid before"
 )
 _FOLD_CATALOG_DIR = Path(__file__).resolve().parent.parent.parent / "folds" / "catalog_defs"
 
