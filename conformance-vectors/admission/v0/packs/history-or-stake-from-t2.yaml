@@ -45,4 +45,4 @@ rows:
     params: {k: 3, step_decades: 1, max_adverse_permille: 100}
     from: T2
     on_fail: "LIMIT"
-    ask: {derivation: served_summary/1}
+    ask: {derivation: standard_history/3}
