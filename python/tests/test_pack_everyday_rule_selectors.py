@@ -28,7 +28,7 @@ from capsule_engine.packs import (
 
 PACK_DIR = Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog" / "everyday"
 PACK = load_pack_dir(PACK_DIR)
-PACK_DIGEST = "acb8a0f7073b872e0a1cc367997ace49dd69fd4e63fe60996c328d8b324ac4a7"
+PACK_DIGEST = "80aeea436b0daf3099fbb1713c148760a6e08cd7565048b753a6f05fa90527c5"
 
 SELECTOR = {
     "r01-research-and-prepare": "non_consequential",
@@ -112,7 +112,7 @@ def _gate_table(pack, decisions) -> dict[str, dict[str, str]]:
 
 
 def test_each_gate_rule_names_its_selector_and_the_digest_is_recorded():
-    assert PACK.pack_id == "asg/everyday/0.3.9"
+    assert PACK.pack_id == "asg/everyday/0.3.10"
     assert {o.id: o.selector for o in PACK.obligations if o.check == "action_class_gate"} == SELECTOR
     assert all(o.selector is None for o in PACK.obligations if o.check != "action_class_gate")
     assert PACK.definition_digest() == PACK_DIGEST

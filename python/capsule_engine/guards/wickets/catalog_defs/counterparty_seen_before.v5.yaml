@@ -1,0 +1,34 @@
+# counterparty_seen_before wicket, version 5: version 4 with one change
+# (capsule-engine#327). On a history the caller does not know to be
+# complete, a purchase with no earlier act counted to its payee is not
+# applicable, in scope, with the reason that the history supplied is
+# incomplete, and the engine asks rather than allows, as caps does on the
+# same input. Version 4 failed it as a first-time counterparty,
+# asserting the payee is new when the engine cannot know that. A counted
+# earlier act still passes, a complete history with none still fails, and a
+# purchase that names no payee still fails with the reason no payee named.
+# The fold is unchanged: counterparty.seen_before/3.0.0. Version 4
+# (counterparty_seen_before.v4.yaml) stays as it was for the packs that pin it.
+#
+# `fold_digest` is the real `definition_digest()` of
+# folds/catalog_defs/counterparty.seen_before.v3.yaml (folds/definition.py);
+# the check refuses to run when the catalog fold does not match it.
+wicket_id: counterparty_seen_before/5.0.0
+check: counterparty_seen_before
+semantics: >-
+  For an action in action_classes, the operator's prior acts addressed to the
+  action's target are counted, leaving dry runs out: an accepted decision, or
+  an act whose check was approved to proceed and then executed. One or more
+  passes. None fails, unless the history supplied may be missing acts: then
+  the rule is not evaluated, the reason says the history is incomplete, and
+  the action is asked about rather than allowed. An act that was declined, or
+  approved and never executed, is not counted. An action that names no
+  target, or a target that is empty or only whitespace, fails as a
+  first-time counterparty, with the reason no payee named. Any other action
+  class is out of scope.
+config:
+  fold_id: counterparty.seen_before/3.0.0
+  fold_digest: 73dbf8cd8a36fadca0ac823d2b17592fdc457c24081bc44667f032601e914033
+  action_classes: [money.purchase]
+  missing_target: unseen
+  incomplete_history: not_evaluable

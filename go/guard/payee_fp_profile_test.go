@@ -378,7 +378,7 @@ func TestPayeeProfileSeenBeforeMatchesTheEngine(t *testing.T) {
 		if e.seenBefore.fold.digest != "73dbf8cd8a36fadca0ac823d2b17592fdc457c24081bc44667f032601e914033" {
 			t.Fatalf("r06 reads fold %s", e.seenBefore.fold.digest)
 		}
-		sb := checkSeenBefore(a, &historyReader{h: MemoryHistory([]Record{r})}, e.seenBefore)
+		sb := checkSeenBefore(a, &historyReader{h: MemoryHistory([]Record{r})}, e.seenBefore, false)
 		sbDigest, _, err := sb.EvidenceDigest()
 		if err != nil {
 			t.Fatal(err)

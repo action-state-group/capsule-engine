@@ -10,7 +10,7 @@ import "embed"
 
 // All is the whole pack tree: every version directory and engine/.
 //
-//go:embed engine everyday-0.3.4 everyday-0.3.5 everyday-0.3.6 everyday-0.3.7 everyday-0.3.8 everyday-0.3.9 inference-0.1.0 seller-0.1.0 seller-0.1.1 seller-0.1.2 seller-0.1.3 seller-0.1.4 seller-0.1.5 seller-0.1.6
+//go:embed engine everyday-0.3.4 everyday-0.3.5 everyday-0.3.6 everyday-0.3.7 everyday-0.3.8 everyday-0.3.9 everyday-0.3.10 inference-0.1.0 seller-0.1.0 seller-0.1.1 seller-0.1.2 seller-0.1.3 seller-0.1.4 seller-0.1.5 seller-0.1.6
 var All embed.FS
 
 // Everyday034 is asg/everyday/0.3.4: its pack-source.yaml, the definitions it cites, and
@@ -66,6 +66,15 @@ var Everyday039 embed.FS
 
 // Everyday039Dir is the directory of asg/everyday/0.3.9 inside Everyday039.
 const Everyday039Dir = "everyday-0.3.9"
+
+// Everyday0310 is asg/everyday/0.3.10: its pack-source.yaml, the definitions it cites, and
+// PROVENANCE.json.
+//
+//go:embed everyday-0.3.10
+var Everyday0310 embed.FS
+
+// Everyday0310Dir is the directory of asg/everyday/0.3.10 inside Everyday0310.
+const Everyday0310Dir = "everyday-0.3.10"
 
 // Inference010 is asg/inference/0.1.0: its pack-source.yaml, the definitions it cites, and
 // PROVENANCE.json.

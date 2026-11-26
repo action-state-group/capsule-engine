@@ -91,7 +91,7 @@ def _rule_number(obligation_id: str) -> int:
 
 
 def test_the_pack_is_version_0_3_8_with_exactly_27_rules_numbered_1_to_27():
-    assert PACK.pack_id == "asg/everyday/0.3.9"
+    assert PACK.pack_id == "asg/everyday/0.3.10"
     assert len(PACK.obligations) == 27
     assert sorted(_rule_number(o.id) for o in PACK.obligations) == list(range(1, 28))
 

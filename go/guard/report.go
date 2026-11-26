@@ -45,6 +45,11 @@ const (
 	// RefusedHeldCaps: caps could not be evaluated over the history, and
 	// the class has no approver to ask (capsule-engine #216).
 	RefusedHeldCaps = "held_caps_no_approver"
+	// RefusedUnevaluated: a check other than caps that asks when it cannot
+	// be evaluated (counterparty_seen_before/5.0.0 on a history that may be
+	// missing acts, capsule-engine#327) could not be, caps was evaluated,
+	// and the class has no approver to ask.
+	RefusedUnevaluated = "unevaluated_no_approver"
 	// RefusedNotEvaluated: a check that fails closed could not be evaluated
 	// (capsule-engine #137).
 	RefusedNotEvaluated = "not_evaluated"
@@ -225,7 +230,8 @@ func (e *Engine) Report(a Action, d Decision) CheckReport {
 	}
 	if len(d.askedUnevaluated) > 0 && !d.anyFailed() && (d.Outcome != Escalate || a.dealIDConflict) {
 		// GuardDecision.verdict (capsule-engine #217): held only because
-		// caps could not be evaluated, with nothing failed. A class with an
+		// caps, or another check that asks (#327), could not be evaluated,
+		// with nothing failed. A class with an
 		// approver asks, and the escalation is the label; a class with no
 		// approver is refused (#216), labelled not_evaluable, which Refused
 		// carries. A record in no deal is refused by the engine whatever
@@ -233,6 +239,9 @@ func (e *Engine) Report(a Action, d Decision) CheckReport {
 		r.Decision, r.Refused = VerdictNotEvaluable, d.Outcome == Deny
 		if r.Refused {
 			r.RefusedFor = RefusedHeldCaps
+			if !slices.Contains(d.askedUnevaluated, "caps") {
+				r.RefusedFor = RefusedUnevaluated
+			}
 			if a.dealIDConflict {
 				r.RefusedFor = RefusedDealConflict
 			}

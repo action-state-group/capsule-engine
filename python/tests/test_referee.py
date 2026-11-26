@@ -146,7 +146,7 @@ def test_an_honest_deal_meets_every_shared_term_and_judges_both_packs(tmp_path):
         assert claim["verdict"] == "met", claim
         assert claim["contract_ref"] == "ec:deal-terms@1"
         assert {deal.buyer.half["capsule_id"], deal.seller.half["capsule_id"]} <= _cited(claim)
-    assert any(c["contract_ref"] == "asg/everyday@0.3.9" and c["verdict"] in ("met", "not_met") for c in doc["claims"])
+    assert any(c["contract_ref"] == "asg/everyday@0.3.10" and c["verdict"] in ("met", "not_met") for c in doc["claims"])
     assert any(c["contract_ref"] == "asg/seller@0.1.6" and c["verdict"] in ("met", "not_met") for c in doc["claims"])
     assert doc["aggregate"]["coverage"]["evaluated_population"] == len(doc["claims"])
 
@@ -200,7 +200,7 @@ def test_no_party_is_judged_under_the_other_partys_pack(tmp_path):
     doc = Deal(tmp_path).judge()
     for c in doc["claims"]:
         if c["id"].startswith("buyer/"):
-            assert c["contract_ref"] == "asg/everyday@0.3.9", c["id"]
+            assert c["contract_ref"] == "asg/everyday@0.3.10", c["id"]
         elif c["id"].startswith("seller/"):
             assert c["contract_ref"] == "asg/seller@0.1.6", c["id"]
         else:

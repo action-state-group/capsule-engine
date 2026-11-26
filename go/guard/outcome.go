@@ -47,6 +47,13 @@ type Constraint struct {
 	// cannot be identified or its acceptance is not known): the action is
 	// refused whatever else allows or asks (Decision.notEvaluated).
 	failsClosed bool
+	// asksUnevaluated marks an in-scope n/a an approver may still resolve
+	// (base.py CheckOutcome.asks_when_unevaluated): the action is asked about
+	// where it would be allowed, or refused with no approver
+	// (Decision.askedUnevaluated). caps sets it through its facts (capsHeld);
+	// counterparty_seen_before/5.0.0 sets it on a history that may be missing
+	// acts.
+	asksUnevaluated bool
 	// unevaluated marks a missing-field n/a the report reads as not
 	// evaluated rather than not applicable: the rule applies and its input
 	// did not arrive (price_floor with a floor in force and no opening).

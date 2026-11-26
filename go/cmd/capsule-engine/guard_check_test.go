@@ -133,7 +133,7 @@ func TestGuardCheckPins(t *testing.T) {
 		}
 		return r.RulesetID
 	}
-	if got := id(good); got != "asg/everyday/0.3.8" {
+	if got := id(good); got != "asg/everyday/0.3.10" {
 		t.Fatalf("default pack %s", got)
 	}
 	var env map[string]json.RawMessage
@@ -195,8 +195,8 @@ func TestGuardCheckRoles(t *testing.T) {
 	if got := idOf(with(map[string]string{"party_role": `"seller"`})); got != "asg/seller/0.1.5" {
 		t.Fatalf("seller default: %s", got)
 	}
-	both := `{"definition_digests":["` + digest("asg/everyday/0.3.8") + `","` + digest("asg/seller/0.1.5") + `"]}`
-	for role, want := range map[string]string{"buyer": "asg/everyday/0.3.8", "seller": "asg/seller/0.1.5"} {
+	both := `{"definition_digests":["` + digest("asg/everyday/0.3.10") + `","` + digest("asg/seller/0.1.5") + `"]}`
+	for role, want := range map[string]string{"buyer": "asg/everyday/0.3.10", "seller": "asg/seller/0.1.5"} {
 		if got := idOf(with(map[string]string{"party_role": `"` + role + `"`, "rules_pin": both})); got != want {
 			t.Fatalf("%s with a flat pin of both packs: %s, want %s", role, got, want)
 		}

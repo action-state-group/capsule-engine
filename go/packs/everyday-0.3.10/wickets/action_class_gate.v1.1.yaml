@@ -1,0 +1,38 @@
+# action_class_gate/1.1.0: action_class_gate/1.0.0 (action_class_gate.yaml)
+# whose personal_disclosure selector leaves out a disclosure to a platform
+# (except_recipient_roles), which recipient_role/1.1.0 measures: an email to
+# the marketplace or relay a listing goes through passes there, and anything
+# else to it refuses there. Every other selector, and personal_disclosure for
+# every other recipient, is 1.0.0's. 1.0.0 stays as it was for the records and
+# packs that pin it.
+wicket_id: action_class_gate/1.1.0
+check: action_class_gate
+semantics: >-
+  Each selector matches an action whose canonical action class, trigger
+  class and consequential flag match every one of those keys it sets, unless
+  it sets except_recipient_roles and the action's recipient_role is one of
+  them. The check fails when a fail selector matches, else passes when a
+  pass selector matches, else is not applicable. An action whose class has
+  no row in the taxonomy fails. The evidence names every selector that
+  matched.
+config:
+  selectors:
+    non_consequential:
+      consequential: false
+      on_match: pass
+    public_posting:
+      action_classes: [communication.publish]
+      on_match: fail
+    booking_create:
+      action_classes: [booking.create]
+      on_match: fail
+    booking_cancel:
+      action_classes: [booking.cancel]
+      on_match: fail
+    destructive_mutation:
+      trigger_classes: [MUTATE]
+      on_match: fail
+    personal_disclosure:
+      trigger_classes: [DISCLOSE]
+      except_recipient_roles: [platform]
+      on_match: fail

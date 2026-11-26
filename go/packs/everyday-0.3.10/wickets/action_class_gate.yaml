@@ -1,0 +1,34 @@
+# action_class_gate wicket: named selectors over guards/action_taxonomy.json
+# (guards/checks/action_class_gate.py). It reads only the action's class,
+# resolved to its canonical row, so it needs no fold and no new field.
+#
+# A selector sets any of action_classes / trigger_classes / consequential
+# (every key it sets must match) and the result a match produces. A `fail`
+# selector marks a class that must be asked about; the `pass` selector marks
+# a class the taxonomy declares non-consequential. The check reads only the
+# class the caller declares, never what the action does. Evidence
+# names every selector that matched, so a pack can tell which one fired.
+# Names must be canonical classes and declarable trigger classes; anything
+# else is refused rather than matching nothing.
+wicket_id: action_class_gate/1.0.0
+check: action_class_gate
+config:
+  selectors:
+    non_consequential:
+      consequential: false
+      on_match: pass
+    public_posting:
+      action_classes: [communication.publish]
+      on_match: fail
+    booking_create:
+      action_classes: [booking.create]
+      on_match: fail
+    booking_cancel:
+      action_classes: [booking.cancel]
+      on_match: fail
+    destructive_mutation:
+      trigger_classes: [MUTATE]
+      on_match: fail
+    personal_disclosure:
+      trigger_classes: [DISCLOSE]
+      on_match: fail

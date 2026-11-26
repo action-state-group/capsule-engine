@@ -32,7 +32,9 @@ ask; with no constraint failed its ``verdict`` is ``not_evaluable``
 (``GuardDecision.not_evaluated_checks``).
 
 A check that could not be evaluated and asks (``CheckOutcome.asks_when_unevaluated``:
-``caps`` when an executed act in the window has a spend that cannot be read)
+``caps`` when an executed act in the window has a spend that cannot be read,
+or the history may be missing acts; ``counterparty_seen_before/5.0.0`` when
+it counts no earlier act on a history that may be missing acts)
 is recorded ``n/a`` in scope, and an action that would be allowed is asked
 about instead, or refused when its class names no approver. It is never
 allowed on a total that is not known, and it is not refused for that alone.
@@ -511,6 +513,7 @@ class GuardEngine:
             constraints = (*constraints, plan_out.constraint)
         gate_runs: list[tuple[WicketDefinition, ConstraintOutcome]] = []
         not_evaluated: list[str] = []
+        asked_configured: list[str] = []
         for wicket in self._wickets:
             if wicket.check in TASK_AUTHORITY_CHECKS:
                 out = TASK_AUTHORITY_CHECKS[wicket.check](action, task_authority_record, wicket.config)
@@ -538,6 +541,10 @@ class GuardEngine:
             constraints = (*constraints, constraint)
             if out.fails_closed and constraint.result == "n/a":
                 not_evaluated.append(constraint.id)
+            if mismatch is None and out.asks_when_unevaluated and constraint.result == "n/a":
+                # counterparty_seen_before/5.0.0 on a history that may be
+                # missing acts: asked about, as caps is below.
+                asked_configured.append(constraint.id)
             if wicket.check == _GATE:
                 gate_runs.append((wicket, constraint))
         # Not keyed on the class, so never held by a taxonomy mismatch.
@@ -563,7 +570,7 @@ class GuardEngine:
             outcome = DENY
         # A held caps result was never evaluated at all; the mismatch decides it.
         asks = mismatch is None and caps_out.asks_when_unevaluated and caps_constraint.result == "n/a"
-        asked_unevaluated = ("caps",) if asks else ()
+        asked_unevaluated = (*(("caps",) if asks else ()), *asked_configured)
         if not_evaluated:
             # A check that fails closed could not be evaluated: refused,
             # whatever else would allow or ask.
