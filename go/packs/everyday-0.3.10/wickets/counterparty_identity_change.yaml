@@ -1,0 +1,9 @@
+# counterparty_identity_change wicket: compare Action.counterparty_account_ref
+# with the value last recorded for the same target
+# (guards/checks/counterparty_identity_change.py), for actions in
+# `action_classes`. `method` pins which comparison governed a decision.
+wicket_id: counterparty_identity_change/1.0.0
+check: counterparty_identity_change
+config:
+  action_classes: [money.transfer]
+  method: prior_recorded_value_v0

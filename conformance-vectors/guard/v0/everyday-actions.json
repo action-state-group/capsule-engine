@@ -4,7 +4,7 @@
   {
    "case": "disclosure-of-email-to-a-platform",
    "kind": "action-ledger",
-   "pack": "everyday-0.3.9",
+   "pack": "everyday-0.3.10",
    "input": "conformance-vectors/guard/v0/inputs/everyday-actions/disclosure-of-email-to-a-platform.json",
    "input_sha256": "2d6133c8b09f3313f137296272ec868e05843608b16752b45bfdaf60d6dded16",
    "expected": {
@@ -130,7 +130,7 @@
         "reason": "the rule is not configured for this action class"
        }
       ],
-      "capsule_id": "a188f902aa20c7d906b43671d0ff55ef79caeea51354183e10e5d575b77a6168"
+      "capsule_id": "57552ba6d33c20469e8e13b191260401fb1dabaa7efd74f8f938a0410e60fbd1"
      }
     ]
    }
@@ -138,7 +138,7 @@
   {
    "case": "disclosure-to-a-third-party",
    "kind": "action-ledger",
-   "pack": "everyday-0.3.9",
+   "pack": "everyday-0.3.10",
    "input": "conformance-vectors/guard/v0/inputs/everyday-actions/disclosure-to-a-third-party.json",
    "input_sha256": "b661331a18fe595ab2633958c03d4fcc1de4f920a88b9c53b125cb22b023bcb0",
    "expected": {
@@ -263,7 +263,7 @@
         "reason": "the rule is not configured for this action class"
        }
       ],
-      "capsule_id": "4eb9c8dd873f9874734c7f903ed484872b66d2ccd519751ca3371acee94baec6"
+      "capsule_id": "babcb4c21246c90a9c2ff4464b64ca1faf438ab6eaa41f02b665352bc590790d"
      }
     ]
    }
@@ -271,7 +271,7 @@
   {
    "case": "message-to-a-known-recipient",
    "kind": "action-ledger",
-   "pack": "everyday-0.3.9",
+   "pack": "everyday-0.3.10",
    "input": "conformance-vectors/guard/v0/inputs/everyday-actions/message-to-a-known-recipient.json",
    "input_sha256": "58ea5e6838e99db667e6b6791dcf5baf4c270d3dbd495c18f5a39dcbb31562ee",
    "expected": {
@@ -396,7 +396,7 @@
         "reason": "the rule is not configured for this action class"
        }
       ],
-      "capsule_id": "806f8a2aa2d14b3789a818160421774fd8968795cd5b1e962b6b3ce2a8186de5"
+      "capsule_id": "5f6f2007043dd4ad56b05c006ea669860255393a38fdedd3b0faa17770dbdfb7"
      },
      {
       "outcome": "deny",
@@ -405,7 +405,7 @@
         "id": "dedupe",
         "result": "fail",
         "method": "exact_match_index_v0",
-        "evidence_digest": "ff7620eef6339f70f10cf43efeeb045233e6dc0bcc2873d60772ebc5b97681d8"
+        "evidence_digest": "50defda35035e4f6b6813095c3f3a66817707d6049112f7c1ccbdc6ccf44cff6"
        },
        {
         "id": "caps",
@@ -518,7 +518,7 @@
         "reason": "the rule is not configured for this action class"
        }
       ],
-      "capsule_id": "1e7fcee178b8056e8d4f9b57d201a64b8a9fb88f0ef6a751462c469cca61c173"
+      "capsule_id": "072ea30fa72a91809773e29dd9df9543afb5cd4eb6447c2963811ee5c7c8c9c0"
      }
     ]
    }
@@ -526,7 +526,7 @@
   {
    "case": "message-with-a-one-time-code",
    "kind": "action-ledger",
-   "pack": "everyday-0.3.9",
+   "pack": "everyday-0.3.10",
    "input": "conformance-vectors/guard/v0/inputs/everyday-actions/message-with-a-one-time-code.json",
    "input_sha256": "ef5e4922bd46676118f6e902df44f5a3417a7ec5f82ea2d9b1ccc6a180612994",
    "expected": {
@@ -651,7 +651,7 @@
         "reason": "the rule is not configured for this action class"
        }
       ],
-      "capsule_id": "8b0b51ebd2c78567bc020119f2f4d1e2dad88bed85e9d5a6cf89e4f6c9a09eb1"
+      "capsule_id": "3581a41ec363b9b1638146d9577c546c996ca30dab38b5029bf9ac6f7a6bb628"
      }
     ]
    }
@@ -659,7 +659,7 @@
   {
    "case": "purchase-with-a-large-upfront-amount",
    "kind": "action-ledger",
-   "pack": "everyday-0.3.9",
+   "pack": "everyday-0.3.10",
    "input": "conformance-vectors/guard/v0/inputs/everyday-actions/purchase-with-a-large-upfront-amount.json",
    "input_sha256": "a30c7724bbd2c84d02131534ea4c67336386651b92a3797cc3ba114a764ac7eb",
    "expected": {
@@ -782,7 +782,7 @@
         "reason": "the action carries no task_authority_ref; the task's bounds could not be checked"
        }
       ],
-      "capsule_id": "90c5869bb5a633e7520da670739d5d2fec2a181f1b53e62cf5de78c04d793d76"
+      "capsule_id": "50f0968a51e4accc8bd18035e4dba8b5377e4b7721f80fc97b46224a20c364dd"
      }
     ]
    }
@@ -790,7 +790,7 @@
   {
    "case": "transfer-account-changes",
    "kind": "action-ledger",
-   "pack": "everyday-0.3.9",
+   "pack": "everyday-0.3.10",
    "input": "conformance-vectors/guard/v0/inputs/everyday-actions/transfer-account-changes.json",
    "input_sha256": "899f2ee93373c10aca9849178ecd69cfb0929eba161689d66a1b82ce91d77c76",
    "expected": {
@@ -913,7 +913,7 @@
         "reason": "the action carries no task_authority_ref; the task's bounds could not be checked"
        }
       ],
-      "capsule_id": "a86a09c35d3b00e590c551b92c0da9175cd6da3d18e0d29f2355707272b23f3c"
+      "capsule_id": "f3c24b47677643ad59c767f286514b058a94004f3175e071f772f54c7e22ee16"
      },
      {
       "outcome": "escalate",
@@ -947,7 +947,7 @@
         "id": "counterparty_identity_change",
         "result": "fail",
         "method": "prior_recorded_value_v0",
-        "evidence_digest": "0b18a9d376ed9882b628cadc9338db7ac59246807db6973ce4458ed8cdd0f403"
+        "evidence_digest": "ae48c96b497003905276ff33c45837be15e752039cb2bafd38c96e4f6e49529b"
        },
        {
         "id": "credential_pattern",
@@ -1032,7 +1032,7 @@
         "reason": "the action carries no task_authority_ref; the task's bounds could not be checked"
        }
       ],
-      "capsule_id": "e23ab19308a53433f837369b507c1173a7ba329e314e5b64083c56e946449ca7"
+      "capsule_id": "f1f6c2b91b4260eb981339d3c3f3a4275a6a7d2080b41219552904eb0cbce2f6"
      }
     ]
    }
@@ -1040,7 +1040,7 @@
   {
    "case": "transfer-recurring",
    "kind": "action-ledger",
-   "pack": "everyday-0.3.9",
+   "pack": "everyday-0.3.10",
    "input": "conformance-vectors/guard/v0/inputs/everyday-actions/transfer-recurring.json",
    "input_sha256": "d92fc32b09d9e003028eaacceb91970f31032587e7a513e9f993fa4b60c67511",
    "expected": {
@@ -1163,7 +1163,7 @@
         "reason": "the action carries no task_authority_ref; the task's bounds could not be checked"
        }
       ],
-      "capsule_id": "b76e703e8e8e40fa5df3f9cc4cd2721b5a5154d34449702a3a98117d904f9fa7"
+      "capsule_id": "ffb3a7217e1acc232a94e133056067af1dd80ccf0915934eece3c7be7aaeac9f"
      }
     ]
    }
@@ -1171,7 +1171,7 @@
   {
    "case": "transfer-to-a-watched-rail",
    "kind": "action-ledger",
-   "pack": "everyday-0.3.9",
+   "pack": "everyday-0.3.10",
    "input": "conformance-vectors/guard/v0/inputs/everyday-actions/transfer-to-a-watched-rail.json",
    "input_sha256": "a18a5681ad1fda2a0896d5b88a9c5ed1459b010e7aa68853d323f533e4a5e196",
    "expected": {
@@ -1294,7 +1294,7 @@
         "reason": "the action carries no task_authority_ref; the task's bounds could not be checked"
        }
       ],
-      "capsule_id": "7083ad3c6a923e855b398b1d25b8d53b4164133e72b7f5275906a8046d512e6e"
+      "capsule_id": "7876db2b4713ac4b7a1e681974615b113c761611f6a4bd4fe5b75c3f3afea88b"
      }
     ]
    }

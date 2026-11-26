@@ -47,6 +47,10 @@ import (
 // the engine's rules for them (outsideTheFold), held to the engine by the
 // G3 and executed-acts-036 vectors. 0.3.5 stays vendored, so 5.0.0 and 3.0.0
 // stay ported.
+//
+// asg/everyday/0.3.10 (capsule-engine#327) cites counterparty_seen_before/
+// 5.0.0 in place of 4.0.0: the same fold, with incomplete_history:
+// not_evaluable (newSeenBefore). 0.3.9 stays vendored, so 4.0.0 stays ported.
 var portedDefinitions = map[string]string{
 	"caps/5.0.0":                         "2807e174dc7c817917621f90a53f3fa54992b76fe3ec28e8567f814b9e72a741",
 	"caps/5.1.0":                         "7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8",
@@ -58,6 +62,7 @@ var portedDefinitions = map[string]string{
 	"action_class_gate/1.0.0":            "fcc352838832e13f5e87662f0194ec4a7065bc989bbe624b43ac5d9d1b638ae2",
 	"counterparty_seen_before/3.0.0":     "9cfab71d142ca7af8912218f4c4ea194f60fb02784d8536233cb7e18eddc24a8",
 	"counterparty_seen_before/4.0.0":     "c7c20d9e57cb0a75184b9c6c4d037c9bea813a7b1105c581defd4481acf964b0",
+	"counterparty_seen_before/5.0.0":     "a8dbea32ff103fb07fe7d9b0791b149ecd654478d044ab8a12b6d3ca9cb78df5",
 	"recipient_seen_before/1.0.0":        "df8803e9c4bdab9deff48e772fcd21ff813d00157068dd250a8a5c6b45cd6c44",
 	"counterparty.seen_before/3.0.0":     "73dbf8cd8a36fadca0ac823d2b17592fdc457c24081bc44667f032601e914033",
 	"spend.weekly/3.0.0":                 "25907741320624a830c5854fc7f2d434bfa17528c8bfc17f4a8a4f84a39f1b18",
@@ -178,8 +183,8 @@ var portedDefinitions = map[string]string{
 // any other class is n/a, out of scope; unportedScope); within them its rule
 // is not_evaluable, "not yet run by this plugin", never a pass.
 //
-// None now: every vendored pack, asg/everyday/0.3.4 to 0.3.8 and
-// asg/seller/0.1.0 to 0.1.5, cites only definitions this port runs. A
+// None now: every vendored pack, asg/everyday/0.3.4 to 0.3.10 and
+// asg/seller/0.1.0 to 0.1.6, cites only definitions this port runs. A
 // later pack's new check is pinned here until it is ported.
 var unportedDefinitions = map[string]string{}
 
@@ -1085,8 +1090,8 @@ type checkInputs struct {
 	// history is whether the history is a check input's, every entry an
 	// executed act (CheckWithHistory), not a log of decisions;
 	// historyIncomplete, whether that history may be missing acts
-	// (InputHistory.saleUnknown), which single_commitment and release_on_acceptance
-	// 1.2.0 read.
+	// (InputHistory.saleUnknown), which single_commitment, release_on_acceptance
+	// 1.2.0 and counterparty_seen_before/5.0.0 read.
 	history           bool
 	historyIncomplete bool
 	taskAuthority     json.RawMessage
@@ -1157,18 +1162,39 @@ func (e *Engine) checkWith(a Action, h History, in checkInputs) (Decision, error
 	// engine.py check (78098ff): a caps result the window could not decide
 	// (CheckOutcome.asks_when_unevaluated: the history is not known to hold
 	// every act, or an act in the window has no readable spend) is never
-	// allowed on. It asks when the class has an approver and is refused
-	// otherwise. A class held only by its taxonomy was refused above.
+	// allowed on, nor is counterparty_seen_before/5.0.0 counting no earlier
+	// act on a history that may be missing acts (#327). It asks when the
+	// class has an approver and is refused otherwise. A class held only by
+	// its taxonomy was refused above, and a held check is no longer n/a by
+	// its own reason (compareTaxonomy clears the flag).
 	var askedUnevaluated []string
-	if outcome == Allow && capsHeld(cs) {
-		askedUnevaluated = []string{"caps"}
-		outcome = Deny
-		if approver {
-			outcome = Escalate
+	if outcome == Allow {
+		askedUnevaluated = asksUnevaluated(cs)
+		if len(askedUnevaluated) > 0 {
+			outcome = Deny
+			if approver {
+				outcome = Escalate
+			}
 		}
 	}
 	return Decision{Outcome: outcome, Constraints: cs, refusedForTaxonomy: refused, notEvaluated: notEvaluated,
 		askedUnevaluated: askedUnevaluated}, nil
+}
+
+// asksUnevaluated are the checks in cs that could not be evaluated and ask,
+// in order: caps when it is held (capsHeld), then each n/a a check marked
+// asksUnevaluated.
+func asksUnevaluated(cs []Constraint) []string {
+	var ids []string
+	if capsHeld(cs) {
+		ids = append(ids, "caps")
+	}
+	for _, c := range cs {
+		if c.asksUnevaluated && c.Result == NotApplicable {
+			ids = append(ids, c.ID)
+		}
+	}
+	return ids
 }
 
 // capsHeld is whether caps is an n/a its window could not decide: the caps
@@ -1229,7 +1255,7 @@ func (e *Engine) runCheck(check string, a Action, r *historyReader, in checkInpu
 	case "task_authority":
 		return checkTaskAuthority(a, in.taskAuthority, e.authority), nil
 	case "counterparty_seen_before":
-		return checkSeenBefore(a, r, e.seenBefore), nil
+		return checkSeenBefore(a, r, e.seenBefore, in.history && in.historyIncomplete), nil
 	case "channel_change":
 		return checkChannelChange(a, e.channel), nil
 	case "material_fields_changed":
@@ -1237,7 +1263,7 @@ func (e *Engine) runCheck(check string, a Action, r *historyReader, in checkInpu
 	case "offer_fields_changed":
 		return checkFieldCount(check, "offer_fields_changed", "offer_fields_basis", a.OfferFieldsChanged, a.OfferFieldsBasis, e.offer, a), nil
 	case "recipient_seen_before":
-		return checkSeenBefore(a, r, e.recipientSeenBefore), nil
+		return checkSeenBefore(a, r, e.recipientSeenBefore, false), nil
 	case "action_class_gate":
 		return checkActionClassGate(a, e.gate, e.tax)
 	case "offer_expiry":

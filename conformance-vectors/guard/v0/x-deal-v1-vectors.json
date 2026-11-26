@@ -4,7 +4,7 @@
   {
    "case": "inputs/v0-pay-history.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.9",
+   "pack": "everyday-0.3.10",
    "input": "go/guard/testdata/x-deal-v1-vectors/inputs/v0-pay-history.input.json",
    "input_sha256": "7cee487c68c6a190325d488c60c0e2b3f14eef9c1be6563c738f04606b1630f2",
    "expected": {
@@ -128,7 +128,7 @@
   {
    "case": "inputs/v1-check-block-names-other.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.9",
+   "pack": "everyday-0.3.10",
    "input": "go/guard/testdata/x-deal-v1-vectors/inputs/v1-check-block-names-other.input.json",
    "input_sha256": "87c98403ede1bdc98be33a3eacb700865059e30186153834d1469a1b8f7fbdb1",
    "expected": {
@@ -257,7 +257,7 @@
   {
    "case": "inputs/v1-check-extra-block.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.9",
+   "pack": "everyday-0.3.10",
    "input": "go/guard/testdata/x-deal-v1-vectors/inputs/v1-check-extra-block.input.json",
    "input_sha256": "fff5425f7db4d16aa734c7ff904b4dc6489a2a71a4a552d1ad229640f5885fed",
    "expected": {
@@ -386,7 +386,7 @@
   {
    "case": "inputs/v1-check-in-history.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.9",
+   "pack": "everyday-0.3.10",
    "input": "go/guard/testdata/x-deal-v1-vectors/inputs/v1-check-in-history.input.json",
    "input_sha256": "1e3286326bff60a67775ef5b01476167555960e7bd27abc37a477fbb7e38f211",
    "expected": {
@@ -510,7 +510,7 @@
   {
    "case": "inputs/v1-check-record.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.9",
+   "pack": "everyday-0.3.10",
    "input": "go/guard/testdata/x-deal-v1-vectors/inputs/v1-check-record.input.json",
    "input_sha256": "cccd5107b5ad27824c27148fc78e9e0df27f5320f053f0d1f2d111618347aca4",
    "expected": {
@@ -634,7 +634,7 @@
   {
    "case": "inputs/v1-check-two-blocks.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.9",
+   "pack": "everyday-0.3.10",
    "input": "go/guard/testdata/x-deal-v1-vectors/inputs/v1-check-two-blocks.input.json",
    "input_sha256": "226c65866b059f51e29ba96b953533ebd1e18ada851b4fe0e4e12cbfc7fd50e0",
    "expected": {
@@ -763,7 +763,7 @@
   {
    "case": "inputs/v1-check-unknown-version.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.9",
+   "pack": "everyday-0.3.10",
    "input": "go/guard/testdata/x-deal-v1-vectors/inputs/v1-check-unknown-version.input.json",
    "input_sha256": "cf31e4c6dfc7c798828580850aee53165c56ed39786d4ec88f666b23708629c9",
    "expected": {
@@ -892,7 +892,7 @@
   {
    "case": "inputs/v1-pay-block-names-other.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.9",
+   "pack": "everyday-0.3.10",
    "input": "go/guard/testdata/x-deal-v1-vectors/inputs/v1-pay-block-names-other.input.json",
    "input_sha256": "7cd1e43b4234b81bc8e6eb2f7d0e44d4f624497f395cb38861d6d4e877a2e53a",
    "expected": {
@@ -1017,7 +1017,7 @@
   {
    "case": "inputs/v1-pay-history.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.9",
+   "pack": "everyday-0.3.10",
    "input": "go/guard/testdata/x-deal-v1-vectors/inputs/v1-pay-history.input.json",
    "input_sha256": "51f356b05700e61575a41a4d38430020bfcf8b36f172eaff09bd6e7c2afc52fd",
    "expected": {
@@ -1141,7 +1141,7 @@
   {
    "case": "inputs/v1-pay-no-settlement.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.9",
+   "pack": "everyday-0.3.10",
    "input": "go/guard/testdata/x-deal-v1-vectors/inputs/v1-pay-no-settlement.input.json",
    "input_sha256": "d2bf0606fac2964287ca41c80adbea6cc8bbd38633c7147cf31b3b81c98dd4b8",
    "expected": {
@@ -1266,7 +1266,7 @@
   {
    "case": "inputs/v1-pay-over-safe.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.9",
+   "pack": "everyday-0.3.10",
    "input": "go/guard/testdata/x-deal-v1-vectors/inputs/v1-pay-over-safe.input.json",
    "input_sha256": "b23fd84be1ca6ad02e15cb9ddeea644b899e2a459cd15160ff3b97d910fad7b3",
    "expected": {
@@ -1391,7 +1391,7 @@
   {
    "case": "inputs/v1-pay-two-blocks.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.9",
+   "pack": "everyday-0.3.10",
    "input": "go/guard/testdata/x-deal-v1-vectors/inputs/v1-pay-two-blocks.input.json",
    "input_sha256": "14b04c0b776412d0e77a0835068824049fac8b09af6eadd610132da5ac8be80a",
    "expected": {
@@ -1516,7 +1516,7 @@
   {
    "case": "inputs/v1-pay-unknown-version.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.9",
+   "pack": "everyday-0.3.10",
    "input": "go/guard/testdata/x-deal-v1-vectors/inputs/v1-pay-unknown-version.input.json",
    "input_sha256": "23447e486e93672c5a35478b3e5fb914d2fbb5fe773ad9094b83f19cedbefd82",
    "expected": {
@@ -1641,7 +1641,7 @@
   {
    "case": "inputs/v1-payee-leg-in.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.9",
+   "pack": "everyday-0.3.10",
    "input": "go/guard/testdata/x-deal-v1-vectors/inputs/v1-payee-leg-in.input.json",
    "input_sha256": "bb6e31bb5aab4dc33ec0d8c23edc5b3b959c5da379665594fa7393c497488d57",
    "expected": {
@@ -1765,7 +1765,7 @@
   {
    "case": "inputs/v1-perform-history.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.9",
+   "pack": "everyday-0.3.10",
    "input": "go/guard/testdata/x-deal-v1-vectors/inputs/v1-perform-history.input.json",
    "input_sha256": "2a39611a269a860b38c89489bae74732d33b89de1e231052ff0c63e31aab1756",
    "expected": {
@@ -1890,7 +1890,7 @@
   {
    "case": "inputs/v1-refund-received.input",
    "kind": "check-input",
-   "pack": "everyday-0.3.9",
+   "pack": "everyday-0.3.10",
    "input": "go/guard/testdata/x-deal-v1-vectors/inputs/v1-refund-received.input.json",
    "input_sha256": "e8f43432242bccaeb4677ac85d554ed6dc2cce9041f118f243e538d119f1453d",
    "expected": {

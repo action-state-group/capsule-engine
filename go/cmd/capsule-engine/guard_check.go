@@ -43,9 +43,9 @@ import (
 //go:embed schemas/external-check-input-v0.schema.json schemas/external-check-result-v0.schema.json
 var checkSchemas embed.FS
 
-// --pack names an embedded pack id (for example asg/everyday/0.3.8); without
+// --pack names an embedded pack id (for example asg/everyday/0.3.10); without
 // it the pack follows the input's rules_pin, else its party_role (buyer or
-// none asg/everyday/0.3.8, seller asg/seller/0.1.5).
+// none asg/everyday/0.3.10, seller asg/seller/0.1.5).
 //
 // --limits names a policy-profile/v0 file: the limits a person set, already
 // in force (the host applies any cooling-off before it writes the file). The
@@ -239,8 +239,8 @@ func rulesPinOf(raw []byte) (*rulesPin, error) {
 
 // partyPacks is the pack a deal is checked against, by party_role.
 var partyPacks = map[string]func() (pack.Pack, error){
-	"":               pack.LoadEveryday038,
-	pack.PartyBuyer:  pack.LoadEveryday038,
+	"":               pack.LoadEveryday0310,
+	pack.PartyBuyer:  pack.LoadEveryday0310,
 	pack.PartySeller: pack.LoadSeller015,
 }
 
@@ -273,7 +273,7 @@ func packFor(id string, a guard.Action, pin *rulesPin) (pack.Pack, error) {
 		}, "the deal profile pins rules this checker does not carry: re-pin the role to an embedded pack")
 	}
 	if !pack.KnownPartyRole(role) {
-		return pack.LoadEveryday038()
+		return pack.LoadEveryday0310()
 	}
 	return partyPacks[role]()
 }

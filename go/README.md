@@ -80,7 +80,7 @@ per rule, caps as one finding per limit (`r05-spending-limits#per_purchase`, `#7
 profile's rules checker (`capsulectl profile update --rules-checker FILE`, pinned by sha256). The
 packs and the two schemas are embedded, so the binary stands alone; the schemas are evidencebook's
 public copies (`cmd/capsule-engine/schemas/PROVENANCE.json`). The pack is `--pack`, else the
-input's `rules_pin`, else its `party_role` (a buyer, or no `party_role`: `asg/everyday/0.3.8`; a seller:
+input's `rules_pin`, else its `party_role` (a buyer, or no `party_role`: `asg/everyday/0.3.10`; a seller:
 `asg/seller/0.1.5`). Those defaults are fixed in `partyPacks` (`cmd/capsule-engine/guard_check.go`) and move only by a change there, so a deal that must run another embedded version names it with `--pack` or a `rules_pin`. A `party_role` with no pack leaves the action unevaluable: no pack runs, and the `not_evaluable` result carries the buyer pack's id and digest because a result must name one (the goldens hold the same). Exit 0 means a result was printed; exit 2 means none could be, with one line
 on stderr that names no value from the input. It applies the pack's own limits only: a limit a person sets is not applied by this command, so a host that lets a person set limits applies them itself (the `" you set"` reason wording is dead here). The result names the pack it ran (`ruleset_id`, `definition_digest`), so a default chosen by role is always visible. The output is held
 byte for byte to `guard/testdata/emit/golden/` by `TestGuardCheckGoldens`. It is a subcommand of

@@ -1,0 +1,34 @@
+# Count of accepted prior actions per counterparty, leaving dry runs out.
+# Used by the counterparty_seen_before/2.0.0 wicket: zero means a first-time
+# counterparty, one or more means a repeat.
+#
+# The one change from counterparty.seen_before/1.0.0, which stays as it was
+# for the records and ports that pin it: GuardEngine records a dry-run allow
+# as accepted, with asg_payload.checkpoint.dry_run = true, but the action
+# never ran, so it must not make a counterparty known. Records without the
+# flag are read as not dry runs.
+#
+# asg_payload.target is the same opaque counterparty reference the
+# counterparty_identity_change check uses to find a payee's prior record.
+# Records without it are skipped. The caller scans one operator's records
+# before evaluating (guards/checks/counterparty_seen_before.py).
+fold_id: counterparty.seen_before/2.0.0
+reads:
+  - path: asg_payload.target
+    erasure_class: commitment-ok
+  - path: disposition.decision
+    erasure_class: commitment-ok
+  - path: asg_payload.checkpoint.dry_run
+    erasure_class: commitment-ok
+    default: false
+filter:
+  - field: disposition.decision
+    op: eq
+    value: accept
+  - field: asg_payload.checkpoint.dry_run
+    op: ne
+    value: true
+key: asg_payload.target
+reduce:
+  reducer: count
+emit: prior_count

@@ -1,0 +1,33 @@
+# Sum of asg_payload.amount_minor (integer minor units) per developer over a
+# rolling 7-day window. Used by the guard API's `caps` check: weekly_spend +
+# this action's own amount, compared against a per-action-class cap.
+#
+# Records with no asg_payload.amount_minor -- every capsule this fold
+# wasn't itself the producer of, e.g. an imported/foreign ledger -- are
+# skipped (no declared default), not treated as zero-spend evidence and
+# never an error (spec §3 rule 4).
+fold_id: spend.weekly/1.0.0
+reads:
+  - path: developer
+    erasure_class: commitment-ok
+  - path: timestamp
+    erasure_class: commitment-ok
+  - path: asg_payload.amount_minor
+    erasure_class: commitment-ok
+  - path: disposition.decision
+    erasure_class: commitment-ok
+# Only accepted actions count toward spend -- a blocked/deferred decision
+# capsule still carries the attempted amount_minor, but the attempt never
+# ran, so it must not inflate a future cap check.
+filter:
+  - field: disposition.decision
+    op: eq
+    value: accept
+key: developer
+window:
+  mode: rolling
+  duration: 7d
+reduce:
+  reducer: sum
+  field: asg_payload.amount_minor
+emit: weekly_spend_minor

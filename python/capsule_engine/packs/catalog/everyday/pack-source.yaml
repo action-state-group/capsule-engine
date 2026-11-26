@@ -62,8 +62,20 @@
 # {class} with {party}", worded from the role and classes rule 3's check
 # recorded, and every other gate rule's reason is a sentence that names
 # neither.
-pack_id: asg/everyday/0.3.9
-pack_version: 0.3.9
+#
+# 0.3.10 says "not fully checked" on rules 2 and 6 where the history may be
+# missing acts (capsule-engine#327). counterparty_seen_before/5.0.0 no longer
+# reads a merchant as new when no earlier payment to it is found in a
+# history the caller does not know to be complete: the rule is not
+# evaluated, with the reason that the history supplied is incomplete, and
+# the purchase is asked about, as rule 5's 7-day limit already is on that
+# history. Nothing that paused under 0.3.9 goes ahead: the
+# first-time merchant it reported asked the same way. A merchant paid before
+# still passes, and a complete history with no earlier payment still flags
+# it. Every other id, check and definition is 0.3.9's, and 0.3.9 stays
+# frozen at its own digest.
+pack_id: asg/everyday/0.3.10
+pack_version: 0.3.10
 scope:
   kind: live
 
@@ -83,9 +95,11 @@ obligations:
       Checks whether a purchase is from a merchant the operator already has an
       accepted action with, or an act that was approved and then executed,
       and records the count. A purchase that names no merchant does not
-      pass. The spending limits are
-      measured by rule 5. Whether the purchase stays inside the bounds the user
-      confirmed for the task is not measured yet.
+      pass. When no such action or act is found in a history that may be
+      missing acts, the rule is not fully checked and the purchase is asked
+      about. The spending limits are measured by rule 5. Whether the purchase
+      stays inside the bounds the user confirmed for the task is not measured
+      yet.
     check: counterparty_seen_before
     default_disposition: DO
   - id: r03-shipping-address-to-fulfilling-merchant
@@ -129,7 +143,9 @@ obligations:
       action with, and no earlier act that was approved and then executed,
       and records the merchant reference, the count and the key it was read
       under. A purchase that names no merchant is flagged as a first-time
-      merchant, with the reason no payee named.
+      merchant, with the reason no payee named. When none is found in a
+      history that may be missing acts, the rule is not fully checked, with
+      the reason that the history is incomplete, and the purchase is asked about.
     check: counterparty_seen_before
     default_disposition: ASK
   - id: r07-subscription-or-free-trial
@@ -367,10 +383,12 @@ constraints:
     digest: 39a7c5b94173a4c8496b338028b8680ba20ac65543802c67e419577acce097bf
   # A purchase from a merchant the operator has no accepted or carried-out
   # act with. 3.0.0 counts an act that asked, was approved and was executed;
-  # 4.0.0 also flags a purchase that names no merchant (no payee named).
-  - wicket_ref: counterparty_seen_before/4.0.0
+  # 4.0.0 also flags a purchase that names no merchant (no payee named);
+  # 5.0.0 asks, not evaluated, where none is found in a history that may be
+  # missing acts.
+  - wicket_ref: counterparty_seen_before/5.0.0
     check: counterparty_seen_before
-    digest: c7c20d9e57cb0a75184b9c6c4d037c9bea813a7b1105c581defd4481acf964b0
+    digest: a8dbea32ff103fb07fe7d9b0791b149ecd654478d044ab8a12b6d3ca9cb78df5
   # Each reads one number, one member of a closed set, or one opaque
   # reference from the action, never an object or text. The 1.1.0
   # definitions are 1.0.0's with marketplace.sale added to their classes.

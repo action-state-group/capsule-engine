@@ -62,7 +62,7 @@ func TestGuardCheckLimits(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	p, err := pack.LoadEveryday038()
+	p, err := pack.LoadEveryday0310()
 	if err != nil {
 		t.Fatal(err)
 	}

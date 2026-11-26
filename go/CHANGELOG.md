@@ -5,6 +5,8 @@ and `portedDefinitions` (`guard/engine.go`).
 
 ## Unreleased
 
+- Added (capsule-engine#327): pack `asg/everyday/0.3.10` (`LoadEveryday0310`, definition digest `a2859695...bc3b`) and the ported definition `counterparty_seen_before/5.0.0` (`a8dbea32...8df5`), as in the Python package: on a history that may be missing acts (`InputHistory` not complete, or an act's `item_ref` unreadable), a purchase with no earlier act counted to its payee is an in-scope `n/a` that asks (`Constraint` marks it; `Decision` lists it beside caps), not a first-time-merchant failure. The report reads r02 and r06 as `not_evaluable` with the reason; an approver-less refusal for it alone is `RefusedUnevaluated`. `capsule-engine guard check` now defaults a buyer (or no `party_role`) to `asg/everyday/0.3.10`, where it was 0.3.8, so on an incomplete history r02 and r06 read "the history of earlier purchases supplied is incomplete", as r05's 7-day limit does; a `rules_pin` naming another pack keeps it. 0.3.9 and earlier stay embedded at their digests; the shared vectors move to 0.3.10.
+
 ## 0.8.0 — 2026-11-24
 
 A minor on v0 (RELEASING.md): an API addition (`admission.Decided`, `Disputes.Decided`, `ReasonNoDisputeTally`, `Row.RecordUnread`), a new admission predicate and pack row field, and the command's rows gaining `reason`; no `go/packs` pack version or ported definition changes since v0.7.0 (`git diff go/v0.7.0..origin/main -- go/packs go/guard/engine.go` is empty). Cut so evidencebook-skills#280's ARD demo can run `capsule-engine admission evaluate` on a seller card with a lost dispute. Merged since v0.7.0 that touch `go/`: #322.

@@ -18,6 +18,15 @@ empty or only whitespace, fails as a first-time
 counterparty with the reason "no payee named": version 4 is configured for
 money.purchase, and a purchase that names nobody cannot be shown to go to a
 payee seen before.
+
+With ``incomplete_history: not_evaluable`` (counterparty_seen_before/5.0.0),
+a count of zero on a history that may be missing acts (a live history's
+``incomplete`` record under the operator, ``guards/history_state.py``) is
+not a first-time counterparty: the check is ``n/a`` in scope, with no
+missing field and the reason ``HISTORY_INCOMPLETE_REASON``, and the engine
+asks rather than allows (``CheckOutcome.asks_when_unevaluated``), as caps
+does on the same history. A counted earlier act still passes, and a missing
+target still fails as no payee named. Absent, the count decides as before.
 """
 from __future__ import annotations
 
@@ -30,14 +39,30 @@ from ...folds.engine import evaluate_one
 from ..action import Action
 from ..capsule import ConstraintOutcome, not_applicable_evidence
 from ..history import History, Query
+from ..history_state import INCOMPLETE, history_state
 from .base import CheckOutcome
 
-__all__ = ["check_counterparty_seen_before", "check_recipient_seen_before", "seen_before_fold"]
+__all__ = [
+    "HISTORY_INCOMPLETE_REASON",
+    "check_counterparty_seen_before",
+    "check_recipient_seen_before",
+    "seen_before_fold",
+]
 
 _CHECK_ID = "counterparty_seen_before"
 # What an in-scope action naming no target records: ``n/a`` naming the field
 # (versions 1 to 3), or a failure as an unseen counterparty (version 4).
 MISSING_TARGET_MODES = frozenset({"n/a", "unseen"})
+# What a count of zero on a history that may be missing acts records: a
+# first-time counterparty as on any history (versions 1 to 4), or not
+# evaluated, asking (version 5).
+INCOMPLETE_HISTORY_MODES = frozenset({"count", "not_evaluable"})
+# Starts as caps' history_incomplete_reason does, so a reader shortening one
+# shortens the other the same way.
+HISTORY_INCOMPLETE_REASON = (
+    "the history supplied is incomplete (it lists more purchases than it holds, or some could not be read), "
+    "so the rule cannot tell whether this merchant was paid before"
+)
 _FOLD_CATALOG_DIR = Path(__file__).resolve().parent.parent.parent / "folds" / "catalog_defs"
 
 
@@ -88,12 +113,16 @@ def _no_payee(check_id: str, noun: str, action: Action, method: str) -> CheckOut
 
 def check_counterparty_seen_before(
     action: Action, history: History, *, definition: FoldDefinition, action_classes: list[str],
-    missing_target: str = "n/a",
+    missing_target: str = "n/a", incomplete_history: str = "count",
 ) -> CheckOutcome:
     if missing_target not in MISSING_TARGET_MODES:
         raise ValueError(f"missing_target {missing_target!r} is not one of {sorted(MISSING_TARGET_MODES)}")
+    if incomplete_history not in INCOMPLETE_HISTORY_MODES:
+        raise ValueError(
+            f"incomplete_history {incomplete_history!r} is not one of {sorted(INCOMPLETE_HISTORY_MODES)}"
+        )
     return _seen_before(_CHECK_ID, "counterparty", action, history, definition=definition, action_classes=action_classes,
-                        missing_target=missing_target)
+                        missing_target=missing_target, incomplete_history=incomplete_history)
 
 
 def check_recipient_seen_before(
@@ -107,7 +136,7 @@ def check_recipient_seen_before(
 
 def _seen_before(
     check_id: str, noun: str, action: Action, history: History, *, definition: FoldDefinition,
-    action_classes: list[str], missing_target: str = "n/a",
+    action_classes: list[str], missing_target: str = "n/a", incomplete_history: str = "count",
 ) -> CheckOutcome:
     method = definition.fold_id
     if action.action_class not in action_classes:
@@ -133,6 +162,21 @@ def _seen_before(
     }
     if action.ignored_inputs:
         evidence["ignored_inputs"] = list(action.ignored_inputs)
+    if not seen_before and incomplete_history == "not_evaluable" and any(
+        history_state(capsule) == INCOMPLETE for capsule in records
+    ):
+        return CheckOutcome(
+            constraint=ConstraintOutcome(
+                id=check_id,
+                result="n/a",
+                reason=HISTORY_INCOMPLETE_REASON,
+                evidence=not_applicable_evidence(check_id, in_scope=True),
+                check_type="policy",
+                method=method,
+            ),
+            fold_envelopes=(trace.to_envelope(),),
+            asks_when_unevaluated=True,
+        )
     if seen_before:
         return CheckOutcome(
             constraint=ConstraintOutcome(

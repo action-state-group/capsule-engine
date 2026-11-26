@@ -24,6 +24,14 @@ import (
 // with no fold run, where versions 1 to 3 (missing_target absent, read as
 // n/a) record n/a for an absent target and count a blank one under "".
 //
+// 5.0.0 (capsule-engine#327) is 4.0.0 with config incomplete_history:
+// not_evaluable. A count of zero on a history that may be missing acts
+// (checkInputs.historyIncomplete, the Go reading of the live history's
+// incomplete record) is then an in-scope n/a with historyIncompleteReason
+// that asks rather than allows (Constraint.asksUnevaluated), where versions
+// 1 to 4 fail it as a first-time counterparty. A counted act still passes,
+// and a missing target still fails as no payee named.
+//
 // recipient_seen_before/1.0.0 (365eb92, check_recipient_seen_before) is the
 // same check under its own id, for a message: the same _seen_before over
 // counterparty.seen_before/2.0.0, scoped to the message classes its wicket
@@ -35,6 +43,8 @@ type seenBeforeConfig struct {
 	FoldDigest    string   `yaml:"fold_digest"`
 	ActionClasses []string `yaml:"action_classes"`
 	MissingTarget *string  `yaml:"missing_target"`
+	// IncompleteHistory is absent (count) on versions 1 to 4.
+	IncompleteHistory *string `yaml:"incomplete_history"`
 }
 
 // What an in-scope action naming no target records (the engine's
@@ -45,6 +55,20 @@ const (
 	missingTargetUnseen = "unseen"
 )
 
+// What a count of zero on a history that may be missing acts records (the
+// engine's INCOMPLETE_HISTORY_MODES): a first-time counterparty, as on any
+// history, or not evaluated, asking. Absent is count.
+const (
+	incompleteHistoryCount        = "count"
+	incompleteHistoryNotEvaluable = "not_evaluable"
+)
+
+// historyIncompleteReason is the engine's HISTORY_INCOMPLETE_REASON. It
+// opens as caps' reason on the same history does, so the command's short
+// reason (shortReasons) reads the same for both.
+const historyIncompleteReason = "the history supplied is incomplete (it lists more purchases than it holds, or some could not be read), " +
+	"so the rule cannot tell whether this merchant was paid before"
+
 type seenBefore struct {
 	// id is the check: counterparty_seen_before or recipient_seen_before.
 	id            string
@@ -52,6 +76,8 @@ type seenBefore struct {
 	actionClasses []string
 	// missingTarget is the wicket's missing_target mode.
 	missingTarget string
+	// incompleteHistory is the wicket's incomplete_history mode.
+	incompleteHistory string
 }
 
 // newSeenBefore resolves the wicket's fold by id and digest from the fold
@@ -83,7 +109,14 @@ func newSeenBefore(w pack.Wicket, p pack.Pack) (seenBefore, error) {
 	if mode != missingTargetNA && mode != missingTargetUnseen {
 		return seenBefore{}, fmt.Errorf("%s: missing_target %q is not one of %s, %s", w.ID, mode, missingTargetNA, missingTargetUnseen)
 	}
-	return seenBefore{id: w.Check, fold: fl, actionClasses: cfg.ActionClasses, missingTarget: mode}, nil
+	incomplete := incompleteHistoryCount
+	if cfg.IncompleteHistory != nil {
+		incomplete = *cfg.IncompleteHistory
+	}
+	if incomplete != incompleteHistoryCount && incomplete != incompleteHistoryNotEvaluable {
+		return seenBefore{}, fmt.Errorf("%s: incomplete_history %q is not one of %s, %s", w.ID, incomplete, incompleteHistoryCount, incompleteHistoryNotEvaluable)
+	}
+	return seenBefore{id: w.Check, fold: fl, actionClasses: cfg.ActionClasses, missingTarget: mode, incompleteHistory: incomplete}, nil
 }
 
 // checkSeenBefore is _seen_before, run as sb.id: out of scope for a class
@@ -92,7 +125,9 @@ func newSeenBefore(w pack.Wicket, p pack.Pack) (seenBefore, error) {
 // otherwise a missing target is a population-a n/a; otherwise the fold's count of the
 // operator's accepted prior actions addressed to this target, failing at
 // zero (a first-time counterparty or recipient) and passing at one or more.
-func checkSeenBefore(a Action, h *historyReader, sb seenBefore) (c Constraint) {
+// Under incomplete_history not_evaluable, zero on a history that may be
+// missing acts (incomplete) is not evaluated and asks.
+func checkSeenBefore(a Action, h *historyReader, sb seenBefore, incomplete bool) (c Constraint) {
 	id := sb.id
 	rd := []string{"action_class"}
 	defer func() { c.reads = rd }()
@@ -134,6 +169,11 @@ func checkSeenBefore(a Action, h *historyReader, sb seenBefore) (c Constraint) {
 	evidence := canon.Obj(members...)
 	if prior > 0 {
 		return decided(id, method, Pass, evidence)
+	}
+	if incomplete && sb.incompleteHistory == incompleteHistoryNotEvaluable {
+		out := notEvaluable(id, method, historyIncompleteReason)
+		out.asksUnevaluated = true
+		return out
 	}
 	return decided(id, method, Fail, evidence)
 }

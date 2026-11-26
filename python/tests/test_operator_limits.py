@@ -50,7 +50,7 @@ OPERATOR = "household-limits-fixture"
 
 # The everyday pack (0.3.8) and its caps wicket as released: an operator
 # limit must not move either.
-EVERYDAY_PACK_DIGEST = "acb8a0f7073b872e0a1cc367997ace49dd69fd4e63fe60996c328d8b324ac4a7"
+EVERYDAY_PACK_DIGEST = "a2859695ce95af93d740d6da7e4445bf0a2aefb7f51f656a93b6c1baae59bc3b"
 CAPS_V5_WICKET_DIGEST = "7fd8def459eb42af32878108626748a76faea2bdf4f402530445f807ac5df2a8"
 CAPS_V5_FILE_SHA256 = "0588eebe725ae317e89234def7adce0010441e476a1031325a396964cb8bb7fe"
 
