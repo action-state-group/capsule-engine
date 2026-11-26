@@ -95,10 +95,11 @@ obligations:
       Checks whether a purchase is from a merchant the operator already has an
       accepted action with, or an act that was approved and then executed,
       and records the count. A purchase that names no merchant does not
-      pass. When none is found in a history that may be missing acts, the
-      rule is not fully checked and the purchase is asked about. The spending limits are
-      measured by rule 5. Whether the purchase stays inside the bounds the user
-      confirmed for the task is not measured yet.
+      pass. When no such action or act is found in a history that may be
+      missing acts, the rule is not fully checked and the purchase is asked
+      about. The spending limits are measured by rule 5. Whether the purchase
+      stays inside the bounds the user confirmed for the task is not measured
+      yet.
     check: counterparty_seen_before
     default_disposition: DO
   - id: r03-shipping-address-to-fulfilling-merchant
