@@ -241,8 +241,8 @@ pub const CARD_UNVERIFIABLE: &str = "unverifiable";
 pub const CARD_REFUSED: &str = "refused";
 pub const CARD_UNANSWERED: &str = "unanswered";
 
-/// The counterparty's history_card/1, served_summary/1, standard_history/1
-/// or inference-service-history/0 answer as the caller verified it
+/// The counterparty's history_card/1, standard_history/1 or
+/// inference-service-history/0 answer as the caller verified it
 /// (evaluate.go Card). An empty state is absent. An absent
 /// checkpoint is read as Go's zero time, 0001-01-01T00:00:00Z.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]

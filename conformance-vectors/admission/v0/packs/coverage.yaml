@@ -54,7 +54,7 @@ rows:
     params: {min: 5}
     from: T1
     on_fail: "LIMIT"
-    ask: {derivation: served_summary/1}
+    ask: {derivation: standard_history/3}
   - id: declared
     statement: The card's key declares a controller.
     source: card

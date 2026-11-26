@@ -84,9 +84,9 @@ const (
 	CardUnanswered   = "unanswered"
 )
 
-// Card is the counterparty's history_card/1, served_summary/1,
-// standard_history/1 or inference-service-history/0 answer as the caller
-// verified it. A zero Card is absent.
+// Card is the counterparty's history_card/1, standard_history/1 or
+// inference-service-history/0 answer as the caller verified it. A zero Card
+// is absent.
 type Card struct {
 	State string
 	// Reason is why the card is unverifiable: the History property an
