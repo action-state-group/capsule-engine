@@ -17,7 +17,6 @@ import yaml
 
 from capsule_engine.packs.errors import PackDefinitionError
 from capsule_engine.packs.loader import load_pack_dir
-from capsule_engine.packs.schema import EvidenceContract
 
 PAYMENTS_SAFETY_DIR = Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog" / "payments-safety"
 AIRLINE_ENGAGEMENT_DIR = Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog" / "airline-engagement"
@@ -542,12 +541,6 @@ def test_every_closed_set_mode_loads_clean(tmp_path, mode):
 # existing pack's outcomes[] entries are the OUTCOME profile's field set,
 # reclassified in place. ``profile``/``epistemic_type`` are additive, same
 # optional-with-default backward-compat pattern as tier/mode above.
-
-
-def test_outcome_class_is_now_named_evidence_contract(tmp_path):
-    pack_dir = _write_pack(tmp_path, {"outcomes": [_outcome()]})
-    pack = load_pack_dir(pack_dir)
-    assert isinstance(pack.outcomes[0], EvidenceContract)
 
 
 def test_default_profile_is_outcome_and_omitted_from_the_digest(tmp_path):

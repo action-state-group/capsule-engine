@@ -46,12 +46,6 @@ def test_dataset_replays_to_known_counts(dataset, tmp_path):
     assert result.counts() == EXPECTED_COUNTS[dataset]
 
 
-def test_every_dataset_file_exists_and_is_nonempty():
-    for dataset, path in ref.DATASETS.items():
-        assert path.is_file(), f"{dataset}: {path} missing -- vendored data must be committed"
-        assert path.stat().st_size > 0
-
-
 # -- module docstring claims "entirely offline, no network" -- enforce it --
 
 

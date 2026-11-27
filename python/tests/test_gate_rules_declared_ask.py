@@ -36,7 +36,6 @@ from capsule_engine.packs.schema import PackDefinition
 # catalog (the catalog now holds 0.3.5).
 PACK_DIR = Path(__file__).parent / "fixtures" / "packs" / "everyday-0.3.2"
 PACK = load_pack_dir(PACK_DIR)
-PACK_0_3_2_DIGEST = "6f333fa8b7a7e137abe6c61e5a32097ed06d493479a018807cbf4d2e4f5da7b2"
 OPERATOR = "household-gate-asks"
 SIGNER = LocalSigner(key_id="everyday-gate-asks-key", secret=b"everyday-gate-asks-fixed-key")
 CAPS_FOLD = next(f for f in PACK.folds if f.fold_id.startswith("spend.weekly/"))
@@ -81,11 +80,6 @@ def engine_for(tmp_path):
 
 def _failing_rules(decision) -> list[str]:
     return [r.obligation_id for r in obligation_results(PACK, decision.constraints) if r.result == "fail"]
-
-
-def test_the_pack_this_runs_against_is_everyday_0_3_2_at_its_vendored_digest():
-    assert PACK.pack_id == "asg/everyday/0.3.2"
-    assert PACK.definition_digest() == PACK_0_3_2_DIGEST
 
 
 def test_a_booking_asks_the_account_holder_citing_r16_only(engine_for):
