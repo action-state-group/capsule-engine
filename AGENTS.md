@@ -2,10 +2,12 @@
 
 ## Check before you push
 
-Before every push: `scripts/check.sh` (about 15 min on an Apple-silicon Mac; it needs Python 3.11
-and 3.12, Go, rustup, and network access for the pinned checkouts and for shallow clones of
+Before every push: `scripts/check.sh` (about 6 minutes on an 18-core Apple-silicon Mac mini, its
+groups running in parallel after one install, capsule-engine#335; it needs Python 3.11 and 3.12,
+Go, rustup, and network access for the pinned checkouts and for shallow clones of
 scitt-payload-binding and tau2-bench, about 450 MB, as the script's header says). It runs every
-job a pull request ran before asg-agent-team-ethan#409, so there is no second tier. Pull requests
+job a pull request ran before asg-agent-team-ethan#409, and dco's sign-off check on the commits
+since `origin/main`, so there is no second tier. Pull requests
 run only the fast set: the Python conformance vectors and `python/tests/test_generate_go_packs.py`
 run nightly and on main (`slow-suites`), and `vendor-drift` runs only on pull requests that touch a
 vendored copy or its vendor script. `neutrality` needs a CI-only secret and runs only in CI.

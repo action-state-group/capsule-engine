@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: Apache-2.0
 # Local check before a push (asg-agent-team-ethan#409). Runs the commands CI
-# runs, with the same flags, and exits non-zero on the first failure.
+# runs, with the same flags, and exits non-zero if any of them fails.
 #
 #   scripts/check.sh
 #
@@ -10,12 +10,15 @@
 # including the parts that now run only nightly and on main in
 # slow-suites.yml (the conformance vectors and all of pytest; pull requests
 # leave out tests/test_generate_go_packs.py) or only on the pull requests
-# vendor-drift.yml's path list matches. pytest runs in parallel here, the
-# same tests as a serial `pytest -q`. Main and the nightly run nothing beyond
-# this, so there is no second tier. vendor-drift clones scitt-payload-binding
-# and tau2-bench (shallow, about 450 MB) at their default branches' heads.
-# Not run locally: neutrality.yml (its term list is a CI-only secret) and
-# dco.yml (it checks a pull request's commits).
+# vendor-drift.yml's path list matches, and dco.yml's sign-off check on the
+# commits since the base branch (CHECK_DCO_BASE, default origin/main). The
+# groups (python, wheel, go, rust, packs, vendor-drift, dco) run at the same
+# time after one shared install, so the wall time is the longest group's;
+# pytest runs in parallel too, the same tests as a serial `pytest -q`. Main
+# and the nightly run nothing beyond this, so there is no second tier.
+# vendor-drift clones scitt-payload-binding and tau2-bench (shallow, about
+# 450 MB) at their default branches' heads. Not run locally: neutrality.yml
+# (its term list is a CI-only secret).
 #
 # Needs Python 3.12 and 3.11 (with uv on PATH, `uv python install` fetches
 # them when missing; without uv, python3.12 and python3.11 on PATH), Go at
@@ -41,7 +44,10 @@ step() { printf '\n== %s\n' "$*"; }
 python_for() { # python_for 3.12 -> path of an interpreter of that version
   if command -v uv >/dev/null; then
     uv python install -q "$1" >&2
-    uv python find "$1"
+    # --system: without it uv returns a virtualenv it finds in a parent
+    # directory first, such as the main checkout's .venv above a worktree,
+    # whose interpreter may have no pip (capsule-engine#335).
+    uv python find --system "$1"
   elif command -v "python$1" >/dev/null; then
     command -v "python$1"
   else
@@ -86,47 +92,138 @@ py="$venv/bin/python"
 step "install (ci.yml test; conformance packs, pack-sources; publish-python build)"
 "$py" -m pip install -q -e "./python[dev]" "$anchor_pin" pyyaml rfc8785 build twine
 
-step "ruff (ci.yml test)"
-"$venv/bin/ruff" check --config python/pyproject.toml .
-step "pytest, all of it (ci.yml test; slow-suites.yml generate-go-packs-tests)"
-(cd python && "$py" -m pytest -q -n auto)
-step "release helper tests (ci.yml test)"
-(cd python && "$py" -m pytest -q ../.github/test_release.py)
-for v in 3.11 3.12; do
-  step "clean-room wheel, Python $v (ci.yml clean-room-wheel)"
-  (cd python && PYTHON="$(python_for "$v")" bash scripts/clean_room_wheel.sh)
+# Every group below reads the checkout and writes only under its own temporary
+# or cache directory, so they run at the same time; each logs to its own file.
+# The wall time is about the longest group's (pytest), not their sum.
+logs="$(mktemp -d)"
+pids=()
+# Each group runs in its own process group (set -m), so an interrupt or an
+# early exit stops the whole group, pytest workers and cargo included, before
+# the logs go: a run left behind could be using a cache checkout the next run
+# replaces.
+stop_groups() {
+  local pid
+  # ${a[@]+...}: bash 3.2 (macOS /bin/bash) calls an empty array unbound under set -u.
+  for pid in ${pids[@]+"${pids[@]}"}; do kill -TERM -- "-$pid" 2>/dev/null || true; done
+  for pid in ${pids[@]+"${pids[@]}"}; do wait "$pid" 2>/dev/null || true; done
+}
+trap 'stop_groups; rm -rf "$logs"' EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
+
+group_python() {
+  step "ruff (ci.yml test)"
+  "$venv/bin/ruff" check --config python/pyproject.toml .
+  step "pytest, all of it (ci.yml test; slow-suites.yml generate-go-packs-tests)"
+  (cd python && "$py" -m pytest -q -n auto)
+  step "release helper tests (ci.yml test)"
+  (cd python && "$py" -m pytest -q ../.github/test_release.py)
+}
+
+group_wheel() {
+  for v in 3.11 3.12; do
+    step "clean-room wheel, Python $v (ci.yml clean-room-wheel)"
+    (cd python && PYTHON="$(python_for "$v")" bash scripts/clean_room_wheel.sh)
+  done
+  # From a clean export of the tree, as clean_room_wheel.sh builds: a build in
+  # python/ writes build/ and *.egg-info there while pytest imports from it.
+  step "build and twine check (publish-python.yml build)"
+  # Under $logs, which the EXIT trap removes, so a failed build leaves nothing.
+  local work
+  work="$(mktemp -d "$logs/build.XXXXXX")"
+  git ls-files -z --cached --others --exclude-standard python \
+    | COPYFILE_DISABLE=1 tar --null -T - -cf - | tar -xf - -C "$work"
+  (cd "$work/python" && "$py" -m build -q --outdir "$work/dist" && "$py" -m twine check "$work"/dist/*)
+}
+
+group_go() {
+  step "go (conformance.yml go)"
+  cd go
+  export GOWORK=off
+  test -z "$(gofmt -l .)" || { gofmt -l .; return 1; }
+  go vet ./...
+  go test ./...
+}
+
+group_rust() {
+  step "rust (conformance.yml rust)"
+  cd rust
+  rustup toolchain install
+  cargo fmt --check
+  cargo clippy --locked --all-targets -- -D warnings
+  cargo test --locked
+}
+
+group_packs() {
+  step "packs (conformance.yml packs)"
+  "$py" scripts/generate_go_packs.py --check
+  step "pack-sources (conformance.yml pack-sources), evidencebook-skills at $skills_ref"
+  clone_at "$cache/evidencebook-skills" https://github.com/action-state-group/evidencebook-skills.git "$skills_ref"
+  "$py" scripts/check_pack_sources.py "$cache/evidencebook-skills"
+  step "vectors (slow-suites.yml vectors)"
+  "$py" scripts/conformance_vectors.py --check
+  "$py" scripts/referee_vectors.py --check
+}
+
+group_vendor_drift() {
+  step "vendor-drift (vendor-drift.yml), upstream default branches"
+  clone_at "$cache/scitt-payload-binding" https://github.com/action-state-group/scitt-payload-binding.git
+  "$py" python/scripts/vendor_cpb_registry.py --check "$cache/scitt-payload-binding"
+  clone_at "$cache/tau2-bench" https://github.com/sierra-research/tau2-bench.git
+  "$py" python/scripts/vendor_tau2_airline_conversations.py --check \
+    --tau2-results-dir "$cache/tau2-bench/data/tau2/results/final"
+}
+
+# dco.yml: every commit the pull request adds carries a sign-off, matched as
+# dco.yml matches it. The base is the branch the pull request targets,
+# origin/main unless CHECK_DCO_BASE names another ref.
+dco_base="${CHECK_DCO_BASE:-origin/main}"
+group_dco() {
+  step "dco (dco.yml), commits in $dco_base..HEAD"
+  local base shas missing=0 sha
+  base="$(git merge-base HEAD "$dco_base")"
+  # Assigned first, so a failing rev-list fails the group instead of
+  # checking nothing.
+  shas="$(git rev-list "$base..HEAD")"
+  for sha in $shas; do
+    if ! git log --format=%B -n 1 "$sha" | grep -qiE "^Signed-off-by: .+ <.+@.+>"; then
+      echo "missing Signed-off-by: $(git log --format='%h %s' -n 1 "$sha")"
+      missing=1
+    fi
+  done
+  return "$missing"
+}
+
+if [[ "$dco_base" == origin/* ]]; then
+  step "fetch $dco_base (dco)"
+  git fetch -q origin "${dco_base#origin/}"
+fi
+
+groups=(python wheel go rust packs vendor_drift dco)
+set -m
+for g in "${groups[@]}"; do
+  ( set -euo pipefail; s=$SECONDS; "group_$g"; echo "== $g passed in $((SECONDS - s))s" ) >"$logs/$g.log" 2>&1 &
+  pids+=("$!")
 done
+step "running ${groups[*]} in parallel (logs: $logs)"
 
-step "build and twine check (publish-python.yml build)"
-dist="$(mktemp -d)"
-trap 'rm -rf "$dist"' EXIT
-(cd python && "$py" -m build -q --outdir "$dist" && "$py" -m twine check "$dist"/*)
-
-step "go (conformance.yml go)"
-(cd go && export GOWORK=off &&
-  { test -z "$(gofmt -l .)" || { gofmt -l .; exit 1; }; } &&
-  go vet ./... && go test ./...)
-
-step "rust (conformance.yml rust)"
-(cd rust && rustup toolchain install && cargo fmt --check &&
-  cargo clippy --locked --all-targets -- -D warnings && cargo test --locked)
-
-step "packs (conformance.yml packs)"
-"$py" scripts/generate_go_packs.py --check
-
-step "pack-sources (conformance.yml pack-sources), evidencebook-skills at $skills_ref"
-clone_at "$cache/evidencebook-skills" https://github.com/action-state-group/evidencebook-skills.git "$skills_ref"
-"$py" scripts/check_pack_sources.py "$cache/evidencebook-skills"
-
-step "vectors (slow-suites.yml vectors)"
-"$py" scripts/conformance_vectors.py --check
-"$py" scripts/referee_vectors.py --check
-
-step "vendor-drift (vendor-drift.yml), upstream default branches"
-clone_at "$cache/scitt-payload-binding" https://github.com/action-state-group/scitt-payload-binding.git
-"$py" python/scripts/vendor_cpb_registry.py --check "$cache/scitt-payload-binding"
-clone_at "$cache/tau2-bench" https://github.com/sierra-research/tau2-bench.git
-"$py" python/scripts/vendor_tau2_airline_conversations.py --check \
-  --tau2-results-dir "$cache/tau2-bench/data/tau2/results/final"
+failed=()
+for i in "${!groups[@]}"; do
+  if wait "${pids[$i]}"; then
+    tail -n 1 "$logs/${groups[$i]}.log"
+  else
+    failed+=("${groups[$i]}")
+  fi
+done
+pids=()
+set +m
+for g in ${failed[@]+"${failed[@]}"}; do
+  printf '\n== %s FAILED; its log:\n' "$g"
+  cat "$logs/$g.log"
+done
+if ((${#failed[@]})); then
+  echo "failed: ${failed[*]}" >&2
+  exit 1
+fi
 
 step "all checks passed"
