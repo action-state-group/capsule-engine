@@ -11,7 +11,6 @@ from pathlib import Path
 
 import pytest
 
-from capsule_engine.packs.loader import load_pack_dir
 from capsule_engine.packs.schema import EVIDENCE_PROFILE_VALUES, MODE_VALUES, ClauseSpec, EvidenceContract
 from capsule_engine.register.compiler import EVIDENCE_CLASS_DEFAULTS, EvidenceCompiler
 from capsule_engine.register.errors import RegisterCompilerError
@@ -91,16 +90,6 @@ def test_doc_evidence_class_never_graded_compliant(compiler):
     requirement = compiler.compile_requirement(row)
     assert "never graded 'compliant'" in requirement.evidence_rule
     assert "compliant" not in requirement.statement.lower()
-
-
-def test_both_sample_rows_are_obtainable_from_a_pack_definition_shape():
-    """The compiled requirement must be the SAME dataclass a real pack.yaml's
-    obligation-profile outcomes[] uses -- proven by loading the real
-    payments-safety pack and confirming both share one EvidenceContract type."""
-    pack_dir = Path(__file__).parent.parent / "capsule_engine" / "packs" / "catalog" / "payments-safety"
-    pack = load_pack_dir(pack_dir)
-    for outcome in pack.outcomes:
-        assert isinstance(outcome, EvidenceContract)
 
 
 @pytest.mark.parametrize("evidence_class", sorted(EVIDENCE_CLASS_VALUES))

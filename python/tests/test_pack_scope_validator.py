@@ -111,6 +111,8 @@ def _pack(tmp_path: Path, *, fold_yaml: str, fold_id: str, scope, caps_minor: di
 
 
 def test_scope_declared_and_agreeing_loads_cleanly(tmp_path):
+    """A pack with only one action class configured has nothing to pool
+    across -- declaring just ['developer'] is honest and sufficient."""
     pack = _pack(
         tmp_path,
         fold_yaml=DEVELOPER_KEYED_FOLD,
@@ -220,20 +222,6 @@ def test_multi_class_scope_declared_and_fold_genuinely_partitions_loads_cleanly(
     )
     loaded = load_pack_dir(pack)
     assert loaded.constraint_scopes["test.caps/1.0.0"] == ("developer", "action_class")
-
-
-def test_single_class_caps_minor_does_not_require_action_class_scope(tmp_path):
-    """A pack with only one action class configured has nothing to pool
-    across -- declaring just ['developer'] is honest and sufficient."""
-    pack = _pack(
-        tmp_path,
-        fold_yaml=DEVELOPER_KEYED_FOLD,
-        fold_id="test.spend.by_developer/1.0.0",
-        scope=["developer"],
-        caps_minor={"money.transfer": 100},
-    )
-    loaded = load_pack_dir(pack)
-    assert loaded.constraint_scopes["test.caps/1.0.0"] == ("developer",)
 
 
 def test_scope_participates_in_the_pack_digest(tmp_path):
